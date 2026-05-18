@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- WARN là Status Logger, là log nội bộ của chính Log4j2, không phải log level của app -->
+<Configuration status="WARN" packages="org.apache.logging.log4j.spring">
+
+    <Properties>
+        <Property name="APPLICATION">${spring:spring.application.name}</Property>
+        <Property name="ENVIRONMENT">${spring:spring.profiles.active}</Property>
+        <Property name="LOG_LEVEL">${spring:logging.level.root}</Property>
+        <Property name="DEV_LOG_PATTERN"><![CDATA[
+%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %highlight{%-5level} [%t] application=${APPLICATION} env=${ENVIRONMENT} logger=%logger{36} message=%msg traceId=%X{traceId} user.id=%X{userId} user.role=%X{userRole} http.route=%X{httpRoute} http.method=%X{httpMethod} http.clientIp=%X{httpClientIp} http.durationMs=%X{httpDurationMs} http.statusCode=%X{httpStatusCode} error.code=%X{errorCode} error.message=%X{errorMessage} error.type=%X{errorType} error.stackTrace=%throwable%n
+]]></Property>
+    </Properties>
+
+    <Appenders>
+        <SpringProfile name="dev | local | default">
+            <Console name="ConsoleDev" target="SYSTEM_OUT">
+                <PatternLayout
+                        disableAnsi="false"
+                        pattern="${DEV_LOG_PATTERN}"/>
+            </Console>
+        </SpringProfile>
+
+        <SpringProfile name="prod">
+            <Console name="ConsoleJson" target="SYSTEM_OUT">
+                <JsonTemplateLayout
+                        eventTemplateUri="classpath:log-config/log4j2-json-template.json"
+                        locationInfoEnabled="false"
+                        stackTraceEnabled="true"/>
+            </Console>
+        </SpringProfile>
+    </Appenders>
+
+    <Loggers>
+        <SpringProfile name="dev | local | default">
+            <Root level="${LOG_LEVEL}">
+                <AppenderRef ref="ConsoleDev"/>
+            </Root>
+        </SpringProfile>
+
+        <SpringProfile name="prod">
+            <Root level="${LOG_LEVEL}">
+                <AppenderRef ref="ConsoleJson"/>
+            </Root>
+        </SpringProfile>
+    </Loggers>
+
+</Configuration>

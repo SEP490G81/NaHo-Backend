@@ -1,0 +1,81 @@
+{
+  "timestamp": {
+    "$resolver": "timestamp",
+    "pattern": {
+      "format": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+      "timeZone": "UTC"
+    }
+  },
+  "level": {
+    "$resolver": "level",
+    "field": "name"
+  },
+  "thread": {
+    "$resolver": "thread",
+    "field": "name"
+  },
+  "application": "${spring:spring.application.name}",
+  "env": "${spring:spring.profiles.active}",
+  "logger": {
+    "$resolver": "logger",
+    "field": "name"
+  },
+  "message": {
+    "$resolver": "message",
+    "stringified": true
+  },
+  "traceId": {
+    "$resolver": "mdc",
+    "key": "traceId"
+  },
+  "user": {
+    "id": {
+      "$resolver": "mdc",
+      "key": "userId"
+    },
+    "role": {
+      "$resolver": "mdc",
+      "key": "userRole"
+    }
+  },
+  "http": {
+    "route": {
+      "$resolver": "mdc",
+      "key": "httpRoute"
+    },
+    "method": {
+      "$resolver": "mdc",
+      "key": "httpMethod"
+    },
+    "clientIp": {
+      "$resolver": "mdc",
+      "key": "httpClientIp"
+    },
+    "durationMs": {
+      "$resolver": "mdc",
+      "key": "httpDurationMs"
+    },
+    "statusCode": {
+      "$resolver": "mdc",
+      "key": "httpStatusCode"
+    }
+  },
+  "error": {
+    "code": {
+      "$resolver": "mdc",
+      "key": "errorCode"
+    },
+    "message": {
+      "$resolver": "mdc",
+      "key": "errorMessage"
+    },
+    "type": {
+      "$resolver": "mdc",
+      "key": "errorType"
+    },
+    "stackTrace": {
+      "$resolver": "exception",
+      "field": "stackTrace"
+    }
+  }
+}

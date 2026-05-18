@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: naho-be
+
+  data:
+    web:
+      pageable:
+        one-indexed-parameters: true
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        enable_lazy_load_no_trans: true
+        format_sql: true
+        jdbc:
+          batch_size: 1000
+    show-sql: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  profiles:
+    active: dev
+
+server:
+  port: 8386
+
+logging:
+  config: classpath:log-config/log4j2-spring.xml
+  level:
+    root: info
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    url: /v3/api-docs
