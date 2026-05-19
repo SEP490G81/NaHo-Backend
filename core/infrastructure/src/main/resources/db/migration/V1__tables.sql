@@ -1,12 +1,27 @@
-CREATE TABLE permissions
+CREATE TABLE files
 (
     id            BIGINT AUTO_INCREMENT NOT NULL,
     created_by    VARCHAR(255)          NOT NULL,
     created_time  datetime              NOT NULL,
     modified_by   VARCHAR(255)          NULL,
     modified_time datetime              NULL,
-    code          VARCHAR(255)          NOT NULL,
-    `description` VARCHAR(255)          NULL,
+    file_url      VARCHAR(2048)         NOT NULL,
+    preview_url   VARCHAR(2048)         NOT NULL,
+    original_name VARCHAR(255)          NOT NULL,
+    content_type  VARCHAR(100)          NOT NULL,
+    size          BIGINT                NOT NULL,
+    CONSTRAINT pk_files PRIMARY KEY (id)
+);
+
+CREATE TABLE permissions
+(
+    id              BIGINT AUTO_INCREMENT NOT NULL,
+    created_by      VARCHAR(255)          NOT NULL,
+    created_time    datetime              NOT NULL,
+    modified_by     VARCHAR(255)          NULL,
+    modified_time   datetime              NULL,
+    permission_code SMALLINT              NOT NULL,
+    `description`   VARCHAR(255)          NULL,
     CONSTRAINT pk_permissions PRIMARY KEY (id)
 );
 
@@ -31,21 +46,21 @@ CREATE TABLE roles_permissions
 
 CREATE TABLE users
 (
-    id            BIGINT AUTO_INCREMENT NOT NULL,
-    created_by    VARCHAR(255)          NOT NULL,
-    created_time  datetime              NOT NULL,
-    modified_by   VARCHAR(255)          NULL,
-    modified_time datetime              NULL,
-    username      VARCHAR(255)          NOT NULL,
-    email         VARCHAR(255)          NOT NULL,
-    password      VARCHAR(255)          NOT NULL,
-    first_name    VARCHAR(255)          NULL,
-    last_name     VARCHAR(255)          NULL,
-    gender        VARCHAR(255)          NULL,
-    dob           date                  NULL,
-    avatar_url    VARCHAR(255)          NULL,
-    jlpt_level    VARCHAR(255)          NULL,
-    status        VARCHAR(255)          NULL,
+    id             BIGINT AUTO_INCREMENT NOT NULL,
+    created_by     VARCHAR(255)          NOT NULL,
+    created_time   datetime              NOT NULL,
+    modified_by    VARCHAR(255)          NULL,
+    modified_time  datetime              NULL,
+    username       VARCHAR(36)           NOT NULL,
+    email          VARCHAR(255)          NOT NULL,
+    hash_password  VARCHAR(255)          NOT NULL,
+    first_name     VARCHAR(255)          NULL,
+    last_name      VARCHAR(255)          NULL,
+    gender         VARCHAR(255)          NULL,
+    dob            date                  NULL,
+    avatar_file_id BIGINT                NULL,
+    jlpt_level     VARCHAR(255)          NOT NULL,
+    status         VARCHAR(255)          NOT NULL,
     CONSTRAINT pk_users PRIMARY KEY (id)
 );
 
@@ -57,16 +72,22 @@ CREATE TABLE users_roles
 );
 
 ALTER TABLE permissions
-    ADD CONSTRAINT uc_permissions_code UNIQUE (code);
+    ADD CONSTRAINT uc_permissions_permission_code UNIQUE (permission_code);
 
 ALTER TABLE roles
-    ADD CONSTRAINT uc_roles_rolename UNIQUE (role_name);
+    ADD CONSTRAINT uc_roles_role_name UNIQUE (role_name);
+
+ALTER TABLE users
+    ADD CONSTRAINT uc_users_avatar_file UNIQUE (avatar_file_id);
 
 ALTER TABLE users
     ADD CONSTRAINT uc_users_email UNIQUE (email);
 
 ALTER TABLE users
     ADD CONSTRAINT uc_users_username UNIQUE (username);
+
+ALTER TABLE users
+    ADD CONSTRAINT FK_USERS_ON_AVATAR_FILE FOREIGN KEY (avatar_file_id) REFERENCES files (id);
 
 ALTER TABLE roles_permissions
     ADD CONSTRAINT fk_rolper_on_permission_entity FOREIGN KEY (permission_id) REFERENCES permissions (id);

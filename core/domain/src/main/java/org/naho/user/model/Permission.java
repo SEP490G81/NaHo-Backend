@@ -1,10 +1,12 @@
 package org.naho.user.model;
 
+import org.naho.user.type.PermissionCode;
+
 import java.util.Set;
 
 public class Permission {
     private Long id;
-    private String code;
+    private PermissionCode permissionCode;
     private String description;
     private Set<Role> roles;
 
@@ -12,8 +14,8 @@ public class Permission {
         return id;
     }
 
-    public String getCode() {
-        return code;
+    public PermissionCode getPermissionCode() {
+        return permissionCode;
     }
 
     public String getDescription() {

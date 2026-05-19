@@ -1,5 +1,6 @@
 package org.naho.user.model;
 
+import org.naho.file.model.File;
 import org.naho.shared.exception.DomainException;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.type.Gender;
@@ -27,7 +28,9 @@ public class User {
     private String lastName;
     private Gender gender;
     private Dob dob; // data of birth
-    private String avatarUrl;
+
+    private File avatar;
+
     private JLPTLevel jlptLevel;
     private UserStatus status;
 
@@ -41,57 +44,9 @@ public class User {
         this.lastName = builder.lastName;
         this.gender = builder.gender;
         this.dob = builder.dob;
-        this.avatarUrl = builder.avatarUrl;
+        this.avatar = builder.avatar;
         this.jlptLevel = builder.jlptLevel;
         this.status = builder.status;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Username getUsername() {
-        return username;
-    }
-
-    public Email getEmail() {
-        return email;
-    }
-
-    public Password getPassword() {
-        return password;
-    }
-
-    public Set<Role> getRoles() {
-        return roles;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public Dob getDob() {
-        return dob;
-    }
-
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
-
-    public JLPTLevel getJlptLevel() {
-        return jlptLevel;
-    }
-
-    public UserStatus getStatus() {
-        return status;
     }
 
     public static Builder builder() {
@@ -111,7 +66,7 @@ public class User {
         private String lastName;
         private Gender gender;
         private Dob dob;
-        private String avatarUrl;
+        private File avatar;
         private JLPTLevel jlptLevel;
         private UserStatus status = UserStatus.ACTIVE;
 
@@ -160,8 +115,8 @@ public class User {
             return this;
         }
 
-        public Builder avatarUrl(String avatarUrl) {
-            this.avatarUrl = avatarUrl;
+        public Builder avatar(File avatar) {
+            this.avatar = avatar;
             return this;
         }
 

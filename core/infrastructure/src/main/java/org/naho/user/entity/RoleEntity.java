@@ -17,7 +17,7 @@ import java.util.Set;
 @Table(name = "roles")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoleEntity extends BaseEntity {
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, name = "role_name")
     @Enumerated(EnumType.STRING)
     RoleName roleName;
 

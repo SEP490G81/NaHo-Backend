@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 public class Username {
 
     private static final int MIN_LENGTH = 4;
-    private static final int MAX_LENGTH = 20;
+    public static final int MAX_LENGTH = 36;
 
     private static final Pattern USERNAME_PATTERN =
             Pattern.compile("^[a-z][a-z0-9]*$");

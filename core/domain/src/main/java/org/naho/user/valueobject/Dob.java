@@ -17,6 +17,9 @@ public class Dob {
     }
 
     public static Dob of(LocalDate value) {
+        if (value == null) {
+            return null;
+        }
         LocalDate now = LocalDate.now();
         int age = Period.between(value, now).getYears();
 

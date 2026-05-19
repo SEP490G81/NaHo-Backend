@@ -3,10 +3,12 @@ package org.naho.user.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.naho.file.model.FileEntity;
 import org.naho.shared.BaseEntity;
 import org.naho.user.type.Gender;
 import org.naho.user.type.JLPTLevel;
 import org.naho.user.type.UserStatus;
+import org.naho.user.valueobject.Username;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -21,15 +23,15 @@ import java.util.Set;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserEntity extends BaseEntity {
     // identity
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, length = Username.MAX_LENGTH)
     String username;
 
     @Column(unique = true, nullable = false)
     String email;
 
     // authentication
-    @Column(nullable = false)
-    String password;
+    @Column(name = "hash_password", nullable = false)
+    String hashPassword;
 
     @ManyToMany
     @JoinTable(joinColumns = @JoinColumn(name = "user_id"),
@@ -37,18 +39,26 @@ public class UserEntity extends BaseEntity {
     Set<RoleEntity> roles;
 
     // profile
+    @Column(name = "first_name")
     String firstName;
+
+    @Column(name = "last_name")
     String lastName;
 
     @Enumerated(EnumType.STRING)
     Gender gender;
 
     LocalDate dob; // data of birth
-    String avatarUrl;
 
+    @OneToOne
+    @JoinColumn(name = "avatar_file_id")
+    FileEntity avatar;
+
+    @Column(name = "jlpt_level", nullable = false)
     @Enumerated(EnumType.STRING)
     JLPTLevel jlptLevel;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     UserStatus status;
 }
