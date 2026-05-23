@@ -1,10 +1,10 @@
-package org.naho.user.entity;
+package org.naho.persistence.user.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.naho.file.model.FileEntity;
-import org.naho.shared.BaseEntity;
+import org.naho.persistence.BaseEntity;
+import org.naho.persistence.file.model.FileEntity;
 import org.naho.user.type.Gender;
 import org.naho.user.type.JLPTLevel;
 import org.naho.user.type.UserStatus;

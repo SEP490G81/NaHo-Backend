@@ -1,4 +1,4 @@
-package org.naho.user.entity;
+package org.naho.persistence.user.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -6,7 +6,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.naho.shared.BaseEntity;
+import org.naho.persistence.BaseEntity;
 import org.naho.user.type.PermissionCode;
 
 import java.util.Set;

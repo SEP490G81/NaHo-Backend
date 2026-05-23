@@ -1,4 +1,4 @@
-package org.naho.file.model;
+package org.naho.persistence.file.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -6,8 +6,8 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.naho.shared.BaseEntity;
-import org.naho.user.entity.UserEntity;
+import org.naho.persistence.BaseEntity;
+import org.naho.persistence.user.entity.UserEntity;
 
 @Builder
 @Getter

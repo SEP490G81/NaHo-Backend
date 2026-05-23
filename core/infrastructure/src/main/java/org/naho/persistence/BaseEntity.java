@@ -1,4 +1,4 @@
-package org.naho.shared;
+package org.naho.persistence;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

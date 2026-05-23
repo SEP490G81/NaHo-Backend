@@ -1,4 +1,4 @@
-package org.naho.shared;
+package org.naho.persistence;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
