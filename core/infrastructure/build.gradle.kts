@@ -41,9 +41,12 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5")
     runtimeOnly("com.mysql:mysql-connector-j")
-    testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    // Azure Speech SDK
+    implementation("com.microsoft.cognitiveservices.speech:client-sdk:1.49.1@jar")
 }
 
 tasks.withType<Test> {

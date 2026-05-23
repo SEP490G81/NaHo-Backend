@@ -6,10 +6,7 @@ build/
 .kotlin
 
 ### IntelliJ IDEA ###
-.idea/modules.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
-.idea/libraries/
+.idea/
 *.iws
 *.iml
 *.ipr
@@ -41,3 +38,24 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Local Configurations & Secrets ###
+# Ignore local Spring profile overrides (e.g. application-local.yaml, application-dev-local.yaml)
+**/*-local.yaml
+**/*-local.yml
+**/*-local.properties
+.env
+.env.local
+.env.*.local
+
+# Local build / gradle properties
+local.properties
+gradle.properties.local
+.gradle/
+build/
+
+#Coding pla
+coding_plan
+
+#test
+test.http

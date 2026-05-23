@@ -1,6 +1,14 @@
 spring:
+  config:
+    import: "optional:file:.env[.properties]"
+
   application:
     name: naho-be
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
 
   data:
     web:
