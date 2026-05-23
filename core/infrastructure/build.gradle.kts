@@ -18,7 +18,7 @@ repositories {
 
 dependencyManagement {
     imports {
-        mavenBom("org.springframework.boot:spring-boot-dependencies:4.0.6")
+        mavenBom("org.springframework.boot:spring-boot-dependencies:3.5.14")
     }
 }
 
@@ -34,16 +34,15 @@ dependencies {
     testAnnotationProcessor("org.projectlombok:lombok")
 
     // flyway
-    implementation("org.springframework.boot:spring-boot-starter-flyway")
     implementation("org.flywaydb:flyway-mysql:11.20.0")
-    testImplementation("org.springframework.boot:spring-boot-starter-flyway-test")
+    implementation("org.flywaydb:flyway-core")
 
     // other
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:4.0.1")
+    implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5")
     runtimeOnly("com.mysql:mysql-connector-j")
     testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
-    testImplementation("org.mybatis.spring.boot:mybatis-spring-boot-starter-test:4.0.1")
+    testImplementation("org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
