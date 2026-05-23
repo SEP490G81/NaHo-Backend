@@ -157,3 +157,172 @@ Khi muốn thêm một tính năng mới (ví dụ: Quản lý khóa học - Cou
     *   (Nếu cần) Viết MyBatis Mapper cho các câu query phức tạp.
     *   Tạo file migration Flyway mới dưới dạng SQL (ví dụ: `V3__courses.sql`) để tạo bảng.
 4.  **Presentation Layer (`:core:presentation`)**: Tạo `CourseController.java` để công khai endpoint REST API.
+
+---
+
+## 8. Hướng Dẫn Kiểm Thử API Đánh Giá Phát Âm (Speech Assessment API Test)
+
+Hệ thống đã hỗ trợ endpoint API xử lý Speech To Text (STT) kết hợp đánh giá phát âm chi tiết (Pronunciation Assessment) thông qua Azure Speech AI tại endpoint `POST /api/v1/speech/assess`.
+
+### 8.1. Các bước kiểm thử
+
+1.  **Khởi chạy dự án:** Chạy ứng dụng Spring Boot từ IntelliJ hoặc bằng dòng lệnh:
+    ```powershell
+    .\gradlew.bat :core:bootstrap:bootRun
+    ```
+2.  **Truy cập Swagger UI:** Xem và thử nghiệm trực tiếp tại [http://localhost:8386/swagger-ui.html](http://localhost:8386/swagger-ui.html) (Tag **Speech AI**).
+3.  **Chuẩn bị file âm thanh:** Sử dụng file ghi âm tiếng Nhật định dạng `.wav` (tần số khuyên dùng 16kHz, mono) để thử nghiệm.
+
+### 8.2. Gọi API kiểm thử bằng lệnh cURL
+
+#### Trường hợp 1: Đánh giá Tự do (Unscripted / Free-talk)
+Không cần truyền script mẫu, hệ thống sẽ tự động chuyển giọng nói thành văn bản và đánh giá điểm phát âm:
+```bash
+curl -X POST "http://localhost:8386/api/v1/speech/assess" \
+     -H "accept: application/json" \
+     -H "Content-Type: multipart/form-data" \
+     -F "file=@/path/to/japanese_test.wav"
+```
+
+#### Trường hợp 2: Đọc theo mẫu (Scripted Assessment)
+Đánh giá độ chuẩn xác phát âm bằng cách so khớp giọng nói với văn bản mẫu truyền vào:
+```bash
+curl -X POST "http://localhost:8386/api/v1/speech/assess" \
+     -H "accept: application/json" \
+     -H "Content-Type: multipart/form-data" \
+     -F "file=@/path/to/japanese_test.wav" \
+     -F "referenceText=こんにちは"
+```
+
+### 8.3. Gọi API kiểm thử bằng HTTP Client (IntelliJ IDEA)
+
+IntelliJ IDEA tích hợp sẵn công cụ test API rất thuận tiện (không cần cài thêm phần mềm ngoài):
+
+1. **Khởi tạo file:** Click chuột phải vào bất kỳ thư mục nào trong project, chọn **New** -> **HTTP Request** (hoặc tạo file bất kỳ đặt tên là `test.http`).
+2. **Cấu hình Request:** Sao chép đoạn mã dưới đây và dán vào tệp tin đó (hãy nhớ điều chỉnh đường dẫn tệp `.wav` khớp với file thật trên máy bạn):
+    ```http
+    POST http://localhost:8386/api/v1/speech/assess
+    Accept: application/json
+    Content-Type: multipart/form-data; boundary=boundary
+
+    --boundary
+    Content-Disposition: form-data; name="file"; filename="japanese_test.wav"
+    Content-Type: audio/wav
+
+    < C:\path\to\your\japanese_test.wav
+    --boundary--
+    ```
+3. **Thực thi:** Bạn sẽ thấy một nút Play màu xanh lá cây (▶️) xuất hiện ở lề bên trái (ngang hàng dòng `POST`). Nhấn nút Play này để chạy test. Kết quả phản hồi từ API sẽ hiển thị trực tiếp ở cửa sổ kết quả phía dưới.
+
+### 8.4. Kết quả phản hồi thực tế (Response JSON)
+Response trả về thành công đã được bọc trong lớp `ApiResponse` chuẩn của dự án:
+
+```json
+{
+  "meta": {
+    "traceId": "124eea2c-8abc-4160-84ae-79d40cedf50e",
+    "timestamp": "2026-05-23T13:57:26.101860Z",
+    "pageMeta": null
+  },
+  "message": "Speech assessment completed successfully",
+  "data": {
+    "transcript": "皆さんこんにちは.私はこうあです.FBT大学 của 四年生です.どうぞよろしくお願いします。",
+    "accuracyScore": 88.0,
+    "fluencyScore": 85.0,
+    "completenessScore": 100.0,
+    "pronunciationScore": 85.6,
+    "words": [
+      {
+        "word": "皆さん",
+        "accuracyScore": 91.0,
+        "errorType": "None"
+      },
+      {
+        "word": "こんにちは",
+        "accuracyScore": 91.0,
+        "errorType": "None"
+      },
+      {
+        "word": "私",
+        "accuracyScore": 94.0,
+        "errorType": "None"
+      },
+      {
+        "word": "は",
+        "accuracyScore": 97.0,
+        "errorType": "None"
+      },
+      {
+        "word": "こう",
+        "accuracyScore": 97.0,
+        "errorType": "None"
+      },
+      {
+        "word": "あ",
+        "accuracyScore": 100.0,
+        "errorType": "None"
+      },
+      {
+        "word": "です",
+        "accuracyScore": 79.0,
+        "errorType": "None"
+      },
+      {
+        "word": "f",
+        "accuracyScore": 97.0,
+        "errorType": "None"
+      },
+      {
+        "word": "b",
+        "accuracyScore": 97.0,
+        "errorType": "None"
+      },
+      {
+        "word": "t",
+        "accuracyScore": 97.0,
+        "errorType": "None"
+      },
+      {
+        "word": "大学",
+        "accuracyScore": 60.0,
+        "errorType": "None"
+      },
+      {
+        "word": "の",
+        "accuracyScore": 100.0,
+        "errorType": "None"
+      },
+      {
+        "word": "四年生",
+        "accuracyScore": 91.0,
+        "errorType": "None"
+      },
+      {
+        "word": "es",
+        "accuracyScore": 43.0,
+        "errorType": "Mispronunciation"
+      },
+      {
+        "word": "どうぞ",
+        "accuracyScore": 91.0,
+        "errorType": "None"
+      },
+      {
+        "word": "よろしく",
+        "accuracyScore": 76.0,
+        "errorType": "None"
+      },
+      {
+        "word": "お願い",
+        "accuracyScore": 91.0,
+        "errorType": "None"
+      },
+      {
+        "word": "します",
+        "accuracyScore": 94.0,
+        "errorType": "None"
+      }
+    ]
+  }
+}
+```
