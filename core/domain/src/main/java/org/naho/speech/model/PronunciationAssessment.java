@@ -2,7 +2,7 @@ package org.naho.speech.model;
 
 import java.util.List;
 
-public class PronunciationAssessmentResult {
+public class PronunciationAssessment {
     private String transcript;              // Đoạn text nhận diện được (Speech To Text)
     private Double accuracyScore;          // Điểm độ chuẩn xác phát âm
     private Double fluencyScore;           // Điểm độ trôi chảy
@@ -10,7 +10,7 @@ public class PronunciationAssessmentResult {
     private Double pronunciationScore;     // Điểm đánh giá phát âm tổng thể (PronScore)
     private List<WordAssessment> words;    // Đánh giá chi tiết từng từ
 
-    private PronunciationAssessmentResult(Builder builder) {
+    private PronunciationAssessment(Builder builder) {
         this.transcript = builder.transcript;
         this.accuracyScore = builder.accuracyScore;
         this.fluencyScore = builder.fluencyScore;
@@ -69,8 +69,8 @@ public class PronunciationAssessmentResult {
             return this;
         }
 
-        public PronunciationAssessmentResult build() {
-            return new PronunciationAssessmentResult(this);
+        public PronunciationAssessment build() {
+            return new PronunciationAssessment(this);
         }
     }
 }

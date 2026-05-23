@@ -1,6 +1,5 @@
 plugins {
-    java
-    id("io.spring.dependency-management") version "1.1.7"
+    id("java")
 }
 
 group = "org.naho"
@@ -8,12 +7,6 @@ version = "1.0"
 
 repositories {
     mavenCentral()
-}
-
-dependencyManagement {
-    imports {
-        mavenBom("org.springframework.boot:spring-boot-dependencies:4.0.6")
-    }
 }
 
 java {
@@ -26,16 +19,11 @@ dependencies {
     // project implementation
     implementation(project(":core:domain"))
 
-    // lombok
-    compileOnly("org.projectlombok:lombok")
-    annotationProcessor("org.projectlombok:lombok")
-    testCompileOnly("org.projectlombok:lombok")
-    testAnnotationProcessor("org.projectlombok:lombok")
-
+    testImplementation(platform("org.junit:junit-bom:6.0.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-tasks.withType<Test> {
+tasks.test {
     useJUnitPlatform()
 }
