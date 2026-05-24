@@ -8,7 +8,6 @@ import org.naho.user.type.JLPTLevel;
 import org.naho.user.type.UserStatus;
 import org.naho.user.valueobject.Dob;
 import org.naho.user.valueobject.Email;
-import org.naho.user.valueobject.Password;
 import org.naho.user.valueobject.Username;
 
 import java.util.Set;
@@ -20,7 +19,7 @@ public class User {
     private Email email;
 
     // authentication
-    private Password password;
+    private String hashPassword;
     private Set<Role> roles;
 
     // profile
@@ -38,7 +37,7 @@ public class User {
         this.id = builder.id;
         this.username = builder.username;
         this.email = builder.email;
-        this.password = builder.password;
+        this.hashPassword = builder.hashPassword;
         this.roles = builder.roles;
         this.firstName = builder.firstName;
         this.lastName = builder.lastName;
@@ -59,7 +58,7 @@ public class User {
         private Username username;
         private Email email;
 
-        private Password password;
+        private String hashPassword;
         private Set<Role> roles;
 
         private String firstName;
@@ -85,8 +84,8 @@ public class User {
             return this;
         }
 
-        public Builder password(Password password) {
-            this.password = password;
+        public Builder hashPassword(String hashPassword) {
+            this.hashPassword = hashPassword;
             return this;
         }
 
@@ -145,7 +144,7 @@ public class User {
                 );
             }
 
-            if (password == null) {
+            if (hashPassword == null) {
                 throw new DomainException(
                         UserErrorCode.PASSWORD_REQUIRED,
                         "Password is required!"
