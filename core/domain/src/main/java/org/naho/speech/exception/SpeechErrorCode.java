@@ -2,14 +2,14 @@ package org.naho.speech.exception;
 
 import org.naho.shared.exception.ErrorCode;
 
-public enum SpeechApplicationErrorCode implements ErrorCode {
-    AUDIO_FILE_INVALID("SPEECH_001", "speech.audio.file.invalid"),
-    TEXT_REQUIRED("SPEECH_005", "speech.text.required"),
-    TEXT_TOO_LONG("SPEECH_006", "speech.text.too.long");;
+public enum SpeechErrorCode implements ErrorCode {
+    AUDIO_DATA_REQUIRED("SPEECH_001", "audio.data.not.be.empty"),
+    ;
+
     private final String code;
     private final String title;
 
-    SpeechApplicationErrorCode(String code, String title) {
+    SpeechErrorCode(String code, String title) {
         this.code = code;
         this.title = title;
     }
