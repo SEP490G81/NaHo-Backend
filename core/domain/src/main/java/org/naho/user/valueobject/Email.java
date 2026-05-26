@@ -1,8 +1,8 @@
 package org.naho.user.valueobject;
 
 import org.naho.shared.exception.DomainException;
+import org.naho.user.constant.UserMessageKey;
 import org.naho.user.exception.UserErrorCode;
-import org.naho.user.exception.UserErrorKey;
 
 import java.util.regex.Pattern;
 
@@ -20,7 +20,7 @@ public class Email {
         if (value == null || value.isBlank()) {
             throw new DomainException(
                     UserErrorCode.USER_EMAIL_NOT_VALID,
-                    UserErrorKey.USER_EMAIL_REQUIRED
+                    UserMessageKey.USER_EMAIL_REQUIRED
             );
         }
 
@@ -29,7 +29,7 @@ public class Email {
         if (!EMAIL_PATTERN.matcher(value).matches()) {
             throw new DomainException(
                     UserErrorCode.USER_EMAIL_NOT_VALID,
-                    UserErrorKey.USER_EMAIL_INVALID_FORMAT,
+                    UserMessageKey.USER_EMAIL_INVALID_FORMAT,
                     value
             );
         }

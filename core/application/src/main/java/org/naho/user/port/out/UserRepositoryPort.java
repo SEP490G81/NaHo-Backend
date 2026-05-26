@@ -4,7 +4,7 @@ import org.naho.user.model.User;
 
 import java.util.Optional;
 
-public interface UserRepository {
+public interface UserRepositoryPort {
     Optional<User> findByUsername(String username);
 
     Optional<User> findByEmail(String email);

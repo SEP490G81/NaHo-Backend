@@ -1,7 +1,6 @@
 package org.naho.speech.azure.controller.v1;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
 import org.naho.speech.azure.constant.AzureSpeechApplicationMessageKey;
@@ -15,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/v1/speech")
 @RequiredArgsConstructor

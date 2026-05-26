@@ -1,6 +1,7 @@
-package org.naho.i18n;
+package org.naho.i18n.adapter;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.i18n.MessageService;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
@@ -8,9 +9,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class MessageServiceAdapter implements MessageService {
-
-    private static final String NOT_FOUND_TEMPLATE = "key: {%s} not found!";
-
     private final MessageSource messageSource;
 
     @Override
@@ -18,7 +16,7 @@ public class MessageServiceAdapter implements MessageService {
         return messageSource.getMessage(
                 key,
                 args,
-                NOT_FOUND_TEMPLATE.formatted(key),
+                key,
                 LocaleContextHolder.getLocale()
         );
     }

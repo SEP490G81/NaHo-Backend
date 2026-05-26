@@ -24,7 +24,7 @@ public class MessageSourceConfig {
 
         messageSource.setDefaultEncoding(DEFAULT_ENCODING);
         messageSource.setFallbackToSystemLocale(false);
-        messageSource.setUseCodeAsDefaultMessage(false);
+        messageSource.setUseCodeAsDefaultMessage(true);
 
         return messageSource;
     }

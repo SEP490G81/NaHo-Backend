@@ -1,4 +1,4 @@
-package org.naho.config.speech;
+package org.naho.config;
 
 import org.naho.speech.azure.mapper.PronunciationAssessmentMapper;
 import org.naho.speech.azure.mapper.WordAssessmentMapper;

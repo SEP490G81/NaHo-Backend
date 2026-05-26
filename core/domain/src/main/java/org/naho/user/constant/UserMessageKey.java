@@ -1,7 +1,7 @@
-package org.naho.user.exception;
+package org.naho.user.constant;
 
-public final class UserErrorKey {
-    private UserErrorKey() {
+public final class UserMessageKey {
+    private UserMessageKey() {
     }
 
     public static final String USER_AGE_NOT_VALID_TITLE =

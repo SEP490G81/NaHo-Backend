@@ -1,12 +1,14 @@
-package org.naho.shared.logging;
+package org.naho.shared.handler;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.ThreadContext;
-import org.jspecify.annotations.NonNull;
+import org.naho.shared.constant.ContextLoggingKey;
+import org.naho.shared.constant.HttpLoggingKey;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 

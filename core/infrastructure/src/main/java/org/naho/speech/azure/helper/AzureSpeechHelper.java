@@ -94,8 +94,6 @@ public class AzureSpeechHelper {
 
             try {
                 JsonNode root = objectMapper.readTree(jsonResult);
-
-                // Mặc định kết quả nằm trong mảng NBest
                 JsonNode nBestNode = root.path(AzurePronunciationScoreKey.N_BEST).get(0);
                 if (nBestNode == null) {
                     throw new InfrastructureException(
@@ -171,5 +169,65 @@ public class AzureSpeechHelper {
                     AzureSpeechApplicationMessageKey.SPEECH_AZURE_SERVICE_UNKNOWN_ERROR_OCCUR
             );
         }
+    }
+
+    public SpeechAssessment mergeAssessments(List<SpeechAssessment> assessments) {
+        if (assessments.isEmpty()) {
+            return null;
+        }
+        if (assessments.size() == 1) {
+            return assessments.get(0);
+        }
+
+        StringBuilder fullTranscript = new StringBuilder();
+        List<WordAssessment> allWords = new ArrayList<>();
+
+        double totalAccuracy = 0.0;
+        double totalFluency = 0.0;
+        double totalCompleteness = 0.0;
+        double totalPronScore = 0.0;
+        int totalWordCount = 0;
+
+        for (SpeechAssessment segment : assessments) {
+            if (segment.getTranscriptText() != null && !segment.getTranscriptText().isEmpty()) {
+                if (fullTranscript.length() > 0) {
+                    fullTranscript.append(" ");
+                }
+                fullTranscript.append(segment.getTranscriptText());
+            }
+
+            if (segment.getWords() != null) {
+                allWords.addAll(segment.getWords());
+            }
+
+            int wordCount = segment.getWords() != null ? segment.getWords().size() : 0;
+            if (wordCount > 0) {
+                totalAccuracy += segment.getAccuracyScore() * wordCount;
+                totalFluency += segment.getFluencyScore() * wordCount;
+                totalCompleteness += segment.getCompletenessScore() * wordCount;
+                totalPronScore += segment.getPronunciationScore() * wordCount;
+                totalWordCount += wordCount;
+            } else {
+                totalAccuracy += segment.getAccuracyScore();
+                totalFluency += segment.getFluencyScore();
+                totalCompleteness += segment.getCompletenessScore();
+                totalPronScore += segment.getPronunciationScore();
+                totalWordCount += 1;
+            }
+        }
+
+        double finalAccuracy = totalWordCount > 0 ? totalAccuracy / totalWordCount : 0.0;
+        double finalFluency = totalWordCount > 0 ? totalFluency / totalWordCount : 0.0;
+        double finalCompleteness = totalWordCount > 0 ? totalCompleteness / totalWordCount : 0.0;
+        double finalPronScore = totalWordCount > 0 ? totalPronScore / totalWordCount : 0.0;
+
+        return SpeechAssessment.builder()
+                .transcriptText(fullTranscript.toString())
+                .accuracyScore(finalAccuracy)
+                .fluencyScore(finalFluency)
+                .completenessScore(finalCompleteness)
+                .pronunciationScore(finalPronScore)
+                .words(allWords)
+                .build();
     }
 }

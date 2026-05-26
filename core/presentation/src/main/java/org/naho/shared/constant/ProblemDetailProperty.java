@@ -1,4 +1,4 @@
-package org.naho.shared.exception;
+package org.naho.shared.constant;
 
 public final class ProblemDetailProperty {
     private ProblemDetailProperty() {

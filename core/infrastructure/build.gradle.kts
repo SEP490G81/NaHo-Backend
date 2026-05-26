@@ -37,6 +37,19 @@ dependencies {
     implementation("org.flywaydb:flyway-mysql:11.20.0")
     implementation("org.flywaydb:flyway-core")
 
+    // spring security
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    testImplementation("org.springframework.security:spring-security-test")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+
+    // jwt
+    implementation("io.jsonwebtoken:jjwt-api:0.12.6")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
+
+    // Azure Speech SDK
+    implementation("com.microsoft.cognitiveservices.speech:client-sdk:1.49.1@jar")
+
     // other
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5")
@@ -44,9 +57,6 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-
-    // Azure Speech SDK
-    implementation("com.microsoft.cognitiveservices.speech:client-sdk:1.49.1@jar")
 }
 
 tasks.withType<Test> {

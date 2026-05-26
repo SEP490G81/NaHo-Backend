@@ -1,5 +1,6 @@
 package org.naho.user.model;
 
+import org.naho.file.model.File;
 import org.naho.user.type.AccountType;
 import org.naho.user.type.Gender;
 import org.naho.user.type.JLPTLevel;
@@ -9,11 +10,11 @@ import org.naho.user.valueobject.Email;
 import org.naho.user.valueobject.Username;
 
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.List;
 
 public class User {
     private Long id;
-    private Long avatarFileId;
+    private File avatarFile;
 
     private Username username;
     private Email email;
@@ -33,12 +34,12 @@ public class User {
     private Integer longestStreak;
     private LocalDate lastPracticeDate;
 
-    private Set<Role> roles;
+    private List<Role> roles;
 
     // Private constructor
     private User(Builder builder) {
         this.id = builder.id;
-        this.avatarFileId = builder.avatarFileId;
+        this.avatarFile = builder.avatarFile;
         this.username = builder.username;
         this.email = builder.email;
         this.hashPassword = builder.hashPassword;
@@ -61,8 +62,8 @@ public class User {
         return id;
     }
 
-    public Long getAvatarFileId() {
-        return avatarFileId;
+    public File getAvatarFile() {
+        return avatarFile;
     }
 
     public Username getUsername() {
@@ -85,7 +86,7 @@ public class User {
         return accountType;
     }
 
-    public Set<Role> getRoles() {
+    public List<Role> getRoles() {
         return roles;
     }
 
@@ -132,7 +133,7 @@ public class User {
     // Builder Pattern
     public static class Builder {
         private Long id;
-        private Long avatarFileId;
+        private File avatarFile;
 
         private Username username;
         private Email email;
@@ -140,7 +141,7 @@ public class User {
         private String hashPassword;
         private String refreshToken;
         private AccountType accountType;
-        private Set<Role> roles;
+        private List<Role> roles;
 
         private String firstName;
         private String lastName;
@@ -158,8 +159,8 @@ public class User {
             return this;
         }
 
-        public Builder avatarFileId(Long avatarFileId) {
-            this.avatarFileId = avatarFileId;
+        public Builder avatarFile(File avatarFile) {
+            this.avatarFile = avatarFile;
             return this;
         }
 
@@ -188,7 +189,7 @@ public class User {
             return this;
         }
 
-        public Builder roles(Set<Role> roles) {
+        public Builder roles(List<Role> roles) {
             this.roles = roles;
             return this;
         }

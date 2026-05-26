@@ -1,4 +1,4 @@
-package org.naho.shared.logging;
+package org.naho.shared.constant;
 
 public final class ContextLoggingKey {
     private ContextLoggingKey() {

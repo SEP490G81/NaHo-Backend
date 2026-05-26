@@ -7,7 +7,7 @@ import java.net.URI;
 
 import static org.naho.speech.azure.exception.AzureSpeechApplicationErrorCode.SPEECH_AUDIO_NOT_VALID;
 import static org.naho.speech.azure.exception.AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR;
-import static org.naho.user.exception.UserApplicationErrorCode.USER_NOT_FOUND;
+import static org.naho.user.exception.UserApplicationErrorCode.*;
 import static org.naho.user.exception.UserErrorCode.*;
 
 @Component
@@ -27,6 +27,8 @@ public class ErrorCodeHttpMapper {
                  USER_NOT_FOUND,
                  SPEECH_AUDIO_NOT_VALID -> HttpStatus.BAD_REQUEST;
             case SPEECH_AZURE_SERVICE_ERROR -> HttpStatus.BAD_GATEWAY;
+            case USER_UNAUTHORIZED -> HttpStatus.UNAUTHORIZED;
+            case USER_ACCESS_DENIED -> HttpStatus.FORBIDDEN;
             default -> HttpStatus.INTERNAL_SERVER_ERROR;
         };
     }
