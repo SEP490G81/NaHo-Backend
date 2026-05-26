@@ -2,6 +2,7 @@ package org.naho.user.valueobject;
 
 import org.naho.shared.exception.DomainException;
 import org.naho.user.exception.UserErrorCode;
+import org.naho.user.exception.UserErrorKey;
 
 import java.util.regex.Pattern;
 
@@ -23,8 +24,8 @@ public class Username {
 
         if (value == null || value.isBlank()) {
             throw new DomainException(
-                    UserErrorCode.USERNAME_REQUIRED,
-                    "Username is required!"
+                    UserErrorCode.USER_USERNAME_NOT_VALID,
+                    UserErrorKey.USER_USERNAME_REQUIRED
             );
         }
 
@@ -32,23 +33,17 @@ public class Username {
                 || value.length() > MAX_LENGTH) {
 
             throw new DomainException(
-                    UserErrorCode.USERNAME_NOT_VALID,
-                    String.format(
-                            "Username must be between %d and %d characters!",
-                            MIN_LENGTH,
-                            MAX_LENGTH
-                    )
+                    UserErrorCode.USER_USERNAME_NOT_VALID,
+                    UserErrorKey.USER_USERNAME_INVALID_RANGE,
+                    MIN_LENGTH,
+                    MAX_LENGTH
             );
         }
 
         if (!USERNAME_PATTERN.matcher(value).matches()) {
             throw new DomainException(
-                    UserErrorCode.USERNAME_NOT_VALID,
-                    """
-                            Username must:
-                            - start with a lowercase letter
-                            - contain only lowercase letters and numbers
-                            """
+                    UserErrorCode.USER_USERNAME_NOT_VALID,
+                    UserErrorKey.USER_USERNAME_INVALID_FORMAT
             );
         }
 

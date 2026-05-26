@@ -3,8 +3,10 @@ package org.naho.shared.handler;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.ThreadContext;
 import org.jspecify.annotations.Nullable;
+import org.naho.i18n.MessageService;
 import org.naho.shared.annotation.ApiResponseMessage;
-import org.naho.shared.logging.ContextLoggingKeys;
+import org.naho.shared.constant.CommonPresentationMessageKey;
+import org.naho.shared.logging.ContextLoggingKey;
 import org.naho.shared.response.ApiMeta;
 import org.naho.shared.response.ApiResponse;
 import org.naho.shared.response.PageMeta;
@@ -22,6 +24,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 @RestControllerAdvice
 @RequiredArgsConstructor
 public class ApiResponseHandler implements ResponseBodyAdvice<Object> {
+    private final MessageService messageService;
+
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
         // nếu controller đã trả ra ApiResponse rồi thì không bọc nữa
@@ -53,12 +57,15 @@ public class ApiResponseHandler implements ResponseBodyAdvice<Object> {
         }
 
         ApiResponseMessage apiResponseMessage = returnType.getMethodAnnotation(ApiResponseMessage.class);
-        String message = apiResponseMessage == null ? "No message" : apiResponseMessage.message();
+        String message = messageService.getMessage(
+                apiResponseMessage == null ? CommonPresentationMessageKey.COMMON_NO_MESSAGE
+                        : apiResponseMessage.message()
+        );
 
         if (body instanceof Page<?> page) {
             return ApiResponse.builder()
                     .meta(ApiMeta.createWithPagination(
-                            ThreadContext.get(ContextLoggingKeys.TRACE_ID),
+                            ThreadContext.get(ContextLoggingKey.TRACE_ID),
                             PageMeta.fromPage(page)
                     ))
                     .message(message)
@@ -66,7 +73,7 @@ public class ApiResponseHandler implements ResponseBodyAdvice<Object> {
                     .build();
         }
         return ApiResponse.builder()
-                .meta(ApiMeta.create(ThreadContext.get(ContextLoggingKeys.TRACE_ID)))
+                .meta(ApiMeta.create(ThreadContext.get(ContextLoggingKey.TRACE_ID)))
                 .message(message)
                 .data(body)
                 .build();

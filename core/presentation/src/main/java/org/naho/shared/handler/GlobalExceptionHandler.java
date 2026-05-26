@@ -4,12 +4,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.ThreadContext;
+import org.naho.i18n.MessageService;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.exception.ErrorCode;
 import org.naho.shared.exception.ErrorCodeHttpMapper;
-import org.naho.shared.exception.ProblemDetailProperties;
-import org.naho.shared.logging.ErrorLoggingKeys;
-import org.naho.shared.logging.HttpLoggingKeys;
+import org.naho.shared.exception.ProblemDetailProperty;
+import org.naho.shared.logging.ErrorLoggingKey;
+import org.naho.shared.logging.HttpLoggingKey;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ import java.time.Instant;
 public class GlobalExceptionHandler {
 
     private final ErrorCodeHttpMapper errorCodeHttpMapper;
+    private final MessageService messageService;
 
     @ExceptionHandler(ApplicationException.class)
     public ResponseEntity<ProblemDetail> handleApplicationException(
@@ -38,25 +40,25 @@ public class GlobalExceptionHandler {
         ProblemDetail problemDetail = ProblemDetail.forStatus(httpStatus);
         // set default fields
         problemDetail.setType(errorCodeHttpMapper.toType(errorCode));
-        problemDetail.setTitle(errorCode.getTitle());
-        problemDetail.setDetail(e.getMessage());
+        problemDetail.setTitle(messageService.getMessage(errorCode.getTitleKey()));
+        problemDetail.setDetail(messageService.getMessage(e.getMessage()));
         problemDetail.setInstance(URI.create(request.getRequestURI()));
 
         // set custom fields
-        problemDetail.setProperty(ProblemDetailProperties.ERROR_CODE, errorCode.getCode());
-        problemDetail.setProperty(ProblemDetailProperties.TRACE_ID, ThreadContext.get(ProblemDetailProperties.TRACE_ID));
-        problemDetail.setProperty(ProblemDetailProperties.TIMESTAMP, Instant.now().toString());
+        problemDetail.setProperty(ProblemDetailProperty.ERROR_CODE, errorCode.getCode());
+        problemDetail.setProperty(ProblemDetailProperty.TRACE_ID, ThreadContext.get(ProblemDetailProperty.TRACE_ID));
+        problemDetail.setProperty(ProblemDetailProperty.TIMESTAMP, Instant.now().toString());
 
         // logging
         // set http fields
-        ThreadContext.put(HttpLoggingKeys.HTTP_STATUS_CODE, String.valueOf(httpStatus));
+        ThreadContext.put(HttpLoggingKey.HTTP_STATUS_CODE, String.valueOf(httpStatus));
 
         // set error fields
-        ThreadContext.put(ErrorLoggingKeys.ERROR_CODE, errorCode.getCode());
-        ThreadContext.put(ErrorLoggingKeys.ERROR_MESSAGE, e.getMessage());
-        ThreadContext.put(ErrorLoggingKeys.ERROR_TYPE, e.getClass().getSimpleName());
+        ThreadContext.put(ErrorLoggingKey.ERROR_CODE, errorCode.getCode());
+        ThreadContext.put(ErrorLoggingKey.ERROR_MESSAGE, messageService.getMessage(e.getMessage()));
+        ThreadContext.put(ErrorLoggingKey.ERROR_TYPE, e.getClass().getSimpleName());
 
-        log.warn(errorCode.getTitle(), e);
+        log.warn(messageService.getMessage(errorCode.getTitleKey()), e);
         return ResponseEntity.status(httpStatus).body(problemDetail);
     }
 }

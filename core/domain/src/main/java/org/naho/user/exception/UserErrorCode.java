@@ -3,21 +3,33 @@ package org.naho.user.exception;
 import org.naho.shared.exception.ErrorCode;
 
 public enum UserErrorCode implements ErrorCode {
-    AGE_NOT_VALID("USER_001", "user.age.not.valid"),
-    EMAIL_REQUIRED("USER_002", "user.email.required"),
-    EMAIL_NOT_VALID("USER_003", "user.email.not.valid"),
-    PASSWORD_REQUIRED("USER_004", "user.password.required"),
-    PASSWORD_NOT_VALID("USER_005", "user.password.not.valid"),
-    USERNAME_REQUIRED("USER_006", "user.username.required"),
-    USERNAME_NOT_VALID("USER_007", "user.username.not.valid"),
-    ;
+
+    USER_AGE_NOT_VALID(
+            "USER_001",
+            UserErrorKey.USER_AGE_NOT_VALID_TITLE
+    ),
+
+    USER_EMAIL_NOT_VALID(
+            "USER_002",
+            UserErrorKey.USER_EMAIL_NOT_VALID_TITLE
+    ),
+
+    USER_USERNAME_NOT_VALID(
+            "USER_003",
+            UserErrorKey.USER_USERNAME_NOT_VALID_TITLE
+    ),
+
+    USER_TIMEZONE_NOT_VALID(
+            "USER_OO4",
+            UserErrorKey.USER_TIMEZONE_NOT_VALID_TITLE
+    );
 
     private final String code;
-    private final String title;
+    private final String titleKey;
 
-    UserErrorCode(String code, String title) {
+    UserErrorCode(String code, String titleKey) {
         this.code = code;
-        this.title = title;
+        this.titleKey = titleKey;
     }
 
     @Override
@@ -26,7 +38,7 @@ public enum UserErrorCode implements ErrorCode {
     }
 
     @Override
-    public String getTitle() {
-        return title;
+    public String getTitleKey() {
+        return titleKey;
     }
 }

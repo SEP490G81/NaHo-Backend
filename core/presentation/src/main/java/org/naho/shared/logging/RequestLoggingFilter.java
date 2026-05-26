@@ -32,13 +32,13 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
         Instant startTime = Instant.now();
         String traceId = resolveTraceId(request);
 
-        ThreadContext.put(ContextLoggingKeys.TRACE_ID, traceId);
-        ThreadContext.put(ContextLoggingKeys.USER_ID, "1234567890");
-        ThreadContext.put(ContextLoggingKeys.USER_ROLE, "USER");
+        ThreadContext.put(ContextLoggingKey.TRACE_ID, traceId);
+        ThreadContext.put(ContextLoggingKey.USER_ID, "1234567890");
+        ThreadContext.put(ContextLoggingKey.USER_ROLE, "USER");
 
-        ThreadContext.put(HttpLoggingKeys.HTTP_METHOD, request.getMethod());
-        ThreadContext.put(HttpLoggingKeys.HTTP_ROUTE, request.getRequestURI());
-        ThreadContext.put(HttpLoggingKeys.HTTP_CLIENT_IP, resolveClientIp(request));
+        ThreadContext.put(HttpLoggingKey.HTTP_METHOD, request.getMethod());
+        ThreadContext.put(HttpLoggingKey.HTTP_ROUTE, request.getRequestURI());
+        ThreadContext.put(HttpLoggingKey.HTTP_CLIENT_IP, resolveClientIp(request));
 
         response.setHeader(TRACE_ID_HEADER, traceId);
 
@@ -47,8 +47,8 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
         } finally {
             long durationMs = Duration.between(startTime, Instant.now()).toMillis();
 
-            ThreadContext.put(HttpLoggingKeys.HTTP_STATUS_CODE, String.valueOf(response.getStatus()));
-            ThreadContext.put(HttpLoggingKeys.HTTP_DURATION_MS, String.valueOf(durationMs));
+            ThreadContext.put(HttpLoggingKey.HTTP_STATUS_CODE, String.valueOf(response.getStatus()));
+            ThreadContext.put(HttpLoggingKey.HTTP_DURATION_MS, String.valueOf(durationMs));
 
             log.info(REQUEST_COMPLETED_MESSAGE);
 
