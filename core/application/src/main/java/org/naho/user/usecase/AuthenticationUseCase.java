@@ -2,6 +2,7 @@ package org.naho.user.usecase;
 
 import org.naho.shared.exception.ApplicationException;
 import org.naho.user.command.CredentialsLoginCommand;
+import org.naho.user.constant.UserApplicationMessageKey;
 import org.naho.user.exception.UserApplicationErrorCode;
 import org.naho.user.model.User;
 import org.naho.user.port.in.AuthenticationInputPort;
@@ -20,7 +21,8 @@ public class AuthenticationUseCase implements AuthenticationInputPort {
         User user = userRepository.findByUsername(command.username())
                 .orElseThrow(() -> new ApplicationException(
                         UserApplicationErrorCode.USER_NOT_FOUND,
-                        "User with username " + command.username() + " not found!"
+                        UserApplicationMessageKey.USER_WRONG_USERNAME_OR_PASSWORD,
+                        command.username()
                 ));
 
         return null;

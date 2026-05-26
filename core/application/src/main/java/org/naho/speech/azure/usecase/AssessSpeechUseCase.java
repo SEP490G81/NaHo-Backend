@@ -2,12 +2,13 @@ package org.naho.speech.azure.usecase;
 
 import org.naho.shared.exception.ApplicationException;
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
-import org.naho.speech.azure.exception.SpeechApplicationErrorCode;
+import org.naho.speech.azure.constant.AzureSpeechApplicationMessageKey;
+import org.naho.speech.azure.exception.AzureSpeechApplicationErrorCode;
 import org.naho.speech.azure.mapper.PronunciationAssessmentMapper;
 import org.naho.speech.azure.port.in.AssessSpeechInputPort;
 import org.naho.speech.azure.port.out.AzureSpeechService;
-import org.naho.speech.azure.result.PronunciationAssessmentResult;
-import org.naho.speech.model.PronunciationAssessment;
+import org.naho.speech.azure.result.SpeechAssessmentResult;
+import org.naho.speech.model.SpeechAssessment;
 
 public class AssessSpeechUseCase implements AssessSpeechInputPort {
 
@@ -20,16 +21,16 @@ public class AssessSpeechUseCase implements AssessSpeechInputPort {
     }
 
     @Override
-    public PronunciationAssessmentResult execute(SpeechAssessmentCommand command) {
+    public SpeechAssessmentResult execute(SpeechAssessmentCommand command) {
         if (command.audioBytes() == null || command.audioBytes().length == 0) {
             throw new ApplicationException(
-                    SpeechApplicationErrorCode.AUDIO_FILE_INVALID,
-                    "Audio content cannot be empty!"
+                    AzureSpeechApplicationErrorCode.SPEECH_AUDIO_NOT_VALID,
+                    AzureSpeechApplicationMessageKey.SPEECH_AUDIO_FILE_EMPTY
             );
         }
 
-        PronunciationAssessment pronunciationAssessment = azureSpeechService.assess(command);
+        SpeechAssessment speechAssessment = azureSpeechService.assess(command);
 
-        return pronunciationAssessmentMapper.modelToResult(pronunciationAssessment);
+        return pronunciationAssessmentMapper.modelToResult(speechAssessment);
     }
 }

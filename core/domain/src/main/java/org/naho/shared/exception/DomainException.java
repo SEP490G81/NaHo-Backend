@@ -1,14 +1,20 @@
 package org.naho.shared.exception;
 
 public class DomainException extends RuntimeException {
-    private ErrorCode errorCode;
+    private final ErrorCode errorCode;
+    private final Object[] args;
 
-    public DomainException(ErrorCode errorCode, String message) {
-        super(message);
+    public DomainException(ErrorCode errorCode, String detailMessage, Object... args) {
+        super(detailMessage);
         this.errorCode = errorCode;
+        this.args = args;
     }
 
     public ErrorCode getErrorCode() {
         return errorCode;
+    }
+
+    public Object[] getArgs() {
+        return args;
     }
 }

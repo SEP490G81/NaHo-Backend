@@ -7,11 +7,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.naho.shared.constant.FileExtension;
 import org.naho.shared.exception.InfrastructureException;
-import org.naho.speech.azure.constant.PronunciationScoreKeys;
-import org.naho.speech.azure.exception.
-        SpeechInfrastructureErrorCode;
-import org.naho.speech.model.PronunciationAssessment;
+import org.naho.speech.azure.constant.AzurePronunciationScoreKey;
+import org.naho.speech.azure.constant.AzureSpeechApplicationMessageKey;
+import org.naho.speech.azure.exception.AzureSpeechApplicationErrorCode;
+import org.naho.speech.model.SpeechAssessment;
 import org.naho.speech.model.WordAssessment;
+import org.naho.speech.type.SpeechAssessmentErrorType;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -54,8 +55,8 @@ public class AzureSpeechHelper {
 
         } catch (IOException e) {
             throw new InfrastructureException(
-                    SpeechInfrastructureErrorCode.AUDIO_FILE_INVALID,
-                    "Failed to create temporary audio file"
+                    AzureSpeechApplicationErrorCode.SPEECH_AUDIO_NOT_VALID,
+                    AzureSpeechApplicationMessageKey.SPEECH_AUDIO_FILE_EMPTY
             );
         }
     }
@@ -86,7 +87,7 @@ public class AzureSpeechHelper {
         return config;
     }
 
-    public PronunciationAssessment processResult(SpeechRecognitionResult result) {
+    public SpeechAssessment processResult(SpeechRecognitionResult result) {
         if (result.getReason() == ResultReason.RecognizedSpeech) {
             // Lấy kết quả thô dạng JSON để parsing chi tiết đầy đủ metrics
             String jsonResult = result.getProperties().getProperty(PropertyId.SpeechServiceResponse_JsonResult);
@@ -95,36 +96,43 @@ public class AzureSpeechHelper {
                 JsonNode root = objectMapper.readTree(jsonResult);
 
                 // Mặc định kết quả nằm trong mảng NBest
-                JsonNode nBestNode = root.path(PronunciationScoreKeys.N_BEST).get(0);
+                JsonNode nBestNode = root.path(AzurePronunciationScoreKey.N_BEST).get(0);
                 if (nBestNode == null) {
                     throw new InfrastructureException(
-                            SpeechInfrastructureErrorCode.SPEECH_RECOGNITION_NO_MATCH, "No speech matched from audio!");
+                            AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR,
+                            AzureSpeechApplicationMessageKey.SPEECH_AZURE_N_BEST_NODE_NULL
+                    );
                 }
 
-                String displayResultText = nBestNode.path(PronunciationScoreKeys.DISPLAY).asText();
-                JsonNode pronNode = nBestNode.path(PronunciationScoreKeys.PRONUNCIATION_ASSESSMENT);
+                String displayResultText = nBestNode.path(AzurePronunciationScoreKey.DISPLAY).asText();
+                JsonNode pronNode = nBestNode.path(AzurePronunciationScoreKey.PRONUNCIATION_ASSESSMENT);
 
-                double accuracyScore = pronNode.path(PronunciationScoreKeys.ACCURACY_SCORE).asDouble(0.0);
-                double fluencyScore = pronNode.path(PronunciationScoreKeys.FLUENCY_SCORE).asDouble(0.0);
-                double completenessScore = pronNode.path(PronunciationScoreKeys.COMPLETENESS_SCORE).asDouble(0.0);
-                double pronScore = pronNode.path(PronunciationScoreKeys.PRON_SCORE).asDouble(0.0);
+                double accuracyScore = pronNode.path(AzurePronunciationScoreKey.ACCURACY_SCORE).asDouble(0.0);
+                double fluencyScore = pronNode.path(AzurePronunciationScoreKey.FLUENCY_SCORE).asDouble(0.0);
+                double completenessScore = pronNode.path(AzurePronunciationScoreKey.COMPLETENESS_SCORE).asDouble(0.0);
+                double pronScore = pronNode.path(AzurePronunciationScoreKey.PRON_SCORE).asDouble(0.0);
 
                 // Lấy chi tiết từ (Word level)
                 List<WordAssessment> wordList = new ArrayList<>();
-                JsonNode wordsNode = nBestNode.path(PronunciationScoreKeys.WORDS);
+                JsonNode wordsNode = nBestNode.path(AzurePronunciationScoreKey.WORDS);
                 if (wordsNode.isArray()) {
                     for (JsonNode wordNode : wordsNode) {
-                        String wordStr = wordNode.path(PronunciationScoreKeys.WORD).asText();
-                        JsonNode wordPronNode = wordNode.path(PronunciationScoreKeys.PRONUNCIATION_ASSESSMENT);
-                        double wordAccuracy = wordPronNode.path(PronunciationScoreKeys.ACCURACY_SCORE).asDouble(0.0);
-                        String errorType = wordPronNode.path(PronunciationScoreKeys.ERROR_TYPE).asText(PronunciationScoreKeys.NONE);
+                        String wordStr = wordNode.path(AzurePronunciationScoreKey.WORD).asText();
+                        JsonNode wordPronNode = wordNode.path(AzurePronunciationScoreKey.PRONUNCIATION_ASSESSMENT);
+                        double wordAccuracy = wordPronNode.path(AzurePronunciationScoreKey.ACCURACY_SCORE).asDouble(0.0);
+                        String errorType = wordPronNode.path(AzurePronunciationScoreKey.ERROR_TYPE).asText(AzurePronunciationScoreKey.NONE).toUpperCase();
 
-                        wordList.add(new WordAssessment(wordStr, wordAccuracy, errorType));
+                        wordList.add(WordAssessment.builder()
+                                .word(wordStr)
+                                .accuracyScore(wordAccuracy)
+                                .errorType(SpeechAssessmentErrorType.valueOf(errorType))
+                                .build()
+                        );
                     }
                 }
 
-                return PronunciationAssessment.builder()
-                        .transcript(displayResultText)
+                return SpeechAssessment.builder()
+                        .transcriptText(displayResultText)
                         .accuracyScore(accuracyScore)
                         .fluencyScore(fluencyScore)
                         .completenessScore(completenessScore)
@@ -134,10 +142,10 @@ public class AzureSpeechHelper {
 
             } catch (IOException e) {
                 // Fallback nếu parse JSON lỗi, lấy kết quả cơ bản từ SDK objects
-                com.microsoft.cognitiveservices.speech.PronunciationAssessmentResult sdkResult =
-                        com.microsoft.cognitiveservices.speech.PronunciationAssessmentResult.fromResult(result);
-                return PronunciationAssessment.builder()
-                        .transcript(result.getText())
+                PronunciationAssessmentResult sdkResult =
+                        PronunciationAssessmentResult.fromResult(result);
+                return SpeechAssessment.builder()
+                        .transcriptText(result.getText())
                         .accuracyScore(sdkResult.getAccuracyScore())
                         .fluencyScore(sdkResult.getFluencyScore())
                         .completenessScore(sdkResult.getCompletenessScore())
@@ -147,19 +155,20 @@ public class AzureSpeechHelper {
             }
         } else if (result.getReason() == ResultReason.NoMatch) {
             throw new InfrastructureException(
-                    SpeechInfrastructureErrorCode.SPEECH_RECOGNITION_NO_MATCH,
-                    "No speech could be recognized. Please try again with clear speech!"
+                    AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR,
+                    AzureSpeechApplicationMessageKey.SPEECH_RECOGNITION_NO_MATCH
             );
         } else if (result.getReason() == ResultReason.Canceled) {
             CancellationDetails cancellation = CancellationDetails.fromResult(result);
             throw new InfrastructureException(
-                    SpeechInfrastructureErrorCode.SPEECH_RECOGNITION_CANCELED,
-                    "Azure Speech API canceled: " + cancellation.getErrorDetails()
+                    AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR,
+                    AzureSpeechApplicationMessageKey.SPEECH_RECOGNITION_CANCELLED,
+                    cancellation.getErrorDetails()
             );
         } else {
             throw new InfrastructureException(
-                    SpeechInfrastructureErrorCode.AZURE_SPEECH_SERVICE_ERROR,
-                    "Unknown speech service error occurred!"
+                    AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR,
+                    AzureSpeechApplicationMessageKey.SPEECH_AZURE_SERVICE_UNKNOWN_ERROR_OCCUR
             );
         }
     }

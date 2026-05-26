@@ -1,8 +1,6 @@
 package org.naho.user.model;
 
-import org.naho.file.model.File;
-import org.naho.shared.exception.DomainException;
-import org.naho.user.exception.UserErrorCode;
+import org.naho.user.type.AccountType;
 import org.naho.user.type.Gender;
 import org.naho.user.type.JLPTLevel;
 import org.naho.user.type.UserStatus;
@@ -10,67 +8,158 @@ import org.naho.user.valueobject.Dob;
 import org.naho.user.valueobject.Email;
 import org.naho.user.valueobject.Username;
 
+import java.time.LocalDate;
 import java.util.Set;
 
 public class User {
-    // identity
     private Long id;
+    private Long avatarFileId;
+
     private Username username;
     private Email email;
 
-    // authentication
     private String hashPassword;
-    private Set<Role> roles;
+    private String refreshToken;
+    private AccountType accountType;
 
-    // profile
     private String firstName;
     private String lastName;
     private Gender gender;
-    private Dob dob; // data of birth
-
-    private File avatar;
+    private Dob dob;
 
     private JLPTLevel jlptLevel;
     private UserStatus status;
+    private Integer currentStreak;
+    private Integer longestStreak;
+    private LocalDate lastPracticeDate;
 
+    private Set<Role> roles;
+
+    // Private constructor
     private User(Builder builder) {
         this.id = builder.id;
+        this.avatarFileId = builder.avatarFileId;
         this.username = builder.username;
         this.email = builder.email;
         this.hashPassword = builder.hashPassword;
+        this.refreshToken = builder.refreshToken;
+        this.accountType = builder.accountType;
         this.roles = builder.roles;
         this.firstName = builder.firstName;
         this.lastName = builder.lastName;
         this.gender = builder.gender;
         this.dob = builder.dob;
-        this.avatar = builder.avatar;
         this.jlptLevel = builder.jlptLevel;
         this.status = builder.status;
+        this.currentStreak = builder.currentStreak;
+        this.longestStreak = builder.longestStreak;
+        this.lastPracticeDate = builder.lastPracticeDate;
+    }
+
+    // Getters
+    public Long getId() {
+        return id;
+    }
+
+    public Long getAvatarFileId() {
+        return avatarFileId;
+    }
+
+    public Username getUsername() {
+        return username;
+    }
+
+    public Email getEmail() {
+        return email;
+    }
+
+    public String getHashPassword() {
+        return hashPassword;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public AccountType getAccountType() {
+        return accountType;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public Dob getDob() {
+        return dob;
+    }
+
+    public JLPTLevel getJlptLevel() {
+        return jlptLevel;
+    }
+
+    public UserStatus getStatus() {
+        return status;
+    }
+
+    public Integer getCurrentStreak() {
+        return currentStreak;
+    }
+
+    public Integer getLongestStreak() {
+        return longestStreak;
+    }
+
+    public LocalDate getLastPracticeDate() {
+        return lastPracticeDate;
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
-    // Builder
+    // Builder Pattern
     public static class Builder {
         private Long id;
+        private Long avatarFileId;
+
         private Username username;
         private Email email;
 
         private String hashPassword;
+        private String refreshToken;
+        private AccountType accountType;
         private Set<Role> roles;
 
         private String firstName;
         private String lastName;
         private Gender gender;
         private Dob dob;
-        private File avatar;
+
         private JLPTLevel jlptLevel;
-        private UserStatus status = UserStatus.ACTIVE;
+        private UserStatus status;
+        private Integer currentStreak;
+        private Integer longestStreak;
+        private LocalDate lastPracticeDate;
 
         public Builder id(Long id) {
             this.id = id;
+            return this;
+        }
+
+        public Builder avatarFileId(Long avatarFileId) {
+            this.avatarFileId = avatarFileId;
             return this;
         }
 
@@ -86,6 +175,16 @@ public class User {
 
         public Builder hashPassword(String hashPassword) {
             this.hashPassword = hashPassword;
+            return this;
+        }
+
+        public Builder refreshToken(String refreshToken) {
+            this.refreshToken = refreshToken;
+            return this;
+        }
+
+        public Builder accountType(AccountType accountType) {
+            this.accountType = accountType;
             return this;
         }
 
@@ -114,11 +213,6 @@ public class User {
             return this;
         }
 
-        public Builder avatar(File avatar) {
-            this.avatar = avatar;
-            return this;
-        }
-
         public Builder jlptLevel(JLPTLevel jlptLevel) {
             this.jlptLevel = jlptLevel;
             return this;
@@ -129,27 +223,22 @@ public class User {
             return this;
         }
 
+        public Builder currentStreak(Integer currentStreak) {
+            this.currentStreak = currentStreak;
+            return this;
+        }
+
+        public Builder longestStreak(Integer longestStreak) {
+            this.longestStreak = longestStreak;
+            return this;
+        }
+
+        public Builder lastPracticeDate(LocalDate lastPracticeDate) {
+            this.lastPracticeDate = lastPracticeDate;
+            return this;
+        }
+
         public User build() {
-            if (username == null) {
-                throw new DomainException(
-                        UserErrorCode.USERNAME_REQUIRED,
-                        "Username is required!"
-                );
-            }
-
-            if (email == null) {
-                throw new DomainException(
-                        UserErrorCode.EMAIL_REQUIRED,
-                        "Email is required!"
-                );
-            }
-
-            if (hashPassword == null) {
-                throw new DomainException(
-                        UserErrorCode.PASSWORD_REQUIRED,
-                        "Password is required!"
-                );
-            }
             return new User(this);
         }
     }

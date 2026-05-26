@@ -9,11 +9,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.naho.shared.exception.InfrastructureException;
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
-import org.naho.speech.azure.config.AzureSpeechProperties;
-import org.naho.speech.azure.exception.SpeechInfrastructureErrorCode;
+import org.naho.speech.azure.constant.AzureSpeechApplicationMessageKey;
+import org.naho.speech.azure.constant.AzureSpeechConfigProperty;
+import org.naho.speech.azure.exception.AzureSpeechApplicationErrorCode;
 import org.naho.speech.azure.helper.AzureSpeechHelper;
 import org.naho.speech.azure.port.out.AzureSpeechService;
-import org.naho.speech.model.PronunciationAssessment;
+import org.naho.speech.model.SpeechAssessment;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -24,11 +25,11 @@ import java.util.concurrent.ExecutionException;
 @RequiredArgsConstructor
 public class AzureSpeechServiceAdapter implements AzureSpeechService {
 
-    private final AzureSpeechProperties properties;
+    private final AzureSpeechConfigProperty properties;
     private final AzureSpeechHelper azureSpeechHelper;
 
     @Override
-    public PronunciationAssessment assess(SpeechAssessmentCommand command) {
+    public SpeechAssessment assess(SpeechAssessmentCommand command) {
         byte[] audioBytes = command.audioBytes();
         String referenceText = command.referenceText();
 
@@ -54,7 +55,7 @@ public class AzureSpeechServiceAdapter implements AzureSpeechService {
             SpeechRecognitionResult result = recognizer.recognizeOnceAsync().get();
 
             // 5. Xử lý kết quả trả về
-            PronunciationAssessment domainResult = azureSpeechHelper.processResult(result);
+            SpeechAssessment domainResult = azureSpeechHelper.processResult(result);
 
             // Giải phóng tài nguyên
             recognizer.close();
@@ -66,7 +67,10 @@ public class AzureSpeechServiceAdapter implements AzureSpeechService {
 
         } catch (InterruptedException | ExecutionException e) {
             Thread.currentThread().interrupt();
-            throw new InfrastructureException(SpeechInfrastructureErrorCode.AZURE_SPEECH_SERVICE_ERROR, "Azure Speech service connection interrupted!");
+            throw new InfrastructureException(
+                    AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR,
+                    AzureSpeechApplicationMessageKey.SPEECH_AZURE_CONNECTION_INTERRUPTED
+            );
         } finally {
             // Luôn đảm bảo xóa file tạm thời để tránh tràn ổ đĩa
             if (tempFile.exists() && !tempFile.delete()) {

@@ -1,16 +1,17 @@
 package org.naho.user.exception;
 
 import org.naho.shared.exception.ErrorCode;
+import org.naho.user.constant.UserApplicationMessageKey;
 
 public enum UserApplicationErrorCode implements ErrorCode {
-    USER_NOT_FOUND("USER_A001", "user.not.found");
+    USER_NOT_FOUND("USER_A001", UserApplicationMessageKey.USER_NOT_FOUND_TITLE);
 
     private final String code;
-    private final String title;
+    private final String titleKey;
 
-    UserApplicationErrorCode(String code, String title) {
+    UserApplicationErrorCode(String code, String titleKey) {
         this.code = code;
-        this.title = title;
+        this.titleKey = titleKey;
     }
 
     @Override
@@ -19,7 +20,7 @@ public enum UserApplicationErrorCode implements ErrorCode {
     }
 
     @Override
-    public String getTitle() {
-        return title;
+    public String getTitleKey() {
+        return titleKey;
     }
 }

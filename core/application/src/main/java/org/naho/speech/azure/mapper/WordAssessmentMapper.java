@@ -6,6 +6,7 @@ import org.naho.speech.model.WordAssessment;
 public class WordAssessmentMapper {
     public WordAssessmentResult domainToResult(WordAssessment domain) {
         return new WordAssessmentResult(
+                domain.getId(),
                 domain.getWord(),
                 domain.getAccuracyScore(),
                 domain.getErrorType()

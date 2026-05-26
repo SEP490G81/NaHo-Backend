@@ -1,9 +1,9 @@
 spring:
-  config:
-    import: optional:file:.env[.properties]
-
   application:
     name: naho-be
+
+  config:
+    import: optional:file:.env[.properties]
 
   servlet:
     multipart:

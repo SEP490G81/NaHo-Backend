@@ -1,8 +1,8 @@
 package org.naho.speech.azure.mapper;
 
-import org.naho.speech.azure.result.PronunciationAssessmentResult;
+import org.naho.speech.azure.result.SpeechAssessmentResult;
 import org.naho.speech.azure.result.WordAssessmentResult;
-import org.naho.speech.model.PronunciationAssessment;
+import org.naho.speech.model.SpeechAssessment;
 
 import java.util.List;
 
@@ -14,14 +14,15 @@ public class PronunciationAssessmentMapper {
         this.wordAssessmentMapper = wordAssessmentMapper;
     }
 
-    public PronunciationAssessmentResult modelToResult(PronunciationAssessment domain) {
+    public SpeechAssessmentResult modelToResult(SpeechAssessment domain) {
         List<WordAssessmentResult> wordAssessmentResults =
                 domain.getWords().stream()
                         .map(wordAssessmentMapper::domainToResult)
                         .toList();
 
-        return new PronunciationAssessmentResult(
-                domain.getTranscript(),
+        return new SpeechAssessmentResult(
+                domain.getId(),
+                domain.getTranscriptText(),
                 domain.getAccuracyScore(),
                 domain.getFluencyScore(),
                 domain.getCompletenessScore(),
