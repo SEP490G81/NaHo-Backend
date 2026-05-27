@@ -6,7 +6,7 @@ import org.naho.user.constant.UserApplicationMessageKey;
 import org.naho.user.exception.UserApplicationErrorCode;
 import org.naho.user.model.User;
 import org.naho.user.port.in.AuthenticationInputPort;
-import org.naho.user.port.out.UserRepository;
+import org.naho.user.port.repository.UserRepository;
 import org.naho.user.result.LoginResult;
 
 public class AuthenticationUseCase implements AuthenticationInputPort {

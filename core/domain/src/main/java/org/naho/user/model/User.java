@@ -129,6 +129,21 @@ public class User {
         return new Builder();
     }
 
+    // Build Register User
+    public static User registerNewUser(String rawUsername, String hashPassword, String rawEmail, Set<Role> defaultRoles) {
+        return User.builder()
+                .username(Username.of(rawUsername))
+                .email(Email.of(rawEmail))
+                .hashPassword(hashPassword)
+                .roles(defaultRoles)
+                .accountType(AccountType.CREDENTIALS)
+                .status(UserStatus.ACTIVE)
+                .currentStreak(0)
+                .longestStreak(0)
+                .build();
+    }
+
+
     // Builder Pattern
     public static class Builder {
         private Long id;
@@ -242,4 +257,6 @@ public class User {
             return new User(this);
         }
     }
+
+    // Build Re
 }

@@ -45,6 +45,9 @@ dependencies {
     testImplementation("org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
+    // Bcrypt
+    implementation("org.springframework.security:spring-security-crypto")
+
     // Azure Speech SDK
     implementation("com.microsoft.cognitiveservices.speech:client-sdk:1.49.1@jar")
 }

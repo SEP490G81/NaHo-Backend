@@ -7,6 +7,7 @@ import java.net.URI;
 
 import static org.naho.speech.azure.exception.AzureSpeechApplicationErrorCode.SPEECH_AUDIO_NOT_VALID;
 import static org.naho.speech.azure.exception.AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR;
+import static org.naho.user.exception.UserApplicationErrorCode.USER_ALREADY_EXISTS;
 import static org.naho.user.exception.UserApplicationErrorCode.USER_NOT_FOUND;
 import static org.naho.user.exception.UserErrorCode.*;
 
@@ -26,6 +27,7 @@ public class ErrorCodeHttpMapper {
                  USER_TIMEZONE_NOT_VALID,
                  USER_NOT_FOUND,
                  SPEECH_AUDIO_NOT_VALID -> HttpStatus.BAD_REQUEST;
+            case USER_ALREADY_EXISTS ->  HttpStatus.CONFLICT;
             case SPEECH_AZURE_SERVICE_ERROR -> HttpStatus.BAD_GATEWAY;
             default -> HttpStatus.INTERNAL_SERVER_ERROR;
         };
