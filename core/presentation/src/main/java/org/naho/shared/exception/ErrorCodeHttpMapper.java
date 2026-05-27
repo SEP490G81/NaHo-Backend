@@ -25,7 +25,8 @@ public class ErrorCodeHttpMapper {
                  USER_USERNAME_NOT_VALID,
                  USER_TIMEZONE_NOT_VALID,
                  USER_NOT_FOUND,
-                 SPEECH_AUDIO_NOT_VALID -> HttpStatus.BAD_REQUEST;
+                 SPEECH_AUDIO_NOT_VALID,
+                 USER_LOGIN_FAILED -> HttpStatus.BAD_REQUEST;
             case SPEECH_AZURE_SERVICE_ERROR -> HttpStatus.BAD_GATEWAY;
             case USER_UNAUTHORIZED -> HttpStatus.UNAUTHORIZED;
             case USER_ACCESS_DENIED -> HttpStatus.FORBIDDEN;

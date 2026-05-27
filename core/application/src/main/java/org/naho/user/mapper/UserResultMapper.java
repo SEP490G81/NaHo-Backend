@@ -5,6 +5,7 @@ import org.naho.file.result.FileResult;
 import org.naho.user.model.User;
 import org.naho.user.result.UserResult;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class UserResultMapper {
@@ -20,6 +21,7 @@ public class UserResultMapper {
                 .toList();
 
         FileResult fileResult = fileResultMapper.domainToResult(domain.getAvatarFile());
+        LocalDate dob = domain.getDob() == null ? null : domain.getDob().getValue();
 
         return UserResult.builder()
                 .id(domain.getId())
@@ -28,7 +30,7 @@ public class UserResultMapper {
                 .firstName(domain.getFirstName())
                 .lastName(domain.getLastName())
                 .gender(domain.getGender())
-                .dob(domain.getDob().getValue())
+                .dob(dob)
                 .avatarFile(fileResult)
                 .jlptLevel(domain.getJlptLevel())
                 .build();

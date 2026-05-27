@@ -1,9 +1,10 @@
 package org.naho.user.port.out;
 
 import org.naho.user.model.User;
+import org.naho.user.result.TokenResult;
 
 public interface JwtServicePort {
-    String generateAccessToken(User user);
+    TokenResult generateAccessToken(User user);
 
-    String generateRefreshToken(User user);
+    TokenResult generateRefreshToken(User user);
 }

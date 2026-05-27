@@ -6,6 +6,7 @@ import org.naho.user.constant.JwtCustomClaimKey;
 import org.naho.user.constant.JwtProperty;
 import org.naho.user.model.User;
 import org.naho.user.port.out.JwtServicePort;
+import org.naho.user.result.TokenResult;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -28,7 +29,7 @@ public class JwtServicePortAdapter implements JwtServicePort {
     }
 
     @Override
-    public String generateAccessToken(User user) {
+    public TokenResult generateAccessToken(User user) {
         Instant issuedAt = Instant.now();
         Instant expireAt = issuedAt.plus(jwtProperty.getAccessTokenExpiration());
 
@@ -38,11 +39,12 @@ public class JwtServicePortAdapter implements JwtServicePort {
                 JwtCustomClaimKey.TOKEN_TYPE, ACCESS_TOKEN_TYPE
         );
 
-        return buildToken(user, claims, issuedAt, expireAt);
+        String value = buildToken(user, claims, issuedAt, expireAt);
+        return new TokenResult(value, jwtProperty.getAccessTokenExpiration().toSeconds());
     }
 
     @Override
-    public String generateRefreshToken(User user) {
+    public TokenResult generateRefreshToken(User user) {
         Instant issuedAt = Instant.now();
         Instant expireAt = issuedAt.plus(jwtProperty.getRefreshTokenExpiration());
 
@@ -50,7 +52,8 @@ public class JwtServicePortAdapter implements JwtServicePort {
                 JwtCustomClaimKey.TOKEN_TYPE, REFRESH_TOKEN_TYPE
         );
 
-        return buildToken(user, claims, issuedAt, expireAt);
+        String value = buildToken(user, claims, issuedAt, expireAt);
+        return new TokenResult(value, jwtProperty.getRefreshTokenExpiration().toSeconds());
     }
 
     private String buildToken(

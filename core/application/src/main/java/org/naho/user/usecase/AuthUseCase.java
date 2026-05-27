@@ -53,13 +53,14 @@ public class AuthUseCase implements AuthPort {
             );
         }
 
-        String accessToken = jwtServicePort.generateAccessToken(user);
-        String refreshToken = jwtServicePort.generateRefreshToken(user);
+        TokenResult accessToken = jwtServicePort.generateAccessToken(user);
+        TokenResult refreshToken = jwtServicePort.generateRefreshToken(user);
         UserResult userResult = userResultMapper.domainToResult(user);
 
         return new LoginResult(
                 userResult,
-                new TokenResult(accessToken, refreshToken)
+                accessToken,
+                refreshToken
         );
     }
 

@@ -23,7 +23,7 @@ public final class UserApplicationMessageKey {
             "user.login.failed.title";
 
     public static final String USER_WRONG_USERNAME_OR_PASSWORD =
-            "user.wrong.username.or.password";
+            "user.wrong.login.info";
     public static final String USER_ACCOUNT_NOT_ACTIVE =
             "user.account.not.active";
 

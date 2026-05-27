@@ -50,6 +50,10 @@ dependencies {
     // Azure Speech SDK
     implementation("com.microsoft.cognitiveservices.speech:client-sdk:1.49.1@jar")
 
+    // MapStructs
+    implementation("org.mapstruct:mapstruct:1.6.3")
+    annotationProcessor("org.mapstruct:mapstruct-processor:1.6.3")
+
     // other
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5")
