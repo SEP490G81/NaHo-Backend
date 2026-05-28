@@ -1,0 +1,16 @@
+package org.naho.speech.azure.constant;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.FieldDefaults;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+@Getter
+@Setter
+@ConfigurationProperties(prefix = "azure.speech")
+@FieldDefaults(level = lombok.AccessLevel.PRIVATE)
+public class AzureSpeechConfigProperty {
+    String subscriptionKey;
+    String region;
+    String language;
+}

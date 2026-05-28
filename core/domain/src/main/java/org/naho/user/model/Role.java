@@ -6,11 +6,22 @@ import java.util.Set;
 
 public class Role {
     private Long id;
+    private Set<Long> permissionIds;
+    private Set<Long> userIds;
+
     private RoleName roleName;
     private String description;
-    private Set<Permission> permissions;
-    private Set<User> users;
 
+    // Private constructor
+    private Role(Builder builder) {
+        this.id = builder.id;
+        this.roleName = builder.roleName;
+        this.description = builder.description;
+        this.permissionIds = builder.permissionIds;
+        this.userIds = builder.userIds;
+    }
+
+    // Getters
     public Long getId() {
         return id;
     }
@@ -23,11 +34,53 @@ public class Role {
         return description;
     }
 
-    public Set<Permission> getPermissions() {
-        return permissions;
+    public Set<Long> getPermissionIds() {
+        return permissionIds;
     }
 
-    public Set<User> getUsers() {
-        return users;
+    public Set<Long> getUserIds() {
+        return userIds;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    // Builder Pattern
+    public static class Builder {
+        private Long id;
+        private RoleName roleName;
+        private String description;
+        private Set<Long> permissionIds;
+        private Set<Long> userIds;
+
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder roleName(RoleName roleName) {
+            this.roleName = roleName;
+            return this;
+        }
+
+        public Builder description(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public Builder permissionIds(Set<Long> permissionIds) {
+            this.permissionIds = permissionIds;
+            return this;
+        }
+
+        public Builder userIds(Set<Long> userIds) {
+            this.userIds = userIds;
+            return this;
+        }
+
+        public Role build() {
+            return new Role(this);
+        }
     }
 }

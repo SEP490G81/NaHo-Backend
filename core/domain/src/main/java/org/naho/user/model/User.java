@@ -1,77 +1,111 @@
 package org.naho.user.model;
 
-import org.naho.file.model.File;
-import org.naho.shared.exception.DomainException;
-import org.naho.user.exception.UserErrorCode;
+import org.naho.user.type.AccountType;
 import org.naho.user.type.Gender;
 import org.naho.user.type.JLPTLevel;
 import org.naho.user.type.UserStatus;
 import org.naho.user.valueobject.Dob;
 import org.naho.user.valueobject.Email;
-import org.naho.user.valueobject.Password;
 import org.naho.user.valueobject.Username;
 
-import java.util.Set;
+import java.time.LocalDate;
+import java.util.List;
 
 public class User {
-    // identity
     private Long id;
+    private Long avatarFileId;
+    private List<Long> roleIds;
+    private List<Long> userSessionIds;
+
     private Username username;
     private Email email;
 
-    // authentication
-    private Password password;
-    private Set<Role> roles;
+    private String hashPassword;
+    private AccountType accountType;
 
-    // profile
     private String firstName;
     private String lastName;
     private Gender gender;
-    private Dob dob; // data of birth
-
-    private File avatar;
+    private Dob dob;
 
     private JLPTLevel jlptLevel;
     private UserStatus status;
+    private Integer currentStreak;
+    private Integer longestStreak;
+    private LocalDate lastPracticeDate;
 
+    public boolean isActive() {
+        return status == UserStatus.ACTIVE;
+    }
+
+    // Private constructor
     private User(Builder builder) {
         this.id = builder.id;
+        this.avatarFileId = builder.avatarFileId;
+        this.roleIds = builder.roleIds;
+        this.userSessionIds = builder.userSessionIds;
         this.username = builder.username;
         this.email = builder.email;
-        this.password = builder.password;
-        this.roles = builder.roles;
+        this.hashPassword = builder.hashPassword;
+        this.accountType = builder.accountType;
         this.firstName = builder.firstName;
         this.lastName = builder.lastName;
         this.gender = builder.gender;
         this.dob = builder.dob;
-        this.avatar = builder.avatar;
         this.jlptLevel = builder.jlptLevel;
         this.status = builder.status;
+        this.currentStreak = builder.currentStreak;
+        this.longestStreak = builder.longestStreak;
+        this.lastPracticeDate = builder.lastPracticeDate;
     }
 
+    // Static builder method
     public static Builder builder() {
         return new Builder();
     }
 
-    // Builder
+    // Builder class
     public static class Builder {
+
         private Long id;
+        private Long avatarFileId;
+        private List<Long> roleIds;
+        private List<Long> userSessionIds;
+
         private Username username;
         private Email email;
 
-        private Password password;
-        private Set<Role> roles;
+        private String hashPassword;
+        private AccountType accountType;
 
         private String firstName;
         private String lastName;
         private Gender gender;
         private Dob dob;
-        private File avatar;
+
         private JLPTLevel jlptLevel;
-        private UserStatus status = UserStatus.ACTIVE;
+        private UserStatus status;
+        private Integer currentStreak;
+        private Integer longestStreak;
+        private LocalDate lastPracticeDate;
 
         public Builder id(Long id) {
             this.id = id;
+            return this;
+        }
+
+        public Builder avatarFileId(Long avatarFileId) {
+            this.avatarFileId = avatarFileId;
+            return this;
+        }
+
+        public Builder roleIds(List<Long> roleIds) {
+            this.roleIds = roleIds;
+            return this;
+        }
+
+        public Builder userSessionIds(List<Long> userSessionIds) {
+            this.userSessionIds = userSessionIds;
             return this;
         }
 
@@ -85,13 +119,13 @@ public class User {
             return this;
         }
 
-        public Builder password(Password password) {
-            this.password = password;
+        public Builder hashPassword(String hashPassword) {
+            this.hashPassword = hashPassword;
             return this;
         }
 
-        public Builder roles(Set<Role> roles) {
-            this.roles = roles;
+        public Builder accountType(AccountType accountType) {
+            this.accountType = accountType;
             return this;
         }
 
@@ -115,11 +149,6 @@ public class User {
             return this;
         }
 
-        public Builder avatar(File avatar) {
-            this.avatar = avatar;
-            return this;
-        }
-
         public Builder jlptLevel(JLPTLevel jlptLevel) {
             this.jlptLevel = jlptLevel;
             return this;
@@ -130,28 +159,92 @@ public class User {
             return this;
         }
 
+        public Builder currentStreak(Integer currentStreak) {
+            this.currentStreak = currentStreak;
+            return this;
+        }
+
+        public Builder longestStreak(Integer longestStreak) {
+            this.longestStreak = longestStreak;
+            return this;
+        }
+
+        public Builder lastPracticeDate(LocalDate lastPracticeDate) {
+            this.lastPracticeDate = lastPracticeDate;
+            return this;
+        }
+
         public User build() {
-            if (username == null) {
-                throw new DomainException(
-                        UserErrorCode.USERNAME_REQUIRED,
-                        "Username is required!"
-                );
-            }
-
-            if (email == null) {
-                throw new DomainException(
-                        UserErrorCode.EMAIL_REQUIRED,
-                        "Email is required!"
-                );
-            }
-
-            if (password == null) {
-                throw new DomainException(
-                        UserErrorCode.PASSWORD_REQUIRED,
-                        "Password is required!"
-                );
-            }
             return new User(this);
         }
+    }
+
+    // Getters
+    public Long getId() {
+        return id;
+    }
+
+    public Long getAvatarFileId() {
+        return avatarFileId;
+    }
+
+    public List<Long> getRoleIds() {
+        return roleIds;
+    }
+
+    public List<Long> getUserSessionIds() {
+        return userSessionIds;
+    }
+
+    public Username getUsername() {
+        return username;
+    }
+
+    public Email getEmail() {
+        return email;
+    }
+
+    public String getHashPassword() {
+        return hashPassword;
+    }
+
+    public AccountType getAccountType() {
+        return accountType;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public Dob getDob() {
+        return dob;
+    }
+
+    public JLPTLevel getJlptLevel() {
+        return jlptLevel;
+    }
+
+    public UserStatus getStatus() {
+        return status;
+    }
+
+    public Integer getCurrentStreak() {
+        return currentStreak;
+    }
+
+    public Integer getLongestStreak() {
+        return longestStreak;
+    }
+
+    public LocalDate getLastPracticeDate() {
+        return lastPracticeDate;
     }
 }

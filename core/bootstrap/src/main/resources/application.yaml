@@ -1,9 +1,9 @@
 spring:
-  config:
-    import: "optional:file:.env[.properties]"
-
   application:
     name: naho-be
+
+  config:
+    import: optional:file:.env[.properties]
 
   servlet:
     multipart:
@@ -49,3 +49,12 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     url: /v3/api-docs
+
+mybatis:
+  mapper-locations: classpath*:mybatis/mapper/**/*.xml
+
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    access-token-expiration: 5m
+    refresh-token-expiration: 30d
