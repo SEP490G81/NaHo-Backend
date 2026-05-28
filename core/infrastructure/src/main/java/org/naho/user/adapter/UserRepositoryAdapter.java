@@ -3,7 +3,7 @@ package org.naho.user.adapter;
 import org.naho.user.entity.RoleEntity;
 import org.naho.user.entity.UserEntity;
 import org.naho.user.model.User;
-import org.naho.user.port.repository.UserRepository;
+import org.naho.user.port.out.UserRepository;
 import org.naho.user.repository.UserJpaRepository;
 import org.naho.user.type.JLPTLevel;
 import org.springframework.stereotype.Repository;

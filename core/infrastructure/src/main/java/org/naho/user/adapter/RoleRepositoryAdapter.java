@@ -3,7 +3,7 @@ package org.naho.user.adapter;
 import lombok.RequiredArgsConstructor;
 import org.naho.user.entity.RoleEntity;
 import org.naho.user.model.Role;
-import org.naho.user.port.repository.RoleRepository;
+import org.naho.user.port.out.RoleRepository;
 import org.naho.user.repository.RoleJpaRepository;
 import org.naho.user.type.RoleName;
 import org.springframework.stereotype.Component;

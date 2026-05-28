@@ -8,8 +8,8 @@ import org.naho.user.model.Role;
 import org.naho.user.model.User;
 import org.naho.user.port.in.RegisterInputPort;
 import org.naho.user.port.out.PasswordEncoderPort;
-import org.naho.user.port.repository.RoleRepository;
-import org.naho.user.port.repository.UserRepository;
+import org.naho.user.port.out.RoleRepository;
+import org.naho.user.port.out.UserRepository;
 import org.naho.user.result.RegisterResult;
 import org.naho.user.type.RoleName;
 
@@ -50,19 +50,19 @@ public class RegisterUseCase implements RegisterInputPort {
         String encodedPassword = passwordEncoder.encode(command.password());
 
         // Assign StudentRole
-        Set<Role> assingedRole = new HashSet<>();
+        Set<Role> assignedRole = new HashSet<>();
         Role defaultRole = roleRepository.findByName(RoleName.STUDENT).orElseThrow(()-> new ApplicationException(
                 UserApplicationErrorCode.USER_ROLE_NOT_VALID,
                 UserApplicationMessageKey.USER_ROLE_NOT_FOUND
         ));
 
-        assingedRole.add(defaultRole);
+        assignedRole.add(defaultRole);
 
         User newUser = User.registerNewUser(
                 command.username(),
                 encodedPassword,
                 command.email(),
-                assingedRole
+                assignedRole
         );
 
         User savedUser = userRepository.save(newUser);

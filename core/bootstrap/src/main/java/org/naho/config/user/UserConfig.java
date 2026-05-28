@@ -2,8 +2,8 @@ package org.naho.config.user;
 
 import org.naho.user.port.in.RegisterInputPort;
 import org.naho.user.port.out.PasswordEncoderPort;
-import org.naho.user.port.repository.RoleRepository;
-import org.naho.user.port.repository.UserRepository;
+import org.naho.user.port.out.RoleRepository;
+import org.naho.user.port.out.UserRepository;
 import org.naho.user.usecase.RegisterUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

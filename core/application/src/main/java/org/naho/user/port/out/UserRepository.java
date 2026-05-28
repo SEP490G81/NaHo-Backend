@@ -1,4 +1,4 @@
-package org.naho.user.port.repository;
+package org.naho.user.port.out;
 
 import org.naho.user.model.User;
 
