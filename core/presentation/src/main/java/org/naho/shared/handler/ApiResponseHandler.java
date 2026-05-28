@@ -5,8 +5,8 @@ import org.apache.logging.log4j.ThreadContext;
 import org.jspecify.annotations.Nullable;
 import org.naho.i18n.MessageService;
 import org.naho.shared.annotation.ApiResponseMessage;
-import org.naho.shared.constant.CommonPresentationMessageKey;
-import org.naho.shared.logging.ContextLoggingKey;
+import org.naho.shared.constant.CommonApplicationMessageKey;
+import org.naho.shared.constant.ContextLoggingKey;
 import org.naho.shared.response.ApiMeta;
 import org.naho.shared.response.ApiResponse;
 import org.naho.shared.response.PageMeta;
@@ -58,7 +58,7 @@ public class ApiResponseHandler implements ResponseBodyAdvice<Object> {
 
         ApiResponseMessage apiResponseMessage = returnType.getMethodAnnotation(ApiResponseMessage.class);
         String message = messageService.getMessage(
-                apiResponseMessage == null ? CommonPresentationMessageKey.COMMON_NO_MESSAGE
+                apiResponseMessage == null ? CommonApplicationMessageKey.COMMON_NO_MESSAGE
                         : apiResponseMessage.message()
         );
 

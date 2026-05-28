@@ -1,23 +1,135 @@
 package org.naho.user.result;
 
-import org.naho.file.result.FileResult;
 import org.naho.user.type.Gender;
 import org.naho.user.type.JLPTLevel;
-import org.naho.user.type.UserStatus;
 
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.List;
 
-public record UserResult(
-        Long id,
-        String email,
-        Set<String> roles,
-        String firstName,
-        String lastName,
-        Gender gender,
-        LocalDate dob,
-        FileResult avatar,
-        JLPTLevel jlptLevel,
-        UserStatus status
-) {
+public class UserResult {
+
+    private final Long id;
+    private final List<String> roleNames;
+    private final String avatarFileUrl;
+
+    private final String email;
+    private final String firstName;
+    private final String lastName;
+    private final Gender gender;
+    private final LocalDate dob;
+    private final JLPTLevel jlptLevel;
+
+    private UserResult(Builder builder) {
+        this.id = builder.id;
+        this.email = builder.email;
+        this.roleNames = builder.roleNames;
+        this.firstName = builder.firstName;
+        this.lastName = builder.lastName;
+        this.gender = builder.gender;
+        this.dob = builder.dob;
+        this.avatarFileUrl = builder.avatarFileUrl;
+        this.jlptLevel = builder.jlptLevel;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public List<String> getRoleNames() {
+        return roleNames;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public LocalDate getDob() {
+        return dob;
+    }
+
+    public String getAvatarFileUrl() {
+        return avatarFileUrl;
+    }
+
+    public JLPTLevel getJlptLevel() {
+        return jlptLevel;
+    }
+
+    public static class Builder {
+
+        private Long id;
+        private String email;
+        private List<String> roleNames;
+        private String firstName;
+        private String lastName;
+        private Gender gender;
+        private LocalDate dob;
+        private String avatarFileUrl;
+        private JLPTLevel jlptLevel;
+
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder email(String email) {
+            this.email = email;
+            return this;
+        }
+
+        public Builder roleNames(List<String> roleNames) {
+            this.roleNames = roleNames;
+            return this;
+        }
+
+        public Builder firstName(String firstName) {
+            this.firstName = firstName;
+            return this;
+        }
+
+        public Builder lastName(String lastName) {
+            this.lastName = lastName;
+            return this;
+        }
+
+        public Builder gender(Gender gender) {
+            this.gender = gender;
+            return this;
+        }
+
+        public Builder dob(LocalDate dob) {
+            this.dob = dob;
+            return this;
+        }
+
+        public Builder avatarFileUrl(String avatarFileUrl) {
+            this.avatarFileUrl = avatarFileUrl;
+            return this;
+        }
+
+        public Builder jlptLevel(JLPTLevel jlptLevel) {
+            this.jlptLevel = jlptLevel;
+            return this;
+        }
+
+        public UserResult build() {
+            return new UserResult(this);
+        }
+    }
 }

@@ -1,7 +1,14 @@
 package org.naho.user.command;
 
+import org.naho.user.type.DeviceType;
+
 public record CredentialsLoginCommand(
-        String username,
-        String rawPassword
+        String usernameOrEmail,
+        String rawPassword,
+        String deviceId,
+        String deviceName,
+        DeviceType deviceType,
+        String userAgent,
+        String ipAddress
 ) {
 }

@@ -9,17 +9,18 @@ import org.naho.user.valueobject.Email;
 import org.naho.user.valueobject.Username;
 
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.List;
 
 public class User {
     private Long id;
     private Long avatarFileId;
+    private List<Long> roleIds;
+    private List<Long> userSessionIds;
 
     private Username username;
     private Email email;
 
     private String hashPassword;
-    private String refreshToken;
     private AccountType accountType;
 
     private String firstName;
@@ -33,18 +34,20 @@ public class User {
     private Integer longestStreak;
     private LocalDate lastPracticeDate;
 
-    private Set<Role> roles;
+    public boolean isActive() {
+        return status == UserStatus.ACTIVE;
+    }
 
     // Private constructor
     private User(Builder builder) {
         this.id = builder.id;
         this.avatarFileId = builder.avatarFileId;
+        this.roleIds = builder.roleIds;
+        this.userSessionIds = builder.userSessionIds;
         this.username = builder.username;
         this.email = builder.email;
         this.hashPassword = builder.hashPassword;
-        this.refreshToken = builder.refreshToken;
         this.accountType = builder.accountType;
-        this.roles = builder.roles;
         this.firstName = builder.firstName;
         this.lastName = builder.lastName;
         this.gender = builder.gender;
@@ -56,91 +59,24 @@ public class User {
         this.lastPracticeDate = builder.lastPracticeDate;
     }
 
-    // Getters
-    public Long getId() {
-        return id;
-    }
-
-    public Long getAvatarFileId() {
-        return avatarFileId;
-    }
-
-    public Username getUsername() {
-        return username;
-    }
-
-    public Email getEmail() {
-        return email;
-    }
-
-    public String getHashPassword() {
-        return hashPassword;
-    }
-
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-
-    public AccountType getAccountType() {
-        return accountType;
-    }
-
-    public Set<Role> getRoles() {
-        return roles;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public Dob getDob() {
-        return dob;
-    }
-
-    public JLPTLevel getJlptLevel() {
-        return jlptLevel;
-    }
-
-    public UserStatus getStatus() {
-        return status;
-    }
-
-    public Integer getCurrentStreak() {
-        return currentStreak;
-    }
-
-    public Integer getLongestStreak() {
-        return longestStreak;
-    }
-
-    public LocalDate getLastPracticeDate() {
-        return lastPracticeDate;
-    }
-
+    // Static builder method
     public static Builder builder() {
         return new Builder();
     }
 
-    // Builder Pattern
+    // Builder class
     public static class Builder {
+
         private Long id;
         private Long avatarFileId;
+        private List<Long> roleIds;
+        private List<Long> userSessionIds;
 
         private Username username;
         private Email email;
 
         private String hashPassword;
-        private String refreshToken;
         private AccountType accountType;
-        private Set<Role> roles;
 
         private String firstName;
         private String lastName;
@@ -163,6 +99,16 @@ public class User {
             return this;
         }
 
+        public Builder roleIds(List<Long> roleIds) {
+            this.roleIds = roleIds;
+            return this;
+        }
+
+        public Builder userSessionIds(List<Long> userSessionIds) {
+            this.userSessionIds = userSessionIds;
+            return this;
+        }
+
         public Builder username(Username username) {
             this.username = username;
             return this;
@@ -178,18 +124,8 @@ public class User {
             return this;
         }
 
-        public Builder refreshToken(String refreshToken) {
-            this.refreshToken = refreshToken;
-            return this;
-        }
-
         public Builder accountType(AccountType accountType) {
             this.accountType = accountType;
-            return this;
-        }
-
-        public Builder roles(Set<Role> roles) {
-            this.roles = roles;
             return this;
         }
 
@@ -241,5 +177,74 @@ public class User {
         public User build() {
             return new User(this);
         }
+    }
+
+    // Getters
+    public Long getId() {
+        return id;
+    }
+
+    public Long getAvatarFileId() {
+        return avatarFileId;
+    }
+
+    public List<Long> getRoleIds() {
+        return roleIds;
+    }
+
+    public List<Long> getUserSessionIds() {
+        return userSessionIds;
+    }
+
+    public Username getUsername() {
+        return username;
+    }
+
+    public Email getEmail() {
+        return email;
+    }
+
+    public String getHashPassword() {
+        return hashPassword;
+    }
+
+    public AccountType getAccountType() {
+        return accountType;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public Dob getDob() {
+        return dob;
+    }
+
+    public JLPTLevel getJlptLevel() {
+        return jlptLevel;
+    }
+
+    public UserStatus getStatus() {
+        return status;
+    }
+
+    public Integer getCurrentStreak() {
+        return currentStreak;
+    }
+
+    public Integer getLongestStreak() {
+        return longestStreak;
+    }
+
+    public LocalDate getLastPracticeDate() {
+        return lastPracticeDate;
     }
 }
