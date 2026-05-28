@@ -6,16 +6,17 @@ import java.util.Set;
 
 public class Permission {
     private Long id;
+    private Set<Long> roleIds;
+    
     private PermissionCode permissionCode;
     private String description;
-    private Set<Role> roles;
 
     // Private constructor
     private Permission(Builder builder) {
         this.id = builder.id;
         this.permissionCode = builder.permissionCode;
         this.description = builder.description;
-        this.roles = builder.roles;
+        this.roleIds = builder.roleIds;
     }
 
     // Getters
@@ -31,8 +32,8 @@ public class Permission {
         return description;
     }
 
-    public Set<Role> getRoles() {
-        return roles;
+    public Set<Long> getLongs() {
+        return roleIds;
     }
 
     public static Builder builder() {
@@ -44,7 +45,7 @@ public class Permission {
         private Long id;
         private PermissionCode permissionCode;
         private String description;
-        private Set<Role> roles;
+        private Set<Long> roleIds;
 
         public Builder id(Long id) {
             this.id = id;
@@ -61,8 +62,8 @@ public class Permission {
             return this;
         }
 
-        public Builder roles(Set<Role> roles) {
-            this.roles = roles;
+        public Builder roleIds(Set<Long> roleIds) {
+            this.roleIds = roleIds;
             return this;
         }
 

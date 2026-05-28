@@ -8,4 +8,6 @@ public interface UserRepositoryPort {
     Optional<User> findByUsername(String username);
 
     Optional<User> findByEmail(String email);
+
+    Optional<User> findByUsernameOrEmail(String usernameOrEmail);
 }

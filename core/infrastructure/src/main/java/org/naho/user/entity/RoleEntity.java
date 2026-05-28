@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.user.type.RoleName;
 
+import java.util.List;
 import java.util.Set;
 
 @Builder
@@ -24,7 +25,7 @@ public class RoleEntity extends BaseEntity {
     String description;
 
     @ManyToMany(mappedBy = "roles")
-    Set<UserEntity> users;
+    List<UserEntity> users;
 
     @ManyToMany
     @JoinTable(joinColumns = @JoinColumn(name = "role_id"),

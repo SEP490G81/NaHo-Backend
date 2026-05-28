@@ -9,3 +9,7 @@ azure:
     subscription-key: ${AZURE_SPEECH_KEY}
     region: ${AZURE_SPEECH_REGION}
     language: "ja-JP"
+
+app:
+  cookie:
+    secure: false
