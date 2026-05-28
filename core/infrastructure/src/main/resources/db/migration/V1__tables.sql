@@ -163,6 +163,24 @@ CREATE TABLE topics
     CONSTRAINT pk_topics PRIMARY KEY (id)
 );
 
+CREATE TABLE user_sessions
+(
+    id                 BIGINT AUTO_INCREMENT NOT NULL,
+    user_id            BIGINT                NOT NULL,
+    hash_refresh_token VARCHAR(512)          NOT NULL,
+    device_id          VARCHAR(100)          NULL,
+    device_name        VARCHAR(255)          NULL,
+    device_type        VARCHAR(50)           NULL,
+    user_agent         TEXT                  NULL,
+    ip_address         VARCHAR(45)           NULL,
+    issued_at          datetime              NOT NULL,
+    expires_at         datetime              NOT NULL,
+    last_used_at       datetime              NULL,
+    revoked_at         datetime              NULL,
+    revoked_reason     VARCHAR(50)           NULL,
+    CONSTRAINT pk_user_sessions PRIMARY KEY (id)
+);
+
 CREATE TABLE users
 (
     id                 BIGINT AUTO_INCREMENT NOT NULL,
@@ -173,7 +191,6 @@ CREATE TABLE users
     username           VARCHAR(36)           NOT NULL,
     email              VARCHAR(255)          NOT NULL,
     hash_password      VARCHAR(255)          NOT NULL,
-    refresh_token      VARCHAR(512)          NULL,
     account_type       VARCHAR(20)           NOT NULL,
     first_name         VARCHAR(100)          NULL,
     last_name          VARCHAR(100)          NULL,
@@ -191,8 +208,7 @@ CREATE TABLE users
 CREATE TABLE users_roles
 (
     role_id BIGINT NOT NULL,
-    user_id BIGINT NOT NULL,
-    CONSTRAINT pk_users_roles PRIMARY KEY (role_id, user_id)
+    user_id BIGINT NOT NULL
 );
 
 CREATE TABLE vocabulary_japanese_tokenizers
@@ -277,6 +293,9 @@ ALTER TABLE topics
 
 ALTER TABLE users
     ADD CONSTRAINT FK_USERS_ON_AVATAR_FILE FOREIGN KEY (avatar_file_id) REFERENCES files (id);
+
+ALTER TABLE user_sessions
+    ADD CONSTRAINT FK_USER_SESSIONS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
 ALTER TABLE word_assessments
     ADD CONSTRAINT FK_WORD_ASSESSMENTS_ON_SPEECH_ASSESSMENT FOREIGN KEY (speech_assessment_id) REFERENCES speech_assessments (id);

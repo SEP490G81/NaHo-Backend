@@ -1,7 +1,9 @@
 package org.naho.user.dto.response;
 
+import java.time.Instant;
+
 public record TokenResponse(
-        String accessToken,
-        String refreshToken
+        String value,
+        Instant expiresAt
 ) {
 }

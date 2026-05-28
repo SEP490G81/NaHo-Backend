@@ -1,6 +1,5 @@
 package org.naho.user.result;
 
-import org.naho.file.result.FileResult;
 import org.naho.user.type.Gender;
 import org.naho.user.type.JLPTLevel;
 
@@ -10,24 +9,25 @@ import java.util.List;
 public class UserResult {
 
     private final Long id;
+    private final List<String> roleNames;
+    private final String avatarFileUrl;
+
     private final String email;
-    private final List<String> roles;
     private final String firstName;
     private final String lastName;
     private final Gender gender;
     private final LocalDate dob;
-    private final FileResult avatarFile;
     private final JLPTLevel jlptLevel;
 
     private UserResult(Builder builder) {
         this.id = builder.id;
         this.email = builder.email;
-        this.roles = builder.roles;
+        this.roleNames = builder.roleNames;
         this.firstName = builder.firstName;
         this.lastName = builder.lastName;
         this.gender = builder.gender;
         this.dob = builder.dob;
-        this.avatarFile = builder.avatarFile;
+        this.avatarFileUrl = builder.avatarFileUrl;
         this.jlptLevel = builder.jlptLevel;
     }
 
@@ -43,8 +43,8 @@ public class UserResult {
         return email;
     }
 
-    public List<String> getRoles() {
-        return roles;
+    public List<String> getRoleNames() {
+        return roleNames;
     }
 
     public String getFirstName() {
@@ -63,8 +63,8 @@ public class UserResult {
         return dob;
     }
 
-    public FileResult getAvatarFile() {
-        return avatarFile;
+    public String getAvatarFileUrl() {
+        return avatarFileUrl;
     }
 
     public JLPTLevel getJlptLevel() {
@@ -75,12 +75,12 @@ public class UserResult {
 
         private Long id;
         private String email;
-        private List<String> roles;
+        private List<String> roleNames;
         private String firstName;
         private String lastName;
         private Gender gender;
         private LocalDate dob;
-        private FileResult avatarFile;
+        private String avatarFileUrl;
         private JLPTLevel jlptLevel;
 
         public Builder id(Long id) {
@@ -93,8 +93,8 @@ public class UserResult {
             return this;
         }
 
-        public Builder roles(List<String> roles) {
-            this.roles = roles;
+        public Builder roleNames(List<String> roleNames) {
+            this.roleNames = roleNames;
             return this;
         }
 
@@ -118,8 +118,8 @@ public class UserResult {
             return this;
         }
 
-        public Builder avatarFile(FileResult avatarFile) {
-            this.avatarFile = avatarFile;
+        public Builder avatarFileUrl(String avatarFileUrl) {
+            this.avatarFileUrl = avatarFileUrl;
             return this;
         }
 

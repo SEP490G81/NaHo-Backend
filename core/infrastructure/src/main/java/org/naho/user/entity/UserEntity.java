@@ -12,7 +12,7 @@ import org.naho.user.type.UserStatus;
 import org.naho.user.valueobject.Username;
 
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.List;
 
 @Builder
 @Getter
@@ -31,9 +31,6 @@ public class UserEntity extends BaseEntity {
 
     @Column(name = "hash_password", nullable = false)
     String hashPassword;
-
-    @Column(name = "refresh_token", length = 512)
-    String refreshToken;
 
     @Column(name = "account_type", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
@@ -73,7 +70,11 @@ public class UserEntity extends BaseEntity {
     FileEntity avatarFile;
 
     @ManyToMany
-    @JoinTable(joinColumns = @JoinColumn(name = "user_id"),
+    @JoinTable(
+            joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
-    Set<RoleEntity> roles;
+    List<RoleEntity> roles;
+
+    @OneToMany(mappedBy = "user")
+    List<UserSessionEntity> userSessions;
 }
