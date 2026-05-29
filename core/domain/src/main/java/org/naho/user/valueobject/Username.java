@@ -1,8 +1,8 @@
 package org.naho.user.valueobject;
 
 import org.naho.shared.exception.DomainException;
+import org.naho.user.constant.UserMessageKey;
 import org.naho.user.exception.UserErrorCode;
-import org.naho.user.exception.UserErrorKey;
 
 import java.util.regex.Pattern;
 
@@ -25,7 +25,7 @@ public class Username {
         if (value == null || value.isBlank()) {
             throw new DomainException(
                     UserErrorCode.USER_USERNAME_NOT_VALID,
-                    UserErrorKey.USER_USERNAME_REQUIRED
+                    UserMessageKey.USER_USERNAME_REQUIRED
             );
         }
 
@@ -34,7 +34,7 @@ public class Username {
 
             throw new DomainException(
                     UserErrorCode.USER_USERNAME_NOT_VALID,
-                    UserErrorKey.USER_USERNAME_INVALID_RANGE,
+                    UserMessageKey.USER_USERNAME_INVALID_RANGE,
                     MIN_LENGTH,
                     MAX_LENGTH
             );
@@ -43,7 +43,7 @@ public class Username {
         if (!USERNAME_PATTERN.matcher(value).matches()) {
             throw new DomainException(
                     UserErrorCode.USER_USERNAME_NOT_VALID,
-                    UserErrorKey.USER_USERNAME_INVALID_FORMAT
+                    UserMessageKey.USER_USERNAME_INVALID_FORMAT
             );
         }
 

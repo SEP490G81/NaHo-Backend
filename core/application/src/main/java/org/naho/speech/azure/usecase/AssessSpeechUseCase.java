@@ -6,17 +6,17 @@ import org.naho.speech.azure.constant.AzureSpeechApplicationMessageKey;
 import org.naho.speech.azure.exception.AzureSpeechApplicationErrorCode;
 import org.naho.speech.azure.mapper.PronunciationAssessmentMapper;
 import org.naho.speech.azure.port.in.AssessSpeechInputPort;
-import org.naho.speech.azure.port.out.AzureSpeechService;
+import org.naho.speech.azure.port.out.AzureSpeechServicePort;
 import org.naho.speech.azure.result.SpeechAssessmentResult;
 import org.naho.speech.model.SpeechAssessment;
 
 public class AssessSpeechUseCase implements AssessSpeechInputPort {
 
-    private final AzureSpeechService azureSpeechService;
+    private final AzureSpeechServicePort azureSpeechServicePort;
     private final PronunciationAssessmentMapper pronunciationAssessmentMapper;
 
-    public AssessSpeechUseCase(AzureSpeechService azureSpeechService, PronunciationAssessmentMapper pronunciationAssessmentMapper) {
-        this.azureSpeechService = azureSpeechService;
+    public AssessSpeechUseCase(AzureSpeechServicePort azureSpeechServicePort, PronunciationAssessmentMapper pronunciationAssessmentMapper) {
+        this.azureSpeechServicePort = azureSpeechServicePort;
         this.pronunciationAssessmentMapper = pronunciationAssessmentMapper;
     }
 
@@ -29,7 +29,7 @@ public class AssessSpeechUseCase implements AssessSpeechInputPort {
             );
         }
 
-        SpeechAssessment speechAssessment = azureSpeechService.assess(command);
+        SpeechAssessment speechAssessment = azureSpeechServicePort.assess(command);
 
         return pronunciationAssessmentMapper.modelToResult(speechAssessment);
     }

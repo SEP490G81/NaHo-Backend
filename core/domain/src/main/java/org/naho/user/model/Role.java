@@ -6,18 +6,19 @@ import java.util.Set;
 
 public class Role {
     private Long id;
+    private Set<Long> permissionIds;
+    private Set<Long> userIds;
+
     private RoleName roleName;
     private String description;
-    private Set<Permission> permissions;
-    private Set<User> users;
 
     // Private constructor
     private Role(Builder builder) {
         this.id = builder.id;
         this.roleName = builder.roleName;
         this.description = builder.description;
-        this.permissions = builder.permissions;
-        this.users = builder.users;
+        this.permissionIds = builder.permissionIds;
+        this.userIds = builder.userIds;
     }
 
     // Getters
@@ -33,12 +34,12 @@ public class Role {
         return description;
     }
 
-    public Set<Permission> getPermissions() {
-        return permissions;
+    public Set<Long> getPermissionIds() {
+        return permissionIds;
     }
 
-    public Set<User> getUsers() {
-        return users;
+    public Set<Long> getUserIds() {
+        return userIds;
     }
 
     public static Builder builder() {
@@ -50,8 +51,8 @@ public class Role {
         private Long id;
         private RoleName roleName;
         private String description;
-        private Set<Permission> permissions;
-        private Set<User> users;
+        private Set<Long> permissionIds;
+        private Set<Long> userIds;
 
         public Builder id(Long id) {
             this.id = id;
@@ -68,13 +69,13 @@ public class Role {
             return this;
         }
 
-        public Builder permissions(Set<Permission> permissions) {
-            this.permissions = permissions;
+        public Builder permissionIds(Set<Long> permissionIds) {
+            this.permissionIds = permissionIds;
             return this;
         }
 
-        public Builder users(Set<User> users) {
-            this.users = users;
+        public Builder userIds(Set<Long> userIds) {
+            this.userIds = userIds;
             return this;
         }
 

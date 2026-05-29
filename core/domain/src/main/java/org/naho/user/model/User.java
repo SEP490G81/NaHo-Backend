@@ -9,42 +9,41 @@ import org.naho.user.valueobject.Email;
 import org.naho.user.valueobject.Username;
 
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.List;
 
 public class User {
-    private Long id;
-    private Long avatarFileId;
+    private final Long id;
+    private final Long avatarFileId;
+    private final List<Long> roleIds;
+    private final List<Long> userSessionIds;
 
-    private Username username;
-    private Email email;
+    private final Username username;
+    private final Email email;
 
-    private String hashPassword;
-    private String refreshToken;
-    private AccountType accountType;
+    private final String hashPassword;
+    private final AccountType accountType;
 
-    private String firstName;
-    private String lastName;
-    private Gender gender;
-    private Dob dob;
+    private final String firstName;
+    private final String lastName;
+    private final Gender gender;
+    private final Dob dob;
 
-    private JLPTLevel jlptLevel;
-    private UserStatus status;
-    private Integer currentStreak;
-    private Integer longestStreak;
-    private LocalDate lastPracticeDate;
-
-    private Set<Role> roles;
+    private final JLPTLevel jlptLevel;
+    private final UserStatus status;
+    private final Integer currentStreak;
+    private final Integer longestStreak;
+    private final LocalDate lastPracticeDate;
 
     // Private constructor
     private User(Builder builder) {
         this.id = builder.id;
         this.avatarFileId = builder.avatarFileId;
+        this.roleIds = builder.roleIds;
+        this.userSessionIds = builder.userSessionIds;
         this.username = builder.username;
         this.email = builder.email;
         this.hashPassword = builder.hashPassword;
-        this.refreshToken = builder.refreshToken;
         this.accountType = builder.accountType;
-        this.roles = builder.roles;
         this.firstName = builder.firstName;
         this.lastName = builder.lastName;
         this.gender = builder.gender;
@@ -56,6 +55,28 @@ public class User {
         this.lastPracticeDate = builder.lastPracticeDate;
     }
 
+    // Static builder method
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    // Build Register User
+    public static User registerNewUser(String rawUsername, String hashPassword, String rawEmail) {
+        return User.builder()
+                .username(Username.of(rawUsername))
+                .email(Email.of(rawEmail))
+                .hashPassword(hashPassword)
+                .accountType(AccountType.CREDENTIALS)
+                .status(UserStatus.ACTIVE)
+                .currentStreak(0)
+                .longestStreak(0)
+                .build();
+    }
+
+    public boolean isActive() {
+        return status == UserStatus.ACTIVE;
+    }
+
     // Getters
     public Long getId() {
         return id;
@@ -63,6 +84,14 @@ public class User {
 
     public Long getAvatarFileId() {
         return avatarFileId;
+    }
+
+    public List<Long> getRoleIds() {
+        return roleIds;
+    }
+
+    public List<Long> getUserSessionIds() {
+        return userSessionIds;
     }
 
     public Username getUsername() {
@@ -77,16 +106,8 @@ public class User {
         return hashPassword;
     }
 
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-
     public AccountType getAccountType() {
         return accountType;
-    }
-
-    public Set<Role> getRoles() {
-        return roles;
     }
 
     public String getFirstName() {
@@ -125,37 +146,19 @@ public class User {
         return lastPracticeDate;
     }
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    // Build Register User
-    public static User registerNewUser(String rawUsername, String hashPassword, String rawEmail, Set<Role> defaultRoles) {
-        return User.builder()
-                .username(Username.of(rawUsername))
-                .email(Email.of(rawEmail))
-                .hashPassword(hashPassword)
-                .roles(defaultRoles)
-                .accountType(AccountType.CREDENTIALS)
-                .status(UserStatus.ACTIVE)
-                .currentStreak(0)
-                .longestStreak(0)
-                .build();
-    }
-
-
-    // Builder Pattern
+    // Builder class
     public static class Builder {
+
         private Long id;
         private Long avatarFileId;
+        private List<Long> roleIds;
+        private List<Long> userSessionIds;
 
         private Username username;
         private Email email;
 
         private String hashPassword;
-        private String refreshToken;
         private AccountType accountType;
-        private Set<Role> roles;
 
         private String firstName;
         private String lastName;
@@ -178,6 +181,16 @@ public class User {
             return this;
         }
 
+        public Builder roleIds(List<Long> roleIds) {
+            this.roleIds = roleIds;
+            return this;
+        }
+
+        public Builder userSessionIds(List<Long> userSessionIds) {
+            this.userSessionIds = userSessionIds;
+            return this;
+        }
+
         public Builder username(Username username) {
             this.username = username;
             return this;
@@ -193,18 +206,8 @@ public class User {
             return this;
         }
 
-        public Builder refreshToken(String refreshToken) {
-            this.refreshToken = refreshToken;
-            return this;
-        }
-
         public Builder accountType(AccountType accountType) {
             this.accountType = accountType;
-            return this;
-        }
-
-        public Builder roles(Set<Role> roles) {
-            this.roles = roles;
             return this;
         }
 
@@ -257,6 +260,4 @@ public class User {
             return new User(this);
         }
     }
-
-    // Build Re
 }

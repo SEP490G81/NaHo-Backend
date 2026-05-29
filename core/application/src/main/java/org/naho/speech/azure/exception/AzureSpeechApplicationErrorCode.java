@@ -11,6 +11,10 @@ public enum AzureSpeechApplicationErrorCode implements ErrorCode {
     SPEECH_AZURE_SERVICE_ERROR(
             "SPEECH_A002",
             AzureSpeechApplicationMessageKey.SPEECH_AZURE_SERVICE_ERROR_TITLE
+    ),
+    SPEECH_TEXT_NOT_VALID(
+            "SPEECH_A003",
+            AzureSpeechApplicationMessageKey.SPEECH_TEXT_NOT_VALID_TITLE
     );
 
     private final String code;

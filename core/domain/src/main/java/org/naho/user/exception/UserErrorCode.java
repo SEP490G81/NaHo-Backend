@@ -1,27 +1,28 @@
 package org.naho.user.exception;
 
 import org.naho.shared.exception.ErrorCode;
+import org.naho.user.constant.UserMessageKey;
 
 public enum UserErrorCode implements ErrorCode {
 
     USER_AGE_NOT_VALID(
             "USER_001",
-            UserErrorKey.USER_AGE_NOT_VALID_TITLE
+            UserMessageKey.USER_AGE_NOT_VALID_TITLE
     ),
 
     USER_EMAIL_NOT_VALID(
             "USER_002",
-            UserErrorKey.USER_EMAIL_NOT_VALID_TITLE
+            UserMessageKey.USER_EMAIL_NOT_VALID_TITLE
     ),
 
     USER_USERNAME_NOT_VALID(
             "USER_003",
-            UserErrorKey.USER_USERNAME_NOT_VALID_TITLE
+            UserMessageKey.USER_USERNAME_NOT_VALID_TITLE
     ),
 
     USER_TIMEZONE_NOT_VALID(
             "USER_OO4",
-            UserErrorKey.USER_TIMEZONE_NOT_VALID_TITLE
+            UserMessageKey.USER_TIMEZONE_NOT_VALID_TITLE
     );
 
     private final String code;

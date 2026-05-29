@@ -15,7 +15,7 @@ public class LocaleResolverConfig {
     public LocaleResolver localeResolver() {
         AcceptHeaderLocaleResolver resolver = new AcceptHeaderLocaleResolver();
 
-        Locale vietnamese = Locale.forLanguageTag("vi-VN");
+        Locale vietnamese = Locale.forLanguageTag("vi");
 
         resolver.setDefaultLocale(vietnamese);
         resolver.setSupportedLocales(List.of(

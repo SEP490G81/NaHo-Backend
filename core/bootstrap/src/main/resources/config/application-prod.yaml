@@ -3,3 +3,7 @@ spring:
     url: jdbc:mysql://localhost:3306/naho?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
     username: root
     password: 1234
+
+app:
+  cookie:
+    secure: true
