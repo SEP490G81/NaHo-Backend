@@ -15,6 +15,10 @@ public class UserResultMapper {
     }
 
     public UserResult domainToResult(User domain) {
+        if (domain == null) {
+            return null;
+        }
+
         List<String> roles = domain.getRoles()
                 .stream().map(role -> role.getRoleName().toString())
                 .toList();
@@ -23,14 +27,16 @@ public class UserResultMapper {
 
         return UserResult.builder()
                 .id(domain.getId())
-                .email(domain.getEmail().getValue())
+                .username(domain.getUsername() != null ? domain.getUsername().getValue() : null)
+                .email(domain.getEmail() != null ? domain.getEmail().getValue() : null)
                 .roles(roles)
                 .firstName(domain.getFirstName())
                 .lastName(domain.getLastName())
                 .gender(domain.getGender())
-                .dob(domain.getDob().getValue())
+                .dob(domain.getDob() != null ? domain.getDob().getValue() : null)
                 .avatarFile(fileResult)
                 .jlptLevel(domain.getJlptLevel())
+                .status(domain.getStatus())
                 .build();
     }
     public List<UserResult> domainsToResults(List<User> domains) {

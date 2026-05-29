@@ -7,6 +7,7 @@ import lombok.experimental.FieldDefaults;
 import org.naho.file.dto.response.FileResponse;
 import org.naho.user.type.Gender;
 import org.naho.user.type.JLPTLevel;
+import org.naho.user.type.UserStatus;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.List;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class UserResponse {
     Long id;
+    String username;
     String email;
     List<String> roles;
     String firstName;
@@ -25,4 +27,5 @@ public class UserResponse {
     LocalDate dob;
     FileResponse avatarFile;
     JLPTLevel jlptLevel;
+    UserStatus status;
 }

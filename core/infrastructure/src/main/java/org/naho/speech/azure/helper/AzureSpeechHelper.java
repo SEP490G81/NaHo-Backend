@@ -8,8 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.naho.shared.constant.FileExtension;
 import org.naho.shared.exception.InfrastructureException;
 import org.naho.speech.azure.constant.AzurePronunciationScoreKey;
-import org.naho.speech.azure.constant.AzureSpeechApplicationMessageKey;
-import org.naho.speech.azure.exception.AzureSpeechApplicationErrorCode;
+import org.naho.speech.azure.constant.AzureSpeechInfrastructureMessageKey;
+import org.naho.speech.azure.exception.AzureSpeechInfrastructureErrorCode;
 import org.naho.speech.model.SpeechAssessment;
 import org.naho.speech.model.WordAssessment;
 import org.naho.speech.type.SpeechAssessmentErrorType;
@@ -46,8 +46,7 @@ public class AzureSpeechHelper {
             Path tempFile = Files.createTempFile(
                     tempDir,
                     TEMP_AUDIO_FILE_PREFIX,
-                    FileExtension.WAV_EXTENSION
-            );
+                    FileExtension.WAV_EXTENSION);
 
             Files.write(tempFile, audioBytes);
 
@@ -55,8 +54,8 @@ public class AzureSpeechHelper {
 
         } catch (IOException e) {
             throw new InfrastructureException(
-                    AzureSpeechApplicationErrorCode.SPEECH_AUDIO_NOT_VALID,
-                    AzureSpeechApplicationMessageKey.SPEECH_AUDIO_FILE_EMPTY
+                    AzureSpeechInfrastructureErrorCode.AZURE_SPEECH_TEMP_FILE_ERROR,
+                    AzureSpeechInfrastructureMessageKey.AZURE_SPEECH_TEMP_FILE_ERROR
             );
         }
     }
@@ -71,15 +70,15 @@ public class AzureSpeechHelper {
         String normalizedReferenceText = referenceText == null ? "" : referenceText.trim();
 
         // Miscue detection chỉ hoạt động ổn định khi có reference text (scripted mode).
-        // Với unscripted mode, Azure có thể trả về kết quả không chính xác hoặc inconsistent.
+        // Với unscripted mode, Azure có thể trả về kết quả không chính xác hoặc
+        // inconsistent.
         boolean miscueEnabled = !normalizedReferenceText.isEmpty();
 
         PronunciationAssessmentConfig config = new PronunciationAssessmentConfig(
                 normalizedReferenceText,
                 PronunciationAssessmentGradingSystem.HundredMark,
                 PronunciationAssessmentGranularity.Phoneme,
-                miscueEnabled
-        );
+                miscueEnabled);
 
         // Bật thêm tính năng prosody (âm điệu, ngắt nghỉ)
         config.enableProsodyAssessment();
@@ -97,9 +96,8 @@ public class AzureSpeechHelper {
                 JsonNode nBestNode = root.path(AzurePronunciationScoreKey.N_BEST).get(0);
                 if (nBestNode == null) {
                     throw new InfrastructureException(
-                            AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR,
-                            AzureSpeechApplicationMessageKey.SPEECH_AZURE_N_BEST_NODE_NULL
-                    );
+                            AzureSpeechInfrastructureErrorCode.AZURE_SPEECH_SERVICE_ERROR,
+                            "N-Best node null");
                 }
 
                 String displayResultText = nBestNode.path(AzurePronunciationScoreKey.DISPLAY).asText();
@@ -117,15 +115,16 @@ public class AzureSpeechHelper {
                     for (JsonNode wordNode : wordsNode) {
                         String wordStr = wordNode.path(AzurePronunciationScoreKey.WORD).asText();
                         JsonNode wordPronNode = wordNode.path(AzurePronunciationScoreKey.PRONUNCIATION_ASSESSMENT);
-                        double wordAccuracy = wordPronNode.path(AzurePronunciationScoreKey.ACCURACY_SCORE).asDouble(0.0);
-                        String errorType = wordPronNode.path(AzurePronunciationScoreKey.ERROR_TYPE).asText(AzurePronunciationScoreKey.NONE).toUpperCase();
+                        double wordAccuracy = wordPronNode.path(AzurePronunciationScoreKey.ACCURACY_SCORE)
+                                .asDouble(0.0);
+                        String errorType = wordPronNode.path(AzurePronunciationScoreKey.ERROR_TYPE)
+                                .asText(AzurePronunciationScoreKey.NONE).toUpperCase();
 
                         wordList.add(WordAssessment.builder()
                                 .word(wordStr)
                                 .accuracyScore(wordAccuracy)
                                 .errorType(SpeechAssessmentErrorType.valueOf(errorType))
-                                .build()
-                        );
+                                .build());
                     }
                 }
 
@@ -140,8 +139,7 @@ public class AzureSpeechHelper {
 
             } catch (IOException e) {
                 // Fallback nếu parse JSON lỗi, lấy kết quả cơ bản từ SDK objects
-                PronunciationAssessmentResult sdkResult =
-                        PronunciationAssessmentResult.fromResult(result);
+                PronunciationAssessmentResult sdkResult = PronunciationAssessmentResult.fromResult(result);
                 return SpeechAssessment.builder()
                         .transcriptText(result.getText())
                         .accuracyScore(sdkResult.getAccuracyScore())
@@ -153,21 +151,18 @@ public class AzureSpeechHelper {
             }
         } else if (result.getReason() == ResultReason.NoMatch) {
             throw new InfrastructureException(
-                    AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR,
-                    AzureSpeechApplicationMessageKey.SPEECH_RECOGNITION_NO_MATCH
-            );
+                    AzureSpeechInfrastructureErrorCode.AZURE_SPEECH_SERVICE_ERROR,
+                    "No match");
         } else if (result.getReason() == ResultReason.Canceled) {
             CancellationDetails cancellation = CancellationDetails.fromResult(result);
             throw new InfrastructureException(
-                    AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR,
-                    AzureSpeechApplicationMessageKey.SPEECH_RECOGNITION_CANCELLED,
-                    cancellation.getErrorDetails()
-            );
+                    AzureSpeechInfrastructureErrorCode.AZURE_SPEECH_RECOGNITION_CANCELLED,
+                    AzureSpeechInfrastructureMessageKey.AZURE_SPEECH_RECOGNITION_CANCELLED,
+                    cancellation.getErrorDetails());
         } else {
             throw new InfrastructureException(
-                    AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR,
-                    AzureSpeechApplicationMessageKey.SPEECH_AZURE_SERVICE_UNKNOWN_ERROR_OCCUR
-            );
+                    AzureSpeechInfrastructureErrorCode.AZURE_SPEECH_SERVICE_ERROR,
+                    AzureSpeechInfrastructureMessageKey.AZURE_SPEECH_SERVICE_ERROR);
         }
     }
 

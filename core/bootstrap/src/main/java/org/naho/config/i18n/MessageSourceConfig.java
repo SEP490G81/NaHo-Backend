@@ -19,7 +19,8 @@ public class MessageSourceConfig {
                 "classpath:i18n/auth/auth",
                 "classpath:i18n/speech/speech",
                 "classpath:i18n/validation/validation",
-                "classpath:i18n/exception/exception"
+                "classpath:i18n/exception/exception",
+                "classpath:i18n/ai/ai"
         );
 
         messageSource.setDefaultEncoding(DEFAULT_ENCODING);

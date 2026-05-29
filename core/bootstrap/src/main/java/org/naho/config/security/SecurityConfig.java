@@ -25,7 +25,8 @@ import java.nio.charset.StandardCharsets;
 public class SecurityConfig {
     private static final String[] API_WHITELIST = {
             "/api/v1/auth/**",
-            "api/v1/speech/**"
+            "api/v1/speech/**",
+            "/api/v1/user/**"
     };
 
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;

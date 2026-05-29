@@ -7,7 +7,9 @@ import java.util.Optional;
 
 public interface UserRepositoryPort {
     Optional<User> findByUsername(String username);
-
+    Optional<User> findById(Long id);
     Optional<User> findByEmail(String email);
     List<User> getListUser();
+    void save(User user);
+    List<User> findByFilters(String userNameOrMail, String role, String status, String jlptLevel);
 }

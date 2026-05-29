@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.naho.shared.exception.InfrastructureException;
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
-import org.naho.speech.azure.constant.AzureSpeechApplicationMessageKey;
 import org.naho.speech.azure.constant.AzureSpeechConfigProperty;
-import org.naho.speech.azure.exception.AzureSpeechApplicationErrorCode;
+import org.naho.speech.azure.constant.AzureSpeechInfrastructureMessageKey;
+import org.naho.speech.azure.exception.AzureSpeechInfrastructureErrorCode;
 import org.naho.speech.azure.helper.AzureSpeechHelper;
 import org.naho.speech.azure.port.out.AzureSpeechService;
 import org.naho.speech.model.SpeechAssessment;
@@ -40,14 +40,14 @@ public class AzureSpeechServiceAdapter implements AzureSpeechService {
 
         try {
             // 2. Cấu hình SpeechConfig và AudioConfig từ file tạm
-            SpeechConfig speechConfig = SpeechConfig.fromSubscription(properties.getSubscriptionKey(), properties.getRegion());
+            SpeechConfig speechConfig = SpeechConfig.fromSubscription(properties.getSubscriptionKey(),
+                    properties.getRegion());
             speechConfig.setSpeechRecognitionLanguage(properties.getLanguage());
 
             AudioConfig audioConfig = AudioConfig.fromWavFileInput(tempFile.getAbsolutePath());
 
             // 3. Khởi tạo cấu hình đánh giá phát âm (Pronunciation Assessment)
-            PronunciationAssessmentConfig config =
-                    azureSpeechHelper.createPronunciationAssessmentConfig(referenceText);
+            PronunciationAssessmentConfig config = azureSpeechHelper.createPronunciationAssessmentConfig(referenceText);
 
             // Khởi tạo SpeechRecognizer
             SpeechRecognizer recognizer = new SpeechRecognizer(speechConfig, audioConfig);
@@ -76,9 +76,8 @@ public class AzureSpeechServiceAdapter implements AzureSpeechService {
                 if (cancellation.getReason() == CancellationReason.Error) {
                     log.error("Azure Speech continuous recognition error: {}", cancellation.getErrorDetails());
                     errors.add(new InfrastructureException(
-                            AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR,
-                            "Azure Speech API error: " + cancellation.getErrorDetails()
-                    ));
+                            AzureSpeechInfrastructureErrorCode.AZURE_SPEECH_SERVICE_ERROR,
+                            "Azure Speech API error: " + cancellation.getErrorDetails()));
                 }
                 stopRecognitionSemaphore.release();
             });
@@ -111,12 +110,14 @@ public class AzureSpeechServiceAdapter implements AzureSpeechService {
                 if (firstError instanceof RuntimeException) {
                     throw (RuntimeException) firstError;
                 } else {
-                    throw new InfrastructureException(AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR, firstError.getMessage());
+                    throw new InfrastructureException(AzureSpeechInfrastructureErrorCode.AZURE_SPEECH_SERVICE_ERROR,
+                            firstError.getMessage());
                 }
             }
 
             if (segmentAssessments.isEmpty()) {
-                throw new InfrastructureException(AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR, "No speech could be recognized. Please try again with clear speech.");
+                throw new InfrastructureException(AzureSpeechInfrastructureErrorCode.AZURE_SPEECH_SERVICE_ERROR,
+                        "No speech could be recognized. Please try again with clear speech.");
             }
 
             // 5. Tổng hợp các phân đoạn thành kết quả cuối cùng
@@ -125,9 +126,8 @@ public class AzureSpeechServiceAdapter implements AzureSpeechService {
         } catch (InterruptedException | ExecutionException e) {
             Thread.currentThread().interrupt();
             throw new InfrastructureException(
-                    AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR,
-                    AzureSpeechApplicationMessageKey.SPEECH_AZURE_CONNECTION_INTERRUPTED
-            );
+                    AzureSpeechInfrastructureErrorCode.AZURE_SPEECH_CONNECTION_TIMEOUT,
+                    AzureSpeechInfrastructureMessageKey.AZURE_SPEECH_CONNECTION_TIMEOUT);
         } finally {
             // Luôn đảm bảo xóa file tạm thời để tránh tràn ổ đĩa
             if (tempFile.exists() && !tempFile.delete()) {

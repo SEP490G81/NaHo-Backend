@@ -7,4 +7,5 @@ import org.naho.user.result.UserResult;
 @Mapper(componentModel = "spring")
 public interface UserResponseMapper {
     UserResponse resultToResponse(UserResult result);
+
 }

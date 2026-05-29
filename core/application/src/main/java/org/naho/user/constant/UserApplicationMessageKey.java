@@ -18,7 +18,10 @@ public final class UserApplicationMessageKey {
             "user.email.not.found";
     public static final String USER_USERNAME_NOT_FOUND =
             "user.username.not.found";
-
+    public static final String USER_HASH_FAILED_TITLE =
+            "user.hash.failed.title";
+    public static final String USER_HASH_FAILED =
+            "user.hash.failed";
     public static final String USER_LOGIN_FAILED_TITLE =
             "user.login.failed.title";
 
@@ -29,4 +32,10 @@ public final class UserApplicationMessageKey {
 
     public static final String USER_LOGIN_SUCCESSFULLY =
             "user.login.successfully";
+    public static final String USER_LIST_GET_FAILED = "user.list.get.failed";
+    public static final String USER_GET_FAILED = "user.get.failed";
+    public static final String USER_UPDATE_STATUS_FAILED = "user.update.status.failed";
+
+
+
 }

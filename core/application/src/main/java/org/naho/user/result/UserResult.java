@@ -3,6 +3,7 @@ package org.naho.user.result;
 import org.naho.file.result.FileResult;
 import org.naho.user.type.Gender;
 import org.naho.user.type.JLPTLevel;
+import org.naho.user.type.UserStatus;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.List;
 public class UserResult {
 
     private final Long id;
+    private final String username;
     private final String email;
     private final List<String> roles;
     private final String firstName;
@@ -18,9 +20,11 @@ public class UserResult {
     private final LocalDate dob;
     private final FileResult avatarFile;
     private final JLPTLevel jlptLevel;
+    private final UserStatus status;
 
     private UserResult(Builder builder) {
         this.id = builder.id;
+        this.username = builder.username;
         this.email = builder.email;
         this.roles = builder.roles;
         this.firstName = builder.firstName;
@@ -29,6 +33,7 @@ public class UserResult {
         this.dob = builder.dob;
         this.avatarFile = builder.avatarFile;
         this.jlptLevel = builder.jlptLevel;
+        this.status = builder.status;
     }
 
     public static Builder builder() {
@@ -37,6 +42,10 @@ public class UserResult {
 
     public Long getId() {
         return id;
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     public String getEmail() {
@@ -71,9 +80,14 @@ public class UserResult {
         return jlptLevel;
     }
 
+    public UserStatus getStatus() {
+        return status;
+    }
+
     public static class Builder {
 
         private Long id;
+        private String username;
         private String email;
         private List<String> roles;
         private String firstName;
@@ -82,9 +96,15 @@ public class UserResult {
         private LocalDate dob;
         private FileResult avatarFile;
         private JLPTLevel jlptLevel;
+        private UserStatus status;
 
         public Builder id(Long id) {
             this.id = id;
+            return this;
+        }
+
+        public Builder username(String username) {
+            this.username = username;
             return this;
         }
 
@@ -125,6 +145,11 @@ public class UserResult {
 
         public Builder jlptLevel(JLPTLevel jlptLevel) {
             this.jlptLevel = jlptLevel;
+            return this;
+        }
+
+        public Builder status(UserStatus status) {
+            this.status = status;
             return this;
         }
 
