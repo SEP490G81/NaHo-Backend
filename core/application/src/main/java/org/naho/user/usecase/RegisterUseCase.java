@@ -1,5 +1,6 @@
 package org.naho.user.usecase;
 
+import org.naho.i18n.MessageService;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.user.command.RegisterCommand;
 import org.naho.user.constant.UserApplicationMessageKey;
@@ -20,12 +21,18 @@ public class RegisterUseCase implements RegisterInputPort {
     private final UserRepositoryPort userRepository;
     private final RoleRepositoryPort roleRepository;
     private final PasswordEncoderPort passwordEncoder;
+    private final MessageService messageService;
 
-    public RegisterUseCase(UserRepositoryPort userRepository, PasswordEncoderPort passwordEncoder,
-                           RoleRepositoryPort roleRepository) {
+    public RegisterUseCase(
+            UserRepositoryPort userRepository,
+            PasswordEncoderPort passwordEncoder,
+            RoleRepositoryPort roleRepository,
+            MessageService messageService
+    ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
+        this.messageService = messageService;
     }
 
     @Override
@@ -35,7 +42,8 @@ public class RegisterUseCase implements RegisterInputPort {
             throw new ApplicationException(
                     UserApplicationErrorCode.USER_ALREADY_EXISTS,
                     UserApplicationMessageKey.USER_USERNAME_ALREADY_EXISTS,
-                    command.username());
+                    command.username()
+            );
         }
         if (userRepository.existsByEmail(command.email())) {
             throw new ApplicationException(

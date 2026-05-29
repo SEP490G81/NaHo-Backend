@@ -10,8 +10,8 @@ import org.apache.logging.log4j.ThreadContext;
 import org.naho.i18n.MessageService;
 import org.naho.shared.constant.ErrorLoggingKey;
 import org.naho.shared.constant.HttpLoggingKey;
+import org.naho.shared.constant.ProblemDetailProperty;
 import org.naho.shared.exception.ErrorCode;
-import org.naho.shared.exception.ProblemDetailHelper;
 import org.naho.user.exception.UserApplicationErrorCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,7 +21,9 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 
 @Component
 @RequiredArgsConstructor
@@ -30,14 +32,28 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
     private final MessageService messageService;
     private final ObjectMapper objectMapper;
-    private final ProblemDetailHelper problemDetailHelper;
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+    public void commence(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            AuthenticationException authException
+    ) throws IOException, ServletException {
         ErrorCode errorCode = UserApplicationErrorCode.USER_UNAUTHORIZED;
 
-        ProblemDetail problemDetail = problemDetailHelper.buildProblemDetail(errorCode, authException, request);
+        // create problem detail
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
 
+        // set default fields
+        problemDetail.setType(URI.create("https://naho.org/problem/authentication-error"));
+        problemDetail.setTitle(messageService.getMessage(errorCode.getTitleKey()));
+        problemDetail.setDetail(messageService.getMessage(authException.getMessage()));
+        problemDetail.setInstance(URI.create(request.getRequestURI()));
+
+        // set custom fields
+        problemDetail.setProperty(ProblemDetailProperty.ERROR_CODE, errorCode.getCode());
+        problemDetail.setProperty(ProblemDetailProperty.TRACE_ID, ThreadContext.get(ProblemDetailProperty.TRACE_ID));
+        problemDetail.setProperty(ProblemDetailProperty.TIMESTAMP, Instant.now().toString());
         ThreadContext.put(HttpLoggingKey.HTTP_STATUS_CODE, String.valueOf(HttpStatus.UNAUTHORIZED.value()));
         ThreadContext.put(ErrorLoggingKey.ERROR_CODE, errorCode.getCode());
         ThreadContext.put(ErrorLoggingKey.ERROR_MESSAGE, authException.getMessage());
