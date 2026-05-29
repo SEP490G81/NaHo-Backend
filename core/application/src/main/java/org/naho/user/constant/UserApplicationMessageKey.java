@@ -38,4 +38,8 @@ public final class UserApplicationMessageKey {
             "user.hash.failed.title";
     public static final String USER_HASH_FAILED =
             "user.hash.failed";
+
+    public static final String USER_LIST_GET_FAILED = "user.list.get.failed";
+    public static final String USER_GET_FAILED = "user.get.failed";
+    public static final String USER_UPDATE_STATUS_FAILED = "user.update.status.failed";
 }

@@ -12,6 +12,7 @@ public class UserResultMapper {
 
         return UserResult.builder()
                 .id(domain.getId())
+                .username(domain.getUsername() != null ? domain.getUsername().getValue() : null)
                 .email(domain.getEmail().getValue())
                 .roleNames(roleNames)
                 .firstName(domain.getFirstName())
@@ -20,6 +21,7 @@ public class UserResultMapper {
                 .dob(dob)
                 .avatarFileUrl(avatarFileUrl)
                 .jlptLevel(domain.getJlptLevel())
+                .status(domain.getStatus())
                 .build();
     }
 }
