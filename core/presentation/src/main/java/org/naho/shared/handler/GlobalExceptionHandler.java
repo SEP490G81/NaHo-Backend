@@ -3,19 +3,13 @@ package org.naho.shared.handler;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.ThreadContext;
 import org.naho.i18n.MessageService;
-import org.naho.shared.constant.ErrorLoggingKey;
-import org.naho.shared.constant.HttpLoggingKey;
 import org.naho.shared.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.net.URI;
-import java.time.Instant;
 
 @RestControllerAdvice
 @RequiredArgsConstructor
@@ -24,30 +18,36 @@ public class GlobalExceptionHandler {
 
     private final ErrorCodeHttpMapper errorCodeHttpMapper;
     private final MessageService messageService;
-    private final ProblemDetailHelper problemDetailHelper;
+    private final ProblemDetailFactory problemDetailFactory;
+    private final ErrorLogContextWriter errorLogContextWriter;
 
-    @ExceptionHandler(ApplicationException.class)
+    @ExceptionHandler({BaseException.class})
     public ResponseEntity<ProblemDetail> handleApplicationException(
-            ApplicationException e,
+            BaseException e,
             HttpServletRequest request
     ) {
         ErrorCode errorCode = e.getErrorCode();
-        HttpStatus httpStatus = errorCodeHttpMapper.toStatus(errorCode);
+        HttpStatus status = errorCodeHttpMapper.toStatus(errorCode);
+        String errorMessage = messageService.getMessage(e.getMessage(), e.getArgs());
 
-        // create problem detail
-        ProblemDetail problemDetail = problemDetailHelper.buildProblemDetail(errorCode, e, request);
+        ProblemDetail problemDetail = problemDetailFactory.create(
+                errorCode.getCode(),
+                messageService.getMessage(errorCode.getTitleKey()),
+                status,
+                errorCodeHttpMapper.toType(errorCode),
+                errorMessage,
+                request
+        );
 
-        // logging
-        // set http fields
-        ThreadContext.put(HttpLoggingKey.HTTP_STATUS_CODE, String.valueOf(httpStatus));
-
-        // set error fields
-        ThreadContext.put(ErrorLoggingKey.ERROR_CODE, errorCode.getCode());
-        ThreadContext.put(ErrorLoggingKey.ERROR_MESSAGE, messageService.getMessage(e.getMessage()));
-        ThreadContext.put(ErrorLoggingKey.ERROR_TYPE, e.getClass().getSimpleName());
+        errorLogContextWriter.write(
+                status,
+                errorCode,
+                e,
+                errorMessage
+        );
 
         log.warn(messageService.getMessage(errorCode.getTitleKey()), e);
-        return ResponseEntity.status(httpStatus).body(problemDetail);
+        return ResponseEntity.status(status).body(problemDetail);
     }
 
     @ExceptionHandler(Exception.class)
@@ -57,20 +57,27 @@ public class GlobalExceptionHandler {
     ) {
         ErrorCode errorCode = CommonApplicationErrorCode.COMMON_INTERNAL_SERVER_ERROR;
 
-        // create problem detail
-        ProblemDetail problemDetail = problemDetailHelper.buildProblemDetail(errorCode, e, request);
+        HttpStatus status = errorCodeHttpMapper.toStatus(errorCode);
+        String errorMessage = messageService.getMessage(e.getMessage());
 
-        // logging
-        // set http fields
-        ThreadContext.put(HttpLoggingKey.HTTP_STATUS_CODE, String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR));
+        ProblemDetail problemDetail = problemDetailFactory.create(
+                errorCode.getCode(),
+                messageService.getMessage(errorCode.getTitleKey()),
+                status,
+                errorCodeHttpMapper.toType(errorCode),
+                errorMessage,
+                request
+        );
 
-        // set error fields
-        ThreadContext.put(ErrorLoggingKey.ERROR_CODE, errorCode.getCode());
-        ThreadContext.put(ErrorLoggingKey.ERROR_MESSAGE, e.getMessage());
-        ThreadContext.put(ErrorLoggingKey.ERROR_TYPE, e.getClass().getSimpleName());
+        errorLogContextWriter.write(
+                status,
+                errorCode,
+                e,
+                errorMessage
+        );
 
         log.error(messageService.getMessage(errorCode.getTitleKey()), e);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problemDetail);
+        return ResponseEntity.status(status).body(problemDetail);
     }
 }
 
