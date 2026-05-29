@@ -22,7 +22,4 @@ public class UserResultMapper {
                 .jlptLevel(domain.getJlptLevel())
                 .build();
     }
-    public List<UserResult> domainsToResults(List<User> domains) {
-        return domains.stream().map(this::domainToResult).toList();
-    }
 }

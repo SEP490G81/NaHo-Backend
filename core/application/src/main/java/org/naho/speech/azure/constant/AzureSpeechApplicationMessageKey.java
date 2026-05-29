@@ -9,7 +9,7 @@ public final class AzureSpeechApplicationMessageKey {
     public static final String SPEECH_PRONUNCIATION_ASSESSMENT_SUCCESSFULLY =
             "speech.pronunciation.assessment.successfully";
 
-    // error
+    // speech assessment
     public static final String SPEECH_AUDIO_NOT_VALID_TITLE =
             "speech.audio.not.valid.title";
     public static final String SPEECH_AUDIO_FILE_EMPTY =
@@ -32,4 +32,16 @@ public final class AzureSpeechApplicationMessageKey {
 
     public static final String SPEECH_AZURE_CONNECTION_INTERRUPTED =
             "speech.azure.connection.interrupted";
+
+    // text to speech
+    public static final String SPEECH_SYNTHESIS_CANCELLED =
+            "speech.synthesis.cancelled";
+    public static final String SPEECH_SYNTHESIS_UNKNOWN_ERROR_OCCUR =
+            "speech.synthesis.unknown.error.occur";
+    // text
+    public static final String SPEECH_TEXT_NOT_VALID_TITLE =
+            "speech.text.not.valid.title";
+    public static final String SPEECH_TEXT_BLANK =
+            "speech.text.blank=";
+    public static final String SPEECH_TEXT_INVALID_RANGE = "speech.text.invalid.range";
 }

@@ -9,8 +9,8 @@ import org.naho.speech.azure.command.SpeechAssessmentCommand;
 import org.naho.speech.azure.constant.AzureSpeechApplicationMessageKey;
 import org.naho.speech.azure.constant.AzureSpeechConfigProperty;
 import org.naho.speech.azure.exception.AzureSpeechApplicationErrorCode;
-import org.naho.speech.azure.helper.AzureSpeechHelper;
-import org.naho.speech.azure.port.out.AzureSpeechService;
+import org.naho.speech.azure.helper.AzureSpeechServiceHelper;
+import org.naho.speech.azure.port.out.AzureSpeechServicePort;
 import org.naho.speech.model.SpeechAssessment;
 import org.springframework.stereotype.Service;
 
@@ -25,10 +25,10 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AzureSpeechServiceAdapter implements AzureSpeechService {
+public class AzureSpeechServiceAdapter implements AzureSpeechServicePort {
 
     private final AzureSpeechConfigProperty properties;
-    private final AzureSpeechHelper azureSpeechHelper;
+    private final AzureSpeechServiceHelper azureSpeechServiceHelper;
 
     @Override
     public SpeechAssessment assess(SpeechAssessmentCommand command) {
@@ -36,7 +36,7 @@ public class AzureSpeechServiceAdapter implements AzureSpeechService {
         String referenceText = command.referenceText();
 
         // 1. Tạo file tạm thời để lưu dữ liệu audio gửi lên
-        File tempFile = azureSpeechHelper.createTempAudioFile(audioBytes);
+        File tempFile = azureSpeechServiceHelper.createTempAudioFile(audioBytes);
 
         try {
             // 2. Cấu hình SpeechConfig và AudioConfig từ file tạm
@@ -47,7 +47,7 @@ public class AzureSpeechServiceAdapter implements AzureSpeechService {
 
             // 3. Khởi tạo cấu hình đánh giá phát âm (Pronunciation Assessment)
             PronunciationAssessmentConfig config =
-                    azureSpeechHelper.createPronunciationAssessmentConfig(referenceText);
+                    azureSpeechServiceHelper.createPronunciationAssessmentConfig(referenceText);
 
             // Khởi tạo SpeechRecognizer
             SpeechRecognizer recognizer = new SpeechRecognizer(speechConfig, audioConfig);
@@ -62,7 +62,7 @@ public class AzureSpeechServiceAdapter implements AzureSpeechService {
             recognizer.recognized.addEventListener((s, e) -> {
                 if (e.getResult().getReason() == ResultReason.RecognizedSpeech) {
                     try {
-                        SpeechAssessment segmentResult = azureSpeechHelper.processResult(e.getResult());
+                        SpeechAssessment segmentResult = azureSpeechServiceHelper.processResult(e.getResult());
                         segmentAssessments.add(segmentResult);
                     } catch (Exception ex) {
                         log.error("Error processing recognition segment result", ex);
@@ -120,7 +120,7 @@ public class AzureSpeechServiceAdapter implements AzureSpeechService {
             }
 
             // 5. Tổng hợp các phân đoạn thành kết quả cuối cùng
-            return azureSpeechHelper.mergeAssessments(segmentAssessments);
+            return azureSpeechServiceHelper.mergeAssessments(segmentAssessments);
 
         } catch (InterruptedException | ExecutionException e) {
             Thread.currentThread().interrupt();

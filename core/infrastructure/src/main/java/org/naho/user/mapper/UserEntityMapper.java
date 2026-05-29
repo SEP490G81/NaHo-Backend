@@ -1,6 +1,7 @@
 package org.naho.user.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.naho.file.mapper.FileEntityMapper;
 import org.naho.user.entity.UserEntity;
 import org.naho.user.model.User;
@@ -14,5 +15,8 @@ import org.naho.user.model.User;
         }
 )
 public interface UserEntityMapper {
+    @Mapping(target = "avatarFileId", source = "avatarFile.id")
+    @Mapping(target = "roleIds", source = "roles")
+    @Mapping(target = "userSessionIds", ignore = true)
     User entityToDomain(UserEntity entity);
 }
