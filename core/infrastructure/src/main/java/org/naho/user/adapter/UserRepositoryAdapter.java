@@ -1,6 +1,7 @@
 package org.naho.user.adapter;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.user.entity.UserEntity;
 import org.naho.user.mapper.UserEntityMapper;
 import org.naho.user.model.User;
 import org.naho.user.port.out.UserRepositoryPort;
@@ -32,5 +33,26 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     public Optional<User> findByUsernameOrEmail(String usernameOrEmail) {
         return userJpaRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
                 .map(userEntityMapper::entityToDomain);
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return userJpaRepository.existsByUsername(username);
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return userJpaRepository.existsByEmail(email);
+    }
+
+    @Override
+    public User save(User user) {
+        // map từ domain sang infra...
+        UserEntity entity = userEntityMapper.domainToEntity(user);
+
+        UserEntity savedEntity = userJpaRepository.save(entity);
+
+        // map từ entity về domain
+        return userEntityMapper.entityToDomain(savedEntity);
     }
 }

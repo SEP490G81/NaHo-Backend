@@ -12,31 +12,27 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class User {
-    private Long id;
-    private Long avatarFileId;
-    private List<Long> roleIds;
-    private List<Long> userSessionIds;
+    private final Long id;
+    private final Long avatarFileId;
+    private final List<Long> roleIds;
+    private final List<Long> userSessionIds;
 
-    private Username username;
-    private Email email;
+    private final Username username;
+    private final Email email;
 
-    private String hashPassword;
-    private AccountType accountType;
+    private final String hashPassword;
+    private final AccountType accountType;
 
-    private String firstName;
-    private String lastName;
-    private Gender gender;
-    private Dob dob;
+    private final String firstName;
+    private final String lastName;
+    private final Gender gender;
+    private final Dob dob;
 
-    private JLPTLevel jlptLevel;
-    private UserStatus status;
-    private Integer currentStreak;
-    private Integer longestStreak;
-    private LocalDate lastPracticeDate;
-
-    public boolean isActive() {
-        return status == UserStatus.ACTIVE;
-    }
+    private final JLPTLevel jlptLevel;
+    private final UserStatus status;
+    private final Integer currentStreak;
+    private final Integer longestStreak;
+    private final LocalDate lastPracticeDate;
 
     // Private constructor
     private User(Builder builder) {
@@ -62,6 +58,93 @@ public class User {
     // Static builder method
     public static Builder builder() {
         return new Builder();
+    }
+
+    // Build Register User
+    public static User registerNewUser(String rawUsername, String hashPassword, String rawEmail, List<Long> roleIds) {
+        return User.builder()
+                .username(Username.of(rawUsername))
+                .email(Email.of(rawEmail))
+                .hashPassword(hashPassword)
+                .accountType(AccountType.CREDENTIALS)
+                .status(UserStatus.ACTIVE)
+                .roleIds(roleIds)
+                .currentStreak(0)
+                .longestStreak(0)
+                .build();
+    }
+
+    public boolean isActive() {
+        return status == UserStatus.ACTIVE;
+    }
+
+    // Getters
+    public Long getId() {
+        return id;
+    }
+
+    public Long getAvatarFileId() {
+        return avatarFileId;
+    }
+
+    public List<Long> getRoleIds() {
+        return roleIds;
+    }
+
+    public List<Long> getUserSessionIds() {
+        return userSessionIds;
+    }
+
+    public Username getUsername() {
+        return username;
+    }
+
+    public Email getEmail() {
+        return email;
+    }
+
+    public String getHashPassword() {
+        return hashPassword;
+    }
+
+    public AccountType getAccountType() {
+        return accountType;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public Dob getDob() {
+        return dob;
+    }
+
+    public JLPTLevel getJlptLevel() {
+        return jlptLevel;
+    }
+
+    public UserStatus getStatus() {
+        return status;
+    }
+
+    public Integer getCurrentStreak() {
+        return currentStreak;
+    }
+
+    public Integer getLongestStreak() {
+        return longestStreak;
+    }
+
+    public LocalDate getLastPracticeDate() {
+        return lastPracticeDate;
     }
 
     // Builder class
@@ -177,74 +260,5 @@ public class User {
         public User build() {
             return new User(this);
         }
-    }
-
-    // Getters
-    public Long getId() {
-        return id;
-    }
-
-    public Long getAvatarFileId() {
-        return avatarFileId;
-    }
-
-    public List<Long> getRoleIds() {
-        return roleIds;
-    }
-
-    public List<Long> getUserSessionIds() {
-        return userSessionIds;
-    }
-
-    public Username getUsername() {
-        return username;
-    }
-
-    public Email getEmail() {
-        return email;
-    }
-
-    public String getHashPassword() {
-        return hashPassword;
-    }
-
-    public AccountType getAccountType() {
-        return accountType;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public Dob getDob() {
-        return dob;
-    }
-
-    public JLPTLevel getJlptLevel() {
-        return jlptLevel;
-    }
-
-    public UserStatus getStatus() {
-        return status;
-    }
-
-    public Integer getCurrentStreak() {
-        return currentStreak;
-    }
-
-    public Integer getLongestStreak() {
-        return longestStreak;
-    }
-
-    public LocalDate getLastPracticeDate() {
-        return lastPracticeDate;
     }
 }

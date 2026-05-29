@@ -8,7 +8,9 @@ public enum UserApplicationErrorCode implements ErrorCode {
     USER_ACCESS_DENIED("USER_A002", UserApplicationMessageKey.USER_ACCESS_DENIED_TITLE),
     USER_NOT_FOUND("USER_A003", UserApplicationMessageKey.USER_NOT_FOUND_TITLE),
     USER_LOGIN_FAILED("USER_A004", UserApplicationMessageKey.USER_LOGIN_FAILED_TITLE),
-    USER_HASH_FAILED("USER_A005", UserApplicationMessageKey.USER_HASH_FAILED_TITLE);
+    USER_HASH_FAILED("USER_A005", UserApplicationMessageKey.USER_HASH_FAILED_TITLE),
+    USER_ALREADY_EXISTS("USER_A006", UserApplicationMessageKey.USER_ALREADY_EXISTS_TITLE),
+    USER_ROLE_NOT_VALID("USER_A007", UserApplicationMessageKey.USER_ROLE_NOT_VALID_TITLE);
 
     private final String code;
     private final String titleKey;
