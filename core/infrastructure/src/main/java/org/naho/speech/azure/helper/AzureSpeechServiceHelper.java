@@ -26,7 +26,7 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class AzureSpeechHelper {
+public class AzureSpeechServiceHelper {
     private final ObjectMapper objectMapper;
 
     private static final String TEMP_AUDIO_FILE_PREFIX = "audio_";
