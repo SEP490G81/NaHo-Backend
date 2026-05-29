@@ -61,13 +61,14 @@ public class User {
     }
 
     // Build Register User
-    public static User registerNewUser(String rawUsername, String hashPassword, String rawEmail) {
+    public static User registerNewUser(String rawUsername, String hashPassword, String rawEmail, List<Long> roleIds) {
         return User.builder()
                 .username(Username.of(rawUsername))
                 .email(Email.of(rawEmail))
                 .hashPassword(hashPassword)
                 .accountType(AccountType.CREDENTIALS)
                 .status(UserStatus.ACTIVE)
+                .roleIds(roleIds)
                 .currentStreak(0)
                 .longestStreak(0)
                 .build();

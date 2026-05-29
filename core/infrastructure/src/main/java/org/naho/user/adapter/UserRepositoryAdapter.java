@@ -1,6 +1,7 @@
 package org.naho.user.adapter;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.user.entity.UserEntity;
 import org.naho.user.mapper.UserEntityMapper;
 import org.naho.user.model.User;
 import org.naho.user.port.out.UserRepositoryPort;
@@ -46,51 +47,12 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
     @Override
     public User save(User user) {
-        return null; // tạm thời để merging
-    }
+        // map từ domain sang infra...
+        UserEntity entity = userEntityMapper.domainToEntity(user);
 
-//    @Override
-//    public User save(User user) {
-//        // map từ domain sang infra...
-//        UserEntity entity = UserEntity.builder()
-//                .username(user.getUsername().getValue())
-//                .email(user.getEmail().getValue())
-//                .hashPassword(user.getHashPassword())
-//                .accountType(user.getAccountType())
-//                .status(user.getStatus())
-//                .currentStreak(user.getCurrentStreak())
-//                .longestStreak(user.getLongestStreak())
-//                .jlptLevel(user.getJlptLevel()!=null? user.getJlptLevel() : JLPTLevel.N5)
-//                .build();
-//
-//        entity.setCreatedBy(0L);
-//        if (user.getRoles() != null && !user.getRoles().isEmpty()) {
-//            Set<RoleEntity> roleEntities = user.getRoles().stream()
-//                    .map(role -> {
-//                        RoleEntity roleEntity = new RoleEntity();
-//                        roleEntity.setId(role.getId());
-//                        roleEntity.setRoleName(role.getRoleName());
-//                        roleEntity.setDescription(role.getDescription());
-//                        return roleEntity;
-//                    }).collect(Collectors.toSet());
-//            entity.setRoles(roleEntities);
-//        } else {
-//            entity.setRoles(Collections.emptySet());
-//        }
-//
-//        UserEntity savedEntity = userJpaRepository.save(entity);
-//
-//        // map từ entity về domain
-//        return User.builder()
-//                .id(savedEntity.getId())
-//                .username(org.naho.user.valueobject.Username.of(savedEntity.getUsername()))
-//                .email(org.naho.user.valueobject.Email.of(savedEntity.getEmail()))
-//                .hashPassword(savedEntity.getHashPassword())
-//                .accountType(savedEntity.getAccountType())
-//                .status(savedEntity.getStatus())
-//                .currentStreak(savedEntity.getCurrentStreak())
-//                .longestStreak(savedEntity.getLongestStreak())
-//                .jlptLevel(savedEntity.getJlptLevel())
-//                .build();
-//    }
+        UserEntity savedEntity = userJpaRepository.save(entity);
+
+        // map từ entity về domain
+        return userEntityMapper.entityToDomain(savedEntity);
+    }
 }

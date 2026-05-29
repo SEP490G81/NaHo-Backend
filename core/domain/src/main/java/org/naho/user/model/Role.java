@@ -12,6 +12,9 @@ public class Role {
     private RoleName roleName;
     private String description;
 
+    private Role() {
+    }
+
     // Private constructor
     private Role(Builder builder) {
         this.id = builder.id;
@@ -19,6 +22,10 @@ public class Role {
         this.description = builder.description;
         this.permissionIds = builder.permissionIds;
         this.userIds = builder.userIds;
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     // Getters
@@ -40,10 +47,6 @@ public class Role {
 
     public Set<Long> getUserIds() {
         return userIds;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     // Builder Pattern
