@@ -114,7 +114,6 @@ public class AzureSpeechServiceAdapter implements AzureSpeechService {
                             firstError.getMessage());
                 }
             }
-
             if (segmentAssessments.isEmpty()) {
                 throw new InfrastructureException(AzureSpeechInfrastructureErrorCode.AZURE_SPEECH_SERVICE_ERROR,
                         "No speech could be recognized. Please try again with clear speech.");
