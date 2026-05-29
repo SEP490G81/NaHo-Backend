@@ -31,5 +31,5 @@ public class SpeechConfig {
             TextToSpeechServicePort textToSpeechServicePort
     ) {
         return new TextToSpeechUseCase(textToSpeechServicePort);
-    }
+        }
 }

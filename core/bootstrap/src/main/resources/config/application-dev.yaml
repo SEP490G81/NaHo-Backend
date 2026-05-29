@@ -13,3 +13,10 @@ azure:
 app:
   cookie:
     secure: false
+
+openai:
+  api-key: ${OPENAI_API_KEY}
+  chat-model: ${OPENAI_CHAT_MODEL:gpt-4.1-mini}
+  scoring-model: ${OPENAI_SCORING_MODEL:gpt-4o}
+  max-tokens: ${OPENAI_MAX_TOKENS:1000}
+  temperature: ${OPENAI_TEMPERATURE:0.7}
