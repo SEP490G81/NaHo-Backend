@@ -1,18 +1,18 @@
 package org.naho.user.adapter;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.user.entity.UserEntity;
 import org.naho.user.mapper.UserEntityMapper;
 import org.naho.user.model.User;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.naho.user.repository.UserJpaRepository;
+import org.naho.user.type.JLPTLevel;
+import org.naho.user.type.RoleName;
+import org.naho.user.type.UserStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
-import org.naho.user.entity.UserEntity;
-import org.naho.user.type.JLPTLevel;
-import org.naho.user.type.RoleName;
-import org.naho.user.type.UserStatus;
 
 @Component
 @RequiredArgsConstructor
@@ -40,24 +40,20 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
-    public Optional<User> findById(Long id) {
-        return userJpaRepository.findById(id)
-                .map(userEntityMapper::entityToDomain);
+    public boolean existsByUsername(String username) {
+        return userJpaRepository.existsByUsername(username);
     }
 
     @Override
-    public List<User> getListUser() {
-        return userJpaRepository.findAll().stream()
-                .map(userEntityMapper::entityToDomain)
-                .toList();
+    public boolean existsByEmail(String email) {
+        return userJpaRepository.existsByEmail(email);
     }
 
     @Override
-    public void save(User user) {
-        UserEntity entity = userJpaRepository.findById(user.getId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + user.getId()));
-        entity.setStatus(user.getStatus());
-        userJpaRepository.save(entity);
+    public User save(User user) {
+        UserEntity entity = userEntityMapper.domainToEntity(user);
+        UserEntity savedEntity = userJpaRepository.save(entity);
+        return userEntityMapper.entityToDomain(savedEntity);
     }
 
     @Override
@@ -95,6 +91,19 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         }
 
         return userJpaRepository.findByFilters(formattedNameOrMail, roleEnum, statusEnum, jlptLevelEnum).stream()
+                .map(userEntityMapper::entityToDomain)
+                .toList();
+    }
+
+    @Override
+    public Optional<User> findById(Long id) {
+        return userJpaRepository.findById(id)
+                .map(userEntityMapper::entityToDomain);
+    }
+
+    @Override
+    public List<User> getListUser() {
+        return userJpaRepository.findAll().stream()
                 .map(userEntityMapper::entityToDomain)
                 .toList();
     }

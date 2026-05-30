@@ -19,4 +19,10 @@ public interface UserEntityMapper {
     @Mapping(target = "roleIds", source = "roles")
     @Mapping(target = "userSessionIds", ignore = true)
     User entityToDomain(UserEntity entity);
+    
+    @Mapping(target = "avatarFile", ignore = true)
+    @Mapping(target = "roles", source = "roleIds")
+    @Mapping(target = "jlptLevel", defaultValue = "N5")
+    @Mapping(target = "userSessions", ignore = true)
+    UserEntity domainToEntity(User user);
 }

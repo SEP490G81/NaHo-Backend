@@ -20,14 +20,18 @@ public interface UserJpaRepository extends BaseJpaRepository<UserEntity> {
 
     Optional<UserEntity> findByUsernameOrEmail(String username, String email);
 
+    boolean existsByUsername(String username);
+
+    boolean existsByEmail(String email);
+
     @Query("SELECT DISTINCT u FROM UserEntity u " +
-           "LEFT JOIN u.roles r " +
-           "WHERE (:userNameOrEmail IS NULL OR :userNameOrEmail = '' " +
-           "       OR LOWER(u.username) LIKE :userNameOrEmail " +
-           "       OR LOWER(u.email) LIKE :userNameOrEmail) " +
-           "AND (:role IS NULL OR r.roleName = :role) " +
-           "AND (:status IS NULL OR u.status = :status) " +
-           "AND (:jlptLevel IS NULL OR u.jlptLevel = :jlptLevel)")
+            "LEFT JOIN u.roles r " +
+            "WHERE (:userNameOrEmail IS NULL OR :userNameOrEmail = '' " +
+            "       OR LOWER(u.username) LIKE :userNameOrEmail " +
+            "       OR LOWER(u.email) LIKE :userNameOrEmail) " +
+            "AND (:role IS NULL OR r.roleName = :role) " +
+            "AND (:status IS NULL OR u.status = :status) " +
+            "AND (:jlptLevel IS NULL OR u.jlptLevel = :jlptLevel)")
     List<UserEntity> findByFilters(
             @Param("userNameOrEmail") String userNameOrEmail,
             @Param("role") RoleName role,

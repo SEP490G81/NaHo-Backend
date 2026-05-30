@@ -39,7 +39,22 @@ public final class UserApplicationMessageKey {
     public static final String USER_HASH_FAILED =
             "user.hash.failed";
 
-    public static final String USER_LIST_GET_FAILED = "user.list.get.failed";
-    public static final String USER_GET_FAILED = "user.get.failed";
-    public static final String USER_UPDATE_STATUS_FAILED = "user.update.status.failed";
+    public static final String USER_LIST_GET_FAILED =
+            "user.list.get.failed";
+    public static final String USER_GET_FAILED =
+            "user.get.failed";
+    public static final String USER_UPDATE_STATUS_FAILED =
+            "user.update.status.failed";
+    public static final String USER_ALREADY_EXISTS_TITLE =
+            "user.already.exists.title";
+    public static final String USER_EMAIL_ALREADY_EXISTS =
+            "user.email.already.exists";
+    public static final String USER_USERNAME_ALREADY_EXISTS =
+            "user.username.already.exists";
+    public static final String USER_REGISTER_SUCCESSFULLY =
+            "user.register.successfully";
+    public static final String USER_ROLE_NOT_FOUND =
+            "user.role.not.found";
+    public static final String USER_ROLE_NOT_VALID_TITLE =
+            "user.role.not.valid.title";
 }

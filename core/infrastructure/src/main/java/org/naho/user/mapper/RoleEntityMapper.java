@@ -17,4 +17,14 @@ public interface RoleEntityMapper {
     default Long entityToId(RoleEntity role) {
         return role == null ? null : role.getId();
     }
+
+    default RoleEntity idToRoleEntity(Long id) {
+        if (id == null) {
+            return null;
+        }
+        RoleEntity roleEntity = new RoleEntity();
+        roleEntity.setId(id);
+        return roleEntity;
+    }
 }
+
