@@ -6,4 +6,10 @@ import java.util.List;
 
 public interface GetUserInputPort {
     List<UserResult> getListUsers();
+
+    UserResult getUserById(Long userId);
+
+    List<UserResult> searchUsers(String userNameOrEmail, String role, String status, String jlptLevel);
+
+    UserResult getUserByUserName(String userName);
 }

@@ -3,11 +3,9 @@ package org.naho.config;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.user.mapper.UserResultMapper;
-import org.naho.user.port.in.AuthPort;
-import org.naho.user.port.in.RegisterInputPort;
+import org.naho.user.port.in.*;
 import org.naho.user.port.out.*;
-import org.naho.user.usecase.AuthUseCase;
-import org.naho.user.usecase.RegisterUseCase;
+import org.naho.user.usecase.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -49,5 +47,37 @@ public class UserConfig {
             RoleRepositoryPort roleRepository
     ) {
         return new RegisterUseCase(userRepository, passwordEncoder, roleRepository);
+    }
+
+    @Bean
+    public GetUserInputPort getUserInputPort(
+            UserRepositoryPort userRepositoryPort,
+            RoleRepositoryPort roleRepositoryPort,
+            FileRepositoryPort fileRepositoryPort,
+            UserResultMapper userResultMapper
+    ) {
+        return new GetUserUseCase(userRepositoryPort, roleRepositoryPort, fileRepositoryPort, userResultMapper);
+    }
+
+    @Bean
+    public UpdateUserInputPort updateUserInputPort(
+            UserRepositoryPort userRepositoryPort,
+            UserResultMapper userResultMapper,
+            RoleRepositoryPort roleRepositoryPort,
+            FileRepositoryPort fileRepositoryPort
+    ) {
+        return new UpdateUserUseCase(
+                userRepositoryPort,
+                userResultMapper,
+                roleRepositoryPort,
+                fileRepositoryPort
+        );
+    }
+
+    @Bean
+    public GetRoleInputPort getRoleInputPort(
+            RoleRepositoryPort roleRepositoryPort
+    ) {
+        return new GetRoleUseCase(roleRepositoryPort);
     }
 }

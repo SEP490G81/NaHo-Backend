@@ -2,6 +2,8 @@ package org.naho.speech.llm.adapter;
 
 import org.naho.speech.llm.config.OpenAiProperties;
 import org.naho.speech.llm.port.out.AiChatPort;
+import org.naho.shared.exception.InfrastructureException;
+import org.naho.speech.llm.exception.AiApplicationError;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -60,17 +62,22 @@ public class OpenAiChatAdapter implements AiChatPort {
         try {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() != 200) {
-                throw new RuntimeException(
+                throw new InfrastructureException(
+                        AiApplicationError.OPENAI_API_ERROR,
                         "OpenAI API error. Status: " + response.statusCode() + " | " + response.body());
             }
             return extractContent(response.body());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException("Request to OpenAI interrupted", e);
+            throw new InfrastructureException(
+                    AiApplicationError.OPENAI_CONNECTION_TIMEOUT,
+                    "Request to OpenAI interrupted", e);
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            throw new RuntimeException("Cannot call OpenAI API: " + e.getMessage(), e);
+            throw new InfrastructureException(
+                    AiApplicationError.OPENAI_API_ERROR,
+                    "Cannot call OpenAI API: " + e.getMessage(), e);
         }
     }
 
@@ -83,7 +90,8 @@ public class OpenAiChatAdapter implements AiChatPort {
 
             if (response.statusCode() != 200) {
                 String errorBody = response.body().reduce("", (a, b) -> a + b);
-                throw new RuntimeException(
+                throw new InfrastructureException(
+                        AiApplicationError.OPENAI_STREAMING_ERROR,
                         "OpenAI streaming error. Status: " + response.statusCode() + " | " + errorBody);
             }
 
@@ -95,17 +103,21 @@ public class OpenAiChatAdapter implements AiChatPort {
 
                 String token = extractDeltaContent(payload);
                 if (token != null && !token.isEmpty()) {
-                    onToken.accept(token);
+                      onToken.accept(token);
                 }
             });
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException("Streaming request interrupted", e);
+            throw new InfrastructureException(
+                    AiApplicationError.OPENAI_CONNECTION_TIMEOUT,
+                    "Streaming request interrupted", e);
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            throw new RuntimeException("OpenAI streaming error: " + e.getMessage(), e);
+            throw new InfrastructureException(
+                    AiApplicationError.OPENAI_STREAMING_ERROR,
+                    "OpenAI streaming error: " + e.getMessage(), e);
         }
     }
 
@@ -134,7 +146,9 @@ public class OpenAiChatAdapter implements AiChatPort {
                     streamField
             );
         } catch (Exception e) {
-            throw new RuntimeException("Cannot build request body: " + e.getMessage(), e);
+            throw new InfrastructureException(
+                    AiApplicationError.OPENAI_PARSE_ERROR,
+                    "Cannot build request body: " + e.getMessage(), e);
         }
     }
 
@@ -187,7 +201,9 @@ public class OpenAiChatAdapter implements AiChatPort {
             JsonNode root = OBJECT_MAPPER.readTree(responseJson);
             return root.path("choices").path(0).path("message").path("content").asText("");
         } catch (Exception e) {
-            throw new RuntimeException("Cannot parse content from OpenAI response: " + responseJson, e);
+            throw new InfrastructureException(
+                    AiApplicationError.OPENAI_PARSE_ERROR,
+                    "Cannot parse content from OpenAI response: " + responseJson, e);
         }
     }
 

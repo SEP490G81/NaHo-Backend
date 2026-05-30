@@ -10,7 +10,9 @@ public enum UserApplicationErrorCode implements ErrorCode {
     USER_LOGIN_FAILED("USER_A004", UserApplicationMessageKey.USER_LOGIN_FAILED_TITLE),
     USER_HASH_FAILED("USER_A005", UserApplicationMessageKey.USER_HASH_FAILED_TITLE),
     USER_ALREADY_EXISTS("USER_A006", UserApplicationMessageKey.USER_ALREADY_EXISTS_TITLE),
-    USER_ROLE_NOT_VALID("USER_A007", UserApplicationMessageKey.USER_ROLE_NOT_VALID_TITLE);
+    USER_ROLE_NOT_VALID("USER_A007", UserApplicationMessageKey.USER_ROLE_NOT_VALID_TITLE),
+    USER_LIST_GET_FAILED("USER_A006", UserApplicationMessageKey.USER_LIST_GET_FAILED),
+    USER_UPDATE_FAILED("USER_A007", UserApplicationMessageKey.USER_UPDATE_STATUS_FAILED);
 
     private final String code;
     private final String titleKey;

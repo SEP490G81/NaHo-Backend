@@ -2,6 +2,8 @@ package org.naho.speech.llm.adapter;
 
 import org.naho.speech.llm.config.OpenAiProperties;
 import org.naho.speech.llm.port.out.AiScoringPort;
+import org.naho.shared.exception.InfrastructureException;
+import org.naho.speech.llm.exception.AiApplicationError;
 import org.naho.speech.llm.result.ScoringResult;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -124,16 +126,22 @@ public class OpenAiScoringAdapter implements AiScoringPort {
         try {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() != 200) {
-                throw new RuntimeException("Scoring API error. Status: " + response.statusCode() + " | " + response.body());
+                throw new InfrastructureException(
+                        AiApplicationError.OPENAI_API_ERROR,
+                        "Scoring API error. Status: " + response.statusCode() + " | " + response.body());
             }
             String rawContent = extractContent(response.body());
             System.out.println("[OpenAiScoringAdapter] Raw JSON: " + rawContent);
             return parseScoringResult(sessionId, rawContent);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException("Scoring request interrupted", e);
+            throw new InfrastructureException(
+                    AiApplicationError.OPENAI_CONNECTION_TIMEOUT,
+                    "Scoring request interrupted", e);
         } catch (Exception e) {
-            throw new RuntimeException("Cannot call scoring API: " + e.getMessage(), e);
+            throw new InfrastructureException(
+                    AiApplicationError.OPENAI_API_ERROR,
+                    "Cannot call scoring API: " + e.getMessage(), e);
         }
     }
 
@@ -173,7 +181,9 @@ public class OpenAiScoringAdapter implements AiScoringPort {
             JsonNode root = OBJECT_MAPPER.readTree(responseJson);
             return root.path("choices").path(0).path("message").path("content").asText("");
         } catch (Exception e) {
-            throw new RuntimeException("Cannot parse content field from response: " + responseJson, e);
+            throw new InfrastructureException(
+                    AiApplicationError.OPENAI_PARSE_ERROR,
+                    "Cannot parse content field from response: " + responseJson, e);
         }
     }
 
@@ -262,7 +272,9 @@ public class OpenAiScoringAdapter implements AiScoringPort {
                     improvedExpressions
             );
         } catch (Exception e) {
-            throw new RuntimeException("Cannot parse scoring JSON: " + cleaned, e);
+            throw new InfrastructureException(
+                    AiApplicationError.OPENAI_PARSE_ERROR,
+                    "Cannot parse scoring JSON: " + cleaned, e);
         }
     }
 

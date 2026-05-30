@@ -116,7 +116,10 @@ public class AzureSpeechServiceAdapter implements AzureSpeechServicePort {
             }
 
             if (segmentAssessments.isEmpty()) {
-                throw new InfrastructureException(AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR, "No speech could be recognized. Please try again with clear speech.");
+                throw new InfrastructureException(
+                        AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR,
+                        AzureSpeechApplicationMessageKey.SPEECH_RECOGNITION_NO_MATCH
+                );
             }
 
             // 5. Tổng hợp các phân đoạn thành kết quả cuối cùng

@@ -18,11 +18,11 @@ public interface RoleEntityMapper {
         return role == null ? null : role.getId();
     }
 
-    default org.naho.user.entity.RoleEntity idToRoleEntity(Long id) {
+    default RoleEntity idToRoleEntity(Long id) {
         if (id == null) {
             return null;
         }
-        org.naho.user.entity.RoleEntity roleEntity = new org.naho.user.entity.RoleEntity();
+        RoleEntity roleEntity = new RoleEntity();
         roleEntity.setId(id);
         return roleEntity;
     }

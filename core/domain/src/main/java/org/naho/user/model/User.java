@@ -29,7 +29,7 @@ public class User {
     private final Dob dob;
 
     private final JLPTLevel jlptLevel;
-    private final UserStatus status;
+    private UserStatus status;
     private final Integer currentStreak;
     private final Integer longestStreak;
     private final LocalDate lastPracticeDate;
@@ -76,6 +76,11 @@ public class User {
 
     public boolean isActive() {
         return status == UserStatus.ACTIVE;
+    }
+
+    // Setters
+    public void setStatus(UserStatus status) {
+        this.status = status;
     }
 
     // Getters

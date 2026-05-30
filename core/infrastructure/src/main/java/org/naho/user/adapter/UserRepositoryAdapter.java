@@ -6,8 +6,12 @@ import org.naho.user.mapper.UserEntityMapper;
 import org.naho.user.model.User;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.naho.user.repository.UserJpaRepository;
+import org.naho.user.type.JLPTLevel;
+import org.naho.user.type.RoleName;
+import org.naho.user.type.UserStatus;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -47,12 +51,60 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
     @Override
     public User save(User user) {
-        // map từ domain sang infra...
         UserEntity entity = userEntityMapper.domainToEntity(user);
-
         UserEntity savedEntity = userJpaRepository.save(entity);
-
-        // map từ entity về domain
         return userEntityMapper.entityToDomain(savedEntity);
+    }
+
+    @Override
+    public List<User> findByFilters(String userNameOrMail, String role, String status, String jlptLevel) {
+        RoleName roleEnum = null;
+        if (role != null && !role.trim().isEmpty()) {
+            try {
+                roleEnum = RoleName.valueOf(role.trim().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                return List.of();
+            }
+        }
+
+        UserStatus statusEnum = null;
+        if (status != null && !status.trim().isEmpty()) {
+            try {
+                statusEnum = UserStatus.valueOf(status.trim().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                return List.of();
+            }
+        }
+
+        JLPTLevel jlptLevelEnum = null;
+        if (jlptLevel != null && !jlptLevel.trim().isEmpty()) {
+            try {
+                jlptLevelEnum = JLPTLevel.valueOf(jlptLevel.trim().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                return List.of();
+            }
+        }
+
+        String formattedNameOrMail = null;
+        if (userNameOrMail != null && !userNameOrMail.trim().isEmpty()) {
+            formattedNameOrMail = "%" + userNameOrMail.trim().toLowerCase() + "%";
+        }
+
+        return userJpaRepository.findByFilters(formattedNameOrMail, roleEnum, statusEnum, jlptLevelEnum).stream()
+                .map(userEntityMapper::entityToDomain)
+                .toList();
+    }
+
+    @Override
+    public Optional<User> findById(Long id) {
+        return userJpaRepository.findById(id)
+                .map(userEntityMapper::entityToDomain);
+    }
+
+    @Override
+    public List<User> getListUser() {
+        return userJpaRepository.findAll().stream()
+                .map(userEntityMapper::entityToDomain)
+                .toList();
     }
 }
