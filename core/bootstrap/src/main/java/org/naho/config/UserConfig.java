@@ -1,7 +1,6 @@
 package org.naho.config;
 
 import org.naho.file.port.out.FileRepositoryPort;
-import org.naho.i18n.MessageService;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.user.mapper.UserResultMapper;
 import org.naho.user.port.in.AuthPort;
@@ -47,9 +46,8 @@ public class UserConfig {
     public RegisterInputPort registerInputPort(
             UserRepositoryPort userRepository,
             PasswordEncoderPort passwordEncoder,
-            RoleRepositoryPort roleRepository,
-            MessageService messageService
+            RoleRepositoryPort roleRepository
     ) {
-        return new RegisterUseCase(userRepository, passwordEncoder, roleRepository, messageService);
+        return new RegisterUseCase(userRepository, passwordEncoder, roleRepository);
     }
 }
