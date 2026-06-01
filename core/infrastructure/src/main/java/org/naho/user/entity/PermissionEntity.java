@@ -7,7 +7,6 @@ import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.naho.shared.persistence.BaseEntity;
-import org.naho.user.type.PermissionCode;
 
 import java.util.Set;
 
@@ -21,7 +20,7 @@ import java.util.Set;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PermissionEntity extends BaseEntity {
     @Column(unique = true, nullable = false, name = "permission_code", length = 100)
-    PermissionCode permissionCode;
+    String permissionCode;
 
     String description;
 

@@ -26,7 +26,6 @@ public class UserConfig {
             RoleRepositoryPort roleRepositoryPort,
             FileRepositoryPort fileRepositoryPort,
             TransactionPort transactionPort
-
     ) {
         return new AuthUseCase(
                 userRepositoryPort,

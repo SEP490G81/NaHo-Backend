@@ -60,7 +60,7 @@ CREATE TABLE permissions
     created_time    datetime              NOT NULL,
     modified_by     BIGINT                NULL,
     modified_time   datetime              NULL,
-    permission_code SMALLINT              NOT NULL,
+    permission_code VARCHAR(100)          NOT NULL,
     `description`   VARCHAR(255)          NULL,
     CONSTRAINT pk_permissions PRIMARY KEY (id)
 );

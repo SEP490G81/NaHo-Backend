@@ -45,7 +45,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: prod
 
-      DB_URL: jdbc:mysql://mysql:3306/naho?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      DB_URL: jdbc:mysql://mysql:3306/naho?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
       DB_USERNAME: naho_user
       DB_PASSWORD: ${MYSQL_PASSWORD}
 

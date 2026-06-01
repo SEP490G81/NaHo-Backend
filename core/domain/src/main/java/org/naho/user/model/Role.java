@@ -12,9 +12,6 @@ public class Role {
     private RoleName roleName;
     private String description;
 
-    private Role() {
-    }
-
     // Private constructor
     private Role(Builder builder) {
         this.id = builder.id;

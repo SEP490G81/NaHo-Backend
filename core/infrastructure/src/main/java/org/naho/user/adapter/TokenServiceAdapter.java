@@ -55,7 +55,6 @@ public class TokenServiceAdapter implements TokenServicePort {
         Instant expiresAt = issuedAt.plus(jwtProperty.getAccessTokenExpiration());
 
         Map<String, Object> claims = Map.of(
-                JwtCustomClaimKey.USER_ROLES, roleNames,
                 JwtCustomClaimKey.USER_SESSION_ID, userSession.getId(),
                 JwtCustomClaimKey.TOKEN_TYPE, ACCESS_TOKEN_TYPE
         );
@@ -103,16 +102,11 @@ public class TokenServiceAdapter implements TokenServicePort {
                     JwtCustomClaimKey.USER_SESSION_ID,
                     Long.class
             );
-            List<String> roles = claims.get(
-                    JwtCustomClaimKey.USER_ROLES,
-                    List.class
-            );
             Instant expiresAt = claims.getExpiration().toInstant();
 
             return new AccessTokenPayload(
                     userId,
                     sessionId,
-                    roles,
                     expiresAt
             );
 

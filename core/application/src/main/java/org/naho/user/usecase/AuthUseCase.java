@@ -132,5 +132,4 @@ public class AuthUseCase implements AuthPort {
                 SessionRevokedReason.USER_LOGOUT
         );
     }
-
 }
