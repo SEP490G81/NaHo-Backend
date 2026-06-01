@@ -1,4 +1,4 @@
-package org.naho.config;
+package org.naho.config.application;
 
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.shared.port.out.TransactionPort;

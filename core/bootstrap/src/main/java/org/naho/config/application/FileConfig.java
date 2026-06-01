@@ -1,4 +1,4 @@
-package org.naho.config;
+package org.naho.config.application;
 
 import org.naho.file.mapper.FileResultMapper;
 import org.springframework.context.annotation.Bean;

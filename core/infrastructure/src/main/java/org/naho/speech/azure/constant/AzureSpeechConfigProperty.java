@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "azure.speech")
+@ConfigurationProperties(prefix = "app.azure")
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class AzureSpeechConfigProperty {
     String subscriptionKey;

@@ -1,8 +1,12 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/naho?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
-    username: root
-    password: 1234
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    
+logging:
+  level:
+    root: warn
 
 app:
   cookie:

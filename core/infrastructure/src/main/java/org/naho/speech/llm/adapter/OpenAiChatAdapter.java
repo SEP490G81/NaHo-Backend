@@ -1,11 +1,11 @@
 package org.naho.speech.llm.adapter;
 
-import org.naho.speech.llm.config.OpenAiProperties;
-import org.naho.speech.llm.port.out.AiChatPort;
-import org.naho.shared.exception.InfrastructureException;
-import org.naho.speech.llm.exception.AiApplicationError;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.naho.shared.exception.InfrastructureException;
+import org.naho.speech.llm.constant.OpenAiConfigProperty;
+import org.naho.speech.llm.exception.AiApplicationError;
+import org.naho.speech.llm.port.out.AiChatPort;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -22,10 +22,10 @@ public class OpenAiChatAdapter implements AiChatPort {
     private static final String OPENAI_URL = "https://api.openai.com/v1/chat/completions";
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    private final OpenAiProperties properties;
+    private final OpenAiConfigProperty properties;
     private final HttpClient httpClient;
 
-    public OpenAiChatAdapter(OpenAiProperties properties) {
+    public OpenAiChatAdapter(OpenAiConfigProperty properties) {
         this.properties = properties;
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(30))
@@ -103,7 +103,7 @@ public class OpenAiChatAdapter implements AiChatPort {
 
                 String token = extractDeltaContent(payload);
                 if (token != null && !token.isEmpty()) {
-                      onToken.accept(token);
+                    onToken.accept(token);
                 }
             });
 
@@ -139,10 +139,10 @@ public class OpenAiChatAdapter implements AiChatPort {
 
             return String.format(
                     "{\"model\":\"%s\",\"messages\":%s,\"max_tokens\":%d,\"temperature\":%.1f%s}",
-                    properties.chatModel(),
+                    properties.getChatModel(),
                     messagesJson,
-                    properties.maxTokens(),
-                    properties.temperature(),
+                    properties.getMaxTokens(),
+                    properties.getTemperature(),
                     streamField
             );
         } catch (Exception e) {
@@ -168,10 +168,10 @@ public class OpenAiChatAdapter implements AiChatPort {
                   "temperature": %.1f%s
                 }
                 """.formatted(
-                properties.chatModel(),
+                properties.getChatModel(),
                 escapedMessage,
-                properties.maxTokens(),
-                properties.temperature(),
+                properties.getMaxTokens(),
+                properties.getTemperature(),
                 streamField
         );
     }
@@ -181,7 +181,7 @@ public class OpenAiChatAdapter implements AiChatPort {
                 .uri(URI.create(OPENAI_URL))
                 .timeout(timeout)
                 .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + properties.apiKey())
+                .header("Authorization", "Bearer " + properties.getApiKey())
                 .POST(HttpRequest.BodyPublishers.ofString(body))
                 .build();
     }

@@ -1,12 +1,12 @@
 package org.naho.speech.llm.adapter;
 
-import org.naho.speech.llm.config.OpenAiProperties;
-import org.naho.speech.llm.port.out.AiScoringPort;
-import org.naho.shared.exception.InfrastructureException;
-import org.naho.speech.llm.exception.AiApplicationError;
-import org.naho.speech.llm.result.ScoringResult;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.naho.shared.exception.InfrastructureException;
+import org.naho.speech.llm.constant.OpenAiConfigProperty;
+import org.naho.speech.llm.exception.AiApplicationError;
+import org.naho.speech.llm.port.out.AiScoringPort;
+import org.naho.speech.llm.result.ScoringResult;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -94,10 +94,10 @@ public class OpenAiScoringAdapter implements AiScoringPort {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    private final OpenAiProperties properties;
+    private final OpenAiConfigProperty properties;
     private final HttpClient httpClient;
 
-    public OpenAiScoringAdapter(OpenAiProperties properties) {
+    public OpenAiScoringAdapter(OpenAiConfigProperty properties) {
         this.properties = properties;
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(30))
@@ -110,7 +110,7 @@ public class OpenAiScoringAdapter implements AiScoringPort {
                                String fullTranscript,
                                String speechMetadata,
                                String asrConfidence) {
-        System.out.println("[OpenAiScoringAdapter] Calling model: " + properties.scoringModel());
+        System.out.println("[OpenAiScoringAdapter] Calling model: " + properties.getScoringModel());
 
         String userContent = buildUserContent(topic, fullTranscript, speechMetadata, asrConfidence);
         String requestBody = buildScoringRequestBody(userContent);
@@ -119,7 +119,7 @@ public class OpenAiScoringAdapter implements AiScoringPort {
                 .uri(URI.create(OPENAI_URL))
                 .timeout(Duration.ofMinutes(10))
                 .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + properties.apiKey())
+                .header("Authorization", "Bearer " + properties.getApiKey())
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .build();
 
@@ -172,7 +172,7 @@ public class OpenAiScoringAdapter implements AiScoringPort {
                 ],
                 "max_completion_tokens": 2000
                 }
-                """.formatted(properties.scoringModel(), escapedSystem, escapedContent);
+                """.formatted(properties.getScoringModel(), escapedSystem, escapedContent);
     }
 
 

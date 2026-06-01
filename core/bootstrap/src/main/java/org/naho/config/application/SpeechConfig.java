@@ -1,4 +1,4 @@
-package org.naho.config;
+package org.naho.config.application;
 
 import org.naho.speech.azure.mapper.PronunciationAssessmentMapper;
 import org.naho.speech.azure.mapper.WordAssessmentMapper;
@@ -31,5 +31,5 @@ public class SpeechConfig {
             TextToSpeechServicePort textToSpeechServicePort
     ) {
         return new TextToSpeechUseCase(textToSpeechServicePort);
-        }
+    }
 }

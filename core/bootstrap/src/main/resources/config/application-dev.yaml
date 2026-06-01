@@ -4,19 +4,17 @@ spring:
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:1234}
 
-azure:
-  speech:
-    subscription-key: ${AZURE_SPEECH_KEY}
-    region: ${AZURE_SPEECH_REGION}
-    language: "ja-JP"
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DATABASE:0}
+
+logging:
+  level:
+    root: info
 
 app:
   cookie:
     secure: false
-
-openai:
-  api-key: ${OPENAI_API_KEY}
-  chat-model: ${OPENAI_CHAT_MODEL:gpt-4.1-mini}
-  scoring-model: ${OPENAI_SCORING_MODEL:gpt-4o}
-  max-tokens: ${OPENAI_MAX_TOKENS:1000}
-  temperature: ${OPENAI_TEMPERATURE:0.7}
