@@ -44,17 +44,17 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getUser(@PathVariable Long id) {
+    public ResponseEntity<UserResponse> getUser(@PathVariable("id") Long id) {
         UserResult result = getUserInputPort.getUserById(id);
         return ResponseEntity.ok(userResponseMapper.resultToResponse(result));
     }
 
     @GetMapping
     public ResponseEntity<List<UserResponse>> getListUser(
-            @RequestParam(required = false) String userNameOrEmail,
-            @RequestParam(required = false) String role,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) String jlptLevel
+            @RequestParam(value = "userNameOrEmail", required = false) String userNameOrEmail,
+            @RequestParam(value = "role", required = false) String role,
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "jlptLevel", required = false) String jlptLevel
     ) {
         List<UserResult> results = getUserInputPort.searchUsers(userNameOrEmail, role, status, jlptLevel);
         return ResponseEntity.ok(results.stream().map(userResponseMapper::resultToResponse).toList());
@@ -62,7 +62,7 @@ public class UserController {
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<UserResponse> updateStatus(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody UpdateStatusRequest request
     ) {
         UserResult user = updateUserInputPort.updateStatus(id, request.newStatus());
