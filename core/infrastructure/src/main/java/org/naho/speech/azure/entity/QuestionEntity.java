@@ -8,7 +8,9 @@ import org.naho.shared.persistence.BaseEntity;
 
 import java.util.List;
 
-@Builder
+import lombok.experimental.SuperBuilder;
+
+@SuperBuilder
 @Getter
 @Setter
 @NoArgsConstructor

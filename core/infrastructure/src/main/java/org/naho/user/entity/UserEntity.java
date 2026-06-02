@@ -3,6 +3,7 @@ package org.naho.user.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 import org.naho.file.model.FileEntity;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.user.type.AccountType;
@@ -14,7 +15,7 @@ import org.naho.user.valueobject.Username;
 import java.time.LocalDate;
 import java.util.List;
 
-@Builder
+@SuperBuilder
 @Getter
 @Setter
 @NoArgsConstructor

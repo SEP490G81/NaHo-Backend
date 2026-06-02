@@ -6,7 +6,9 @@ import lombok.experimental.FieldDefaults;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.speech.type.SpeechAssessmentErrorType;
 
-@Builder
+import lombok.experimental.SuperBuilder;
+
+@SuperBuilder
 @Getter
 @Setter
 @NoArgsConstructor
