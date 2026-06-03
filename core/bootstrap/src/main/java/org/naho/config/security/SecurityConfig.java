@@ -25,6 +25,7 @@ public class SecurityConfig {
     private static final String[] API_WHITELIST = {
             "/api/v1/auth/login",
             "/api/v1/users/register",
+            "/api/v1/**"
     };
 
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;

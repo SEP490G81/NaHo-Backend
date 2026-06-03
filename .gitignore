@@ -55,3 +55,6 @@ gradle.properties.local
 
 #Coding pla
 coding_plan
+
+### Sudachi Dictionary ###
+*.dic
