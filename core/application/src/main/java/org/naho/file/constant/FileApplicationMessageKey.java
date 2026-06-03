@@ -8,4 +8,12 @@ public final class FileApplicationMessageKey {
             "file.not.found.title";
     public static final String FILE_NOT_FOUND =
             "file.not.found";
+
+    public static final String FILE_UPLOAD_FAILED_TITLE =
+            "file.upload.failed.title";
+    public static final String FILE_UPLOAD_FAILED =
+            "file.upload.failed";
+
+    public static final String FILE_UPLOAD_SUCCESSFULLY =
+            "file.upload.successfully";
 }

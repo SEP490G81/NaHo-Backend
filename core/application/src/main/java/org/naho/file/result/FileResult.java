@@ -2,8 +2,8 @@ package org.naho.file.result;
 
 public record FileResult(
         Long id,
-        String fileUrl,
-        String previewUrl,
+        String objectKey,
+        String previewKey,
         String originalName,
         String contentType,
         Long size

@@ -3,7 +3,7 @@ package org.naho.speech.llm.adapter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.naho.shared.exception.InfrastructureException;
-import org.naho.speech.llm.constant.OpenAiConfigProperty;
+import org.naho.speech.llm.constant.OpenAiConfigProperties;
 import org.naho.speech.llm.exception.AiApplicationError;
 import org.naho.speech.llm.port.out.AiChatPort;
 
@@ -22,10 +22,10 @@ public class OpenAiChatAdapter implements AiChatPort {
     private static final String OPENAI_URL = "https://api.openai.com/v1/chat/completions";
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    private final OpenAiConfigProperty properties;
+    private final OpenAiConfigProperties properties;
     private final HttpClient httpClient;
 
-    public OpenAiChatAdapter(OpenAiConfigProperty properties) {
+    public OpenAiChatAdapter(OpenAiConfigProperties properties) {
         this.properties = properties;
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(30))

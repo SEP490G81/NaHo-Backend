@@ -10,7 +10,7 @@ import org.naho.user.exception.UserApplicationErrorCode;
 import org.naho.user.mapper.UserResultMapper;
 import org.naho.user.model.User;
 import org.naho.user.model.UserSession;
-import org.naho.user.port.in.AuthPort;
+import org.naho.user.port.in.AuthInputPort;
 import org.naho.user.port.out.*;
 import org.naho.user.result.LoginResult;
 import org.naho.user.result.TokenResult;
@@ -20,7 +20,7 @@ import org.naho.user.type.SessionRevokedReason;
 import java.time.Instant;
 import java.util.List;
 
-public class AuthUseCase implements AuthPort {
+public class AuthInputUseCase implements AuthInputPort {
     private final UserRepositoryPort userRepositoryPort;
     private final EncoderPort encoderPort;
     private final TokenServicePort tokenServicePort;
@@ -30,7 +30,7 @@ public class AuthUseCase implements AuthPort {
     private final FileRepositoryPort fileRepositoryPort;
     private final TransactionPort transactionPort;
 
-    public AuthUseCase(
+    public AuthInputUseCase(
             UserRepositoryPort userRepositoryPort,
             EncoderPort encoderPort,
             TokenServicePort tokenServicePort,
@@ -104,11 +104,11 @@ public class AuthUseCase implements AuthPort {
         UserSession savedUserSession = userSessionRepositoryPort.save(userSession);
 
         List<String> roleNames = roleRepositoryPort.findRoleNamesByUserId(user.getId());
-        String avatarFileUrl = fileRepositoryPort.findFileUrlById(user.getAvatarFileId());
+        String avatarObjectKey = fileRepositoryPort.findObjectKeyById(user.getAvatarFileId());
 
         TokenResult accessToken = tokenServicePort.generateAccessToken(user, roleNames, savedUserSession);
 
-        UserResult userResult = userResultMapper.domainToResult(user, roleNames, avatarFileUrl);
+        UserResult userResult = userResultMapper.domainToResult(user, roleNames, avatarObjectKey);
 
         return new LoginResult(
                 userResult,

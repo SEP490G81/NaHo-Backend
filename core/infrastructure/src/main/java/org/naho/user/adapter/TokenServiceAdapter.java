@@ -7,7 +7,7 @@ import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.user.constant.JwtCustomClaimKey;
-import org.naho.user.constant.JwtProperty;
+import org.naho.user.constant.JwtProperties;
 import org.naho.user.constant.UserApplicationMessageKey;
 import org.naho.user.exception.UserApplicationErrorCode;
 import org.naho.user.model.User;
@@ -33,16 +33,21 @@ public class TokenServiceAdapter implements TokenServicePort {
 
     private static final int TOKEN_BYTES = 64;
 
-    private final JwtProperty jwtProperty;
+    private final JwtProperties jwtProperties;
     private final SecretKey jwtSecretKey;
     private final SecureRandom secureRandom;
     private final Base64.Encoder base64UrlEncoder;
 
-    public TokenServiceAdapter(JwtProperty jwtProperty) {
-        this.jwtProperty = jwtProperty;
+    public TokenServiceAdapter(JwtProperties jwtProperties) {
+        this.jwtProperties = jwtProperties;
 
+        System.out.println("==============");
+        System.out.println(jwtProperties.getSecret());
+        System.out.println(jwtProperties.getSecret().length());
+        System.out.println("==============");
+        
         this.jwtSecretKey = Keys.hmacShaKeyFor(
-                jwtProperty.getSecret().getBytes(StandardCharsets.UTF_8)
+                jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8)
         );
 
         this.secureRandom = new SecureRandom();
@@ -52,7 +57,7 @@ public class TokenServiceAdapter implements TokenServicePort {
     @Override
     public TokenResult generateAccessToken(User user, List<String> roleNames, UserSession userSession) {
         Instant issuedAt = Instant.now();
-        Instant expiresAt = issuedAt.plus(jwtProperty.getAccessTokenExpiration());
+        Instant expiresAt = issuedAt.plus(jwtProperties.getAccessTokenExpiration());
 
         Map<String, Object> claims = Map.of(
                 JwtCustomClaimKey.USER_SESSION_ID, userSession.getId(),
@@ -73,7 +78,7 @@ public class TokenServiceAdapter implements TokenServicePort {
     @Override
     public TokenResult generateRefreshToken() {
         Instant issuedAt = Instant.now();
-        Instant expiresAt = issuedAt.plus(jwtProperty.getRefreshTokenExpiration());
+        Instant expiresAt = issuedAt.plus(jwtProperties.getRefreshTokenExpiration());
 
         String rawToken = generateSecureRandomToken();
         return new TokenResult(rawToken, expiresAt);

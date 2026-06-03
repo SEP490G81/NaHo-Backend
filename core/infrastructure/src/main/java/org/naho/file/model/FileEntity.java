@@ -16,11 +16,11 @@ import org.naho.shared.persistence.BaseEntity;
 @Table(name = "files")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FileEntity extends BaseEntity {
-    @Column(name = "file_url", nullable = false, length = 2048)
-    String fileUrl;
+    @Column(name = "object_key", nullable = false, length = 2048)
+    String objectKey;
 
-    @Column(name = "preview_url", nullable = false, length = 2048)
-    String previewUrl;
+    @Column(name = "preview_key", nullable = false, length = 2048)
+    String previewKey;
 
     @Column(name = "original_name", nullable = false)
     String originalName;

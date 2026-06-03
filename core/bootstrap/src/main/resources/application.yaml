@@ -74,3 +74,6 @@ app:
     subscription-key: ${AZURE_SPEECH_KEY}
     region: japaneast
     language: ja-JP
+  s3:
+    bucket-name: naho-bucket
+    region: ap-southeast-1

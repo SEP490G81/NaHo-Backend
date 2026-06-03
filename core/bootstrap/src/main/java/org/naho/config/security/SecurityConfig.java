@@ -2,7 +2,7 @@ package org.naho.config.security;
 
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
-import org.naho.user.constant.JwtProperty;
+import org.naho.user.constant.JwtProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -51,9 +51,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtDecoder jwtDecoder(JwtProperty jwtProperty) {
+    public JwtDecoder jwtDecoder(JwtProperties jwtProperties) {
         SecretKey secretKey = Keys.hmacShaKeyFor(
-                jwtProperty.getSecret().getBytes(StandardCharsets.UTF_8)
+                jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8)
         );
 
         return NimbusJwtDecoder

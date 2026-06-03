@@ -58,6 +58,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.apache.commons:commons-pool2:2.13.1")
 
+    // s3
+    implementation("software.amazon.awssdk:s3:2.46.0")
+
     // other
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5")

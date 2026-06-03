@@ -3,16 +3,16 @@ package org.naho.file.model;
 public class File {
 
     private final Long id;
-    private final String fileUrl;
-    private final String previewUrl;
+    private final String objectKey;
+    private final String previewKey;
     private final String originalName;
     private final String contentType;
     private final Long size;
 
     private File(Builder builder) {
         this.id = builder.id;
-        this.fileUrl = builder.fileUrl;
-        this.previewUrl = builder.previewUrl;
+        this.objectKey = builder.objectKey;
+        this.previewKey = builder.previewKey;
         this.originalName = builder.originalName;
         this.contentType = builder.contentType;
         this.size = builder.size;
@@ -26,12 +26,12 @@ public class File {
         return id;
     }
 
-    public String getFileUrl() {
-        return fileUrl;
+    public String getObjectKey() {
+        return objectKey;
     }
 
-    public String getPreviewUrl() {
-        return previewUrl;
+    public String getPreviewKey() {
+        return previewKey;
     }
 
     public String getOriginalName() {
@@ -49,8 +49,8 @@ public class File {
     public static class Builder {
 
         private Long id;
-        private String fileUrl;
-        private String previewUrl;
+        private String objectKey;
+        private String previewKey;
         private String originalName;
         private String contentType;
         private Long size;
@@ -60,13 +60,13 @@ public class File {
             return this;
         }
 
-        public Builder fileUrl(String fileUrl) {
-            this.fileUrl = fileUrl;
+        public Builder objectKey(String objectKey) {
+            this.objectKey = objectKey;
             return this;
         }
 
-        public Builder previewUrl(String previewUrl) {
-            this.previewUrl = previewUrl;
+        public Builder previewKey(String previewKey) {
+            this.previewKey = previewKey;
             return this;
         }
 

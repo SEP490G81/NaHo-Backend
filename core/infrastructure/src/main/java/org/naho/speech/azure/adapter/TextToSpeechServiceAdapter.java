@@ -4,7 +4,7 @@ import com.microsoft.cognitiveservices.speech.*;
 import lombok.RequiredArgsConstructor;
 import org.naho.shared.exception.InfrastructureException;
 import org.naho.speech.azure.constant.AzureSpeechApplicationMessageKey;
-import org.naho.speech.azure.constant.AzureSpeechConfigProperty;
+import org.naho.speech.azure.constant.AzureSpeechConfigProperties;
 import org.naho.speech.azure.constant.AzureSpeechContentType;
 import org.naho.speech.azure.exception.AzureSpeechApplicationErrorCode;
 import org.naho.speech.azure.helper.TextToSpeechServiceHelper;
@@ -17,7 +17,7 @@ import java.util.concurrent.ExecutionException;
 @Component
 @RequiredArgsConstructor
 public class TextToSpeechServiceAdapter implements TextToSpeechServicePort {
-    private final AzureSpeechConfigProperty property;
+    private final AzureSpeechConfigProperties property;
     private final TextToSpeechServiceHelper textToSpeechServiceHelper;
 
     @Override

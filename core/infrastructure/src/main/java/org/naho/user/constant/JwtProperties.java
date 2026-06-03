@@ -1,18 +1,18 @@
-package org.naho.speech.llm.constant;
+package org.naho.user.constant;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.time.Duration;
+
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "app.openai")
+@ConfigurationProperties(prefix = "app.jwt")
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
-public class OpenAiConfigProperty {
-    String apiKey;
-    String chatModel;
-    String scoringModel;
-    int maxTokens;
-    double temperature;
+public class JwtProperties {
+    String secret;
+    Duration accessTokenExpiration;
+    Duration refreshTokenExpiration;
 }

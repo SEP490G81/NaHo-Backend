@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.naho.shared.exception.InfrastructureException;
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
 import org.naho.speech.azure.constant.AzureSpeechApplicationMessageKey;
-import org.naho.speech.azure.constant.AzureSpeechConfigProperty;
+import org.naho.speech.azure.constant.AzureSpeechConfigProperties;
 import org.naho.speech.azure.exception.AzureSpeechApplicationErrorCode;
 import org.naho.speech.azure.helper.AzureSpeechServiceHelper;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class AzureSpeechServiceAdapter implements AzureSpeechServicePort {
 
-    private final AzureSpeechConfigProperty properties;
+    private final AzureSpeechConfigProperties properties;
     private final AzureSpeechServiceHelper azureSpeechServiceHelper;
 
     @Override

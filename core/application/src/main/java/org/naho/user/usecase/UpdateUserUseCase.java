@@ -54,8 +54,8 @@ public class UpdateUserUseCase implements UpdateUserInputPort {
         User updatedUser = userRepositoryPort.save(user);
 
         List<String> roleNames = roleRepositoryPort.findRoleNamesByUserId(user.getId());
-        String avatarFileUrl = fileRepositoryPort.findFileUrlById(user.getAvatarFileId());
+        String avatarObjectKey = fileRepositoryPort.findObjectKeyById(user.getAvatarFileId());
 
-        return userResultMapper.domainToResult(updatedUser, roleNames, avatarFileUrl);
+        return userResultMapper.domainToResult(updatedUser, roleNames, avatarObjectKey);
     }
 }

@@ -5,7 +5,7 @@ import org.naho.speech.llm.adapter.AzureSpeechToTextAdapter;
 import org.naho.speech.llm.adapter.InMemorySessionStore;
 import org.naho.speech.llm.adapter.OpenAiChatAdapter;
 import org.naho.speech.llm.adapter.OpenAiScoringAdapter;
-import org.naho.speech.llm.constant.OpenAiConfigProperty;
+import org.naho.speech.llm.constant.OpenAiConfigProperties;
 import org.naho.speech.llm.port.in.EndSessionInputPort;
 import org.naho.speech.llm.port.in.SpeakingSessionInputPort;
 import org.naho.speech.llm.port.in.SuggestedTopicsInputPort;
@@ -38,8 +38,8 @@ import org.springframework.context.annotation.Configuration;
 public class ChatConfig {
     // ─── Output Port Adapters ────────────────────────────────────
     @Bean
-    public AiChatPort aiChatPort(OpenAiConfigProperty openAiConfigProperty) {
-        return new OpenAiChatAdapter(openAiConfigProperty);
+    public AiChatPort aiChatPort(OpenAiConfigProperties openAiConfigProperties) {
+        return new OpenAiChatAdapter(openAiConfigProperties);
     }
 
     @Bean
@@ -48,8 +48,8 @@ public class ChatConfig {
     }
 
     @Bean
-    public AiScoringPort aiScoringPort(OpenAiConfigProperty openAiConfigProperty) {
-        return new OpenAiScoringAdapter(openAiConfigProperty);
+    public AiScoringPort aiScoringPort(OpenAiConfigProperties openAiConfigProperties) {
+        return new OpenAiScoringAdapter(openAiConfigProperties);
     }
 
     @Bean
