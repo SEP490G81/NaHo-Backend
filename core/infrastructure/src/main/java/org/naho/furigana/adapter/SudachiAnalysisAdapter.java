@@ -22,7 +22,6 @@ import java.util.List;
 public class SudachiAnalysisAdapter implements FuriganaAnalysisPort {
 
     private Dictionary dictionary;
-    private Tokenizer tokenizer;
 
     @PostConstruct
     public void init() throws IOException {
@@ -45,7 +44,6 @@ public class SudachiAnalysisAdapter implements FuriganaAnalysisPort {
 
         try {
             this.dictionary = new DictionaryFactory().create("", settingsContent, true);
-            this.tokenizer = dictionary.create();
         } catch (IOException e) {
             throw new RuntimeException("Failed to initialize Sudachi dictionary", e);
         }
@@ -75,8 +73,10 @@ public class SudachiAnalysisAdapter implements FuriganaAnalysisPort {
         List<FuriganaToken> tokens = new ArrayList<>();
         StringBuilder fullFurigana = new StringBuilder();
 
+        Tokenizer tokenizer = dictionary.create(); // sửa lỗi thread-safe
+
         // Use SplitMode.C to get longest possible words, or A for shortest. C is usually best for meaning.
-        for (Morpheme m : tokenizer.tokenize(Tokenizer.SplitMode.A, text)) {
+        for (Morpheme m : tokenizer.tokenize(Tokenizer.SplitMode.C, text)) {
             String surface = m.surface();
             String readingKatakana = m.readingForm();
             String readingHiragana = convertKatakanaToHiragana(readingKatakana);
