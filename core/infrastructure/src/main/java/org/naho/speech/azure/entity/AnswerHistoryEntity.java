@@ -7,7 +7,9 @@ import org.naho.file.model.FileEntity;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.user.entity.UserEntity;
 
-@Builder
+import lombok.experimental.SuperBuilder;
+
+@SuperBuilder
 @Getter
 @Setter
 @NoArgsConstructor

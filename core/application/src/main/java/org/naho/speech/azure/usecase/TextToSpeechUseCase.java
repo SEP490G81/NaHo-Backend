@@ -1,9 +1,9 @@
 package org.naho.speech.azure.usecase;
 
+import org.naho.i18n.message.speech.SpeechDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.speech.azure.command.TextToSpeechCommand;
-import org.naho.speech.azure.constant.AzureSpeechApplicationMessageKey;
-import org.naho.speech.azure.exception.AzureSpeechApplicationErrorCode;
+import org.naho.speech.azure.exception.AzureSpeechErrorCode;
 import org.naho.speech.azure.port.in.TextToSpeechInputPort;
 import org.naho.speech.azure.port.out.TextToSpeechServicePort;
 import org.naho.speech.azure.result.AudioSpeechResult;
@@ -20,16 +20,16 @@ public class TextToSpeechUseCase implements TextToSpeechInputPort {
     public AudioSpeechResult execute(TextToSpeechCommand command) {
         if (command.text() == null || command.text().isBlank()) {
             throw new ApplicationException(
-                    AzureSpeechApplicationErrorCode.SPEECH_TEXT_NOT_VALID,
-                    AzureSpeechApplicationMessageKey.SPEECH_TEXT_BLANK
+                    AzureSpeechErrorCode.SPEECH_TEXT_NOT_VALID,
+                    SpeechDetailMessageKey.SPEECH_TEXT_BLANK
             );
         }
 
         // Giới hạn ký tự tối đa tùy chỉnh
         if (command.text().length() > TEXT_MAX_LENGTH) {
             throw new ApplicationException(
-                    AzureSpeechApplicationErrorCode.SPEECH_TEXT_NOT_VALID,
-                    AzureSpeechApplicationMessageKey.SPEECH_TEXT_INVALID_RANGE,
+                    AzureSpeechErrorCode.SPEECH_TEXT_NOT_VALID,
+                    SpeechDetailMessageKey.SPEECH_TEXT_INVALID_RANGE,
                     TEXT_MAX_LENGTH
             );
         }

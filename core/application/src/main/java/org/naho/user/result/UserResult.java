@@ -12,7 +12,7 @@ public class UserResult {
     private final Long id;
     private final String username;
     private final List<String> roleNames;
-    private final String avatarFileUrl;
+    private final String avatarObjectKey;
 
     private final String email;
     private final String firstName;
@@ -31,7 +31,7 @@ public class UserResult {
         this.lastName = builder.lastName;
         this.gender = builder.gender;
         this.dob = builder.dob;
-        this.avatarFileUrl = builder.avatarFileUrl;
+        this.avatarObjectKey = builder.avatarObjectKey;
         this.jlptLevel = builder.jlptLevel;
         this.status = builder.status;
     }
@@ -72,8 +72,8 @@ public class UserResult {
         return dob;
     }
 
-    public String getAvatarFileUrl() {
-        return avatarFileUrl;
+    public String getAvatarObjectKey() {
+        return avatarObjectKey;
     }
 
     public JLPTLevel getJlptLevel() {
@@ -93,7 +93,7 @@ public class UserResult {
         private String lastName;
         private Gender gender;
         private LocalDate dob;
-        private String avatarFileUrl;
+        private String avatarObjectKey;
         private JLPTLevel jlptLevel;
         private UserStatus status;
 
@@ -137,8 +137,8 @@ public class UserResult {
             return this;
         }
 
-        public Builder avatarFileUrl(String avatarFileUrl) {
-            this.avatarFileUrl = avatarFileUrl;
+        public Builder avatarObjectKey(String avatarObjectKey) {
+            this.avatarObjectKey = avatarObjectKey;
             return this;
         }
 

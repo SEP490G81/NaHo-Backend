@@ -3,13 +3,14 @@ package org.naho.user.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.user.type.RoleName;
 
 import java.util.List;
 import java.util.Set;
 
-@Builder
+@SuperBuilder
 @Getter
 @Setter
 @NoArgsConstructor

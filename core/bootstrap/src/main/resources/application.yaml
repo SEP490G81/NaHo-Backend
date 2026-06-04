@@ -64,7 +64,7 @@ app:
     refresh-token-expiration: 30d
 
   openai:
-    api-key: ${OPENAI_API_KEY}
+    api-key: ${LLM_API_KEY}
     chat-model: gpt-4.1-mini
     scoring-model: gpt-4o
     max-tokens: 1000
@@ -74,3 +74,6 @@ app:
     subscription-key: ${AZURE_SPEECH_KEY}
     region: japaneast
     language: ja-JP
+  s3:
+    bucket-name: naho-bucket
+    region: ap-southeast-1

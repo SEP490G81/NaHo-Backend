@@ -8,8 +8,8 @@ public class FileResultMapper {
         if (domain == null) return null;
         return new FileResult(
                 domain.getId(),
-                domain.getFileUrl(),
-                domain.getPreviewUrl(),
+                domain.getObjectKey(),
+                domain.getPreviewKey(),
                 domain.getOriginalName(),
                 domain.getContentType(),
                 domain.getSize()

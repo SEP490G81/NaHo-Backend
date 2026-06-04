@@ -35,7 +35,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
 
     private static final String FREE_INSTRUCTION =
             "- This is a free conversation. The learner can talk about any topic.\n"
-                    + "- Start by greeting the learner and asking what they'd like to talk about.";
+                    + "- Start by greeting tgithe learner and asking what they'd like to talk about.";
 
     private final AiChatPort aiChatPort;
     private final SessionStorePort sessionStorePort;
@@ -49,11 +49,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         this.speechToTextPort = speechToTextPort;
     }
 
-    //👉 Tạo một phiên hội thoại mới giữa user và AI
-//👉 Gán chủ đề (topic) cho phiên đó
-//👉 Khởi tạo prompt hệ thống để AI biết cách nói chuyện
-//👉 Cho AI trả lời câu chào đầu tiên
-//👉 Lưu toàn bộ lịch sử hội thoại
+
     @Override
     public SpeakingTopicResult startTopicSession(StartSpeakingCommand command) {
         String sessionId = UUID.randomUUID().toString();

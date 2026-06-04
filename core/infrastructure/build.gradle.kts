@@ -26,6 +26,7 @@ dependencies {
     // project dependencies
     implementation(project(":core:domain"))
     implementation(project(":core:application"))
+    implementation(project(":core:common"))
 
     // lombok
     compileOnly("org.projectlombok:lombok")
@@ -58,9 +59,12 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.apache.commons:commons-pool2:2.13.1")
 
+    // s3
+    implementation("software.amazon.awssdk:s3:2.46.0")
+
     // Sudachi
     implementation("com.worksap.nlp:sudachi:0.7.5")
-    
+
     // other
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5")

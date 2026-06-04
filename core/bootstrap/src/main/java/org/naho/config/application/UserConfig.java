@@ -17,7 +17,7 @@ public class UserConfig {
     }
 
     @Bean
-    public AuthPort authPort(
+    public AuthInputPort authPort(
             UserRepositoryPort userRepositoryPort,
             EncoderPort encoderPort,
             TokenServicePort tokenServicePort,
@@ -27,7 +27,7 @@ public class UserConfig {
             FileRepositoryPort fileRepositoryPort,
             TransactionPort transactionPort
     ) {
-        return new AuthUseCase(
+        return new AuthInputUseCase(
                 userRepositoryPort,
                 encoderPort,
                 tokenServicePort,
@@ -42,10 +42,10 @@ public class UserConfig {
     @Bean
     public RegisterInputPort registerInputPort(
             UserRepositoryPort userRepository,
-            PasswordEncoderPort passwordEncoder,
+            EncoderPort encoderPort,
             RoleRepositoryPort roleRepository
     ) {
-        return new RegisterUseCase(userRepository, passwordEncoder, roleRepository);
+        return new RegisterUseCase(userRepository, encoderPort, roleRepository);
     }
 
     @Bean

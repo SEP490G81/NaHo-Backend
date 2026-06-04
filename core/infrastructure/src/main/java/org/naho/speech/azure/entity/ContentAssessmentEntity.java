@@ -5,7 +5,9 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.naho.shared.persistence.BaseEntity;
 
-@Builder
+import lombok.experimental.SuperBuilder;
+
+@SuperBuilder
 @Getter
 @Setter
 @NoArgsConstructor

@@ -5,12 +5,12 @@ import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.shared.constant.CookieProperty;
 import org.naho.user.command.CredentialsLoginCommand;
 import org.naho.user.command.LogoutCommand;
-import org.naho.user.constant.UserApplicationMessageKey;
+import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.user.dto.mapper.LoginRequestMapper;
 import org.naho.user.dto.mapper.LoginResponseMapper;
 import org.naho.user.dto.request.CredentialsLoginRequest;
 import org.naho.user.dto.response.LoginResponse;
-import org.naho.user.port.in.AuthPort;
+import org.naho.user.port.in.AuthInputPort;
 import org.naho.user.result.AccessTokenPayload;
 import org.naho.user.result.LoginResult;
 import org.springframework.http.HttpHeaders;
@@ -32,18 +32,18 @@ import java.time.Instant;
 public class AuthController {
     private static final String REFRESH_TOKEN_TYPE = "refresh-token";
 
-    private final AuthPort authPort;
+    private final AuthInputPort authInputPort;
     private final LoginResponseMapper loginResponseMapper;
     private final LoginRequestMapper loginRequestMapper;
     private final CookieProperty cookieProperty;
 
-    @ApiResponseMessage(message = UserApplicationMessageKey.USER_LOGIN_SUCCESSFULLY)
+    @ApiResponseMessage(message = UserDetailMessageKey.USER_LOGIN_SUCCESSFULLY)
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> credentialsLogin(
             @RequestBody CredentialsLoginRequest request
     ) {
         CredentialsLoginCommand command = loginRequestMapper.requestToCommand(request);
-        LoginResult result = authPort.credentialsLogin(command);
+        LoginResult result = authInputPort.credentialsLogin(command);
         LoginResponse response = loginResponseMapper.resultToResponse(result);
 
         Duration maxAge = Duration.between(
@@ -69,13 +69,13 @@ public class AuthController {
                 .body(response);
     }
 
-    @ApiResponseMessage(message = UserApplicationMessageKey.USER_LOGOUT_SUCCESSFULLY)
+    @ApiResponseMessage(message = UserDetailMessageKey.USER_LOGOUT_SUCCESSFULLY)
     @PostMapping("/logout")
     public ResponseEntity<Void> logout() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AccessTokenPayload payload = (AccessTokenPayload) authentication.getPrincipal();
 
-        authPort.logout(new LogoutCommand(
+        authInputPort.logout(new LogoutCommand(
                 payload.userId(),
                 payload.userSessionId()
         ));

@@ -1,8 +1,8 @@
 package org.naho.user.valueobject;
 
-import org.naho.shared.exception.DomainException;
-import org.naho.user.constant.UserMessageKey;
-import org.naho.user.exception.UserErrorCode;
+import org.naho.i18n.message.user.UserDetailMessageKey;
+import org.naho.user.exception.DomainException;
+import org.naho.user.exception.UserDomainErrorCode;
 
 import java.util.regex.Pattern;
 
@@ -24,8 +24,8 @@ public class Username {
 
         if (value == null || value.isBlank()) {
             throw new DomainException(
-                    UserErrorCode.USER_USERNAME_NOT_VALID,
-                    UserMessageKey.USER_USERNAME_REQUIRED
+                    UserDomainErrorCode.USER_USERNAME_NOT_VALID,
+                    UserDetailMessageKey.USER_USERNAME_REQUIRED
             );
         }
 
@@ -33,8 +33,8 @@ public class Username {
                 || value.length() > MAX_LENGTH) {
 
             throw new DomainException(
-                    UserErrorCode.USER_USERNAME_NOT_VALID,
-                    UserMessageKey.USER_USERNAME_INVALID_RANGE,
+                    UserDomainErrorCode.USER_USERNAME_NOT_VALID,
+                    UserDetailMessageKey.USER_USERNAME_INVALID_RANGE,
                     MIN_LENGTH,
                     MAX_LENGTH
             );
@@ -42,8 +42,8 @@ public class Username {
 
         if (!USERNAME_PATTERN.matcher(value).matches()) {
             throw new DomainException(
-                    UserErrorCode.USER_USERNAME_NOT_VALID,
-                    UserMessageKey.USER_USERNAME_INVALID_FORMAT
+                    UserDomainErrorCode.USER_USERNAME_NOT_VALID,
+                    UserDetailMessageKey.USER_USERNAME_INVALID_FORMAT
             );
         }
 

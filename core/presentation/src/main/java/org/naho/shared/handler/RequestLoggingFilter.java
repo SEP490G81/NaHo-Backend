@@ -7,8 +7,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.ThreadContext;
-import org.naho.shared.constant.ContextLoggingKey;
-import org.naho.shared.constant.HttpLoggingKey;
+import org.naho.logging.ContextLoggingKey;
+import org.naho.logging.HttpLoggingKey;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 

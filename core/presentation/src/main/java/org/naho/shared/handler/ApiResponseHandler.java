@@ -4,9 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.ThreadContext;
 import org.jspecify.annotations.Nullable;
 import org.naho.i18n.MessageService;
+import org.naho.logging.ContextLoggingKey;
 import org.naho.shared.annotation.ApiResponseMessage;
-import org.naho.shared.constant.CommonApplicationMessageKey;
-import org.naho.shared.constant.ContextLoggingKey;
 import org.naho.shared.response.ApiMeta;
 import org.naho.shared.response.ApiResponse;
 import org.naho.shared.response.PageMeta;
@@ -38,6 +37,9 @@ public class ApiResponseHandler implements ResponseBodyAdvice<Object> {
         if (ByteArrayHttpMessageConverter.class.isAssignableFrom(converterType)) {
             return false;
         }
+        if (String.class.isAssignableFrom(returnType.getParameterType())) {
+            return false;
+        }
         return true;
     }
 
@@ -52,13 +54,14 @@ public class ApiResponseHandler implements ResponseBodyAdvice<Object> {
         if (body == null ||
                 body instanceof ApiResponse<?> ||
                 body instanceof ProblemDetail ||
-                body instanceof ByteArrayHttpMessageConverter) {
+                body instanceof ByteArrayHttpMessageConverter ||
+                body instanceof String) {
             return body;
         }
 
         ApiResponseMessage apiResponseMessage = returnType.getMethodAnnotation(ApiResponseMessage.class);
         String message = messageService.getMessage(
-                apiResponseMessage == null ? CommonApplicationMessageKey.COMMON_NO_MESSAGE
+                apiResponseMessage == null ? org.naho.i18n.message.common.CommonDetailMessageKey.COMMON_NO_MESSAGE
                         : apiResponseMessage.message()
         );
 

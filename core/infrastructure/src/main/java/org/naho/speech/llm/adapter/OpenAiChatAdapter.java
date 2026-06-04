@@ -3,8 +3,8 @@ package org.naho.speech.llm.adapter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.naho.shared.exception.InfrastructureException;
-import org.naho.speech.llm.constant.OpenAiConfigProperty;
-import org.naho.speech.llm.exception.AiApplicationError;
+import org.naho.speech.llm.constant.OpenAiConfigProperties;
+import org.naho.speech.llm.exception.LlmApplicationError;
 import org.naho.speech.llm.port.out.AiChatPort;
 
 import java.net.URI;
@@ -19,13 +19,13 @@ import java.util.stream.Stream;
 
 public class OpenAiChatAdapter implements AiChatPort {
 
-    private static final String OPENAI_URL = "https://api.openai.com/v1/chat/completions";
+    private static final String LLM_URL = "https://api.openai.com/v1/chat/completions";
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    private final OpenAiConfigProperty properties;
+    private final OpenAiConfigProperties properties;
     private final HttpClient httpClient;
 
-    public OpenAiChatAdapter(OpenAiConfigProperty properties) {
+    public OpenAiChatAdapter(OpenAiConfigProperties properties) {
         this.properties = properties;
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(30))
@@ -63,21 +63,23 @@ public class OpenAiChatAdapter implements AiChatPort {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() != 200) {
                 throw new InfrastructureException(
-                        AiApplicationError.OPENAI_API_ERROR,
+                        LlmApplicationError.LLM_API_ERROR,
                         "OpenAI API error. Status: " + response.statusCode() + " | " + response.body());
             }
             return extractContent(response.body());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new InfrastructureException(
-                    AiApplicationError.OPENAI_CONNECTION_TIMEOUT,
-                    "Request to OpenAI interrupted", e);
+                    LlmApplicationError.LLM_CONNECTION_TIMEOUT,
+                    "Request to OpenAI interrupted", e
+            );
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
             throw new InfrastructureException(
-                    AiApplicationError.OPENAI_API_ERROR,
-                    "Cannot call OpenAI API: " + e.getMessage(), e);
+                    LlmApplicationError.LLM_API_ERROR,
+                    "Cannot call OpenAI API: " + e.getMessage(), e
+            );
         }
     }
 
@@ -91,7 +93,7 @@ public class OpenAiChatAdapter implements AiChatPort {
             if (response.statusCode() != 200) {
                 String errorBody = response.body().reduce("", (a, b) -> a + b);
                 throw new InfrastructureException(
-                        AiApplicationError.OPENAI_STREAMING_ERROR,
+                        LlmApplicationError.LLM_STREAMING_ERROR,
                         "OpenAI streaming error. Status: " + response.statusCode() + " | " + errorBody);
             }
 
@@ -110,14 +112,16 @@ public class OpenAiChatAdapter implements AiChatPort {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new InfrastructureException(
-                    AiApplicationError.OPENAI_CONNECTION_TIMEOUT,
-                    "Streaming request interrupted", e);
+                    LlmApplicationError.LLM_CONNECTION_TIMEOUT,
+                    "Streaming request interrupted", e
+            );
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
             throw new InfrastructureException(
-                    AiApplicationError.OPENAI_STREAMING_ERROR,
-                    "OpenAI streaming error: " + e.getMessage(), e);
+                    LlmApplicationError.LLM_STREAMING_ERROR,
+                    "OpenAI streaming error: " + e.getMessage(), e
+            );
         }
     }
 
@@ -147,8 +151,9 @@ public class OpenAiChatAdapter implements AiChatPort {
             );
         } catch (Exception e) {
             throw new InfrastructureException(
-                    AiApplicationError.OPENAI_PARSE_ERROR,
-                    "Cannot build request body: " + e.getMessage(), e);
+                    LlmApplicationError.LLM_PARSE_ERROR,
+                    "Cannot build request body: " + e.getMessage(), e
+            );
         }
     }
 
@@ -178,7 +183,7 @@ public class OpenAiChatAdapter implements AiChatPort {
 
     private HttpRequest buildHttpRequest(String body, Duration timeout) {
         return HttpRequest.newBuilder()
-                .uri(URI.create(OPENAI_URL))
+                .uri(URI.create(LLM_URL))
                 .timeout(timeout)
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + properties.getApiKey())
@@ -202,8 +207,9 @@ public class OpenAiChatAdapter implements AiChatPort {
             return root.path("choices").path(0).path("message").path("content").asText("");
         } catch (Exception e) {
             throw new InfrastructureException(
-                    AiApplicationError.OPENAI_PARSE_ERROR,
-                    "Cannot parse content from OpenAI response: " + responseJson, e);
+                    LlmApplicationError.LLM_PARSE_ERROR,
+                    "Cannot parse content from OpenAI response: " + responseJson, e
+            );
         }
     }
 

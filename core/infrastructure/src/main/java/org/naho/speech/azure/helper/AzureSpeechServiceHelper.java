@@ -5,11 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.cognitiveservices.speech.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.naho.i18n.message.speech.SpeechDetailMessageKey;
 import org.naho.shared.constant.FileExtension;
 import org.naho.shared.exception.InfrastructureException;
 import org.naho.speech.azure.constant.AzurePronunciationScoreKey;
-import org.naho.speech.azure.constant.AzureSpeechApplicationMessageKey;
-import org.naho.speech.azure.exception.AzureSpeechApplicationErrorCode;
+import org.naho.speech.azure.exception.AzureSpeechErrorCode;
 import org.naho.speech.model.SpeechAssessment;
 import org.naho.speech.model.WordAssessment;
 import org.naho.speech.type.SpeechAssessmentErrorType;
@@ -55,8 +55,8 @@ public class AzureSpeechServiceHelper {
 
         } catch (IOException e) {
             throw new InfrastructureException(
-                    AzureSpeechApplicationErrorCode.SPEECH_AUDIO_NOT_VALID,
-                    AzureSpeechApplicationMessageKey.SPEECH_AUDIO_FILE_EMPTY
+                    AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
+                    SpeechDetailMessageKey.SPEECH_AUDIO_FILE_EMPTY
             );
         }
     }
@@ -97,8 +97,8 @@ public class AzureSpeechServiceHelper {
                 JsonNode nBestNode = root.path(AzurePronunciationScoreKey.N_BEST).get(0);
                 if (nBestNode == null) {
                     throw new InfrastructureException(
-                            AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR,
-                            AzureSpeechApplicationMessageKey.SPEECH_AZURE_N_BEST_NODE_NULL
+                            AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR,
+                            SpeechDetailMessageKey.SPEECH_AZURE_N_BEST_NODE_NULL
                     );
                 }
 
@@ -153,20 +153,20 @@ public class AzureSpeechServiceHelper {
             }
         } else if (result.getReason() == ResultReason.NoMatch) {
             throw new InfrastructureException(
-                    AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR,
-                    AzureSpeechApplicationMessageKey.SPEECH_RECOGNITION_NO_MATCH
+                    AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR,
+                    SpeechDetailMessageKey.SPEECH_RECOGNITION_NO_MATCH
             );
         } else if (result.getReason() == ResultReason.Canceled) {
             CancellationDetails cancellation = CancellationDetails.fromResult(result);
             throw new InfrastructureException(
-                    AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR,
-                    AzureSpeechApplicationMessageKey.SPEECH_RECOGNITION_CANCELLED,
+                    AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR,
+                    SpeechDetailMessageKey.SPEECH_RECOGNITION_CANCELLED,
                     cancellation.getErrorDetails()
             );
         } else {
             throw new InfrastructureException(
-                    AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR,
-                    AzureSpeechApplicationMessageKey.SPEECH_AZURE_SERVICE_UNKNOWN_ERROR_OCCUR
+                    AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR,
+                    SpeechDetailMessageKey.SPEECH_AZURE_SERVICE_UNKNOWN_ERROR_OCCUR
             );
         }
     }
