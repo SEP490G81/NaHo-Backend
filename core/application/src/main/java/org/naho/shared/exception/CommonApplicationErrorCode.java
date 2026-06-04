@@ -1,12 +1,10 @@
 package org.naho.shared.exception;
 
-import org.naho.shared.constant.CommonApplicationMessageKey;
-
 public enum CommonApplicationErrorCode implements ErrorCode {
 
     COMMON_INTERNAL_SERVER_ERROR(
             "COMMON_A001",
-            CommonApplicationMessageKey.COMMON_INTERNAL_SERVER_ERROR_TITLE
+            org.naho.i18n.message.common.CommonTitleMessageKey.COMMON_INTERNAL_SERVER_ERROR_TITLE
     );
 
     private final String code;

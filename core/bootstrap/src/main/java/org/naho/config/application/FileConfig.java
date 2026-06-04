@@ -3,6 +3,7 @@ package org.naho.config.application;
 import org.naho.file.mapper.FileResultMapper;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileStorageServicePort;
+import org.naho.file.port.out.FileValidatorPort;
 import org.naho.file.usecase.FileStorageUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,12 +19,14 @@ public class FileConfig {
     public FileStorageUseCase fileStorageUseCase(
             FileStorageServicePort fileStorageServicePort,
             FileRepositoryPort fileRepositoryPort,
-            FileResultMapper fileResultMapper
+            FileResultMapper fileResultMapper,
+            FileValidatorPort fileValidatorPort
     ) {
         return new FileStorageUseCase(
                 fileStorageServicePort,
                 fileRepositoryPort,
-                fileResultMapper
+                fileResultMapper,
+                fileValidatorPort
         );
     }
 }

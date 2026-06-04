@@ -7,7 +7,5 @@ public interface FileRepositoryPort {
 
     File save(File file);
 
-    String deleteById(Long id);
-
-    String deleteByObjectKey(String objectKey);
+    void deleteById(Long id);
 }

@@ -23,6 +23,7 @@ dependencies {
     implementation(project(":core:application"))
     implementation(project(":core:infrastructure"))
     implementation(project(":core:presentation"))
+    implementation(project(":core:common"))
 
     // lombok
     compileOnly("org.projectlombok:lombok")

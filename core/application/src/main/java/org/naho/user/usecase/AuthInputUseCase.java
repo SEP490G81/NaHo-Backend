@@ -1,12 +1,13 @@
 package org.naho.user.usecase;
 
 import org.naho.file.port.out.FileRepositoryPort;
+import org.naho.i18n.message.user.UserDetailMessageKey;
+import org.naho.i18n.message.user.UserTitleMessageKey;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.user.command.CredentialsLoginCommand;
 import org.naho.user.command.LogoutCommand;
-import org.naho.user.constant.UserApplicationMessageKey;
-import org.naho.user.exception.UserApplicationErrorCode;
+import org.naho.user.exception.UserErrorCode;
 import org.naho.user.mapper.UserResultMapper;
 import org.naho.user.model.User;
 import org.naho.user.model.UserSession;
@@ -58,20 +59,20 @@ public class AuthInputUseCase implements AuthInputPort {
     private LoginResult doCredentialsLogin(CredentialsLoginCommand command) {
         User user = userRepositoryPort.findByUsernameOrEmail(command.usernameOrEmail())
                 .orElseThrow(() -> new ApplicationException(
-                        UserApplicationErrorCode.USER_LOGIN_FAILED,
-                        UserApplicationMessageKey.USER_WRONG_LOGIN_INFO
+                        UserErrorCode.USER_LOGIN_FAILED,
+                        UserDetailMessageKey.USER_WRONG_LOGIN_INFO
                 ));
 
         if (!encoderPort.matches(command.rawPassword(), user.getHashPassword())) {
             throw new ApplicationException(
-                    UserApplicationErrorCode.USER_LOGIN_FAILED,
-                    UserApplicationMessageKey.USER_WRONG_LOGIN_INFO
+                    UserErrorCode.USER_LOGIN_FAILED,
+                    UserDetailMessageKey.USER_WRONG_LOGIN_INFO
             );
         }
         if (!user.isActive()) {
             throw new ApplicationException(
-                    UserApplicationErrorCode.USER_LOGIN_FAILED,
-                    UserApplicationMessageKey.USER_ACCOUNT_NOT_ACTIVE
+                    UserErrorCode.USER_LOGIN_FAILED,
+                    UserDetailMessageKey.USER_ACCOUNT_NOT_ACTIVE
             );
         }
 
@@ -121,8 +122,8 @@ public class AuthInputUseCase implements AuthInputPort {
     public void logout(LogoutCommand command) {
         if (command == null || command.userId() == null || command.userSessionId() == null) {
             throw new ApplicationException(
-                    UserApplicationErrorCode.USER_UNAUTHORIZED,
-                    UserApplicationMessageKey.USER_UNAUTHORIZED_TITLE
+                    UserErrorCode.USER_UNAUTHORIZED,
+                    UserTitleMessageKey.USER_UNAUTHORIZED_TITLE
             );
         }
         userSessionRepositoryPort.revokeActiveSessionsByUserIdAndUserSessionId(

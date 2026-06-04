@@ -26,6 +26,7 @@ dependencies {
     // project dependencies
     implementation(project(":core:domain"))
     implementation(project(":core:application"))
+    implementation(project(":core:common"))
 
     // lombok
     compileOnly("org.projectlombok:lombok")

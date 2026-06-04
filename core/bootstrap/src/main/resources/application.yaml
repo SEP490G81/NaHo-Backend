@@ -64,7 +64,7 @@ app:
     refresh-token-expiration: 30d
 
   openai:
-    api-key: ${OPENAI_API_KEY}
+    api-key: ${LLM_API_KEY}
     chat-model: gpt-4.1-mini
     scoring-model: gpt-4o
     max-tokens: 1000

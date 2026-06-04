@@ -1,7 +1,12 @@
 package org.naho.file.port.out;
 
-import org.naho.file.command.FileUploadCommand;
+import java.io.InputStream;
 
 public interface FileStorageServicePort {
-    String upload(FileUploadCommand command);
+    void upload(String objectKey,
+                InputStream inputStream,
+                String contentType,
+                Long size);
+
+    void delete(String objectKey);
 }

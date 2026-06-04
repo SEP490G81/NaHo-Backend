@@ -7,6 +7,4 @@ public interface FileStorageInputPort {
     FileResult upload(FileUploadCommand command);
 
     String deleteById(Long id);
-
-    String deleteByObjectKey(String objectKey);
 }

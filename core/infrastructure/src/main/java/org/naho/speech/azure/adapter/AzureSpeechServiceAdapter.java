@@ -4,11 +4,11 @@ import com.microsoft.cognitiveservices.speech.*;
 import com.microsoft.cognitiveservices.speech.audio.AudioConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.naho.i18n.message.speech.SpeechDetailMessageKey;
 import org.naho.shared.exception.InfrastructureException;
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
-import org.naho.speech.azure.constant.AzureSpeechApplicationMessageKey;
 import org.naho.speech.azure.constant.AzureSpeechConfigProperties;
-import org.naho.speech.azure.exception.AzureSpeechApplicationErrorCode;
+import org.naho.speech.azure.exception.AzureSpeechErrorCode;
 import org.naho.speech.azure.helper.AzureSpeechServiceHelper;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
 import org.naho.speech.model.SpeechAssessment;
@@ -76,7 +76,7 @@ public class AzureSpeechServiceAdapter implements AzureSpeechServicePort {
                 if (cancellation.getReason() == CancellationReason.Error) {
                     log.error("Azure Speech continuous recognition error: {}", cancellation.getErrorDetails());
                     errors.add(new InfrastructureException(
-                            AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR,
+                            AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR,
                             "Azure Speech API error: " + cancellation.getErrorDetails()
                     ));
                 }
@@ -111,14 +111,17 @@ public class AzureSpeechServiceAdapter implements AzureSpeechServicePort {
                 if (firstError instanceof RuntimeException) {
                     throw (RuntimeException) firstError;
                 } else {
-                    throw new InfrastructureException(AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR, firstError.getMessage());
+                    throw new InfrastructureException(
+                            AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR,
+                            firstError.getMessage()
+                    );
                 }
             }
 
             if (segmentAssessments.isEmpty()) {
                 throw new InfrastructureException(
-                        AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR,
-                        AzureSpeechApplicationMessageKey.SPEECH_RECOGNITION_NO_MATCH
+                        AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR,
+                        SpeechDetailMessageKey.SPEECH_RECOGNITION_NO_MATCH
                 );
             }
 
@@ -128,8 +131,8 @@ public class AzureSpeechServiceAdapter implements AzureSpeechServicePort {
         } catch (InterruptedException | ExecutionException e) {
             Thread.currentThread().interrupt();
             throw new InfrastructureException(
-                    AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR,
-                    AzureSpeechApplicationMessageKey.SPEECH_AZURE_CONNECTION_INTERRUPTED
+                    AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR,
+                    SpeechDetailMessageKey.SPEECH_AZURE_CONNECTION_INTERRUPTED
             );
         } finally {
             // Luôn đảm bảo xóa file tạm thời để tránh tràn ổ đĩa

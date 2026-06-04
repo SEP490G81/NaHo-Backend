@@ -1,8 +1,8 @@
 package org.naho.user.valueobject;
 
-import org.naho.shared.exception.DomainException;
-import org.naho.user.constant.UserMessageKey;
-import org.naho.user.exception.UserErrorCode;
+import org.naho.i18n.message.user.UserDetailMessageKey;
+import org.naho.user.exception.DomainException;
+import org.naho.user.exception.UserDomainErrorCode;
 
 import java.time.ZoneId;
 
@@ -16,8 +16,8 @@ public class UserTimezone {
     public static UserTimezone of(String value) {
         if (value == null || !ZoneId.getAvailableZoneIds().contains(value)) {
             throw new DomainException(
-                    UserErrorCode.USER_TIMEZONE_NOT_VALID,
-                    UserMessageKey.USER_TIMEZONE_NOT_FOUND,
+                    UserDomainErrorCode.USER_TIMEZONE_NOT_VALID,
+                    UserDetailMessageKey.USER_TIMEZONE_NOT_FOUND,
                     value
             );
         }

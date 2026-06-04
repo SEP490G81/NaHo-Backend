@@ -2,11 +2,11 @@ package org.naho.speech.azure.adapter;
 
 import com.microsoft.cognitiveservices.speech.*;
 import lombok.RequiredArgsConstructor;
+import org.naho.i18n.message.speech.SpeechDetailMessageKey;
 import org.naho.shared.exception.InfrastructureException;
-import org.naho.speech.azure.constant.AzureSpeechApplicationMessageKey;
 import org.naho.speech.azure.constant.AzureSpeechConfigProperties;
 import org.naho.speech.azure.constant.AzureSpeechContentType;
-import org.naho.speech.azure.exception.AzureSpeechApplicationErrorCode;
+import org.naho.speech.azure.exception.AzureSpeechErrorCode;
 import org.naho.speech.azure.helper.TextToSpeechServiceHelper;
 import org.naho.speech.azure.port.out.TextToSpeechServicePort;
 import org.naho.speech.azure.result.AudioSpeechResult;
@@ -62,22 +62,22 @@ public class TextToSpeechServiceAdapter implements TextToSpeechServicePort {
                 SpeechSynthesisCancellationDetails cancellation = SpeechSynthesisCancellationDetails.fromResult(result);
 
                 throw new InfrastructureException(
-                        AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR,
-                        AzureSpeechApplicationMessageKey.SPEECH_SYNTHESIS_CANCELLED,
+                        AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR,
+                        SpeechDetailMessageKey.SPEECH_SYNTHESIS_CANCELLED,
                         cancellation.getErrorDetails()
                 );
             } else {
                 throw new InfrastructureException(
-                        AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR,
-                        AzureSpeechApplicationMessageKey.SPEECH_SYNTHESIS_UNKNOWN_ERROR_OCCUR
+                        AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR,
+                        SpeechDetailMessageKey.SPEECH_SYNTHESIS_UNKNOWN_ERROR_OCCUR
                 );
             }
 
         } catch (InterruptedException | ExecutionException e) {
             Thread.currentThread().interrupt();
             throw new InfrastructureException(
-                    AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR,
-                    AzureSpeechApplicationMessageKey.SPEECH_AZURE_CONNECTION_INTERRUPTED
+                    AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR,
+                    SpeechDetailMessageKey.SPEECH_AZURE_CONNECTION_INTERRUPTED
             );
         } finally {
             // Giải phóng bắt buộc các tài nguyên native JNI của C++ SDK

@@ -1,8 +1,9 @@
 package org.naho.speech.llm.command;
 
-import org.naho.speech.llm.constant.AiApplicationMessageKey;
-import org.naho.speech.llm.exception.AiApplicationError;
+import org.naho.i18n.message.llm.LlmTitleMessageKey;
+import org.naho.i18n.message.speech.SpeechDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
+import org.naho.speech.llm.exception.LlmApplicationError;
 
 /**
  * Command DTO: Gửi audio message trong speaking session.
@@ -19,14 +20,14 @@ public record SendAudioMessageCommand(
     public SendAudioMessageCommand {
         if (sessionId == null || sessionId.isBlank()) {
             throw new ApplicationException(
-                    AiApplicationError.AI_SESSION_ID_INVALID,
-                    AiApplicationMessageKey.AI_SESSION_ID_INVALID_TITLE
+                    LlmApplicationError.LLM_SESSION_ID_INVALID,
+                    LlmTitleMessageKey.LLM_SESSION_ID_INVALID_TITLE
             );
         }
         if (audioBytes == null || audioBytes.length == 0) {
             throw new ApplicationException(
-                    AiApplicationError.AI_USER_MESSAGE_INVALID,
-                    "Audio data must not be empty"
+                    LlmApplicationError.LLM_USER_MESSAGE_INVALID,
+                    SpeechDetailMessageKey.SPEECH_AUDIO_FILE_EMPTY
             );
         }
     }
