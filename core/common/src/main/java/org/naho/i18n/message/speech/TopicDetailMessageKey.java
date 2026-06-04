@@ -1,0 +1,14 @@
+package org.naho.i18n.message.speech;
+
+public final class TopicDetailMessageKey {
+
+    private TopicDetailMessageKey() {
+    }
+
+    public static final String TOPIC_CREATION_SUCCESS = "topic.detail.create_success";
+    public static final String TOPIC_NAME_EMPTY = "topic.detail.name_empty";
+    public static final String TOPIC_DESCRIPTION_EMPTY = "topic.detail.description_empty";
+    public static final String TOPIC_ALREADY_EXISTS_IN_LEVEL = "topic.detail.already_exists_in_level";
+    public static final String TOPIC_ORDER_INDEX_INVALID = "topic.detail.order_index_invalid";
+    public static final String TOPIC_USER_NOT_FOUND = "topic.detail.user_not_found";
+}
