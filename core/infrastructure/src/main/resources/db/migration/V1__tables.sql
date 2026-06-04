@@ -1,9 +1,7 @@
 CREATE TABLE answer_histories
 (
     id            BIGINT AUTO_INCREMENT NOT NULL,
-    created_by    BIGINT                NOT NULL,
     created_time  datetime              NOT NULL,
-    modified_by   BIGINT                NULL,
     modified_time datetime              NULL,
     user_id       BIGINT                NOT NULL,
     question_id   BIGINT                NOT NULL,
@@ -14,9 +12,7 @@ CREATE TABLE answer_histories
 CREATE TABLE content_assessments
 (
     id                BIGINT AUTO_INCREMENT NOT NULL,
-    created_by        BIGINT                NOT NULL,
     created_time      datetime              NOT NULL,
-    modified_by       BIGINT                NULL,
     modified_time     datetime              NULL,
     vocabulary_score  DOUBLE                NOT NULL,
     grammar_score     DOUBLE                NOT NULL,
@@ -29,12 +25,10 @@ CREATE TABLE content_assessments
 CREATE TABLE files
 (
     id            BIGINT AUTO_INCREMENT NOT NULL,
-    created_by    BIGINT                NOT NULL,
     created_time  datetime              NOT NULL,
-    modified_by   BIGINT                NULL,
     modified_time datetime              NULL,
-    file_url      VARCHAR(2048)         NOT NULL,
-    preview_url   VARCHAR(2048)         NOT NULL,
+    object_key    VARCHAR(2048)         NOT NULL,
+    preview_key   VARCHAR(2048)         NULL,
     original_name VARCHAR(255)          NOT NULL,
     content_type  VARCHAR(100)          NOT NULL,
     size          BIGINT                NOT NULL,
@@ -44,9 +38,7 @@ CREATE TABLE files
 CREATE TABLE japanese_tokenizers
 (
     id            BIGINT AUTO_INCREMENT NOT NULL,
-    created_by    BIGINT                NOT NULL,
     created_time  datetime              NOT NULL,
-    modified_by   BIGINT                NULL,
     modified_time datetime              NULL,
     japanese_text VARCHAR(255)          NOT NULL,
     reading_text  VARCHAR(255)          NULL,
@@ -56,11 +48,9 @@ CREATE TABLE japanese_tokenizers
 CREATE TABLE permissions
 (
     id              BIGINT AUTO_INCREMENT NOT NULL,
-    created_by      BIGINT                NOT NULL,
     created_time    datetime              NOT NULL,
-    modified_by     BIGINT                NULL,
     modified_time   datetime              NULL,
-    permission_code SMALLINT              NOT NULL,
+    permission_code VARCHAR(100)          NOT NULL,
     `description`   VARCHAR(255)          NULL,
     CONSTRAINT pk_permissions PRIMARY KEY (id)
 );
@@ -74,9 +64,7 @@ CREATE TABLE phrase_japanese_tokenizers
 CREATE TABLE question_sample_phrases
 (
     id                      BIGINT AUTO_INCREMENT NOT NULL,
-    created_by              BIGINT                NOT NULL,
     created_time            datetime              NOT NULL,
-    modified_by             BIGINT                NULL,
     modified_time           datetime              NULL,
     vietnamese_meaning_text TEXT                  NULL,
     english_meaning_text    TEXT                  NULL,
@@ -87,9 +75,7 @@ CREATE TABLE question_sample_phrases
 CREATE TABLE question_vocabularies
 (
     id                      BIGINT AUTO_INCREMENT NOT NULL,
-    created_by              BIGINT                NOT NULL,
     created_time            datetime              NOT NULL,
-    modified_by             BIGINT                NULL,
     modified_time           datetime              NULL,
     vietnamese_meaning_text VARCHAR(255)          NULL,
     english_meaning_text    VARCHAR(255)          NULL,
@@ -100,9 +86,7 @@ CREATE TABLE question_vocabularies
 CREATE TABLE questions
 (
     id                     BIGINT AUTO_INCREMENT NOT NULL,
-    created_by             BIGINT                NOT NULL,
     created_time           datetime              NOT NULL,
-    modified_by            BIGINT                NULL,
     modified_time          datetime              NULL,
     question_text          VARCHAR(255)          NOT NULL,
     contextual_hint        TEXT                  NULL,
@@ -115,9 +99,7 @@ CREATE TABLE questions
 CREATE TABLE roles
 (
     id            BIGINT AUTO_INCREMENT NOT NULL,
-    created_by    BIGINT                NOT NULL,
     created_time  datetime              NOT NULL,
-    modified_by   BIGINT                NULL,
     modified_time datetime              NULL,
     role_name     VARCHAR(20)           NOT NULL,
     `description` VARCHAR(255)          NULL,
@@ -134,9 +116,7 @@ CREATE TABLE roles_permissions
 CREATE TABLE speech_assessments
 (
     id                  BIGINT AUTO_INCREMENT NOT NULL,
-    created_by          BIGINT                NOT NULL,
     created_time        datetime              NOT NULL,
-    modified_by         BIGINT                NULL,
     modified_time       datetime              NULL,
     transcript_text     TEXT                  NOT NULL,
     accuracy_score      DOUBLE                NOT NULL,
@@ -150,9 +130,7 @@ CREATE TABLE speech_assessments
 CREATE TABLE topics
 (
     id                  BIGINT AUTO_INCREMENT NOT NULL,
-    created_by          BIGINT                NOT NULL,
     created_time        datetime              NOT NULL,
-    modified_by         BIGINT                NULL,
     modified_time       datetime              NULL,
     name                VARCHAR(255)          NULL,
     `description`       VARCHAR(255)          NULL,
@@ -184,9 +162,7 @@ CREATE TABLE user_sessions
 CREATE TABLE users
 (
     id                 BIGINT AUTO_INCREMENT NOT NULL,
-    created_by         BIGINT                NOT NULL,
     created_time       datetime              NOT NULL,
-    modified_by        BIGINT                NULL,
     modified_time      datetime              NULL,
     username           VARCHAR(36)           NOT NULL,
     email              VARCHAR(255)          NOT NULL,
@@ -220,9 +196,7 @@ CREATE TABLE vocabulary_japanese_tokenizers
 CREATE TABLE word_assessments
 (
     id                   BIGINT AUTO_INCREMENT NOT NULL,
-    created_by           BIGINT                NOT NULL,
     created_time         datetime              NOT NULL,
-    modified_by          BIGINT                NULL,
     modified_time        datetime              NULL,
     word                 VARCHAR(255)          NOT NULL,
     accuracy_score       DOUBLE                NOT NULL,

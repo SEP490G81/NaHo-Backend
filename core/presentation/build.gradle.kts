@@ -26,6 +26,7 @@ dependencies {
     // project dependencies
     implementation(project(":core:domain"))
     implementation(project(":core:application"))
+    implementation(project(":core:common"))
 
     // log4j2
     implementation("org.springframework.boot:spring-boot-starter-log4j2")

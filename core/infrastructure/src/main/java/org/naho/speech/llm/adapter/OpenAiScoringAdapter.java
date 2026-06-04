@@ -1,12 +1,12 @@
 package org.naho.speech.llm.adapter;
 
-import org.naho.speech.llm.config.OpenAiProperties;
-import org.naho.speech.llm.port.out.AiScoringPort;
-import org.naho.shared.exception.InfrastructureException;
-import org.naho.speech.llm.exception.AiApplicationError;
-import org.naho.speech.llm.result.ScoringResult;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.naho.shared.exception.InfrastructureException;
+import org.naho.speech.llm.constant.OpenAiConfigProperties;
+import org.naho.speech.llm.exception.LlmApplicationError;
+import org.naho.speech.llm.port.out.AiScoringPort;
+import org.naho.speech.llm.result.ScoringResult;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -20,7 +20,7 @@ import java.util.Map;
 
 public class OpenAiScoringAdapter implements AiScoringPort {
 
-    private static final String OPENAI_URL = "https://api.openai.com/v1/chat/completions";
+    private static final String LLM_URL = "https://api.openai.com/v1/chat/completions";
 
     private static final String SCORING_SYSTEM_PROMPT = """
             You are a strict Japanese speaking evaluator for conversational AI language learning. \
@@ -94,10 +94,10 @@ public class OpenAiScoringAdapter implements AiScoringPort {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    private final OpenAiProperties properties;
+    private final OpenAiConfigProperties properties;
     private final HttpClient httpClient;
 
-    public OpenAiScoringAdapter(OpenAiProperties properties) {
+    public OpenAiScoringAdapter(OpenAiConfigProperties properties) {
         this.properties = properties;
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(30))
@@ -110,16 +110,16 @@ public class OpenAiScoringAdapter implements AiScoringPort {
                                String fullTranscript,
                                String speechMetadata,
                                String asrConfidence) {
-        System.out.println("[OpenAiScoringAdapter] Calling model: " + properties.scoringModel());
+        System.out.println("[OpenAiScoringAdapter] Calling model: " + properties.getScoringModel());
 
         String userContent = buildUserContent(topic, fullTranscript, speechMetadata, asrConfidence);
         String requestBody = buildScoringRequestBody(userContent);
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(OPENAI_URL))
+                .uri(URI.create(LLM_URL))
                 .timeout(Duration.ofMinutes(10))
                 .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + properties.apiKey())
+                .header("Authorization", "Bearer " + properties.getApiKey())
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .build();
 
@@ -127,7 +127,7 @@ public class OpenAiScoringAdapter implements AiScoringPort {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() != 200) {
                 throw new InfrastructureException(
-                        AiApplicationError.OPENAI_API_ERROR,
+                        LlmApplicationError.LLM_API_ERROR,
                         "Scoring API error. Status: " + response.statusCode() + " | " + response.body());
             }
             String rawContent = extractContent(response.body());
@@ -136,12 +136,14 @@ public class OpenAiScoringAdapter implements AiScoringPort {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new InfrastructureException(
-                    AiApplicationError.OPENAI_CONNECTION_TIMEOUT,
-                    "Scoring request interrupted", e);
+                    LlmApplicationError.LLM_CONNECTION_TIMEOUT,
+                    "Scoring request interrupted", e
+            );
         } catch (Exception e) {
             throw new InfrastructureException(
-                    AiApplicationError.OPENAI_API_ERROR,
-                    "Cannot call scoring API: " + e.getMessage(), e);
+                    LlmApplicationError.LLM_API_ERROR,
+                    "Cannot call scoring API: " + e.getMessage(), e
+            );
         }
     }
 
@@ -172,7 +174,7 @@ public class OpenAiScoringAdapter implements AiScoringPort {
                 ],
                 "max_completion_tokens": 2000
                 }
-                """.formatted(properties.scoringModel(), escapedSystem, escapedContent);
+                """.formatted(properties.getScoringModel(), escapedSystem, escapedContent);
     }
 
 
@@ -182,8 +184,9 @@ public class OpenAiScoringAdapter implements AiScoringPort {
             return root.path("choices").path(0).path("message").path("content").asText("");
         } catch (Exception e) {
             throw new InfrastructureException(
-                    AiApplicationError.OPENAI_PARSE_ERROR,
-                    "Cannot parse content field from response: " + responseJson, e);
+                    LlmApplicationError.LLM_PARSE_ERROR,
+                    "Cannot parse content field from response: " + responseJson, e
+            );
         }
     }
 
@@ -273,7 +276,7 @@ public class OpenAiScoringAdapter implements AiScoringPort {
             );
         } catch (Exception e) {
             throw new InfrastructureException(
-                    AiApplicationError.OPENAI_PARSE_ERROR,
+                    LlmApplicationError.LLM_PARSE_ERROR,
                     "Cannot parse scoring JSON: " + cleaned, e);
         }
     }

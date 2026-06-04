@@ -1,9 +1,9 @@
 package org.naho.user.usecase;
 
 import org.naho.file.port.out.FileRepositoryPort;
+import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
-import org.naho.user.constant.UserApplicationMessageKey;
-import org.naho.user.exception.UserApplicationErrorCode;
+import org.naho.user.exception.UserErrorCode;
 import org.naho.user.mapper.UserResultMapper;
 import org.naho.user.model.User;
 import org.naho.user.port.in.GetUserInputPort;
@@ -42,8 +42,8 @@ public class GetUserUseCase implements GetUserInputPort {
     public UserResult getUserById(Long userId) {
         User user = userRepositoryPort.findById(userId)
                 .orElseThrow(() -> new ApplicationException(
-                        UserApplicationErrorCode.USER_NOT_FOUND,
-                        UserApplicationMessageKey.USER_GET_FAILED
+                        UserErrorCode.USER_NOT_FOUND,
+                        UserDetailMessageKey.USER_GET_FAILED
                 ));
         return mapToResult(user);
     }
@@ -58,15 +58,15 @@ public class GetUserUseCase implements GetUserInputPort {
     public UserResult getUserByUserName(String userName) {
         User user = userRepositoryPort.findByUsername(userName)
                 .orElseThrow(() -> new ApplicationException(
-                        UserApplicationErrorCode.USER_NOT_FOUND,
-                        UserApplicationMessageKey.USER_GET_FAILED
+                        UserErrorCode.USER_NOT_FOUND,
+                        UserDetailMessageKey.USER_GET_FAILED
                 ));
         return mapToResult(user);
     }
 
     private UserResult mapToResult(User user) {
         List<String> roleNames = roleRepositoryPort.findRoleNamesByUserId(user.getId());
-        String avatarFileUrl = fileRepositoryPort.findFileUrlById(user.getAvatarFileId());
-        return userResultMapper.domainToResult(user, roleNames, avatarFileUrl);
+        String avatarObjectKey = fileRepositoryPort.findObjectKeyById(user.getAvatarFileId());
+        return userResultMapper.domainToResult(user, roleNames, avatarObjectKey);
     }
 }

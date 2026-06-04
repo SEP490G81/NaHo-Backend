@@ -1,0 +1,83 @@
+package org.naho.config.application;
+
+import org.naho.speech.azure.port.out.AzureSpeechServicePort;
+import org.naho.speech.llm.adapter.AzureSpeechToTextAdapter;
+import org.naho.speech.llm.adapter.InMemorySessionStore;
+import org.naho.speech.llm.adapter.OpenAiChatAdapter;
+import org.naho.speech.llm.adapter.OpenAiScoringAdapter;
+import org.naho.speech.llm.constant.OpenAiConfigProperties;
+import org.naho.speech.llm.port.in.EndSessionInputPort;
+import org.naho.speech.llm.port.in.SpeakingSessionInputPort;
+import org.naho.speech.llm.port.in.SuggestedTopicsInputPort;
+import org.naho.speech.llm.port.out.AiChatPort;
+import org.naho.speech.llm.port.out.AiScoringPort;
+import org.naho.speech.llm.port.out.SessionStorePort;
+import org.naho.speech.llm.port.out.SpeechToTextPort;
+import org.naho.speech.llm.usecase.EndSessionUseCase;
+import org.naho.speech.llm.usecase.SpeakingSessionUseCase;
+import org.naho.speech.llm.usecase.SuggestedTopicsUseCase;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * Bootstrap Configuration: Liên kết các UseCase, Port, Adapter cho module AI Speaking.
+ * <p>
+ * Luồng wiring:
+ * OpenAiConfigProperties → OpenAiProperties (record)
+ * → OpenAiChatAdapter (AiChatPort)
+ * → OpenAiScoringAdapter (AiScoringPort)
+ * <p>
+ * InMemorySessionStore (SessionStorePort)
+ * AzureSpeechToTextAdapter (SpeechToTextPort) ← bridge với AzureSpeechService
+ * <p>
+ * SpeakingSessionUseCase (SpeakingSessionInputPort)
+ * EndSessionUseCase (EndSessionInputPort)
+ * SuggestedTopicsUseCase (SuggestedTopicsInputPort)
+ */
+@Configuration
+public class ChatConfig {
+    // ─── Output Port Adapters ────────────────────────────────────
+    @Bean
+    public AiChatPort aiChatPort(OpenAiConfigProperties openAiConfigProperties) {
+        return new OpenAiChatAdapter(openAiConfigProperties);
+    }
+
+    @Bean
+    public SessionStorePort sessionStorePort() {
+        return new InMemorySessionStore();
+    }
+
+    @Bean
+    public AiScoringPort aiScoringPort(OpenAiConfigProperties openAiConfigProperties) {
+        return new OpenAiScoringAdapter(openAiConfigProperties);
+    }
+
+    @Bean
+    public SpeechToTextPort speechToTextPort(AzureSpeechServicePort azureSpeechServicePort) {
+        return new AzureSpeechToTextAdapter(azureSpeechServicePort);
+    }
+
+    // ─── Input Port UseCases ─────────────────────────────────────
+
+    @Bean
+    public SpeakingSessionInputPort speakingSessionInputPort(
+            AiChatPort aiChatPort,
+            SessionStorePort sessionStorePort,
+            SpeechToTextPort speechToTextPort
+    ) {
+        return new SpeakingSessionUseCase(aiChatPort, sessionStorePort, speechToTextPort);
+    }
+
+    @Bean
+    public EndSessionInputPort endSessionInputPort(
+            SessionStorePort sessionStorePort,
+            AiScoringPort aiScoringPort
+    ) {
+        return new EndSessionUseCase(sessionStorePort, aiScoringPort);
+    }
+
+    @Bean
+    public SuggestedTopicsInputPort suggestedTopicsInputPort() {
+        return new SuggestedTopicsUseCase();
+    }
+}

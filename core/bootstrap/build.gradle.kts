@@ -23,13 +23,14 @@ dependencies {
     implementation(project(":core:application"))
     implementation(project(":core:infrastructure"))
     implementation(project(":core:presentation"))
+    implementation(project(":core:common"))
 
     // lombok
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
     testCompileOnly("org.projectlombok:lombok")
     testAnnotationProcessor("org.projectlombok:lombok")
-    
+
     // log4j2
     implementation("org.springframework.boot:spring-boot-starter-log4j2")
     runtimeOnly("org.apache.logging.log4j:log4j-layout-template-json:2.25.4")
@@ -52,6 +53,9 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:0.12.6")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
+
+    // s3
+    implementation("software.amazon.awssdk:s3:2.46.0")
 
     // other
     testImplementation("org.testcontainers:mysql:1.21.4")

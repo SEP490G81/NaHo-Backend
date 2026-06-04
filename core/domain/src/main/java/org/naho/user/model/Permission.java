@@ -1,14 +1,12 @@
 package org.naho.user.model;
 
-import org.naho.user.type.PermissionCode;
-
 import java.util.Set;
 
 public class Permission {
     private Long id;
     private Set<Long> roleIds;
-    
-    private PermissionCode permissionCode;
+
+    private String permissionCode;
     private String description;
 
     // Private constructor
@@ -24,7 +22,7 @@ public class Permission {
         return id;
     }
 
-    public PermissionCode getPermissionCode() {
+    public String getPermissionCode() {
         return permissionCode;
     }
 
@@ -32,7 +30,7 @@ public class Permission {
         return description;
     }
 
-    public Set<Long> getLongs() {
+    public Set<Long> getRoleIds() {
         return roleIds;
     }
 
@@ -43,7 +41,7 @@ public class Permission {
     // Builder class
     public static class Builder {
         private Long id;
-        private PermissionCode permissionCode;
+        private String permissionCode;
         private String description;
         private Set<Long> roleIds;
 
@@ -52,7 +50,7 @@ public class Permission {
             return this;
         }
 
-        public Builder permissionCode(PermissionCode permissionCode) {
+        public Builder permissionCode(String permissionCode) {
             this.permissionCode = permissionCode;
             return this;
         }

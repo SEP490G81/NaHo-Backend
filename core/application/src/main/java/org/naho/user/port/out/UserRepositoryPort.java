@@ -13,7 +13,7 @@ public interface UserRepositoryPort {
     Optional<User> findByUsernameOrEmail(String usernameOrEmail);
 
     boolean existsByUsername(String username);
-    
+
     boolean existsByEmail(String email);
 
     User save(User user);

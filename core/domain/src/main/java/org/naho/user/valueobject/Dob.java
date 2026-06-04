@@ -1,8 +1,8 @@
 package org.naho.user.valueobject;
 
-import org.naho.shared.exception.DomainException;
-import org.naho.user.constant.UserMessageKey;
-import org.naho.user.exception.UserErrorCode;
+import org.naho.i18n.message.user.UserDetailMessageKey;
+import org.naho.user.exception.DomainException;
+import org.naho.user.exception.UserDomainErrorCode;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -27,8 +27,8 @@ public class Dob {
 
         if (age < MIN_AGE || age > MAX_AGE) {
             throw new DomainException(
-                    UserErrorCode.USER_AGE_NOT_VALID,
-                    UserMessageKey.USER_AGE_INVALID_RANGE,
+                    UserDomainErrorCode.USER_AGE_NOT_VALID,
+                    UserDetailMessageKey.USER_AGE_INVALID_RANGE,
                     MIN_AGE,
                     MAX_AGE
             );

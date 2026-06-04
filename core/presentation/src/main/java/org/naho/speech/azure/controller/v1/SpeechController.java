@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
 import org.naho.speech.azure.command.TextToSpeechCommand;
-import org.naho.speech.azure.constant.AzureSpeechApplicationMessageKey;
+import org.naho.i18n.message.speech.SpeechDetailMessageKey;
 import org.naho.speech.azure.constant.AzureSpeechContentType;
 import org.naho.speech.azure.dto.mapper.PronunciationAssessmentMapper;
 import org.naho.speech.azure.dto.mapper.TextToSpeechRequestMapper;
@@ -38,7 +38,7 @@ public class SpeechController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    @ApiResponseMessage(message = AzureSpeechApplicationMessageKey.SPEECH_PRONUNCIATION_ASSESSMENT_SUCCESSFULLY)
+    @ApiResponseMessage(message = SpeechDetailMessageKey.SPEECH_PRONUNCIATION_ASSESSMENT_SUCCESSFULLY)
     public ResponseEntity<PronunciationAssessmentResponse> assessPronunciation(
             @RequestPart("file") MultipartFile file,
             @RequestParam(value = "reference-text", required = false) String referenceText

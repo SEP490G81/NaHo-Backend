@@ -1,9 +1,9 @@
 package org.naho.user.adapter;
 
+import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
-import org.naho.user.constant.JwtProperty;
-import org.naho.user.constant.UserApplicationMessageKey;
-import org.naho.user.exception.UserApplicationErrorCode;
+import org.naho.user.constant.JwtProperties;
+import org.naho.user.exception.UserErrorCode;
 import org.naho.user.port.out.EncoderPort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -23,11 +23,11 @@ public class EncoderAdapter implements EncoderPort {
 
     public EncoderAdapter(
             PasswordEncoder passwordEncoder,
-            JwtProperty jwtProperty
+            JwtProperties jwtProperties
     ) {
         this.passwordEncoder = passwordEncoder;
         this.refreshTokenHashKey = new SecretKeySpec(
-                jwtProperty.getSecret().getBytes(StandardCharsets.UTF_8),
+                jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8),
                 REFRESH_TOKEN_HASH_ALGORITHM
         );
         this.base64UrlEncoder = Base64.getUrlEncoder().withoutPadding();
@@ -49,8 +49,8 @@ public class EncoderAdapter implements EncoderPort {
             return base64UrlEncoder.encodeToString(digest);
         } catch (Exception ex) {
             throw new ApplicationException(
-                    UserApplicationErrorCode.USER_HASH_FAILED,
-                    UserApplicationMessageKey.USER_HASH_FAILED,
+                    UserErrorCode.USER_HASH_FAILED,
+                    UserDetailMessageKey.USER_HASH_FAILED,
                     ex.getMessage()
             );
         }

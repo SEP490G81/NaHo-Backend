@@ -5,11 +5,11 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.user.constant.JwtCustomClaimKey;
-import org.naho.user.constant.JwtProperty;
-import org.naho.user.constant.UserApplicationMessageKey;
-import org.naho.user.exception.UserApplicationErrorCode;
+import org.naho.user.constant.JwtProperties;
+import org.naho.user.exception.UserErrorCode;
 import org.naho.user.model.User;
 import org.naho.user.model.UserSession;
 import org.naho.user.port.out.TokenServicePort;
@@ -33,16 +33,16 @@ public class TokenServiceAdapter implements TokenServicePort {
 
     private static final int TOKEN_BYTES = 64;
 
-    private final JwtProperty jwtProperty;
+    private final JwtProperties jwtProperties;
     private final SecretKey jwtSecretKey;
     private final SecureRandom secureRandom;
     private final Base64.Encoder base64UrlEncoder;
 
-    public TokenServiceAdapter(JwtProperty jwtProperty) {
-        this.jwtProperty = jwtProperty;
+    public TokenServiceAdapter(JwtProperties jwtProperties) {
+        this.jwtProperties = jwtProperties;
 
         this.jwtSecretKey = Keys.hmacShaKeyFor(
-                jwtProperty.getSecret().getBytes(StandardCharsets.UTF_8)
+                jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8)
         );
 
         this.secureRandom = new SecureRandom();
@@ -52,10 +52,9 @@ public class TokenServiceAdapter implements TokenServicePort {
     @Override
     public TokenResult generateAccessToken(User user, List<String> roleNames, UserSession userSession) {
         Instant issuedAt = Instant.now();
-        Instant expiresAt = issuedAt.plus(jwtProperty.getAccessTokenExpiration());
+        Instant expiresAt = issuedAt.plus(jwtProperties.getAccessTokenExpiration());
 
         Map<String, Object> claims = Map.of(
-                JwtCustomClaimKey.USER_ROLES, roleNames,
                 JwtCustomClaimKey.USER_SESSION_ID, userSession.getId(),
                 JwtCustomClaimKey.TOKEN_TYPE, ACCESS_TOKEN_TYPE
         );
@@ -74,7 +73,7 @@ public class TokenServiceAdapter implements TokenServicePort {
     @Override
     public TokenResult generateRefreshToken() {
         Instant issuedAt = Instant.now();
-        Instant expiresAt = issuedAt.plus(jwtProperty.getRefreshTokenExpiration());
+        Instant expiresAt = issuedAt.plus(jwtProperties.getRefreshTokenExpiration());
 
         String rawToken = generateSecureRandomToken();
         return new TokenResult(rawToken, expiresAt);
@@ -93,8 +92,8 @@ public class TokenServiceAdapter implements TokenServicePort {
 
             if (!ACCESS_TOKEN_TYPE.equals(tokenType)) {
                 throw new ApplicationException(
-                        UserApplicationErrorCode.USER_UNAUTHORIZED,
-                        UserApplicationMessageKey.USER_UNAUTHORIZED_TITLE
+                        UserErrorCode.USER_UNAUTHORIZED,
+                        UserDetailMessageKey.USER_UNAUTHORIZED
                 );
             }
 
@@ -103,24 +102,19 @@ public class TokenServiceAdapter implements TokenServicePort {
                     JwtCustomClaimKey.USER_SESSION_ID,
                     Long.class
             );
-            List<String> roles = claims.get(
-                    JwtCustomClaimKey.USER_ROLES,
-                    List.class
-            );
             Instant expiresAt = claims.getExpiration().toInstant();
 
             return new AccessTokenPayload(
                     userId,
                     sessionId,
-                    roles,
                     expiresAt
             );
 
         } catch (JwtException | IllegalArgumentException ex) {
             log.warn(ex.getMessage(), ex);
             throw new ApplicationException(
-                    UserApplicationErrorCode.USER_UNAUTHORIZED,
-                    UserApplicationMessageKey.USER_UNAUTHORIZED_TITLE
+                    UserErrorCode.USER_UNAUTHORIZED,
+                    UserDetailMessageKey.USER_UNAUTHORIZED
             );
         }
     }

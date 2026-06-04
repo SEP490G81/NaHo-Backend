@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.naho.user.port.out.PermissionRepositoryPort;
 import org.naho.user.port.out.TokenServicePort;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,6 +25,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String BEARER_PREFIX = "Bearer ";
 
     private final TokenServicePort tokenServicePort;
+    private final PermissionRepositoryPort permissionRepositoryPort;
 
     @Override
     protected void doFilterInternal(
@@ -38,16 +40,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+        Authentication existingAuthentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        if (existingAuthentication != null && existingAuthentication.isAuthenticated()) {
             filterChain.doFilter(request, response);
             return;
         }
 
         AccessTokenPayload payload = tokenServicePort.verifyAccessToken(accessToken);
-        
-        List<SimpleGrantedAuthority> authorities = payload.roles()
-                .stream().map(role -> role.startsWith("ROLE_") ? role : "ROLE_" + role)
-                .map(SimpleGrantedAuthority::new)
+
+        List<String> permissions = permissionRepositoryPort.findAllPermissionCodeByUserId(payload.userId());
+
+        List<SimpleGrantedAuthority> authorities = permissions
+                .stream().map(SimpleGrantedAuthority::new)
                 .toList();
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(
@@ -55,6 +61,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 null,
                 authorities
         );
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
         filterChain.doFilter(request, response);
     }

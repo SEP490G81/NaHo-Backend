@@ -1,5 +1,5 @@
 package org.naho.user.type;
 
 public enum UserStatus {
-    ACTIVE, UNACTIVE
+    ACTIVE, UNACTIVE, DELETED
 }

@@ -1,0 +1,19 @@
+# gradle
+.gradle
+**/.gradle
+
+# build output
+build
+**/build
+
+# IDE
+.idea
+.vscode
+
+# git
+.gitignore
+.git
+
+# environment
+.env
+.env.*

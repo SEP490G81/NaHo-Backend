@@ -52,10 +52,6 @@ bin/
 local.properties
 gradle.properties.local
 .gradle/
-build/
 
 #Coding pla
 coding_plan
-
-#test
-test.http

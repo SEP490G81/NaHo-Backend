@@ -3,7 +3,7 @@ package org.naho.user.controller.v1;
 import lombok.RequiredArgsConstructor;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.user.command.RegisterCommand;
-import org.naho.user.constant.UserApplicationMessageKey;
+import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.user.dto.mapper.RegisterRequestMapper;
 import org.naho.user.dto.mapper.RegisterResponseMapper;
 import org.naho.user.dto.mapper.UserResponseMapper;
@@ -35,7 +35,7 @@ public class UserController {
     private final RegisterRequestMapper registerRequestMapper;
 
     @PostMapping("/register")
-    @ApiResponseMessage(message = UserApplicationMessageKey.USER_REGISTER_SUCCESSFULLY)
+    @ApiResponseMessage(message = UserDetailMessageKey.USER_REGISTER_SUCCESSFULLY)
     public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request) {
         RegisterCommand command = registerRequestMapper.requestToCommand(request);
         RegisterResult result = registerInputPort.register(command);

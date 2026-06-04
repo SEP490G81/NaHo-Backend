@@ -19,7 +19,7 @@ public class UserResponse {
     Long id;
     String username;
     List<String> roleNames;
-    String avatarFileUrl;
+    String avatarObjectKey;
 
     String email;
     String firstName;

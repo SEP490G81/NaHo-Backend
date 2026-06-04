@@ -18,6 +18,7 @@ java {
 dependencies {
     // project implementation
     implementation(project(":core:domain"))
+    implementation(project(":core:common"))
 
     testImplementation(platform("org.junit:junit-bom:6.0.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
