@@ -1,13 +1,13 @@
 package org.naho.furigana.usecase;
 
 import org.naho.furigana.command.AnalyzeFuriganaCommand;
-import org.naho.furigana.constant.FuriganaApplicationMessageKey;
 import org.naho.furigana.exception.FuriganaApplicationErrorCode;
 import org.naho.furigana.mapper.FuriganaResultMapper;
 import org.naho.furigana.model.FuriganaText;
 import org.naho.furigana.port.in.AnalyzeFuriganaInputPort;
 import org.naho.furigana.port.out.FuriganaAnalysisPort;
 import org.naho.furigana.result.FuriganaResult;
+import org.naho.i18n.message.furigana.FuriganaDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
 
 public class AnalyzeFuriganaUseCase implements AnalyzeFuriganaInputPort {
@@ -25,7 +25,7 @@ public class AnalyzeFuriganaUseCase implements AnalyzeFuriganaInputPort {
         if (command == null || command.text() == null || command.text().trim().isEmpty()) {
             throw new ApplicationException(
                     FuriganaApplicationErrorCode.FURIGANA_ANALYZE_FAILED,
-                    FuriganaApplicationMessageKey.FURIGANA_TEXT_EMPTY
+                    FuriganaDetailMessageKey.FURIGANA_TEXT_EMPTY
             );
         }
         FuriganaText domainText = furiganaAnalysisPort.analyze(command.text());
