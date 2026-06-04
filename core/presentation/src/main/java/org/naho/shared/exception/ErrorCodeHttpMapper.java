@@ -9,7 +9,6 @@ import static org.naho.furigana.exception.FuriganaApplicationErrorCode.FURIGANA_
 import static org.naho.speech.azure.exception.AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID;
 import static org.naho.speech.azure.exception.AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR;
 import static org.naho.user.exception.UserDomainErrorCode.*;
-import static org.naho.user.exception.UserApplicationErrorCode.*;
 import static org.naho.user.exception.UserErrorCode.*;
 
 @Component
