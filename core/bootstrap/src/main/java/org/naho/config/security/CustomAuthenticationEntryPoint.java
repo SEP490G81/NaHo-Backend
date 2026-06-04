@@ -8,11 +8,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.ThreadContext;
 import org.naho.i18n.MessageService;
-import org.naho.shared.constant.ErrorLoggingKey;
-import org.naho.shared.constant.HttpLoggingKey;
+import org.naho.logging.ErrorLoggingKey;
+import org.naho.logging.HttpLoggingKey;
 import org.naho.shared.constant.ProblemDetailProperty;
 import org.naho.shared.exception.ErrorCode;
-import org.naho.user.exception.UserApplicationErrorCode;
+import org.naho.user.exception.UserErrorCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
@@ -39,7 +39,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
             HttpServletResponse response,
             AuthenticationException authException
     ) throws IOException, ServletException {
-        ErrorCode errorCode = UserApplicationErrorCode.USER_UNAUTHORIZED;
+        ErrorCode errorCode = UserErrorCode.USER_UNAUTHORIZED;
 
         // create problem detail
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);

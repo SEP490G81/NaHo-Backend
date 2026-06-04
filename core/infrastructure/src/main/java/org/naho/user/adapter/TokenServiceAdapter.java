@@ -5,11 +5,11 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.user.constant.JwtCustomClaimKey;
 import org.naho.user.constant.JwtProperties;
-import org.naho.user.constant.UserApplicationMessageKey;
-import org.naho.user.exception.UserApplicationErrorCode;
+import org.naho.user.exception.UserErrorCode;
 import org.naho.user.model.User;
 import org.naho.user.model.UserSession;
 import org.naho.user.port.out.TokenServicePort;
@@ -41,11 +41,6 @@ public class TokenServiceAdapter implements TokenServicePort {
     public TokenServiceAdapter(JwtProperties jwtProperties) {
         this.jwtProperties = jwtProperties;
 
-        System.out.println("==============");
-        System.out.println(jwtProperties.getSecret());
-        System.out.println(jwtProperties.getSecret().length());
-        System.out.println("==============");
-        
         this.jwtSecretKey = Keys.hmacShaKeyFor(
                 jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8)
         );
@@ -97,8 +92,8 @@ public class TokenServiceAdapter implements TokenServicePort {
 
             if (!ACCESS_TOKEN_TYPE.equals(tokenType)) {
                 throw new ApplicationException(
-                        UserApplicationErrorCode.USER_UNAUTHORIZED,
-                        UserApplicationMessageKey.USER_UNAUTHORIZED_TITLE
+                        UserErrorCode.USER_UNAUTHORIZED,
+                        UserDetailMessageKey.USER_UNAUTHORIZED
                 );
             }
 
@@ -118,8 +113,8 @@ public class TokenServiceAdapter implements TokenServicePort {
         } catch (JwtException | IllegalArgumentException ex) {
             log.warn(ex.getMessage(), ex);
             throw new ApplicationException(
-                    UserApplicationErrorCode.USER_UNAUTHORIZED,
-                    UserApplicationMessageKey.USER_UNAUTHORIZED_TITLE
+                    UserErrorCode.USER_UNAUTHORIZED,
+                    UserDetailMessageKey.USER_UNAUTHORIZED
             );
         }
     }

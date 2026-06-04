@@ -1,9 +1,9 @@
 package org.naho.speech.azure.usecase;
 
+import org.naho.i18n.message.speech.SpeechDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
-import org.naho.speech.azure.constant.AzureSpeechApplicationMessageKey;
-import org.naho.speech.azure.exception.AzureSpeechApplicationErrorCode;
+import org.naho.speech.azure.exception.AzureSpeechErrorCode;
 import org.naho.speech.azure.mapper.PronunciationAssessmentMapper;
 import org.naho.speech.azure.port.in.AssessSpeechInputPort;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
@@ -24,8 +24,8 @@ public class AssessSpeechUseCase implements AssessSpeechInputPort {
     public SpeechAssessmentResult execute(SpeechAssessmentCommand command) {
         if (command.audioBytes() == null || command.audioBytes().length == 0) {
             throw new ApplicationException(
-                    AzureSpeechApplicationErrorCode.SPEECH_AUDIO_NOT_VALID,
-                    AzureSpeechApplicationMessageKey.SPEECH_AUDIO_FILE_EMPTY
+                    AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
+                    SpeechDetailMessageKey.SPEECH_AUDIO_FILE_EMPTY
             );
         }
 

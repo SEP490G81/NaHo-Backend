@@ -42,10 +42,10 @@ public class UserConfig {
     @Bean
     public RegisterInputPort registerInputPort(
             UserRepositoryPort userRepository,
-            PasswordEncoderPort passwordEncoder,
+            EncoderPort encoderPort,
             RoleRepositoryPort roleRepository
     ) {
-        return new RegisterUseCase(userRepository, passwordEncoder, roleRepository);
+        return new RegisterUseCase(userRepository, encoderPort, roleRepository);
     }
 
     @Bean

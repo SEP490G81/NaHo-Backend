@@ -5,7 +5,7 @@ import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.shared.constant.CookieProperty;
 import org.naho.user.command.CredentialsLoginCommand;
 import org.naho.user.command.LogoutCommand;
-import org.naho.user.constant.UserApplicationMessageKey;
+import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.user.dto.mapper.LoginRequestMapper;
 import org.naho.user.dto.mapper.LoginResponseMapper;
 import org.naho.user.dto.request.CredentialsLoginRequest;
@@ -37,7 +37,7 @@ public class AuthController {
     private final LoginRequestMapper loginRequestMapper;
     private final CookieProperty cookieProperty;
 
-    @ApiResponseMessage(message = UserApplicationMessageKey.USER_LOGIN_SUCCESSFULLY)
+    @ApiResponseMessage(message = UserDetailMessageKey.USER_LOGIN_SUCCESSFULLY)
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> credentialsLogin(
             @RequestBody CredentialsLoginRequest request
@@ -69,7 +69,7 @@ public class AuthController {
                 .body(response);
     }
 
-    @ApiResponseMessage(message = UserApplicationMessageKey.USER_LOGOUT_SUCCESSFULLY)
+    @ApiResponseMessage(message = UserDetailMessageKey.USER_LOGOUT_SUCCESSFULLY)
     @PostMapping("/logout")
     public ResponseEntity<Void> logout() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

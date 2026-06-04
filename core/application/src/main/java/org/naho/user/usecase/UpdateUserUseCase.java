@@ -1,9 +1,9 @@
 package org.naho.user.usecase;
 
 import org.naho.file.port.out.FileRepositoryPort;
+import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
-import org.naho.user.constant.UserApplicationMessageKey;
-import org.naho.user.exception.UserApplicationErrorCode;
+import org.naho.user.exception.UserErrorCode;
 import org.naho.user.mapper.UserResultMapper;
 import org.naho.user.model.User;
 import org.naho.user.port.in.UpdateUserInputPort;
@@ -37,8 +37,8 @@ public class UpdateUserUseCase implements UpdateUserInputPort {
     public UserResult updateStatus(Long id, String status) {
         User user = userRepositoryPort.findById(id)
                 .orElseThrow(() -> new ApplicationException(
-                        UserApplicationErrorCode.USER_NOT_FOUND,
-                        UserApplicationMessageKey.USER_ID_NOT_FOUND
+                        UserErrorCode.USER_NOT_FOUND,
+                        UserDetailMessageKey.USER_ID_NOT_FOUND
                 ));
 
         try {
@@ -46,8 +46,8 @@ public class UpdateUserUseCase implements UpdateUserInputPort {
             user.setStatus(userStatus);
         } catch (IllegalArgumentException e) {
             throw new ApplicationException(
-                    UserApplicationErrorCode.USER_UPDATE_FAILED,
-                    UserApplicationMessageKey.USER_UPDATE_STATUS_FAILED
+                    UserErrorCode.USER_PERSIST_FAILED,
+                    UserDetailMessageKey.USER_UPDATE_STATUS_FAILED
             );
         }
 

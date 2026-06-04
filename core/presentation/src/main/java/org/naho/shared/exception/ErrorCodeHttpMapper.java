@@ -5,9 +5,9 @@ import org.springframework.stereotype.Component;
 
 import java.net.URI;
 
-import static org.naho.speech.azure.exception.AzureSpeechApplicationErrorCode.SPEECH_AUDIO_NOT_VALID;
-import static org.naho.speech.azure.exception.AzureSpeechApplicationErrorCode.SPEECH_AZURE_SERVICE_ERROR;
-import static org.naho.user.exception.UserApplicationErrorCode.*;
+import static org.naho.speech.azure.exception.AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID;
+import static org.naho.speech.azure.exception.AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR;
+import static org.naho.user.exception.UserDomainErrorCode.*;
 import static org.naho.user.exception.UserErrorCode.*;
 
 @Component
@@ -27,7 +27,7 @@ public class ErrorCodeHttpMapper {
                  USER_NOT_FOUND,
                  SPEECH_AUDIO_NOT_VALID,
                  USER_LOGIN_FAILED -> HttpStatus.BAD_REQUEST;
-            case USER_ALREADY_EXISTS ->  HttpStatus.CONFLICT;
+            case USER_ALREADY_EXISTS -> HttpStatus.CONFLICT;
             case SPEECH_AZURE_SERVICE_ERROR -> HttpStatus.BAD_GATEWAY;
             case USER_UNAUTHORIZED -> HttpStatus.UNAUTHORIZED;
             case USER_ACCESS_DENIED -> HttpStatus.FORBIDDEN;

@@ -1,8 +1,8 @@
 package org.naho.shared.exception;
 
 import org.apache.logging.log4j.ThreadContext;
-import org.naho.shared.constant.ErrorLoggingKey;
-import org.naho.shared.constant.HttpLoggingKey;
+import org.naho.logging.ErrorLoggingKey;
+import org.naho.logging.HttpLoggingKey;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
