@@ -10,7 +10,9 @@ import org.naho.user.type.JLPTLevel;
 
 import java.util.List;
 
-@Builder
+import lombok.experimental.SuperBuilder;
+
+@SuperBuilder
 @Getter
 @Setter
 @NoArgsConstructor

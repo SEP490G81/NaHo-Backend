@@ -55,7 +55,7 @@ public class GlobalExceptionHandler {
             Exception e,
             HttpServletRequest request
     ) {
-        ErrorCode errorCode = CommonApplicationErrorCode.COMMON_INTERNAL_SERVER_ERROR;
+        ErrorCode errorCode = CommonErrorCode.COMMON_INTERNAL_SERVER_ERROR;
 
         HttpStatus status = errorCodeHttpMapper.toStatus(errorCode);
         String errorMessage = messageService.getMessage(e.getMessage());

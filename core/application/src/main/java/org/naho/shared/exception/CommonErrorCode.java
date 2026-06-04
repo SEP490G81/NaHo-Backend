@@ -1,6 +1,6 @@
 package org.naho.shared.exception;
 
-public enum CommonApplicationErrorCode implements ErrorCode {
+public enum CommonErrorCode implements ErrorCode {
 
     COMMON_INTERNAL_SERVER_ERROR(
             "COMMON_A001",
@@ -10,7 +10,7 @@ public enum CommonApplicationErrorCode implements ErrorCode {
     private final String code;
     private final String titleKey;
 
-    CommonApplicationErrorCode(String code, String titleKey) {
+    CommonErrorCode(String code, String titleKey) {
         this.code = code;
         this.titleKey = titleKey;
     }

@@ -6,11 +6,12 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 import org.naho.shared.persistence.BaseEntity;
 
 import java.util.Set;
 
-@Builder
+@SuperBuilder
 @Getter
 @Setter
 @NoArgsConstructor
