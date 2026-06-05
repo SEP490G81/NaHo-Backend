@@ -2,6 +2,7 @@ package org.naho.config.application;
 
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.shared.port.out.TransactionPort;
+import org.naho.user.helper.AuthUseCaseHelper;
 import org.naho.user.mapper.UserResultMapper;
 import org.naho.user.port.in.*;
 import org.naho.user.port.out.*;
@@ -17,6 +18,21 @@ public class UserConfig {
     }
 
     @Bean
+    public AuthUseCaseHelper authUseCaseHelper(
+            RoleRepositoryPort roleRepositoryPort,
+            FileRepositoryPort fileRepositoryPort,
+            TokenServicePort tokenServicePort,
+            UserResultMapper userResultMapper
+    ) {
+        return new AuthUseCaseHelper(
+                roleRepositoryPort,
+                fileRepositoryPort,
+                tokenServicePort,
+                userResultMapper
+        );
+    }
+
+    @Bean
     public AuthInputPort authPort(
             UserRepositoryPort userRepositoryPort,
             EncoderPort encoderPort,
@@ -25,9 +41,10 @@ public class UserConfig {
             UserSessionRepositoryPort userSessionRepositoryPort,
             RoleRepositoryPort roleRepositoryPort,
             FileRepositoryPort fileRepositoryPort,
-            TransactionPort transactionPort
+            TransactionPort transactionPort,
+            AuthUseCaseHelper authUseCaseHelper
     ) {
-        return new AuthInputUseCase(
+        return new AuthUseCase(
                 userRepositoryPort,
                 encoderPort,
                 tokenServicePort,
@@ -35,7 +52,8 @@ public class UserConfig {
                 userSessionRepositoryPort,
                 roleRepositoryPort,
                 fileRepositoryPort,
-                transactionPort
+                transactionPort,
+                authUseCaseHelper
         );
     }
 

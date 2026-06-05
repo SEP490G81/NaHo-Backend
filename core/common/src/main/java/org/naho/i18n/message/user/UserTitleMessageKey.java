@@ -39,4 +39,7 @@ public final class UserTitleMessageKey {
 
     public static final String USER_PERSIST_FAILED_TITLE =
             "user.persist.failed.title";
+
+    public static final String USER_INVALID_REFRESH_TOKEN_TITLE =
+            "user.invalid.refresh.token.title";
 }

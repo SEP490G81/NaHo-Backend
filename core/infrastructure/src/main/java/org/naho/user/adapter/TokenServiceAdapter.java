@@ -10,7 +10,6 @@ import org.naho.shared.exception.ApplicationException;
 import org.naho.user.constant.JwtCustomClaimKey;
 import org.naho.user.constant.JwtProperties;
 import org.naho.user.exception.UserErrorCode;
-import org.naho.user.model.User;
 import org.naho.user.model.UserSession;
 import org.naho.user.port.out.TokenServicePort;
 import org.naho.user.result.AccessTokenPayload;
@@ -50,9 +49,10 @@ public class TokenServiceAdapter implements TokenServicePort {
     }
 
     @Override
-    public TokenResult generateAccessToken(User user, List<String> roleNames, UserSession userSession) {
+    public TokenResult generateAccessToken(List<String> roleNames, UserSession userSession) {
         Instant issuedAt = Instant.now();
         Instant expiresAt = issuedAt.plus(jwtProperties.getAccessTokenExpiration());
+        Long expiresIn = Instant.now().plus(jwtProperties.getAccessTokenExpiration()).getEpochSecond();
 
         Map<String, Object> claims = Map.of(
                 JwtCustomClaimKey.USER_SESSION_ID, userSession.getId(),
@@ -60,23 +60,24 @@ public class TokenServiceAdapter implements TokenServicePort {
         );
 
         String value = Jwts.builder()
-                .subject(String.valueOf(user.getId()))
+                .subject(String.valueOf(userSession.getUserId()))
                 .claims(claims)
                 .issuedAt(Date.from(issuedAt))
                 .expiration(Date.from(expiresAt))
                 .signWith(jwtSecretKey, Jwts.SIG.HS512)
                 .compact();
 
-        return new TokenResult(value, expiresAt);
+        return new TokenResult(value, expiresAt, expiresIn);
     }
 
     @Override
     public TokenResult generateRefreshToken() {
         Instant issuedAt = Instant.now();
         Instant expiresAt = issuedAt.plus(jwtProperties.getRefreshTokenExpiration());
+        Long expiresIn = Instant.now().plus(jwtProperties.getAccessTokenExpiration()).getEpochSecond();
 
         String rawToken = generateSecureRandomToken();
-        return new TokenResult(rawToken, expiresAt);
+        return new TokenResult(rawToken, expiresAt, expiresIn);
     }
 
     @Override

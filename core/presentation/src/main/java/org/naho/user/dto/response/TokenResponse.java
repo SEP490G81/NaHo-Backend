@@ -4,6 +4,7 @@ import java.time.Instant;
 
 public record TokenResponse(
         String value,
-        Instant expiresAt
+        Instant expiresAt,
+        Long expiresIn
 ) {
 }

@@ -49,7 +49,7 @@ public class RegisterUseCase implements RegisterInputPort {
         }
 
         // Encode pass
-        String encodedPassword = encoderPort.hash(command.password());
+        String encodedPassword = encoderPort.hashPassword(command.password());
 
         // Assign StudentRole
         Role defaultRole = roleRepository.findByName(RoleName.LEARNER)

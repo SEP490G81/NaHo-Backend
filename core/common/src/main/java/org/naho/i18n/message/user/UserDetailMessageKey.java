@@ -72,4 +72,19 @@ public final class UserDetailMessageKey {
 
     public static final String USER_UNAUTHORIZED =
             "user.unauthorized";
+
+    public static final String USER_REFRESH_TOKEN_NOT_FOUND =
+            "user.refresh.token.not.found";
+
+    public static final String USER_REFRESH_TOKEN_EXPIRED =
+            "user.refresh.token.expired";
+
+    public static final String USER_REFRESH_TOKEN_REVOKED =
+            "user.refresh.token.revoked";
+
+    public static final String USER_ROTATE_TOKEN_SUCCESSFULLY =
+            "user.rotate.token.successfully";
+
+    public static final String USER_GET_SUCCESSFULLY =
+            "user.get.successfully";
 }
