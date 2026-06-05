@@ -132,7 +132,8 @@ public class AuthUseCase implements AuthInputPort {
                 command.userId(),
                 command.userSessionId(),
                 Instant.now(),
-                SessionRevokedReason.USER_LOGOUT);
+                SessionRevokedReason.USER_LOGOUT
+        );
     }
 
     @Override

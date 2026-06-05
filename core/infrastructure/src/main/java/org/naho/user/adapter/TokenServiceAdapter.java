@@ -9,6 +9,7 @@ import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.user.constant.JwtCustomClaimKey;
 import org.naho.user.constant.JwtProperties;
+import org.naho.user.constant.TokenType;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.model.UserSession;
 import org.naho.user.port.out.TokenServicePort;
@@ -67,7 +68,7 @@ public class TokenServiceAdapter implements TokenServicePort {
                 .signWith(jwtSecretKey, Jwts.SIG.HS512)
                 .compact();
 
-        return new TokenResult(value, expiresAt, expiresIn);
+        return new TokenResult(TokenType.ACCESS_TOKEN_NAME, value, expiresAt, expiresIn);
     }
 
     @Override
@@ -77,7 +78,7 @@ public class TokenServiceAdapter implements TokenServicePort {
         Long expiresIn = Instant.now().plus(jwtProperties.getAccessTokenExpiration()).getEpochSecond();
 
         String rawToken = generateSecureRandomToken();
-        return new TokenResult(rawToken, expiresAt, expiresIn);
+        return new TokenResult(TokenType.REFRESH_TOKEN_NAME, rawToken, expiresAt, expiresIn);
     }
 
     @Override

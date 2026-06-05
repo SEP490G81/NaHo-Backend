@@ -3,14 +3,14 @@ package org.naho.user.controller.v1;
 import lombok.RequiredArgsConstructor;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
-import org.naho.shared.constant.CookieProperty;
 import org.naho.user.command.CredentialsLoginCommand;
 import org.naho.user.command.LogoutCommand;
+import org.naho.user.constant.TokenType;
 import org.naho.user.dto.mapper.LoginRequestMapper;
 import org.naho.user.dto.mapper.UserResponseMapper;
 import org.naho.user.dto.request.CredentialsLoginRequest;
 import org.naho.user.dto.response.UserResponse;
-import org.naho.user.helper.AuthControllerHelper;
+import org.naho.user.helper.CookieFactory;
 import org.naho.user.port.in.AuthInputPort;
 import org.naho.user.result.AccessTokenPayload;
 import org.naho.user.result.LoginResult;
@@ -26,12 +26,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    public static final String REFRESH_TOKEN_TYPE = "refresh-token";
-
     private final AuthInputPort authInputPort;
     private final LoginRequestMapper loginRequestMapper;
-    private final CookieProperty cookieProperty;
-    private final AuthControllerHelper authControllerHelper;
+    private final CookieFactory cookieFactory;
     private final UserResponseMapper userResponseMapper;
 
     @ApiResponseMessage(message = UserDetailMessageKey.USER_GET_SUCCESSFULLY)
@@ -42,7 +39,7 @@ public class AuthController {
 
         UserResult result = authInputPort.findUserById(payload.userId());
         UserResponse response = userResponseMapper.resultToResponse(result);
-        
+
         return ResponseEntity.ok(response);
     }
 
@@ -53,7 +50,17 @@ public class AuthController {
     ) {
         CredentialsLoginCommand command = loginRequestMapper.requestToCommand(request);
         LoginResult result = authInputPort.credentialsLogin(command);
-        return authControllerHelper.attachTokensToResponseHeader(result);
+
+        ResponseCookie accessTokenCookie =
+                cookieFactory.createCookieForJWTToken(result.accessToken());
+        ResponseCookie refreshTokenCookie =
+                cookieFactory.createCookieForJWTToken(result.refreshToken());
+
+        return ResponseEntity
+                .ok()
+                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                .build();
     }
 
     @ApiResponseMessage(message = UserDetailMessageKey.USER_LOGOUT_SUCCESSFULLY)
@@ -67,27 +74,36 @@ public class AuthController {
                 payload.userSessionId()
         ));
 
-        ResponseCookie clearCookie = ResponseCookie
-                .from(REFRESH_TOKEN_TYPE, "")
-                .httpOnly(true)
-                .secure(cookieProperty.isSecure())
-                .sameSite("Strict")
-                .path("/")
-                .maxAge(0)
-                .build();
+        ResponseCookie clearAccessTokenCookie =
+                cookieFactory.clearCookieForJWTToken(TokenType.ACCESS_TOKEN_NAME);
 
-        return ResponseEntity.noContent()
-                .header(HttpHeaders.SET_COOKIE, clearCookie.toString())
+        ResponseCookie clearRefreshTokenCookie =
+                cookieFactory.clearCookieForJWTToken(TokenType.REFRESH_TOKEN_NAME);
+
+        return ResponseEntity
+                .noContent()
+                .header(HttpHeaders.SET_COOKIE, clearAccessTokenCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, clearRefreshTokenCookie.toString())
                 .build();
     }
 
     @ApiResponseMessage(message = UserDetailMessageKey.USER_ROTATE_TOKEN_SUCCESSFULLY)
     @PostMapping("/rotation")
     public ResponseEntity<Void> rotateToken(
-            @CookieValue(REFRESH_TOKEN_TYPE) String refreshToken
+            @CookieValue(TokenType.REFRESH_TOKEN_NAME) String refreshToken
     ) {
         LoginResult result = authInputPort.rotateToken(refreshToken);
-        return authControllerHelper.attachTokensToResponseHeader(result);
+
+        ResponseCookie accessTokenCookie =
+                cookieFactory.createCookieForJWTToken(result.accessToken());
+        ResponseCookie refreshTokenCookie =
+                cookieFactory.createCookieForJWTToken(result.refreshToken());
+
+        return ResponseEntity
+                .ok()
+                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                .build();
     }
 
 }
