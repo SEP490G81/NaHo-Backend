@@ -87,7 +87,7 @@ public class AuthInputUseCase implements AuthInputPort {
 
         TokenResult refreshToken = tokenServicePort.generateRefreshToken();
 
-        String hashRefreshToken = encoderPort.hash(refreshToken.value());
+        String hashRefreshToken = encoderPort.hashRefreshToken(refreshToken.value());
 
         UserSession userSession = UserSession.builder()
                 .userId(user.getId())

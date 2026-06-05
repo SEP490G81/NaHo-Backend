@@ -39,7 +39,7 @@ public class EncoderAdapter implements EncoderPort {
     }
 
     @Override
-    public String hash(String raw) {
+    public String hashRefreshToken(String raw) {
         try {
             Mac mac = Mac.getInstance(REFRESH_TOKEN_HASH_ALGORITHM);
             mac.init(refreshTokenHashKey);
@@ -54,5 +54,10 @@ public class EncoderAdapter implements EncoderPort {
                     ex.getMessage()
             );
         }
+    }
+
+    @Override
+    public String hashPassword(String raw) {
+        return passwordEncoder.encode(raw);
     }
 }

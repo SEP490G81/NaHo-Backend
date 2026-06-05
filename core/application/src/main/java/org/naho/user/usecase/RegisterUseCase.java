@@ -47,9 +47,9 @@ public class RegisterUseCase implements RegisterInputPort {
                     UserDetailMessageKey.USER_EMAIL_ALREADY_EXISTS,
                     command.email());
         }
-
+        
         // Encode pass
-        String encodedPassword = encoderPort.hash(command.password());
+        String encodedPassword = encoderPort.hashPassword(command.password());
 
         // Assign StudentRole
         Role defaultRole = roleRepository.findByName(RoleName.LEARNER)
