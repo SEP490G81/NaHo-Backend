@@ -9,6 +9,7 @@ import org.naho.user.constant.TokenType;
 import org.naho.user.dto.mapper.LoginRequestMapper;
 import org.naho.user.dto.mapper.UserResponseMapper;
 import org.naho.user.dto.request.CredentialsLoginRequest;
+import org.naho.user.dto.response.TokenExpResponse;
 import org.naho.user.dto.response.UserResponse;
 import org.naho.user.helper.CookieFactory;
 import org.naho.user.port.in.AuthInputPort;
@@ -18,8 +19,7 @@ import org.naho.user.result.UserResult;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -33,10 +33,9 @@ public class AuthController {
 
     @ApiResponseMessage(message = UserDetailMessageKey.USER_GET_SUCCESSFULLY)
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> getCurrentLoggedUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        AccessTokenPayload payload = (AccessTokenPayload) authentication.getPrincipal();
-
+    public ResponseEntity<UserResponse> getCurrentLoggedUser(
+            @AuthenticationPrincipal AccessTokenPayload payload
+    ) {
         UserResult result = authInputPort.findUserById(payload.userId());
         UserResponse response = userResponseMapper.resultToResponse(result);
 
@@ -45,7 +44,7 @@ public class AuthController {
 
     @ApiResponseMessage(message = UserDetailMessageKey.USER_LOGIN_SUCCESSFULLY)
     @PostMapping("/login")
-    public ResponseEntity<Void> credentialsLogin(
+    public ResponseEntity<TokenExpResponse> credentialsLogin(
             @RequestBody CredentialsLoginRequest request
     ) {
         CredentialsLoginCommand command = loginRequestMapper.requestToCommand(request);
@@ -56,19 +55,23 @@ public class AuthController {
         ResponseCookie refreshTokenCookie =
                 cookieFactory.createCookieForJWTToken(result.refreshToken());
 
+        TokenExpResponse tokenExpResponse = new TokenExpResponse(
+                result.accessToken().expiresAt(),
+                result.accessToken().expiresIn()
+        );
+
         return ResponseEntity
                 .ok()
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
                 .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
-                .build();
+                .body(tokenExpResponse);
     }
 
     @ApiResponseMessage(message = UserDetailMessageKey.USER_LOGOUT_SUCCESSFULLY)
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        AccessTokenPayload payload = (AccessTokenPayload) authentication.getPrincipal();
-
+    public ResponseEntity<Void> logout(
+            @AuthenticationPrincipal AccessTokenPayload payload
+    ) {
         authInputPort.logout(new LogoutCommand(
                 payload.userId(),
                 payload.userSessionId()
@@ -89,7 +92,7 @@ public class AuthController {
 
     @ApiResponseMessage(message = UserDetailMessageKey.USER_ROTATE_TOKEN_SUCCESSFULLY)
     @PostMapping("/rotation")
-    public ResponseEntity<Void> rotateToken(
+    public ResponseEntity<TokenExpResponse> rotateToken(
             @CookieValue(TokenType.REFRESH_TOKEN_NAME) String refreshToken
     ) {
         LoginResult result = authInputPort.rotateToken(refreshToken);
@@ -99,11 +102,16 @@ public class AuthController {
         ResponseCookie refreshTokenCookie =
                 cookieFactory.createCookieForJWTToken(result.refreshToken());
 
+        TokenExpResponse tokenExpResponse = new TokenExpResponse(
+                result.accessToken().expiresAt(),
+                result.accessToken().expiresIn()
+        );
+
         return ResponseEntity
                 .ok()
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
                 .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
-                .build();
+                .body(tokenExpResponse);
     }
 
 }

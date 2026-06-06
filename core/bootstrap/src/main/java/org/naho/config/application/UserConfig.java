@@ -22,13 +22,15 @@ public class UserConfig {
             RoleRepositoryPort roleRepositoryPort,
             FileRepositoryPort fileRepositoryPort,
             TokenServicePort tokenServicePort,
-            UserResultMapper userResultMapper
+            UserResultMapper userResultMapper,
+            UserRepositoryPort userRepositoryPort
     ) {
         return new AuthUseCaseHelper(
                 roleRepositoryPort,
                 fileRepositoryPort,
                 tokenServicePort,
-                userResultMapper
+                userResultMapper,
+                userRepositoryPort
         );
     }
 

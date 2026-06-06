@@ -149,7 +149,8 @@ public class AuthUseCase implements AuthInputPort {
 
             throw new ApplicationException(
                     UserErrorCode.USER_INVALID_REFRESH_TOKEN,
-                    UserDetailMessageKey.USER_REFRESH_TOKEN_EXPIRED);
+                    UserDetailMessageKey.USER_REFRESH_TOKEN_EXPIRED
+            );
         }
 
         if (userSession.isRevoked()) {
@@ -158,7 +159,8 @@ public class AuthUseCase implements AuthInputPort {
 
             throw new ApplicationException(
                     UserErrorCode.USER_INVALID_REFRESH_TOKEN,
-                    UserDetailMessageKey.USER_REFRESH_TOKEN_REVOKED);
+                    UserDetailMessageKey.USER_REFRESH_TOKEN_REVOKED
+            );
         }
 
         return transactionPort.execute(() -> doRotateToken(userSession, now));
