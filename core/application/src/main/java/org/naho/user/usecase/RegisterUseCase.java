@@ -47,7 +47,7 @@ public class RegisterUseCase implements RegisterInputPort {
                     UserDetailMessageKey.USER_EMAIL_ALREADY_EXISTS,
                     command.email());
         }
-
+        
         // Encode pass
         String encodedPassword = encoderPort.hashPassword(command.password());
 
