@@ -61,7 +61,7 @@ app:
   jwt:
     secret: ${JWT_SECRET}
     access-token-expiration: 5m
-    refresh-token-expiration: 30d
+    refresh-token-expiration: 14d
 
   openai:
     api-key: ${LLM_API_KEY}

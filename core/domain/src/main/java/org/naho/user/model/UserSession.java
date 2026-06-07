@@ -21,6 +21,26 @@ public class UserSession {
     private Instant revokedAt;
     private SessionRevokedReason revokedReason;
 
+    public boolean isExpired() {
+        return expiresAt != null && expiresAt.isBefore(Instant.now());
+    }
+
+    public boolean isRevoked() {
+        return revokedAt != null || revokedReason != null;
+    }
+
+    public void setRevokedAt(Instant revokedAt) {
+        this.revokedAt = revokedAt;
+    }
+
+    public void setRevokedReason(SessionRevokedReason revokedReason) {
+        this.revokedReason = revokedReason;
+    }
+
+    public void setLastUsedAt(Instant lastUsedAt) {
+        this.lastUsedAt = lastUsedAt;
+    }
+
     // Private constructor
     private UserSession(Builder builder) {
         this.id = builder.id;

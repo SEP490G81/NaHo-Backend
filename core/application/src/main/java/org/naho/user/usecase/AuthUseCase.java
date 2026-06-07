@@ -8,6 +8,7 @@ import org.naho.shared.port.out.TransactionPort;
 import org.naho.user.command.CredentialsLoginCommand;
 import org.naho.user.command.LogoutCommand;
 import org.naho.user.exception.UserErrorCode;
+import org.naho.user.helper.AuthUseCaseHelper;
 import org.naho.user.mapper.UserResultMapper;
 import org.naho.user.model.User;
 import org.naho.user.model.UserSession;
@@ -21,7 +22,7 @@ import org.naho.user.type.SessionRevokedReason;
 import java.time.Instant;
 import java.util.List;
 
-public class AuthInputUseCase implements AuthInputPort {
+public class AuthUseCase implements AuthInputPort {
     private final UserRepositoryPort userRepositoryPort;
     private final EncoderPort encoderPort;
     private final TokenServicePort tokenServicePort;
@@ -30,8 +31,9 @@ public class AuthInputUseCase implements AuthInputPort {
     private final RoleRepositoryPort roleRepositoryPort;
     private final FileRepositoryPort fileRepositoryPort;
     private final TransactionPort transactionPort;
+    private final AuthUseCaseHelper authUseCaseHelper;
 
-    public AuthInputUseCase(
+    public AuthUseCase(
             UserRepositoryPort userRepositoryPort,
             EncoderPort encoderPort,
             TokenServicePort tokenServicePort,
@@ -39,8 +41,8 @@ public class AuthInputUseCase implements AuthInputPort {
             UserSessionRepositoryPort userSessionRepositoryPort,
             RoleRepositoryPort roleRepositoryPort,
             FileRepositoryPort fileRepositoryPort,
-            TransactionPort transactionPort
-    ) {
+            TransactionPort transactionPort,
+            AuthUseCaseHelper authUseCaseHelper) {
         this.userRepositoryPort = userRepositoryPort;
         this.encoderPort = encoderPort;
         this.tokenServicePort = tokenServicePort;
@@ -49,6 +51,20 @@ public class AuthInputUseCase implements AuthInputPort {
         this.roleRepositoryPort = roleRepositoryPort;
         this.fileRepositoryPort = fileRepositoryPort;
         this.transactionPort = transactionPort;
+        this.authUseCaseHelper = authUseCaseHelper;
+    }
+
+    @Override
+    public UserResult findUserById(Long userId) {
+        User user = userRepositoryPort.findById(userId)
+                .orElseThrow(() -> new ApplicationException(
+                        UserErrorCode.USER_NOT_FOUND,
+                        UserDetailMessageKey.USER_ID_NOT_FOUND,
+                        userId
+                ));
+        List<String> roleNames = roleRepositoryPort.findRoleNamesByUserId(userId);
+        String avatarObjectKey = fileRepositoryPort.findObjectKeyById(user.getAvatarFileId());
+        return userResultMapper.domainToResult(user, roleNames, avatarObjectKey);
     }
 
     @Override
@@ -60,20 +76,18 @@ public class AuthInputUseCase implements AuthInputPort {
         User user = userRepositoryPort.findByUsernameOrEmail(command.usernameOrEmail())
                 .orElseThrow(() -> new ApplicationException(
                         UserErrorCode.USER_LOGIN_FAILED,
-                        UserDetailMessageKey.USER_WRONG_LOGIN_INFO
-                ));
+                        UserDetailMessageKey.USER_WRONG_LOGIN_INFO));
 
         if (!encoderPort.matches(command.rawPassword(), user.getHashPassword())) {
             throw new ApplicationException(
                     UserErrorCode.USER_LOGIN_FAILED,
-                    UserDetailMessageKey.USER_WRONG_LOGIN_INFO
-            );
+                    UserDetailMessageKey.USER_WRONG_LOGIN_INFO);
         }
+
         if (!user.isActive()) {
             throw new ApplicationException(
                     UserErrorCode.USER_LOGIN_FAILED,
-                    UserDetailMessageKey.USER_ACCOUNT_NOT_ACTIVE
-            );
+                    UserDetailMessageKey.USER_ACCOUNT_NOT_ACTIVE);
         }
 
         if (command.deviceId() != null && !command.deviceId().isBlank()) {
@@ -81,14 +95,14 @@ public class AuthInputUseCase implements AuthInputPort {
                     user.getId(),
                     command.deviceId(),
                     Instant.now(),
-                    SessionRevokedReason.LOGIN_AGAIN
-            );
+                    SessionRevokedReason.LOGIN_AGAIN);
         }
 
         TokenResult refreshToken = tokenServicePort.generateRefreshToken();
 
         String hashRefreshToken = encoderPort.hashRefreshToken(refreshToken.value());
 
+        Instant now = Instant.now();
         UserSession userSession = UserSession.builder()
                 .userId(user.getId())
                 .hashRefreshToken(hashRefreshToken)
@@ -97,25 +111,14 @@ public class AuthInputUseCase implements AuthInputPort {
                 .deviceType(command.deviceType())
                 .userAgent(command.userAgent())
                 .ipAddress(command.ipAddress())
-                .issuedAt(Instant.now())
+                .issuedAt(now)
                 .expiresAt(refreshToken.expiresAt())
-                .lastUsedAt(Instant.now())
+                .lastUsedAt(now)
                 .build();
 
         UserSession savedUserSession = userSessionRepositoryPort.save(userSession);
 
-        List<String> roleNames = roleRepositoryPort.findRoleNamesByUserId(user.getId());
-        String avatarObjectKey = fileRepositoryPort.findObjectKeyById(user.getAvatarFileId());
-
-        TokenResult accessToken = tokenServicePort.generateAccessToken(user, roleNames, savedUserSession);
-
-        UserResult userResult = userResultMapper.domainToResult(user, roleNames, avatarObjectKey);
-
-        return new LoginResult(
-                userResult,
-                accessToken,
-                refreshToken
-        );
+        return authUseCaseHelper.buildLoginResult(refreshToken, savedUserSession);
     }
 
     @Override
@@ -123,8 +126,7 @@ public class AuthInputUseCase implements AuthInputPort {
         if (command == null || command.userId() == null || command.userSessionId() == null) {
             throw new ApplicationException(
                     UserErrorCode.USER_UNAUTHORIZED,
-                    UserTitleMessageKey.USER_UNAUTHORIZED_TITLE
-            );
+                    UserTitleMessageKey.USER_UNAUTHORIZED_TITLE);
         }
         userSessionRepositoryPort.revokeActiveSessionsByUserIdAndUserSessionId(
                 command.userId(),
@@ -132,5 +134,65 @@ public class AuthInputUseCase implements AuthInputPort {
                 Instant.now(),
                 SessionRevokedReason.USER_LOGOUT
         );
+    }
+
+    @Override
+    public LoginResult rotateToken(String refreshToken) {
+        String hashRefreshToken = encoderPort.hashRefreshToken(refreshToken);
+        UserSession userSession = userSessionRepositoryPort.findByHashRefreshToken(hashRefreshToken);
+        Instant now = Instant.now();
+
+        if (userSession.isExpired()) {
+            userSession.setRevokedAt(now);
+            userSession.setRevokedReason(SessionRevokedReason.EXPIRED);
+            userSessionRepositoryPort.save(userSession);
+
+            throw new ApplicationException(
+                    UserErrorCode.USER_INVALID_REFRESH_TOKEN,
+                    UserDetailMessageKey.USER_REFRESH_TOKEN_EXPIRED
+            );
+        }
+
+        if (userSession.isRevoked()) {
+            userSession.setRevokedReason(SessionRevokedReason.TOKEN_REUSE_DETECTED);
+            userSessionRepositoryPort.save(userSession);
+
+            throw new ApplicationException(
+                    UserErrorCode.USER_INVALID_REFRESH_TOKEN,
+                    UserDetailMessageKey.USER_REFRESH_TOKEN_REVOKED
+            );
+        }
+
+        return transactionPort.execute(() -> doRotateToken(userSession, now));
+    }
+
+    private LoginResult doRotateToken(UserSession userSession, Instant now) {
+        // revoke old refresh token
+        userSession.setRevokedReason(SessionRevokedReason.ROTATED);
+        userSession.setRevokedAt(now);
+        userSession.setLastUsedAt(now);
+        userSessionRepositoryPort.save(userSession);
+
+        // generate new refresh token and new user session
+        TokenResult newRefreshToken = tokenServicePort.generateRefreshToken();
+
+        String newHashRefreshToken = encoderPort.hashRefreshToken(newRefreshToken.value());
+
+        UserSession newUserSession = UserSession.builder()
+                .userId(userSession.getUserId())
+                .hashRefreshToken(newHashRefreshToken)
+                .deviceId(userSession.getDeviceId())
+                .deviceName(userSession.getDeviceName())
+                .deviceType(userSession.getDeviceType())
+                .userAgent(userSession.getUserAgent())
+                .ipAddress(userSession.getIpAddress())
+                .issuedAt(now)
+                .expiresAt(newRefreshToken.expiresAt())
+                .lastUsedAt(now)
+                .build();
+
+        UserSession savedUserSession = userSessionRepositoryPort.save(newUserSession);
+
+        return authUseCaseHelper.buildLoginResult(newRefreshToken, savedUserSession);
     }
 }

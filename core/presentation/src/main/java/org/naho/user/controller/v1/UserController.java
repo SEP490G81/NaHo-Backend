@@ -1,9 +1,9 @@
 package org.naho.user.controller.v1;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.user.command.RegisterCommand;
-import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.user.dto.mapper.RegisterRequestMapper;
 import org.naho.user.dto.mapper.RegisterResponseMapper;
 import org.naho.user.dto.mapper.UserResponseMapper;

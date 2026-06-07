@@ -8,5 +8,6 @@ public enum SessionRevokedReason {
     PASSWORD_CHANGED,
     ADMIN_REVOKED,
     TOKEN_REUSE_DETECTED,
-    EXPIRED
+    EXPIRED,
+    ROTATED
 }

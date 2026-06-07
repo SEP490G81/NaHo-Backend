@@ -3,7 +3,9 @@ package org.naho.user.result;
 import java.time.Instant;
 
 public record TokenResult(
+        String tokenName,
         String value,
-        Instant expiresAt
+        Instant expiresAt,
+        Long expiresIn
 ) {
 }
