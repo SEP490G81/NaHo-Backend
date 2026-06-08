@@ -35,6 +35,10 @@ public enum UserErrorCode implements ErrorCode {
     USER_PERSIST_FAILED(
             "USER_A008",
             UserTitleMessageKey.USER_PERSIST_FAILED_TITLE
+    ),
+    USER_INVALID_REFRESH_TOKEN(
+            "USER_A009",
+            UserTitleMessageKey.USER_INVALID_REFRESH_TOKEN_TITLE
     );
 
     private final String code;

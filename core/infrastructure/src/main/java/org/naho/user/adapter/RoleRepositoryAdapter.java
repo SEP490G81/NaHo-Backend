@@ -1,6 +1,7 @@
 package org.naho.user.adapter;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.user.entity.RoleEntity;
 import org.naho.user.mapper.RoleEntityMapper;
 import org.naho.user.model.Role;
 import org.naho.user.mybatis.RoleQueryMapper;
@@ -27,7 +28,8 @@ public class RoleRepositoryAdapter implements RoleRepositoryPort {
 
     @Override
     public Optional<Role> findByName(RoleName roleName) {
-        return roleQueryMapper.findByName(roleName);
+        RoleEntity roleEntity = roleQueryMapper.findByName(roleName);
+        return Optional.ofNullable(roleEntityMapper.entityToDomain(roleEntity));
     }
 
     @Override

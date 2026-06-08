@@ -60,6 +60,15 @@ services:
 
       AZURE_SPEECH_KEY: ${AZURE_SPEECH_KEY}
 
+      AWS_PROFILE: mfa
+
+    # bind mount
+    # cú pháp: host_path:container_path:mode
+    # ${USERPROFILE} = C:/Users/Admin
+    # ro nghĩa là ReadOnly
+    volumes:
+      - ${USERPROFILE}/.aws:/home/spring/.aws:ro
+
     depends_on:
       - mysql
       - redis

@@ -18,6 +18,7 @@ COPY core/domain/build.gradle.kts ./core/domain/
 COPY core/application/build.gradle.kts ./core/application/
 COPY core/infrastructure/build.gradle.kts ./core/infrastructure/
 COPY core/presentation/build.gradle.kts ./core/presentation/
+COPY core/common/build.gradle.kts ./core/common/
 COPY core/bootstrap/build.gradle.kts ./core/bootstrap/
 
 # preload dependencies

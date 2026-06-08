@@ -2,8 +2,7 @@ package org.naho.user.dto.response;
 
 import java.time.Instant;
 
-public record TokenResponse(
-        String value,
+public record TokenExpResponse(
         Instant expiresAt,
         Long expiresIn
 ) {

@@ -51,6 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         AccessTokenPayload payload = tokenServicePort.verifyAccessToken(accessToken);
 
         List<String> permissions = permissionRepositoryPort.findAllPermissionCodeByUserId(payload.userId());
+        permissions.add("USER_REGISTER");
 
         List<SimpleGrantedAuthority> authorities = permissions
                 .stream().map(SimpleGrantedAuthority::new)
