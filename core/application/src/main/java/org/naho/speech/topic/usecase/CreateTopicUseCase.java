@@ -20,15 +20,6 @@ public class CreateTopicUseCase implements CreateTopicInputPort {
 
     @Override
     public TopicResult createTopic(CreateTopicCommand command) {
-        // Validation
-        if (command.name() == null || command.name().isBlank()) {
-            throw new ApplicationException(TopicErrorCode.TOPIC_NAME_EMPTY, TopicDetailMessageKey.TOPIC_NAME_EMPTY);
-        }
-
-        if (command.description() == null || command.description().isBlank()) {
-            throw new ApplicationException(TopicErrorCode.TOPIC_DESCRIPTION_EMPTY, TopicDetailMessageKey.TOPIC_DESCRIPTION_EMPTY);
-        }
-
         // Validation for duplicate in JLPT level
         if (topicRepositoryPort.existsByNameAndJlptLevel(command.name(), command.jlptLevel())) {
             throw new ApplicationException(TopicErrorCode.TOPIC_ALREADY_EXISTS_IN_LEVEL, TopicDetailMessageKey.TOPIC_ALREADY_EXISTS_IN_LEVEL);

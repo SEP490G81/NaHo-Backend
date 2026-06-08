@@ -1,5 +1,8 @@
 package org.naho.speech.model;
 
+import org.naho.i18n.message.speech.TopicDetailMessageKey;
+import org.naho.speech.exception.DomainException;
+import org.naho.speech.exception.TopicDomainErrorCode;
 import org.naho.speech.type.TopicStatus;
 import org.naho.user.type.JLPTLevel;
 
@@ -14,6 +17,7 @@ public class Topic {
     private final JLPTLevel jlptLevel;
     private final Double orderIndex;
     private final Long userId;
+
 
     // Private constructor dùng cho Builder
     private Topic(Builder builder) {
@@ -31,6 +35,24 @@ public class Topic {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    private void validateName(String name) {
+        if (name == null || name.isBlank()) {
+            throw new DomainException(
+                    TopicDomainErrorCode.TOPIC_NAME_EMPTY,
+                    TopicDetailMessageKey.TOPIC_NAME_EMPTY
+            );
+        }
+    }
+
+    private void validateDescription(String description) {
+        if (description == null || description.isBlank()) {
+            throw new DomainException(
+                    TopicDomainErrorCode.TOPIC_DESCRIPTION_EMPTY,
+                    TopicDetailMessageKey.TOPIC_DESCRIPTION_EMPTY
+            );
+        }
     }
 
     // Getter
@@ -138,7 +160,10 @@ public class Topic {
         }
 
         public Topic build() {
-            return new Topic(this);
+            Topic topic = new Topic(this);
+            topic.validateName(topic.getName());
+            topic.validateDescription(topic.getDescription());
+            return topic;
         }
     }
 }

@@ -3,6 +3,7 @@ package org.naho.speech.topic.controller.v1;
 import lombok.RequiredArgsConstructor;
 import org.naho.i18n.message.speech.TopicDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
+import org.naho.speech.topic.command.ListTopicCommand;
 import org.naho.speech.topic.dto.mapper.TopicRequestMapper;
 import org.naho.speech.topic.dto.mapper.TopicResponseMapper;
 import org.naho.speech.topic.dto.request.CreateTopicRequest;
@@ -10,15 +11,18 @@ import org.naho.speech.topic.dto.response.TopicListItemResponse;
 import org.naho.speech.topic.dto.response.TopicResponse;
 import org.naho.speech.topic.port.in.CreateTopicInputPort;
 import org.naho.speech.topic.port.in.ListTopicUseCasePort;
-import org.naho.speech.topic.query.ListTopicQuery;
 import org.naho.speech.topic.result.TopicListResult;
 import org.naho.speech.topic.result.TopicResult;
 import org.naho.speech.type.TopicStatus;
+import org.naho.user.port.out.RoleRepositoryPort;
+import org.naho.user.result.AccessTokenPayload;
 import org.naho.user.type.JLPTLevel;
+import org.naho.user.type.RoleName;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,19 +35,21 @@ public class TopicController {
     private final CreateTopicInputPort createTopicInputPort;
     private final TopicRequestMapper topicRequestMapper;
     private final TopicResponseMapper topicResponseMapper;
+    private final RoleRepositoryPort roleRepositoryPort;
 
     private final ListTopicUseCasePort listTopicUseCasePort;
 
     @PostMapping
     @ApiResponseMessage(message = TopicDetailMessageKey.TOPIC_CREATION_SUCCESS)
-    public ResponseEntity<TopicResponse> createTopic(@RequestBody CreateTopicRequest request) {
-//         TODO: Lay ID nguoi dung dang dang nhap tu token (tam thoi gan bang 1L)
-        Long userId = 1L;
+    public ResponseEntity<TopicResponse> createTopic(
+            @RequestBody CreateTopicRequest request,
+            @AuthenticationPrincipal AccessTokenPayload payload
+    ) {
+        Long userId = payload.userId();
 
         var command = topicRequestMapper.toCommand(request, userId);
         TopicResult result = createTopicInputPort.createTopic(command);
         TopicResponse response = topicResponseMapper.resultToResponse(result);
-
 
         return ResponseEntity.ok(response);
     }
@@ -57,11 +63,14 @@ public class TopicController {
             @RequestParam(name = "jlptLevel", required = false) JLPTLevel jlptLevel,
             @RequestParam(name = "sortBy", defaultValue = "order_index") String sortBy,
             @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection,
-            @RequestHeader(name = "X-Role", defaultValue = "USER") String role
+            @AuthenticationPrincipal AccessTokenPayload payload
+//            @RequestHeader(name = "X-Role", defaultValue = "USER") String role
     ) {
-        boolean isAdmin = "ADMIN".equalsIgnoreCase(role);
 
-        ListTopicQuery query = new ListTopicQuery(
+        List<String> roleSet = roleRepositoryPort.findRoleNamesByUserId(payload.userId());
+        boolean isAdmin = roleSet.contains(RoleName.ADMIN.name());
+
+        ListTopicCommand query = new ListTopicCommand(
                 page, size, keyword, status, jlptLevel, sortBy, sortDirection, isAdmin
         );
 
