@@ -7,20 +7,21 @@ import org.naho.speech.topic.command.ListTopicCommand;
 import org.naho.speech.topic.dto.mapper.TopicRequestMapper;
 import org.naho.speech.topic.dto.mapper.TopicResponseMapper;
 import org.naho.speech.topic.dto.request.CreateTopicRequest;
+import org.naho.speech.topic.dto.request.TopicFilterRequest;
+import org.naho.speech.topic.dto.response.CreateTopicResponse;
 import org.naho.speech.topic.dto.response.TopicListItemResponse;
-import org.naho.speech.topic.dto.response.TopicResponse;
 import org.naho.speech.topic.port.in.CreateTopicInputPort;
-import org.naho.speech.topic.port.in.ListTopicUseCasePort;
+import org.naho.speech.topic.port.in.ListTopicInputPort;
+import org.naho.speech.topic.result.CreateTopicResult;
 import org.naho.speech.topic.result.TopicListResult;
-import org.naho.speech.topic.result.TopicResult;
-import org.naho.speech.type.TopicStatus;
 import org.naho.user.port.out.RoleRepositoryPort;
 import org.naho.user.result.AccessTokenPayload;
-import org.naho.user.type.JLPTLevel;
 import org.naho.user.type.RoleName;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -37,54 +38,39 @@ public class TopicController {
     private final TopicResponseMapper topicResponseMapper;
     private final RoleRepositoryPort roleRepositoryPort;
 
-    private final ListTopicUseCasePort listTopicUseCasePort;
+    private final ListTopicInputPort listTopicInputPort;
 
+    // CREATE TOPIC
     @PostMapping
     @ApiResponseMessage(message = TopicDetailMessageKey.TOPIC_CREATION_SUCCESS)
-    public ResponseEntity<TopicResponse> createTopic(
+    public ResponseEntity<CreateTopicResponse> createTopic(
             @RequestBody CreateTopicRequest request,
             @AuthenticationPrincipal AccessTokenPayload payload
     ) {
         Long userId = payload.userId();
 
         var command = topicRequestMapper.toCommand(request, userId);
-        TopicResult result = createTopicInputPort.createTopic(command);
-        TopicResponse response = topicResponseMapper.resultToResponse(result);
+        CreateTopicResult result = createTopicInputPort.createTopic(command);
+        CreateTopicResponse response = topicResponseMapper.resultToResponse(result);
 
         return ResponseEntity.ok(response);
     }
 
+    // GET LIST TOPIC
     @GetMapping
     public ResponseEntity<Page<TopicListItemResponse>> listTopics(
-            @RequestParam(name = "page", defaultValue = "1") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size,
-            @RequestParam(name = "keyword", required = false) String keyword,
-            @RequestParam(name = "status", required = false) TopicStatus status,
-            @RequestParam(name = "jlptLevel", required = false) JLPTLevel jlptLevel,
-            @RequestParam(name = "sortBy", defaultValue = "order_index") String sortBy,
-            @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection,
+            @ModelAttribute TopicFilterRequest filter,
+            @PageableDefault(page = 0, size = 10, sort = "order_index", direction = Sort.Direction.ASC) Pageable pageable,
             @AuthenticationPrincipal AccessTokenPayload payload
-//            @RequestHeader(name = "X-Role", defaultValue = "USER") String role
     ) {
-
         List<String> roleSet = roleRepositoryPort.findRoleNamesByUserId(payload.userId());
-        boolean isAdmin = roleSet.contains(RoleName.ADMIN.name());
+        boolean isAdmin = roleSet.contains(RoleName.ADMIN.name()) ||
+                roleSet.contains(RoleName.CONTENT_MANAGER.name());
 
-        ListTopicCommand query = new ListTopicCommand(
-                page, size, keyword, status, jlptLevel, sortBy, sortDirection, isAdmin
-        );
-
-        TopicListResult result = listTopicUseCasePort.listTopics(query);
+        ListTopicCommand query = topicRequestMapper.toListCommand(filter, pageable, isAdmin);
+        TopicListResult result = listTopicInputPort.listTopics(query);
         List<TopicListItemResponse> items = topicResponseMapper.listResultToResponse(result.items());
 
-        // We wrap it in a pseudo Page to utilize ApiResponseHandler's pagination capability
-        Page<TopicListItemResponse> pageResult =
-                new PageImpl<>(
-                        items,
-                        PageRequest.of(query.page() - 1, query.size()),
-                        result.totalElements()
-                );
-
-        return ResponseEntity.ok(pageResult);
+        return ResponseEntity.ok(new PageImpl<>(items, pageable, result.totalElements()));
     }
 }

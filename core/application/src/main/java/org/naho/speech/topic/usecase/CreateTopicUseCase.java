@@ -7,7 +7,7 @@ import org.naho.speech.topic.command.CreateTopicCommand;
 import org.naho.speech.topic.exception.TopicErrorCode;
 import org.naho.speech.topic.port.in.CreateTopicInputPort;
 import org.naho.speech.topic.port.out.TopicRepositoryPort;
-import org.naho.speech.topic.result.TopicResult;
+import org.naho.speech.topic.result.CreateTopicResult;
 import org.naho.speech.type.TopicStatus;
 
 public class CreateTopicUseCase implements CreateTopicInputPort {
@@ -19,7 +19,7 @@ public class CreateTopicUseCase implements CreateTopicInputPort {
     }
 
     @Override
-    public TopicResult createTopic(CreateTopicCommand command) {
+    public CreateTopicResult createTopic(CreateTopicCommand command) {
         // Validation for duplicate in JLPT level
         if (topicRepositoryPort.existsByNameAndJlptLevel(command.name(), command.jlptLevel())) {
             throw new ApplicationException(TopicErrorCode.TOPIC_ALREADY_EXISTS_IN_LEVEL, TopicDetailMessageKey.TOPIC_ALREADY_EXISTS_IN_LEVEL);
@@ -48,7 +48,7 @@ public class CreateTopicUseCase implements CreateTopicInputPort {
 
         Topic savedTopic = topicRepositoryPort.save(topic);
 
-        return new TopicResult(
+        return new CreateTopicResult(
                 savedTopic.getId(),
                 savedTopic.getUserId(),
                 savedTopic.getName(),

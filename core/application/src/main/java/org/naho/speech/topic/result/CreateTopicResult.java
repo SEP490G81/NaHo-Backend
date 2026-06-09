@@ -3,7 +3,7 @@ package org.naho.speech.topic.result;
 import org.naho.speech.type.TopicStatus;
 import org.naho.user.type.JLPTLevel;
 
-public record TopicResult(
+public record CreateTopicResult(
         Long id,
         Long userId,
         String japaneseName,

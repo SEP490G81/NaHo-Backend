@@ -1,7 +1,7 @@
 package org.naho.speech.topic.usecase;
 
 import org.naho.speech.topic.command.ListTopicCommand;
-import org.naho.speech.topic.port.in.ListTopicUseCasePort;
+import org.naho.speech.topic.port.in.ListTopicInputPort;
 import org.naho.speech.topic.port.out.TopicListRepositoryPort;
 import org.naho.speech.topic.result.TopicListItemResult;
 import org.naho.speech.topic.result.TopicListResult;
@@ -9,11 +9,11 @@ import org.naho.speech.type.TopicStatus;
 
 import java.util.List;
 
-public class ListTopicUseCase implements ListTopicUseCasePort {
+public class ListTopicInput implements ListTopicInputPort {
 
     private final TopicListRepositoryPort topicListRepositoryPort;
 
-    public ListTopicUseCase(TopicListRepositoryPort topicListRepositoryPort) {
+    public ListTopicInput(TopicListRepositoryPort topicListRepositoryPort) {
         this.topicListRepositoryPort = topicListRepositoryPort;
     }
 

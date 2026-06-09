@@ -1,8 +1,8 @@
 package org.naho.speech.topic.port.in;
 
 import org.naho.speech.topic.command.CreateTopicCommand;
-import org.naho.speech.topic.result.TopicResult;
+import org.naho.speech.topic.result.CreateTopicResult;
 
 public interface CreateTopicInputPort {
-    TopicResult createTopic(CreateTopicCommand command);
+    CreateTopicResult createTopic(CreateTopicCommand command);
 }
