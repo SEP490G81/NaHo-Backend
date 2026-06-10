@@ -1,6 +1,5 @@
 package org.naho.user.model;
 
-import org.naho.user.type.DeviceType;
 import org.naho.user.type.SessionRevokedReason;
 
 import java.time.Instant;
@@ -11,8 +10,6 @@ public class UserSession {
     private Long userId;
     private String hashRefreshToken;
     private String deviceId;
-    private String deviceName;
-    private DeviceType deviceType;
     private String userAgent;
     private String ipAddress;
     private Instant issuedAt;
@@ -47,8 +44,6 @@ public class UserSession {
         this.userId = builder.userId;
         this.hashRefreshToken = builder.hashRefreshToken;
         this.deviceId = builder.deviceId;
-        this.deviceName = builder.deviceName;
-        this.deviceType = builder.deviceType;
         this.userAgent = builder.userAgent;
         this.ipAddress = builder.ipAddress;
         this.issuedAt = builder.issuedAt;
@@ -65,13 +60,10 @@ public class UserSession {
 
     // Builder class
     public static class Builder {
-
         private Long id;
         private Long userId;
         private String hashRefreshToken;
         private String deviceId;
-        private String deviceName;
-        private DeviceType deviceType;
         private String userAgent;
         private String ipAddress;
         private Instant issuedAt;
@@ -97,16 +89,6 @@ public class UserSession {
 
         public Builder deviceId(String deviceId) {
             this.deviceId = deviceId;
-            return this;
-        }
-
-        public Builder deviceName(String deviceName) {
-            this.deviceName = deviceName;
-            return this;
-        }
-
-        public Builder deviceType(DeviceType deviceType) {
-            this.deviceType = deviceType;
             return this;
         }
 
@@ -166,15 +148,7 @@ public class UserSession {
     public String getDeviceId() {
         return deviceId;
     }
-
-    public String getDeviceName() {
-        return deviceName;
-    }
-
-    public DeviceType getDeviceType() {
-        return deviceType;
-    }
-
+    
     public String getUserAgent() {
         return userAgent;
     }

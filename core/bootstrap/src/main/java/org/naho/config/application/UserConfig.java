@@ -9,9 +9,15 @@ import org.naho.user.port.out.*;
 import org.naho.user.usecase.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import ua_parser.Parser;
 
 @Configuration
 public class UserConfig {
+    @Bean
+    public Parser parser() {
+        return new Parser();
+    }
+
     @Bean
     public UserResultMapper userResultMapper() {
         return new UserResultMapper();

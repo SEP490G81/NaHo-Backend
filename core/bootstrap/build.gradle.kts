@@ -33,7 +33,7 @@ dependencies {
 
     // log4j2
     implementation("org.springframework.boot:spring-boot-starter-log4j2")
-    runtimeOnly("org.apache.logging.log4j:log4j-layout-template-json:2.25.4")
+    runtimeOnly("org.apache.logging.log4j:log4j-layout-template-json")
 
     modules {
         module("org.springframework.boot:spring-boot-starter-logging") {
@@ -56,6 +56,9 @@ dependencies {
 
     // s3
     implementation("software.amazon.awssdk:s3:2.46.0")
+
+    // UA-parser (User Agent)
+    implementation("com.github.ua-parser:uap-java:1.6.1")
 
     // other
     testImplementation("org.testcontainers:mysql:1.21.4")

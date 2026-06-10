@@ -3,7 +3,6 @@ package org.naho.user.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.naho.user.type.DeviceType;
 import org.naho.user.type.SessionRevokedReason;
 
 import java.time.Instant;
@@ -20,7 +19,7 @@ public class UserSessionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-    
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     UserEntity user;
@@ -30,13 +29,6 @@ public class UserSessionEntity {
 
     @Column(name = "device_id", length = 100)
     String deviceId;
-
-    @Column(name = "device_name")
-    String deviceName;
-
-    @Column(name = "device_type", length = 50)
-    @Enumerated(EnumType.STRING)
-    DeviceType deviceType;
 
     @Column(name = "user_agent", columnDefinition = "TEXT")
     String userAgent;

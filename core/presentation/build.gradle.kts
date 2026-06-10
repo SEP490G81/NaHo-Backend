@@ -54,6 +54,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     testImplementation("org.springframework.security:spring-security-test")
 
+    // UA-parser (User Agent)
+    implementation("com.github.ua-parser:uap-java:1.6.1")
+
     // other
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")

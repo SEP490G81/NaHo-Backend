@@ -87,4 +87,7 @@ public final class UserDetailMessageKey {
 
     public static final String USER_GET_SUCCESSFULLY =
             "user.get.successfully";
+
+    public static final String USER_LOGOUT_ALL_SUCCESSFULLY =
+            "user.logout.all.successfully";
 }

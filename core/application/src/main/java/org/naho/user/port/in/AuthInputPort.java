@@ -13,4 +13,6 @@ public interface AuthInputPort {
     LoginResult rotateToken(String refreshToken);
 
     UserResult findUserById(Long userId);
+
+    void logoutAllSessions(Long userId);
 }
