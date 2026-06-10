@@ -1,5 +1,6 @@
 package org.naho.user.controller.v1;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
@@ -11,6 +12,7 @@ import org.naho.user.dto.mapper.UserResponseMapper;
 import org.naho.user.dto.request.CredentialsLoginRequest;
 import org.naho.user.dto.response.UserResponse;
 import org.naho.user.helper.CookieFactory;
+import org.naho.user.helper.LoginRequestResolver;
 import org.naho.user.port.in.AuthInputPort;
 import org.naho.user.result.AccessTokenPayload;
 import org.naho.user.result.LoginResult;
@@ -29,6 +31,7 @@ public class AuthController {
     private final LoginRequestMapper loginRequestMapper;
     private final CookieFactory cookieFactory;
     private final UserResponseMapper userResponseMapper;
+    private final LoginRequestResolver loginRequestResolver;
 
     @ApiResponseMessage(message = UserDetailMessageKey.USER_GET_SUCCESSFULLY)
     @GetMapping("/me")
@@ -44,8 +47,12 @@ public class AuthController {
     @ApiResponseMessage(message = UserDetailMessageKey.USER_LOGIN_SUCCESSFULLY)
     @PostMapping("/login")
     public ResponseEntity<Void> credentialsLogin(
-            @RequestBody CredentialsLoginRequest request
+            @RequestBody CredentialsLoginRequest request,
+            HttpServletRequest httpServletRequest
     ) {
+        request.setIpAddress(loginRequestResolver.getIpAddress(httpServletRequest));
+        request.setUserAgent(loginRequestResolver.getUserAgent(httpServletRequest));
+
         CredentialsLoginCommand command = loginRequestMapper.requestToCommand(request);
         LoginResult result = authInputPort.credentialsLogin(command);
 
@@ -70,6 +77,26 @@ public class AuthController {
                 payload.userId(),
                 payload.userSessionId()
         ));
+
+        ResponseCookie clearAccessTokenCookie =
+                cookieFactory.clearCookieForJWTToken(TokenType.ACCESS_TOKEN_NAME);
+
+        ResponseCookie clearRefreshTokenCookie =
+                cookieFactory.clearCookieForJWTToken(TokenType.REFRESH_TOKEN_NAME);
+
+        return ResponseEntity
+                .noContent()
+                .header(HttpHeaders.SET_COOKIE, clearAccessTokenCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, clearRefreshTokenCookie.toString())
+                .build();
+    }
+
+    @ApiResponseMessage(message = UserDetailMessageKey.USER_LOGOUT_ALL_SUCCESSFULLY)
+    @PostMapping("/logout-all")
+    public ResponseEntity<Void> logoutAllSessions(
+            @AuthenticationPrincipal AccessTokenPayload payload
+    ) {
+        authInputPort.logoutAllSessions(payload.userId());
 
         ResponseCookie clearAccessTokenCookie =
                 cookieFactory.clearCookieForJWTToken(TokenType.ACCESS_TOKEN_NAME);

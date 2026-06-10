@@ -22,4 +22,13 @@
           and revoked_at is null
           and expires_at > #{revokedAt}
     </update>
+
+    <update id="revokeAllActiveSessionsByUserId">
+        update user_sessions
+        set revoked_at     = #{revokedAt},
+            revoked_reason = #{reason}
+        where user_id = #{userId}
+          and revoked_at is null
+          and expires_at > #{revokedAt}
+    </update>
 </mapper>

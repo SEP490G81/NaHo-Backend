@@ -44,7 +44,7 @@ bin/
 **/*-local.yaml
 **/*-local.yml
 **/*-local.properties
-.env
+../.env
 .env.local
 .env.*.local
 

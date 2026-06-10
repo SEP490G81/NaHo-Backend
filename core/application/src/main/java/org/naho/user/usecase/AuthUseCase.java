@@ -42,7 +42,8 @@ public class AuthUseCase implements AuthInputPort {
             RoleRepositoryPort roleRepositoryPort,
             FileRepositoryPort fileRepositoryPort,
             TransactionPort transactionPort,
-            AuthUseCaseHelper authUseCaseHelper) {
+            AuthUseCaseHelper authUseCaseHelper
+    ) {
         this.userRepositoryPort = userRepositoryPort;
         this.encoderPort = encoderPort;
         this.tokenServicePort = tokenServicePort;
@@ -65,6 +66,21 @@ public class AuthUseCase implements AuthInputPort {
         List<String> roleNames = roleRepositoryPort.findRoleNamesByUserId(userId);
         String avatarObjectKey = fileRepositoryPort.findObjectKeyById(user.getAvatarFileId());
         return userResultMapper.domainToResult(user, roleNames, avatarObjectKey);
+    }
+
+    @Override
+    public void logoutAllSessions(Long userId) {
+        if (userId == null) {
+            throw new ApplicationException(
+                    UserErrorCode.USER_UNAUTHORIZED,
+                    UserDetailMessageKey.USER_UNAUTHORIZED
+            );
+        }
+        userSessionRepositoryPort.revokeAllActiveSessionsByUserId(
+                userId,
+                Instant.now(),
+                SessionRevokedReason.USER_LOGOUT_ALL
+        );
     }
 
     @Override
@@ -107,8 +123,6 @@ public class AuthUseCase implements AuthInputPort {
                 .userId(user.getId())
                 .hashRefreshToken(hashRefreshToken)
                 .deviceId(command.deviceId())
-                .deviceName(command.deviceName())
-                .deviceType(command.deviceType())
                 .userAgent(command.userAgent())
                 .ipAddress(command.ipAddress())
                 .issuedAt(now)
@@ -142,26 +156,7 @@ public class AuthUseCase implements AuthInputPort {
         UserSession userSession = userSessionRepositoryPort.findByHashRefreshToken(hashRefreshToken);
         Instant now = Instant.now();
 
-        if (userSession.isExpired()) {
-            userSession.setRevokedAt(now);
-            userSession.setRevokedReason(SessionRevokedReason.EXPIRED);
-            userSessionRepositoryPort.save(userSession);
-
-            throw new ApplicationException(
-                    UserErrorCode.USER_INVALID_REFRESH_TOKEN,
-                    UserDetailMessageKey.USER_REFRESH_TOKEN_EXPIRED
-            );
-        }
-
-        if (userSession.isRevoked()) {
-            userSession.setRevokedReason(SessionRevokedReason.TOKEN_REUSE_DETECTED);
-            userSessionRepositoryPort.save(userSession);
-
-            throw new ApplicationException(
-                    UserErrorCode.USER_INVALID_REFRESH_TOKEN,
-                    UserDetailMessageKey.USER_REFRESH_TOKEN_REVOKED
-            );
-        }
+        userSessionRepositoryPort.verifyUserSession(userSession, now);
 
         return transactionPort.execute(() -> doRotateToken(userSession, now));
     }
@@ -182,8 +177,6 @@ public class AuthUseCase implements AuthInputPort {
                 .userId(userSession.getUserId())
                 .hashRefreshToken(newHashRefreshToken)
                 .deviceId(userSession.getDeviceId())
-                .deviceName(userSession.getDeviceName())
-                .deviceType(userSession.getDeviceType())
                 .userAgent(userSession.getUserAgent())
                 .ipAddress(userSession.getIpAddress())
                 .issuedAt(now)

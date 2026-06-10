@@ -21,4 +21,10 @@ public interface UserSessionQueryMapper {
             @Param("revokedAt") Instant revokedAt,
             @Param("reason") SessionRevokedReason reason
     );
+
+    void revokeAllActiveSessionsByUserId(
+            @Param("userId") Long userId,
+            @Param("revokedAt") Instant revokedAt,
+            @Param("reason") SessionRevokedReason reason
+    );
 }

@@ -3,7 +3,7 @@ package org.naho.user.type;
 public enum SessionRevokedReason {
     LOGIN_AGAIN,
     USER_LOGOUT,
-    LOGOUT_ALL,
+    USER_LOGOUT_ALL,
     LOGOUT_OTHERS,
     PASSWORD_CHANGED,
     ADMIN_REVOKED,

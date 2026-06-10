@@ -3,10 +3,13 @@ package org.naho.user.adapter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.naho.i18n.message.user.UserDetailMessageKey;
+import org.naho.i18n.message.user.UserSessionDetailMessageKey;
+import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.exception.InfrastructureException;
 import org.naho.user.entity.UserEntity;
 import org.naho.user.entity.UserSessionEntity;
 import org.naho.user.exception.UserErrorCode;
+import org.naho.user.exception.UserSessionErrorCode;
 import org.naho.user.mapper.UserSessionEntityMapper;
 import org.naho.user.model.UserSession;
 import org.naho.user.mybatis.UserSessionQueryMapper;
@@ -39,15 +42,46 @@ public class UserSessionRepositoryAdapter implements UserSessionRepositoryPort {
     }
 
     @Override
-    public void revokeActiveSessionsByUserIdAndDeviceId(Long userId, String deviceId, Instant revokedAt,
-            SessionRevokedReason reason) {
-        userSessionQueryMapper.revokeActiveSessionsByUserIdAndDeviceId(userId, deviceId, revokedAt, reason);
+    public void revokeActiveSessionsByUserIdAndDeviceId(
+            Long userId,
+            String deviceId,
+            Instant revokedAt,
+            SessionRevokedReason reason
+    ) {
+        userSessionQueryMapper.revokeActiveSessionsByUserIdAndDeviceId(
+                userId,
+                deviceId,
+                revokedAt,
+                reason
+        );
     }
 
     @Override
-    public void revokeActiveSessionsByUserIdAndUserSessionId(Long userId, Long userSessionId, Instant revokedAt,
-            SessionRevokedReason reason) {
-        userSessionQueryMapper.revokeActiveSessionsByUserIdAndUserSessionId(userId, userSessionId, revokedAt, reason);
+    public void revokeActiveSessionsByUserIdAndUserSessionId(
+            Long userId,
+            Long userSessionId,
+            Instant revokedAt,
+            SessionRevokedReason reason
+    ) {
+        userSessionQueryMapper.revokeActiveSessionsByUserIdAndUserSessionId(
+                userId,
+                userSessionId,
+                revokedAt,
+                reason
+        );
+    }
+
+    @Override
+    public void revokeAllActiveSessionsByUserId(
+            Long userId,
+            Instant revokedAt,
+            SessionRevokedReason reason
+    ) {
+        userSessionQueryMapper.revokeAllActiveSessionsByUserId(
+                userId,
+                revokedAt,
+                reason
+        );
     }
 
     @Override
@@ -58,5 +92,48 @@ public class UserSessionRepositoryAdapter implements UserSessionRepositoryPort {
                         UserErrorCode.USER_INVALID_REFRESH_TOKEN,
                         UserDetailMessageKey.USER_REFRESH_TOKEN_NOT_FOUND));
         return userSessionEntityMapper.entityToDomain(userSessionEntity);
+    }
+
+    @Override
+    public UserSession findBySessionId(Long sessionId) {
+        if (sessionId == null) {
+            throw new InfrastructureException(
+                    UserSessionErrorCode.USER_SESSION_NOT_FOUND,
+                    UserSessionDetailMessageKey.USER_SESSION_ID_NULL
+            );
+        }
+
+        UserSessionEntity userSessionEntity = userSessionJpaRepository
+                .findById(sessionId)
+                .orElseThrow(() -> new InfrastructureException(
+                        UserSessionErrorCode.USER_SESSION_NOT_FOUND,
+                        UserSessionDetailMessageKey.USER_SESSION_ID_NOT_FOUND,
+                        sessionId
+                ));
+        return userSessionEntityMapper.entityToDomain(userSessionEntity);
+    }
+
+    @Override
+    public void verifyUserSession(UserSession userSession, Instant now) {
+        if (userSession.isExpired()) {
+            userSession.setRevokedAt(now);
+            userSession.setRevokedReason(SessionRevokedReason.EXPIRED);
+            this.save(userSession);
+
+            throw new ApplicationException(
+                    UserErrorCode.USER_INVALID_REFRESH_TOKEN,
+                    UserDetailMessageKey.USER_REFRESH_TOKEN_EXPIRED
+            );
+        }
+
+        if (userSession.isRevoked()) {
+            userSession.setRevokedReason(SessionRevokedReason.TOKEN_REUSE_DETECTED);
+            this.save(userSession);
+
+            throw new ApplicationException(
+                    UserErrorCode.USER_INVALID_REFRESH_TOKEN,
+                    UserDetailMessageKey.USER_REFRESH_TOKEN_REVOKED
+            );
+        }
     }
 }

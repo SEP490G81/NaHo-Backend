@@ -147,8 +147,6 @@ CREATE TABLE user_sessions
     user_id            BIGINT                NOT NULL,
     hash_refresh_token VARCHAR(512)          NOT NULL,
     device_id          VARCHAR(100)          NULL,
-    device_name        VARCHAR(255)          NULL,
-    device_type        VARCHAR(50)           NULL,
     user_agent         TEXT                  NULL,
     ip_address         VARCHAR(45)           NULL,
     issued_at          datetime              NOT NULL,
