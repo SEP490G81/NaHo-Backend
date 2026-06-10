@@ -3,14 +3,17 @@ package org.naho.speech.topic.controller.v1;
 import lombok.RequiredArgsConstructor;
 import org.naho.i18n.message.speech.TopicDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
+import org.naho.speech.topic.command.GetTopicDetailCommand;
 import org.naho.speech.topic.command.ListTopicCommand;
 import org.naho.speech.topic.dto.mapper.TopicRequestMapper;
 import org.naho.speech.topic.dto.mapper.TopicResponseMapper;
 import org.naho.speech.topic.dto.request.CreateTopicRequest;
 import org.naho.speech.topic.dto.request.TopicFilterRequest;
 import org.naho.speech.topic.dto.response.CreateTopicResponse;
+import org.naho.speech.topic.dto.response.TopicDetailResponse;
 import org.naho.speech.topic.dto.response.TopicListItemResponse;
 import org.naho.speech.topic.port.in.CreateTopicInputPort;
+import org.naho.speech.topic.port.in.GetTopicDetailInputPort;
 import org.naho.speech.topic.port.in.ListTopicInputPort;
 import org.naho.speech.topic.result.CreateTopicResult;
 import org.naho.speech.topic.result.TopicListResult;
@@ -39,6 +42,7 @@ public class TopicController {
     private final RoleRepositoryPort roleRepositoryPort;
 
     private final ListTopicInputPort listTopicInputPort;
+    private final GetTopicDetailInputPort getTopicDetailInputPort;
 
     // CREATE TOPIC
     @PostMapping
@@ -72,5 +76,17 @@ public class TopicController {
         List<TopicListItemResponse> items = topicResponseMapper.listResultToResponse(result.items());
 
         return ResponseEntity.ok(new PageImpl<>(items, pageable, result.totalElements()));
+    }
+
+
+    // GET TOPIC DETAIL
+    @GetMapping("/{id}")
+    public ResponseEntity<TopicDetailResponse> getTopicDetail(
+            @PathVariable("id") Long id
+    ) {
+        var command = new GetTopicDetailCommand(id);
+        var result = getTopicDetailInputPort.getTopicDetail(command);
+        var response = topicResponseMapper.detailResultToResponse(result);
+        return ResponseEntity.ok(response);
     }
 }

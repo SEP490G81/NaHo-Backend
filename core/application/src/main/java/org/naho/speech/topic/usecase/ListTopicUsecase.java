@@ -9,11 +9,11 @@ import org.naho.speech.type.TopicStatus;
 
 import java.util.List;
 
-public class ListTopicInput implements ListTopicInputPort {
+public class ListTopicUsecase implements ListTopicInputPort {
 
     private final TopicListRepositoryPort topicListRepositoryPort;
 
-    public ListTopicInput(TopicListRepositoryPort topicListRepositoryPort) {
+    public ListTopicUsecase(TopicListRepositoryPort topicListRepositoryPort) {
         this.topicListRepositoryPort = topicListRepositoryPort;
     }
 

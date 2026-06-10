@@ -11,6 +11,8 @@ import org.naho.user.repository.UserJpaRepository;
 import org.naho.user.type.JLPTLevel;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class TopicRepositoryAdapter implements TopicRepositoryPort {
 
@@ -79,5 +81,22 @@ public class TopicRepositoryAdapter implements TopicRepositoryPort {
     @Override
     public Double getMaxOrderIndex() {
         return topicJpaRepository.getMaxOrderIndex();
+    }
+
+
+    @Override
+    public Optional<Topic> findById(Long id) {
+        return topicJpaRepository.findById(id).map(savedEntity -> Topic.builder()
+                .id(savedEntity.getId())
+                .userId(savedEntity.getUser() != null ? savedEntity.getUser().getId() : null)
+                .name(savedEntity.getName())
+                .description(savedEntity.getDescription())
+                .japaneseNameTokens(savedEntity.getJapaneseNameTokens())
+                .japaneseDescriptionTokens(savedEntity.getJapaneseDescriptionTokens())
+                .status(savedEntity.getStatus())
+                .jlptLevel(savedEntity.getJlptLevel())
+                .orderIndex(savedEntity.getOrderIndex())
+                .coverImageFileId(savedEntity.getCoverImageFile() != null ? savedEntity.getCoverImageFile().getId() : null)
+                .build());
     }
 }

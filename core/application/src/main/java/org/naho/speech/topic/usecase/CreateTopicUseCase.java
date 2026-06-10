@@ -22,7 +22,7 @@ public class CreateTopicUseCase implements CreateTopicInputPort {
     public CreateTopicResult createTopic(CreateTopicCommand command) {
         // Validation for duplicate in JLPT level
         if (topicRepositoryPort.existsByNameAndJlptLevel(command.name(), command.jlptLevel())) {
-            throw new ApplicationException(TopicErrorCode.TOPIC_ALREADY_EXISTS_IN_LEVEL, TopicDetailMessageKey.TOPIC_ALREADY_EXISTS_IN_LEVEL);
+            throw new ApplicationException(TopicErrorCode.TOPIC_ALREADY_EXISTS, TopicDetailMessageKey.TOPIC_ALREADY_EXISTS_IN_LEVEL);
         }
 
         // Logic for Order Index

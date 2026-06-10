@@ -8,6 +8,9 @@ import java.net.URI;
 import static org.naho.furigana.exception.FuriganaApplicationErrorCode.FURIGANA_ANALYZE_FAILED;
 import static org.naho.speech.azure.exception.AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID;
 import static org.naho.speech.azure.exception.AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR;
+import static org.naho.speech.exception.TopicDomainErrorCode.TOPIC_DESCRIPTION_EMPTY;
+import static org.naho.speech.exception.TopicDomainErrorCode.TOPIC_NAME_EMPTY;
+import static org.naho.speech.topic.exception.TopicErrorCode.TOPIC_ALREADY_EXISTS;
 import static org.naho.user.exception.UserDomainErrorCode.*;
 import static org.naho.user.exception.UserErrorCode.*;
 
@@ -28,8 +31,11 @@ public class ErrorCodeHttpMapper {
                  USER_NOT_FOUND,
                  SPEECH_AUDIO_NOT_VALID,
                  FURIGANA_ANALYZE_FAILED,
+                 TOPIC_NAME_EMPTY,
+                 TOPIC_DESCRIPTION_EMPTY,
                  USER_LOGIN_FAILED -> HttpStatus.BAD_REQUEST;
-            case USER_ALREADY_EXISTS -> HttpStatus.CONFLICT;
+            case TOPIC_ALREADY_EXISTS,
+                 USER_ALREADY_EXISTS -> HttpStatus.CONFLICT;
             case SPEECH_AZURE_SERVICE_ERROR -> HttpStatus.BAD_GATEWAY;
             case USER_UNAUTHORIZED -> HttpStatus.UNAUTHORIZED;
             case USER_ACCESS_DENIED -> HttpStatus.FORBIDDEN;
