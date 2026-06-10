@@ -1,5 +1,6 @@
 package org.naho.speech.topic.controller.v1;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.naho.i18n.message.speech.TopicDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
@@ -8,12 +9,14 @@ import org.naho.speech.topic.dto.mapper.TopicRequestMapper;
 import org.naho.speech.topic.dto.mapper.TopicResponseMapper;
 import org.naho.speech.topic.dto.request.CreateTopicRequest;
 import org.naho.speech.topic.dto.request.TopicFilterRequest;
+import org.naho.speech.topic.dto.request.UpdateTopicRequest;
 import org.naho.speech.topic.dto.response.CreateTopicResponse;
 import org.naho.speech.topic.dto.response.TopicDetailResponse;
 import org.naho.speech.topic.dto.response.TopicListItemResponse;
 import org.naho.speech.topic.port.in.CreateTopicInputPort;
 import org.naho.speech.topic.port.in.GetTopicDetailInputPort;
 import org.naho.speech.topic.port.in.ListTopicInputPort;
+import org.naho.speech.topic.port.in.UpdateTopicInputPort;
 import org.naho.speech.topic.result.CreateTopicResult;
 import org.naho.speech.topic.result.TopicListResult;
 import org.naho.user.port.out.RoleRepositoryPort;
@@ -42,6 +45,7 @@ public class TopicController {
 
     private final ListTopicInputPort listTopicInputPort;
     private final GetTopicDetailInputPort getTopicDetailInputPort;
+    private final UpdateTopicInputPort updateTopicInputPort;
 
     // CREATE TOPIC
     @PostMapping
@@ -87,6 +91,24 @@ public class TopicController {
     ) {
         var command = topicRequestMapper.toDetailCommand(id);
         var result = getTopicDetailInputPort.getTopicDetail(command);
+        var response = topicResponseMapper.detailResultToResponse(result);
+        return ResponseEntity.ok(response);
+    }
+
+    // UPDATE TOPIC
+    @PutMapping("/{id}")
+    @ApiResponseMessage(message = TopicDetailMessageKey.TOPIC_UPDATE_SUCCESS)
+    public ResponseEntity<TopicDetailResponse> updateTopic(
+            @PathVariable("id") Long id,
+            @RequestBody @Valid UpdateTopicRequest request,
+            @AuthenticationPrincipal AccessTokenPayload payload
+    ) {
+        List<String> roleSet = roleRepositoryPort.findRoleNamesByUserId(payload.userId());
+        boolean isAdminOrManager = roleSet.contains(RoleName.ADMIN.name()) ||
+                roleSet.contains(RoleName.CONTENT_MANAGER.name());
+
+        var command = topicRequestMapper.toUpdateCommand(request, id, payload.userId(), isAdminOrManager);
+        var result = updateTopicInputPort.updateTopic(command);
         var response = topicResponseMapper.detailResultToResponse(result);
         return ResponseEntity.ok(response);
     }

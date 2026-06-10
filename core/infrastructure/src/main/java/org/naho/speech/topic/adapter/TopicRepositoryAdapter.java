@@ -79,6 +79,11 @@ public class TopicRepositoryAdapter implements TopicRepositoryPort {
     }
 
     @Override
+    public boolean existsByNameAndJlptLevelExcludeId(String name, JLPTLevel jlptLevel, Long id) {
+        return topicJpaRepository.existsByNameAndJlptLevelAndIdNot(name, jlptLevel, id);
+    }
+
+    @Override
     public Double getMaxOrderIndex() {
         return topicJpaRepository.getMaxOrderIndex();
     }

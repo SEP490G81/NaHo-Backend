@@ -8,15 +8,15 @@ import org.naho.user.type.JLPTLevel;
 
 public class Topic {
     private final Long id;
-    private final Long coverImageFileId;
-    private final String name;
-    private final String description;
-    private final String japaneseNameTokens;
-    private final String japaneseDescriptionTokens;
-    private final TopicStatus status;
-    private final JLPTLevel jlptLevel;
-    private final Double orderIndex;
     private final Long userId;
+    private Long coverImageFileId;
+    private String name;
+    private String description;
+    private String japaneseNameTokens;
+    private String japaneseDescriptionTokens;
+    private TopicStatus status;
+    private JLPTLevel jlptLevel;
+    private Double orderIndex;
 
 
     // Private constructor dùng cho Builder
@@ -53,6 +53,20 @@ public class Topic {
                     TopicDetailMessageKey.TOPIC_DESCRIPTION_EMPTY
             );
         }
+    }
+
+    public void update(String name, String description, String japaneseNameTokens, String japaneseDescriptionTokens, TopicStatus status, JLPTLevel jlptLevel, Double orderIndex, Long coverImageFileId) {
+        validateName(name);
+        validateDescription(description);
+
+        this.name = name;
+        this.description = description;
+        this.japaneseNameTokens = japaneseNameTokens;
+        this.japaneseDescriptionTokens = japaneseDescriptionTokens;
+        this.status = status;
+        this.jlptLevel = jlptLevel;
+        this.orderIndex = orderIndex;
+        this.coverImageFileId = coverImageFileId;
     }
 
     // Getter

@@ -10,6 +10,8 @@ public interface TopicRepositoryPort {
 
     boolean existsByNameAndJlptLevel(String name, JLPTLevel jlptLevel);
 
+    boolean existsByNameAndJlptLevelExcludeId(String name, JLPTLevel jlptLevel, Long id);
+
     Double getMaxOrderIndex();
 
     Optional<Topic> findById(Long id);

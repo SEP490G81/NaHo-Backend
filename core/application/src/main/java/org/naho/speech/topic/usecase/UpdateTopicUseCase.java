@@ -1,0 +1,78 @@
+package org.naho.speech.topic.usecase;
+
+import org.naho.i18n.message.speech.TopicDetailMessageKey;
+import org.naho.shared.exception.ApplicationException;
+import org.naho.speech.model.Topic;
+import org.naho.speech.topic.command.UpdateTopicCommand;
+import org.naho.speech.topic.exception.TopicErrorCode;
+import org.naho.speech.topic.port.in.UpdateTopicInputPort;
+import org.naho.speech.topic.port.out.TopicRepositoryPort;
+import org.naho.speech.topic.result.TopicDetailResult;
+
+public class UpdateTopicUseCase implements UpdateTopicInputPort {
+    private final TopicRepositoryPort topicRepositoryPort;
+
+    public UpdateTopicUseCase(TopicRepositoryPort topicRepositoryPort) {
+        this.topicRepositoryPort = topicRepositoryPort;
+    }
+
+    @Override
+    public TopicDetailResult updateTopic(UpdateTopicCommand command) {
+        Topic topic = topicRepositoryPort.findById(command.id())
+                .orElseThrow(() -> new ApplicationException(
+                        TopicErrorCode.TOPIC_NOT_FOUND,
+                        TopicDetailMessageKey.TOPIC_ID_NOT_FOUND,
+                        command.id()
+                ));
+
+        if (!command.isAdminOrManager() && !topic.getUserId().equals(command.requestUserId())) {
+            throw new ApplicationException(
+                    TopicErrorCode.TOPIC_UPDATE_FORBIDDEN,
+                    TopicDetailMessageKey.TOPIC_USER_NOT_HAVE_PERMISSION
+            );
+        }
+
+        if (topicRepositoryPort.existsByNameAndJlptLevelExcludeId(command.name(), command.jlptLevel(), command.id())) {
+            throw new ApplicationException(
+                    TopicErrorCode.TOPIC_ALREADY_EXISTS,
+                    TopicDetailMessageKey.TOPIC_ALREADY_EXISTS_IN_LEVEL
+            );
+        }
+
+        Double orderIndex = command.orderIndex();
+        if (orderIndex == null) {
+            orderIndex = topic.getOrderIndex(); // Keep old if null
+        } else if (orderIndex < 0) {
+            throw new ApplicationException(
+                    TopicErrorCode.TOPIC_ORDER_INDEX_INVALID,
+                    TopicDetailMessageKey.TOPIC_ORDER_INDEX_INVALID
+            );
+        }
+
+        topic.update(
+                command.name(),
+                command.description(),
+                command.nameTokens(),
+                command.descriptionTokens(),
+                command.status(),
+                command.jlptLevel(),
+                orderIndex,
+                command.coverImageFileId()
+        );
+
+        Topic savedTopic = topicRepositoryPort.save(topic);
+
+        return new TopicDetailResult(
+                savedTopic.getId(),
+                savedTopic.getUserId(),
+                savedTopic.getName(),
+                savedTopic.getDescription(),
+                savedTopic.getJapaneseNameTokens(),
+                savedTopic.getJapaneseDescriptionTokens(),
+                savedTopic.getStatus(),
+                savedTopic.getJlptLevel(),
+                savedTopic.getOrderIndex(),
+                savedTopic.getCoverImageFileId()
+        );
+    }
+}
