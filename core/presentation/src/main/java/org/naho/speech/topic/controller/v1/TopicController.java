@@ -3,7 +3,6 @@ package org.naho.speech.topic.controller.v1;
 import lombok.RequiredArgsConstructor;
 import org.naho.i18n.message.speech.TopicDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
-import org.naho.speech.topic.command.GetTopicDetailCommand;
 import org.naho.speech.topic.command.ListTopicCommand;
 import org.naho.speech.topic.dto.mapper.TopicRequestMapper;
 import org.naho.speech.topic.dto.mapper.TopicResponseMapper;
@@ -62,6 +61,7 @@ public class TopicController {
 
     // GET LIST TOPIC
     @GetMapping
+    @ApiResponseMessage(message = TopicDetailMessageKey.TOPIC_GET_LIST_SUCCESS)
     public ResponseEntity<Page<TopicListItemResponse>> listTopics(
             @ModelAttribute TopicFilterRequest filter,
             @PageableDefault(page = 0, size = 10, sort = "order_index", direction = Sort.Direction.ASC) Pageable pageable,
@@ -81,10 +81,11 @@ public class TopicController {
 
     // GET TOPIC DETAIL
     @GetMapping("/{id}")
+    @ApiResponseMessage(message = TopicDetailMessageKey.TOPIC_GET_DETAIL_SUCCESS)
     public ResponseEntity<TopicDetailResponse> getTopicDetail(
             @PathVariable("id") Long id
     ) {
-        var command = new GetTopicDetailCommand(id);
+        var command = topicRequestMapper.toDetailCommand(id);
         var result = getTopicDetailInputPort.getTopicDetail(command);
         var response = topicResponseMapper.detailResultToResponse(result);
         return ResponseEntity.ok(response);

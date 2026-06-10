@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.naho.shared.mapper.JsonMapper;
 import org.naho.speech.topic.command.CreateTopicCommand;
+import org.naho.speech.topic.command.GetTopicDetailCommand;
 import org.naho.speech.topic.command.ListTopicCommand;
 import org.naho.speech.topic.dto.request.CreateTopicRequest;
 import org.naho.speech.topic.dto.request.TopicFilterRequest;
@@ -44,4 +45,6 @@ public interface TopicRequestMapper {
                 isAdmin
         );
     }
+
+    GetTopicDetailCommand toDetailCommand(Long id);
 }

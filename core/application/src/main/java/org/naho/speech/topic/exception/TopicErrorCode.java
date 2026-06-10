@@ -4,7 +4,7 @@ import org.naho.i18n.message.speech.TopicTitleMessageKey;
 import org.naho.shared.exception.ErrorCode;
 
 public enum TopicErrorCode implements ErrorCode {
-    TOPIC_NOT_FOUND("TOPIC_A001", TopicTitleMessageKey.TOPIC_NOT_FOUND_TITLE),
+    TOPIC_NOT_FOUND("TOPIC_A001", TopicTitleMessageKey.TOPIC_GET_FAIL_TITLE),
     TOPIC_CREATION_FAILED("TOPIC_A002", TopicTitleMessageKey.TOPIC_CREATION_FAILED_TITLE),
     TOPIC_ALREADY_EXISTS("TOPIC_A003", TopicTitleMessageKey.TOPIC_CREATION_FAILED_TITLE),
     TOPIC_ORDER_INDEX_INVALID("TOPIC_A004", TopicTitleMessageKey.TOPIC_CREATION_FAILED_TITLE);
