@@ -5,6 +5,13 @@ build/
 !**/src/test/**/build/
 .kotlin
 
+# ==========================
+# Environment Variables
+# ==========================
+.env
+.env.*
+!.env.example
+
 ### IntelliJ IDEA ###
 .idea/
 *.iws
