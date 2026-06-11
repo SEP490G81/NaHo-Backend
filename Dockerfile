@@ -21,6 +21,9 @@ COPY core/presentation/build.gradle.kts ./core/presentation/
 COPY core/common/build.gradle.kts ./core/common/
 COPY core/bootstrap/build.gradle.kts ./core/bootstrap/
 
+# Chuyển từ CRLF sang LF và cấp quyền cho ./gradlew
+RUN sed -i 's/\r$//' ./gradlew && chmod +x ./gradlew
+
 # preload dependencies
 RUN ./gradlew dependencies --no-daemon
 
