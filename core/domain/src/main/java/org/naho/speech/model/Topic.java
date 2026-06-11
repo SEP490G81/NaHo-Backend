@@ -1,26 +1,72 @@
 package org.naho.speech.model;
 
+import org.naho.i18n.message.speech.TopicDetailMessageKey;
+import org.naho.speech.exception.DomainException;
+import org.naho.speech.exception.TopicDomainErrorCode;
 import org.naho.speech.type.TopicStatus;
 import org.naho.user.type.JLPTLevel;
 
 public class Topic {
-    private Long id;
+    private final Long id;
+    private final Long userId;
     private Long coverImageFileId;
     private String name;
     private String description;
+    private String japaneseNameTokens;
+    private String japaneseDescriptionTokens;
     private TopicStatus status;
     private JLPTLevel jlptLevel;
-    private Integer orderIndex;
+    private Double orderIndex;
+
 
     // Private constructor dùng cho Builder
     private Topic(Builder builder) {
         this.id = builder.id;
         this.coverImageFileId = builder.coverImageFileId;
+        this.userId = builder.userId;
         this.name = builder.name;
         this.description = builder.description;
+        this.japaneseNameTokens = builder.japaneseNameTokens;
+        this.japaneseDescriptionTokens = builder.japaneseDescriptionTokens;
         this.status = builder.status;
         this.jlptLevel = builder.jlptLevel;
         this.orderIndex = builder.orderIndex;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    private void validateName(String name) {
+        if (name == null || name.isBlank()) {
+            throw new DomainException(
+                    TopicDomainErrorCode.TOPIC_NAME_EMPTY,
+                    TopicDetailMessageKey.TOPIC_NAME_EMPTY
+            );
+        }
+    }
+
+    private void validateDescription(String description) {
+        if (description == null || description.isBlank()) {
+            throw new DomainException(
+                    TopicDomainErrorCode.TOPIC_DESCRIPTION_EMPTY,
+                    TopicDetailMessageKey.TOPIC_DESCRIPTION_EMPTY
+            );
+        }
+    }
+
+    public void update(String name, String description, String japaneseNameTokens, String japaneseDescriptionTokens, TopicStatus status, JLPTLevel jlptLevel, Double orderIndex, Long coverImageFileId) {
+        validateName(name);
+        validateDescription(description);
+
+        this.name = name;
+        this.description = description;
+        this.japaneseNameTokens = japaneseNameTokens;
+        this.japaneseDescriptionTokens = japaneseDescriptionTokens;
+        this.status = status;
+        this.jlptLevel = jlptLevel;
+        this.orderIndex = orderIndex;
+        this.coverImageFileId = coverImageFileId;
     }
 
     // Getter
@@ -32,12 +78,24 @@ public class Topic {
         return coverImageFileId;
     }
 
+    public Long getUserId() {
+        return userId;
+    }
+
     public String getName() {
         return name;
     }
 
     public String getDescription() {
         return description;
+    }
+
+    public String getJapaneseNameTokens() {
+        return japaneseNameTokens;
+    }
+
+    public String getJapaneseDescriptionTokens() {
+        return japaneseDescriptionTokens;
     }
 
     public TopicStatus getStatus() {
@@ -48,23 +106,22 @@ public class Topic {
         return jlptLevel;
     }
 
-    public Integer getOrderIndex() {
+    public Double getOrderIndex() {
         return orderIndex;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     // Builder
     public static class Builder {
         private Long id;
         private Long coverImageFileId;
+        private Long userId;
         private String name;
         private String description;
+        private String japaneseNameTokens;
+        private String japaneseDescriptionTokens;
         private TopicStatus status;
         private JLPTLevel jlptLevel;
-        private Integer orderIndex;
+        private Double orderIndex;
 
         public Builder id(Long id) {
             this.id = id;
@@ -73,6 +130,11 @@ public class Topic {
 
         public Builder coverImageFileId(Long coverImageFileId) {
             this.coverImageFileId = coverImageFileId;
+            return this;
+        }
+
+        public Builder userId(Long userId) {
+            this.userId = userId;
             return this;
         }
 
@@ -86,6 +148,16 @@ public class Topic {
             return this;
         }
 
+        public Builder japaneseNameTokens(String japaneseNameTokens) {
+            this.japaneseNameTokens = japaneseNameTokens;
+            return this;
+        }
+
+        public Builder japaneseDescriptionTokens(String japaneseDescriptionTokens) {
+            this.japaneseDescriptionTokens = japaneseDescriptionTokens;
+            return this;
+        }
+
         public Builder status(TopicStatus status) {
             this.status = status;
             return this;
@@ -96,13 +168,16 @@ public class Topic {
             return this;
         }
 
-        public Builder orderIndex(Integer orderIndex) {
+        public Builder orderIndex(Double orderIndex) {
             this.orderIndex = orderIndex;
             return this;
         }
 
         public Topic build() {
-            return new Topic(this);
+            Topic topic = new Topic(this);
+            topic.validateName(topic.getName());
+            topic.validateDescription(topic.getDescription());
+            return topic;
         }
     }
 }

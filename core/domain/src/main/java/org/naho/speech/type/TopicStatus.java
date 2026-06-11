@@ -4,4 +4,5 @@ public enum TopicStatus {
     DRAFT,
     ACTIVE,
     HIDDEN,
+    ARCHIVE
 }

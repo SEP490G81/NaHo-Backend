@@ -1,12 +1,15 @@
 package org.naho.speech.model;
 
+import org.naho.speech.type.QuestionStatus;
+
 public class Question {
-    private Long id;
-    private Long questionAudioFileId;
-    private Long topicId;
-    private String questionText;
-    private String contextualHint;
-    private Integer orderIndex;
+    private final Long id;
+    private final Long questionAudioFileId;
+    private final Long topicId;
+    private final String questionText;
+    private final String contextualHint;
+    private final Integer orderIndex;
+    private final QuestionStatus status;
 
     // Private constructor dùng cho Builder
     private Question(Builder builder) {
@@ -16,6 +19,11 @@ public class Question {
         this.questionText = builder.questionText;
         this.contextualHint = builder.contextualHint;
         this.orderIndex = builder.orderIndex;
+        this.status = builder.status;
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     // Getter
@@ -43,8 +51,8 @@ public class Question {
         return orderIndex;
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public QuestionStatus getStatus() {
+        return status;
     }
 
     // Builder
@@ -55,6 +63,7 @@ public class Question {
         private String questionText;
         private String contextualHint;
         private Integer orderIndex;
+        private QuestionStatus status;
 
         public Builder id(Long id) {
             this.id = id;
@@ -83,6 +92,11 @@ public class Question {
 
         public Builder orderIndex(Integer orderIndex) {
             this.orderIndex = orderIndex;
+            return this;
+        }
+
+        public Builder status(QuestionStatus status) {
+            this.status = status;
             return this;
         }
 

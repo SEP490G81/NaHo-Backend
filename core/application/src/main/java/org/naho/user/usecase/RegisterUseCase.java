@@ -51,7 +51,7 @@ public class RegisterUseCase implements RegisterInputPort {
         // Encode pass
         String encodedPassword = encoderPort.hashPassword(command.password());
 
-        // Assign StudentRole
+        // Assign LEARNERRole
         Role defaultRole = roleRepository.findByName(RoleName.LEARNER)
                 .orElseThrow(() -> new ApplicationException(
                         UserErrorCode.USER_ROLE_NOT_VALID,

@@ -62,6 +62,9 @@ dependencies {
     // s3
     implementation("software.amazon.awssdk:s3:2.46.0")
 
+    // Sudachi
+    implementation("com.worksap.nlp:sudachi:0.7.5")
+
     // other
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5")
