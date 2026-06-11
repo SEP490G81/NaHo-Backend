@@ -104,4 +104,9 @@ public class TopicRepositoryAdapter implements TopicRepositoryPort {
                 .coverImageFileId(savedEntity.getCoverImageFile() != null ? savedEntity.getCoverImageFile().getId() : null)
                 .build());
     }
+
+    @Override
+    public void deleteById(Long id) {
+        topicJpaRepository.deleteById(id);
+    }
 }

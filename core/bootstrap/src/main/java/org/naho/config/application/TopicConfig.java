@@ -1,15 +1,11 @@
 package org.naho.config.application;
 
+import org.naho.shared.port.out.TransactionPort;
+import org.naho.speech.question.port.out.QuestionRepositoryPort;
 import org.naho.speech.topic.adapter.TopicListRepositoryAdapter;
 import org.naho.speech.topic.adapter.TopicRepositoryAdapter;
-import org.naho.speech.topic.port.in.CreateTopicInputPort;
-import org.naho.speech.topic.port.in.GetTopicDetailInputPort;
-import org.naho.speech.topic.port.in.ListTopicInputPort;
-import org.naho.speech.topic.port.in.UpdateTopicInputPort;
-import org.naho.speech.topic.usecase.CreateTopicUseCase;
-import org.naho.speech.topic.usecase.GetTopicDetailUseCase;
-import org.naho.speech.topic.usecase.ListTopicUsecase;
-import org.naho.speech.topic.usecase.UpdateTopicUseCase;
+import org.naho.speech.topic.port.in.*;
+import org.naho.speech.topic.usecase.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -30,9 +26,16 @@ public class TopicConfig {
     public GetTopicDetailInputPort getTopicDetailInputPort(TopicRepositoryAdapter topicRepositoryAdapter) {
         return new GetTopicDetailUseCase(topicRepositoryAdapter);
     }
-    
+
     @Bean
     public UpdateTopicInputPort updateTopicInputPort(TopicRepositoryAdapter topicRepositoryAdapter) {
         return new UpdateTopicUseCase(topicRepositoryAdapter);
+    }
+
+    @Bean
+    public DeleteTopicInputPort deleteTopicInputPort(TopicRepositoryAdapter topicRepositoryAdapter,
+                                                     QuestionRepositoryPort questionRepositoryPort,
+                                                     TransactionPort transactionPort) {
+        return new DeleteTopicUseCase(topicRepositoryAdapter, questionRepositoryPort, transactionPort);
     }
 }

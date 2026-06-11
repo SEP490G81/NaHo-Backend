@@ -3,10 +3,7 @@ package org.naho.speech.topic.dto.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.naho.shared.mapper.JsonMapper;
-import org.naho.speech.topic.command.CreateTopicCommand;
-import org.naho.speech.topic.command.GetTopicDetailCommand;
-import org.naho.speech.topic.command.ListTopicCommand;
-import org.naho.speech.topic.command.UpdateTopicCommand;
+import org.naho.speech.topic.command.*;
 import org.naho.speech.topic.dto.request.CreateTopicRequest;
 import org.naho.speech.topic.dto.request.TopicFilterRequest;
 import org.naho.speech.topic.dto.request.UpdateTopicRequest;
@@ -62,4 +59,6 @@ public interface TopicRequestMapper {
     @Mapping(target = "orderIndex", source = "request.orderIndex")
     @Mapping(target = "coverImageFileId", source = "request.coverImageFileId")
     UpdateTopicCommand toUpdateCommand(UpdateTopicRequest request, Long id, Long userId, boolean isAdminOrManager);
+
+    DeleteTopicCommand toDeleteCommand(Long id, boolean isAdminOrManager);
 }

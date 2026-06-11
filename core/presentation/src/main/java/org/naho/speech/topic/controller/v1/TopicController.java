@@ -13,10 +13,7 @@ import org.naho.speech.topic.dto.request.UpdateTopicRequest;
 import org.naho.speech.topic.dto.response.CreateTopicResponse;
 import org.naho.speech.topic.dto.response.TopicDetailResponse;
 import org.naho.speech.topic.dto.response.TopicListItemResponse;
-import org.naho.speech.topic.port.in.CreateTopicInputPort;
-import org.naho.speech.topic.port.in.GetTopicDetailInputPort;
-import org.naho.speech.topic.port.in.ListTopicInputPort;
-import org.naho.speech.topic.port.in.UpdateTopicInputPort;
+import org.naho.speech.topic.port.in.*;
 import org.naho.speech.topic.result.CreateTopicResult;
 import org.naho.speech.topic.result.TopicListResult;
 import org.naho.user.port.out.RoleRepositoryPort;
@@ -46,6 +43,7 @@ public class TopicController {
     private final ListTopicInputPort listTopicInputPort;
     private final GetTopicDetailInputPort getTopicDetailInputPort;
     private final UpdateTopicInputPort updateTopicInputPort;
+    private final DeleteTopicInputPort deleteTopicInputPort;
 
     // CREATE TOPIC
     @PostMapping
@@ -111,5 +109,21 @@ public class TopicController {
         var result = updateTopicInputPort.updateTopic(command);
         var response = topicResponseMapper.detailResultToResponse(result);
         return ResponseEntity.ok(response);
+    }
+
+    // DELETE TOPIC
+    @DeleteMapping("/{id}")
+    @ApiResponseMessage(message = TopicDetailMessageKey.TOPIC_DELETE_SUCCESS)
+    public ResponseEntity<Void> deleteTopic(
+            @PathVariable("id") Long id,
+            @AuthenticationPrincipal AccessTokenPayload payload
+    ) {
+        List<String> roleSet = roleRepositoryPort.findRoleNamesByUserId(payload.userId());
+        boolean isAdminOrManager = roleSet.contains(RoleName.ADMIN.name()) ||
+                roleSet.contains(RoleName.CONTENT_MANAGER.name());
+
+        var command = topicRequestMapper.toDeleteCommand(id, isAdminOrManager);
+        deleteTopicInputPort.deleteTopic(command);
+        return ResponseEntity.noContent().build();
     }
 }

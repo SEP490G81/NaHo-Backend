@@ -15,4 +15,6 @@ public interface TopicRepositoryPort {
     Double getMaxOrderIndex();
 
     Optional<Topic> findById(Long id);
+
+    void deleteById(Long id);
 }

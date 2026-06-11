@@ -1,8 +1,7 @@
 package org.naho.speech.type;
 
-public enum TopicStatus {
+public enum QuestionStatus {
     DRAFT,
     ACTIVE,
-    HIDDEN,
     ARCHIVE
 }
