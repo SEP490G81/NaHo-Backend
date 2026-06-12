@@ -12,11 +12,10 @@ public class UserResult {
     private final Long id;
     private final String username;
     private final List<String> roleNames;
-    private final String avatarObjectKey;
+    private final String avatarUrl;
 
     private final String email;
-    private final String firstName;
-    private final String lastName;
+    private final String fullName;
     private final Gender gender;
     private final LocalDate dob;
     private final JLPTLevel jlptLevel;
@@ -27,11 +26,10 @@ public class UserResult {
         this.username = builder.username;
         this.email = builder.email;
         this.roleNames = builder.roleNames;
-        this.firstName = builder.firstName;
-        this.lastName = builder.lastName;
+        this.fullName = builder.fullName;
         this.gender = builder.gender;
         this.dob = builder.dob;
-        this.avatarObjectKey = builder.avatarObjectKey;
+        this.avatarUrl = builder.avatarUrl;
         this.jlptLevel = builder.jlptLevel;
         this.status = builder.status;
     }
@@ -56,12 +54,8 @@ public class UserResult {
         return roleNames;
     }
 
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
+    public String getFullName() {
+        return fullName;
     }
 
     public Gender getGender() {
@@ -72,8 +66,8 @@ public class UserResult {
         return dob;
     }
 
-    public String getAvatarObjectKey() {
-        return avatarObjectKey;
+    public String getAvatarUrl() {
+        return avatarUrl;
     }
 
     public JLPTLevel getJlptLevel() {
@@ -89,11 +83,10 @@ public class UserResult {
         private String username;
         private String email;
         private List<String> roleNames;
-        private String firstName;
-        private String lastName;
+        private String fullName;
         private Gender gender;
         private LocalDate dob;
-        private String avatarObjectKey;
+        private String avatarUrl;
         private JLPTLevel jlptLevel;
         private UserStatus status;
 
@@ -117,13 +110,8 @@ public class UserResult {
             return this;
         }
 
-        public Builder firstName(String firstName) {
-            this.firstName = firstName;
-            return this;
-        }
-
-        public Builder lastName(String lastName) {
-            this.lastName = lastName;
+        public Builder fullName(String fullName) {
+            this.fullName = fullName;
             return this;
         }
 
@@ -137,8 +125,8 @@ public class UserResult {
             return this;
         }
 
-        public Builder avatarObjectKey(String avatarObjectKey) {
-            this.avatarObjectKey = avatarObjectKey;
+        public Builder avatarUrl(String avatarUrl) {
+            this.avatarUrl = avatarUrl;
             return this;
         }
 

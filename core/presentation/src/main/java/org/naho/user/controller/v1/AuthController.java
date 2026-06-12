@@ -5,16 +5,20 @@ import lombok.RequiredArgsConstructor;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.user.command.CredentialsLoginCommand;
+import org.naho.user.command.GoogleLoginCommand;
 import org.naho.user.command.LogoutCommand;
 import org.naho.user.constant.TokenType;
 import org.naho.user.dto.mapper.LoginRequestMapper;
 import org.naho.user.dto.mapper.UserResponseMapper;
 import org.naho.user.dto.request.CredentialsLoginRequest;
+import org.naho.user.dto.request.GoogleLoginRequest;
 import org.naho.user.dto.response.UserResponse;
 import org.naho.user.helper.CookieFactory;
 import org.naho.user.helper.LoginRequestResolver;
 import org.naho.user.port.in.AuthInputPort;
+import org.naho.user.port.out.TokenServicePort;
 import org.naho.user.result.AccessTokenPayload;
+import org.naho.user.result.GoogleUserInfoResult;
 import org.naho.user.result.LoginResult;
 import org.naho.user.result.UserResult;
 import org.springframework.http.HttpHeaders;
@@ -32,6 +36,8 @@ public class AuthController {
     private final CookieFactory cookieFactory;
     private final UserResponseMapper userResponseMapper;
     private final LoginRequestResolver loginRequestResolver;
+    private final TokenServicePort tokenServiceAdapter;
+    private final TokenServicePort tokenServicePort;
 
     @ApiResponseMessage(message = UserDetailMessageKey.USER_GET_SUCCESSFULLY)
     @GetMapping("/me")
@@ -55,6 +61,39 @@ public class AuthController {
 
         CredentialsLoginCommand command = loginRequestMapper.requestToCommand(request);
         LoginResult result = authInputPort.credentialsLogin(command);
+
+        ResponseCookie accessTokenCookie =
+                cookieFactory.createCookieForJWTToken(result.accessToken());
+        ResponseCookie refreshTokenCookie =
+                cookieFactory.createCookieForJWTToken(result.refreshToken());
+
+        return ResponseEntity
+                .ok()
+                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                .build();
+    }
+
+    @ApiResponseMessage(message = UserDetailMessageKey.USER_LOGIN_SUCCESSFULLY)
+    @PostMapping("/login/google")
+    public ResponseEntity<Void> googleLogin(
+            @RequestBody GoogleLoginRequest request,
+            HttpServletRequest httpServletRequest
+    ) {
+        GoogleUserInfoResult googleUserInfoResult =
+                tokenServicePort.verifyGoogleToken(request.getIdToken());
+
+        GoogleLoginCommand command = GoogleLoginCommand.builder()
+                .sub(googleUserInfoResult.sub())
+                .email(googleUserInfoResult.email())
+                .fullName(googleUserInfoResult.fullName())
+                .pictureUrl(googleUserInfoResult.pictureUrl())
+                .deviceId(request.getDeviceId())
+                .userAgent(loginRequestResolver.getUserAgent(httpServletRequest))
+                .ipAddress(loginRequestResolver.getIpAddress(httpServletRequest))
+                .build();
+
+        LoginResult result = authInputPort.googleLogin(command);
 
         ResponseCookie accessTokenCookie =
                 cookieFactory.createCookieForJWTToken(result.accessToken());

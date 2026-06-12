@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class UserResultMapper {
-    public UserResult domainToResult(User domain, List<String> roleNames, String avatarObjectKey) {
+    public UserResult domainToResult(User domain, List<String> roleNames) {
         LocalDate dob = domain.getDob() == null ? null : domain.getDob().getValue();
 
         return UserResult.builder()
@@ -15,11 +15,10 @@ public class UserResultMapper {
                 .username(domain.getUsername() != null ? domain.getUsername().getValue() : null)
                 .email(domain.getEmail().getValue())
                 .roleNames(roleNames)
-                .firstName(domain.getFirstName())
-                .lastName(domain.getLastName())
+                .fullName(domain.getFullName())
                 .gender(domain.getGender())
                 .dob(dob)
-                .avatarObjectKey(avatarObjectKey)
+                .avatarUrl(domain.getAvatarUrl())
                 .jlptLevel(domain.getJlptLevel())
                 .status(domain.getStatus())
                 .build();

@@ -1,5 +1,8 @@
 package org.naho.user.model;
 
+import org.naho.i18n.message.user.UserSessionDetailMessageKey;
+import org.naho.shared.exception.DomainException;
+import org.naho.user.exception.UserSessionDomainErrorCode;
 import org.naho.user.type.SessionRevokedReason;
 
 import java.time.Instant;
@@ -128,6 +131,12 @@ public class UserSession {
         }
 
         public UserSession build() {
+            if (this.deviceId == null || this.deviceId.isBlank()) {
+                throw new DomainException(
+                        UserSessionDomainErrorCode.USER_SESSION_DEVICE_ID_NOT_VALID,
+                        UserSessionDetailMessageKey.USER_SESSION_DEVICE_ID_BLANK
+                );
+            }
             return new UserSession(this);
         }
     }
@@ -148,7 +157,7 @@ public class UserSession {
     public String getDeviceId() {
         return deviceId;
     }
-    
+
     public String getUserAgent() {
         return userAgent;
     }

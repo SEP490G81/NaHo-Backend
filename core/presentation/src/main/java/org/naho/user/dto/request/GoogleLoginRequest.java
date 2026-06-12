@@ -8,10 +8,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
-public class CredentialsLoginRequest {
-    String usernameOrEmail;
-    String rawPassword;
+public class GoogleLoginRequest {
+    String idToken;
     String deviceId;
-    String userAgent;
-    String ipAddress;
 }

@@ -19,11 +19,10 @@ public class UserResponse {
     Long id;
     String username;
     List<String> roleNames;
-    String avatarObjectKey;
+    String avatarUrl;
 
     String email;
-    String firstName;
-    String lastName;
+    String fullName;
     Gender gender;
     LocalDate dob;
     JLPTLevel jlptLevel;

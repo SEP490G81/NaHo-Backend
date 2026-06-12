@@ -28,7 +28,6 @@ CREATE TABLE files
     created_time  datetime              NOT NULL,
     modified_time datetime              NULL,
     object_key    VARCHAR(2048)         NOT NULL,
-    preview_key   VARCHAR(2048)         NULL,
     original_name VARCHAR(255)          NOT NULL,
     content_type  VARCHAR(100)          NOT NULL,
     size          BIGINT                NOT NULL,
@@ -91,6 +90,7 @@ CREATE TABLE questions
     question_text          VARCHAR(255)          NOT NULL,
     contextual_hint        TEXT                  NULL,
     order_index            INT                   NULL,
+    status                 VARCHAR(50)           NULL,
     question_audio_file_id BIGINT                NOT NULL,
     topic_id               BIGINT                NOT NULL,
     CONSTRAINT pk_questions PRIMARY KEY (id)
@@ -129,15 +129,18 @@ CREATE TABLE speech_assessments
 
 CREATE TABLE topics
 (
-    id                  BIGINT AUTO_INCREMENT NOT NULL,
-    created_time        datetime              NOT NULL,
-    modified_time       datetime              NULL,
-    name                VARCHAR(255)          NULL,
-    `description`       VARCHAR(255)          NULL,
-    status              VARCHAR(50)           NULL,
-    jlpt_level          VARCHAR(2)            NULL,
-    order_index         INT                   NULL,
-    cover_image_file_id BIGINT                NULL,
+    id                          BIGINT AUTO_INCREMENT NOT NULL,
+    created_time                datetime              NOT NULL,
+    modified_time               datetime              NULL,
+    japanese_name               VARCHAR(255)          NULL,
+    japanese_description        VARCHAR(255)          NULL,
+    japanese_name_tokens        JSON                  NULL,
+    japanese_description_tokens JSON                  NULL,
+    status                      VARCHAR(50)           NULL,
+    jlpt_level                  VARCHAR(2)            NULL,
+    order_index                 DOUBLE                NULL,
+    cover_image_file_id         BIGINT                NULL,
+    user_id                     BIGINT                NULL,
     CONSTRAINT pk_topics PRIMARY KEY (id)
 );
 
@@ -162,12 +165,10 @@ CREATE TABLE users
     id                 BIGINT AUTO_INCREMENT NOT NULL,
     created_time       datetime              NOT NULL,
     modified_time      datetime              NULL,
-    username           VARCHAR(36)           NOT NULL,
+    username           VARCHAR(36)           NULL,
     email              VARCHAR(255)          NOT NULL,
-    hash_password      VARCHAR(255)          NOT NULL,
-    account_type       VARCHAR(20)           NOT NULL,
-    first_name         VARCHAR(100)          NULL,
-    last_name          VARCHAR(100)          NULL,
+    hash_password      VARCHAR(255)          NULL,
+    full_name          VARCHAR(200)          NULL,
     gender             VARCHAR(10)           NULL,
     dob                date                  NULL,
     jlpt_level         VARCHAR(2)            NOT NULL,
@@ -175,7 +176,8 @@ CREATE TABLE users
     current_streak     INT                   NULL,
     longest_streak     INT                   NULL,
     last_practice_date date                  NULL,
-    avatar_file_id     BIGINT                NULL,
+    avatar_url         VARCHAR(2048)         NULL,
+    provider_id        VARCHAR(512)          NULL,
     CONSTRAINT pk_users PRIMARY KEY (id)
 );
 
@@ -225,10 +227,10 @@ ALTER TABLE topics
     ADD CONSTRAINT uc_topics_cover_image_file UNIQUE (cover_image_file_id);
 
 ALTER TABLE users
-    ADD CONSTRAINT uc_users_avatar_file UNIQUE (avatar_file_id);
+    ADD CONSTRAINT uc_users_email UNIQUE (email);
 
 ALTER TABLE users
-    ADD CONSTRAINT uc_users_email UNIQUE (email);
+    ADD CONSTRAINT uc_users_provider UNIQUE (provider_id);
 
 ALTER TABLE users
     ADD CONSTRAINT uc_users_username UNIQUE (username);
@@ -263,8 +265,8 @@ ALTER TABLE speech_assessments
 ALTER TABLE topics
     ADD CONSTRAINT FK_TOPICS_ON_COVER_IMAGE_FILE FOREIGN KEY (cover_image_file_id) REFERENCES files (id);
 
-ALTER TABLE users
-    ADD CONSTRAINT FK_USERS_ON_AVATAR_FILE FOREIGN KEY (avatar_file_id) REFERENCES files (id);
+ALTER TABLE topics
+    ADD CONSTRAINT FK_TOPICS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
 ALTER TABLE user_sessions
     ADD CONSTRAINT FK_USER_SESSIONS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);

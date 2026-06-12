@@ -41,7 +41,6 @@ public class FileStorageUseCase implements FileStorageInputPort {
 
         File file = File.builder()
                 .objectKey(objectKey)
-                .previewKey(null)
                 .originalName(command.getOriginalName())
                 .contentType(command.getContentType())
                 .size(command.getSize())

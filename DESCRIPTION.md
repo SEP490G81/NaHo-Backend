@@ -33,14 +33,3 @@
 - Chứa hàm main để chạy toàn bộ dự án, các file config như: Bean Config, S3, I18n, Spring Security...
 
 - Chứa các file cấu hình application.yaml, application-dev.yaml, và application-prod.yaml
-
-### II. Tổ chức team trên AWS
-
-- Hiện tại nhóm tôi gồm 5 người
-- Tôi sử dụng tài khoản root để tạo ra 5 IAM Users cho chính tôi và 4 người còn lại
-- Tôi đã add cả nhóm vào 1 group là S3Developers, giờ tôi muốn những IAM trong group này có policies sau:
-
-+ Có full quyền đối với S3 storage: arn:aws:s3:::naho-bucket
-+ Có quyền tạo, xem, quản lí access key của chính họ
-+ Phải bật MFA thì mới được có các quyền trên, nếu chưa bật thì bị cấm toàn bộ quyền, nhưng mọi quyền liên quan đến MFA
-  phải luôn được allow

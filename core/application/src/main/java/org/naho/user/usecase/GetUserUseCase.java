@@ -1,6 +1,5 @@
 package org.naho.user.usecase;
 
-import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.user.exception.UserErrorCode;
@@ -17,18 +16,15 @@ public class GetUserUseCase implements GetUserInputPort {
 
     private final UserRepositoryPort userRepositoryPort;
     private final RoleRepositoryPort roleRepositoryPort;
-    private final FileRepositoryPort fileRepositoryPort;
     private final UserResultMapper userResultMapper;
 
     public GetUserUseCase(
             UserRepositoryPort userRepositoryPort,
             RoleRepositoryPort roleRepositoryPort,
-            FileRepositoryPort fileRepositoryPort,
             UserResultMapper userResultMapper
     ) {
         this.userRepositoryPort = userRepositoryPort;
         this.roleRepositoryPort = roleRepositoryPort;
-        this.fileRepositoryPort = fileRepositoryPort;
         this.userResultMapper = userResultMapper;
     }
 
@@ -66,7 +62,6 @@ public class GetUserUseCase implements GetUserInputPort {
 
     private UserResult mapToResult(User user) {
         List<String> roleNames = roleRepositoryPort.findRoleNamesByUserId(user.getId());
-        String avatarObjectKey = fileRepositoryPort.findObjectKeyById(user.getAvatarFileId());
-        return userResultMapper.domainToResult(user, roleNames, avatarObjectKey);
+        return userResultMapper.domainToResult(user, roleNames);
     }
 }

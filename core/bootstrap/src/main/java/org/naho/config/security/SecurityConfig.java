@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.naho.user.constant.JwtProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -50,6 +51,7 @@ public class SecurityConfig {
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
                 )
+                .oauth2Login(Customizer.withDefaults())
                 .build();
     }
 

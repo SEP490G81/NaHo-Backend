@@ -1,6 +1,5 @@
 package org.naho.user.model;
 
-import org.naho.user.type.AccountType;
 import org.naho.user.type.Gender;
 import org.naho.user.type.JLPTLevel;
 import org.naho.user.type.UserStatus;
@@ -13,7 +12,6 @@ import java.util.List;
 
 public class User {
     private final Long id;
-    private final Long avatarFileId;
     private final List<Long> roleIds;
     private final List<Long> userSessionIds;
 
@@ -21,10 +19,9 @@ public class User {
     private final Email email;
 
     private final String hashPassword;
-    private final AccountType accountType;
 
-    private final String firstName;
-    private final String lastName;
+    private final String avatarUrl;
+    private final String fullName;
     private final Gender gender;
     private final Dob dob;
 
@@ -34,18 +31,18 @@ public class User {
     private final Integer longestStreak;
     private final LocalDate lastPracticeDate;
 
+    private final String providerId;
+
     // Private constructor
     private User(Builder builder) {
         this.id = builder.id;
-        this.avatarFileId = builder.avatarFileId;
+        this.avatarUrl = builder.avatarUrl;
         this.roleIds = builder.roleIds;
         this.userSessionIds = builder.userSessionIds;
         this.username = builder.username;
         this.email = builder.email;
         this.hashPassword = builder.hashPassword;
-        this.accountType = builder.accountType;
-        this.firstName = builder.firstName;
-        this.lastName = builder.lastName;
+        this.fullName = builder.fullName;
         this.gender = builder.gender;
         this.dob = builder.dob;
         this.jlptLevel = builder.jlptLevel;
@@ -53,6 +50,7 @@ public class User {
         this.currentStreak = builder.currentStreak;
         this.longestStreak = builder.longestStreak;
         this.lastPracticeDate = builder.lastPracticeDate;
+        this.providerId = builder.providerId;
     }
 
     // Static builder method
@@ -60,13 +58,11 @@ public class User {
         return new Builder();
     }
 
-    // Build Register User
     public static User registerNewUser(String rawUsername, String hashPassword, String rawEmail, List<Long> roleIds) {
         return User.builder()
                 .username(Username.of(rawUsername))
                 .email(Email.of(rawEmail))
                 .hashPassword(hashPassword)
-                .accountType(AccountType.CREDENTIALS)
                 .status(UserStatus.ACTIVE)
                 .roleIds(roleIds)
                 .currentStreak(0)
@@ -88,8 +84,8 @@ public class User {
         return id;
     }
 
-    public Long getAvatarFileId() {
-        return avatarFileId;
+    public String getAvatarUrl() {
+        return avatarUrl;
     }
 
     public List<Long> getRoleIds() {
@@ -112,16 +108,8 @@ public class User {
         return hashPassword;
     }
 
-    public AccountType getAccountType() {
-        return accountType;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
+    public String getFullName() {
+        return fullName;
     }
 
     public Gender getGender() {
@@ -152,11 +140,14 @@ public class User {
         return lastPracticeDate;
     }
 
+    public String getProviderId() {
+        return providerId;
+    }
+
     // Builder class
     public static class Builder {
 
         private Long id;
-        private Long avatarFileId;
         private List<Long> roleIds;
         private List<Long> userSessionIds;
 
@@ -164,10 +155,9 @@ public class User {
         private Email email;
 
         private String hashPassword;
-        private AccountType accountType;
 
-        private String firstName;
-        private String lastName;
+        private String avatarUrl;
+        private String fullName;
         private Gender gender;
         private Dob dob;
 
@@ -176,14 +166,15 @@ public class User {
         private Integer currentStreak;
         private Integer longestStreak;
         private LocalDate lastPracticeDate;
+        private String providerId;
 
         public Builder id(Long id) {
             this.id = id;
             return this;
         }
 
-        public Builder avatarFileId(Long avatarFileId) {
-            this.avatarFileId = avatarFileId;
+        public Builder avatarUrl(String avatarUrl) {
+            this.avatarUrl = avatarUrl;
             return this;
         }
 
@@ -212,18 +203,8 @@ public class User {
             return this;
         }
 
-        public Builder accountType(AccountType accountType) {
-            this.accountType = accountType;
-            return this;
-        }
-
-        public Builder firstName(String firstName) {
-            this.firstName = firstName;
-            return this;
-        }
-
-        public Builder lastName(String lastName) {
-            this.lastName = lastName;
+        public Builder fullName(String fullName) {
+            this.fullName = fullName;
             return this;
         }
 
@@ -259,6 +240,11 @@ public class User {
 
         public Builder lastPracticeDate(LocalDate lastPracticeDate) {
             this.lastPracticeDate = lastPracticeDate;
+            return this;
+        }
+
+        public Builder providerId(String providerId) {
+            this.providerId = providerId;
             return this;
         }
 

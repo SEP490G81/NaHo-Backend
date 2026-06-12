@@ -41,6 +41,13 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
 
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${CLIENT_ID}
+
 server:
   port: 8386
 

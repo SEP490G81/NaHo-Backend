@@ -1,7 +1,4 @@
-package org.naho.user.exception;
-
-import org.naho.shared.exception.BaseException;
-import org.naho.shared.exception.ErrorCode;
+package org.naho.shared.exception;
 
 public class DomainException extends BaseException {
     public DomainException(ErrorCode errorCode, String detailMessage, Object... args) {
