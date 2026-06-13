@@ -33,3 +33,11 @@
 - Chứa hàm main để chạy toàn bộ dự án, các file config như: Bean Config, S3, I18n, Spring Security...
 
 - Chứa các file cấu hình application.yaml, application-dev.yaml, và application-prod.yaml
+
+Trên đây là cấu trúc dự án hiện tại của tôi, giờ tôi muốn bạn triển khai cho tôi
+chức năng login với google (tôi đã cấu hình các thứ cần thiết).
+Luồng hoạt động sẽ là user gọi tới google sdk do spring boot phụ trách rồi xử lí các bước đăng nhập.
+Ngoài ra tôi cũng phải làm sao để lấy được deviceId từ cookie của user, user agent và ip address từ header.
+Bạn chỉ cần cho tôi các file code luồng chính (tôi đã có các model, entity, dto,... cần thiết)
+Chỉ cho tôi cả nơi để đặt file.
+Các file chứa đầy đủ code từ import đến hết.

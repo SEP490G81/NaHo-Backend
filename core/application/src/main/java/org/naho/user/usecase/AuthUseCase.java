@@ -99,29 +99,38 @@ public class AuthUseCase implements AuthInputPort {
 
     private LoginResult doGoogleLogin(GoogleLoginCommand command) {
         String providerId = PROVIDER_GOOGLE + command.getSub();
-        User user = userRepositoryPort.findByProviderId(providerId)
+        User currentUser = userRepositoryPort.findByProviderId(providerId)
                 .orElse(null);
 
-        if (user == null) {
-            Role learnerRole = roleRepositoryPort.findByName(RoleName.LEARNER)
-                    .orElseThrow(() -> new ApplicationException(
-                            RoleErrorCode.ROLE_NOT_FOUND,
-                            RoleDetailMessageKey.ROLE_ROLE_NAME_NOT_FOUND,
-                            RoleName.LEARNER.name()
-                    ));
+        if (currentUser == null) {
+            User emailUser = userRepositoryPort.findByEmail(command.getEmail())
+                    .orElse(null);
+            // if user is not found by providerId and email, create new
+            if (emailUser == null) {
+                Role learnerRole = roleRepositoryPort.findByName(RoleName.LEARNER)
+                        .orElseThrow(() -> new ApplicationException(
+                                RoleErrorCode.ROLE_NOT_FOUND,
+                                RoleDetailMessageKey.ROLE_ROLE_NAME_NOT_FOUND,
+                                RoleName.LEARNER.name()
+                        ));
 
-            User newUser = User.builder()
-                    .email(Email.of(command.getEmail()))
-                    .fullName(command.getFullName())
-                    .avatarUrl(command.getPictureUrl())
-                    .status(UserStatus.ACTIVE)
-                    .roleIds(List.of(learnerRole.getId()))
-                    .providerId(providerId)
-                    .build();
+                User newUser = User.builder()
+                        .email(Email.of(command.getEmail()))
+                        .fullName(command.getFullName())
+                        .avatarUrl(command.getPictureUrl())
+                        .status(UserStatus.ACTIVE)
+                        .roleIds(List.of(learnerRole.getId()))
+                        .providerId(providerId)
+                        .build();
 
-            user = userRepositoryPort.save(newUser);
+                currentUser = userRepositoryPort.save(newUser);
+            } else {
+                // if user is found by email, update providerId
+                emailUser.setProviderId(providerId);
+                currentUser = userRepositoryPort.save(emailUser);
+            }
         } else {
-            if (!user.isActive()) {
+            if (!currentUser.isActive()) {
                 throw new ApplicationException(
                         UserErrorCode.USER_LOGIN_FAILED,
                         UserDetailMessageKey.USER_ACCOUNT_NOT_ACTIVE);
@@ -129,7 +138,7 @@ public class AuthUseCase implements AuthInputPort {
 
             if (!command.isDeviceIdBlank()) {
                 userSessionRepositoryPort.revokeActiveSessionsByUserIdAndDeviceId(
-                        user.getId(),
+                        currentUser.getId(),
                         command.getDeviceId(),
                         Instant.now(),
                         SessionRevokedReason.LOGIN_AGAIN);
@@ -142,7 +151,7 @@ public class AuthUseCase implements AuthInputPort {
 
         Instant now = Instant.now();
         UserSession userSession = UserSession.builder()
-                .userId(user.getId())
+                .userId(currentUser.getId())
                 .hashRefreshToken(hashRefreshToken)
                 .deviceId(command.getDeviceId())
                 .userAgent(command.getUserAgent())

@@ -47,6 +47,7 @@ spring:
         registration:
           google:
             client-id: ${CLIENT_ID}
+            client-secret: ${CLIENT_SECRET}
 
 server:
   port: 8386
@@ -65,6 +66,7 @@ mybatis:
   mapper-locations: classpath*:mybatis/mapper/**/*.xml
 
 app:
+  frontend-url: ${FRONTEND_URL}
   jwt:
     secret: ${JWT_SECRET}
     access-token-expiration: 5m

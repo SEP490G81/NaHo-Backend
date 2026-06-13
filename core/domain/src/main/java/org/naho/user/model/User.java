@@ -31,7 +31,7 @@ public class User {
     private final Integer longestStreak;
     private final LocalDate lastPracticeDate;
 
-    private final String providerId;
+    private String providerId;
 
     // Private constructor
     private User(Builder builder) {
@@ -77,6 +77,10 @@ public class User {
     // Setters
     public void setStatus(UserStatus status) {
         this.status = status;
+    }
+
+    public void setProviderId(String providerId) {
+        this.providerId = providerId;
     }
 
     // Getters

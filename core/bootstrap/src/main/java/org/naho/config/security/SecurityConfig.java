@@ -2,10 +2,10 @@ package org.naho.config.security;
 
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import org.naho.shared.handler.CustomOAuth2SuccessHandler;
 import org.naho.user.constant.JwtProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -24,6 +24,8 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private static final String[] API_WHITELIST = {
+            "/oauth2/**",
+            "/login/oauth2/code/**",
             "/api/v1/auth/login",
             "/api/v1/auth/rotation",
             "/api/v1/users/**",
@@ -36,7 +38,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
-            JwtAuthenticationFilter jwtAuthenticationFilter
+            JwtAuthenticationFilter jwtAuthenticationFilter,
+            CustomOAuth2SuccessHandler customOAuth2SuccessHandler
     ) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -51,7 +54,8 @@ public class SecurityConfig {
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
                 )
-                .oauth2Login(Customizer.withDefaults())
+                .oauth2Login(oauth2 -> oauth2
+                        .successHandler(customOAuth2SuccessHandler))
                 .build();
     }
 

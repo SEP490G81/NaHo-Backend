@@ -11,4 +11,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class GoogleProperties {
     String clientId;
+    String clientSecret;
 }
