@@ -3,6 +3,7 @@ package org.naho.speech.azure.controller.v1;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.naho.shared.filter.RequestLoggingFilter;
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
 import org.naho.speech.azure.command.TextToSpeechCommand;
 import org.naho.speech.azure.dto.mapper.PronunciationAssessmentMapper;
@@ -29,7 +30,8 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(
@@ -44,7 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                         classes = {
                                 org.naho.shared.handler.ApiResponseHandler.class,
                                 org.naho.shared.handler.GlobalExceptionHandler.class,
-                                org.naho.shared.handler.RequestLoggingFilter.class
+                                RequestLoggingFilter.class
                         }
                 )
         }
@@ -103,7 +105,7 @@ class SpeechControllerTest {
 
         verify(assessSpeechInputPort, times(1)).execute(argThat(cmd ->
                 cmd.referenceText().equals("こんにちは") &&
-                cmd.audioBytes().length == 4
+                        cmd.audioBytes().length == 4
         ));
     }
 
@@ -130,8 +132,8 @@ class SpeechControllerTest {
 
         verify(textToSpeechRequestMapper, times(1)).requestToCommand(argThat(req ->
                 req.text().equals("こんにちは") &&
-                req.voiceName().equals("ja-JP-NanamiNeural") &&
-                req.language().equals("ja-JP")
+                        req.voiceName().equals("ja-JP-NanamiNeural") &&
+                        req.language().equals("ja-JP")
         ));
         verify(textToSpeechInputPort, times(1)).execute(command);
     }

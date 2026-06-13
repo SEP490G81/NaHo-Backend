@@ -39,6 +39,10 @@ public enum UserErrorCode implements ErrorCode {
     USER_INVALID_REFRESH_TOKEN(
             "USER_A009",
             UserTitleMessageKey.USER_INVALID_REFRESH_TOKEN_TITLE
+    ),
+    USER_GOOGLE_ID_TOKEN_NOT_VALID(
+            "USER_A010",
+            UserTitleMessageKey.USER_GOOGLE_ID_TOKEN_NOT_VALID_TITLE
     );
 
     private final String code;

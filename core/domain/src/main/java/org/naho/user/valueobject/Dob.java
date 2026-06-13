@@ -1,7 +1,7 @@
 package org.naho.user.valueobject;
 
 import org.naho.i18n.message.user.UserDetailMessageKey;
-import org.naho.user.exception.DomainException;
+import org.naho.shared.exception.DomainException;
 import org.naho.user.exception.UserDomainErrorCode;
 
 import java.time.LocalDate;

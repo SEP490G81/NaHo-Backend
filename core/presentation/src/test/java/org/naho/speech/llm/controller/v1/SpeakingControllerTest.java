@@ -3,6 +3,7 @@ package org.naho.speech.llm.controller.v1;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.naho.shared.filter.RequestLoggingFilter;
 import org.naho.speech.llm.command.SendAudioMessageCommand;
 import org.naho.speech.llm.command.SendMessageWithSessionCommand;
 import org.naho.speech.llm.command.StartSpeakingCommand;
@@ -14,11 +15,7 @@ import org.naho.speech.llm.dto.response.*;
 import org.naho.speech.llm.port.in.EndSessionInputPort;
 import org.naho.speech.llm.port.in.SpeakingSessionInputPort;
 import org.naho.speech.llm.port.in.SuggestedTopicsInputPort;
-import org.naho.speech.llm.result.AudioChatResult;
-import org.naho.speech.llm.result.ChatResult;
-import org.naho.speech.llm.result.ScoringResult;
-import org.naho.speech.llm.result.SpeakingTopicResult;
-import org.naho.speech.llm.result.SuggestedTopicsResult;
+import org.naho.speech.llm.result.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
@@ -51,7 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                         classes = {
                                 org.naho.shared.handler.ApiResponseHandler.class,
                                 org.naho.shared.handler.GlobalExceptionHandler.class,
-                                org.naho.shared.handler.RequestLoggingFilter.class
+                                RequestLoggingFilter.class
                         }
                 )
         }
@@ -229,8 +226,8 @@ class SpeakingControllerTest {
 
         verify(speakingSessionInputPort, times(1)).sendAudioMessage(argThat(cmd ->
                 cmd.sessionId().equals(sessionId) &&
-                cmd.referenceText().equals("こんにちは") &&
-                cmd.audioBytes().length == 3
+                        cmd.referenceText().equals("こんにちは") &&
+                        cmd.audioBytes().length == 3
         ));
     }
 

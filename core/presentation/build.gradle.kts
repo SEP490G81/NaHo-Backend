@@ -53,7 +53,8 @@ dependencies {
     // spring security
     implementation("org.springframework.boot:spring-boot-starter-security")
     testImplementation("org.springframework.security:spring-security-test")
-
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+    
     // UA-parser (User Agent)
     implementation("com.github.ua-parser:uap-java:1.6.1")
 

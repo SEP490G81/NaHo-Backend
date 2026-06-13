@@ -21,9 +21,6 @@ public class FileEntity extends BaseEntity {
     @Column(name = "object_key", nullable = false, length = 2048)
     String objectKey;
 
-    @Column(name = "preview_key", length = 2048)
-    String previewKey;
-
     @Column(name = "original_name", nullable = false)
     String originalName;
 

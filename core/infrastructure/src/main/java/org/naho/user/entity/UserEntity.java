@@ -4,9 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-import org.naho.file.model.FileEntity;
 import org.naho.shared.persistence.BaseEntity;
-import org.naho.user.type.AccountType;
 import org.naho.user.type.Gender;
 import org.naho.user.type.JLPTLevel;
 import org.naho.user.type.UserStatus;
@@ -24,24 +22,17 @@ import java.util.List;
 @Table(name = "users")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserEntity extends BaseEntity {
-    @Column(unique = true, nullable = false, length = Username.MAX_LENGTH)
+    @Column(unique = true, length = Username.MAX_LENGTH)
     String username;
 
     @Column(unique = true, nullable = false)
     String email;
 
-    @Column(name = "hash_password", nullable = false)
+    @Column(name = "hash_password")
     String hashPassword;
 
-    @Column(name = "account_type", nullable = false, length = 20)
-    @Enumerated(EnumType.STRING)
-    AccountType accountType;
-
-    @Column(name = "first_name", length = 100)
-    String firstName;
-
-    @Column(name = "last_name", length = 100)
-    String lastName;
+    @Column(name = "full_name", length = 200)
+    String fullName;
 
     @Column(length = 10)
     @Enumerated(EnumType.STRING)
@@ -66,9 +57,11 @@ public class UserEntity extends BaseEntity {
     @Column(name = "last_practice_date")
     LocalDate lastPracticeDate;
 
-    @OneToOne
-    @JoinColumn(name = "avatar_file_id")
-    FileEntity avatarFile;
+    @Column(name = "avatar_url", length = 2048)
+    String avatarUrl;
+
+    @Column(name = "provider_id", length = 512, unique = true)
+    String providerId;
 
     @ManyToMany
     @JoinTable(

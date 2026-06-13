@@ -4,7 +4,6 @@ public class File {
 
     private final Long id;
     private final String objectKey;
-    private final String previewKey;
     private final String originalName;
     private final String contentType;
     private final Long size;
@@ -12,7 +11,6 @@ public class File {
     private File(Builder builder) {
         this.id = builder.id;
         this.objectKey = builder.objectKey;
-        this.previewKey = builder.previewKey;
         this.originalName = builder.originalName;
         this.contentType = builder.contentType;
         this.size = builder.size;
@@ -28,10 +26,6 @@ public class File {
 
     public String getObjectKey() {
         return objectKey;
-    }
-
-    public String getPreviewKey() {
-        return previewKey;
     }
 
     public String getOriginalName() {
@@ -50,7 +44,6 @@ public class File {
 
         private Long id;
         private String objectKey;
-        private String previewKey;
         private String originalName;
         private String contentType;
         private Long size;
@@ -62,11 +55,6 @@ public class File {
 
         public Builder objectKey(String objectKey) {
             this.objectKey = objectKey;
-            return this;
-        }
-
-        public Builder previewKey(String previewKey) {
-            this.previewKey = previewKey;
             return this;
         }
 

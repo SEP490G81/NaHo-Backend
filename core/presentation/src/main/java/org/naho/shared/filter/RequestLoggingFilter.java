@@ -1,4 +1,4 @@
-package org.naho.shared.handler;
+package org.naho.shared.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

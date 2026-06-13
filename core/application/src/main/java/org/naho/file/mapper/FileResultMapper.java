@@ -9,7 +9,6 @@ public class FileResultMapper {
         return new FileResult(
                 domain.getId(),
                 domain.getObjectKey(),
-                domain.getPreviewKey(),
                 domain.getOriginalName(),
                 domain.getContentType(),
                 domain.getSize()
