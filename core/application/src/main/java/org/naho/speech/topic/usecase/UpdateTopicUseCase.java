@@ -2,12 +2,12 @@ package org.naho.speech.topic.usecase;
 
 import org.naho.i18n.message.speech.TopicDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
-import org.naho.speech.model.Topic;
 import org.naho.speech.topic.command.UpdateTopicCommand;
 import org.naho.speech.topic.exception.TopicErrorCode;
 import org.naho.speech.topic.port.in.UpdateTopicInputPort;
 import org.naho.speech.topic.port.out.TopicRepositoryPort;
 import org.naho.speech.topic.result.TopicDetailResult;
+import org.naho.topic.model.Topic;
 
 public class UpdateTopicUseCase implements UpdateTopicInputPort {
     private final TopicRepositoryPort topicRepositoryPort;
@@ -32,7 +32,7 @@ public class UpdateTopicUseCase implements UpdateTopicInputPort {
             );
         }
 
-        if (topicRepositoryPort.existsByNameAndJlptLevelExcludeId(command.name(), command.jlptLevel(), command.id())) {
+        if (topicRepositoryPort.existsByJapaneseNameAndJlptLevelExcludeId(command.japaneseName(), command.jlptLevel(), command.id())) {
             throw new ApplicationException(
                     TopicErrorCode.TOPIC_ALREADY_EXISTS,
                     TopicDetailMessageKey.TOPIC_ALREADY_EXISTS_IN_LEVEL
@@ -50,7 +50,7 @@ public class UpdateTopicUseCase implements UpdateTopicInputPort {
         }
 
         topic.update(
-                command.name(),
+                command.japaneseName(),
                 command.description(),
                 command.nameTokens(),
                 command.descriptionTokens(),
@@ -65,7 +65,7 @@ public class UpdateTopicUseCase implements UpdateTopicInputPort {
         return new TopicDetailResult(
                 savedTopic.getId(),
                 savedTopic.getUserId(),
-                savedTopic.getName(),
+                savedTopic.getJapaneseName(),
                 savedTopic.getDescription(),
                 savedTopic.getJapaneseNameTokens(),
                 savedTopic.getJapaneseDescriptionTokens(),

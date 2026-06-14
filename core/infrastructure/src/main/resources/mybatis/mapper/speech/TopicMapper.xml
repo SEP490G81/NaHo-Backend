@@ -26,7 +26,7 @@
     <select id="findTopics" resultType="org.naho.speech.topic.result.TopicListItemResult">
         SELECT 
             t.id AS id,
-            t.japanese_name AS name,
+            t.japanese_name AS japaneseName,
             t.japanese_description AS description,
             t.japanese_name_tokens AS japaneseNameTokens,
             t.japanese_description_tokens AS japaneseDescriptionTokens,

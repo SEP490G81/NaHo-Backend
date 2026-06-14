@@ -1,6 +1,6 @@
 package org.naho.speech.topic.port.out;
 
-import org.naho.speech.model.Topic;
+import org.naho.topic.model.Topic;
 import org.naho.user.type.JLPTLevel;
 
 import java.util.Optional;
@@ -8,9 +8,9 @@ import java.util.Optional;
 public interface TopicRepositoryPort {
     Topic save(Topic topic);
 
-    boolean existsByNameAndJlptLevel(String name, JLPTLevel jlptLevel);
+    boolean existsByJapaneseNameAndJlptLevel(String japaneseName, JLPTLevel jlptLevel);
 
-    boolean existsByNameAndJlptLevelExcludeId(String name, JLPTLevel jlptLevel, Long id);
+    boolean existsByJapaneseNameAndJlptLevelExcludeId(String japaneseName, JLPTLevel jlptLevel, Long id);
 
     Double getMaxOrderIndex();
 

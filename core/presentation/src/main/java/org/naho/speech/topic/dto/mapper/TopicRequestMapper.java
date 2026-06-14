@@ -50,7 +50,7 @@ public interface TopicRequestMapper {
     @Mapping(target = "id", source = "id")
     @Mapping(target = "requestUserId", source = "userId")
     @Mapping(target = "isAdminOrManager", source = "isAdminOrManager")
-    @Mapping(target = "name", source = "request.name")
+    @Mapping(target = "japaneseName", source = "request.japaneseName")
     @Mapping(target = "description", source = "request.description")
     @Mapping(target = "nameTokens", source = "request.nameTokens", qualifiedByName = "convertObjectToJsonString")
     @Mapping(target = "descriptionTokens", source = "request.descriptionTokens", qualifiedByName = "convertObjectToJsonString")

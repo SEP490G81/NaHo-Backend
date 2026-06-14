@@ -2,12 +2,13 @@ package org.naho.file.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.naho.shared.persistence.BaseEntity;
-
 import lombok.experimental.SuperBuilder;
+import org.naho.persona.entity.PersonaEntity;
+import org.naho.shared.persistence.BaseEntity;
 
 @SuperBuilder
 @Getter
@@ -29,4 +30,7 @@ public class FileEntity extends BaseEntity {
 
     @Column(nullable = false)
     Long size; // bytes
+
+    @OneToOne(mappedBy = "avatarFile")
+    PersonaEntity persona;
 }

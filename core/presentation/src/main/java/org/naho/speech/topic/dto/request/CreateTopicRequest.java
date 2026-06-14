@@ -3,7 +3,7 @@ package org.naho.speech.topic.dto.request;
 import org.naho.user.type.JLPTLevel;
 
 public record CreateTopicRequest(
-        String name,
+        String japaneseName,
         String description,
         Object nameTokens,
         Object descriptionTokens,

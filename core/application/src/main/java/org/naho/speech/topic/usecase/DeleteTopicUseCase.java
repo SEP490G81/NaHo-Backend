@@ -3,14 +3,14 @@ package org.naho.speech.topic.usecase;
 import org.naho.i18n.message.speech.TopicDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.TransactionPort;
-import org.naho.speech.model.Topic;
 import org.naho.speech.question.port.out.QuestionRepositoryPort;
 import org.naho.speech.topic.command.DeleteTopicCommand;
 import org.naho.speech.topic.exception.TopicErrorCode;
 import org.naho.speech.topic.port.in.DeleteTopicInputPort;
 import org.naho.speech.topic.port.out.TopicRepositoryPort;
-import org.naho.speech.type.QuestionStatus;
-import org.naho.speech.type.TopicStatus;
+import org.naho.topic.model.Topic;
+import org.naho.topic.type.QuestionStatus;
+import org.naho.topic.type.TopicStatus;
 
 import java.util.Optional;
 
@@ -55,7 +55,7 @@ public class DeleteTopicUseCase implements DeleteTopicInputPort {
             if (hasAnswers) {
                 // Soft delete
                 topic.update(
-                        topic.getName(),
+                        topic.getJapaneseName(),
                         topic.getDescription(),
                         topic.getJapaneseNameTokens(),
                         topic.getJapaneseDescriptionTokens(),

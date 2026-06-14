@@ -39,7 +39,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         String email = oAuth2User.getAttribute("email");
         String name = oAuth2User.getAttribute("name");
         String picture = oAuth2User.getAttribute("picture");
-        
+
         GoogleLoginCommand command = GoogleLoginCommand.builder()
                 .sub(sub)
                 .email(email)

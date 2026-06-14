@@ -5,6 +5,8 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.shared.persistence.BaseEntity;
+import org.naho.social.entity.ReportEntity;
+import org.naho.speech.question.entity.QuestionEntity;
 import org.naho.user.type.Gender;
 import org.naho.user.type.JLPTLevel;
 import org.naho.user.type.UserStatus;
@@ -31,7 +33,7 @@ public class UserEntity extends BaseEntity {
     @Column(name = "hash_password")
     String hashPassword;
 
-    @Column(name = "full_name", length = 200)
+    @Column(name = "full_name")
     String fullName;
 
     @Column(length = 10)
@@ -71,4 +73,10 @@ public class UserEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "user")
     List<UserSessionEntity> userSessions;
+
+    @OneToMany(mappedBy = "user")
+    List<QuestionEntity> questions;
+
+    @OneToMany(mappedBy = "user")
+    List<ReportEntity> reports;
 }

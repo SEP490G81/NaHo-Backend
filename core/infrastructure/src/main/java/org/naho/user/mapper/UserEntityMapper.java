@@ -20,6 +20,7 @@ public interface UserEntityMapper {
     @Mapping(target = "roles", source = "roleIds")
     @Mapping(target = "jlptLevel", defaultValue = "N5")
     @Mapping(target = "userSessions", ignore = true)
+    @Mapping(target = "questions", ignore = true)
     @Mapping(target = "createdTime", ignore = true)
     @Mapping(target = "modifiedTime", ignore = true)
     UserEntity domainToEntity(User user);

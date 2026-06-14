@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    private final ErrorCodeHttpMapper errorCodeHttpMapper;
     private final MessageService messageService;
     private final ProblemDetailFactory problemDetailFactory;
     private final ErrorLogContextWriter errorLogContextWriter;
@@ -27,14 +26,14 @@ public class GlobalExceptionHandler {
             HttpServletRequest request
     ) {
         ErrorCode errorCode = e.getErrorCode();
-        HttpStatus status = errorCodeHttpMapper.toStatus(errorCode);
+        HttpStatus status = HttpStatus.valueOf(errorCode.getStatusCode());
         String errorMessage = messageService.getMessage(e.getMessage(), e.getArgs());
 
         ProblemDetail problemDetail = problemDetailFactory.create(
                 errorCode.getCode(),
                 messageService.getMessage(errorCode.getTitleKey()),
                 status,
-                errorCodeHttpMapper.toType(errorCode),
+                errorCode.getTypeUri(),
                 errorMessage,
                 request
         );
@@ -57,14 +56,14 @@ public class GlobalExceptionHandler {
     ) {
         ErrorCode errorCode = CommonErrorCode.COMMON_INTERNAL_SERVER_ERROR;
 
-        HttpStatus status = errorCodeHttpMapper.toStatus(errorCode);
+        HttpStatus status = HttpStatus.valueOf(errorCode.getStatusCode());
         String errorMessage = messageService.getMessage(e.getMessage());
 
         ProblemDetail problemDetail = problemDetailFactory.create(
                 errorCode.getCode(),
                 messageService.getMessage(errorCode.getTitleKey()),
                 status,
-                errorCodeHttpMapper.toType(errorCode),
+                errorCode.getTypeUri(),
                 errorMessage,
                 request
         );
