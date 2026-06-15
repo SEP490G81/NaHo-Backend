@@ -7,7 +7,6 @@ import org.naho.file.model.File;
 import org.naho.file.port.in.FileStorageInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileStorageServicePort;
-import org.naho.file.port.out.FileValidatorPort;
 import org.naho.file.result.FileResult;
 import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
@@ -19,23 +18,32 @@ public class FileStorageUseCase implements FileStorageInputPort {
     private final FileStorageServicePort fileStorageServicePort;
     private final FileRepositoryPort fileRepositoryPort;
     private final FileResultMapper fileResultMapper;
-    private final FileValidatorPort fileValidatorPort;
 
     public FileStorageUseCase(
             FileStorageServicePort fileStorageServicePort,
             FileRepositoryPort fileRepositoryPort,
-            FileResultMapper fileResultMapper,
-            FileValidatorPort fileValidatorPort
+            FileResultMapper fileResultMapper
     ) {
         this.fileStorageServicePort = fileStorageServicePort;
         this.fileRepositoryPort = fileRepositoryPort;
         this.fileResultMapper = fileResultMapper;
-        this.fileValidatorPort = fileValidatorPort;
     }
 
     @Override
-    public FileResult upload(FileUploadCommand command) {
-        fileValidatorPort.validateFileUploadCommand(command);
+    public FileResult uploadFile(FileUploadCommand command) {
+        if (command == null || command.getInputStream() == null) {
+            throw new ApplicationException(
+                    FileErrorCode.FILE_NOT_VALID,
+                    FileDetailMessageKey.FILE_EMPTY
+            );
+        }
+
+        if (command.getFolderName() == null || command.getFolderName().isBlank()) {
+            throw new ApplicationException(
+                    FileErrorCode.FILE_NOT_VALID,
+                    FileDetailMessageKey.FILE_FOLDER_NAME_EMPTY
+            );
+        }
 
         String objectKey = command.getFolderName() + "/" + UUID.randomUUID() + "-" + Instant.now().toEpochMilli();
 
@@ -75,3 +83,4 @@ public class FileStorageUseCase implements FileStorageInputPort {
         return objectKey;
     }
 }
+

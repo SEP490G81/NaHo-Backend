@@ -31,7 +31,7 @@ public class FileController {
         FileUploadCommand command =
                 fileRequestMapper.multipartFileAndFolderNameToCommand(file, folderName);
 
-        FileResult result = fileStorageInputPort.upload(command);
+        FileResult result = fileStorageInputPort.uploadFile(command);
         FileResponse response = fileResponseMapper.resultToResponse(result);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

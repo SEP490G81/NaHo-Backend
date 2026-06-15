@@ -18,7 +18,6 @@ public class Topic {
     private JLPTLevel jlptLevel;
     private Double orderIndex;
 
-
     // Private constructor dùng cho Builder
     private Topic(Builder builder) {
         this.id = builder.id;

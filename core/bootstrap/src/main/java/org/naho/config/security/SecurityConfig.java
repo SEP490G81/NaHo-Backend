@@ -30,7 +30,6 @@ public class SecurityConfig {
             "/api/v1/auth/rotation",
             "/api/v1/users/**",
             "/api/v1/roles/**",
-            "/api/v1/**"
     };
 
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
