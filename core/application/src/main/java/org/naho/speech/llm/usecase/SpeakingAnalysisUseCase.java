@@ -59,7 +59,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public SpeakingAnalysisResult analyze(SpeakingAnalysisCommand command) {
+    public SpeakingAnalysisResult analyzeSpeaking(SpeakingAnalysisCommand command) {
         System.out.println("[SpeakingAnalysis] Starting analysis for user: " + command.userId() + ", question: " + command.questionId());
 
         User user = userRepositoryPort.findById(command.userId())

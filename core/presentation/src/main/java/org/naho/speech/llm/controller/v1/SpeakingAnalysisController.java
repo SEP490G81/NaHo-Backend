@@ -48,7 +48,7 @@ public class SpeakingAnalysisController {
                 durationSec
         );
 
-        var result = speakingAnalysisInputPort.analyze(command);
+        var result = speakingAnalysisInputPort.analyzeSpeaking(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(speakingAnalysisMapper.toResponse(result));
     }
 
