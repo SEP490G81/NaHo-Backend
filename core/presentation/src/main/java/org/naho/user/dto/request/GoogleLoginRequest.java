@@ -1,0 +1,14 @@
+package org.naho.user.dto.request;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
+@Setter
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@NoArgsConstructor
+@AllArgsConstructor
+public class GoogleLoginRequest {
+    String idToken;
+    String deviceId;
+}

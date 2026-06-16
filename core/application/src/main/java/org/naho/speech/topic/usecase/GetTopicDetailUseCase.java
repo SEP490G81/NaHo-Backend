@@ -2,12 +2,12 @@ package org.naho.speech.topic.usecase;
 
 import org.naho.i18n.message.speech.TopicDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
-import org.naho.speech.model.Topic;
 import org.naho.speech.topic.command.GetTopicDetailCommand;
 import org.naho.speech.topic.exception.TopicErrorCode;
 import org.naho.speech.topic.port.in.GetTopicDetailInputPort;
 import org.naho.speech.topic.port.out.TopicRepositoryPort;
 import org.naho.speech.topic.result.TopicDetailResult;
+import org.naho.topic.model.Topic;
 
 public class GetTopicDetailUseCase implements GetTopicDetailInputPort {
 
@@ -28,7 +28,7 @@ public class GetTopicDetailUseCase implements GetTopicDetailInputPort {
         return new TopicDetailResult(
                 topic.getId(),
                 topic.getUserId(),
-                topic.getName(),
+                topic.getJapaneseName(),
                 topic.getDescription(),
                 topic.getJapaneseNameTokens(),
                 topic.getJapaneseDescriptionTokens(),

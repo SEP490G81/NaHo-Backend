@@ -7,4 +7,7 @@ public record CredentialsLoginCommand(
         String userAgent,
         String ipAddress
 ) {
+    public boolean isDeviceIdBlank() {
+        return deviceId == null || deviceId.isBlank();
+    }
 }

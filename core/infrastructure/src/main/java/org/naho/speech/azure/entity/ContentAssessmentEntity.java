@@ -3,9 +3,9 @@ package org.naho.speech.azure.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.naho.shared.persistence.BaseEntity;
-
 import lombok.experimental.SuperBuilder;
+import org.naho.shared.persistence.BaseEntity;
+import org.naho.speech.question.entity.AnswerHistoryEntity;
 
 @SuperBuilder
 @Getter

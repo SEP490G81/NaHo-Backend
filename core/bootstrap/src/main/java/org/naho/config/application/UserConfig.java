@@ -1,6 +1,5 @@
 package org.naho.config.application;
 
-import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.user.helper.AuthUseCaseHelper;
 import org.naho.user.mapper.UserResultMapper;
@@ -26,14 +25,12 @@ public class UserConfig {
     @Bean
     public AuthUseCaseHelper authUseCaseHelper(
             RoleRepositoryPort roleRepositoryPort,
-            FileRepositoryPort fileRepositoryPort,
             TokenServicePort tokenServicePort,
             UserResultMapper userResultMapper,
             UserRepositoryPort userRepositoryPort
     ) {
         return new AuthUseCaseHelper(
                 roleRepositoryPort,
-                fileRepositoryPort,
                 tokenServicePort,
                 userResultMapper,
                 userRepositoryPort
@@ -48,7 +45,6 @@ public class UserConfig {
             UserResultMapper userResultMapper,
             UserSessionRepositoryPort userSessionRepositoryPort,
             RoleRepositoryPort roleRepositoryPort,
-            FileRepositoryPort fileRepositoryPort,
             TransactionPort transactionPort,
             AuthUseCaseHelper authUseCaseHelper
     ) {
@@ -59,7 +55,6 @@ public class UserConfig {
                 userResultMapper,
                 userSessionRepositoryPort,
                 roleRepositoryPort,
-                fileRepositoryPort,
                 transactionPort,
                 authUseCaseHelper
         );
@@ -78,24 +73,21 @@ public class UserConfig {
     public GetUserInputPort getUserInputPort(
             UserRepositoryPort userRepositoryPort,
             RoleRepositoryPort roleRepositoryPort,
-            FileRepositoryPort fileRepositoryPort,
             UserResultMapper userResultMapper
     ) {
-        return new GetUserUseCase(userRepositoryPort, roleRepositoryPort, fileRepositoryPort, userResultMapper);
+        return new GetUserUseCase(userRepositoryPort, roleRepositoryPort, userResultMapper);
     }
 
     @Bean
     public UpdateUserInputPort updateUserInputPort(
             UserRepositoryPort userRepositoryPort,
             UserResultMapper userResultMapper,
-            RoleRepositoryPort roleRepositoryPort,
-            FileRepositoryPort fileRepositoryPort
+            RoleRepositoryPort roleRepositoryPort
     ) {
         return new UpdateUserUseCase(
                 userRepositoryPort,
                 userResultMapper,
-                roleRepositoryPort,
-                fileRepositoryPort
+                roleRepositoryPort
         );
     }
 

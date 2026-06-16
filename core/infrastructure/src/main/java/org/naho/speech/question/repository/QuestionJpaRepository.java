@@ -1,7 +1,7 @@
 package org.naho.speech.question.repository;
 
-import org.naho.speech.azure.entity.QuestionEntity;
-import org.naho.speech.type.QuestionStatus;
+import org.naho.speech.question.entity.QuestionEntity;
+import org.naho.topic.type.QuestionStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

@@ -1,16 +1,20 @@
 package org.naho.user.helper;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ua_parser.Client;
 import ua_parser.Parser;
 
+import java.util.Arrays;
+
 @Component
 @RequiredArgsConstructor
 public class LoginRequestResolver {
     private static final String USER_AGENT_HEADER = "User-Agent";
     private static final String X_FORWARDED_FOR_HEADER = "X-Forwarded-For";
+    private static final String DEVICE_ID = "Device-ID";
     private final Parser parser;
 
     public String getIpAddress(HttpServletRequest request) {
@@ -19,6 +23,17 @@ public class LoginRequestResolver {
             return forwardedFor.split(",")[0].trim();
         }
         return request.getRemoteAddr();
+    }
+
+    public String getDeviceId(HttpServletRequest request) {
+        if (request.getCookies() == null) {
+            return null;
+        }
+        return Arrays.stream(request.getCookies())
+                .filter(cookie -> DEVICE_ID.equals(cookie.getName()))
+                .map(Cookie::getValue)
+                .findFirst()
+                .orElse(null);
     }
 
     public String getUserAgent(HttpServletRequest request) {

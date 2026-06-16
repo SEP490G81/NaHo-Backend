@@ -2,13 +2,13 @@ package org.naho.speech.topic.usecase;
 
 import org.naho.i18n.message.speech.TopicDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
-import org.naho.speech.model.Topic;
 import org.naho.speech.topic.command.CreateTopicCommand;
 import org.naho.speech.topic.exception.TopicErrorCode;
 import org.naho.speech.topic.port.in.CreateTopicInputPort;
 import org.naho.speech.topic.port.out.TopicRepositoryPort;
 import org.naho.speech.topic.result.CreateTopicResult;
-import org.naho.speech.type.TopicStatus;
+import org.naho.topic.model.Topic;
+import org.naho.topic.type.TopicStatus;
 
 public class CreateTopicUseCase implements CreateTopicInputPort {
 
@@ -21,7 +21,7 @@ public class CreateTopicUseCase implements CreateTopicInputPort {
     @Override
     public CreateTopicResult createTopic(CreateTopicCommand command) {
         // Validation for duplicate in JLPT level
-        if (topicRepositoryPort.existsByNameAndJlptLevel(command.name(), command.jlptLevel())) {
+        if (topicRepositoryPort.existsByJapaneseNameAndJlptLevel(command.japaneseName(), command.jlptLevel())) {
             throw new ApplicationException(TopicErrorCode.TOPIC_ALREADY_EXISTS, TopicDetailMessageKey.TOPIC_ALREADY_EXISTS_IN_LEVEL);
         }
 
@@ -36,7 +36,7 @@ public class CreateTopicUseCase implements CreateTopicInputPort {
 
         Topic topic = Topic.builder()
                 .userId(command.userId())
-                .name(command.name())
+                .japaneseName(command.japaneseName())
                 .description(command.description())
                 .japaneseNameTokens(command.nameTokens())
                 .japaneseDescriptionTokens(command.descriptionTokens())
@@ -51,7 +51,7 @@ public class CreateTopicUseCase implements CreateTopicInputPort {
         return new CreateTopicResult(
                 savedTopic.getId(),
                 savedTopic.getUserId(),
-                savedTopic.getName(),
+                savedTopic.getJapaneseName(),
                 savedTopic.getDescription(),
                 savedTopic.getJapaneseNameTokens(),
                 savedTopic.getJapaneseDescriptionTokens(),

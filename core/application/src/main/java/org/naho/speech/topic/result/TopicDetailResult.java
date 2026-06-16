@@ -1,17 +1,18 @@
 package org.naho.speech.topic.result;
 
-import org.naho.speech.type.TopicStatus;
+import org.naho.topic.type.TopicStatus;
 import org.naho.user.type.JLPTLevel;
 
 public record TopicDetailResult(
-    Long id,
-    Long userId,
-    String name,
-    String description,
-    String japaneseNameTokens,
-    String japaneseDescriptionTokens,
-    TopicStatus status,
-    JLPTLevel jlptLevel,
-    Double orderIndex,
-    Long coverImageFileId
-) {}
+        Long id,
+        Long userId,
+        String japaneseName,
+        String description,
+        String japaneseNameTokens,
+        String japaneseDescriptionTokens,
+        TopicStatus status,
+        JLPTLevel jlptLevel,
+        Double orderIndex,
+        Long coverImageFileId
+) {
+}

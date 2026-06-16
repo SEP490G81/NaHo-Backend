@@ -1,6 +1,6 @@
 package org.naho.speech.topic.result;
 
-import org.naho.speech.type.TopicStatus;
+import org.naho.topic.type.TopicStatus;
 import org.naho.user.type.JLPTLevel;
 
 public record CreateTopicResult(

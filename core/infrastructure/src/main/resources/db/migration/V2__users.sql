@@ -12,14 +12,12 @@ INSERT INTO users (created_time,
                    username,
                    email,
                    hash_password,
-                   account_type,
                    jlpt_level,
                    status)
 VALUES (NOW(),
         'vuongtruc2004',
         'vuongtrucwork2004@gmail.com',
         '{bcrypt}$2a$10$mLvl6v0NmQ4f5cP6360qnueyzPYTyLizOJDyr7gL2DbAnnFzbK0mq',
-        'CREDENTIALS',
         'N5',
         'ACTIVE');
 

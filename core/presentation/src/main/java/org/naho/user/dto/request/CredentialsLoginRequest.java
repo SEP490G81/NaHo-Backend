@@ -9,12 +9,9 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CredentialsLoginRequest {
-    // fe
     String usernameOrEmail;
     String rawPassword;
     String deviceId;
-
-    // be
     String userAgent;
     String ipAddress;
 }

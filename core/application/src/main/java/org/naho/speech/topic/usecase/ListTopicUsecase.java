@@ -5,7 +5,7 @@ import org.naho.speech.topic.port.in.ListTopicInputPort;
 import org.naho.speech.topic.port.out.TopicListRepositoryPort;
 import org.naho.speech.topic.result.TopicListItemResult;
 import org.naho.speech.topic.result.TopicListResult;
-import org.naho.speech.type.TopicStatus;
+import org.naho.topic.type.TopicStatus;
 
 import java.util.List;
 

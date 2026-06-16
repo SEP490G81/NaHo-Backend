@@ -43,6 +43,10 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 
+    // google
+    implementation("com.google.api-client:google-api-client:2.8.1")
+    implementation("com.google.oauth-client:google-oauth-client:1.39.0")
+
     // jwt
     implementation("io.jsonwebtoken:jjwt-api:0.12.6")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")

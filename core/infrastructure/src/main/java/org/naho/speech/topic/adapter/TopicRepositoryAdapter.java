@@ -2,10 +2,10 @@ package org.naho.speech.topic.adapter;
 
 import org.naho.file.model.FileEntity;
 import org.naho.file.repository.FileJpaRepository;
-import org.naho.speech.azure.entity.TopicEntity;
-import org.naho.speech.model.Topic;
+import org.naho.speech.topic.entity.TopicEntity;
 import org.naho.speech.topic.port.out.TopicRepositoryPort;
 import org.naho.speech.topic.repository.TopicJpaRepository;
+import org.naho.topic.model.Topic;
 import org.naho.user.entity.UserEntity;
 import org.naho.user.repository.UserJpaRepository;
 import org.naho.user.type.JLPTLevel;
@@ -37,7 +37,7 @@ public class TopicRepositoryAdapter implements TopicRepositoryPort {
             entity.setId(topic.getId());
         }
 
-        entity.setName(topic.getName());
+        entity.setJapaneseName(topic.getJapaneseName());
         entity.setDescription(topic.getDescription());
         entity.setJapaneseNameTokens(topic.getJapaneseNameTokens());
         entity.setJapaneseDescriptionTokens(topic.getJapaneseDescriptionTokens());
@@ -62,7 +62,7 @@ public class TopicRepositoryAdapter implements TopicRepositoryPort {
         return Topic.builder()
                 .id(savedEntity.getId())
                 .userId(savedEntity.getUser() != null ? savedEntity.getUser().getId() : null)
-                .name(savedEntity.getName())
+                .japaneseName(savedEntity.getJapaneseName())
                 .description(savedEntity.getDescription())
                 .japaneseNameTokens(savedEntity.getJapaneseNameTokens())
                 .japaneseDescriptionTokens(savedEntity.getJapaneseDescriptionTokens())
@@ -74,13 +74,13 @@ public class TopicRepositoryAdapter implements TopicRepositoryPort {
     }
 
     @Override
-    public boolean existsByNameAndJlptLevel(String name, JLPTLevel jlptLevel) {
-        return topicJpaRepository.existsByNameAndJlptLevel(name, jlptLevel);
+    public boolean existsByJapaneseNameAndJlptLevel(String japaneseName, JLPTLevel jlptLevel) {
+        return topicJpaRepository.existsByJapaneseNameAndJlptLevel(japaneseName, jlptLevel);
     }
 
     @Override
-    public boolean existsByNameAndJlptLevelExcludeId(String name, JLPTLevel jlptLevel, Long id) {
-        return topicJpaRepository.existsByNameAndJlptLevelAndIdNot(name, jlptLevel, id);
+    public boolean existsByJapaneseNameAndJlptLevelExcludeId(String japaneseName, JLPTLevel jlptLevel, Long id) {
+        return topicJpaRepository.existsByJapaneseNameAndJlptLevelAndIdNot(japaneseName, jlptLevel, id);
     }
 
     @Override
@@ -94,7 +94,7 @@ public class TopicRepositoryAdapter implements TopicRepositoryPort {
         return topicJpaRepository.findById(id).map(savedEntity -> Topic.builder()
                 .id(savedEntity.getId())
                 .userId(savedEntity.getUser() != null ? savedEntity.getUser().getId() : null)
-                .name(savedEntity.getName())
+                .japaneseName(savedEntity.getJapaneseName())
                 .description(savedEntity.getDescription())
                 .japaneseNameTokens(savedEntity.getJapaneseNameTokens())
                 .japaneseDescriptionTokens(savedEntity.getJapaneseDescriptionTokens())

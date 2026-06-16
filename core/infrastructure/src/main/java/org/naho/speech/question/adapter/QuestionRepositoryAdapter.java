@@ -2,7 +2,7 @@ package org.naho.speech.question.adapter;
 
 import org.naho.speech.question.port.out.QuestionRepositoryPort;
 import org.naho.speech.question.repository.QuestionJpaRepository;
-import org.naho.speech.type.QuestionStatus;
+import org.naho.topic.type.QuestionStatus;
 import org.springframework.stereotype.Component;
 
 @Component

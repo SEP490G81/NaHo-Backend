@@ -1,5 +1,9 @@
 package org.naho.user.adapter;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -7,6 +11,8 @@ import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
+import org.naho.shared.exception.InfrastructureException;
+import org.naho.user.constant.GoogleProperties;
 import org.naho.user.constant.JwtCustomClaimKey;
 import org.naho.user.constant.JwtProperties;
 import org.naho.user.constant.TokenType;
@@ -15,11 +21,14 @@ import org.naho.user.model.UserSession;
 import org.naho.user.port.out.TokenServicePort;
 import org.naho.user.port.out.UserSessionRepositoryPort;
 import org.naho.user.result.AccessTokenPayload;
+import org.naho.user.result.GoogleUserInfoResult;
 import org.naho.user.result.TokenResult;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.Base64;
@@ -35,6 +44,8 @@ public class TokenServiceAdapter implements TokenServicePort {
     private static final int TOKEN_BYTES = 64;
 
     private final JwtProperties jwtProperties;
+    private final GoogleProperties googleProperties;
+
     private final SecretKey jwtSecretKey;
     private final SecureRandom secureRandom;
     private final Base64.Encoder base64UrlEncoder;
@@ -42,9 +53,11 @@ public class TokenServiceAdapter implements TokenServicePort {
 
     public TokenServiceAdapter(
             JwtProperties jwtProperties,
+            GoogleProperties googleProperties,
             UserSessionRepositoryPort userSessionRepositoryPort
     ) {
         this.jwtProperties = jwtProperties;
+        this.googleProperties = googleProperties;
 
         this.jwtSecretKey = Keys.hmacShaKeyFor(
                 jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8)
@@ -124,6 +137,41 @@ public class TokenServiceAdapter implements TokenServicePort {
             throw new ApplicationException(
                     UserErrorCode.USER_UNAUTHORIZED,
                     UserDetailMessageKey.USER_UNAUTHORIZED
+            );
+        }
+    }
+
+    @Override
+    public GoogleUserInfoResult verifyGoogleToken(String idToken) {
+        log.info("Verify Client ID: {}", googleProperties.getClientId());
+        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier
+                .Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance())
+                .setAudience(List.of(googleProperties.getClientId()))
+                .build();
+
+        try {
+            GoogleIdToken googleIdToken = verifier.verify(idToken);
+            if (googleIdToken == null) {
+                throw new ApplicationException(
+                        UserErrorCode.USER_GOOGLE_ID_TOKEN_NOT_VALID,
+                        UserDetailMessageKey.USER_GOOGLE_ID_TOKEN_NOT_FOUND
+                );
+            }
+
+            GoogleIdToken.Payload payload = googleIdToken.getPayload();
+
+            return new GoogleUserInfoResult(
+                    payload.getSubject(),
+                    payload.getEmail(),
+                    (String) payload.get("name"),
+                    (String) payload.get("picture")
+            );
+
+        } catch (IOException | GeneralSecurityException e) {
+            throw new InfrastructureException(
+                    UserErrorCode.USER_GOOGLE_ID_TOKEN_NOT_VALID,
+                    UserDetailMessageKey.USER_GOOGLE_ID_TOKEN_NOT_VALID,
+                    e.getMessage()
             );
         }
     }

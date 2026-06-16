@@ -4,7 +4,7 @@ import org.naho.user.type.JLPTLevel;
 
 public record CreateTopicCommand(
         Long userId,
-        String name,
+        String japaneseName,
         String description,
         String nameTokens,
         String descriptionTokens,
