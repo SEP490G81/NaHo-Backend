@@ -17,6 +17,10 @@ repositories {
     mavenCentral()
 }
 
+springBoot {
+    mainClass.set("org.naho.ApplicationBootstrap")
+}
+
 dependencies {
     // project dependencies
     implementation(project(":core:domain"))
@@ -24,6 +28,9 @@ dependencies {
     implementation(project(":core:infrastructure"))
     implementation(project(":core:presentation"))
     implementation(project(":core:common"))
+
+    // flyway
+    implementation("org.flywaydb:flyway-core")
 
     // lombok
     compileOnly("org.projectlombok:lombok")

@@ -11,6 +11,10 @@ spring:
       password: ${REDIS_PASSWORD:}
       database: ${REDIS_DATABASE:0}
 
+  flyway:
+    validate-on-migrate: true
+    clean-disabled: false
+
 logging:
   level:
     root: info

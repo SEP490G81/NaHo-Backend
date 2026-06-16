@@ -48,12 +48,12 @@ public class FileStorageUseCase implements FileStorageInputPort {
 
         File savedFile = fileRepositoryPort.save(file);
 
-        fileStorageServicePort.upload(
-                objectKey,
-                command.getInputStream(),
-                command.getContentType(),
-                command.getSize()
-        );
+        // fileStorageServicePort.upload(
+        //         objectKey,
+        //         command.getInputStream(),
+        //         command.getContentType(),
+        //         command.getSize()
+        // );
 
         return fileResultMapper.domainToResult(savedFile);
     }
@@ -71,7 +71,7 @@ public class FileStorageUseCase implements FileStorageInputPort {
 
         fileRepositoryPort.deleteById(id);
 
-        fileStorageServicePort.delete(objectKey);
+        // fileStorageServicePort.delete(objectKey);
         return objectKey;
     }
 }
