@@ -1,9 +1,9 @@
 package org.naho.config.application;
 
 import org.naho.furigana.mapper.FuriganaResultMapper;
-import org.naho.furigana.port.in.AnalyzeFuriganaInputPort;
-import org.naho.furigana.port.out.FuriganaAnalysisPort;
-import org.naho.furigana.usecase.AnalyzeFuriganaUseCase;
+import org.naho.furigana.port.in.GenerateFuriganaInputPort;
+import org.naho.furigana.port.out.FuriganaGenerationPort;
+import org.naho.furigana.usecase.GenerateFuriganaUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,9 +16,9 @@ public class FuriganaConfig {
     }
 
     @Bean
-    public AnalyzeFuriganaInputPort analyzeFuriganaInputPort(
-            FuriganaAnalysisPort furiganaAnalysisPort,
+    public GenerateFuriganaInputPort analyzeFuriganaInputPort(
+            FuriganaGenerationPort furiganaAnalysisPort,
             FuriganaResultMapper furiganaResultMapper) {
-        return new AnalyzeFuriganaUseCase(furiganaAnalysisPort, furiganaResultMapper);
+        return new GenerateFuriganaUseCase(furiganaAnalysisPort, furiganaResultMapper);
     }
 }

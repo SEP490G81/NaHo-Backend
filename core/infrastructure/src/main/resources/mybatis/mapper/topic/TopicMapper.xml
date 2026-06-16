@@ -14,6 +14,9 @@
                 AND (t.japanese_name LIKE CONCAT('%', #{query.keyword}, '%')
                 OR t.japanese_description LIKE CONCAT('%', #{query.keyword}, '%'))
             </if>
+            <if test="query.categoryId != null">
+                AND t.category_id = #{query.categoryId}
+            </if>
         </where>
     </sql>
 
@@ -26,8 +29,8 @@
     <select id="findTopics" resultType="org.naho.topic.result.TopicListItemResult">
         SELECT
         t.id AS id,
-        t.japanese_name AS name,
-        t.japanese_description AS description,
+        t.japanese_name AS japaneseName,
+        t.japanese_description AS japaneseDescription,
         t.japanese_name_markup AS japaneseNameMarkup,
         t.japanese_description_markup AS japaneseDescriptionMarkup,
         t.status AS status,

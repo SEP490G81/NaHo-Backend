@@ -4,8 +4,8 @@ import org.naho.user.type.JLPTLevel;
 
 public record CreateTopicCommand(
         Long userId,
-        String nameMarkup,
-        String descriptionMarkup,
+        String japaneseNameMarkup,
+        String japaneseDescriptionMarkup,
         JLPTLevel jlptLevel,
         Double orderIndex,
         Long coverImageFileId,

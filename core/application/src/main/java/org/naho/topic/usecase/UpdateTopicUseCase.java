@@ -34,10 +34,10 @@ public class UpdateTopicUseCase implements UpdateTopicInputPort {
         }
 
         // Extract raw text from markup
-        String rawName = MarkupParserUtil.extractRawTextFromMarkup(command.nameMarkup());
-        String rawDescription = MarkupParserUtil.extractRawTextFromMarkup(command.descriptionMarkup());
+        String rawName = MarkupParserUtil.extractRawTextFromMarkup(command.japaneseNameMarkup());
+        String rawDescription = MarkupParserUtil.extractRawTextFromMarkup(command.japaneseDescriptionMarkup());
 
-        if (topicRepositoryPort.existsByNameAndJlptLevelExcludeId(rawName, command.jlptLevel(), command.id())) {
+        if (topicRepositoryPort.existsByJapaneseNameAndJlptLevelExcludeId(rawName, command.jlptLevel(), command.id())) {
             throw new ApplicationException(
                     TopicErrorCode.TOPIC_ALREADY_EXISTS,
                     TopicDetailMessageKey.TOPIC_ALREADY_EXISTS_IN_LEVEL
@@ -57,8 +57,8 @@ public class UpdateTopicUseCase implements UpdateTopicInputPort {
         topic.update(
                 rawName,
                 rawDescription,
-                command.nameMarkup(),
-                command.descriptionMarkup(),
+                command.japaneseNameMarkup(),
+                command.japaneseDescriptionMarkup(),
                 command.status(),
                 command.jlptLevel(),
                 orderIndex,
@@ -71,8 +71,8 @@ public class UpdateTopicUseCase implements UpdateTopicInputPort {
         return new TopicDetailResult(
                 savedTopic.getId(),
                 savedTopic.getUserId(),
-                savedTopic.getName(),
-                savedTopic.getDescription(),
+                savedTopic.getJapaneseName(),
+                savedTopic.getJapaneseDescription(),
                 savedTopic.getJapaneseNameMarkup(),
                 savedTopic.getJapaneseDescriptionMarkup(),
                 savedTopic.getStatus(),

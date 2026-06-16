@@ -5,8 +5,8 @@ import org.naho.user.type.JLPTLevel;
 
 public record TopicListItemResponse(
         Long id,
-        String name,
-        String description,
+        String japaneseName,
+        String japaneseDescription,
         String japaneseNameMarkup,
         String japaneseDescriptionMarkup,
         TopicStatus status,

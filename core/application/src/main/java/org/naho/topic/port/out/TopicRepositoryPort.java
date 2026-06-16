@@ -8,9 +8,9 @@ import java.util.Optional;
 public interface TopicRepositoryPort {
     Topic save(Topic topic);
 
-    boolean existsByNameAndJlptLevel(String name, JLPTLevel jlptLevel);
+    boolean existsByJapaneseNameAndJlptLevel(String name, JLPTLevel jlptLevel);
 
-    boolean existsByNameAndJlptLevelExcludeId(String name, JLPTLevel jlptLevel, Long id);
+    boolean existsByJapaneseNameAndJlptLevelExcludeId(String name, JLPTLevel jlptLevel, Long id);
 
     Double getMaxOrderIndex();
 

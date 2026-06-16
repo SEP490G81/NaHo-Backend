@@ -8,7 +8,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.naho.furigana.model.FuriganaText;
 import org.naho.furigana.model.FuriganaToken;
-import org.naho.furigana.port.out.FuriganaAnalysisPort;
+import org.naho.furigana.port.out.FuriganaGenerationPort;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class SudachiAnalysisAdapter implements FuriganaAnalysisPort {
+public class SudachiAnalysisAdapter implements FuriganaGenerationPort {
 
     private Dictionary dictionary;
 
@@ -61,7 +61,7 @@ public class SudachiAnalysisAdapter implements FuriganaAnalysisPort {
     }
 
     @Override
-    public FuriganaText analyze(String text) {
+    public FuriganaText generate(String text) {
         if (text == null || text.trim().isEmpty()) {
             return FuriganaText.builder()
                     .originalText(text)

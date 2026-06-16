@@ -36,6 +36,7 @@ public interface TopicRequestMapper {
                 filter != null ? filter.keyword() : null,
                 filter != null ? filter.status() : null,
                 filter != null ? filter.jlptLevel() : null,
+                filter != null ? filter.categoryId() : null,
                 sortBy,
                 sortDirection,
                 isAdmin

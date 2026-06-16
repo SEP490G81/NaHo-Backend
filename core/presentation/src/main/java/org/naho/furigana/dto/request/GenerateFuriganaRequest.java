@@ -3,6 +3,6 @@ package org.naho.furigana.dto.request;
 import lombok.Data;
 
 @Data
-public class AnalyzeFuriganaRequest {
+public class GenerateFuriganaRequest {
     private String text;
 }

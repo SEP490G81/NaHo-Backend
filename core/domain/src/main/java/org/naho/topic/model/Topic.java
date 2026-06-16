@@ -12,8 +12,8 @@ public class Topic {
     private final Long userId;
     private Long categoryId;
     private Long coverImageFileId;
-    private String name;
-    private String description;
+    private String japaneseName;
+    private String japaneseDescription;
     private String japaneseNameMarkup;
     private String japaneseDescriptionMarkup;
     private TopicStatus status;
@@ -27,8 +27,8 @@ public class Topic {
         this.coverImageFileId = builder.coverImageFileId;
         this.userId = builder.userId;
         this.categoryId = builder.categoryId;
-        this.name = builder.name;
-        this.description = builder.description;
+        this.japaneseName = builder.japaneseName;
+        this.japaneseDescription = builder.japaneseDescription;
         this.japaneseNameMarkup = builder.japaneseNameMarkup;
         this.japaneseDescriptionMarkup = builder.japaneseDescriptionMarkup;
         this.status = builder.status;
@@ -40,8 +40,8 @@ public class Topic {
         return new Builder();
     }
 
-    private void validateName(String name) {
-        if (name == null || name.isBlank()) {
+    private void validateJapaneseName(String japaneseName) {
+        if (japaneseName == null || japaneseName.isBlank()) {
             throw new DomainException(
                     TopicDomainErrorCode.TOPIC_NAME_EMPTY,
                     TopicDetailMessageKey.TOPIC_NAME_EMPTY
@@ -49,8 +49,8 @@ public class Topic {
         }
     }
 
-    private void validateDescription(String description) {
-        if (description == null || description.isBlank()) {
+    private void validateJapaneseDescription(String japaneseDescription) {
+        if (japaneseDescription == null || japaneseDescription.isBlank()) {
             throw new DomainException(
                     TopicDomainErrorCode.TOPIC_DESCRIPTION_EMPTY,
                     TopicDetailMessageKey.TOPIC_DESCRIPTION_EMPTY
@@ -58,12 +58,21 @@ public class Topic {
         }
     }
 
-    public void update(String name, String description, String japaneseNameMarkup, String japaneseDescriptionMarkup, TopicStatus status, JLPTLevel jlptLevel, Double orderIndex, Long coverImageFileId, Long categoryId) {
-        validateName(name);
-        validateDescription(description);
+    public void update(String japaneseName,
+                       String japaneseDescription,
+                       String japaneseNameMarkup,
+                       String japaneseDescriptionMarkup,
+                       TopicStatus status,
+                       JLPTLevel jlptLevel,
+                       Double orderIndex,
+                       Long coverImageFileId,
+                       Long categoryId
+    ) {
+        validateJapaneseName(japaneseName);
+        validateJapaneseDescription(japaneseDescription);
 
-        this.name = name;
-        this.description = description;
+        this.japaneseName = japaneseName;
+        this.japaneseDescription = japaneseDescription;
         this.japaneseNameMarkup = japaneseNameMarkup;
         this.japaneseDescriptionMarkup = japaneseDescriptionMarkup;
         this.status = status;
@@ -90,12 +99,12 @@ public class Topic {
         return categoryId;
     }
 
-    public String getName() {
-        return name;
+    public String getJapaneseName() {
+        return japaneseName;
     }
 
-    public String getDescription() {
-        return description;
+    public String getJapaneseDescription() {
+        return japaneseDescription;
     }
 
     public String getJapaneseNameMarkup() {
@@ -124,8 +133,8 @@ public class Topic {
         private Long coverImageFileId;
         private Long userId;
         private Long categoryId;
-        private String name;
-        private String description;
+        private String japaneseName;
+        private String japaneseDescription;
         private String japaneseNameMarkup;
         private String japaneseDescriptionMarkup;
         private TopicStatus status;
@@ -152,13 +161,13 @@ public class Topic {
             return this;
         }
 
-        public Builder name(String name) {
-            this.name = name;
+        public Builder japaneseName(String japaneseName) {
+            this.japaneseName = japaneseName;
             return this;
         }
 
-        public Builder description(String description) {
-            this.description = description;
+        public Builder japaneseDescription(String japaneseDescription) {
+            this.japaneseDescription = japaneseDescription;
             return this;
         }
 
@@ -189,8 +198,8 @@ public class Topic {
 
         public Topic build() {
             Topic topic = new Topic(this);
-            topic.validateName(topic.getName());
-            topic.validateDescription(topic.getDescription());
+            topic.validateJapaneseName(topic.getJapaneseName());
+            topic.validateJapaneseDescription(topic.getJapaneseDescription());
             return topic;
         }
     }

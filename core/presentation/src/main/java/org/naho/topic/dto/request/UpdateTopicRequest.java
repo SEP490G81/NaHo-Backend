@@ -5,8 +5,8 @@ import org.naho.topic.type.TopicStatus;
 import org.naho.user.type.JLPTLevel;
 
 public record UpdateTopicRequest(
-        String nameMarkup,
-        String descriptionMarkup,
+        String japaneseNameMarkup,
+        String japaneseDescriptionMarkup,
         @NotNull TopicStatus status,
         @NotNull JLPTLevel jlptLevel,
         Double orderIndex,

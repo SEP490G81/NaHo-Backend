@@ -22,12 +22,15 @@ public class CreateTopicUseCase implements CreateTopicInputPort {
     @Override
     public CreateTopicResult createTopic(CreateTopicCommand command) {
         // Extract raw text from markup
-        String rawName = MarkupParserUtil.extractRawTextFromMarkup(command.nameMarkup());
-        String rawDescription = MarkupParserUtil.extractRawTextFromMarkup(command.descriptionMarkup());
+        String rawName = MarkupParserUtil.extractRawTextFromMarkup(command.japaneseNameMarkup());
+        String rawDescription = MarkupParserUtil.extractRawTextFromMarkup(command.japaneseDescriptionMarkup());
 
         // Validation for duplicate in JLPT level
-        if (topicRepositoryPort.existsByNameAndJlptLevel(rawName, command.jlptLevel())) {
-            throw new ApplicationException(TopicErrorCode.TOPIC_ALREADY_EXISTS, TopicDetailMessageKey.TOPIC_ALREADY_EXISTS_IN_LEVEL);
+        if (topicRepositoryPort.existsByJapaneseNameAndJlptLevel(rawName, command.jlptLevel())) {
+            throw new ApplicationException(
+                    TopicErrorCode.TOPIC_ALREADY_EXISTS,
+                    TopicDetailMessageKey.TOPIC_ALREADY_EXISTS_IN_LEVEL
+            );
         }
 
         // Logic for Order Index
@@ -36,15 +39,18 @@ public class CreateTopicUseCase implements CreateTopicInputPort {
             Double maxOrderIndex = topicRepositoryPort.getMaxOrderIndex();
             orderIndex = (maxOrderIndex != null) ? maxOrderIndex + 1.0 : 1.0;
         } else if (orderIndex < 0) {
-            throw new ApplicationException(TopicErrorCode.TOPIC_ORDER_INDEX_INVALID, TopicDetailMessageKey.TOPIC_ORDER_INDEX_INVALID);
+            throw new ApplicationException(
+                    TopicErrorCode.TOPIC_ORDER_INDEX_INVALID,
+                    TopicDetailMessageKey.TOPIC_ORDER_INDEX_INVALID
+            );
         }
 
         Topic topic = Topic.builder()
                 .userId(command.userId())
-                .name(rawName)
-                .description(rawDescription)
-                .japaneseNameMarkup(command.nameMarkup())
-                .japaneseDescriptionMarkup(command.descriptionMarkup())
+                .japaneseName(rawName)
+                .japaneseDescription(rawDescription)
+                .japaneseNameMarkup(command.japaneseNameMarkup())
+                .japaneseDescriptionMarkup(command.japaneseDescriptionMarkup())
                 .jlptLevel(command.jlptLevel())
                 .orderIndex(orderIndex)
                 .coverImageFileId(command.coverImageFileId())
@@ -57,8 +63,8 @@ public class CreateTopicUseCase implements CreateTopicInputPort {
         return new CreateTopicResult(
                 savedTopic.getId(),
                 savedTopic.getUserId(),
-                savedTopic.getName(),
-                savedTopic.getDescription(),
+                savedTopic.getJapaneseName(),
+                savedTopic.getJapaneseDescription(),
                 savedTopic.getJapaneseNameMarkup(),
                 savedTopic.getJapaneseDescriptionMarkup(),
                 savedTopic.getStatus(),

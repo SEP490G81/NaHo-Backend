@@ -102,8 +102,9 @@ public class TopicController {
             @AuthenticationPrincipal AccessTokenPayload payload
     ) {
         List<String> roleSet = roleRepositoryPort.findRoleNamesByUserId(payload.userId());
-        boolean isAdminOrManager = roleSet.contains(RoleName.ADMIN.name()) ||
-                roleSet.contains(RoleName.CONTENT_MANAGER.name());
+        boolean isAdminOrManager =
+                roleSet.contains(RoleName.ADMIN.name()) ||
+                        roleSet.contains(RoleName.CONTENT_MANAGER.name());
 
         var command = topicRequestMapper.toUpdateCommand(request, id, payload.userId(), isAdminOrManager);
         var result = updateTopicInputPort.updateTopic(command);
@@ -119,8 +120,9 @@ public class TopicController {
             @AuthenticationPrincipal AccessTokenPayload payload
     ) {
         List<String> roleSet = roleRepositoryPort.findRoleNamesByUserId(payload.userId());
-        boolean isAdminOrManager = roleSet.contains(RoleName.ADMIN.name()) ||
-                roleSet.contains(RoleName.CONTENT_MANAGER.name());
+        boolean isAdminOrManager =
+                roleSet.contains(RoleName.ADMIN.name()) ||
+                        roleSet.contains(RoleName.CONTENT_MANAGER.name());
 
         var command = topicRequestMapper.toDeleteCommand(id, isAdminOrManager);
         deleteTopicInputPort.deleteTopic(command);

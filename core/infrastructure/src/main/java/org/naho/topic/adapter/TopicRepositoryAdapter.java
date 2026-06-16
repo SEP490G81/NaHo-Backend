@@ -42,8 +42,8 @@ public class TopicRepositoryAdapter implements TopicRepositoryPort {
             entity.setId(topic.getId());
         }
 
-        entity.setName(topic.getName());
-        entity.setDescription(topic.getDescription());
+        entity.setJapaneseName(topic.getJapaneseName());
+        entity.setJapaneseDescription(topic.getJapaneseDescription());
         entity.setJapaneseNameMarkup(topic.getJapaneseNameMarkup());
         entity.setJapaneseDescriptionMarkup(topic.getJapaneseDescriptionMarkup());
         entity.setStatus(topic.getStatus());
@@ -73,8 +73,8 @@ public class TopicRepositoryAdapter implements TopicRepositoryPort {
         return Topic.builder()
                 .id(savedEntity.getId())
                 .userId(savedEntity.getUser() != null ? savedEntity.getUser().getId() : null)
-                .name(savedEntity.getName())
-                .description(savedEntity.getDescription())
+                .japaneseName(savedEntity.getJapaneseName())
+                .japaneseDescription(savedEntity.getJapaneseDescription())
                 .japaneseNameMarkup(savedEntity.getJapaneseNameMarkup())
                 .japaneseDescriptionMarkup(savedEntity.getJapaneseDescriptionMarkup())
                 .status(savedEntity.getStatus())
@@ -86,13 +86,13 @@ public class TopicRepositoryAdapter implements TopicRepositoryPort {
     }
 
     @Override
-    public boolean existsByNameAndJlptLevel(String name, JLPTLevel jlptLevel) {
-        return topicJpaRepository.existsByNameAndJlptLevel(name, jlptLevel);
+    public boolean existsByJapaneseNameAndJlptLevel(String japaneseName, JLPTLevel jlptLevel) {
+        return topicJpaRepository.existsByJapaneseNameAndJlptLevel(japaneseName, jlptLevel);
     }
 
     @Override
-    public boolean existsByNameAndJlptLevelExcludeId(String name, JLPTLevel jlptLevel, Long id) {
-        return topicJpaRepository.existsByNameAndJlptLevelAndIdNot(name, jlptLevel, id);
+    public boolean existsByJapaneseNameAndJlptLevelExcludeId(String japneseName, JLPTLevel jlptLevel, Long id) {
+        return topicJpaRepository.existsByJapaneseNameAndJlptLevelAndIdNot(japneseName, jlptLevel, id);
     }
 
     @Override
@@ -106,8 +106,8 @@ public class TopicRepositoryAdapter implements TopicRepositoryPort {
         return topicJpaRepository.findById(id).map(savedEntity -> Topic.builder()
                 .id(savedEntity.getId())
                 .userId(savedEntity.getUser() != null ? savedEntity.getUser().getId() : null)
-                .name(savedEntity.getName())
-                .description(savedEntity.getDescription())
+                .japaneseName(savedEntity.getJapaneseName())
+                .japaneseDescription(savedEntity.getJapaneseDescription())
                 .japaneseNameMarkup(savedEntity.getJapaneseNameMarkup())
                 .japaneseDescriptionMarkup(savedEntity.getJapaneseDescriptionMarkup())
                 .status(savedEntity.getStatus())

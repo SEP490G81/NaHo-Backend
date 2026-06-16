@@ -55,8 +55,8 @@ public class DeleteTopicUseCase implements DeleteTopicInputPort {
             if (hasAnswers) {
                 // Soft delete
                 topic.update(
-                        topic.getName(),
-                        topic.getDescription(),
+                        topic.getJapaneseName(),
+                        topic.getJapaneseDescription(),
                         topic.getJapaneseNameMarkup(),
                         topic.getJapaneseDescriptionMarkup(),
                         TopicStatus.ARCHIVE,

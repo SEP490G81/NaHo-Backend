@@ -1,6 +1,6 @@
 package org.naho.furigana.command;
 
-public record AnalyzeFuriganaCommand(
+public record GenerateFuriganaCommand(
         String text
 ) {
 }

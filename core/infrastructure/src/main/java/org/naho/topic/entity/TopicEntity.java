@@ -24,10 +24,10 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TopicEntity extends BaseEntity {
     @Column(name = "japanese_name")
-    String name;
+    String japaneseName;
 
     @Column(name = "japanese_description")
-    String description;
+    String japaneseDescription;
 
     @Column(name = "japanese_name_markup", columnDefinition = "TEXT")
     String japaneseNameMarkup;
