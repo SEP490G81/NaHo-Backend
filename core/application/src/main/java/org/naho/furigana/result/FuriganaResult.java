@@ -5,6 +5,6 @@ import java.util.List;
 public record FuriganaResult(
         String originalText,
         List<FuriganaTokenResult> tokens,
-        String fullFurigana
+        String markupString
 ) {
 }

@@ -66,12 +66,12 @@ public class SudachiAnalysisAdapter implements FuriganaAnalysisPort {
             return FuriganaText.builder()
                     .originalText(text)
                     .tokens(new ArrayList<>())
-                    .fullFurigana("")
+                    .markupString("")
                     .build();
         }
 
         List<FuriganaToken> tokens = new ArrayList<>();
-        StringBuilder fullFurigana = new StringBuilder();
+        StringBuilder markupString = new StringBuilder();
 
         Tokenizer tokenizer = dictionary.create(); // sửa lỗi thread-safe
 
@@ -94,13 +94,18 @@ public class SudachiAnalysisAdapter implements FuriganaAnalysisPort {
                     .kanji(surface)
                     .furigana(furigana != null ? furigana : "")
                     .build());
-            fullFurigana.append(readingHiragana);
+
+            if (furigana != null && !furigana.isEmpty()) {
+                markupString.append("[").append(surface).append("](").append(furigana).append(")");
+            } else {
+                markupString.append(surface);
+            }
         }
 
         return FuriganaText.builder()
                 .originalText(text)
                 .tokens(tokens)
-                .fullFurigana(fullFurigana.toString())
+                .markupString(markupString.toString())
                 .build();
     }
 
