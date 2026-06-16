@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.naho.file.exception.FileErrorCode;
+import org.naho.file.mapper.FileResultMapper;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.i18n.message.file.FileDetailMessageKey;
@@ -24,6 +25,9 @@ class DeleteFileByIdTest {
     @Mock
     private FileRepositoryPort fileRepositoryPort;
 
+    @Mock
+    private FileResultMapper fileResultMapper;
+
     @InjectMocks
     private FileStorageUseCase fileStorageUseCase;
 
@@ -37,7 +41,7 @@ class DeleteFileByIdTest {
                 .thenReturn(objectKey);
 
         doNothing().when(fileRepositoryPort).deleteById(id);
-        doNothing().when(fileStorageServicePort).delete(objectKey);
+        doNothing().when(fileStorageServicePort).deleteFileByObjectKey(objectKey);
 
         // Act (When)
         String result = fileStorageUseCase.deleteFileById(id);
@@ -52,7 +56,7 @@ class DeleteFileByIdTest {
                 .deleteById(id);
 
         verify(fileStorageServicePort, times(1))
-                .delete(objectKey);
+                .deleteFileByObjectKey(objectKey);
 
         verifyNoMoreInteractions(fileRepositoryPort, fileStorageServicePort);
     }
@@ -116,7 +120,7 @@ class DeleteFileByIdTest {
         doNothing().when(fileRepositoryPort).deleteById(id);
 
         doThrow(new RuntimeException("S3 connection error"))
-                .when(fileStorageServicePort).delete(objectKey);
+                .when(fileStorageServicePort).deleteFileByObjectKey(objectKey);
 
         // Act (When) & Assert (Then)
         RuntimeException exception = assertThrows(
@@ -133,7 +137,7 @@ class DeleteFileByIdTest {
                 .deleteById(id);
 
         verify(fileStorageServicePort, times(1))
-                .delete(objectKey);
+                .deleteFileByObjectKey(objectKey);
 
         verifyNoMoreInteractions(fileRepositoryPort, fileStorageServicePort);
     }

@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
@@ -75,7 +74,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 command.contentType(),
                 (long) command.audioBytes().length
         );
-        FileResult uploadResult = fileStorageInputPort.upload(uploadCommand);
+        FileResult uploadResult = fileStorageInputPort.uploadFile(uploadCommand);
 
         AnswerHistory answerHistory = AnswerHistory.builder()
                 .userId(user.getId())
@@ -360,8 +359,10 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    private record FeedbackResponse(Scores scores) {}
+    private record FeedbackResponse(Scores scores) {
+    }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    private record Scores(Double vocabulary, Double grammar, Double naturalness) {}
+    private record Scores(Double vocabulary, Double grammar, Double naturalness) {
+    }
 }

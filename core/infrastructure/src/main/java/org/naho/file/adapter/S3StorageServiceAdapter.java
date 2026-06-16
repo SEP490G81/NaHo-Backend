@@ -20,10 +20,10 @@ public class S3StorageServiceAdapter implements FileStorageServicePort {
     private final S3Properties s3Properties;
 
     @Override
-    public void upload(String objectKey,
-                       InputStream inputStream,
-                       String contentType,
-                       Long size) {
+    public void uploadFile(String objectKey,
+                           InputStream inputStream,
+                           String contentType,
+                           Long size) {
         try {
             s3Client.putObject(
                     request -> request.bucket(s3Properties.getBucketName())
@@ -41,7 +41,7 @@ public class S3StorageServiceAdapter implements FileStorageServicePort {
     }
 
     @Override
-    public void delete(String objectKey) {
+    public void deleteFileByObjectKey(String objectKey) {
         try {
             s3Client.deleteObject(request -> request
                     .bucket(s3Properties.getBucketName())

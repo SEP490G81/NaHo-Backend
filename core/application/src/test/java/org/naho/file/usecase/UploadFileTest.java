@@ -6,8 +6,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.naho.file.command.FileUploadCommand;
-import org.naho.file.exception.FileErrorCode;
 import org.naho.file.exception.FileDomainErrorCode;
+import org.naho.file.exception.FileErrorCode;
 import org.naho.file.mapper.FileResultMapper;
 import org.naho.file.model.File;
 import org.naho.file.port.out.FileRepositoryPort;
@@ -18,6 +18,7 @@ import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.exception.DomainException;
 
 import java.io.InputStream;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -69,7 +70,7 @@ class UploadFileTest {
         when(fileRepositoryPort.save(any(File.class)))
                 .thenReturn(savedFile);
 
-        doNothing().when(fileStorageServicePort).upload(
+        doNothing().when(fileStorageServicePort).uploadFile(
                 anyString(),
                 eq(inputStream),
                 eq("image/png"),
@@ -86,15 +87,15 @@ class UploadFileTest {
         assertEquals(expectedResult, result);
 
         verify(fileRepositoryPort, times(1))
-                .save(argThat(file -> 
+                .save(argThat(file ->
                         file.getOriginalName().equals("avatar.png") &&
-                        file.getContentType().equals("image/png") &&
-                        file.getSize().equals(1024L) &&
-                        file.getObjectKey().startsWith("avatars/")
+                                file.getContentType().equals("image/png") &&
+                                file.getSize().equals(1024L) &&
+                                file.getObjectKey().startsWith("avatars/")
                 ));
 
         verify(fileStorageServicePort, times(1))
-                .upload(
+                .uploadFile(
                         argThat(key -> key.startsWith("avatars/")),
                         eq(inputStream),
                         eq("image/png"),
@@ -203,7 +204,7 @@ class UploadFileTest {
         when(fileRepositoryPort.save(any(File.class)))
                 .thenReturn(savedFile);
 
-        doThrow(new RuntimeException("AWS storage error")).when(fileStorageServicePort).upload(
+        doThrow(new RuntimeException("AWS storage error")).when(fileStorageServicePort).uploadFile(
                 anyString(),
                 eq(inputStream),
                 eq("image/png"),
@@ -222,7 +223,7 @@ class UploadFileTest {
                 .save(any(File.class));
 
         verify(fileStorageServicePort, times(1))
-                .upload(
+                .uploadFile(
                         argThat(key -> key.startsWith("avatars/")),
                         eq(inputStream),
                         eq("image/png"),
