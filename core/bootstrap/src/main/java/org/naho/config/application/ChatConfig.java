@@ -19,6 +19,18 @@ import org.naho.speech.llm.usecase.SuggestedTopicsUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import org.naho.speech.llm.port.in.SpeakingAnalysisInputPort;
+import org.naho.speech.llm.port.out.AiAnalysisPort;
+import org.naho.speech.llm.port.out.AnswerHistoryRepositoryPort;
+import org.naho.speech.llm.adapter.OpenAiAnalysisAdapter;
+import org.naho.speech.llm.usecase.SpeakingAnalysisUseCase;
+import org.naho.user.port.out.UserRepositoryPort;
+import org.naho.speech.question.port.out.QuestionRepositoryPort;
+import org.naho.speech.topic.port.out.TopicRepositoryPort;
+import org.naho.file.port.in.FileStorageInputPort;
+import org.naho.file.port.out.FileRepositoryPort;
+import org.naho.furigana.port.out.FuriganaAnalysisPort;
+
 /**
  * Bootstrap Configuration: Liên kết các UseCase, Port, Adapter cho module AI Speaking.
  * <p>
@@ -79,5 +91,35 @@ public class ChatConfig {
     @Bean
     public SuggestedTopicsInputPort suggestedTopicsInputPort() {
         return new SuggestedTopicsUseCase();
+    }
+
+    @Bean
+    public AiAnalysisPort aiAnalysisPort(OpenAiConfigProperties openAiConfigProperties) {
+        return new OpenAiAnalysisAdapter(openAiConfigProperties);
+    }
+
+    @Bean
+    public SpeakingAnalysisInputPort speakingAnalysisInputPort(
+            UserRepositoryPort userRepositoryPort,
+            QuestionRepositoryPort questionRepositoryPort,
+            TopicRepositoryPort topicRepositoryPort,
+            FileStorageInputPort fileStorageInputPort,
+            FileRepositoryPort fileRepositoryPort,
+            AnswerHistoryRepositoryPort answerHistoryRepositoryPort,
+            AzureSpeechServicePort azureSpeechServicePort,
+            AiAnalysisPort aiAnalysisPort,
+            FuriganaAnalysisPort furiganaAnalysisPort
+    ) {
+        return new SpeakingAnalysisUseCase(
+                userRepositoryPort,
+                questionRepositoryPort,
+                fileStorageInputPort,
+                fileRepositoryPort,
+                answerHistoryRepositoryPort,
+                azureSpeechServicePort,
+                topicRepositoryPort,
+                aiAnalysisPort,
+                furiganaAnalysisPort
+        );
     }
 }
