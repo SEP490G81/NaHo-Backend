@@ -1,5 +1,9 @@
 package org.naho.file.model;
 
+import org.naho.file.exception.FileDomainErrorCode;
+import org.naho.i18n.message.file.FileDetailMessageKey;
+import org.naho.shared.exception.DomainException;
+
 public class File {
 
     private final Long id;
@@ -74,6 +78,27 @@ public class File {
         }
 
         public File build() {
+            if (objectKey == null || objectKey.isBlank()) {
+                throw new DomainException(
+                        FileDomainErrorCode.FILE_OBJECT_KEY_EMPTY,
+                        FileDetailMessageKey.FILE_EMPTY
+                );
+            }
+
+            if (originalName == null || originalName.isBlank()) {
+                throw new DomainException(
+                        FileDomainErrorCode.FILE_ORIGINAL_NAME_EMPTY,
+                        FileDetailMessageKey.FILE_ORIGINAL_NAME_EMPTY
+                );
+            }
+
+            if (size == null || size <= 0) {
+                throw new DomainException(
+                        FileDomainErrorCode.FILE_SIZE_INVALID,
+                        FileDetailMessageKey.FILE_EMPTY
+                );
+            }
+
             return new File(this);
         }
     }
