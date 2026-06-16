@@ -19,10 +19,10 @@ import org.naho.user.constant.TokenType;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.model.UserSession;
 import org.naho.user.port.out.TokenServicePort;
-import org.naho.user.port.out.UserSessionRepositoryPort;
 import org.naho.user.result.AccessTokenPayload;
 import org.naho.user.result.GoogleUserInfoResult;
 import org.naho.user.result.TokenResult;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -49,12 +49,12 @@ public class TokenServiceAdapter implements TokenServicePort {
     private final SecretKey jwtSecretKey;
     private final SecureRandom secureRandom;
     private final Base64.Encoder base64UrlEncoder;
-    private final UserSessionRepositoryPort userSessionRepositoryPort;
+    private final RedisTemplate<String, String> redisTemplate;
 
     public TokenServiceAdapter(
             JwtProperties jwtProperties,
             GoogleProperties googleProperties,
-            UserSessionRepositoryPort userSessionRepositoryPort
+            RedisTemplate<String, String> redisTemplate
     ) {
         this.jwtProperties = jwtProperties;
         this.googleProperties = googleProperties;
@@ -65,7 +65,7 @@ public class TokenServiceAdapter implements TokenServicePort {
 
         this.secureRandom = new SecureRandom();
         this.base64UrlEncoder = Base64.getUrlEncoder().withoutPadding();
-        this.userSessionRepositoryPort = userSessionRepositoryPort;
+        this.redisTemplate = redisTemplate;
     }
 
     @Override
@@ -123,6 +123,13 @@ public class TokenServiceAdapter implements TokenServicePort {
                     JwtCustomClaimKey.USER_SESSION_ID,
                     Long.class
             );
+
+            if (redisTemplate.hasKey(UserSessionServiceAdapter.REDIS_KEY_PREFIX + sessionId)) {
+                throw new ApplicationException(
+                        UserErrorCode.USER_UNAUTHORIZED,
+                        UserDetailMessageKey.USER_UNAUTHORIZED
+                );
+            }
 
             Instant expiresAt = claims.getExpiration().toInstant();
 

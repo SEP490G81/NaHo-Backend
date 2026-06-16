@@ -31,4 +31,12 @@
           and revoked_at is null
           and expires_at > #{revokedAt}
     </update>
+
+    <select id="findAllActiveSessionIdsByUserId" resultType="long">
+        select us.id
+        from user_sessions us
+        where us.user_id = #{userId}
+          and us.revoked_at is not null
+          and us.revoked_reason is not null
+    </select>
 </mapper>

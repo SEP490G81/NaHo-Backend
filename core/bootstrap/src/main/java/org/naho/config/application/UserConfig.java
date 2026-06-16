@@ -46,7 +46,8 @@ public class UserConfig {
             UserSessionRepositoryPort userSessionRepositoryPort,
             RoleRepositoryPort roleRepositoryPort,
             TransactionPort transactionPort,
-            AuthUseCaseHelper authUseCaseHelper
+            AuthUseCaseHelper authUseCaseHelper,
+            UserSessionServicePort userSessionServicePort
     ) {
         return new AuthUseCase(
                 userRepositoryPort,
@@ -56,7 +57,8 @@ public class UserConfig {
                 userSessionRepositoryPort,
                 roleRepositoryPort,
                 transactionPort,
-                authUseCaseHelper
+                authUseCaseHelper,
+                userSessionServicePort
         );
     }
 

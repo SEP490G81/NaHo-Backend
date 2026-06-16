@@ -22,7 +22,7 @@ public class UserSession {
     private SessionRevokedReason revokedReason;
 
     public boolean isExpired() {
-        return expiresAt != null && expiresAt.isBefore(Instant.now());
+        return expiresAt != null && !expiresAt.isAfter(Instant.now());
     }
 
     public boolean isRevoked() {

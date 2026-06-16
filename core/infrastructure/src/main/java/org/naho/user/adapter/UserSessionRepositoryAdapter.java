@@ -20,6 +20,7 @@ import org.naho.user.type.SessionRevokedReason;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -85,12 +86,45 @@ public class UserSessionRepositoryAdapter implements UserSessionRepositoryPort {
     }
 
     @Override
+    public List<Long> findAllActiveSessionIdsByUserId(Long userId) {
+        return userSessionQueryMapper.findAllActiveSessionIdsByUserId(userId);
+    }
+
+    @Override
+    public List<UserSession> findAllActiveSessionsByUserId(Long userId) {
+        List<UserSessionEntity> userSessionEntities = userSessionJpaRepository
+                .findAllByUser_IdAndRevokedAtIsNullAndRevokedReasonIsNull(userId);
+        return userSessionEntities.stream()
+                .map(userSessionEntityMapper::entityToDomain)
+                .toList();
+    }
+
+    @Override
+    public UserSession findByUserId(Long userId) {
+        if (userId == null) {
+            throw new InfrastructureException(
+                    UserSessionErrorCode.USER_SESSION_USER_ID_INVALID,
+                    UserSessionDetailMessageKey.USER_SESSION_USER_ID_BLANK
+            );
+        }
+        UserSessionEntity userSessionEntity = userSessionJpaRepository.findByUser_Id(userId)
+                .orElseThrow(() -> new InfrastructureException(
+                                UserSessionErrorCode.USER_SESSION_NOT_FOUND,
+                                UserSessionDetailMessageKey.USER_SESSION_USER_ID_NOT_FOUND,
+                                userId
+                        )
+                );
+        return userSessionEntityMapper.entityToDomain(userSessionEntity);
+    }
+
+    @Override
     public UserSession findByHashRefreshToken(String hashRefreshToken) {
         UserSessionEntity userSessionEntity = userSessionJpaRepository
                 .findByHashRefreshToken(hashRefreshToken)
                 .orElseThrow(() -> new InfrastructureException(
                         UserErrorCode.USER_INVALID_REFRESH_TOKEN,
-                        UserDetailMessageKey.USER_REFRESH_TOKEN_NOT_FOUND));
+                        UserDetailMessageKey.USER_REFRESH_TOKEN_NOT_FOUND
+                ));
         return userSessionEntityMapper.entityToDomain(userSessionEntity);
     }
 

@@ -8,8 +8,13 @@ public enum UserSessionErrorCode implements ErrorCode {
             "USER_SESSION_A001",
             UserSessionTitleMessageKey.USER_SESSION_NOT_FOUND_TITLE,
             404
+    ),
+    USER_SESSION_USER_ID_INVALID(
+            "USER_SESSION_A002",
+            UserSessionTitleMessageKey.USER_SESSION_USER_ID_NOT_VALID_TITLE,
+            400
     );
-    
+
     private final String code;
     private final String titleKey;
     private final int statusCode;

@@ -39,6 +39,7 @@ public class AuthUseCase implements AuthInputPort {
     private final RoleRepositoryPort roleRepositoryPort;
     private final TransactionPort transactionPort;
     private final AuthUseCaseHelper authUseCaseHelper;
+    private final UserSessionServicePort userSessionServicePort;
 
     public AuthUseCase(
             UserRepositoryPort userRepositoryPort,
@@ -48,7 +49,8 @@ public class AuthUseCase implements AuthInputPort {
             UserSessionRepositoryPort userSessionRepositoryPort,
             RoleRepositoryPort roleRepositoryPort,
             TransactionPort transactionPort,
-            AuthUseCaseHelper authUseCaseHelper
+            AuthUseCaseHelper authUseCaseHelper,
+            UserSessionServicePort userSessionServicePort
     ) {
         this.userRepositoryPort = userRepositoryPort;
         this.encoderPort = encoderPort;
@@ -58,6 +60,7 @@ public class AuthUseCase implements AuthInputPort {
         this.roleRepositoryPort = roleRepositoryPort;
         this.transactionPort = transactionPort;
         this.authUseCaseHelper = authUseCaseHelper;
+        this.userSessionServicePort = userSessionServicePort;
     }
 
     @Override
@@ -129,21 +132,18 @@ public class AuthUseCase implements AuthInputPort {
                 emailUser.setProviderId(providerId);
                 currentUser = userRepositoryPort.save(emailUser);
             }
-        } else {
-            if (!currentUser.isActive()) {
-                throw new ApplicationException(
-                        UserErrorCode.USER_LOGIN_FAILED,
-                        UserDetailMessageKey.USER_ACCOUNT_NOT_ACTIVE);
-            }
-
-            if (!command.isDeviceIdBlank()) {
-                userSessionRepositoryPort.revokeActiveSessionsByUserIdAndDeviceId(
-                        currentUser.getId(),
-                        command.getDeviceId(),
-                        Instant.now(),
-                        SessionRevokedReason.LOGIN_AGAIN);
-            }
         }
+
+        if (!currentUser.isActive()) {
+            throw new ApplicationException(
+                    UserErrorCode.USER_LOGIN_FAILED,
+                    UserDetailMessageKey.USER_ACCOUNT_NOT_ACTIVE);
+        }
+
+        userSessionServicePort.revokeAllSessionsByUserId(
+                currentUser.getId(),
+                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
+        );
 
         TokenResult refreshToken = tokenServicePort.generateRefreshToken();
 
@@ -184,13 +184,10 @@ public class AuthUseCase implements AuthInputPort {
                     UserDetailMessageKey.USER_ACCOUNT_NOT_ACTIVE);
         }
 
-        if (!command.isDeviceIdBlank()) {
-            userSessionRepositoryPort.revokeActiveSessionsByUserIdAndDeviceId(
-                    user.getId(),
-                    command.deviceId(),
-                    Instant.now(),
-                    SessionRevokedReason.LOGIN_AGAIN);
-        }
+        userSessionServicePort.revokeAllSessionsByUserId(
+                user.getId(),
+                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
+        );
 
         TokenResult refreshToken = tokenServicePort.generateRefreshToken();
 
