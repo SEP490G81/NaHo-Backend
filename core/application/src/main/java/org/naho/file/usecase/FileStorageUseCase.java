@@ -67,7 +67,7 @@ public class FileStorageUseCase implements FileStorageInputPort {
     }
 
     @Override
-    public String deleteById(Long id) {
+    public String deleteFileById(Long id) {
         if (id == null) {
             throw new ApplicationException(
                     FileErrorCode.FILE_NOT_FOUND,

@@ -38,7 +38,7 @@ public class FileController {
 
     @ApiResponseMessage(message = FileDetailMessageKey.FILE_DELETE_SUCCESSFULLY)
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteFile(@PathVariable("id") Long fileId) {
-        return ResponseEntity.ok(fileStorageInputPort.deleteById(fileId));
+    public ResponseEntity<String> deleteFileById(@PathVariable("id") Long fileId) {
+        return ResponseEntity.ok(fileStorageInputPort.deleteFileById(fileId));
     }
 }
