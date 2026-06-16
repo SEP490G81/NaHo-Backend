@@ -11,7 +11,8 @@ build/
 .env
 .env.*
 !.env.example
-
+guilde_scoring.md
+speaking_analysis_guide.md
 ### IntelliJ IDEA ###
 .idea/
 *.iws
