@@ -61,7 +61,7 @@ public class SudachiAnalysisAdapter implements FuriganaGenerationPort {
     }
 
     @Override
-    public FuriganaText generate(String text) {
+    public FuriganaText generateFurigana(String text) {
         if (text == null || text.trim().isEmpty()) {
             return FuriganaText.builder()
                     .originalText(text)

@@ -21,14 +21,14 @@ public class GenerateFuriganaUseCase implements GenerateFuriganaInputPort {
     }
 
     @Override
-    public FuriganaResult generate(GenerateFuriganaCommand command) {
+    public FuriganaResult generateFurigana(GenerateFuriganaCommand command) {
         if (command == null || command.text() == null || command.text().trim().isEmpty()) {
             throw new ApplicationException(
                     FuriganaErrorCode.FURIGANA_ANALYZE_FAILED,
                     FuriganaDetailMessageKey.FURIGANA_TEXT_EMPTY
             );
         }
-        FuriganaText domainText = furiganaGenerationPort.generate(command.text());
+        FuriganaText domainText = furiganaGenerationPort.generateFurigana(command.text());
         return furiganaResultMapper.domainToResult(domainText);
     }
 }

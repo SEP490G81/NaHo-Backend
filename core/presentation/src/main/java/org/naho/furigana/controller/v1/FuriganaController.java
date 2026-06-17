@@ -27,9 +27,9 @@ public class FuriganaController {
 
     @PostMapping("/generate")
     @ApiResponseMessage(message = FuriganaDetailMessageKey.FURIGANA_GENERATE_SUCCESSFULLY)
-    public ResponseEntity<FuriganaResponse> generate(@RequestBody GenerateFuriganaRequest request) {
+    public ResponseEntity<FuriganaResponse> generateFurigana(@RequestBody GenerateFuriganaRequest request) {
         GenerateFuriganaCommand command = furiganaRequestMapper.requestToCommand(request);
-        FuriganaResult result = generateFuriganaInputPort.generate(command);
+        FuriganaResult result = generateFuriganaInputPort.generateFurigana(command);
         FuriganaResponse response = furiganaResponseMapper.resultToResponse(result);
         return ResponseEntity.ok(response);
     }

@@ -16,9 +16,9 @@ public class FuriganaConfig {
     }
 
     @Bean
-    public GenerateFuriganaInputPort analyzeFuriganaInputPort(
-            FuriganaGenerationPort furiganaAnalysisPort,
+    public GenerateFuriganaInputPort generateFuriganaInputPort(
+            FuriganaGenerationPort furiganaGenerationPort,
             FuriganaResultMapper furiganaResultMapper) {
-        return new GenerateFuriganaUseCase(furiganaAnalysisPort, furiganaResultMapper);
+        return new GenerateFuriganaUseCase(furiganaGenerationPort, furiganaResultMapper);
     }
 }
