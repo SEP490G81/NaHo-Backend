@@ -5,7 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.shared.persistence.BaseEntity;
-import org.naho.social.entity.ReportEntity;
+import org.naho.social.report.entity.ReportEntity;
 import org.naho.speech.question.entity.QuestionEntity;
 import org.naho.user.type.Gender;
 import org.naho.user.type.JLPTLevel;
@@ -66,9 +66,7 @@ public class UserEntity extends BaseEntity {
     String providerId;
 
     @ManyToMany
-    @JoinTable(
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @JoinTable(joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     List<RoleEntity> roles;
 
     @OneToMany(mappedBy = "user")

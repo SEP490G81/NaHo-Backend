@@ -1,10 +1,11 @@
-package org.naho.social.entity;
+package org.naho.social.report.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.shared.persistence.BaseEntity;
+import org.naho.social.entity.CommentEntity;
 import org.naho.social.type.ReportType;
 import org.naho.speech.question.entity.QuestionEntity;
 import org.naho.user.entity.UserEntity;
