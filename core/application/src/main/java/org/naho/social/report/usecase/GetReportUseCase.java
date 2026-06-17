@@ -9,14 +9,17 @@ import org.naho.social.report.mapper.ReportResultMapper;
 import org.naho.social.report.port.in.GetReportInputPort;
 import org.naho.social.report.port.out.ReportRepositoryPort;
 import org.naho.social.report.result.ReportResult;
+import org.naho.social.type.ReportType;
 
-public class GetDetailReportUseCase implements GetReportInputPort {
+import java.util.List;
+
+public class GetReportUseCase implements GetReportInputPort {
 
     private final ReportRepositoryPort reportRepositoryPort;
     private final ReportResultMapper reportResultMapper;
 
-    public GetDetailReportUseCase(ReportRepositoryPort reportRepositoryPort,
-                                  ReportResultMapper reportResultMapper) {
+    public GetReportUseCase(ReportRepositoryPort reportRepositoryPort,
+                            ReportResultMapper reportResultMapper) {
         this.reportRepositoryPort = reportRepositoryPort;
         this.reportResultMapper = reportResultMapper;
     }
@@ -31,4 +34,21 @@ public class GetDetailReportUseCase implements GetReportInputPort {
 
         return reportResultMapper.domainToResult(report);
     }
+
+    @Override
+    public List<ReportResult> getReportsByAdmin() {
+        List<Report> reports = reportRepositoryPort.findByReportTypeIn(List.of(ReportType.SYSTEM));
+        return reports.stream()
+                .map(reportResultMapper::domainToResult)
+                .toList();
+    }
+
+    @Override
+    public List<ReportResult> getReportsByContentManager() {
+        List<Report> reports = reportRepositoryPort.findByReportTypeIn(List.of(ReportType.QUESTION, ReportType.COMMENT));
+        return reports.stream()
+                .map(reportResultMapper::domainToResult)
+                .toList();
+    }
+
 }
