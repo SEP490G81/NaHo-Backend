@@ -1,35 +1,25 @@
 package org.naho.config.application;
 
-import org.naho.speech.azure.port.out.AzureSpeechServicePort;
-import org.naho.speech.llm.adapter.AzureSpeechToTextAdapter;
-import org.naho.speech.llm.adapter.InMemorySessionStore;
-import org.naho.speech.llm.adapter.OpenAiChatAdapter;
-import org.naho.speech.llm.adapter.OpenAiScoringAdapter;
-import org.naho.speech.llm.constant.OpenAiConfigProperties;
-import org.naho.speech.llm.port.in.EndSessionInputPort;
-import org.naho.speech.llm.port.in.SpeakingSessionInputPort;
-import org.naho.speech.llm.port.in.SuggestedTopicsInputPort;
-import org.naho.speech.llm.port.out.AiChatPort;
-import org.naho.speech.llm.port.out.AiScoringPort;
-import org.naho.speech.llm.port.out.SessionStorePort;
-import org.naho.speech.llm.port.out.SpeechToTextPort;
-import org.naho.speech.llm.usecase.EndSessionUseCase;
-import org.naho.speech.llm.usecase.SpeakingSessionUseCase;
-import org.naho.speech.llm.usecase.SuggestedTopicsUseCase;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-import org.naho.speech.llm.port.in.SpeakingAnalysisInputPort;
-import org.naho.speech.llm.port.out.AiAnalysisPort;
-import org.naho.speech.llm.port.out.AnswerHistoryRepositoryPort;
-import org.naho.speech.llm.adapter.OpenAiAnalysisAdapter;
-import org.naho.speech.llm.usecase.SpeakingAnalysisUseCase;
-import org.naho.user.port.out.UserRepositoryPort;
-import org.naho.speech.question.port.out.QuestionRepositoryPort;
-import org.naho.speech.topic.port.out.TopicRepositoryPort;
 import org.naho.file.port.in.FileStorageInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
-import org.naho.furigana.port.out.FuriganaAnalysisPort;
+import org.naho.furigana.port.out.FuriganaGenerationPort;
+import org.naho.question.port.out.QuestionRepositoryPort;
+import org.naho.speech.azure.port.out.AzureSpeechServicePort;
+import org.naho.speech.llm.adapter.*;
+import org.naho.speech.llm.constant.OpenAiConfigProperties;
+import org.naho.speech.llm.port.in.EndSessionInputPort;
+import org.naho.speech.llm.port.in.SpeakingAnalysisInputPort;
+import org.naho.speech.llm.port.in.SpeakingSessionInputPort;
+import org.naho.speech.llm.port.in.SuggestedTopicsInputPort;
+import org.naho.speech.llm.port.out.*;
+import org.naho.speech.llm.usecase.EndSessionUseCase;
+import org.naho.speech.llm.usecase.SpeakingAnalysisUseCase;
+import org.naho.speech.llm.usecase.SpeakingSessionUseCase;
+import org.naho.speech.llm.usecase.SuggestedTopicsUseCase;
+import org.naho.topic.port.out.TopicRepositoryPort;
+import org.naho.user.port.out.UserRepositoryPort;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * Bootstrap Configuration: Liên kết các UseCase, Port, Adapter cho module AI Speaking.
@@ -108,7 +98,7 @@ public class ChatConfig {
             AnswerHistoryRepositoryPort answerHistoryRepositoryPort,
             AzureSpeechServicePort azureSpeechServicePort,
             AiAnalysisPort aiAnalysisPort,
-            FuriganaAnalysisPort furiganaAnalysisPort
+            FuriganaGenerationPort furiganaGenerationPort
     ) {
         return new SpeakingAnalysisUseCase(
                 userRepositoryPort,
@@ -119,7 +109,7 @@ public class ChatConfig {
                 azureSpeechServicePort,
                 topicRepositoryPort,
                 aiAnalysisPort,
-                furiganaAnalysisPort
+                furiganaGenerationPort
         );
     }
 }

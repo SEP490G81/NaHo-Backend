@@ -8,7 +8,7 @@ import java.util.List;
 public class FuriganaResponse {
     private String originalText;
     private List<FuriganaTokenResponse> tokens;
-    private String fullFurigana;
+    private String markupString;
 
     @Data
     public static class FuriganaTokenResponse {

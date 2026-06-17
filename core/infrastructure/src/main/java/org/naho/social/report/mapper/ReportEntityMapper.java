@@ -5,7 +5,7 @@ import org.mapstruct.Mapping;
 import org.naho.social.entity.CommentEntity;
 import org.naho.social.report.entity.ReportEntity;
 import org.naho.social.model.Report;
-import org.naho.speech.question.entity.QuestionEntity;
+import org.naho.question.entity.QuestionEntity;
 import org.naho.user.entity.UserEntity;
 
 @Mapper(componentModel = "spring")

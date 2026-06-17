@@ -18,7 +18,7 @@ public class FuriganaResultMapper {
                                 token.getFurigana()
                         ))
                         .collect(Collectors.toList()),
-                domain.getFullFurigana()
+                domain.getMarkupString()
         );
     }
 }

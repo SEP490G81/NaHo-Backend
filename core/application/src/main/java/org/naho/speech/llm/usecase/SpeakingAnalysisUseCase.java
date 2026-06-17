@@ -9,9 +9,11 @@ import org.naho.file.command.FileUploadCommand;
 import org.naho.file.port.in.FileStorageInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.result.FileResult;
-import org.naho.furigana.port.out.FuriganaAnalysisPort;
+import org.naho.furigana.port.out.FuriganaGenerationPort;
 import org.naho.i18n.message.speech.QuestionDetailMessageKey;
 import org.naho.i18n.message.user.UserDetailMessageKey;
+import org.naho.question.exeption.QuestionErrorCode;
+import org.naho.question.port.out.QuestionRepositoryPort;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
@@ -25,12 +27,10 @@ import org.naho.speech.model.AnswerHistory;
 import org.naho.speech.model.ContentAssessment;
 import org.naho.speech.model.SpeechAssessment;
 import org.naho.speech.model.WordAssessment;
-import org.naho.speech.question.port.out.QuestionRepositoryPort;
-import org.naho.speech.question.exeption.QuestionErrorCode;
-import org.naho.speech.topic.port.out.TopicRepositoryPort;
 import org.naho.speech.type.SpeechAssessmentErrorType;
 import org.naho.topic.model.Question;
 import org.naho.topic.model.Topic;
+import org.naho.topic.port.out.TopicRepositoryPort;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.model.User;
 import org.naho.user.port.out.UserRepositoryPort;
@@ -54,28 +54,26 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     private final AzureSpeechServicePort azureSpeechServicePort;
     private final TopicRepositoryPort topicRepositoryPort;
     private final AiAnalysisPort aiAnalysisPort;
-    private final FuriganaAnalysisPort furiganaAnalysisPort;
+    private final FuriganaGenerationPort furiganaGenerarationPort;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public SpeakingAnalysisResult analyze(SpeakingAnalysisCommand command) {
-        System.out.println("[SpeakingAnalysis] Starting analysis for user: " + command.userId() + ", question: "
-                + command.questionId());
+        System.out.println("[SpeakingAnalysis] Starting analysis for user: " + command.userId() + ", question: " + command.questionId());
 
         User user = userRepositoryPort.findById(command.userId())
-                .orElseThrow(() -> new ApplicationException(UserErrorCode.USER_NOT_FOUND,
-                        UserDetailMessageKey.USER_ID_NOT_FOUND));
+                .orElseThrow(() -> new ApplicationException(UserErrorCode.USER_NOT_FOUND, UserDetailMessageKey.USER_ID_NOT_FOUND));
 
         Question question = questionRepositoryPort.findById(command.questionId())
-                .orElseThrow(() -> new ApplicationException(QuestionErrorCode.QUESTION_NOT_FOUND,
-                        QuestionDetailMessageKey.QUESTION_NOT_FOUND));
+                .orElseThrow(() -> new ApplicationException(QuestionErrorCode.QUESTION_NOT_FOUND, QuestionDetailMessageKey.QUESTION_NOT_FOUND));
 
         FileUploadCommand uploadCommand = new FileUploadCommand(
                 "recordings",
                 command.originalFilename() != null ? command.originalFilename() : "recording.wav",
                 new ByteArrayInputStream(command.audioBytes()),
                 command.contentType(),
-                (long) command.audioBytes().length);
+                (long) command.audioBytes().length
+        );
         FileResult uploadResult = fileStorageInputPort.uploadFile(uploadCommand);
 
         AnswerHistory answerHistory = AnswerHistory.builder()
@@ -112,7 +110,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             serializedWordList.add(Map.of(
                     "word", word.getWord(),
                     "score", word.getAccuracyScore(),
-                    "error", word.getErrorType().name()));
+                    "error", word.getErrorType().name()
+            ));
         }
         answerHistoryRepositoryPort.saveAllWordAssessment(wordList);
 
@@ -133,7 +132,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 topicName,
                 question.getTitle(),
                 azureAssessment.getTranscriptText(),
-                azureWordFeedbackJson);
+                azureWordFeedbackJson
+        );
 
         double vocabScore = 0.0;
         double grammarScore = 0.0;
@@ -184,17 +184,20 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         AnswerHistory history = answerHistoryRepositoryPort.findAnswerHistoryById(historyId)
                 .orElseThrow(() -> new ApplicationException(
                         QuestionErrorCode.QUESTION_NOT_FOUND,
-                        "Answer history not found with id: " + historyId));
+                        "Answer history not found with id: " + historyId
+                ));
 
         SpeechAssessment speech = answerHistoryRepositoryPort.findSpeechAssessmentByAnswerHistoryId(historyId)
                 .orElseThrow(() -> new ApplicationException(
                         QuestionErrorCode.QUESTION_NOT_FOUND,
-                        "Speech assessment not found for history id: " + historyId));
+                        "Speech assessment not found for history id: " + historyId
+                ));
 
         ContentAssessment content = answerHistoryRepositoryPort.findContentAssessmentByAnswerHistoryId(historyId)
                 .orElseThrow(() -> new ApplicationException(
                         QuestionErrorCode.QUESTION_NOT_FOUND,
-                        "Content assessment not found for history id: " + historyId));
+                        "Content assessment not found for history id: " + historyId
+                ));
 
         JsonNode root;
         try {
@@ -202,7 +205,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         } catch (Exception e) {
             throw new ApplicationException(
                     QuestionErrorCode.QUESTION_NOT_FOUND,
-                    "Corrupted AI feedback data");
+                    "Corrupted AI feedback data"
+            );
         }
 
         Integer durationSec = root.path("durationSec").asInt(0);
@@ -218,7 +222,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 pronunciationScore,
                 vocabScore,
                 grammarScore,
-                naturalnessScore);
+                naturalnessScore
+        );
 
         List<SpeakingHistoryDetailResult.UserTranscriptItem> userTranscript = new ArrayList<>();
         JsonNode utNode = root.path("userTranscript");
@@ -231,7 +236,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                     error = new SpeakingHistoryDetailResult.ErrorDetail(
                             errNode.path("type").asText(""),
                             errNode.path("explanation").asText(""),
-                            errNode.path("suggestion").asText(""));
+                            errNode.path("suggestion").asText("")
+                    );
                 }
                 userTranscript.add(new SpeakingHistoryDetailResult.UserTranscriptItem(text, error));
             }
@@ -241,7 +247,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         SpeakingHistoryDetailResult.AiSuggestion aiSuggestion = new SpeakingHistoryDetailResult.AiSuggestion(
                 sugNode.path("jp").asText(""),
                 sugNode.path("furigana").asText(""),
-                sugNode.path("vi").asText(""));
+                sugNode.path("vi").asText("")
+        );
 
         Map<String, String> wordNotes = new HashMap<>();
         JsonNode wordNotesNode = root.path("wordNotes");
@@ -267,13 +274,11 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
 
                 String furigana = "";
                 try {
-                    var furiganaText = furiganaAnalysisPort.analyze(wordText);
+                    var furiganaText = furiganaGenerarationPort.generateFurigana(wordText);
                     if (furiganaText != null && furiganaText.getTokens() != null) {
                         StringBuilder sb = new StringBuilder();
                         for (var token : furiganaText.getTokens()) {
-                            sb.append(
-                                    token.getFurigana() != null && !token.getFurigana().isBlank() ? token.getFurigana()
-                                            : token.getKanji());
+                            sb.append(token.getFurigana() != null && !token.getFurigana().isBlank() ? token.getFurigana() : token.getKanji());
                         }
                         furigana = sb.toString();
                     }
@@ -296,7 +301,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                         wordText,
                         furigana,
                         severity,
-                        note));
+                        note
+                ));
             }
         }
 
@@ -310,7 +316,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                         item.path("jp").asText(""),
                         item.path("furigana").asText(""),
                         item.path("vi").asText(""),
-                        item.path("note").asText("")));
+                        item.path("note").asText("")
+                ));
             }
         }
 
@@ -333,7 +340,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 pronunciation,
                 pronunciationNote,
                 expressions,
-                itVocab);
+                itVocab
+        );
 
         String objectKey = fileRepositoryPort.findObjectKeyById(history.getAudioFileId());
 
@@ -345,7 +353,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 durationSec,
                 overallScore,
                 objectKey,
-                report);
+                report
+        );
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)

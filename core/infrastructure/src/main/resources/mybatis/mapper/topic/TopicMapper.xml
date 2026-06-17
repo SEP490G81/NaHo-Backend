@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.naho.topic.mybatis.TopicQueryMapper">
+
+    <sql id="Base_Where_Clause">
+        <where>
+            <if test="query.status != null">
+                AND t.status = #{query.status}
+            </if>
+            <if test="query.jlptLevel != null">
+                AND t.jlpt_level = #{query.jlptLevel}
+            </if>
+            <if test="query.keyword != null and query.keyword != ''">
+                AND (t.japanese_name LIKE CONCAT('%', #{query.keyword}, '%')
+                OR t.japanese_description LIKE CONCAT('%', #{query.keyword}, '%'))
+            </if>
+            <if test="query.categoryId != null">
+                AND t.category_id = #{query.categoryId}
+            </if>
+        </where>
+    </sql>
+
+    <select id="countTopics" resultType="long">
+        SELECT COUNT(t.id)
+        FROM topics t
+        <include refid="Base_Where_Clause"/>
+    </select>
+
+    <select id="findTopics" resultType="org.naho.topic.result.TopicListItemResult">
+        SELECT
+        t.id AS id,
+        t.japanese_name AS japaneseName,
+        t.japanese_description AS japaneseDescription,
+        t.japanese_name_markup AS japaneseNameMarkup,
+        t.japanese_description_markup AS japaneseDescriptionMarkup,
+        t.status AS status,
+        t.jlpt_level AS jlptLevel,
+        t.order_index AS orderIndex,
+        t.cover_image_file_id AS coverImageFileId,
+        t.category_id AS categoryId,
+        COUNT(q.id) AS totalQuestions
+        FROM topics t
+        LEFT JOIN questions q ON t.id = q.topic_id
+        <include refid="Base_Where_Clause"/>
+        GROUP BY
+        t.id, t.japanese_name, t.japanese_description,
+        t.japanese_name_markup, t.japanese_description_markup,
+        t.status, t.jlpt_level, t.order_index, t.cover_image_file_id, t.category_id
+        <choose>
+            <when test="query.sortBy != null and query.sortBy != ''">
+                ORDER BY t.${query.sortBy}
+                <choose>
+                    <when test='query.sortDirection != null and query.sortDirection.equalsIgnoreCase("DESC")'>
+                        DESC
+                    </when>
+                    <otherwise>
+                        ASC
+                    </otherwise>
+                </choose>
+            </when>
+            <otherwise>
+                ORDER BY t.order_index ASC
+            </otherwise>
+        </choose>
+        LIMIT #{query.size} OFFSET #{offset}
+    </select>
+
+</mapper>
