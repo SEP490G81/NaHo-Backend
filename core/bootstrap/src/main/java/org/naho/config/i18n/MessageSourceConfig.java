@@ -17,6 +17,7 @@ public class MessageSourceConfig {
         messageSource.setBasenames(
                 "classpath:i18n/common/common",
                 "classpath:i18n/user/user",
+                "classpath:i18n/social/social",
                 "classpath:i18n/speech/speech",
                 "classpath:i18n/file/file",
                 "classpath:i18n/llm/llm",

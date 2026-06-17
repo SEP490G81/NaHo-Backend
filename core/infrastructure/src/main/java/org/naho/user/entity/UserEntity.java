@@ -6,7 +6,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.question.entity.QuestionEntity;
 import org.naho.shared.persistence.BaseEntity;
-import org.naho.social.entity.ReportEntity;
+import org.naho.social.report.entity.ReportEntity;
 import org.naho.user.type.Gender;
 import org.naho.user.type.JLPTLevel;
 import org.naho.user.type.UserStatus;

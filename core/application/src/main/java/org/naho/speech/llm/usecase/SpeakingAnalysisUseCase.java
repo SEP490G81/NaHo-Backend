@@ -328,8 +328,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 itVocab.add(new SpeakingHistoryDetailResult.ItVocabItem(
                         item.path("term").asText(""),
                         item.path("reading").asText(""),
-                        item.path("meaning").asText("")
-                ));
+                        item.path("meaning").asText("")));
             }
         }
 
