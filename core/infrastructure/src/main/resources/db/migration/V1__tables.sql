@@ -206,17 +206,18 @@ CREATE TABLE topics
 
 CREATE TABLE user_sessions
 (
-    id                 BIGINT AUTO_INCREMENT NOT NULL,
-    user_id            BIGINT                NOT NULL,
-    hash_refresh_token VARCHAR(512)          NOT NULL,
-    device_id          VARCHAR(100)          NULL,
-    user_agent         TEXT                  NULL,
-    ip_address         VARCHAR(45)           NULL,
-    issued_at          datetime              NOT NULL,
-    expires_at         datetime              NOT NULL,
-    last_used_at       datetime              NULL,
-    revoked_at         datetime              NULL,
-    revoked_reason     VARCHAR(50)           NULL,
+    id                       BIGINT AUTO_INCREMENT NOT NULL,
+    user_id                  BIGINT                NOT NULL,
+    hash_refresh_token       VARCHAR(512)          NOT NULL,
+    device_id                VARCHAR(100)          NULL,
+    user_agent               TEXT                  NULL,
+    ip_address               VARCHAR(45)           NULL,
+    issued_at                datetime              NOT NULL,
+    refresh_token_expires_at datetime              NOT NULL,
+    access_token_expires_at  datetime              NOT NULL,
+    last_used_at             datetime              NULL,
+    revoked_at               datetime              NULL,
+    revoked_reason           VARCHAR(50)           NULL,
     CONSTRAINT pk_user_sessions PRIMARY KEY (id)
 );
 

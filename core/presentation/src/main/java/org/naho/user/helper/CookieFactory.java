@@ -25,7 +25,7 @@ public class CookieFactory {
         }
 
         return ResponseCookie
-                .from(tokenResult.tokenName(), tokenResult.value())
+                .from(tokenResult.cookieName(), tokenResult.value())
                 .httpOnly(true)
                 .secure(cookieProperty.isSecure())
                 .sameSite("Lax")
@@ -34,9 +34,9 @@ public class CookieFactory {
                 .build();
     }
 
-    public ResponseCookie clearCookieForJWTToken(String tokenName) {
+    public ResponseCookie clearCookieForJWTToken(String cookieName) {
         return ResponseCookie
-                .from(tokenName, "")
+                .from(cookieName, "")
                 .httpOnly(true)
                 .secure(cookieProperty.isSecure())
                 .sameSite("Strict")
