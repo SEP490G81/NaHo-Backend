@@ -16,13 +16,14 @@ public class UserSession {
     private String userAgent;
     private String ipAddress;
     private Instant issuedAt;
-    private Instant expiresAt;
+    private Instant refreshTokenExpiresAt;
+    private Instant accessTokenExpiresAt;
     private Instant lastUsedAt;
     private Instant revokedAt;
     private SessionRevokedReason revokedReason;
 
-    public boolean isExpired() {
-        return expiresAt != null && !expiresAt.isAfter(Instant.now());
+    public boolean isRefreshTokenExpired() {
+        return refreshTokenExpiresAt != null && !refreshTokenExpiresAt.isAfter(Instant.now());
     }
 
     public boolean isRevoked() {
@@ -50,7 +51,8 @@ public class UserSession {
         this.userAgent = builder.userAgent;
         this.ipAddress = builder.ipAddress;
         this.issuedAt = builder.issuedAt;
-        this.expiresAt = builder.expiresAt;
+        this.refreshTokenExpiresAt = builder.refreshTokenExpiresAt;
+        this.accessTokenExpiresAt = builder.accessTokenExpiresAt;
         this.lastUsedAt = builder.lastUsedAt;
         this.revokedAt = builder.revokedAt;
         this.revokedReason = builder.revokedReason;
@@ -70,7 +72,8 @@ public class UserSession {
         private String userAgent;
         private String ipAddress;
         private Instant issuedAt;
-        private Instant expiresAt;
+        private Instant refreshTokenExpiresAt;
+        private Instant accessTokenExpiresAt;
         private Instant lastUsedAt;
         private Instant revokedAt;
         private SessionRevokedReason revokedReason;
@@ -110,8 +113,13 @@ public class UserSession {
             return this;
         }
 
-        public Builder expiresAt(Instant expiresAt) {
-            this.expiresAt = expiresAt;
+        public Builder refreshTokenExpiresAt(Instant refreshTokenExpiresAt) {
+            this.refreshTokenExpiresAt = refreshTokenExpiresAt;
+            return this;
+        }
+
+        public Builder accessTokenExpiresAt(Instant accessTokenExpiresAt) {
+            this.accessTokenExpiresAt = accessTokenExpiresAt;
             return this;
         }
 
@@ -170,8 +178,12 @@ public class UserSession {
         return issuedAt;
     }
 
-    public Instant getExpiresAt() {
-        return expiresAt;
+    public Instant getRefreshTokenExpiresAt() {
+        return refreshTokenExpiresAt;
+    }
+
+    public Instant getAccessTokenExpiresAt() {
+        return accessTokenExpiresAt;
     }
 
     public Instant getLastUsedAt() {

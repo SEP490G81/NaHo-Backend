@@ -149,7 +149,7 @@ public class UserSessionRepositoryAdapter implements UserSessionRepositoryPort {
 
     @Override
     public void verifyUserSession(UserSession userSession, Instant now) {
-        if (userSession.isExpired()) {
+        if (userSession.isRefreshTokenExpired()) {
             userSession.setRevokedAt(now);
             userSession.setRevokedReason(SessionRevokedReason.EXPIRED);
             this.save(userSession);

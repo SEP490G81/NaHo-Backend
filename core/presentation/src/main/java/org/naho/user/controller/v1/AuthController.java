@@ -79,10 +79,10 @@ public class AuthController {
         ));
 
         ResponseCookie clearAccessTokenCookie =
-                cookieFactory.clearCookieForJWTToken(TokenType.ACCESS_TOKEN_NAME);
+                cookieFactory.clearCookieForJWTToken(TokenType.ACCESS_TOKEN_COOKIE_NAME);
 
         ResponseCookie clearRefreshTokenCookie =
-                cookieFactory.clearCookieForJWTToken(TokenType.REFRESH_TOKEN_NAME);
+                cookieFactory.clearCookieForJWTToken(TokenType.REFRESH_TOKEN_COOKIE_NAME);
 
         return ResponseEntity
                 .noContent()
@@ -99,10 +99,10 @@ public class AuthController {
         authInputPort.logoutAllSessions(payload.userId());
 
         ResponseCookie clearAccessTokenCookie =
-                cookieFactory.clearCookieForJWTToken(TokenType.ACCESS_TOKEN_NAME);
+                cookieFactory.clearCookieForJWTToken(TokenType.ACCESS_TOKEN_COOKIE_NAME);
 
         ResponseCookie clearRefreshTokenCookie =
-                cookieFactory.clearCookieForJWTToken(TokenType.REFRESH_TOKEN_NAME);
+                cookieFactory.clearCookieForJWTToken(TokenType.REFRESH_TOKEN_COOKIE_NAME);
 
         return ResponseEntity
                 .noContent()

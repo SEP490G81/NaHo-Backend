@@ -39,8 +39,11 @@ public class UserSessionEntity {
     @Column(name = "issued_at", nullable = false)
     Instant issuedAt;
 
-    @Column(name = "expires_at", nullable = false)
-    Instant expiresAt;
+    @Column(name = "refresh_token_expires_at", nullable = false)
+    Instant refreshTokenExpiresAt;
+
+    @Column(name = "access_token_expires_at", nullable = false)
+    Instant accessTokenExpiresAt;
 
     @Column(name = "last_used_at")
     Instant lastUsedAt;

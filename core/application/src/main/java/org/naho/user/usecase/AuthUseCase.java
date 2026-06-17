@@ -10,7 +10,6 @@ import org.naho.user.command.GoogleLoginCommand;
 import org.naho.user.command.LogoutCommand;
 import org.naho.user.exception.RoleErrorCode;
 import org.naho.user.exception.UserErrorCode;
-import org.naho.user.helper.AuthUseCaseHelper;
 import org.naho.user.mapper.UserResultMapper;
 import org.naho.user.model.Role;
 import org.naho.user.model.User;
@@ -38,7 +37,6 @@ public class AuthUseCase implements AuthInputPort {
     private final UserSessionRepositoryPort userSessionRepositoryPort;
     private final RoleRepositoryPort roleRepositoryPort;
     private final TransactionPort transactionPort;
-    private final AuthUseCaseHelper authUseCaseHelper;
     private final UserSessionServicePort userSessionServicePort;
 
     public AuthUseCase(
@@ -49,7 +47,6 @@ public class AuthUseCase implements AuthInputPort {
             UserSessionRepositoryPort userSessionRepositoryPort,
             RoleRepositoryPort roleRepositoryPort,
             TransactionPort transactionPort,
-            AuthUseCaseHelper authUseCaseHelper,
             UserSessionServicePort userSessionServicePort
     ) {
         this.userRepositoryPort = userRepositoryPort;
@@ -59,7 +56,6 @@ public class AuthUseCase implements AuthInputPort {
         this.userSessionRepositoryPort = userSessionRepositoryPort;
         this.roleRepositoryPort = roleRepositoryPort;
         this.transactionPort = transactionPort;
-        this.authUseCaseHelper = authUseCaseHelper;
         this.userSessionServicePort = userSessionServicePort;
     }
 
@@ -145,11 +141,12 @@ public class AuthUseCase implements AuthInputPort {
                 SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
         );
 
-        TokenResult refreshToken = tokenServicePort.generateRefreshToken();
+        Instant now = Instant.now();
+
+        TokenResult refreshToken = tokenServicePort.generateRefreshToken(now);
 
         String hashRefreshToken = encoderPort.hashRefreshToken(refreshToken.value());
 
-        Instant now = Instant.now();
         UserSession userSession = UserSession.builder()
                 .userId(currentUser.getId())
                 .hashRefreshToken(hashRefreshToken)
@@ -157,13 +154,19 @@ public class AuthUseCase implements AuthInputPort {
                 .userAgent(command.getUserAgent())
                 .ipAddress(command.getIpAddress())
                 .issuedAt(now)
-                .expiresAt(refreshToken.expiresAt())
+                .refreshTokenExpiresAt(refreshToken.expiresAt())
+                .accessTokenExpiresAt(tokenServicePort.getAccessTokenExpiry(now))
                 .lastUsedAt(now)
                 .build();
 
         UserSession savedUserSession = userSessionRepositoryPort.save(userSession);
 
-        return authUseCaseHelper.buildLoginResult(refreshToken, savedUserSession);
+        TokenResult accessToken = tokenServicePort.generateAccessToken(savedUserSession);
+
+        return new LoginResult(
+                accessToken,
+                refreshToken
+        );
     }
 
     private LoginResult doCredentialsLogin(CredentialsLoginCommand command) {
@@ -189,11 +192,12 @@ public class AuthUseCase implements AuthInputPort {
                 SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
         );
 
-        TokenResult refreshToken = tokenServicePort.generateRefreshToken();
+        Instant now = Instant.now();
+
+        TokenResult refreshToken = tokenServicePort.generateRefreshToken(now);
 
         String hashRefreshToken = encoderPort.hashRefreshToken(refreshToken.value());
 
-        Instant now = Instant.now();
         UserSession userSession = UserSession.builder()
                 .userId(user.getId())
                 .hashRefreshToken(hashRefreshToken)
@@ -201,13 +205,19 @@ public class AuthUseCase implements AuthInputPort {
                 .userAgent(command.userAgent())
                 .ipAddress(command.ipAddress())
                 .issuedAt(now)
-                .expiresAt(refreshToken.expiresAt())
+                .refreshTokenExpiresAt(refreshToken.expiresAt())
+                .accessTokenExpiresAt(tokenServicePort.getAccessTokenExpiry(now))
                 .lastUsedAt(now)
                 .build();
 
         UserSession savedUserSession = userSessionRepositoryPort.save(userSession);
 
-        return authUseCaseHelper.buildLoginResult(refreshToken, savedUserSession);
+        TokenResult accessToken = tokenServicePort.generateAccessToken(savedUserSession);
+
+        return new LoginResult(
+                accessToken,
+                refreshToken
+        );
     }
 
     @Override
@@ -244,7 +254,7 @@ public class AuthUseCase implements AuthInputPort {
         userSessionRepositoryPort.save(userSession);
 
         // generate new refresh token and new user session
-        TokenResult newRefreshToken = tokenServicePort.generateRefreshToken();
+        TokenResult newRefreshToken = tokenServicePort.generateRefreshToken(now);
 
         String newHashRefreshToken = encoderPort.hashRefreshToken(newRefreshToken.value());
 
@@ -255,12 +265,18 @@ public class AuthUseCase implements AuthInputPort {
                 .userAgent(userSession.getUserAgent())
                 .ipAddress(userSession.getIpAddress())
                 .issuedAt(now)
-                .expiresAt(newRefreshToken.expiresAt())
+                .refreshTokenExpiresAt(newRefreshToken.expiresAt())
+                .accessTokenExpiresAt(tokenServicePort.getAccessTokenExpiry(now))
                 .lastUsedAt(now)
                 .build();
 
         UserSession savedUserSession = userSessionRepositoryPort.save(newUserSession);
 
-        return authUseCaseHelper.buildLoginResult(newRefreshToken, savedUserSession);
+        TokenResult newAccessToken = tokenServicePort.generateAccessToken(savedUserSession);
+
+        return new LoginResult(
+                newAccessToken,
+                newRefreshToken
+        );
     }
 }

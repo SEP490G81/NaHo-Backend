@@ -10,7 +10,7 @@
         where user_id = #{userId}
           and device_id = #{deviceId}
           and revoked_at is null
-          and expires_at > #{revokedAt}
+          and refresh_token_expires_at > #{revokedAt}
     </update>
 
     <update id="revokeActiveSessionsByUserIdAndUserSessionId">
@@ -20,7 +20,7 @@
         where id = #{userSessionId}
           and user_id = #{userId}
           and revoked_at is null
-          and expires_at > #{revokedAt}
+          and refresh_token_expires_at > #{revokedAt}
     </update>
 
     <update id="revokeAllActiveSessionsByUserId">
@@ -29,7 +29,7 @@
             revoked_reason = #{reason}
         where user_id = #{userId}
           and revoked_at is null
-          and expires_at > #{revokedAt}
+          and refresh_token_expires_at > #{revokedAt}
     </update>
 
     <select id="findAllActiveSessionIdsByUserId" resultType="long">
