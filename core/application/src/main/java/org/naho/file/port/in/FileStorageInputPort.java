@@ -4,7 +4,7 @@ import org.naho.file.command.FileUploadCommand;
 import org.naho.file.result.FileResult;
 
 public interface FileStorageInputPort {
-    FileResult upload(FileUploadCommand command);
+    FileResult uploadFile(FileUploadCommand command);
 
-    String deleteById(Long id);
+    String deleteFileById(Long id);
 }
