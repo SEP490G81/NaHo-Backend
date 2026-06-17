@@ -6,6 +6,7 @@ import org.naho.i18n.message.user.UserTitleMessageKey;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.user.command.CredentialsLoginCommand;
+import org.naho.user.command.ForceLogoutCommand;
 import org.naho.user.command.GoogleLoginCommand;
 import org.naho.user.command.LogoutCommand;
 import org.naho.user.exception.RoleErrorCode;
@@ -38,6 +39,7 @@ public class AuthUseCase implements AuthInputPort {
     private final RoleRepositoryPort roleRepositoryPort;
     private final TransactionPort transactionPort;
     private final UserSessionServicePort userSessionServicePort;
+    private final UserSessionEventPublisherPort userSessionEventPublisherPort;
 
     public AuthUseCase(
             UserRepositoryPort userRepositoryPort,
@@ -47,7 +49,8 @@ public class AuthUseCase implements AuthInputPort {
             UserSessionRepositoryPort userSessionRepositoryPort,
             RoleRepositoryPort roleRepositoryPort,
             TransactionPort transactionPort,
-            UserSessionServicePort userSessionServicePort
+            UserSessionServicePort userSessionServicePort,
+            UserSessionEventPublisherPort userSessionEventPublisherPort
     ) {
         this.userRepositoryPort = userRepositoryPort;
         this.encoderPort = encoderPort;
@@ -57,6 +60,7 @@ public class AuthUseCase implements AuthInputPort {
         this.roleRepositoryPort = roleRepositoryPort;
         this.transactionPort = transactionPort;
         this.userSessionServicePort = userSessionServicePort;
+        this.userSessionEventPublisherPort = userSessionEventPublisherPort;
     }
 
     @Override
@@ -163,6 +167,12 @@ public class AuthUseCase implements AuthInputPort {
 
         TokenResult accessToken = tokenServicePort.generateAccessToken(savedUserSession);
 
+        userSessionEventPublisherPort.publishForceLogoutEvent(new ForceLogoutCommand(
+                savedUserSession.getUserId(),
+                savedUserSession.getId(),
+                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
+        ));
+        
         return new LoginResult(
                 accessToken,
                 refreshToken
@@ -213,6 +223,12 @@ public class AuthUseCase implements AuthInputPort {
         UserSession savedUserSession = userSessionRepositoryPort.save(userSession);
 
         TokenResult accessToken = tokenServicePort.generateAccessToken(savedUserSession);
+
+        userSessionEventPublisherPort.publishForceLogoutEvent(new ForceLogoutCommand(
+                savedUserSession.getUserId(),
+                savedUserSession.getId(),
+                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
+        ));
 
         return new LoginResult(
                 accessToken,

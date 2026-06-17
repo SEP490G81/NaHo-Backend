@@ -68,6 +68,10 @@ dependencies {
     // UA-parser (User Agent)
     implementation("com.github.ua-parser:uap-java:1.6.1")
 
+    // Redis
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.apache.commons:commons-pool2:2.13.1")
+
     // other
     testImplementation("org.testcontainers:mysql:1.21.4")
     testImplementation("org.springframework.boot:spring-boot-starter-test")

@@ -1,10 +1,17 @@
 package org.naho.shared.exception;
 
+import org.naho.i18n.message.common.CommonTitleMessageKey;
+
 public enum CommonErrorCode implements ErrorCode {
 
     COMMON_INTERNAL_SERVER_ERROR(
             "COMMON_A001",
-            org.naho.i18n.message.common.CommonTitleMessageKey.COMMON_INTERNAL_SERVER_ERROR_TITLE,
+            CommonTitleMessageKey.COMMON_INTERNAL_SERVER_ERROR_TITLE,
+            500
+    ),
+    COMMON_CANNOT_READ_JSON(
+            "COMMON_A002",
+            CommonTitleMessageKey.COMMON_CANNOT_READ_JSON_TITLE,
             500
     );
 
