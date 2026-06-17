@@ -11,5 +11,6 @@ public interface FileEntityMapper {
 
     @Mapping(target = "createdTime", ignore = true)
     @Mapping(target = "modifiedTime", ignore = true)
+    @Mapping(target = "persona", ignore = true)
     FileEntity domainToEntity(File domain);
 }

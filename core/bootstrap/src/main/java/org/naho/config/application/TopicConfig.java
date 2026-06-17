@@ -1,11 +1,11 @@
 package org.naho.config.application;
 
+import org.naho.question.port.out.QuestionRepositoryPort;
 import org.naho.shared.port.out.TransactionPort;
-import org.naho.speech.question.port.out.QuestionRepositoryPort;
-import org.naho.speech.topic.adapter.TopicListRepositoryAdapter;
-import org.naho.speech.topic.adapter.TopicRepositoryAdapter;
-import org.naho.speech.topic.port.in.*;
-import org.naho.speech.topic.usecase.*;
+import org.naho.topic.adapter.TopicListRepositoryAdapter;
+import org.naho.topic.adapter.TopicRepositoryAdapter;
+import org.naho.topic.port.in.*;
+import org.naho.topic.usecase.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

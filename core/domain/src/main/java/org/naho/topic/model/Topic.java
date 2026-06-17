@@ -1,5 +1,6 @@
 package org.naho.topic.model;
 
+
 import org.naho.i18n.message.speech.TopicDetailMessageKey;
 import org.naho.shared.exception.DomainException;
 import org.naho.topic.exception.TopicDomainErrorCode;
@@ -9,11 +10,12 @@ import org.naho.user.type.JLPTLevel;
 public class Topic {
     private final Long id;
     private final Long userId;
+    private Long categoryId;
     private Long coverImageFileId;
     private String japaneseName;
-    private String description;
-    private String japaneseNameTokens;
-    private String japaneseDescriptionTokens;
+    private String japaneseDescription;
+    private String japaneseNameMarkup;
+    private String japaneseDescriptionMarkup;
     private TopicStatus status;
     private JLPTLevel jlptLevel;
     private Double orderIndex;
@@ -23,10 +25,11 @@ public class Topic {
         this.id = builder.id;
         this.coverImageFileId = builder.coverImageFileId;
         this.userId = builder.userId;
+        this.categoryId = builder.categoryId;
         this.japaneseName = builder.japaneseName;
-        this.description = builder.description;
-        this.japaneseNameTokens = builder.japaneseNameTokens;
-        this.japaneseDescriptionTokens = builder.japaneseDescriptionTokens;
+        this.japaneseDescription = builder.japaneseDescription;
+        this.japaneseNameMarkup = builder.japaneseNameMarkup;
+        this.japaneseDescriptionMarkup = builder.japaneseDescriptionMarkup;
         this.status = builder.status;
         this.jlptLevel = builder.jlptLevel;
         this.orderIndex = builder.orderIndex;
@@ -45,8 +48,8 @@ public class Topic {
         }
     }
 
-    private void validateDescription(String description) {
-        if (description == null || description.isBlank()) {
+    private void validateJapaneseDescription(String japaneseDescription) {
+        if (japaneseDescription == null || japaneseDescription.isBlank()) {
             throw new DomainException(
                     TopicDomainErrorCode.TOPIC_DESCRIPTION_EMPTY,
                     TopicDetailMessageKey.TOPIC_DESCRIPTION_EMPTY
@@ -54,18 +57,28 @@ public class Topic {
         }
     }
 
-    public void update(String japaneseName, String description, String japaneseNameTokens, String japaneseDescriptionTokens, TopicStatus status, JLPTLevel jlptLevel, Double orderIndex, Long coverImageFileId) {
+    public void update(String japaneseName,
+                       String japaneseDescription,
+                       String japaneseNameMarkup,
+                       String japaneseDescriptionMarkup,
+                       TopicStatus status,
+                       JLPTLevel jlptLevel,
+                       Double orderIndex,
+                       Long coverImageFileId,
+                       Long categoryId
+    ) {
         validateJapaneseName(japaneseName);
-        validateDescription(description);
+        validateJapaneseDescription(japaneseDescription);
 
         this.japaneseName = japaneseName;
-        this.description = description;
-        this.japaneseNameTokens = japaneseNameTokens;
-        this.japaneseDescriptionTokens = japaneseDescriptionTokens;
+        this.japaneseDescription = japaneseDescription;
+        this.japaneseNameMarkup = japaneseNameMarkup;
+        this.japaneseDescriptionMarkup = japaneseDescriptionMarkup;
         this.status = status;
         this.jlptLevel = jlptLevel;
         this.orderIndex = orderIndex;
         this.coverImageFileId = coverImageFileId;
+        this.categoryId = categoryId;
     }
 
     // Getter
@@ -81,20 +94,24 @@ public class Topic {
         return userId;
     }
 
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
     public String getJapaneseName() {
         return japaneseName;
     }
 
-    public String getDescription() {
-        return description;
+    public String getJapaneseDescription() {
+        return japaneseDescription;
     }
 
-    public String getJapaneseNameTokens() {
-        return japaneseNameTokens;
+    public String getJapaneseNameMarkup() {
+        return japaneseNameMarkup;
     }
 
-    public String getJapaneseDescriptionTokens() {
-        return japaneseDescriptionTokens;
+    public String getJapaneseDescriptionMarkup() {
+        return japaneseDescriptionMarkup;
     }
 
     public TopicStatus getStatus() {
@@ -114,10 +131,11 @@ public class Topic {
         private Long id;
         private Long coverImageFileId;
         private Long userId;
+        private Long categoryId;
         private String japaneseName;
-        private String description;
-        private String japaneseNameTokens;
-        private String japaneseDescriptionTokens;
+        private String japaneseDescription;
+        private String japaneseNameMarkup;
+        private String japaneseDescriptionMarkup;
         private TopicStatus status;
         private JLPTLevel jlptLevel;
         private Double orderIndex;
@@ -137,23 +155,28 @@ public class Topic {
             return this;
         }
 
+        public Builder categoryId(Long categoryId) {
+            this.categoryId = categoryId;
+            return this;
+        }
+
         public Builder japaneseName(String japaneseName) {
             this.japaneseName = japaneseName;
             return this;
         }
 
-        public Builder description(String description) {
-            this.description = description;
+        public Builder japaneseDescription(String japaneseDescription) {
+            this.japaneseDescription = japaneseDescription;
             return this;
         }
 
-        public Builder japaneseNameTokens(String japaneseNameTokens) {
-            this.japaneseNameTokens = japaneseNameTokens;
+        public Builder japaneseNameMarkup(String japaneseNameMarkup) {
+            this.japaneseNameMarkup = japaneseNameMarkup;
             return this;
         }
 
-        public Builder japaneseDescriptionTokens(String japaneseDescriptionTokens) {
-            this.japaneseDescriptionTokens = japaneseDescriptionTokens;
+        public Builder japaneseDescriptionMarkup(String japaneseDescriptionMarkup) {
+            this.japaneseDescriptionMarkup = japaneseDescriptionMarkup;
             return this;
         }
 
@@ -175,7 +198,7 @@ public class Topic {
         public Topic build() {
             Topic topic = new Topic(this);
             topic.validateJapaneseName(topic.getJapaneseName());
-            topic.validateDescription(topic.getDescription());
+            topic.validateJapaneseDescription(topic.getJapaneseDescription());
             return topic;
         }
     }

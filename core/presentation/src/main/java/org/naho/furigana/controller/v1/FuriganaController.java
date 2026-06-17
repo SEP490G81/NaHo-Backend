@@ -1,12 +1,12 @@
 package org.naho.furigana.controller.v1;
 
 import lombok.RequiredArgsConstructor;
-import org.naho.furigana.command.AnalyzeFuriganaCommand;
+import org.naho.furigana.command.GenerateFuriganaCommand;
 import org.naho.furigana.dto.mapper.FuriganaRequestMapper;
 import org.naho.furigana.dto.mapper.FuriganaResponseMapper;
-import org.naho.furigana.dto.request.AnalyzeFuriganaRequest;
+import org.naho.furigana.dto.request.GenerateFuriganaRequest;
 import org.naho.furigana.dto.response.FuriganaResponse;
-import org.naho.furigana.port.in.AnalyzeFuriganaInputPort;
+import org.naho.furigana.port.in.GenerateFuriganaInputPort;
 import org.naho.furigana.result.FuriganaResult;
 import org.naho.i18n.message.furigana.FuriganaDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
@@ -21,15 +21,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class FuriganaController {
 
-    private final AnalyzeFuriganaInputPort analyzeFuriganaInputPort;
+    private final GenerateFuriganaInputPort generateFuriganaInputPort;
     private final FuriganaRequestMapper furiganaRequestMapper;
     private final FuriganaResponseMapper furiganaResponseMapper;
 
-    @PostMapping("/analyze")
-    @ApiResponseMessage(message = FuriganaDetailMessageKey.FURIGANA_ANALYZE_SUCCESSFULLY)
-    public ResponseEntity<FuriganaResponse> analyze(@RequestBody AnalyzeFuriganaRequest request) {
-        AnalyzeFuriganaCommand command = furiganaRequestMapper.requestToCommand(request);
-        FuriganaResult result = analyzeFuriganaInputPort.analyze(command);
+    @PostMapping("/generate")
+    @ApiResponseMessage(message = FuriganaDetailMessageKey.FURIGANA_GENERATE_SUCCESSFULLY)
+    public ResponseEntity<FuriganaResponse> generateFurigana(@RequestBody GenerateFuriganaRequest request) {
+        GenerateFuriganaCommand command = furiganaRequestMapper.requestToCommand(request);
+        FuriganaResult result = generateFuriganaInputPort.generateFurigana(command);
         FuriganaResponse response = furiganaResponseMapper.resultToResponse(result);
         return ResponseEntity.ok(response);
     }

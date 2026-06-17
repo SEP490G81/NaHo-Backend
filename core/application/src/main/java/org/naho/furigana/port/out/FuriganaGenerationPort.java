@@ -1,0 +1,7 @@
+package org.naho.furigana.port.out;
+
+import org.naho.furigana.model.FuriganaText;
+
+public interface FuriganaGenerationPort {
+    FuriganaText generateFurigana(String text);
+}
