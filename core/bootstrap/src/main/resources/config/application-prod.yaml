@@ -3,7 +3,18 @@ spring:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
-    
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+      database: ${REDIS_DATABASE}
+
+  flyway:
+    validate-on-migrate: true
+    clean-disabled: false
+
 logging:
   level:
     root: warn
