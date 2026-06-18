@@ -4,11 +4,14 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import org.naho.file.model.FileEntity;
 import org.naho.question.entity.QuestionEntity;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.social.entity.CommentEntity;
 import org.naho.social.type.ReportType;
 import org.naho.user.entity.UserEntity;
+
+import java.util.List;
 
 @SuperBuilder
 @Getter
@@ -22,11 +25,11 @@ public class ReportEntity extends BaseEntity {
     @Column(nullable = false)
     String title;
 
-    @Column(nullable = false, length = 512)
+    @Column(nullable = false, columnDefinition = "TEXT")
     String description;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     ReportType reportType;
 
     @Builder.Default
@@ -43,4 +46,7 @@ public class ReportEntity extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "comment_id")
     CommentEntity comment;
+
+    @OneToMany(mappedBy = "report")
+    List<FileEntity> files;
 }

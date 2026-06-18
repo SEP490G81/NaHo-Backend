@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import org.naho.file.model.FileEntity;
 import org.naho.question.entity.QuestionEntity;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.social.report.entity.ReportEntity;
@@ -43,4 +44,7 @@ public class CommentEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "comment")
     List<ReportEntity> reports;
+
+    @OneToMany(mappedBy = "comment")
+    List<FileEntity> files;
 }

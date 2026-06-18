@@ -1,14 +1,13 @@
 package org.naho.file.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.persona.entity.PersonaEntity;
+import org.naho.question.entity.QuestionEntity;
 import org.naho.shared.persistence.BaseEntity;
+import org.naho.social.entity.CommentEntity;
 
 @SuperBuilder
 @Getter
@@ -33,4 +32,12 @@ public class FileEntity extends BaseEntity {
 
     @OneToOne(mappedBy = "avatarFile")
     PersonaEntity persona;
+
+    @ManyToOne
+    @JoinColumn(name = "comment_id")
+    CommentEntity comment;
+
+    @ManyToOne
+    @JoinColumn(name = "question_id")
+    QuestionEntity question;
 }
