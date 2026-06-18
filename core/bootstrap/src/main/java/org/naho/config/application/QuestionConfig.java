@@ -6,12 +6,20 @@ import org.naho.question.port.in.*;
 import org.naho.question.usecase.*;
 import org.naho.shared.port.out.EventPublisherPort;
 import org.naho.shared.port.out.TransactionPort;
+import org.naho.speech.llm.port.out.AiChatPort;
 import org.naho.topic.adapter.TopicRepositoryAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class QuestionConfig {
+
+    @Bean
+    public SuggestCustomQuestionUseCase suggestCustomQuestionUseCase(
+            AiChatPort aiChatPort
+    ) {
+        return new SuggestCustomQuestionUseCase(aiChatPort);
+    }
 
     @Bean
     public CreateQuestionInputPort createQuestionInputPort(QuestionRepositoryAdapter questionRepositoryAdapter,
