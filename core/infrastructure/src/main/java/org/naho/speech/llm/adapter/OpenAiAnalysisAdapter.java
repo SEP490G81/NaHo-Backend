@@ -29,64 +29,64 @@ public class OpenAiAnalysisAdapter implements AiAnalysisPort {
     @Override
     public String analyzeSpeaking(String topic, String question, String studentTranscript, String azureWordFeedbackJson) {
         String systemPrompt = """
-            You are an expert Japanese language assessor.
-            Evaluate the student's spoken Japanese answer based on the context.
-            Focus on grammatical accuracy, vocabulary usage, and naturalness.
-            
-            Based on the student's transcript and the word-level pronunciation scores/errors from Azure Speech, perform a detailed evaluation.
-            
-            Return the results ONLY as a valid JSON object matching the following schema.
-            Do NOT include any markdown formatting (like ```json or ```), no leading/trailing comments, and no extra text. It must be a raw parseable JSON string.
-            
-            JSON Schema:
-            {
-              "scores": {
-                "vocabulary": <double 0.0-10.0>,
-                "grammar": <double 0.0-10.0>,
-                "naturalness": <double 0.0-10.0>
-              },
-              "userTranscript": [
+                You are an expert Japanese language assessor.
+                Evaluate the student's spoken Japanese answer based on the context.
+                Focus on grammatical accuracy, vocabulary usage, and naturalness.
+                
+                Based on the student's transcript and the word-level pronunciation scores/errors from Azure Speech, perform a detailed evaluation.
+                
+                Return the results ONLY as a valid JSON object matching the following schema.
+                Do NOT include any markdown formatting (like ```json or ```), no leading/trailing comments, and no extra text. It must be a raw parseable JSON string.
+                
+                JSON Schema:
                 {
-                  "text": "<segment of user's answer>",
-                  "error": null
-                },
-                {
-                  "text": "<segment containing error>",
-                  "error": {
-                    "type": "Ngữ pháp / Sự tự nhiên / Từ vựng",
-                    "explanation": "<Vietnamese explanation of the error>",
-                    "suggestion": "<corrected Japanese version>"
-                  }
+                  "scores": {
+                    "vocabulary": <double 0.0-10.0>,
+                    "grammar": <double 0.0-10.0>,
+                    "naturalness": <double 0.0-10.0>
+                  },
+                  "userTranscript": [
+                    {
+                      "text": "<segment of user's answer>",
+                      "error": null
+                    },
+                    {
+                      "text": "<segment containing error>",
+                      "error": {
+                        "type": "Ngữ pháp / Sự tự nhiên / Từ vựng",
+                        "explanation": "<Vietnamese explanation of the error>",
+                        "suggestion": "<corrected Japanese version>"
+                      }
+                    }
+                  ],
+                  "aiSuggestion": {
+                    "jp": "<natural Japanese recommended response>",
+                    "furigana": "<the recommended response with furigana/hiragana for all kanji>",
+                    "vi": "<Vietnamese translation of the recommended response>"
+                  },
+                  "pronunciationNote": "<Overall pronunciation advice in Vietnamese based on the azure word feedback. Focus on what areas the student needs to improve, e.g., long vowels, double consonants, or typical errors.>",
+                  "wordNotes": {
+                    "<japanese_word>": "<Vietnamese feedback note for this specific word, e.g., 'Phát âm tốt', 'Chú ý kéo dài hơi', etc. Keep it very short and helpful.>"
+                  },
+                  "expressions": [
+                    {
+                      "jp": "<useful Japanese phrase related to this topic>",
+                      "furigana": "<furigana for the phrase>",
+                      "vi": "<Vietnamese translation>",
+                      "note": "<Vietnamese note on how/when to use it>"
+                    }
+                  ],
+                  "itVocab": [
+                    {
+                      "term": "<IT Japanese vocabulary, e.g., 進捗>",
+                      "reading": "<reading in hiragana>",
+                      "meaning": "<Vietnamese meaning>"
+                    }
+                  ]
                 }
-              ],
-              "aiSuggestion": {
-                "jp": "<natural Japanese recommended response>",
-                "furigana": "<the recommended response with furigana/hiragana for all kanji>",
-                "vi": "<Vietnamese translation of the recommended response>"
-              },
-              "pronunciationNote": "<Overall pronunciation advice in Vietnamese based on the azure word feedback. Focus on what areas the student needs to improve, e.g., long vowels, double consonants, or typical errors.>",
-              "wordNotes": {
-                "<japanese_word>": "<Vietnamese feedback note for this specific word, e.g., 'Phát âm tốt', 'Chú ý kéo dài hơi', etc. Keep it very short and helpful.>"
-              },
-              "expressions": [
-                {
-                  "jp": "<useful Japanese phrase related to this topic>",
-                  "furigana": "<furigana for the phrase>",
-                  "vi": "<Vietnamese translation>",
-                  "note": "<Vietnamese note on how/when to use it>"
-                }
-              ],
-              "itVocab": [
-                {
-                  "term": "<IT Japanese vocabulary, e.g., 進捗>",
-                  "reading": "<reading in hiragana>",
-                  "meaning": "<Vietnamese meaning>"
-                }
-              ]
-            }
-            
-            NOTE for itVocab: ONLY populate itVocab with 1-3 useful IT Japanese terms if the topic is IT/tech related. Otherwise, leave it as an empty list [].
-            """;
+                
+                NOTE for itVocab: ONLY populate itVocab with 1-3 useful IT Japanese terms if the topic is IT/tech related. Otherwise, leave it as an empty list [].
+                """;
 
         String userContent = String.format(
                 "Topic: %s\nQuestion: %s\nStudent Transcript: %s\nAzure Pronunciation Data: %s",
@@ -95,6 +95,7 @@ public class OpenAiAnalysisAdapter implements AiAnalysisPort {
 
         String requestBody = buildRequestBody(systemPrompt, userContent);
 
+        System.out.println("Check key: " + properties.getApiKey());
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(LLM_URL))
                 .timeout(Duration.ofSeconds(60))
@@ -118,6 +119,7 @@ public class OpenAiAnalysisAdapter implements AiAnalysisPort {
                     "Analysis request interrupted", e
             );
         } catch (Exception e) {
+            System.out.println("check key: " + properties.getApiKey());
             throw new InfrastructureException(
                     LlmApplicationError.LLM_API_ERROR,
                     "Cannot call OpenAI Analysis API: " + e.getMessage(), e

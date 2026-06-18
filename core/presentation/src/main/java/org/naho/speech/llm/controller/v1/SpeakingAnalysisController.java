@@ -31,7 +31,7 @@ public class SpeakingAnalysisController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @ApiResponseMessage(message = "Phân tích phát âm thành công!")
-    public ResponseEntity<SpeakingAnalysisResponse> analyze(
+    public ResponseEntity<SpeakingAnalysisResponse> uploadAudioAndAnalyzeSpeaking(
             @RequestPart("file") MultipartFile file,
             @RequestParam("topicId") Long topicId,
             @RequestParam("questionId") Long questionId,
@@ -48,13 +48,13 @@ public class SpeakingAnalysisController {
                 durationSec
         );
 
-        var result = speakingAnalysisInputPort.analyze(command);
+        var result = speakingAnalysisInputPort.analyzeSpeaking(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(speakingAnalysisMapper.toResponse(result));
     }
 
     @GetMapping(value = "/history/{historyId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponseMessage(message = "Lấy chi tiết lịch sử thành công!")
-    public ResponseEntity<SpeakingHistoryDetailResponse> getHistoryDetail(
+    public ResponseEntity<SpeakingHistoryDetailResponse> getSpeakingHistoryDetail(
             @PathVariable("historyId") String historyIdStr
     ) {
         Long historyId;

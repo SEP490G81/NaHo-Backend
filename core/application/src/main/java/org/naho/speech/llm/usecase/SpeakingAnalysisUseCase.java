@@ -58,7 +58,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public SpeakingAnalysisResult analyze(SpeakingAnalysisCommand command) {
+    public SpeakingAnalysisResult analyzeSpeaking(SpeakingAnalysisCommand command) {
         System.out.println("[SpeakingAnalysis] Starting analysis for user: " + command.userId() + ", question: " + command.questionId());
 
         User user = userRepositoryPort.findById(command.userId())
@@ -138,27 +138,57 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         double vocabScore = 0.0;
         double grammarScore = 0.0;
         double naturalnessScore = 0.0;
+        double pronScore10 = azureAssessment.getPronunciationScore() / 10.0;
+        double overallScore = Math.round(pronScore10 * 10.0) / 10.0;
 
         try {
             FeedbackResponse feedback = objectMapper.readValue(rawLlmFeedback, FeedbackResponse.class);
             if (feedback != null && feedback.scores() != null) {
-                vocabScore = feedback.scores().vocabulary();
-                grammarScore = feedback.scores().grammar();
-                naturalnessScore = feedback.scores().naturalness();
+                vocabScore = feedback.scores().vocabulary() != null ? feedback.scores().vocabulary() : 0.0;
+                grammarScore = feedback.scores().grammar() != null ? feedback.scores().grammar() : 0.0;
+                naturalnessScore = feedback.scores().naturalness() != null ? feedback.scores().naturalness() : 0.0;
             }
 
-            double pronScore10 = azureAssessment.getPronunciationScore() / 10.0;
-            double avgScore = (pronScore10 + vocabScore + grammarScore + naturalnessScore) / 4.0;
-            avgScore = Math.round(avgScore * 10.0) / 10.0;
+            overallScore = (pronScore10 + vocabScore + grammarScore + naturalnessScore) / 4.0;
+            overallScore = Math.round(overallScore * 10.0) / 10.0;
 
             JsonNode rootNode = objectMapper.readTree(rawLlmFeedback);
             if (rootNode instanceof ObjectNode objectNode) {
                 objectNode.put("durationSec", command.durationSec());
-                objectNode.put("overallScore", avgScore);
+                objectNode.put("overallScore", overallScore);
                 rawLlmFeedback = objectMapper.writeValueAsString(objectNode);
             }
         } catch (Exception e) {
             e.printStackTrace();
+            if (vocabScore > 0.0 || grammarScore > 0.0 || naturalnessScore > 0.0) {
+                overallScore = (pronScore10 + vocabScore + grammarScore + naturalnessScore) / 4.0;
+                overallScore = Math.round(overallScore * 10.0) / 10.0;
+            } else {
+                overallScore = Math.round(pronScore10 * 10.0) / 10.0;
+            }
+            try {
+                ObjectNode fallbackNode = objectMapper.createObjectNode();
+                ObjectNode scoresNode = objectMapper.createObjectNode();
+                scoresNode.put("vocabulary", vocabScore);
+                scoresNode.put("grammar", grammarScore);
+                scoresNode.put("naturalness", naturalnessScore);
+                fallbackNode.set("scores", scoresNode);
+                fallbackNode.putArray("userTranscript");
+                ObjectNode suggestionNode = objectMapper.createObjectNode();
+                suggestionNode.put("jp", "");
+                suggestionNode.put("furigana", "");
+                suggestionNode.put("vi", "");
+                fallbackNode.set("aiSuggestion", suggestionNode);
+                fallbackNode.put("pronunciationNote", "");
+                fallbackNode.putObject("wordNotes");
+                fallbackNode.putArray("expressions");
+                fallbackNode.putArray("itVocab");
+                fallbackNode.put("durationSec", command.durationSec());
+                fallbackNode.put("overallScore", overallScore);
+                rawLlmFeedback = objectMapper.writeValueAsString(fallbackNode);
+            } catch (Exception ex) {
+                rawLlmFeedback = "{}";
+            }
         }
 
         ContentAssessment contentAssessment = ContentAssessment.builder()
@@ -169,10 +199,6 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 .answerHistoryId(answerHistory.getId())
                 .build();
         answerHistoryRepositoryPort.saveContentAssessment(contentAssessment);
-
-        double pronScore10 = azureAssessment.getPronunciationScore() / 10.0;
-        double overallScore = (pronScore10 + vocabScore + grammarScore + naturalnessScore) / 4.0;
-        overallScore = Math.round(overallScore * 10.0) / 10.0;
 
         return new SpeakingAnalysisResult(answerHistory.getId(), overallScore);
     }
@@ -185,6 +211,12 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 .orElseThrow(() -> new ApplicationException(
                         QuestionErrorCode.QUESTION_NOT_FOUND,
                         "Answer history not found with id: " + historyId
+                ));
+
+        Question question = questionRepositoryPort.findById(history.getQuestionId())
+                .orElseThrow(() -> new ApplicationException(
+                        QuestionErrorCode.QUESTION_NOT_FOUND,
+                        "Question not found with id: " + history.getQuestionId()
                 ));
 
         SpeechAssessment speech = answerHistoryRepositoryPort.findSpeechAssessmentByAnswerHistoryId(historyId)
@@ -347,7 +379,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
 
         return new SpeakingHistoryDetailResult(
                 history.getId(),
-                history.getQuestionId(),
+                question.getTopicId(),
                 history.getQuestionId(),
                 history.getCreatedTime() != null ? history.getCreatedTime() : Instant.now(),
                 durationSec,
