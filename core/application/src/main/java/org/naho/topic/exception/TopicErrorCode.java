@@ -1,6 +1,6 @@
 package org.naho.topic.exception;
 
-import org.naho.i18n.message.speech.TopicTitleMessageKey;
+import org.naho.i18n.message.topic.TopicTitleMessageKey;
 import org.naho.shared.exception.ErrorCode;
 
 public enum TopicErrorCode implements ErrorCode {

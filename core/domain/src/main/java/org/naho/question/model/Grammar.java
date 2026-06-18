@@ -1,4 +1,4 @@
-package org.naho.topic.model;
+package org.naho.question.model;
 
 public class Grammar {
     private final Long id;

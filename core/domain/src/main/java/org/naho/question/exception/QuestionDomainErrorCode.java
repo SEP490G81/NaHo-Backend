@@ -1,16 +1,17 @@
-package org.naho.question.exeption;
+package org.naho.question.exception;
 
-import org.naho.i18n.message.speech.QuestionTitleMessageKey;
+import org.naho.i18n.message.question.QuestionTitleMessageKey;
 import org.naho.shared.exception.ErrorCode;
 
-public enum QuestionErrorCode implements ErrorCode {
-    QUESTION_NOT_FOUND("QST_A001", QuestionTitleMessageKey.QUESTION_NOT_FOUND_TITLE, 404);
+public enum QuestionDomainErrorCode implements ErrorCode {
+    QUESTION_TITLE_EMPTY("QST_D001", QuestionTitleMessageKey.QUESTION_CREATION_FAILED_TITLE, 400),
+    QUESTION_DESCRIPTION_EMPTY("QST_D002", QuestionTitleMessageKey.QUESTION_CREATION_FAILED_TITLE, 400);
 
     private final String code;
     private final String titleKey;
     private final int statusCode;
 
-    QuestionErrorCode(String code, String titleKey, int statusCode) {
+    QuestionDomainErrorCode(String code, String titleKey, int statusCode) {
         this.code = code;
         this.titleKey = titleKey;
         this.statusCode = statusCode;

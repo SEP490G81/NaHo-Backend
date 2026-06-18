@@ -1,21 +1,25 @@
 package org.naho.question.adapter;
 
+import lombok.RequiredArgsConstructor;
+import org.naho.file.repository.FileJpaRepository;
+import org.naho.question.model.Question;
 import org.naho.question.port.out.QuestionRepositoryPort;
 import org.naho.question.repository.QuestionJpaRepository;
-import org.naho.topic.model.Question;
-import org.naho.topic.type.QuestionStatus;
+import org.naho.question.type.QuestionStatus;
+import org.naho.topic.repository.TopicJpaRepository;
+import org.naho.user.repository.UserJpaRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 @Component
+@RequiredArgsConstructor
 public class QuestionRepositoryAdapter implements QuestionRepositoryPort {
 
     private final QuestionJpaRepository questionJpaRepository;
-
-    public QuestionRepositoryAdapter(QuestionJpaRepository questionJpaRepository) {
-        this.questionJpaRepository = questionJpaRepository;
-    }
+    private final TopicJpaRepository topicJpaRepository;
+    private final UserJpaRepository userJpaRepository;
+    private final FileJpaRepository fileJpaRepository;
 
     @Override
     public void deleteQuestionsByTopicId(Long topicId) {
@@ -30,6 +34,74 @@ public class QuestionRepositoryAdapter implements QuestionRepositoryPort {
     @Override
     public boolean hasAnyQuestionBeenAnsweredInTopic(Long topicId) {
         return questionJpaRepository.existsAnswerHistoryByTopicId(topicId);
+    }
+
+    @Override
+    public boolean hasQuestionBeenAnswered(Long questionId) {
+        return questionJpaRepository.existsAnswerHistoryByQuestionId(questionId);
+    }
+
+    @Override
+    public Double getMaxOrderIndexByTopicId(Long topicId) {
+        return questionJpaRepository.getMaxOrderIndexByTopicId(topicId);
+    }
+
+    @Override
+    public boolean existsByTopicIdAndTitle(Long topicId, String title) {
+        return questionJpaRepository.existsByTopicIdAndTitle(topicId, title);
+    }
+
+    @Override
+    public boolean existsByTopicIdAndTitleExcludeId(Long topicId, String title, Long id) {
+        return questionJpaRepository.existsByTopicIdAndTitleAndIdNot(topicId, title, id);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        questionJpaRepository.deleteById(id);
+    }
+
+    @Override
+    public Question save(Question question) {
+        org.naho.question.entity.QuestionEntity entity = new org.naho.question.entity.QuestionEntity();
+
+        if (question.getId() != null) {
+            entity.setId(question.getId());
+        }
+
+        entity.setTitle(question.getTitle());
+        entity.setTitleMarkup(question.getTitleMarkup());
+        entity.setDescription(question.getDescription());
+        entity.setDescriptionMarkup(question.getDescriptionMarkup());
+        entity.setOrderIndex(question.getOrderIndex());
+        entity.setStatus(question.getStatus());
+
+        if (question.getTopicId() != null) {
+            entity.setTopic(topicJpaRepository.getReferenceById(question.getTopicId()));
+        }
+
+        if (question.getUserId() != null) {
+            entity.setUser(userJpaRepository.getReferenceById(question.getUserId()));
+        }
+
+        if (question.getQuestionAudioFileId() != null) {
+            entity.setQuestionAudioFile(fileJpaRepository.getReferenceById(question.getQuestionAudioFileId()));
+        }
+
+        org.naho.question.entity.QuestionEntity savedEntity = questionJpaRepository.save(entity);
+
+        return Question.builder()
+                .id(savedEntity.getId())
+                .questionAudioFileId(savedEntity.getQuestionAudioFile() != null ? savedEntity.getQuestionAudioFile().getId() : null)
+                .topicId(savedEntity.getTopic() != null ? savedEntity.getTopic().getId() : null)
+                .userId(savedEntity.getUser() != null ? savedEntity.getUser().getId() : null)
+                .title(savedEntity.getTitle())
+                .titleMarkup(savedEntity.getTitleMarkup())
+                .description(savedEntity.getDescription())
+                .descriptionMarkup(savedEntity.getDescriptionMarkup())
+                .orderIndex(savedEntity.getOrderIndex())
+                .status(savedEntity.getStatus())
+                .build();
     }
 
     @Override

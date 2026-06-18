@@ -2,7 +2,7 @@ package org.naho.topic.controller.v1;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.naho.i18n.message.speech.TopicDetailMessageKey;
+import org.naho.i18n.message.topic.TopicDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.topic.command.ListTopicCommand;
 import org.naho.topic.dto.mapper.TopicRequestMapper;

@@ -1,7 +1,7 @@
 package org.naho.topic.model;
 
 
-import org.naho.i18n.message.speech.TopicDetailMessageKey;
+import org.naho.i18n.message.topic.TopicDetailMessageKey;
 import org.naho.shared.exception.DomainException;
 import org.naho.topic.exception.TopicDomainErrorCode;
 import org.naho.topic.type.TopicStatus;

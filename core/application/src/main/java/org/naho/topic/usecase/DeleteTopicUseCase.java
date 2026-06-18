@@ -1,7 +1,8 @@
 package org.naho.topic.usecase;
 
-import org.naho.i18n.message.speech.TopicDetailMessageKey;
+import org.naho.i18n.message.topic.TopicDetailMessageKey;
 import org.naho.question.port.out.QuestionRepositoryPort;
+import org.naho.question.type.QuestionStatus;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.topic.command.DeleteTopicCommand;
@@ -9,7 +10,6 @@ import org.naho.topic.exception.TopicErrorCode;
 import org.naho.topic.model.Topic;
 import org.naho.topic.port.in.DeleteTopicInputPort;
 import org.naho.topic.port.out.TopicRepositoryPort;
-import org.naho.topic.type.QuestionStatus;
 import org.naho.topic.type.TopicStatus;
 
 import java.util.Optional;

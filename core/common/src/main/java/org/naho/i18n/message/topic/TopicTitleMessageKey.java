@@ -1,4 +1,4 @@
-package org.naho.i18n.message.speech;
+package org.naho.i18n.message.topic;
 
 public final class TopicTitleMessageKey {
 

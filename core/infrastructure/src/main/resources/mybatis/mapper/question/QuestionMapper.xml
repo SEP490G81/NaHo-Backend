@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.naho.question.mapper.QuestionMapper">
+
+    <sql id="Base_Select_List">
+        q
+        .
+        id
+        as id,
+        q.topic_id as topicId,
+        q.user_id as userId,
+        q.title as title,
+        q.title_markup as titleMarkup,
+        q.description as description,
+        q.description_markup as descriptionMarkup,
+        q.order_index as orderIndex,
+        q.status as status
+    </sql>
+
+    <sql id="Search_Conditions">
+        <where>
+            q.status != 'ARCHIVE'
+            <if test="query.topicId != null">
+                AND q.topic_id = #{query.topicId}
+            </if>
+            <if test="query.creatorId != null">
+                AND q.user_id = #{query.creatorId}
+            </if>
+            <if test="query.isSystemCreated != null and query.isSystemCreated == true">
+                <!-- Assume SYSTEM user has role content manager/admin, or we check specifically, adjust if needed -->
+                AND q.user_id IN (SELECT u.id FROM users u JOIN users_roles ur ON u.id = ur.user_id JOIN roles r ON
+                ur.role_id = r.id WHERE r.role_name IN ('ADMIN', 'CONTENT_MANAGER'))
+            </if>
+            <if test="query.isSystemCreated != null and query.isSystemCreated == false">
+                AND q.user_id NOT IN (SELECT u.id FROM users u JOIN users_roles ur ON u.id = ur.user_id JOIN roles r ON
+                ur.role_id = r.id WHERE r.role_name IN ('ADMIN', 'CONTENT_MANAGER'))
+            </if>
+            <if test="query.statuses != null and query.statuses.size() > 0">
+                AND q.status IN
+                <foreach item="item" collection="query.statuses" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="query.keyword != null and query.keyword != ''">
+                AND (
+                LOWER(q.title) LIKE CONCAT('%', LOWER(#{query.keyword}), '%')
+                OR LOWER(q.description) LIKE CONCAT('%', LOWER(#{query.keyword}), '%')
+                )
+            </if>
+        </where>
+    </sql>
+
+    <select id="countQuestions" resultType="long">
+        SELECT COUNT(1)
+        FROM questions q
+        <include refid="Search_Conditions"/>
+    </select>
+
+    <select id="findQuestions" resultType="org.naho.question.result.QuestionListItemResult">
+        SELECT
+        <include refid="Base_Select_List"/>
+        FROM questions q
+        <include refid="Search_Conditions"/>
+        <choose>
+            <when test="query.sortBy != null and query.sortBy != ''">
+                ORDER BY q.${query.sortBy}
+                <if test="query.sortDirection != null and query.sortDirection != ''">
+                    ${query.sortDirection}
+                </if>
+                <if test="query.sortDirection == null or query.sortDirection == ''">
+                    ASC
+                </if>
+            </when>
+            <otherwise>
+                ORDER BY q.order_index ASC, q.created_time DESC
+            </otherwise>
+        </choose>
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+</mapper>

@@ -1,7 +1,7 @@
 package org.naho.question.port.out;
 
-import org.naho.topic.model.Question;
-import org.naho.topic.type.QuestionStatus;
+import org.naho.question.model.Question;
+import org.naho.question.type.QuestionStatus;
 
 import java.util.Optional;
 
@@ -11,5 +11,19 @@ public interface QuestionRepositoryPort {
     void updateQuestionsStatusByTopicId(Long topicId, QuestionStatus status);
 
     boolean hasAnyQuestionBeenAnsweredInTopic(Long topicId);
+
+    boolean hasQuestionBeenAnswered(Long questionId);
+
     Optional<Question> findById(Long id);
+
+    Question save(Question question);
+
+    void deleteById(Long id);
+
+    Double getMaxOrderIndexByTopicId(Long topicId);
+
+    boolean existsByTopicIdAndTitle(Long topicId, String title);
+
+    boolean existsByTopicIdAndTitleExcludeId(Long topicId, String title, Long id);
 }
+
