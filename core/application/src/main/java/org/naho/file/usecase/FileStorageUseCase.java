@@ -83,4 +83,3 @@ public class FileStorageUseCase implements FileStorageInputPort {
         return objectKey;
     }
 }
-
