@@ -70,6 +70,7 @@ dependencies {
     implementation("com.worksap.nlp:sudachi:0.7.5")
 
     // other
+    implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5")
     runtimeOnly("com.mysql:mysql-connector-j")

@@ -9,9 +9,11 @@ import org.naho.file.command.FileUploadCommand;
 import org.naho.file.port.in.FileStorageInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.result.FileResult;
-import org.naho.furigana.port.out.FuriganaAnalysisPort;
+import org.naho.furigana.port.out.FuriganaGenerationPort;
 import org.naho.i18n.message.speech.QuestionDetailMessageKey;
 import org.naho.i18n.message.user.UserDetailMessageKey;
+import org.naho.question.exeption.QuestionErrorCode;
+import org.naho.question.port.out.QuestionRepositoryPort;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
@@ -25,12 +27,10 @@ import org.naho.speech.model.AnswerHistory;
 import org.naho.speech.model.ContentAssessment;
 import org.naho.speech.model.SpeechAssessment;
 import org.naho.speech.model.WordAssessment;
-import org.naho.speech.question.port.out.QuestionRepositoryPort;
-import org.naho.speech.question.port.out.exeption.QuestionErrorCode;
-import org.naho.speech.topic.port.out.TopicRepositoryPort;
 import org.naho.speech.type.SpeechAssessmentErrorType;
 import org.naho.topic.model.Question;
 import org.naho.topic.model.Topic;
+import org.naho.topic.port.out.TopicRepositoryPort;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.model.User;
 import org.naho.user.port.out.UserRepositoryPort;
@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
@@ -55,7 +54,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     private final AzureSpeechServicePort azureSpeechServicePort;
     private final TopicRepositoryPort topicRepositoryPort;
     private final AiAnalysisPort aiAnalysisPort;
-    private final FuriganaAnalysisPort furiganaAnalysisPort;
+    private final FuriganaGenerationPort furiganaGenerarationPort;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
@@ -75,7 +74,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 command.contentType(),
                 (long) command.audioBytes().length
         );
-        FileResult uploadResult = fileStorageInputPort.upload(uploadCommand);
+        FileResult uploadResult = fileStorageInputPort.uploadFile(uploadCommand);
 
         AnswerHistory answerHistory = AnswerHistory.builder()
                 .userId(user.getId())
@@ -275,7 +274,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
 
                 String furigana = "";
                 try {
-                    var furiganaText = furiganaAnalysisPort.analyze(wordText);
+                    var furiganaText = furiganaGenerarationPort.generateFurigana(wordText);
                     if (furiganaText != null && furiganaText.getTokens() != null) {
                         StringBuilder sb = new StringBuilder();
                         for (var token : furiganaText.getTokens()) {
@@ -329,8 +328,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 itVocab.add(new SpeakingHistoryDetailResult.ItVocabItem(
                         item.path("term").asText(""),
                         item.path("reading").asText(""),
-                        item.path("meaning").asText("")
-                ));
+                        item.path("meaning").asText("")));
             }
         }
 
@@ -360,8 +358,10 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    private record FeedbackResponse(Scores scores) {}
+    private record FeedbackResponse(Scores scores) {
+    }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    private record Scores(Double vocabulary, Double grammar, Double naturalness) {}
+    private record Scores(Double vocabulary, Double grammar, Double naturalness) {
+    }
 }

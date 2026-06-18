@@ -5,12 +5,12 @@ import java.util.List;
 public class FuriganaText {
     private final String originalText;
     private final List<FuriganaToken> tokens;
-    private final String fullFurigana;
+    private final String markupString;
 
     private FuriganaText(Builder builder) {
         this.originalText = builder.originalText;
         this.tokens = builder.tokens;
-        this.fullFurigana = builder.fullFurigana;
+        this.markupString = builder.markupString;
     }
 
     public static Builder builder() {
@@ -25,14 +25,14 @@ public class FuriganaText {
         return tokens;
     }
 
-    public String getFullFurigana() {
-        return fullFurigana;
+    public String getMarkupString() {
+        return markupString;
     }
 
     public static class Builder {
         private String originalText;
         private List<FuriganaToken> tokens;
-        private String fullFurigana;
+        private String markupString;
 
         public Builder originalText(String originalText) {
             this.originalText = originalText;
@@ -44,8 +44,8 @@ public class FuriganaText {
             return this;
         }
 
-        public Builder fullFurigana(String fullFurigana) {
-            this.fullFurigana = fullFurigana;
+        public Builder markupString(String markupString) {
+            this.markupString = markupString;
             return this;
         }
 

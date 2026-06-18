@@ -23,5 +23,6 @@ public interface UserEntityMapper {
     @Mapping(target = "questions", ignore = true)
     @Mapping(target = "createdTime", ignore = true)
     @Mapping(target = "modifiedTime", ignore = true)
+    @Mapping(target = "reports", ignore = true)
     UserEntity domainToEntity(User user);
 }

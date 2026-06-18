@@ -9,6 +9,15 @@ CREATE TABLE answer_histories
     CONSTRAINT pk_answer_histories PRIMARY KEY (id)
 );
 
+CREATE TABLE category
+(
+    id            BIGINT AUTO_INCREMENT NOT NULL,
+    created_time  datetime              NOT NULL,
+    modified_time datetime              NULL,
+    category_name VARCHAR(255)          NULL,
+    CONSTRAINT pk_category PRIMARY KEY (id)
+);
+
 CREATE TABLE comments
 (
     id            BIGINT AUTO_INCREMENT NOT NULL,
@@ -183,30 +192,32 @@ CREATE TABLE topics
     created_time                datetime              NOT NULL,
     modified_time               datetime              NULL,
     japanese_name               VARCHAR(255)          NULL,
-    `description`               TEXT                  NULL,
-    japanese_name_tokens        JSON                  NULL,
-    japanese_description_tokens JSON                  NULL,
+    japanese_description        VARCHAR(255)          NULL,
+    japanese_name_markup        TEXT                  NULL,
+    japanese_description_markup TEXT                  NULL,
     status                      VARCHAR(50)           NULL,
     jlpt_level                  VARCHAR(2)            NULL,
     order_index                 DOUBLE                NULL,
     cover_image_file_id         BIGINT                NULL,
     user_id                     BIGINT                NULL,
+    category_id                 BIGINT                NULL,
     CONSTRAINT pk_topics PRIMARY KEY (id)
 );
 
 CREATE TABLE user_sessions
 (
-    id                 BIGINT AUTO_INCREMENT NOT NULL,
-    user_id            BIGINT                NOT NULL,
-    hash_refresh_token VARCHAR(512)          NOT NULL,
-    device_id          VARCHAR(100)          NULL,
-    user_agent         TEXT                  NULL,
-    ip_address         VARCHAR(45)           NULL,
-    issued_at          datetime              NOT NULL,
-    expires_at         datetime              NOT NULL,
-    last_used_at       datetime              NULL,
-    revoked_at         datetime              NULL,
-    revoked_reason     VARCHAR(50)           NULL,
+    id                       BIGINT AUTO_INCREMENT NOT NULL,
+    user_id                  BIGINT                NOT NULL,
+    hash_refresh_token       VARCHAR(512)          NOT NULL,
+    device_id                VARCHAR(100)          NULL,
+    user_agent               TEXT                  NULL,
+    ip_address               VARCHAR(45)           NULL,
+    issued_at                datetime              NOT NULL,
+    refresh_token_expires_at datetime              NOT NULL,
+    access_token_expires_at  datetime              NOT NULL,
+    last_used_at             datetime              NULL,
+    revoked_at               datetime              NULL,
+    revoked_reason           VARCHAR(50)           NULL,
     CONSTRAINT pk_user_sessions PRIMARY KEY (id)
 );
 
@@ -351,6 +362,9 @@ ALTER TABLE reports
 
 ALTER TABLE speech_assessments
     ADD CONSTRAINT FK_SPEECH_ASSESSMENTS_ON_ANSWER_HISTORY FOREIGN KEY (answer_history_id) REFERENCES answer_histories (id);
+
+ALTER TABLE topics
+    ADD CONSTRAINT FK_TOPICS_ON_CATEGORY FOREIGN KEY (category_id) REFERENCES category (id);
 
 ALTER TABLE topics
     ADD CONSTRAINT FK_TOPICS_ON_COVER_IMAGE_FILE FOREIGN KEY (cover_image_file_id) REFERENCES files (id);

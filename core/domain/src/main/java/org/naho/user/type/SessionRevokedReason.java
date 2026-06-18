@@ -9,5 +9,6 @@ public enum SessionRevokedReason {
     ADMIN_REVOKED,
     TOKEN_REUSE_DETECTED,
     EXPIRED,
-    ROTATED
+    ROTATED,
+    LOGIN_ON_OTHER_DEVICE,
 }

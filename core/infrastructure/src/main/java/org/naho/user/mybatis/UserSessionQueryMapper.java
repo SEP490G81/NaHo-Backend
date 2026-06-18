@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Param;
 import org.naho.user.type.SessionRevokedReason;
 
 import java.time.Instant;
+import java.util.List;
 
 @Mapper
 public interface UserSessionQueryMapper {
@@ -27,4 +28,6 @@ public interface UserSessionQueryMapper {
             @Param("revokedAt") Instant revokedAt,
             @Param("reason") SessionRevokedReason reason
     );
+
+    List<Long> findAllActiveSessionIdsByUserId(@Param("userId") Long userId);
 }
