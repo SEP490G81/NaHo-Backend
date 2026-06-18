@@ -1,22 +1,25 @@
-package org.naho.topic.model;
+package org.naho.question.model;
 
-import org.naho.topic.type.QuestionStatus;
+import org.naho.i18n.message.question.QuestionDetailMessageKey;
+import org.naho.question.exception.QuestionDomainErrorCode;
+import org.naho.question.type.QuestionStatus;
+import org.naho.shared.exception.DomainException;
 
 import java.util.List;
 
 public class Question {
     private final Long id;
-    private final Long questionAudioFileId;
     private final Long topicId;
     private final Long userId;
-    private final String title;
-    private final String titleMarkup;
-    private final String description;
-    private final String descriptionMarkup;
-    private final Double orderIndex;
-    private final QuestionStatus status;
     private final List<Grammar> grammars;
     private final List<Vocabulary> vocabularies;
+    private Long questionAudioFileId;
+    private String title;
+    private String titleMarkup;
+    private String description;
+    private String descriptionMarkup;
+    private Double orderIndex;
+    private QuestionStatus status;
 
     // Private constructor dùng cho Builder
     private Question(Builder builder) {
@@ -36,6 +39,45 @@ public class Question {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    private void validateTitle(String title) {
+        if (title == null || title.isBlank()) {
+            throw new DomainException(
+                    QuestionDomainErrorCode.QUESTION_TITLE_EMPTY,
+                    QuestionDetailMessageKey.QUESTION_TITLE_EMPTY
+            );
+        }
+    }
+
+    private void validateDescription(String description) {
+        if (description == null || description.isBlank()) {
+            throw new DomainException(
+                    QuestionDomainErrorCode.QUESTION_DESCRIPTION_EMPTY,
+                    QuestionDetailMessageKey.QUESTION_DESCRIPTION_EMPTY
+            );
+        }
+    }
+
+    public void update(String title,
+                       String description,
+                       String titleMarkup,
+                       String descriptionMarkup,
+                       Double orderIndex,
+                       Long questionAudioFileId) {
+        validateTitle(title);
+        validateDescription(description);
+
+        this.title = title;
+        this.description = description;
+        this.titleMarkup = titleMarkup;
+        this.descriptionMarkup = descriptionMarkup;
+        this.orderIndex = orderIndex;
+        this.questionAudioFileId = questionAudioFileId;
+    }
+
+    public void changeStatus(QuestionStatus newStatus) {
+        this.status = newStatus;
     }
 
     // Getters
@@ -163,7 +205,10 @@ public class Question {
         }
 
         public Question build() {
-            return new Question(this);
+            Question question = new Question(this);
+            question.validateTitle(question.getTitle());
+            question.validateDescription(question.getDescription());
+            return question;
         }
     }
 }

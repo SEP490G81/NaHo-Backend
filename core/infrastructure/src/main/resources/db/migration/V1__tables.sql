@@ -110,8 +110,8 @@ CREATE TABLE questions
     description_markup     TEXT                  NULL,
     order_index            DOUBLE                NULL,
     status                 VARCHAR(50)           NULL,
-    question_audio_file_id BIGINT                NOT NULL,
-    topic_id               BIGINT                NOT NULL,
+    question_audio_file_id BIGINT                NULL,
+    topic_id               BIGINT                NULL,
     user_id                BIGINT                NOT NULL,
     CONSTRAINT pk_questions PRIMARY KEY (id)
 );

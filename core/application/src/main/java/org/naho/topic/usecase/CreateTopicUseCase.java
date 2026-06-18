@@ -1,6 +1,6 @@
 package org.naho.topic.usecase;
 
-import org.naho.i18n.message.speech.TopicDetailMessageKey;
+import org.naho.i18n.message.topic.TopicDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.topic.command.CreateTopicCommand;
 import org.naho.topic.exception.TopicErrorCode;
