@@ -8,6 +8,9 @@ import org.naho.persona.entity.PersonaEntity;
 import org.naho.question.entity.QuestionEntity;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.social.entity.CommentEntity;
+import org.naho.social.report.entity.ReportEntity;
+
+import java.util.List;
 
 @SuperBuilder
 @Getter
@@ -40,4 +43,8 @@ public class FileEntity extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "question_id")
     QuestionEntity question;
+
+    @ManyToOne
+    @JoinColumn(name = "report_id") // Tên cột khóa ngoại trong DB của bạn
+    private ReportEntity report;    // Tên biến này BẮT BUỘC phải là "report" để khớp với mappedBy bên kia
 }
