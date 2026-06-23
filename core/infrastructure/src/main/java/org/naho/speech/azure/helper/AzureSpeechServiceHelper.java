@@ -3,10 +3,10 @@ package org.naho.speech.azure.helper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.cognitiveservices.speech.*;
+import com.microsoft.cognitiveservices.speech.audio.PushAudioInputStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.naho.i18n.message.speech.SpeechDetailMessageKey;
-import org.naho.shared.constant.FileExtension;
 import org.naho.shared.exception.InfrastructureException;
 import org.naho.speech.azure.constant.AzurePronunciationScoreKey;
 import org.naho.speech.azure.exception.AzureSpeechErrorCode;
@@ -15,13 +15,17 @@ import org.naho.speech.model.WordAssessment;
 import org.naho.speech.type.SpeechAssessmentErrorType;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
@@ -29,30 +33,20 @@ import java.util.List;
 public class AzureSpeechServiceHelper {
     private final ObjectMapper objectMapper;
 
-    private static final String TEMP_AUDIO_FILE_PREFIX = "audio_";
+    private static final int MAX_AUDIO_SIZE_BYTES = 20 * 1024 * 1024; // 20MB
+    private static final double MAX_AUDIO_DURATION_SECONDS = 120.0;
+    private static final long EXTRA_PROCESSING_TIMEOUT_SECONDS = 30L;
+    private static final long MAX_PROCESSING_TIMEOUT_SECONDS = 180L;
+    private static final int FFMPEG_MAX_CONCURRENT_PROCESS = 10;
+    private static final int FFMPEG_BUFFER_SIZE = 4096;
 
-    /**
-     * Tạo file audio tạm thời từ dữ liệu byte[] upload lên.
-     * File sẽ được lưu trong thư mục temp của hệ điều hành
-     * và dùng cho quá trình speech processing / pronunciation assessment.
-     *
-     * @param audioBytes dữ liệu audio dạng byte[]
-     * @return file audio tạm thời
-     */
-    public File createTempAudioFile(byte[] audioBytes) {
-        Path tempDir = Paths.get(System.getProperty("java.io.tmpdir"));
+    private static final Semaphore FFMPEG_SEMAPHORE = new Semaphore(FFMPEG_MAX_CONCURRENT_PROCESS);
 
+    public Path createTempInputAudioFile(byte[] audioBytes) {
         try {
-            Path tempFile = Files.createTempFile(
-                    tempDir,
-                    TEMP_AUDIO_FILE_PREFIX,
-                    FileExtension.WAV_EXTENSION
-            );
-
-            Files.write(tempFile, audioBytes);
-
-            return tempFile.toFile();
-
+            Path inputFile = Files.createTempFile("input_audio_", ".audio");
+            Files.write(inputFile, audioBytes);
+            return inputFile;
         } catch (IOException e) {
             throw new InfrastructureException(
                     AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
@@ -61,35 +55,205 @@ public class AzureSpeechServiceHelper {
         }
     }
 
-    /**
-     * Tạo cấu hình Pronunciation Assessment cho Azure Speech SDK.
-     *
-     * @param referenceText đoạn text chuẩn để đối chiếu phát âm
-     * @return cấu hình Pronunciation Assessment
-     */
+    public void validateAudioSize(byte[] rawAudioBytes) {
+        if (rawAudioBytes == null || rawAudioBytes.length == 0) {
+            throw new InfrastructureException(
+                    AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
+                    SpeechDetailMessageKey.SPEECH_AUDIO_FILE_EMPTY
+            );
+        }
+
+        if (rawAudioBytes.length > MAX_AUDIO_SIZE_BYTES) {
+            throw new InfrastructureException(
+                    AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
+                    SpeechDetailMessageKey.SPEECH_AUDIO_FILE_TOO_LARGE
+            );
+        }
+    }
+
+    public double probeAudioDurationSeconds(Path inputFile) {
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder(
+                    "ffprobe",
+                    "-v", "error",
+                    "-show_entries", "format=duration",
+                    "-of", "default=noprint_wrappers=1:nokey=1",
+                    inputFile.toString()
+            );
+
+            Process process = processBuilder.start();
+            boolean finished = process.waitFor(10, TimeUnit.SECONDS);
+
+            if (!finished) {
+                process.destroyForcibly();
+                throw new InfrastructureException(
+                        AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
+                        SpeechDetailMessageKey.SPEECH_AUDIO_DURATION_INVALID
+                );
+            }
+
+            String output = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8).trim();
+            String error = new String(process.getErrorStream().readAllBytes(), StandardCharsets.UTF_8).trim();
+
+            if (process.exitValue() != 0 || output.isBlank()) {
+                log.error("FFprobe failed. output={}, error={}", output, error);
+                throw new InfrastructureException(
+                        AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
+                        SpeechDetailMessageKey.SPEECH_AUDIO_DURATION_INVALID
+                );
+            }
+
+            return Double.parseDouble(output);
+
+        } catch (InfrastructureException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Cannot determine audio duration", e);
+            throw new InfrastructureException(
+                    AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
+                    SpeechDetailMessageKey.SPEECH_AUDIO_DURATION_INVALID
+            );
+        }
+    }
+
+    public void validateAudioDuration(double durationSeconds) {
+        if (durationSeconds <= 0 || Double.isNaN(durationSeconds) || Double.isInfinite(durationSeconds)) {
+            throw new InfrastructureException(
+                    AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
+                    SpeechDetailMessageKey.SPEECH_AUDIO_DURATION_INVALID
+            );
+        }
+
+        if (durationSeconds > MAX_AUDIO_DURATION_SECONDS) {
+            throw new InfrastructureException(
+                    AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
+                    SpeechDetailMessageKey.SPEECH_AUDIO_DURATION_EXCEEDED
+            );
+        }
+    }
+
+    public long calculateProcessingTimeoutSeconds(double durationSeconds) {
+        return Math.min(
+                (long) Math.ceil(durationSeconds) + EXTRA_PROCESSING_TIMEOUT_SECONDS,
+                MAX_PROCESSING_TIMEOUT_SECONDS
+        );
+    }
+
+    public CompletableFuture<Void> streamAzurePcmByFfmpegAsync(Path inputFile, PushAudioInputStream pushStream) {
+        return CompletableFuture.runAsync(() -> {
+            boolean acquired = false;
+            Process process = null;
+
+            try {
+                FFMPEG_SEMAPHORE.acquire();
+                acquired = true;
+
+                ProcessBuilder processBuilder = new ProcessBuilder(
+                        "ffmpeg",
+                        "-hide_banner",
+                        "-loglevel", "error",
+                        "-y",
+                        "-i", inputFile.toString(),
+                        "-vn",
+                        "-af", "silenceremove=start_periods=1:start_duration=0.2:start_threshold=-45dB:stop_periods=1:stop_duration=0.2:stop_threshold=-45dB",
+                        "-acodec", "pcm_s16le",
+                        "-ac", "1",
+                        "-ar", "16000",
+                        "-f", "s16le",
+                        "pipe:1"
+                );
+
+                process = processBuilder.start();
+                Process ffmpegProcess = process;
+
+                CompletableFuture<String> errorFuture = CompletableFuture.supplyAsync(() -> readStreamAsString(ffmpegProcess.getErrorStream()));
+
+                byte[] buffer = new byte[FFMPEG_BUFFER_SIZE];
+                try (InputStream inputStream = process.getInputStream()) {
+                    int bytesRead;
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        byte[] chunk = new byte[bytesRead];
+                        System.arraycopy(buffer, 0, chunk, 0, bytesRead);
+                        pushStream.write(chunk);
+                    }
+                }
+
+                int exitCode = process.waitFor();
+                String ffmpegError = errorFuture.get(3, TimeUnit.SECONDS);
+
+                if (exitCode != 0) {
+                    log.error("FFmpeg streaming failed: {}", ffmpegError);
+                    throw new InfrastructureException(
+                            AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
+                            SpeechDetailMessageKey.SPEECH_AUDIO_CONVERT_FAILED,
+                            ffmpegError
+                    );
+                }
+
+            } catch (InfrastructureException e) {
+                throw e;
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new InfrastructureException(
+                        AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
+                        SpeechDetailMessageKey.SPEECH_AUDIO_CONVERT_INTERRUPTED
+                );
+            } catch (IOException e) {
+                log.error("FFmpeg is not available or cannot start", e);
+                throw new InfrastructureException(
+                        AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
+                        SpeechDetailMessageKey.SPEECH_AUDIO_FFMPEG_NOT_AVAILABLE
+                );
+            } catch (Exception e) {
+                log.error("Unexpected FFmpeg streaming error", e);
+                throw new InfrastructureException(
+                        AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
+                        SpeechDetailMessageKey.SPEECH_AUDIO_CONVERT_FAILED,
+                        e.getMessage()
+                );
+            } finally {
+                try {
+                    pushStream.close();
+                } catch (Exception ignored) {
+                }
+
+                if (process != null && process.isAlive()) {
+                    process.destroyForcibly();
+                }
+
+                if (acquired) {
+                    FFMPEG_SEMAPHORE.release();
+                }
+            }
+        });
+    }
+
+    private String readStreamAsString(InputStream inputStream) {
+        try (InputStream is = inputStream; ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            is.transferTo(baos);
+            return baos.toString(StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            return "";
+        }
+    }
+
     public PronunciationAssessmentConfig createPronunciationAssessmentConfig(String referenceText) {
         String normalizedReferenceText = referenceText == null ? "" : referenceText.trim();
-
-        // Miscue detection chỉ hoạt động ổn định khi có reference text (scripted mode).
-        // Với unscripted mode, Azure có thể trả về kết quả không chính xác hoặc inconsistent.
         boolean miscueEnabled = !normalizedReferenceText.isEmpty();
 
         PronunciationAssessmentConfig config = new PronunciationAssessmentConfig(
                 normalizedReferenceText,
                 PronunciationAssessmentGradingSystem.HundredMark,
-                PronunciationAssessmentGranularity.Phoneme,
+                PronunciationAssessmentGranularity.Word,
                 miscueEnabled
         );
 
-        // Bật thêm tính năng prosody (âm điệu, ngắt nghỉ)
         config.enableProsodyAssessment();
-
         return config;
     }
 
     public SpeechAssessment processResult(SpeechRecognitionResult result) {
         if (result.getReason() == ResultReason.RecognizedSpeech) {
-            // Lấy kết quả thô dạng JSON để parsing chi tiết đầy đủ metrics
             String jsonResult = result.getProperties().getProperty(PropertyId.SpeechServiceResponse_JsonResult);
 
             try {
@@ -110,7 +274,6 @@ public class AzureSpeechServiceHelper {
                 double completenessScore = pronNode.path(AzurePronunciationScoreKey.COMPLETENESS_SCORE).asDouble(0.0);
                 double pronScore = pronNode.path(AzurePronunciationScoreKey.PRON_SCORE).asDouble(0.0);
 
-                // Lấy chi tiết từ (Word level)
                 List<WordAssessment> wordList = new ArrayList<>();
                 JsonNode wordsNode = nBestNode.path(AzurePronunciationScoreKey.WORDS);
                 if (wordsNode.isArray()) {
@@ -124,8 +287,7 @@ public class AzureSpeechServiceHelper {
                                 .word(wordStr)
                                 .accuracyScore(wordAccuracy)
                                 .errorType(SpeechAssessmentErrorType.valueOf(errorType))
-                                .build()
-                        );
+                                .build());
                     }
                 }
 
@@ -139,9 +301,7 @@ public class AzureSpeechServiceHelper {
                         .build();
 
             } catch (IOException e) {
-                // Fallback nếu parse JSON lỗi, lấy kết quả cơ bản từ SDK objects
-                PronunciationAssessmentResult sdkResult =
-                        PronunciationAssessmentResult.fromResult(result);
+                PronunciationAssessmentResult sdkResult = PronunciationAssessmentResult.fromResult(result);
                 return SpeechAssessment.builder()
                         .transcriptText(result.getText())
                         .accuracyScore(sdkResult.getAccuracyScore())
@@ -176,7 +336,7 @@ public class AzureSpeechServiceHelper {
             return null;
         }
         if (assessments.size() == 1) {
-            return assessments.get(0);
+            return assessments.getFirst();
         }
 
         StringBuilder fullTranscript = new StringBuilder();
@@ -190,7 +350,7 @@ public class AzureSpeechServiceHelper {
 
         for (SpeechAssessment segment : assessments) {
             if (segment.getTranscriptText() != null && !segment.getTranscriptText().isEmpty()) {
-                if (fullTranscript.length() > 0) {
+                if (!fullTranscript.isEmpty()) {
                     fullTranscript.append(" ");
                 }
                 fullTranscript.append(segment.getTranscriptText());

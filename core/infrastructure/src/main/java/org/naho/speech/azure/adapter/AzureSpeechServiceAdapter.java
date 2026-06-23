@@ -2,6 +2,9 @@ package org.naho.speech.azure.adapter;
 
 import com.microsoft.cognitiveservices.speech.*;
 import com.microsoft.cognitiveservices.speech.audio.AudioConfig;
+import com.microsoft.cognitiveservices.speech.audio.AudioInputStream;
+import com.microsoft.cognitiveservices.speech.audio.AudioStreamFormat;
+import com.microsoft.cognitiveservices.speech.audio.PushAudioInputStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.naho.i18n.message.speech.SpeechDetailMessageKey;
@@ -14,10 +17,12 @@ import org.naho.speech.azure.port.out.AzureSpeechServicePort;
 import org.naho.speech.model.SpeechAssessment;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -32,33 +37,40 @@ public class AzureSpeechServiceAdapter implements AzureSpeechServicePort {
 
     @Override
     public SpeechAssessment assess(SpeechAssessmentCommand command) {
-        byte[] audioBytes = command.audioBytes();
+        byte[] rawAudioBytes = command.audioBytes();
         String referenceText = command.referenceText();
 
-        // 1. Tạo file tạm thời để lưu dữ liệu audio gửi lên
-        File tempFile = azureSpeechServiceHelper.createTempAudioFile(audioBytes);
+        azureSpeechServiceHelper.validateAudioSize(rawAudioBytes);
+
+        Path inputFile = azureSpeechServiceHelper.createTempInputAudioFile(rawAudioBytes);
+
+        double durationSeconds = azureSpeechServiceHelper.probeAudioDurationSeconds(inputFile);
+        azureSpeechServiceHelper.validateAudioDuration(durationSeconds);
+        long timeoutSeconds = azureSpeechServiceHelper.calculateProcessingTimeoutSeconds(durationSeconds);
+
+        AudioStreamFormat format = AudioStreamFormat.getWaveFormatPCM(16000, (short) 16, (short) 1);
+        PushAudioInputStream pushStream = AudioInputStream.createPushStream(format);
+
+        SpeechConfig speechConfig = null;
+        AudioConfig audioConfig = null;
+        PronunciationAssessmentConfig pronunciationConfig = null;
+        SpeechRecognizer recognizer = null;
+        CompletableFuture<Void> ffmpegStreamingFuture = null;
 
         try {
-            // 2. Cấu hình SpeechConfig và AudioConfig từ file tạm
-            SpeechConfig speechConfig = SpeechConfig.fromSubscription(properties.getSubscriptionKey(), properties.getRegion());
+            speechConfig = SpeechConfig.fromSubscription(properties.getSubscriptionKey(), properties.getRegion());
             speechConfig.setSpeechRecognitionLanguage(properties.getLanguage());
 
-            AudioConfig audioConfig = AudioConfig.fromWavFileInput(tempFile.getAbsolutePath());
+            audioConfig = AudioConfig.fromStreamInput(pushStream);
+            pronunciationConfig = azureSpeechServiceHelper.createPronunciationAssessmentConfig(referenceText);
 
-            // 3. Khởi tạo cấu hình đánh giá phát âm (Pronunciation Assessment)
-            PronunciationAssessmentConfig config =
-                    azureSpeechServiceHelper.createPronunciationAssessmentConfig(referenceText);
+            recognizer = new SpeechRecognizer(speechConfig, audioConfig);
+            pronunciationConfig.applyTo(recognizer);
 
-            // Khởi tạo SpeechRecognizer
-            SpeechRecognizer recognizer = new SpeechRecognizer(speechConfig, audioConfig);
-            config.applyTo(recognizer);
-
-            // Danh sách chứa kết quả của từng phân đoạn nhận diện
             List<SpeechAssessment> segmentAssessments = Collections.synchronizedList(new ArrayList<>());
             List<Throwable> errors = Collections.synchronizedList(new ArrayList<>());
             Semaphore stopRecognitionSemaphore = new Semaphore(0);
 
-            // Lắng nghe sự kiện nhận diện thành công phân đoạn
             recognizer.recognized.addEventListener((s, e) -> {
                 if (e.getResult().getReason() == ResultReason.RecognizedSpeech) {
                     try {
@@ -66,56 +78,58 @@ public class AzureSpeechServiceAdapter implements AzureSpeechServicePort {
                         segmentAssessments.add(segmentResult);
                     } catch (Exception ex) {
                         log.error("Error processing recognition segment result", ex);
+                        errors.add(ex);
                     }
                 }
             });
 
-            // Lắng nghe sự kiện bị hủy / lỗi kết nối
             recognizer.canceled.addEventListener((s, e) -> {
                 CancellationDetails cancellation = CancellationDetails.fromResult(e.getResult());
                 if (cancellation.getReason() == CancellationReason.Error) {
                     log.error("Azure Speech continuous recognition error: {}", cancellation.getErrorDetails());
                     errors.add(new InfrastructureException(
                             AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR,
-                            "Azure Speech API error: " + cancellation.getErrorDetails()
+                            SpeechDetailMessageKey.SPEECH_AZURE_API_ERROR,
+                            cancellation.getErrorDetails()
                     ));
                 }
                 stopRecognitionSemaphore.release();
             });
 
-            // Lắng nghe sự kiện dừng phiên làm việc (khi đọc hết file âm thanh đầu vào)
             recognizer.sessionStopped.addEventListener((s, e) -> {
                 log.info("Speech recognition session stopped.");
                 stopRecognitionSemaphore.release();
             });
 
-            // 4. Bắt đầu nhận diện liên tục
             recognizer.startContinuousRecognitionAsync().get();
 
-            // Đợi quá trình nhận diện hoàn thành (timeout tối đa 60 giây)
-            boolean completed = stopRecognitionSemaphore.tryAcquire(60, TimeUnit.SECONDS);
+            ffmpegStreamingFuture = azureSpeechServiceHelper.streamAzurePcmByFfmpegAsync(inputFile, pushStream);
+
+            boolean completed = stopRecognitionSemaphore.tryAcquire(timeoutSeconds, TimeUnit.SECONDS);
             if (!completed) {
-                log.warn("Continuous recognition timed out after 60 seconds.");
+                log.warn("Continuous recognition timed out after {} seconds.", timeoutSeconds);
+                recognizer.stopContinuousRecognitionAsync().get();
+
+                throw new InfrastructureException(
+                        AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR,
+                        SpeechDetailMessageKey.SPEECH_AUDIO_PROCESSING_TIMEOUT
+                );
             }
 
-            // Dừng nhận diện liên tục và giải phóng các tài nguyên SDK
-            recognizer.stopContinuousRecognitionAsync().get();
-            recognizer.close();
-            speechConfig.close();
-            audioConfig.close();
-            config.close();
+            if (ffmpegStreamingFuture != null) {
+                ffmpegStreamingFuture.get(5, TimeUnit.SECONDS);
+            }
 
-            // Kiểm tra nếu có lỗi nghiêm trọng xảy ra trong quá trình nhận diện
             if (!errors.isEmpty()) {
                 Throwable firstError = errors.get(0);
-                if (firstError instanceof RuntimeException) {
-                    throw (RuntimeException) firstError;
-                } else {
-                    throw new InfrastructureException(
-                            AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR,
-                            firstError.getMessage()
-                    );
+                if (firstError instanceof InfrastructureException infrastructureException) {
+                    throw infrastructureException;
                 }
+                throw new InfrastructureException(
+                        AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR,
+                        SpeechDetailMessageKey.SPEECH_AZURE_API_ERROR,
+                        firstError.getMessage()
+                );
             }
 
             if (segmentAssessments.isEmpty()) {
@@ -125,19 +139,46 @@ public class AzureSpeechServiceAdapter implements AzureSpeechServicePort {
                 );
             }
 
-            // 5. Tổng hợp các phân đoạn thành kết quả cuối cùng
             return azureSpeechServiceHelper.mergeAssessments(segmentAssessments);
 
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new InfrastructureException(
                     AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR,
                     SpeechDetailMessageKey.SPEECH_AZURE_CONNECTION_INTERRUPTED
             );
+        } catch (ExecutionException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof InfrastructureException infrastructureException) {
+                throw infrastructureException;
+            }
+            throw new InfrastructureException(
+                    AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR,
+                    SpeechDetailMessageKey.SPEECH_AZURE_EXECUTION_FAILED
+            );
+        } catch (InfrastructureException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected Azure Speech assessment error", e);
+            throw new InfrastructureException(
+                    AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR,
+                    SpeechDetailMessageKey.SPEECH_AZURE_SERVICE_UNKNOWN_ERROR_OCCUR
+            );
         } finally {
-            // Luôn đảm bảo xóa file tạm thời để tránh tràn ổ đĩa
-            if (tempFile.exists() && !tempFile.delete()) {
-                log.warn("Failed to delete temp file: {}", tempFile.getAbsolutePath());
+            if (ffmpegStreamingFuture != null && !ffmpegStreamingFuture.isDone()) {
+                ffmpegStreamingFuture.cancel(true);
+            }
+            try {
+                pushStream.close();
+            } catch (Exception ignored) {
+            }
+            if (recognizer != null) recognizer.close();
+            if (audioConfig != null) audioConfig.close();
+            if (pronunciationConfig != null) pronunciationConfig.close();
+            if (speechConfig != null) speechConfig.close();
+            try {
+                Files.deleteIfExists(inputFile);
+            } catch (Exception ignored) {
             }
         }
     }
