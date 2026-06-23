@@ -34,7 +34,7 @@ public class AzureSpeechServiceHelper {
     private final ObjectMapper objectMapper;
 
     private static final int MAX_AUDIO_SIZE_BYTES = 20 * 1024 * 1024; // 20MB
-    private static final double MAX_AUDIO_DURATION_SECONDS = 120.0;
+    private static final double MAX_AUDIO_DURATION_SECONDS = 150.0;
     private static final long EXTRA_PROCESSING_TIMEOUT_SECONDS = 30L;
     private static final long MAX_PROCESSING_TIMEOUT_SECONDS = 180L;
     private static final int FFMPEG_MAX_CONCURRENT_PROCESS = 10;
