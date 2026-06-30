@@ -27,7 +27,7 @@ RUN ./gradlew :core:bootstrap:bootJar --no-daemon
 
 
 # ------ STAGE 2: runtime ------
-FROM eclipse-temurin:21.0.11_10-jre-ubi10-minimal
+FROM eclipse-temurin:21-jre-jammy
 
 WORKDIR /app
 
@@ -35,9 +35,9 @@ WORKDIR /app
 # microdnf dùng cho UBI minimal
 USER root
 
-RUN microdnf update -y \
-    && microdnf install -y ffmpeg \
-    && microdnf clean all
+RUN apt-get update \
+ && apt-get install -y ffmpeg \
+ && rm -rf /var/lib/apt/lists/*
 
 RUN groupadd spring \
     && useradd -r -g spring spring
