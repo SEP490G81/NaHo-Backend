@@ -14,9 +14,6 @@
                 AND (t.japanese_name LIKE CONCAT('%', #{query.keyword}, '%')
                 OR t.japanese_description LIKE CONCAT('%', #{query.keyword}, '%'))
             </if>
-            <if test="query.categoryId != null">
-                AND t.category_id = #{query.categoryId}
-            </if>
         </where>
     </sql>
 
@@ -37,15 +34,16 @@
         t.jlpt_level AS jlptLevel,
         t.order_index AS orderIndex,
         t.cover_image_file_id AS coverImageFileId,
-        t.category_id AS categoryId,
         COUNT(q.id) AS totalQuestions
         FROM topics t
-        LEFT JOIN questions q ON t.id = q.topic_id
+        LEFT JOIN lessons l ON t.id = l.topic_id
+        LEFT JOIN objectives o ON l.id = o.lesson_id
+        LEFT JOIN questions q ON o.id = q.objective_id
         <include refid="Base_Where_Clause"/>
         GROUP BY
         t.id, t.japanese_name, t.japanese_description,
         t.japanese_name_markup, t.japanese_description_markup,
-        t.status, t.jlpt_level, t.order_index, t.cover_image_file_id, t.category_id
+        t.status, t.jlpt_level, t.order_index, t.cover_image_file_id
         <choose>
             <when test="query.sortBy != null and query.sortBy != ''">
                 ORDER BY t.${query.sortBy}

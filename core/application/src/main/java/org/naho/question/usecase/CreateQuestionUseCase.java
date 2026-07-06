@@ -11,33 +11,30 @@ import org.naho.question.result.CreateQuestionResult;
 import org.naho.question.type.QuestionStatus;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.topic.exception.TopicErrorCode;
-import org.naho.topic.model.Topic;
-import org.naho.topic.port.out.TopicRepositoryPort;
+import org.naho.topic.port.out.ObjectiveRepositoryPort;
 import org.naho.topic.util.MarkupParserUtil;
-
-import java.util.Optional;
 
 public class CreateQuestionUseCase implements CreateQuestionInputPort {
 
     private final QuestionRepositoryPort questionRepositoryPort;
-    private final TopicRepositoryPort topicRepositoryPort;
+    private final ObjectiveRepositoryPort objectiveRepositoryPort;
 
     public CreateQuestionUseCase(QuestionRepositoryPort questionRepositoryPort,
-                                 TopicRepositoryPort topicRepositoryPort) {
+                                 ObjectiveRepositoryPort objectiveRepositoryPort) {
         this.questionRepositoryPort = questionRepositoryPort;
-        this.topicRepositoryPort = topicRepositoryPort;
+        this.objectiveRepositoryPort = objectiveRepositoryPort;
     }
 
     @Override
     public CreateQuestionResult createQuestion(CreateQuestionCommand command) {
-        // 1. Verify Topic exists if topicId is provided
-        if (command.topicId() != null) {
-            Optional<Topic> topicOpt = topicRepositoryPort.findById(command.topicId());
-            if (topicOpt.isEmpty()) {
+        // 1. Verify Objective exists if objectiveId is provided
+        if (command.objectiveId() != null) {
+            boolean exists = objectiveRepositoryPort.existsById(command.objectiveId());
+            if (!exists) {
                 throw new ApplicationException(
-                        TopicErrorCode.TOPIC_NOT_FOUND,
-                        TopicDetailMessageKey.TOPIC_ID_NOT_FOUND,
-                        command.topicId()
+                        TopicErrorCode.OBJECTIVE_NOT_FOUND,
+                        TopicDetailMessageKey.OBJECTIVE_ID_NOT_FOUND,
+                        command.objectiveId()
                 );
             }
         }
@@ -46,8 +43,8 @@ public class CreateQuestionUseCase implements CreateQuestionInputPort {
         String rawTitle = MarkupParserUtil.extractRawTextFromMarkup(command.titleMarkup());
         String rawDescription = MarkupParserUtil.extractRawTextFromMarkup(command.descriptionMarkup());
 
-        // 2.5. Check duplicate title in same topic (if topicId is provided)
-        if (command.topicId() != null && questionRepositoryPort.existsByTopicIdAndTitle(command.topicId(), rawTitle)) {
+        // 2.5. Check duplicate title in same objective (if objectiveId is provided)
+        if (command.objectiveId() != null && questionRepositoryPort.existsByObjectiveIdAndTitle(command.objectiveId(), rawTitle)) {
             throw new ApplicationException(
                     QuestionErrorCode.QUESTION_TITLE_ALREADY_EXISTS,
                     QuestionDetailMessageKey.QUESTION_TITLE_ALREADY_EXISTS,
@@ -58,17 +55,17 @@ public class CreateQuestionUseCase implements CreateQuestionInputPort {
         // 3. Logic for Order Index
         Double orderIndex = command.orderIndex();
         if (orderIndex == null) {
-            if (command.topicId() != null) {
-                Double maxOrderIndex = questionRepositoryPort.getMaxOrderIndexByTopicId(command.topicId());
+            if (command.objectiveId() != null) {
+                Double maxOrderIndex = questionRepositoryPort.getMaxOrderIndexByObjectiveId(command.objectiveId());
                 orderIndex = (maxOrderIndex != null) ? maxOrderIndex + 1.0 : 1.0;
             } else {
-                orderIndex = 1.0; // Default if no topic
+                orderIndex = 1.0; // Default if no objective
             }
         } else if (orderIndex < 0) {
             throw new ApplicationException(
                     QuestionErrorCode.QUESTION_ORDER_INDEX_INVALID,
                     QuestionDetailMessageKey.QUESTION_ORDER_INDEX_INVALID
-            );
+                );
         }
 
         // 4. Determine initial status based on Creator Role
@@ -76,7 +73,7 @@ public class CreateQuestionUseCase implements CreateQuestionInputPort {
 
         // 5. Build Question
         Question question = Question.builder()
-                .topicId(command.topicId())
+                .objectiveId(command.objectiveId())
                 .userId(command.userId())
                 .titleMarkup(command.titleMarkup())
                 .descriptionMarkup(command.descriptionMarkup())
@@ -84,7 +81,6 @@ public class CreateQuestionUseCase implements CreateQuestionInputPort {
                 .description(rawDescription)
                 .orderIndex(orderIndex)
                 .status(initialStatus)
-                // questionAudioFileId is intentionally left null as per plan
                 .build();
 
         // 6. Save and Return
@@ -92,7 +88,7 @@ public class CreateQuestionUseCase implements CreateQuestionInputPort {
 
         return new CreateQuestionResult(
                 savedQuestion.getId(),
-                savedQuestion.getTopicId(),
+                savedQuestion.getObjectiveId(),
                 savedQuestion.getUserId(),
                 savedQuestion.getTitle(),
                 savedQuestion.getTitleMarkup(),

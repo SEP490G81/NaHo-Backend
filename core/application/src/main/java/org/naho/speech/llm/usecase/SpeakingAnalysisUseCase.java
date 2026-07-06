@@ -123,8 +123,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         }
 
         Topic topic = null;
-        if (question.getTopicId() != null) {
-            topic = topicRepositoryPort.findById(question.getTopicId()).orElse(null);
+        if (question.getObjectiveId() != null) {
+            topic = topicRepositoryPort.findByObjectiveId(question.getObjectiveId()).orElse(null);
         }
         String topicName = topic != null ? topic.getJapaneseName() : "General conversation";
 
@@ -377,9 +377,17 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
 
         String objectKey = fileRepositoryPort.findObjectKeyById(history.getAudioFileId());
 
+        Long topicId = null;
+        if (question.getObjectiveId() != null) {
+            Topic topic = topicRepositoryPort.findByObjectiveId(question.getObjectiveId()).orElse(null);
+            if (topic != null) {
+                topicId = topic.getId();
+            }
+        }
+
         return new SpeakingHistoryDetailResult(
                 history.getId(),
-                question.getTopicId(),
+                topicId,
                 history.getQuestionId(),
                 history.getCreatedTime() != null ? history.getCreatedTime() : Instant.now(),
                 durationSec,

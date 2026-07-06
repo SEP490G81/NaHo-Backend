@@ -48,8 +48,8 @@ public class UpdateQuestionUseCase implements UpdateQuestionInputPort {
         String rawTitle = MarkupParserUtil.extractRawTextFromMarkup(command.titleMarkup());
         String rawDescription = MarkupParserUtil.extractRawTextFromMarkup(command.descriptionMarkup());
 
-        // 3.5. Check duplicate title in same topic (if topicId exists)
-        if (question.getTopicId() != null && questionRepositoryPort.existsByTopicIdAndTitleExcludeId(question.getTopicId(), rawTitle, command.id())) {
+        // 3.5. Check duplicate title in same objective (if objectiveId exists)
+        if (question.getObjectiveId() != null && questionRepositoryPort.existsByObjectiveIdAndTitleExcludeId(question.getObjectiveId(), rawTitle, command.id())) {
             throw new ApplicationException(
                     QuestionErrorCode.QUESTION_TITLE_ALREADY_EXISTS,
                     QuestionDetailMessageKey.QUESTION_TITLE_ALREADY_EXISTS,
@@ -85,7 +85,7 @@ public class UpdateQuestionUseCase implements UpdateQuestionInputPort {
 
         return new UpdateQuestionResult(
                 updatedQuestion.getId(),
-                updatedQuestion.getTopicId(),
+                updatedQuestion.getObjectiveId(),
                 updatedQuestion.getUserId(),
                 updatedQuestion.getTitle(),
                 updatedQuestion.getTitleMarkup(),

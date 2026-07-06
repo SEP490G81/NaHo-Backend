@@ -7,7 +7,7 @@ import java.util.List;
 public record SearchQuestionsCommand(
         int page,
         int size,
-        Long topicId,
+        Long objectiveId,
         Long creatorId,
         Boolean isSystemCreated,
         List<QuestionStatus> statuses,

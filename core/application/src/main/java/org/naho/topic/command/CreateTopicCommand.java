@@ -8,7 +8,6 @@ public record CreateTopicCommand(
         String japaneseDescriptionMarkup,
         JLPTLevel jlptLevel,
         Double orderIndex,
-        Long coverImageFileId,
-        Long categoryId
+        Long coverImageFileId
 ) {
 }

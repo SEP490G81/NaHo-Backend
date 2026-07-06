@@ -13,7 +13,6 @@ public record TopicListItemResult(
         JLPTLevel jlptLevel,
         Double orderIndex,
         Long coverImageFileId,
-        Long categoryId,
         Integer totalQuestions
 ) {
 }

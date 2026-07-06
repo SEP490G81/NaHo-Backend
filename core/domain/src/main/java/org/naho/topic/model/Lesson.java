@@ -1,35 +1,25 @@
 package org.naho.topic.model;
 
-
-import org.naho.i18n.message.topic.TopicDetailMessageKey;
-import org.naho.shared.exception.DomainException;
-import org.naho.topic.exception.TopicDomainErrorCode;
 import org.naho.topic.type.TopicStatus;
-import org.naho.user.type.JLPTLevel;
 
-public class Topic {
+public class Lesson {
     private final Long id;
-    private final Long userId;
-    private Long coverImageFileId;
+    private final Long topicId;
     private String japaneseName;
     private String japaneseDescription;
     private String japaneseNameMarkup;
     private String japaneseDescriptionMarkup;
     private TopicStatus status;
-    private JLPTLevel jlptLevel;
     private Double orderIndex;
 
-    // Private constructor dùng cho Builder
-    private Topic(Builder builder) {
+    private Lesson(Builder builder) {
         this.id = builder.id;
-        this.coverImageFileId = builder.coverImageFileId;
-        this.userId = builder.userId;
+        this.topicId = builder.topicId;
         this.japaneseName = builder.japaneseName;
         this.japaneseDescription = builder.japaneseDescription;
         this.japaneseNameMarkup = builder.japaneseNameMarkup;
         this.japaneseDescriptionMarkup = builder.japaneseDescriptionMarkup;
         this.status = builder.status;
-        this.jlptLevel = builder.jlptLevel;
         this.orderIndex = builder.orderIndex;
     }
 
@@ -37,57 +27,26 @@ public class Topic {
         return new Builder();
     }
 
-    private void validateJapaneseName(String japaneseName) {
-        if (japaneseName == null || japaneseName.isBlank()) {
-            throw new DomainException(
-                    TopicDomainErrorCode.TOPIC_NAME_EMPTY,
-                    TopicDetailMessageKey.TOPIC_NAME_EMPTY
-            );
-        }
-    }
-
-    private void validateJapaneseDescription(String japaneseDescription) {
-        if (japaneseDescription == null || japaneseDescription.isBlank()) {
-            throw new DomainException(
-                    TopicDomainErrorCode.TOPIC_DESCRIPTION_EMPTY,
-                    TopicDetailMessageKey.TOPIC_DESCRIPTION_EMPTY
-            );
-        }
-    }
-
     public void update(String japaneseName,
                        String japaneseDescription,
                        String japaneseNameMarkup,
                        String japaneseDescriptionMarkup,
                        TopicStatus status,
-                       JLPTLevel jlptLevel,
-                       Double orderIndex,
-                       Long coverImageFileId
-    ) {
-        validateJapaneseName(japaneseName);
-        validateJapaneseDescription(japaneseDescription);
-
+                       Double orderIndex) {
         this.japaneseName = japaneseName;
         this.japaneseDescription = japaneseDescription;
         this.japaneseNameMarkup = japaneseNameMarkup;
         this.japaneseDescriptionMarkup = japaneseDescriptionMarkup;
         this.status = status;
-        this.jlptLevel = jlptLevel;
         this.orderIndex = orderIndex;
-        this.coverImageFileId = coverImageFileId;
     }
 
-    // Getter
     public Long getId() {
         return id;
     }
 
-    public Long getCoverImageFileId() {
-        return coverImageFileId;
-    }
-
-    public Long getUserId() {
-        return userId;
+    public Long getTopicId() {
+        return topicId;
     }
 
     public String getJapaneseName() {
@@ -110,25 +69,18 @@ public class Topic {
         return status;
     }
 
-    public JLPTLevel getJlptLevel() {
-        return jlptLevel;
-    }
-
     public Double getOrderIndex() {
         return orderIndex;
     }
 
-    // Builder
     public static class Builder {
         private Long id;
-        private Long coverImageFileId;
-        private Long userId;
+        private Long topicId;
         private String japaneseName;
         private String japaneseDescription;
         private String japaneseNameMarkup;
         private String japaneseDescriptionMarkup;
         private TopicStatus status;
-        private JLPTLevel jlptLevel;
         private Double orderIndex;
 
         public Builder id(Long id) {
@@ -136,13 +88,8 @@ public class Topic {
             return this;
         }
 
-        public Builder coverImageFileId(Long coverImageFileId) {
-            this.coverImageFileId = coverImageFileId;
-            return this;
-        }
-
-        public Builder userId(Long userId) {
-            this.userId = userId;
+        public Builder topicId(Long topicId) {
+            this.topicId = topicId;
             return this;
         }
 
@@ -171,21 +118,13 @@ public class Topic {
             return this;
         }
 
-        public Builder jlptLevel(JLPTLevel jlptLevel) {
-            this.jlptLevel = jlptLevel;
-            return this;
-        }
-
         public Builder orderIndex(Double orderIndex) {
             this.orderIndex = orderIndex;
             return this;
         }
 
-        public Topic build() {
-            Topic topic = new Topic(this);
-            topic.validateJapaneseName(topic.getJapaneseName());
-            topic.validateJapaneseDescription(topic.getJapaneseDescription());
-            return topic;
+        public Lesson build() {
+            return new Lesson(this);
         }
     }
 }

@@ -16,5 +16,7 @@ public interface TopicRepositoryPort {
 
     Optional<Topic> findById(Long id);
 
+    Optional<Topic> findByObjectiveId(Long objectiveId);
+
     void deleteById(Long id);
 }

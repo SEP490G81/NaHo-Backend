@@ -100,7 +100,7 @@ class AnalyzeSpeakingTest {
 
         Question question = Question.builder()
                 .id(2L)
-                .topicId(3L)
+                .objectiveId(3L)
                 .title("Question Title")
                 .description("Question Description")
                 .build();
@@ -160,7 +160,7 @@ class AnalyzeSpeakingTest {
         when(answerHistoryRepositoryPort.saveAnswerHistory(any(AnswerHistory.class))).thenReturn(savedHistory);
         when(azureSpeechServicePort.assess(any(SpeechAssessmentCommand.class))).thenReturn(azureAssessment);
         when(answerHistoryRepositoryPort.saveSpeechAssessment(any(SpeechAssessment.class))).thenReturn(savedSpeechAssessment);
-        when(topicRepositoryPort.findById(3L)).thenReturn(Optional.of(topic));
+        when(topicRepositoryPort.findByObjectiveId(3L)).thenReturn(Optional.of(topic));
         when(aiAnalysisPort.analyzeSpeaking(eq("Topic Japanese"), eq("Question Title"), eq("こんにちは"), anyString())).thenReturn(rawLlmFeedback);
 
         // Act (When)
@@ -191,7 +191,7 @@ class AnalyzeSpeakingTest {
                 assessment.getPronunciationScore().equals(80.0)
         ));
         verify(answerHistoryRepositoryPort, times(1)).saveAllWordAssessment(anyList());
-        verify(topicRepositoryPort, times(1)).findById(3L);
+        verify(topicRepositoryPort, times(1)).findByObjectiveId(3L);
         verify(aiAnalysisPort, times(1)).analyzeSpeaking(eq("Topic Japanese"), eq("Question Title"), eq("こんにちは"), anyString());
         verify(answerHistoryRepositoryPort, times(1)).saveContentAssessment(argThat(content ->
                 content.getAnswerHistoryId().equals(100L) &&
@@ -221,7 +221,7 @@ class AnalyzeSpeakingTest {
 
         Question question = Question.builder()
                 .id(2L)
-                .topicId(null)
+                .objectiveId(null)
                 .title("Question Title")
                 .description("Question Description")
                 .build();
@@ -305,7 +305,7 @@ class AnalyzeSpeakingTest {
 
         Question question = Question.builder()
                 .id(2L)
-                .topicId(null)
+                .objectiveId(null)
                 .title("Question Title")
                 .description("Question Description")
                 .build();

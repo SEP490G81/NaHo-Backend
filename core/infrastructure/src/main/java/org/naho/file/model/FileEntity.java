@@ -10,8 +10,6 @@ import org.naho.shared.persistence.BaseEntity;
 import org.naho.social.entity.CommentEntity;
 import org.naho.social.report.entity.ReportEntity;
 
-import java.util.List;
-
 @SuperBuilder
 @Getter
 @Setter
@@ -46,5 +44,5 @@ public class FileEntity extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "report_id") // Tên cột khóa ngoại trong DB của bạn
-    private ReportEntity report;    // Tên biến này BẮT BUỘC phải là "report" để khớp với mappedBy bên kia
+    ReportEntity report;    // Tên biến này BẮT BUỘC phải là "report" để khớp với mappedBy bên kia
 }

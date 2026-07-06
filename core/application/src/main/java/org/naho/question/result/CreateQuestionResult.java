@@ -4,7 +4,7 @@ import org.naho.question.type.QuestionStatus;
 
 public record CreateQuestionResult(
         Long id,
-        Long topicId,
+        Long objectiveId,
         Long userId,
         String title,
         String titleMarkup,

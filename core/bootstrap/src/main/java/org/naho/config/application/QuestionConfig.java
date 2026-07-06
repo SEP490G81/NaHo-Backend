@@ -23,8 +23,8 @@ public class QuestionConfig {
 
     @Bean
     public CreateQuestionInputPort createQuestionInputPort(QuestionRepositoryAdapter questionRepositoryAdapter,
-                                                           TopicRepositoryAdapter topicRepositoryAdapter) {
-        return new CreateQuestionUseCase(questionRepositoryAdapter, topicRepositoryAdapter);
+                                                           org.naho.topic.adapter.ObjectiveRepositoryAdapter objectiveRepositoryAdapter) {
+        return new CreateQuestionUseCase(questionRepositoryAdapter, objectiveRepositoryAdapter);
     }
 
     @Bean

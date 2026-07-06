@@ -6,7 +6,7 @@ import org.naho.question.model.Question;
 import org.naho.question.port.out.QuestionRepositoryPort;
 import org.naho.question.repository.QuestionJpaRepository;
 import org.naho.question.type.QuestionStatus;
-import org.naho.topic.repository.TopicJpaRepository;
+import org.naho.topic.repository.ObjectiveJpaRepository;
 import org.naho.user.repository.UserJpaRepository;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +17,7 @@ import java.util.Optional;
 public class QuestionRepositoryAdapter implements QuestionRepositoryPort {
 
     private final QuestionJpaRepository questionJpaRepository;
-    private final TopicJpaRepository topicJpaRepository;
+    private final ObjectiveJpaRepository objectiveJpaRepository;
     private final UserJpaRepository userJpaRepository;
     private final FileJpaRepository fileJpaRepository;
 
@@ -42,18 +42,18 @@ public class QuestionRepositoryAdapter implements QuestionRepositoryPort {
     }
 
     @Override
-    public Double getMaxOrderIndexByTopicId(Long topicId) {
-        return questionJpaRepository.getMaxOrderIndexByTopicId(topicId);
+    public Double getMaxOrderIndexByObjectiveId(Long objectiveId) {
+        return questionJpaRepository.getMaxOrderIndexByObjectiveId(objectiveId);
     }
 
     @Override
-    public boolean existsByTopicIdAndTitle(Long topicId, String title) {
-        return questionJpaRepository.existsByTopicIdAndTitle(topicId, title);
+    public boolean existsByObjectiveIdAndTitle(Long objectiveId, String title) {
+        return questionJpaRepository.existsByObjectiveIdAndTitle(objectiveId, title);
     }
 
     @Override
-    public boolean existsByTopicIdAndTitleExcludeId(Long topicId, String title, Long id) {
-        return questionJpaRepository.existsByTopicIdAndTitleAndIdNot(topicId, title, id);
+    public boolean existsByObjectiveIdAndTitleExcludeId(Long objectiveId, String title, Long id) {
+        return questionJpaRepository.existsByObjectiveIdAndTitleAndIdNot(objectiveId, title, id);
     }
 
     @Override
@@ -76,8 +76,8 @@ public class QuestionRepositoryAdapter implements QuestionRepositoryPort {
         entity.setOrderIndex(question.getOrderIndex());
         entity.setStatus(question.getStatus());
 
-        if (question.getTopicId() != null) {
-            entity.setTopic(topicJpaRepository.getReferenceById(question.getTopicId()));
+        if (question.getObjectiveId() != null) {
+            entity.setObjective(objectiveJpaRepository.getReferenceById(question.getObjectiveId()));
         }
 
         if (question.getUserId() != null) {
@@ -93,7 +93,7 @@ public class QuestionRepositoryAdapter implements QuestionRepositoryPort {
         return Question.builder()
                 .id(savedEntity.getId())
                 .questionAudioFileId(savedEntity.getQuestionAudioFile() != null ? savedEntity.getQuestionAudioFile().getId() : null)
-                .topicId(savedEntity.getTopic() != null ? savedEntity.getTopic().getId() : null)
+                .objectiveId(savedEntity.getObjective() != null ? savedEntity.getObjective().getId() : null)
                 .userId(savedEntity.getUser() != null ? savedEntity.getUser().getId() : null)
                 .title(savedEntity.getTitle())
                 .titleMarkup(savedEntity.getTitleMarkup())
@@ -109,7 +109,7 @@ public class QuestionRepositoryAdapter implements QuestionRepositoryPort {
         return questionJpaRepository.findById(id).map(entity -> Question.builder()
                 .id(entity.getId())
                 .questionAudioFileId(entity.getQuestionAudioFile() != null ? entity.getQuestionAudioFile().getId() : null)
-                .topicId(entity.getTopic() != null ? entity.getTopic().getId() : null)
+                .objectiveId(entity.getObjective() != null ? entity.getObjective().getId() : null)
                 .userId(entity.getUser() != null ? entity.getUser().getId() : null)
                 .title(entity.getTitle())
                 .titleMarkup(entity.getTitleMarkup())

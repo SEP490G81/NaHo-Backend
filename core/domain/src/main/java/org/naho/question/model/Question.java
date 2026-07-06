@@ -9,7 +9,7 @@ import java.util.List;
 
 public class Question {
     private final Long id;
-    private final Long topicId;
+    private final Long objectiveId;
     private final Long userId;
     private final List<Grammar> grammars;
     private final List<Vocabulary> vocabularies;
@@ -25,7 +25,7 @@ public class Question {
     private Question(Builder builder) {
         this.id = builder.id;
         this.questionAudioFileId = builder.questionAudioFileId;
-        this.topicId = builder.topicId;
+        this.objectiveId = builder.objectiveId;
         this.userId = builder.userId;
         this.title = builder.title;
         this.titleMarkup = builder.titleMarkup;
@@ -89,8 +89,8 @@ public class Question {
         return questionAudioFileId;
     }
 
-    public Long getTopicId() {
-        return topicId;
+    public Long getObjectiveId() {
+        return objectiveId;
     }
 
     public Long getUserId() {
@@ -133,7 +133,7 @@ public class Question {
     public static class Builder {
         private Long id;
         private Long questionAudioFileId;
-        private Long topicId;
+        private Long objectiveId;
         private Long userId;
         private String title;
         private String titleMarkup;
@@ -154,8 +154,8 @@ public class Question {
             return this;
         }
 
-        public Builder topicId(Long topicId) {
-            this.topicId = topicId;
+        public Builder objectiveId(Long objectiveId) {
+            this.objectiveId = objectiveId;
             return this;
         }
 

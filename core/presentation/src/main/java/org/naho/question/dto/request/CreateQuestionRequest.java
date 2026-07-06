@@ -3,7 +3,7 @@ package org.naho.question.dto.request;
 import jakarta.validation.constraints.NotBlank;
 
 public record CreateQuestionRequest(
-        Long topicId,
+        Long objectiveId,
 
         @NotBlank(message = "Title is required")
         String titleMarkup,

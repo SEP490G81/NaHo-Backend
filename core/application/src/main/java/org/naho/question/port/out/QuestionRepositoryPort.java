@@ -20,10 +20,10 @@ public interface QuestionRepositoryPort {
 
     void deleteById(Long id);
 
-    Double getMaxOrderIndexByTopicId(Long topicId);
+    Double getMaxOrderIndexByObjectiveId(Long objectiveId);
 
-    boolean existsByTopicIdAndTitle(Long topicId, String title);
+    boolean existsByObjectiveIdAndTitle(Long objectiveId, String title);
 
-    boolean existsByTopicIdAndTitleExcludeId(Long topicId, String title, Long id);
+    boolean existsByObjectiveIdAndTitleExcludeId(Long objectiveId, String title, Long id);
 }
 

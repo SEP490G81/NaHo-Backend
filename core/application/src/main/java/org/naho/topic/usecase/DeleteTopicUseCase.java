@@ -62,8 +62,7 @@ public class DeleteTopicUseCase implements DeleteTopicInputPort {
                         TopicStatus.ARCHIVE,
                         topic.getJlptLevel(),
                         topic.getOrderIndex(),
-                        topic.getCoverImageFileId(),
-                        topic.getCategoryId()
+                        topic.getCoverImageFileId()
                 );
                 topicRepositoryPort.save(topic);
                 questionRepositoryPort.updateQuestionsStatusByTopicId(command.id(), QuestionStatus.ARCHIVE);

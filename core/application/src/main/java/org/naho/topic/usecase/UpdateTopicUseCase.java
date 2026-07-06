@@ -62,8 +62,7 @@ public class UpdateTopicUseCase implements UpdateTopicInputPort {
                 command.status(),
                 command.jlptLevel(),
                 orderIndex,
-                command.coverImageFileId(),
-                command.categoryId()
+                command.coverImageFileId()
         );
 
         Topic savedTopic = topicRepositoryPort.save(topic);
@@ -78,8 +77,7 @@ public class UpdateTopicUseCase implements UpdateTopicInputPort {
                 savedTopic.getStatus(),
                 savedTopic.getJlptLevel(),
                 savedTopic.getOrderIndex(),
-                savedTopic.getCoverImageFileId(),
-                savedTopic.getCategoryId()
+                savedTopic.getCoverImageFileId()
         );
     }
 }

@@ -1,7 +1,7 @@
 package org.naho.question.command;
 
 public record CreateQuestionCommand(
-        Long topicId,
+        Long objectiveId,
         Long userId,
         String titleMarkup,
         String descriptionMarkup,

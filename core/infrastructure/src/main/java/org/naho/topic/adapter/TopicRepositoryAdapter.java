@@ -1,7 +1,5 @@
 package org.naho.topic.adapter;
 
-import org.naho.category.entity.CategoryEntity;
-import org.naho.category.repository.CategoryJpaRepository;
 import org.naho.file.model.FileEntity;
 import org.naho.file.repository.FileJpaRepository;
 import org.naho.topic.entity.TopicEntity;
@@ -21,16 +19,13 @@ public class TopicRepositoryAdapter implements TopicRepositoryPort {
     private final TopicJpaRepository topicJpaRepository;
     private final UserJpaRepository userJpaRepository;
     private final FileJpaRepository fileJpaRepository;
-    private final CategoryJpaRepository categoryJpaRepository;
 
     public TopicRepositoryAdapter(TopicJpaRepository topicJpaRepository,
                                   UserJpaRepository userJpaRepository,
-                                  FileJpaRepository fileJpaRepository,
-                                  CategoryJpaRepository categoryJpaRepository) {
+                                  FileJpaRepository fileJpaRepository) {
         this.topicJpaRepository = topicJpaRepository;
         this.userJpaRepository = userJpaRepository;
         this.fileJpaRepository = fileJpaRepository;
-        this.categoryJpaRepository = categoryJpaRepository;
     }
 
     @Override
@@ -62,12 +57,6 @@ public class TopicRepositoryAdapter implements TopicRepositoryPort {
             entity.setCoverImageFile(fileEntity);
         }
 
-        // Set Category
-        if (topic.getCategoryId() != null) {
-            CategoryEntity categoryEntity = categoryJpaRepository.getReferenceById(topic.getCategoryId());
-            entity.setCategory(categoryEntity);
-        }
-
         TopicEntity savedEntity = topicJpaRepository.save(entity);
 
         return Topic.builder()
@@ -81,7 +70,6 @@ public class TopicRepositoryAdapter implements TopicRepositoryPort {
                 .jlptLevel(savedEntity.getJlptLevel())
                 .orderIndex(savedEntity.getOrderIndex())
                 .coverImageFileId(savedEntity.getCoverImageFile() != null ? savedEntity.getCoverImageFile().getId() : null)
-                .categoryId(savedEntity.getCategory() != null ? savedEntity.getCategory().getId() : null)
                 .build();
     }
 
@@ -114,7 +102,22 @@ public class TopicRepositoryAdapter implements TopicRepositoryPort {
                 .jlptLevel(savedEntity.getJlptLevel())
                 .orderIndex(savedEntity.getOrderIndex())
                 .coverImageFileId(savedEntity.getCoverImageFile() != null ? savedEntity.getCoverImageFile().getId() : null)
-                .categoryId(savedEntity.getCategory() != null ? savedEntity.getCategory().getId() : null)
+                .build());
+    }
+
+    @Override
+    public Optional<Topic> findByObjectiveId(Long objectiveId) {
+        return topicJpaRepository.findByObjectiveId(objectiveId).map(savedEntity -> Topic.builder()
+                .id(savedEntity.getId())
+                .userId(savedEntity.getUser() != null ? savedEntity.getUser().getId() : null)
+                .japaneseName(savedEntity.getJapaneseName())
+                .japaneseDescription(savedEntity.getJapaneseDescription())
+                .japaneseNameMarkup(savedEntity.getJapaneseNameMarkup())
+                .japaneseDescriptionMarkup(savedEntity.getJapaneseDescriptionMarkup())
+                .status(savedEntity.getStatus())
+                .jlptLevel(savedEntity.getJlptLevel())
+                .orderIndex(savedEntity.getOrderIndex())
+                .coverImageFileId(savedEntity.getCoverImageFile() != null ? savedEntity.getCoverImageFile().getId() : null)
                 .build());
     }
 

@@ -9,15 +9,6 @@ CREATE TABLE answer_histories
     CONSTRAINT pk_answer_histories PRIMARY KEY (id)
 );
 
-CREATE TABLE category
-(
-    id            BIGINT AUTO_INCREMENT NOT NULL,
-    created_time  datetime              NOT NULL,
-    modified_time datetime              NULL,
-    category_name VARCHAR(255)          NULL,
-    CONSTRAINT pk_category PRIMARY KEY (id)
-);
-
 CREATE TABLE comments
 (
     id            BIGINT AUTO_INCREMENT NOT NULL,
@@ -63,6 +54,9 @@ CREATE TABLE files
     original_name VARCHAR(255)          NOT NULL,
     content_type  VARCHAR(100)          NOT NULL,
     size          BIGINT                NOT NULL,
+    comment_id    BIGINT                NULL,
+    question_id   BIGINT                NULL,
+    report_id     BIGINT                NULL,
     CONSTRAINT pk_files PRIMARY KEY (id)
 );
 
@@ -75,6 +69,36 @@ CREATE TABLE grammars
     english_meaning_text    TEXT                  NULL,
     explanation             MEDIUMTEXT            NULL,
     CONSTRAINT pk_grammars PRIMARY KEY (id)
+);
+
+CREATE TABLE lessons
+(
+    id                          BIGINT AUTO_INCREMENT NOT NULL,
+    created_time                datetime              NOT NULL,
+    modified_time               datetime              NULL,
+    japanese_name               VARCHAR(255)          NULL,
+    japanese_description        VARCHAR(255)          NULL,
+    japanese_name_markup        TEXT                  NULL,
+    japanese_description_markup TEXT                  NULL,
+    status                      VARCHAR(50)           NULL,
+    order_index                 DOUBLE                NULL,
+    topic_id                    BIGINT                NULL,
+    CONSTRAINT pk_lessons PRIMARY KEY (id)
+);
+
+CREATE TABLE objectives
+(
+    id                          BIGINT AUTO_INCREMENT NOT NULL,
+    created_time                datetime              NOT NULL,
+    modified_time               datetime              NULL,
+    japanese_name               VARCHAR(255)          NULL,
+    japanese_description        VARCHAR(255)          NULL,
+    japanese_name_markup        TEXT                  NULL,
+    japanese_description_markup TEXT                  NULL,
+    status                      VARCHAR(50)           NULL,
+    order_index                 DOUBLE                NULL,
+    lesson_id                   BIGINT                NULL,
+    CONSTRAINT pk_objectives PRIMARY KEY (id)
 );
 
 CREATE TABLE permissions
@@ -111,7 +135,7 @@ CREATE TABLE questions
     order_index            DOUBLE                NULL,
     status                 VARCHAR(50)           NULL,
     question_audio_file_id BIGINT                NULL,
-    topic_id               BIGINT                NULL,
+    objective_id           BIGINT                NULL,
     user_id                BIGINT                NOT NULL,
     CONSTRAINT pk_questions PRIMARY KEY (id)
 );
@@ -146,8 +170,8 @@ CREATE TABLE reports
     created_time  datetime              NOT NULL,
     modified_time datetime              NULL,
     title         VARCHAR(255)          NOT NULL,
-    `description` VARCHAR(512)          NOT NULL,
-    report_type   VARCHAR(255)          NOT NULL,
+    `description` TEXT                  NOT NULL,
+    report_type   VARCHAR(50)           NOT NULL,
     is_resolved   BIT(1)                NULL,
     user_id       BIGINT                NOT NULL,
     question_id   BIGINT                NULL,
@@ -200,7 +224,6 @@ CREATE TABLE topics
     order_index                 DOUBLE                NULL,
     cover_image_file_id         BIGINT                NULL,
     user_id                     BIGINT                NULL,
-    category_id                 BIGINT                NULL,
     CONSTRAINT pk_topics PRIMARY KEY (id)
 );
 
@@ -327,6 +350,21 @@ ALTER TABLE comments
 ALTER TABLE content_assessments
     ADD CONSTRAINT FK_CONTENT_ASSESSMENTS_ON_ANSWER_HISTORY FOREIGN KEY (answer_history_id) REFERENCES answer_histories (id);
 
+ALTER TABLE files
+    ADD CONSTRAINT FK_FILES_ON_COMMENT FOREIGN KEY (comment_id) REFERENCES comments (id);
+
+ALTER TABLE files
+    ADD CONSTRAINT FK_FILES_ON_QUESTION FOREIGN KEY (question_id) REFERENCES questions (id);
+
+ALTER TABLE files
+    ADD CONSTRAINT FK_FILES_ON_REPORT FOREIGN KEY (report_id) REFERENCES reports (id);
+
+ALTER TABLE lessons
+    ADD CONSTRAINT FK_LESSONS_ON_TOPIC FOREIGN KEY (topic_id) REFERENCES topics (id);
+
+ALTER TABLE objectives
+    ADD CONSTRAINT FK_OBJECTIVES_ON_LESSON FOREIGN KEY (lesson_id) REFERENCES lessons (id);
+
 ALTER TABLE personas
     ADD CONSTRAINT FK_PERSONAS_ON_AVATAR_FILE FOREIGN KEY (avatar_file_id) REFERENCES files (id);
 
@@ -334,10 +372,10 @@ ALTER TABLE personas
     ADD CONSTRAINT FK_PERSONAS_ON_SUGGESTED_CONVERSATION_STYLE FOREIGN KEY (suggested_conversation_style_id) REFERENCES conversation_styles (id);
 
 ALTER TABLE questions
-    ADD CONSTRAINT FK_QUESTIONS_ON_QUESTION_AUDIO_FILE FOREIGN KEY (question_audio_file_id) REFERENCES files (id);
+    ADD CONSTRAINT FK_QUESTIONS_ON_OBJECTIVE FOREIGN KEY (objective_id) REFERENCES objectives (id);
 
 ALTER TABLE questions
-    ADD CONSTRAINT FK_QUESTIONS_ON_TOPIC FOREIGN KEY (topic_id) REFERENCES topics (id);
+    ADD CONSTRAINT FK_QUESTIONS_ON_QUESTION_AUDIO_FILE FOREIGN KEY (question_audio_file_id) REFERENCES files (id);
 
 ALTER TABLE questions
     ADD CONSTRAINT FK_QUESTIONS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
@@ -362,9 +400,6 @@ ALTER TABLE reports
 
 ALTER TABLE speech_assessments
     ADD CONSTRAINT FK_SPEECH_ASSESSMENTS_ON_ANSWER_HISTORY FOREIGN KEY (answer_history_id) REFERENCES answer_histories (id);
-
-ALTER TABLE topics
-    ADD CONSTRAINT FK_TOPICS_ON_CATEGORY FOREIGN KEY (category_id) REFERENCES category (id);
 
 ALTER TABLE topics
     ADD CONSTRAINT FK_TOPICS_ON_COVER_IMAGE_FILE FOREIGN KEY (cover_image_file_id) REFERENCES files (id);
