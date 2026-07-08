@@ -12,7 +12,6 @@ public record UpdateTopicCommand(
         TopicStatus status,
         JLPTLevel jlptLevel,
         Double orderIndex,
-        Long coverImageFileId,
-        Long categoryId
+        Long coverImageFileId
 ) {
 }

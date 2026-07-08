@@ -9,12 +9,11 @@ public record ListTopicCommand(
         String keyword,
         TopicStatus status,
         JLPTLevel jlptLevel,
-        Long categoryId,
         String sortBy,
         String sortDirection,
         boolean isAdmin
 ) {
     public ListTopicCommand withForcedStatus(TopicStatus newStatus) {
-        return new ListTopicCommand(page, size, keyword, newStatus, jlptLevel, categoryId, sortBy, sortDirection, isAdmin);
+        return new ListTopicCommand(page, size, keyword, newStatus, jlptLevel, sortBy, sortDirection, isAdmin);
     }
 }

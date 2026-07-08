@@ -35,8 +35,7 @@ public class GetTopicDetailUseCase implements GetTopicDetailInputPort {
                 topic.getStatus(),
                 topic.getJlptLevel(),
                 topic.getOrderIndex(),
-                topic.getCoverImageFileId(),
-                topic.getCategoryId()
+                topic.getCoverImageFileId()
         );
     }
 }

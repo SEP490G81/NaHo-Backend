@@ -54,7 +54,6 @@ public class CreateTopicUseCase implements CreateTopicInputPort {
                 .jlptLevel(command.jlptLevel())
                 .orderIndex(orderIndex)
                 .coverImageFileId(command.coverImageFileId())
-                .categoryId(command.categoryId())
                 .status(TopicStatus.DRAFT) // Initial status is DRAFT
                 .build();
 
@@ -70,8 +69,7 @@ public class CreateTopicUseCase implements CreateTopicInputPort {
                 savedTopic.getStatus(),
                 savedTopic.getJlptLevel(),
                 savedTopic.getOrderIndex(),
-                savedTopic.getCoverImageFileId(),
-                savedTopic.getCategoryId()
+                savedTopic.getCoverImageFileId()
         );
     }
 }

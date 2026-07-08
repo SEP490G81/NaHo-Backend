@@ -12,6 +12,7 @@ public final class TopicDetailMessageKey {
     public static final String TOPIC_ALREADY_EXISTS_IN_LEVEL = "topic.detail.already_exists_in_level";
     public static final String TOPIC_ORDER_INDEX_INVALID = "topic.detail.order_index_invalid";
     public static final String TOPIC_ID_NOT_FOUND = "topic.id.not.found";
+    public static final String OBJECTIVE_ID_NOT_FOUND = "objective.id.not.found";
     public static final String TOPIC_USER_NOT_HAVE_PERMISSION = "topic.user.not_have_permission";
 
     private TopicDetailMessageKey() {

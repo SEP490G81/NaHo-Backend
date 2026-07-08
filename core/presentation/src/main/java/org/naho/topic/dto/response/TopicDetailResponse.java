@@ -13,7 +13,6 @@ public record TopicDetailResponse(
         TopicStatus status,
         JLPTLevel jlptLevel,
         Double orderIndex,
-        Long coverImageFileId,
-        Long categoryId
+        Long coverImageFileId
 ) {
 }

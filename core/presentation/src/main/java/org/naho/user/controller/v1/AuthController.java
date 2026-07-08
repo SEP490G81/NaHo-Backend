@@ -114,7 +114,7 @@ public class AuthController {
     @ApiResponseMessage(message = UserDetailMessageKey.USER_ROTATE_TOKEN_SUCCESSFULLY)
     @PostMapping("/rotation")
     public ResponseEntity<Void> rotateToken(
-            @CookieValue(TokenType.REFRESH_TOKEN_NAME) String refreshToken
+            @CookieValue(TokenType.REFRESH_TOKEN_COOKIE_NAME) String refreshToken
     ) {
         LoginResult result = authInputPort.rotateToken(refreshToken);
 

@@ -4,11 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-import org.naho.file.model.FileEntity;
+import org.naho.question.entity.QuestionEntity;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.topic.type.TopicStatus;
-import org.naho.user.entity.UserEntity;
-import org.naho.user.type.JLPTLevel;
 
 import java.util.List;
 
@@ -18,9 +16,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "topics")
+@Table(name = "objectives")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TopicEntity extends BaseEntity {
+public class ObjectiveEntity extends BaseEntity {
+
     @Column(name = "japanese_name")
     String japaneseName;
 
@@ -37,21 +36,13 @@ public class TopicEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     TopicStatus status;
 
-    @Column(name = "jlpt_level", length = 2)
-    @Enumerated(EnumType.STRING)
-    JLPTLevel jlptLevel;
-
     @Column(name = "order_index")
     Double orderIndex;
 
-    @OneToOne
-    @JoinColumn(name = "cover_image_file_id")
-    FileEntity coverImageFile;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    UserEntity user;
+    @JoinColumn(name = "lesson_id")
+    LessonEntity lesson;
 
-    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<LessonEntity> lessons;
+    @OneToMany(mappedBy = "objective", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<QuestionEntity> questions;
 }

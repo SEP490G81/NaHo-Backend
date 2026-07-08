@@ -6,7 +6,6 @@ import org.naho.user.type.JLPTLevel;
 public record TopicFilterRequest(
         String keyword,
         TopicStatus status,
-        JLPTLevel jlptLevel,
-        Long categoryId
+        JLPTLevel jlptLevel
 ) {
 }

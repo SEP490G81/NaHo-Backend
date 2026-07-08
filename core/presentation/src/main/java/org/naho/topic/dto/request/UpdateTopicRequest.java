@@ -10,8 +10,7 @@ public record UpdateTopicRequest(
         @NotNull TopicStatus status,
         @NotNull JLPTLevel jlptLevel,
         Double orderIndex,
-        Long coverImageFileId,
-        Long categoryId
+        Long coverImageFileId
 ) {
 }
 

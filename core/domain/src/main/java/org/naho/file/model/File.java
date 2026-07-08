@@ -7,6 +7,9 @@ import org.naho.shared.exception.DomainException;
 public class File {
 
     private final Long id;
+    private final Long commentId;
+    private final Long questionId;
+    private final Long reportId;
     private final String objectKey;
     private final String originalName;
     private final String contentType;
@@ -14,6 +17,9 @@ public class File {
 
     private File(Builder builder) {
         this.id = builder.id;
+        this.commentId = builder.commentId;
+        this.questionId = builder.questionId;
+        this.reportId = builder.reportId;
         this.objectKey = builder.objectKey;
         this.originalName = builder.originalName;
         this.contentType = builder.contentType;
@@ -26,6 +32,18 @@ public class File {
 
     public Long getId() {
         return id;
+    }
+
+    public Long getCommentId() {
+        return commentId;
+    }
+
+    public Long getQuestionId() {
+        return questionId;
+    }
+
+    public Long getReportId() {
+        return reportId;
     }
 
     public String getObjectKey() {
@@ -47,6 +65,9 @@ public class File {
     public static class Builder {
 
         private Long id;
+        private Long commentId;
+        private Long questionId;
+        private Long reportId;
         private String objectKey;
         private String originalName;
         private String contentType;
@@ -54,6 +75,21 @@ public class File {
 
         public Builder id(Long id) {
             this.id = id;
+            return this;
+        }
+
+        public Builder commentId(Long commentId) {
+            this.commentId = commentId;
+            return this;
+        }
+
+        public Builder questionId(Long questionId) {
+            this.questionId = questionId;
+            return this;
+        }
+
+        public Builder reportId(Long reportId) {
+            this.reportId = reportId;
             return this;
         }
 

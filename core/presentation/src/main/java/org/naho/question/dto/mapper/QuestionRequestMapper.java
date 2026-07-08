@@ -56,7 +56,7 @@ public interface QuestionRequestMapper {
         return new SearchQuestionsCommand(
                 oneBasedPage,
                 pageable.getPageSize(),
-                filter != null ? filter.topicId() : null,
+                filter != null ? filter.objectiveId() : null,
                 filter != null ? filter.creatorId() : null,
                 filter != null ? filter.isSystemCreated() : null,
                 filter != null ? filter.statuses() : null,

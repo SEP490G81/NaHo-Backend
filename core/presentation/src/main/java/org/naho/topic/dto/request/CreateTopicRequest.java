@@ -7,7 +7,6 @@ public record CreateTopicRequest(
         String japaneseDescriptionMarkup,
         JLPTLevel jlptLevel,
         Double orderIndex,
-        Long coverImageFileId,
-        Long categoryId
+        Long coverImageFileId
 ) {
 }

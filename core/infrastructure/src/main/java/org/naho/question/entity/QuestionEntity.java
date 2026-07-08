@@ -10,7 +10,7 @@ import org.naho.shared.persistence.BaseEntity;
 import org.naho.social.entity.CommentEntity;
 import org.naho.social.entity.ReactionEntity;
 import org.naho.social.report.entity.ReportEntity;
-import org.naho.topic.entity.TopicEntity;
+import org.naho.topic.entity.ObjectiveEntity;
 import org.naho.user.entity.UserEntity;
 
 import java.util.List;
@@ -48,8 +48,8 @@ public class QuestionEntity extends BaseEntity {
     FileEntity questionAudioFile;
 
     @ManyToOne
-    @JoinColumn(name = "topic_id", nullable = true)
-    TopicEntity topic;
+    @JoinColumn(name = "objective_id", nullable = true)
+    ObjectiveEntity objective;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

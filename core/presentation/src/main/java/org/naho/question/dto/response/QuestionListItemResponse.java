@@ -6,7 +6,7 @@ import java.time.ZonedDateTime;
 
 public record QuestionListItemResponse(
         Long id,
-        Long topicId,
+        Long objectiveId,
         Long userId,
         String titleMarkup,
         String descriptionMarkup,
