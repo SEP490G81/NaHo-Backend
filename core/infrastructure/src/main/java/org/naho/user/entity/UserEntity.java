@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import org.naho.point.entity.PointHistoryEntity;
+import org.naho.point.entity.PointSummaryEntity;
 import org.naho.question.entity.QuestionEntity;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.social.report.entity.ReportEntity;
@@ -79,4 +81,11 @@ public class UserEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "user")
     List<ReportEntity> reports;
+
+    @OneToMany(mappedBy = "user")
+    List<PointHistoryEntity> pointHistories;
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "point_summary_id")
+    PointSummaryEntity pointSummary;
 }

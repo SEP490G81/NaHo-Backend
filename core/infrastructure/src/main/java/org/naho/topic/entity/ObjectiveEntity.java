@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import org.naho.point.entity.PointHistoryEntity;
 import org.naho.question.entity.QuestionEntity;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.topic.type.TopicStatus;
@@ -45,4 +46,7 @@ public class ObjectiveEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "objective", cascade = CascadeType.ALL, orphanRemoval = true)
     List<QuestionEntity> questions;
+
+    @OneToMany(mappedBy = "objective", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<PointHistoryEntity> pointHistories;
 }

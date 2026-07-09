@@ -1,4 +1,4 @@
-package org.naho.question.controller;
+package org.naho.question.controller.v1;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

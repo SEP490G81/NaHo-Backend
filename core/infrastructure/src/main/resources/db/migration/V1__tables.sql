@@ -123,6 +123,31 @@ CREATE TABLE personas
     CONSTRAINT pk_personas PRIMARY KEY (id)
 );
 
+CREATE TABLE point_histories
+(
+    id               BIGINT AUTO_INCREMENT NOT NULL,
+    created_time     datetime              NOT NULL,
+    modified_time    datetime              NULL,
+    point            DOUBLE                NOT NULL,
+    transaction_type VARCHAR(255)          NOT NULL,
+    transaction_time datetime              NOT NULL,
+    user_id          BIGINT                NOT NULL,
+    question_id      BIGINT                NULL,
+    objective_id     BIGINT                NULL,
+    lesson_id        BIGINT                NULL,
+    topic_id         BIGINT                NULL,
+    CONSTRAINT pk_point_histories PRIMARY KEY (id)
+);
+
+CREATE TABLE point_summary
+(
+    id            BIGINT AUTO_INCREMENT NOT NULL,
+    created_time  datetime              NOT NULL,
+    modified_time datetime              NULL,
+    total_point   DOUBLE                NOT NULL,
+    CONSTRAINT pk_point_summary PRIMARY KEY (id)
+);
+
 CREATE TABLE questions
 (
     id                     BIGINT AUTO_INCREMENT NOT NULL,
@@ -262,6 +287,7 @@ CREATE TABLE users
     last_practice_date date                  NULL,
     avatar_url         VARCHAR(2048)         NULL,
     provider_id        VARCHAR(512)          NULL,
+    point_summary_id   BIGINT                NULL,
     CONSTRAINT pk_users PRIMARY KEY (id)
 );
 
@@ -324,6 +350,9 @@ ALTER TABLE users
     ADD CONSTRAINT uc_users_email UNIQUE (email);
 
 ALTER TABLE users
+    ADD CONSTRAINT uc_users_point_summary UNIQUE (point_summary_id);
+
+ALTER TABLE users
     ADD CONSTRAINT uc_users_provider UNIQUE (provider_id);
 
 ALTER TABLE users
@@ -371,6 +400,21 @@ ALTER TABLE personas
 ALTER TABLE personas
     ADD CONSTRAINT FK_PERSONAS_ON_SUGGESTED_CONVERSATION_STYLE FOREIGN KEY (suggested_conversation_style_id) REFERENCES conversation_styles (id);
 
+ALTER TABLE point_histories
+    ADD CONSTRAINT FK_POINT_HISTORIES_ON_LESSON FOREIGN KEY (lesson_id) REFERENCES lessons (id);
+
+ALTER TABLE point_histories
+    ADD CONSTRAINT FK_POINT_HISTORIES_ON_OBJECTIVE FOREIGN KEY (objective_id) REFERENCES objectives (id);
+
+ALTER TABLE point_histories
+    ADD CONSTRAINT FK_POINT_HISTORIES_ON_QUESTION FOREIGN KEY (question_id) REFERENCES questions (id);
+
+ALTER TABLE point_histories
+    ADD CONSTRAINT FK_POINT_HISTORIES_ON_TOPIC FOREIGN KEY (topic_id) REFERENCES topics (id);
+
+ALTER TABLE point_histories
+    ADD CONSTRAINT FK_POINT_HISTORIES_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+
 ALTER TABLE questions
     ADD CONSTRAINT FK_QUESTIONS_ON_OBJECTIVE FOREIGN KEY (objective_id) REFERENCES objectives (id);
 
@@ -406,6 +450,9 @@ ALTER TABLE topics
 
 ALTER TABLE topics
     ADD CONSTRAINT FK_TOPICS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+
+ALTER TABLE users
+    ADD CONSTRAINT FK_USERS_ON_POINT_SUMMARY FOREIGN KEY (point_summary_id) REFERENCES point_summary (id);
 
 ALTER TABLE user_sessions
     ADD CONSTRAINT FK_USER_SESSIONS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);

@@ -29,9 +29,9 @@ public enum PointHistoryDomainErrorCode implements ErrorCode {
             PointHistoryTitleMessageKey.POINT_HISTORY_QUESTION_ID_NOT_VALID_TITLE,
             400
     ),
-    POINT_HISTORY_CAN_DO_ID_NOT_VALID(
+    POINT_HISTORY_OBJECTIVE_ID_NOT_VALID(
             "POINT_HISTORY_006",
-            PointHistoryTitleMessageKey.POINT_HISTORY_CAN_DO_ID_NOT_VALID_TITLE,
+            PointHistoryTitleMessageKey.POINT_HISTORY_OBJECTIVE_ID_NOT_VALID_TITLE,
             400
     ),
     POINT_HISTORY_LESSON_ID_NOT_VALID(

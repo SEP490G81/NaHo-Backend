@@ -1,6 +1,7 @@
 package org.naho.user.adapter;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.point.entity.PointSummaryEntity;
 import org.naho.user.entity.UserEntity;
 import org.naho.user.mapper.UserEntityMapper;
 import org.naho.user.model.User;
@@ -58,6 +59,19 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     @Override
     public User save(User user) {
         UserEntity entity = userEntityMapper.domainToEntity(user);
+        UserEntity savedEntity = userJpaRepository.save(entity);
+        return userEntityMapper.entityToDomain(savedEntity);
+    }
+
+    @Override
+    public User createNew(User user) {
+        UserEntity entity = userEntityMapper.domainToEntity(user);
+        // default point summary
+        entity.setPointSummary(
+                PointSummaryEntity.builder()
+                        .totalPoint(0.0)
+                        .build()
+        );
         UserEntity savedEntity = userJpaRepository.save(entity);
         return userEntityMapper.entityToDomain(savedEntity);
     }

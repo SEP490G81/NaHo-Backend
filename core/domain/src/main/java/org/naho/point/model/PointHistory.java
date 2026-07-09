@@ -13,7 +13,7 @@ public class PointHistory {
     private final Long userId;
 
     private final Long questionId;
-    private final Long canDoId;
+    private final Long objectiveId;
     private final Long lessonId;
     private final Long topicId;
 
@@ -25,7 +25,7 @@ public class PointHistory {
         this.id = builder.id;
         this.userId = builder.userId;
         this.questionId = builder.questionId;
-        this.canDoId = builder.canDoId;
+        this.objectiveId = builder.objectiveId;
         this.lessonId = builder.lessonId;
         this.topicId = builder.topicId;
         this.point = builder.point;
@@ -42,7 +42,7 @@ public class PointHistory {
         private Long id;
         private Long userId;
         private Long questionId;
-        private Long canDoId;
+        private Long objectiveId;
         private Long lessonId;
         private Long topicId;
         private Double point;
@@ -67,8 +67,8 @@ public class PointHistory {
             return this;
         }
 
-        public Builder canDoId(Long canDoId) {
-            this.canDoId = canDoId;
+        public Builder objectiveId(Long objectiveId) {
+            this.objectiveId = objectiveId;
             return this;
         }
 
@@ -133,10 +133,10 @@ public class PointHistory {
                 );
             }
 
-            if (transactionType.equals(PointTransactionType.CAN_DO_COMPLETION) && canDoId == null) {
+            if (transactionType.equals(PointTransactionType.CAN_DO_COMPLETION) && objectiveId == null) {
                 throw new DomainException(
-                        PointHistoryDomainErrorCode.POINT_HISTORY_CAN_DO_ID_NOT_VALID,
-                        PointHistoryDetailMessageKey.POINT_HISTORY_CAN_DO_ID_BLANK
+                        PointHistoryDomainErrorCode.POINT_HISTORY_OBJECTIVE_ID_NOT_VALID,
+                        PointHistoryDetailMessageKey.POINT_HISTORY_OBJECTIVE_ID_BLANK
                 );
             }
 
@@ -170,8 +170,8 @@ public class PointHistory {
         return questionId;
     }
 
-    public Long getCanDoId() {
-        return canDoId;
+    public Long getObjectiveId() {
+        return objectiveId;
     }
 
     public Long getLessonId() {
