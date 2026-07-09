@@ -31,14 +31,23 @@ public class PointSummaryRepositoryAdapter implements PointSummaryRepositoryPort
     @Override
     public PointSummary save(PointSummary pointSummary) {
         PointSummaryEntity entity = pointSummaryEntityMapper.domainToEntity(pointSummary);
+
         UserEntity user = userJpaRepository.findById(pointSummary.getUserId())
                 .orElseThrow(() -> new ApplicationException(
                         UserErrorCode.USER_NOT_FOUND,
                         UserDetailMessageKey.USER_ID_NOT_FOUND,
                         pointSummary.getUserId()
                 ));
+
         entity.setUser(user);
         PointSummaryEntity savedEntity = pointSummaryJpaRepository.save(entity);
+        
         return pointSummaryEntityMapper.entityToDomain(savedEntity);
+    }
+
+    @Override
+    public Optional<PointSummary> findByUserId(Long userId) {
+        return pointSummaryJpaRepository.findByUser_Id(userId)
+                .map(pointSummaryEntityMapper::entityToDomain);
     }
 }

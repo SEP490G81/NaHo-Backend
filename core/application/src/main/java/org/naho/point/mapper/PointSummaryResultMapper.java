@@ -5,6 +5,9 @@ import org.naho.point.result.PointSummaryResult;
 
 public class PointSummaryResultMapper {
     public PointSummaryResult domainToResult(PointSummary domain) {
+        if (domain == null) {
+            return null;
+        }
         return new PointSummaryResult(
                 domain.getId(),
                 domain.getUserId(),

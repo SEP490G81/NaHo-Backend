@@ -7,4 +7,6 @@ public interface CrudPointSummaryInputPort {
     PointSummaryResult updateTotalPoint(PointSummaryCommand command);
 
     PointSummaryResult addPoint(PointSummaryCommand command);
+
+    PointSummaryResult findPointSummaryByUserId(Long userId);
 }

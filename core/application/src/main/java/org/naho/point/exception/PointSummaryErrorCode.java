@@ -5,7 +5,8 @@ import org.naho.shared.exception.ErrorCode;
 
 public enum PointSummaryErrorCode implements ErrorCode {
     POINT_SUMMARY_NOT_FOUND("POINT_SUMMARY_A001", PointSummaryTitleMessageKey.POINT_SUMMARY_NOT_FOUND_TITLE, 404),
-    POINT_SUMMARY_POINT_INVALID("POINT_SUMMARY_A002", PointSummaryTitleMessageKey.POINT_SUMMARY_TOTAL_POINT_NOT_VALID_TITLE, 400);
+    POINT_SUMMARY_POINT_INVALID("POINT_SUMMARY_A002", PointSummaryTitleMessageKey.POINT_SUMMARY_TOTAL_POINT_NOT_VALID_TITLE, 400),
+    POINT_SUMMARY_USER_ID_INVALID("POINT_SUMMARY_A003", PointSummaryTitleMessageKey.POINT_SUMMARY_USER_ID_NOT_VALID_TITLE, 400);
 
     private final String code;
     private final String titleKey;

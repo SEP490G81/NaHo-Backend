@@ -1,4 +1,4 @@
-package org.naho.config.application;
+package org.naho.config.application.point;
 
 import org.naho.point.mapper.PointSummaryResultMapper;
 import org.naho.point.port.out.PointSummaryRepositoryPort;
@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class PointSummaryConfig {
-    
+
     @Bean
     public PointSummaryResultMapper pointSummaryResultMapper() {
         return new PointSummaryResultMapper();

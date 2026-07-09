@@ -1,0 +1,78 @@
+package org.naho.point.adapter;
+
+import lombok.RequiredArgsConstructor;
+import org.naho.i18n.message.user.UserDetailMessageKey;
+import org.naho.point.command.PointHistoryQueryCommand;
+import org.naho.point.entity.PointHistoryEntity;
+import org.naho.point.mapper.PointHistoryEntityMapper;
+import org.naho.point.model.PointHistory;
+import org.naho.point.port.out.PointHistoryRepositoryPort;
+import org.naho.point.repository.PointHistoryJpaRepository;
+import org.naho.point.specification.PointHistorySpecification;
+import org.naho.shared.exception.ApplicationException;
+import org.naho.user.entity.UserEntity;
+import org.naho.user.exception.UserErrorCode;
+import org.naho.user.repository.UserJpaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@Component
+@RequiredArgsConstructor
+public class PointHistoryRepositoryAdapter implements PointHistoryRepositoryPort {
+    private final PointHistoryEntityMapper pointHistoryEntityMapper;
+    private final PointHistoryJpaRepository pointHistoryJpaRepository;
+    private final UserJpaRepository userJpaRepository;
+
+    @Override
+    public PointHistory save(PointHistory pointHistory) {
+        PointHistoryEntity entity = pointHistoryEntityMapper.domainToEntity(pointHistory);
+
+        UserEntity user = userJpaRepository.findById(pointHistory.getUserId())
+                .orElseThrow(() -> new ApplicationException(
+                        UserErrorCode.USER_NOT_FOUND,
+                        UserDetailMessageKey.USER_ID_NOT_FOUND,
+                        pointHistory.getUserId()
+                ));
+
+        entity.setUser(user);
+        PointHistoryEntity savedPointHistory = pointHistoryJpaRepository.save(entity);
+
+        return pointHistoryEntityMapper.entityToDomain(savedPointHistory);
+    }
+
+    @Override
+    public List<PointHistory> findAllByUserId(PointHistoryQueryCommand command, Long userId) {
+        Pageable pageable = PageRequest.of(
+                command.page(),
+                command.size(),
+                Sort.by(
+                        Sort.Direction.valueOf(command.sortDirection().name()),
+                        command.sortColumn().getColumnName()
+                )
+        );
+
+        Specification<PointHistoryEntity> specification =
+                Specification.allOf(
+                        PointHistorySpecification.hasUserId(userId),
+                        PointHistorySpecification.hasTransactionType(command.transactionType()),
+                        PointHistorySpecification.hasAmountType(command.amountType()),
+                        PointHistorySpecification.transactionTimeBetween(
+                                command.transactionTimeFrom(),
+                                command.transactionTimeTo()
+                        )
+                );
+
+        Page<PointHistoryEntity> page = pointHistoryJpaRepository.findAll(specification, pageable);
+
+        return page.getContent()
+                .stream()
+                .map(pointHistoryEntityMapper::entityToDomain)
+                .toList();
+    }
+}

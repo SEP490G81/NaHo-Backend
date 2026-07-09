@@ -193,4 +193,8 @@ public class PointHistory {
     public Instant getTransactionTime() {
         return transactionTime;
     }
+
+    public void setTransactionTime(Instant transactionTime) {
+        this.transactionTime = transactionTime;
+    }
 }

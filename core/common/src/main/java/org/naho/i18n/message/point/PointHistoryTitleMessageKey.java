@@ -9,6 +9,8 @@ public final class PointHistoryTitleMessageKey {
     public static final String POINT_HISTORY_OBJECTIVE_ID_NOT_VALID_TITLE = "point.history.objective.id.not.valid.title";
     public static final String POINT_HISTORY_LESSON_ID_NOT_VALID_TITLE = "point.history.lesson.id.not.valid.title";
     public static final String POINT_HISTORY_TOPIC_ID_NOT_VALID_TITLE = "point.history.topic.id.not.valid.title";
+    public static final String POINT_HISTORY_PAGE_NOT_VALID_TITLE = "point.history.page.not.valid.title";
+    public static final String POINT_HISTORY_SIZE_NOT_VALID_TITLE = "point.history.size.not.valid.title";
 
     private PointHistoryTitleMessageKey() {
     }

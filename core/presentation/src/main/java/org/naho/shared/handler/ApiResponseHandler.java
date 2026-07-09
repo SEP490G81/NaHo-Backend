@@ -8,9 +8,7 @@ import org.naho.logging.ContextLoggingKey;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.shared.response.ApiMeta;
 import org.naho.shared.response.ApiResponse;
-import org.naho.shared.response.PageMeta;
 import org.springframework.core.MethodParameter;
-import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
@@ -65,16 +63,6 @@ public class ApiResponseHandler implements ResponseBodyAdvice<Object> {
                         : apiResponseMessage.message()
         );
 
-        if (body instanceof Page<?> page) {
-            return ApiResponse.builder()
-                    .meta(ApiMeta.createWithPagination(
-                            ThreadContext.get(ContextLoggingKey.TRACE_ID),
-                            PageMeta.fromPage(page)
-                    ))
-                    .message(message)
-                    .data(page.getContent())
-                    .build();
-        }
         return ApiResponse.builder()
                 .meta(ApiMeta.create(ThreadContext.get(ContextLoggingKey.TRACE_ID)))
                 .message(message)

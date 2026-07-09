@@ -48,4 +48,23 @@ public class CrudPointSummaryUseCase implements CrudPointSummaryInputPort {
         PointSummary saved = pointSummaryRepositoryPort.save(pointSummary);
         return pointSummaryResultMapper.domainToResult(saved);
     }
+
+    @Override
+    public PointSummaryResult findPointSummaryByUserId(Long userId) {
+        if (userId == null) {
+            throw new ApplicationException(
+                    PointSummaryErrorCode.POINT_SUMMARY_USER_ID_INVALID,
+                    PointSummaryDetailMessageKey.POINT_SUMMARY_USER_ID_BLANK
+            );
+        }
+
+        PointSummary pointSummary = pointSummaryRepositoryPort.findByUserId(userId)
+                .orElseThrow(() -> new ApplicationException(
+                        PointSummaryErrorCode.POINT_SUMMARY_NOT_FOUND,
+                        PointSummaryDetailMessageKey.POINT_SUMMARY_NOT_FOUND_BY_USER_ID,
+                        userId
+                ));
+        
+        return pointSummaryResultMapper.domainToResult(pointSummary);
+    }
 }

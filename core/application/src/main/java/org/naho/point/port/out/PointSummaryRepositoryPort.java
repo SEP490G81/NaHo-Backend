@@ -8,4 +8,6 @@ public interface PointSummaryRepositoryPort {
     Optional<PointSummary> findById(Long id);
 
     PointSummary save(PointSummary pointSummary);
+
+    Optional<PointSummary> findByUserId(Long userId);
 }
