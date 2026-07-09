@@ -1,0 +1,9 @@
+package org.naho.i18n.message.point;
+
+public final class PointSummaryDetailMessageKey {
+    public static final String POINT_SUMMARY_USER_ID_BLANK = "point.summary.user.id.blank";
+    public static final String POINT_SUMMARY_TOTAL_POINT_BLANK = "point.summary.total.point.blank";
+
+    private PointSummaryDetailMessageKey() {
+    }
+}

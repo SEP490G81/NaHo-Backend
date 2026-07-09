@@ -21,7 +21,8 @@ public class MessageSourceConfig {
                 "classpath:i18n/speech/speech",
                 "classpath:i18n/file/file",
                 "classpath:i18n/llm/llm",
-                "classpath:i18n/furigana/furigana"
+                "classpath:i18n/furigana/furigana",
+                "classpath:i18n/point/point"
         );
 
         messageSource.setDefaultEncoding(DEFAULT_ENCODING);
