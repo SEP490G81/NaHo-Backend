@@ -5,6 +5,7 @@ import org.apache.logging.log4j.ThreadContext;
 import org.jspecify.annotations.Nullable;
 import org.naho.i18n.MessageService;
 import org.naho.logging.ContextLoggingKey;
+import org.naho.pagination.PageData;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.shared.response.ApiMeta;
 import org.naho.shared.response.ApiResponse;
@@ -63,8 +64,21 @@ public class ApiResponseHandler implements ResponseBodyAdvice<Object> {
                         : apiResponseMessage.message()
         );
 
+        String traceId = ThreadContext.get(ContextLoggingKey.TRACE_ID);
+
+        if (body instanceof PageData<?>) {
+            return ApiResponse.builder()
+                    .meta(ApiMeta.createWithPagination(
+                            traceId,
+                            ((PageData<?>) body).getPageMeta()
+                    ))
+                    .message(message)
+                    .data(((PageData<?>) body).getData())
+                    .build();
+        }
+
         return ApiResponse.builder()
-                .meta(ApiMeta.create(ThreadContext.get(ContextLoggingKey.TRACE_ID)))
+                .meta(ApiMeta.create(traceId))
                 .message(message)
                 .data(body)
                 .build();

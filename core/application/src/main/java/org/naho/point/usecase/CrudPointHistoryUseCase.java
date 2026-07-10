@@ -1,6 +1,7 @@
 package org.naho.point.usecase;
 
 import org.naho.i18n.message.point.PointSummaryDetailMessageKey;
+import org.naho.pagination.PageData;
 import org.naho.point.command.PointHistoryCommand;
 import org.naho.point.command.PointHistoryQueryCommand;
 import org.naho.point.exception.PointSummaryErrorCode;
@@ -16,7 +17,6 @@ import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.TransactionPort;
 
 import java.time.Instant;
-import java.util.List;
 
 public class CrudPointHistoryUseCase implements CrudPointHistoryInputPort {
     private final PointHistoryCommandMapper pointHistoryCommandMapper;
@@ -45,11 +45,17 @@ public class CrudPointHistoryUseCase implements CrudPointHistoryInputPort {
     }
 
     @Override
-    public List<PointHistoryResult> findAllByUserId(PointHistoryQueryCommand command, Long userId) {
-        return pointHistoryRepositoryPort.findAllByUserId(command, userId)
-                .stream()
-                .map(pointHistoryResultMapper::domainToResult)
-                .toList();
+    public PageData<PointHistoryResult> findAllByUserId(PointHistoryQueryCommand command, Long userId) {
+        PageData<PointHistory> pageData = pointHistoryRepositoryPort.findAllByUserId(command, userId);
+
+        return PageData.<PointHistoryResult>builder()
+                .pageMeta(pageData.getPageMeta())
+                .data(pageData.getData()
+                        .stream()
+                        .map(pointHistoryResultMapper::domainToResult)
+                        .toList()
+                )
+                .build();
     }
 
     private PointHistoryResult doCreatePointHistory(PointHistoryCommand command) {

@@ -2,6 +2,8 @@ package org.naho.point.adapter;
 
 import lombok.RequiredArgsConstructor;
 import org.naho.i18n.message.user.UserDetailMessageKey;
+import org.naho.pagination.PageData;
+import org.naho.pagination.PageMeta;
 import org.naho.point.command.PointHistoryQueryCommand;
 import org.naho.point.entity.PointHistoryEntity;
 import org.naho.point.mapper.PointHistoryEntityMapper;
@@ -19,8 +21,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -47,7 +47,7 @@ public class PointHistoryRepositoryAdapter implements PointHistoryRepositoryPort
     }
 
     @Override
-    public List<PointHistory> findAllByUserId(PointHistoryQueryCommand command, Long userId) {
+    public PageData<PointHistory> findAllByUserId(PointHistoryQueryCommand command, Long userId) {
         Pageable pageable = PageRequest.of(
                 command.page(),
                 command.size(),
@@ -70,9 +70,21 @@ public class PointHistoryRepositoryAdapter implements PointHistoryRepositoryPort
 
         Page<PointHistoryEntity> page = pointHistoryJpaRepository.findAll(specification, pageable);
 
-        return page.getContent()
-                .stream()
-                .map(pointHistoryEntityMapper::entityToDomain)
-                .toList();
+        return PageData.<PointHistory>builder()
+                .pageMeta(PageMeta.builder()
+                        .currentPage(page.getNumber())
+                        .pageSize(page.getSize())
+                        .totalPages(page.getTotalPages())
+                        .totalElements(page.getTotalElements())
+                        .hasNext(page.hasNext())
+                        .hasPrevious(page.hasPrevious())
+                        .build()
+                )
+                .data(page.getContent()
+                        .stream()
+                        .map(pointHistoryEntityMapper::entityToDomain)
+                        .toList()
+                )
+                .build();
     }
 }

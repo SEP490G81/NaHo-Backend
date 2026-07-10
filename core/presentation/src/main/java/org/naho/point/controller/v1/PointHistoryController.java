@@ -2,6 +2,7 @@ package org.naho.point.controller.v1;
 
 import lombok.RequiredArgsConstructor;
 import org.naho.i18n.message.point.PointHistoryDetailMessageKey;
+import org.naho.pagination.PageData;
 import org.naho.point.command.PointHistoryCommand;
 import org.naho.point.command.PointHistoryQueryCommand;
 import org.naho.point.dto.mapper.PointHistoryRequestMapper;
@@ -20,8 +21,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/point-history")
@@ -46,19 +45,24 @@ public class PointHistoryController {
 
     @ApiResponseMessage(message = PointHistoryDetailMessageKey.POINT_HISTORY_GET_ALL_SUCCESS)
     @PostMapping("/all")
-    public ResponseEntity<List<PointHistoryResponse>> findAllByUserId(
+    public ResponseEntity<PageData<PointHistoryResponse>> findAllByUserId(
             @AuthenticationPrincipal AccessTokenPayload payload,
             @RequestBody PointHistoryQueryRequest request
     ) {
         PointHistoryQueryCommand command = pointHistoryRequestMapper.requestToCommand(request);
 
-        List<PointHistoryResult> results =
+        PageData<PointHistoryResult> result =
                 crudPointHistoryInputPort.findAllByUserId(command, payload.userId());
 
-        return ResponseEntity.ok(
-                results.stream()
+        PageData<PointHistoryResponse> response = PageData.<PointHistoryResponse>builder()
+                .pageMeta(result.getPageMeta())
+                .data(result.getData()
+                        .stream()
                         .map(pointHistoryResponseMapper::resultToResponse)
                         .toList()
-        );
+                )
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 }
