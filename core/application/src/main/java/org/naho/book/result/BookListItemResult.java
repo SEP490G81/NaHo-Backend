@@ -1,9 +1,10 @@
-package org.naho.book.dto.response;
+package org.naho.book.result;
 
 import org.naho.book.type.CefrLevel;
+import org.naho.book.type.TopicStatus;
 import org.naho.user.type.JLPTLevel;
 
-public record BookResponse(
+public record BookListItemResult(
         Long id,
         String title,
         String description,

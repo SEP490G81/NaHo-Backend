@@ -19,7 +19,7 @@ public class TopicConfig {
 
     @Bean
     public ListTopicInputPort listTopicUseCasePort(TopicListRepositoryAdapter topicListRepositoryAdapter) {
-        return new ListTopicUsecase(topicListRepositoryAdapter);
+        return new ListTopicUseCase(topicListRepositoryAdapter);
     }
 
     @Bean
@@ -34,8 +34,8 @@ public class TopicConfig {
 
     @Bean
     public DeleteTopicInputPort deleteTopicInputPort(TopicRepositoryAdapter topicRepositoryAdapter,
-                                                     QuestionRepositoryPort questionRepositoryPort,
-                                                     TransactionPort transactionPort) {
+            QuestionRepositoryPort questionRepositoryPort,
+            TransactionPort transactionPort) {
         return new DeleteTopicUseCase(topicRepositoryAdapter, questionRepositoryPort, transactionPort);
     }
 }
