@@ -7,10 +7,11 @@ import java.time.Instant;
 public record PointHistoryResponse(
         Long id,
         Long userId,
-        Long questionId,
+        Long learningPathNodeId,
         Long objectiveId,
         Long lessonId,
         Long topicId,
+        Long bookId,
         Double point,
         PointTransactionType transactionType,
         Instant transactionTime

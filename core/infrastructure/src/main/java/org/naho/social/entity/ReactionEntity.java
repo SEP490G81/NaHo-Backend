@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-import org.naho.question.entity.QuestionEntity;
+import org.naho.question.entity.SpeakingQuestionEntity;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.social.type.ReactionType;
 import org.naho.user.entity.UserEntity;
@@ -31,6 +31,6 @@ public class ReactionEntity extends BaseEntity {
     CommentEntity comment;
 
     @ManyToOne
-    @JoinColumn(name = "question_id")
-    QuestionEntity question;
+    @JoinColumn(name = "speaking_question_id")
+    SpeakingQuestionEntity question;
 }

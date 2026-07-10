@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.naho.file.model.FileEntity;
 import org.naho.file.repository.FileJpaRepository;
 import org.naho.question.entity.AnswerHistoryEntity;
-import org.naho.question.entity.QuestionEntity;
+import org.naho.question.entity.SpeakingQuestionEntity;
 import org.naho.question.repository.AnswerHistoryJpaRepository;
-import org.naho.question.repository.QuestionJpaRepository;
+import org.naho.question.repository.SpeakingQuestionJpaRepository;
 import org.naho.speech.azure.entity.ContentAssessmentEntity;
 import org.naho.speech.azure.entity.SpeechAssessmentEntity;
 import org.naho.speech.azure.entity.WordAssessmentEntity;
@@ -35,13 +35,13 @@ public class AnswerHistoryRepositoryAdapter implements AnswerHistoryRepositoryPo
     private final WordAssessmentJpaRepository wordAssessmentJpaRepository;
 
     private final UserJpaRepository userJpaRepository;
-    private final QuestionJpaRepository questionJpaRepository;
+    private final SpeakingQuestionJpaRepository questionJpaRepository;
     private final FileJpaRepository fileJpaRepository;
 
     @Override
     public AnswerHistory saveAnswerHistory(AnswerHistory domain) {
         UserEntity user = userJpaRepository.getReferenceById(domain.getUserId());
-        QuestionEntity question = questionJpaRepository.getReferenceById(domain.getQuestionId());
+        SpeakingQuestionEntity question = questionJpaRepository.getReferenceById(domain.getQuestionId());
         FileEntity file = fileJpaRepository.getReferenceById(domain.getAudioFileId());
 
         AnswerHistoryEntity entity = AnswerHistoryEntity.builder()

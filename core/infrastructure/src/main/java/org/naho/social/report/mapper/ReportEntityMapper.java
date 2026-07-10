@@ -2,7 +2,7 @@ package org.naho.social.report.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.naho.question.entity.QuestionEntity;
+import org.naho.question.entity.SpeakingQuestionEntity;
 import org.naho.social.entity.CommentEntity;
 import org.naho.social.model.Report;
 import org.naho.social.report.entity.ReportEntity;
@@ -33,11 +33,11 @@ public interface ReportEntityMapper {
         return entity;
     }
 
-    default QuestionEntity mapQuestionIdToQuestionEntity(Long questionId) {
+    default SpeakingQuestionEntity mapQuestionIdToQuestionEntity(Long questionId) {
         if (questionId == null) {
             return null;
         }
-        QuestionEntity entity = new QuestionEntity();
+        SpeakingQuestionEntity entity = new SpeakingQuestionEntity();
         entity.setId(questionId);
         return entity;
     }

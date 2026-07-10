@@ -5,8 +5,8 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.book.type.TopicStatus;
+import org.naho.learning.entity.LearningPathNodeEntity;
 import org.naho.point.entity.PointHistoryEntity;
-import org.naho.question.entity.QuestionEntity;
 import org.naho.shared.persistence.BaseEntity;
 
 import java.util.List;
@@ -20,7 +20,6 @@ import java.util.List;
 @Table(name = "objectives")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ObjectiveEntity extends BaseEntity {
-
     @Column(name = "japanese_name")
     String japaneseName;
 
@@ -37,7 +36,7 @@ public class ObjectiveEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     TopicStatus status;
 
-    @Column(name = "order_index", nullable = false, unique = true)
+    @Column(name = "order_index", nullable = false)
     Double orderIndex;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -45,8 +44,8 @@ public class ObjectiveEntity extends BaseEntity {
     LessonEntity lesson;
 
     @OneToMany(mappedBy = "objective", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<QuestionEntity> questions;
-
-    @OneToMany(mappedBy = "objective", cascade = CascadeType.ALL, orphanRemoval = true)
     List<PointHistoryEntity> pointHistories;
+
+    @OneToMany(mappedBy = "objective")
+    List<LearningPathNodeEntity> learningPathNodes;
 }

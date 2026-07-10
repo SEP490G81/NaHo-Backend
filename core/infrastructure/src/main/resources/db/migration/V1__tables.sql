@@ -1,11 +1,11 @@
 CREATE TABLE answer_histories
 (
-    id            BIGINT AUTO_INCREMENT NOT NULL,
-    created_time  datetime              NOT NULL,
-    modified_time datetime              NULL,
-    user_id       BIGINT                NOT NULL,
-    question_id   BIGINT                NOT NULL,
-    audio_file_id BIGINT                NOT NULL,
+    id                   BIGINT AUTO_INCREMENT NOT NULL,
+    created_time         datetime              NOT NULL,
+    modified_time        datetime              NULL,
+    user_id              BIGINT                NOT NULL,
+    speaking_question_id BIGINT                NOT NULL,
+    audio_file_id        BIGINT                NOT NULL,
     CONSTRAINT pk_answer_histories PRIMARY KEY (id)
 );
 
@@ -23,15 +23,26 @@ CREATE TABLE books
     CONSTRAINT pk_books PRIMARY KEY (id)
 );
 
-CREATE TABLE comments
+CREATE TABLE chests
 (
     id            BIGINT AUTO_INCREMENT NOT NULL,
     created_time  datetime              NOT NULL,
     modified_time datetime              NULL,
-    content       TEXT                  NOT NULL,
-    user_id       BIGINT                NOT NULL,
-    question_id   BIGINT                NOT NULL,
-    parent_id     BIGINT                NULL,
+    title         VARCHAR(255)          NOT NULL,
+    `description` TEXT                  NULL,
+    point         DOUBLE                NOT NULL,
+    CONSTRAINT pk_chests PRIMARY KEY (id)
+);
+
+CREATE TABLE comments
+(
+    id                   BIGINT AUTO_INCREMENT NOT NULL,
+    created_time         datetime              NOT NULL,
+    modified_time        datetime              NULL,
+    content              TEXT                  NOT NULL,
+    user_id              BIGINT                NOT NULL,
+    speaking_question_id BIGINT                NOT NULL,
+    parent_id            BIGINT                NULL,
     CONSTRAINT pk_comments PRIMARY KEY (id)
 );
 
@@ -83,6 +94,34 @@ CREATE TABLE grammars
     english_meaning_text    TEXT                  NULL,
     explanation             MEDIUMTEXT            NULL,
     CONSTRAINT pk_grammars PRIMARY KEY (id)
+);
+
+CREATE TABLE leagues
+(
+    id            BIGINT AUTO_INCREMENT NOT NULL,
+    created_time  datetime              NOT NULL,
+    modified_time datetime              NULL,
+    name          VARCHAR(255)          NOT NULL,
+    `description` TEXT                  NULL,
+    min_point     DOUBLE                NOT NULL,
+    max_point     DOUBLE                NOT NULL,
+    icon_file_id  BIGINT                NOT NULL,
+    CONSTRAINT pk_leagues PRIMARY KEY (id)
+);
+
+CREATE TABLE learning_path_nodes
+(
+    id                     BIGINT AUTO_INCREMENT NOT NULL,
+    created_time           datetime              NOT NULL,
+    modified_time          datetime              NULL,
+    global_order_index     DOUBLE                NOT NULL,
+    order_index            DOUBLE                NOT NULL,
+    node_type              VARCHAR(255)          NOT NULL,
+    objective_id           BIGINT                NOT NULL,
+    speaking_question_id   BIGINT                NULL,
+    vocabulary_question_id BIGINT                NULL,
+    chest_id               BIGINT                NULL,
+    CONSTRAINT pk_learning_path_nodes PRIMARY KEY (id)
 );
 
 CREATE TABLE lessons
@@ -139,17 +178,18 @@ CREATE TABLE personas
 
 CREATE TABLE point_histories
 (
-    id               BIGINT AUTO_INCREMENT NOT NULL,
-    created_time     datetime              NOT NULL,
-    modified_time    datetime              NULL,
-    point            DOUBLE                NOT NULL,
-    transaction_type VARCHAR(255)          NOT NULL,
-    transaction_time datetime              NOT NULL,
-    user_id          BIGINT                NOT NULL,
-    question_id      BIGINT                NULL,
-    objective_id     BIGINT                NULL,
-    lesson_id        BIGINT                NULL,
-    topic_id         BIGINT                NULL,
+    id                    BIGINT AUTO_INCREMENT NOT NULL,
+    created_time          datetime              NOT NULL,
+    modified_time         datetime              NULL,
+    point                 DOUBLE                NOT NULL,
+    transaction_type      VARCHAR(255)          NOT NULL,
+    transaction_time      datetime              NOT NULL,
+    user_id               BIGINT                NOT NULL,
+    learning_path_node_id BIGINT                NULL,
+    objective_id          BIGINT                NULL,
+    lesson_id             BIGINT                NULL,
+    topic_id              BIGINT                NULL,
+    book_id               BIGINT                NULL,
     CONSTRAINT pk_point_histories PRIMARY KEY (id)
 );
 
@@ -162,59 +202,30 @@ CREATE TABLE point_summary
     CONSTRAINT pk_point_summary PRIMARY KEY (id)
 );
 
-CREATE TABLE questions
-(
-    id                     BIGINT AUTO_INCREMENT NOT NULL,
-    created_time           datetime              NOT NULL,
-    modified_time          datetime              NULL,
-    title                  VARCHAR(255)          NOT NULL,
-    title_markup           VARCHAR(255)          NOT NULL,
-    `description`          TEXT                  NULL,
-    description_markup     TEXT                  NULL,
-    order_index            DOUBLE                NOT NULL,
-    status                 VARCHAR(50)           NULL,
-    question_audio_file_id BIGINT                NULL,
-    objective_id           BIGINT                NULL,
-    user_id                BIGINT                NOT NULL,
-    CONSTRAINT pk_questions PRIMARY KEY (id)
-);
-
-CREATE TABLE questions_grammars
-(
-    grammar_id  BIGINT NOT NULL,
-    question_id BIGINT NOT NULL
-);
-
-CREATE TABLE questions_vocabularies
-(
-    question_id   BIGINT NOT NULL,
-    vocabulary_id BIGINT NOT NULL
-);
-
 CREATE TABLE reactions
 (
-    id            BIGINT AUTO_INCREMENT NOT NULL,
-    created_time  datetime              NOT NULL,
-    modified_time datetime              NULL,
-    reaction_type VARCHAR(255)          NOT NULL,
-    user_id       BIGINT                NOT NULL,
-    comment_id    BIGINT                NULL,
-    question_id   BIGINT                NULL,
+    id                   BIGINT AUTO_INCREMENT NOT NULL,
+    created_time         datetime              NOT NULL,
+    modified_time        datetime              NULL,
+    reaction_type        VARCHAR(255)          NOT NULL,
+    user_id              BIGINT                NOT NULL,
+    comment_id           BIGINT                NULL,
+    speaking_question_id BIGINT                NULL,
     CONSTRAINT pk_reactions PRIMARY KEY (id)
 );
 
 CREATE TABLE reports
 (
-    id            BIGINT AUTO_INCREMENT NOT NULL,
-    created_time  datetime              NOT NULL,
-    modified_time datetime              NULL,
-    title         VARCHAR(255)          NOT NULL,
-    `description` TEXT                  NOT NULL,
-    report_type   VARCHAR(50)           NOT NULL,
-    is_resolved   BIT(1)                NULL,
-    user_id       BIGINT                NOT NULL,
-    question_id   BIGINT                NULL,
-    comment_id    BIGINT                NULL,
+    id                   BIGINT AUTO_INCREMENT NOT NULL,
+    created_time         datetime              NOT NULL,
+    modified_time        datetime              NULL,
+    title                VARCHAR(255)          NOT NULL,
+    `description`        TEXT                  NOT NULL,
+    report_type          VARCHAR(50)           NOT NULL,
+    is_resolved          BIT(1)                NULL,
+    user_id              BIGINT                NOT NULL,
+    speaking_question_id BIGINT                NULL,
+    comment_id           BIGINT                NULL,
     CONSTRAINT pk_reports PRIMARY KEY (id)
 );
 
@@ -233,6 +244,44 @@ CREATE TABLE roles_permissions
     permission_id BIGINT NOT NULL,
     role_id       BIGINT NOT NULL,
     CONSTRAINT pk_roles_permissions PRIMARY KEY (permission_id, role_id)
+);
+
+CREATE TABLE seasons
+(
+    id            BIGINT AUTO_INCREMENT NOT NULL,
+    created_time  datetime              NOT NULL,
+    modified_time datetime              NULL,
+    season_no     INT                   NOT NULL,
+    start_at      datetime              NOT NULL,
+    end_at        datetime              NOT NULL,
+    CONSTRAINT pk_seasons PRIMARY KEY (id)
+);
+
+CREATE TABLE speaking_questions
+(
+    id                     BIGINT AUTO_INCREMENT NOT NULL,
+    created_time           datetime              NOT NULL,
+    modified_time          datetime              NULL,
+    title                  VARCHAR(255)          NOT NULL,
+    title_markup           VARCHAR(255)          NOT NULL,
+    `description`          TEXT                  NULL,
+    description_markup     TEXT                  NULL,
+    status                 VARCHAR(50)           NULL,
+    question_audio_file_id BIGINT                NULL,
+    user_id                BIGINT                NOT NULL,
+    CONSTRAINT pk_speaking_questions PRIMARY KEY (id)
+);
+
+CREATE TABLE speaking_questions_grammars
+(
+    grammar_id           BIGINT NOT NULL,
+    speaking_question_id BIGINT NOT NULL
+);
+
+CREATE TABLE speaking_questions_vocabularies
+(
+    speaking_question_id BIGINT NOT NULL,
+    vocabulary_id        BIGINT NOT NULL
 );
 
 CREATE TABLE speech_assessments
@@ -264,6 +313,43 @@ CREATE TABLE topics
     user_id                     BIGINT                NULL,
     book_id                     BIGINT                NULL,
     CONSTRAINT pk_topics PRIMARY KEY (id)
+);
+
+CREATE TABLE user_learning_progresses
+(
+    id                    BIGINT AUTO_INCREMENT NOT NULL,
+    created_time          datetime              NOT NULL,
+    modified_time         datetime              NULL,
+    learning_path_node_id BIGINT                NOT NULL,
+    user_id               BIGINT                NOT NULL,
+    CONSTRAINT pk_user_learning_progresses PRIMARY KEY (id)
+);
+
+CREATE TABLE user_node_progresses
+(
+    id                    BIGINT AUTO_INCREMENT NOT NULL,
+    created_time          datetime              NOT NULL,
+    modified_time         datetime              NULL,
+    best_score            DOUBLE                NULL,
+    current_score         DOUBLE                NULL,
+    attempt_count         INT                   NULL,
+    completed_at          datetime              NULL,
+    status                VARCHAR(255)          NULL,
+    learning_path_node_id BIGINT                NOT NULL,
+    user_id               BIGINT                NOT NULL,
+    CONSTRAINT pk_user_node_progresses PRIMARY KEY (id)
+);
+
+CREATE TABLE user_season_points
+(
+    id            BIGINT AUTO_INCREMENT NOT NULL,
+    created_time  datetime              NOT NULL,
+    modified_time datetime              NULL,
+    season_point  DOUBLE                NOT NULL,
+    user_id       BIGINT                NOT NULL,
+    season_id     BIGINT                NOT NULL,
+    league_id     BIGINT                NOT NULL,
+    CONSTRAINT pk_user_season_points PRIMARY KEY (id)
 );
 
 CREATE TABLE user_sessions
@@ -321,6 +407,14 @@ CREATE TABLE vocabularies
     CONSTRAINT pk_vocabularies PRIMARY KEY (id)
 );
 
+CREATE TABLE vocabulary_questions
+(
+    id            BIGINT AUTO_INCREMENT NOT NULL,
+    created_time  datetime              NOT NULL,
+    modified_time datetime              NULL,
+    CONSTRAINT pk_vocabulary_questions PRIMARY KEY (id)
+);
+
 CREATE TABLE word_assessments
 (
     id                   BIGINT AUTO_INCREMENT NOT NULL,
@@ -339,17 +433,23 @@ ALTER TABLE answer_histories
 ALTER TABLE books
     ADD CONSTRAINT uc_books_cover_image_file UNIQUE (cover_image_file_id);
 
-ALTER TABLE books
-    ADD CONSTRAINT uc_books_order_index UNIQUE (order_index);
-
 ALTER TABLE content_assessments
     ADD CONSTRAINT uc_content_assessments_answer_history UNIQUE (answer_history_id);
 
-ALTER TABLE lessons
-    ADD CONSTRAINT uc_lessons_order_index UNIQUE (order_index);
+ALTER TABLE leagues
+    ADD CONSTRAINT uc_leagues_icon_file UNIQUE (icon_file_id);
 
-ALTER TABLE objectives
-    ADD CONSTRAINT uc_objectives_order_index UNIQUE (order_index);
+ALTER TABLE learning_path_nodes
+    ADD CONSTRAINT uc_learning_path_nodes_chest UNIQUE (chest_id);
+
+ALTER TABLE learning_path_nodes
+    ADD CONSTRAINT uc_learning_path_nodes_global_order_index UNIQUE (global_order_index);
+
+ALTER TABLE learning_path_nodes
+    ADD CONSTRAINT uc_learning_path_nodes_speaking_question UNIQUE (speaking_question_id);
+
+ALTER TABLE learning_path_nodes
+    ADD CONSTRAINT uc_learning_path_nodes_vocabulary_question UNIQUE (vocabulary_question_id);
 
 ALTER TABLE permissions
     ADD CONSTRAINT uc_permissions_permission_code UNIQUE (permission_code);
@@ -360,14 +460,11 @@ ALTER TABLE personas
 ALTER TABLE personas
     ADD CONSTRAINT uc_personas_name UNIQUE (name);
 
-ALTER TABLE questions
-    ADD CONSTRAINT uc_questions_order_index UNIQUE (order_index);
-
-ALTER TABLE questions
-    ADD CONSTRAINT uc_questions_question_audio_file UNIQUE (question_audio_file_id);
-
 ALTER TABLE roles
     ADD CONSTRAINT uc_roles_role_name UNIQUE (role_name);
+
+ALTER TABLE speaking_questions
+    ADD CONSTRAINT uc_speaking_questions_question_audio_file UNIQUE (question_audio_file_id);
 
 ALTER TABLE speech_assessments
     ADD CONSTRAINT uc_speech_assessments_answer_history UNIQUE (answer_history_id);
@@ -375,8 +472,8 @@ ALTER TABLE speech_assessments
 ALTER TABLE topics
     ADD CONSTRAINT uc_topics_cover_image_file UNIQUE (cover_image_file_id);
 
-ALTER TABLE topics
-    ADD CONSTRAINT uc_topics_order_index UNIQUE (order_index);
+ALTER TABLE user_learning_progresses
+    ADD CONSTRAINT uc_user_learning_progresses_user UNIQUE (user_id);
 
 ALTER TABLE users
     ADD CONSTRAINT uc_users_email UNIQUE (email);
@@ -394,7 +491,7 @@ ALTER TABLE answer_histories
     ADD CONSTRAINT FK_ANSWER_HISTORIES_ON_AUDIO_FILE FOREIGN KEY (audio_file_id) REFERENCES files (id);
 
 ALTER TABLE answer_histories
-    ADD CONSTRAINT FK_ANSWER_HISTORIES_ON_QUESTION FOREIGN KEY (question_id) REFERENCES questions (id);
+    ADD CONSTRAINT FK_ANSWER_HISTORIES_ON_SPEAKING_QUESTION FOREIGN KEY (speaking_question_id) REFERENCES speaking_questions (id);
 
 ALTER TABLE answer_histories
     ADD CONSTRAINT FK_ANSWER_HISTORIES_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
@@ -406,7 +503,7 @@ ALTER TABLE comments
     ADD CONSTRAINT FK_COMMENTS_ON_PARENT FOREIGN KEY (parent_id) REFERENCES comments (id);
 
 ALTER TABLE comments
-    ADD CONSTRAINT FK_COMMENTS_ON_QUESTION FOREIGN KEY (question_id) REFERENCES questions (id);
+    ADD CONSTRAINT FK_COMMENTS_ON_SPEAKING_QUESTION FOREIGN KEY (speaking_question_id) REFERENCES speaking_questions (id);
 
 ALTER TABLE comments
     ADD CONSTRAINT FK_COMMENTS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
@@ -418,10 +515,25 @@ ALTER TABLE files
     ADD CONSTRAINT FK_FILES_ON_COMMENT FOREIGN KEY (comment_id) REFERENCES comments (id);
 
 ALTER TABLE files
-    ADD CONSTRAINT FK_FILES_ON_QUESTION FOREIGN KEY (question_id) REFERENCES questions (id);
+    ADD CONSTRAINT FK_FILES_ON_QUESTION FOREIGN KEY (question_id) REFERENCES speaking_questions (id);
 
 ALTER TABLE files
     ADD CONSTRAINT FK_FILES_ON_REPORT FOREIGN KEY (report_id) REFERENCES reports (id);
+
+ALTER TABLE leagues
+    ADD CONSTRAINT FK_LEAGUES_ON_ICON_FILE FOREIGN KEY (icon_file_id) REFERENCES files (id);
+
+ALTER TABLE learning_path_nodes
+    ADD CONSTRAINT FK_LEARNING_PATH_NODES_ON_CHEST FOREIGN KEY (chest_id) REFERENCES chests (id);
+
+ALTER TABLE learning_path_nodes
+    ADD CONSTRAINT FK_LEARNING_PATH_NODES_ON_OBJECTIVE FOREIGN KEY (objective_id) REFERENCES objectives (id);
+
+ALTER TABLE learning_path_nodes
+    ADD CONSTRAINT FK_LEARNING_PATH_NODES_ON_SPEAKING_QUESTION FOREIGN KEY (speaking_question_id) REFERENCES speaking_questions (id);
+
+ALTER TABLE learning_path_nodes
+    ADD CONSTRAINT FK_LEARNING_PATH_NODES_ON_VOCABULARY_QUESTION FOREIGN KEY (vocabulary_question_id) REFERENCES vocabulary_questions (id);
 
 ALTER TABLE lessons
     ADD CONSTRAINT FK_LESSONS_ON_TOPIC FOREIGN KEY (topic_id) REFERENCES topics (id);
@@ -436,13 +548,16 @@ ALTER TABLE personas
     ADD CONSTRAINT FK_PERSONAS_ON_SUGGESTED_CONVERSATION_STYLE FOREIGN KEY (suggested_conversation_style_id) REFERENCES conversation_styles (id);
 
 ALTER TABLE point_histories
+    ADD CONSTRAINT FK_POINT_HISTORIES_ON_BOOK FOREIGN KEY (book_id) REFERENCES books (id);
+
+ALTER TABLE point_histories
+    ADD CONSTRAINT FK_POINT_HISTORIES_ON_LEARNING_PATH_NODE FOREIGN KEY (learning_path_node_id) REFERENCES learning_path_nodes (id);
+
+ALTER TABLE point_histories
     ADD CONSTRAINT FK_POINT_HISTORIES_ON_LESSON FOREIGN KEY (lesson_id) REFERENCES lessons (id);
 
 ALTER TABLE point_histories
     ADD CONSTRAINT FK_POINT_HISTORIES_ON_OBJECTIVE FOREIGN KEY (objective_id) REFERENCES objectives (id);
-
-ALTER TABLE point_histories
-    ADD CONSTRAINT FK_POINT_HISTORIES_ON_QUESTION FOREIGN KEY (question_id) REFERENCES questions (id);
 
 ALTER TABLE point_histories
     ADD CONSTRAINT FK_POINT_HISTORIES_ON_TOPIC FOREIGN KEY (topic_id) REFERENCES topics (id);
@@ -450,20 +565,11 @@ ALTER TABLE point_histories
 ALTER TABLE point_histories
     ADD CONSTRAINT FK_POINT_HISTORIES_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
-ALTER TABLE questions
-    ADD CONSTRAINT FK_QUESTIONS_ON_OBJECTIVE FOREIGN KEY (objective_id) REFERENCES objectives (id);
-
-ALTER TABLE questions
-    ADD CONSTRAINT FK_QUESTIONS_ON_QUESTION_AUDIO_FILE FOREIGN KEY (question_audio_file_id) REFERENCES files (id);
-
-ALTER TABLE questions
-    ADD CONSTRAINT FK_QUESTIONS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
-
 ALTER TABLE reactions
     ADD CONSTRAINT FK_REACTIONS_ON_COMMENT FOREIGN KEY (comment_id) REFERENCES comments (id);
 
 ALTER TABLE reactions
-    ADD CONSTRAINT FK_REACTIONS_ON_QUESTION FOREIGN KEY (question_id) REFERENCES questions (id);
+    ADD CONSTRAINT FK_REACTIONS_ON_SPEAKING_QUESTION FOREIGN KEY (speaking_question_id) REFERENCES speaking_questions (id);
 
 ALTER TABLE reactions
     ADD CONSTRAINT FK_REACTIONS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
@@ -472,10 +578,16 @@ ALTER TABLE reports
     ADD CONSTRAINT FK_REPORTS_ON_COMMENT FOREIGN KEY (comment_id) REFERENCES comments (id);
 
 ALTER TABLE reports
-    ADD CONSTRAINT FK_REPORTS_ON_QUESTION FOREIGN KEY (question_id) REFERENCES questions (id);
+    ADD CONSTRAINT FK_REPORTS_ON_SPEAKING_QUESTION FOREIGN KEY (speaking_question_id) REFERENCES speaking_questions (id);
 
 ALTER TABLE reports
     ADD CONSTRAINT FK_REPORTS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+
+ALTER TABLE speaking_questions
+    ADD CONSTRAINT FK_SPEAKING_QUESTIONS_ON_QUESTION_AUDIO_FILE FOREIGN KEY (question_audio_file_id) REFERENCES files (id);
+
+ALTER TABLE speaking_questions
+    ADD CONSTRAINT FK_SPEAKING_QUESTIONS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
 ALTER TABLE speech_assessments
     ADD CONSTRAINT FK_SPEECH_ASSESSMENTS_ON_ANSWER_HISTORY FOREIGN KEY (answer_history_id) REFERENCES answer_histories (id);
@@ -492,29 +604,50 @@ ALTER TABLE topics
 ALTER TABLE users
     ADD CONSTRAINT FK_USERS_ON_POINT_SUMMARY FOREIGN KEY (point_summary_id) REFERENCES point_summary (id);
 
+ALTER TABLE user_learning_progresses
+    ADD CONSTRAINT FK_USER_LEARNING_PROGRESSES_ON_LEARNING_PATH_NODE FOREIGN KEY (learning_path_node_id) REFERENCES learning_path_nodes (id);
+
+ALTER TABLE user_learning_progresses
+    ADD CONSTRAINT FK_USER_LEARNING_PROGRESSES_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+
+ALTER TABLE user_node_progresses
+    ADD CONSTRAINT FK_USER_NODE_PROGRESSES_ON_LEARNING_PATH_NODE FOREIGN KEY (learning_path_node_id) REFERENCES learning_path_nodes (id);
+
+ALTER TABLE user_node_progresses
+    ADD CONSTRAINT FK_USER_NODE_PROGRESSES_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+
+ALTER TABLE user_season_points
+    ADD CONSTRAINT FK_USER_SEASON_POINTS_ON_LEAGUE FOREIGN KEY (league_id) REFERENCES leagues (id);
+
+ALTER TABLE user_season_points
+    ADD CONSTRAINT FK_USER_SEASON_POINTS_ON_SEASON FOREIGN KEY (season_id) REFERENCES seasons (id);
+
+ALTER TABLE user_season_points
+    ADD CONSTRAINT FK_USER_SEASON_POINTS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+
 ALTER TABLE user_sessions
     ADD CONSTRAINT FK_USER_SESSIONS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
 ALTER TABLE word_assessments
     ADD CONSTRAINT FK_WORD_ASSESSMENTS_ON_SPEECH_ASSESSMENT FOREIGN KEY (speech_assessment_id) REFERENCES speech_assessments (id);
 
-ALTER TABLE questions_grammars
-    ADD CONSTRAINT fk_quegra_on_grammar_entity FOREIGN KEY (grammar_id) REFERENCES grammars (id);
-
-ALTER TABLE questions_grammars
-    ADD CONSTRAINT fk_quegra_on_question_entity FOREIGN KEY (question_id) REFERENCES questions (id);
-
-ALTER TABLE questions_vocabularies
-    ADD CONSTRAINT fk_quevoc_on_question_entity FOREIGN KEY (question_id) REFERENCES questions (id);
-
-ALTER TABLE questions_vocabularies
-    ADD CONSTRAINT fk_quevoc_on_vocabulary_entity FOREIGN KEY (vocabulary_id) REFERENCES vocabularies (id);
-
 ALTER TABLE roles_permissions
     ADD CONSTRAINT fk_rolper_on_permission_entity FOREIGN KEY (permission_id) REFERENCES permissions (id);
 
 ALTER TABLE roles_permissions
     ADD CONSTRAINT fk_rolper_on_role_entity FOREIGN KEY (role_id) REFERENCES roles (id);
+
+ALTER TABLE speaking_questions_grammars
+    ADD CONSTRAINT fk_spequegra_on_grammar_entity FOREIGN KEY (grammar_id) REFERENCES grammars (id);
+
+ALTER TABLE speaking_questions_grammars
+    ADD CONSTRAINT fk_spequegra_on_speaking_question_entity FOREIGN KEY (speaking_question_id) REFERENCES speaking_questions (id);
+
+ALTER TABLE speaking_questions_vocabularies
+    ADD CONSTRAINT fk_spequevoc_on_speaking_question_entity FOREIGN KEY (speaking_question_id) REFERENCES speaking_questions (id);
+
+ALTER TABLE speaking_questions_vocabularies
+    ADD CONSTRAINT fk_spequevoc_on_vocabulary_entity FOREIGN KEY (vocabulary_id) REFERENCES vocabularies (id);
 
 ALTER TABLE users_roles
     ADD CONSTRAINT fk_userol_on_role_entity FOREIGN KEY (role_id) REFERENCES roles (id);

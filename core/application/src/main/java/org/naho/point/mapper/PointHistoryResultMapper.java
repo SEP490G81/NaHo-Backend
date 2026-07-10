@@ -11,10 +11,11 @@ public class PointHistoryResultMapper {
         return new PointHistoryResult(
                 domain.getId(),
                 domain.getUserId(),
-                domain.getQuestionId(),
+                domain.getLearningPathNodeId(),
                 domain.getObjectiveId(),
                 domain.getLessonId(),
                 domain.getTopicId(),
+                domain.getBookId(),
                 domain.getPoint(),
                 domain.getTransactionType(),
                 domain.getTransactionTime()

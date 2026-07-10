@@ -12,11 +12,11 @@ import org.naho.file.port.in.FileStorageInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.result.FileResult;
 import org.naho.furigana.port.out.FuriganaGenerationPort;
-import org.naho.i18n.message.question.QuestionDetailMessageKey;
+import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
 import org.naho.i18n.message.user.UserDetailMessageKey;
-import org.naho.question.exception.QuestionErrorCode;
-import org.naho.question.model.Question;
-import org.naho.question.port.out.QuestionRepositoryPort;
+import org.naho.question.exception.SpeakingQuestionErrorCode;
+import org.naho.question.model.SpeakingQuestion;
+import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
@@ -47,7 +47,7 @@ import java.util.Map;
 public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
 
     private final UserRepositoryPort userRepositoryPort;
-    private final QuestionRepositoryPort questionRepositoryPort;
+    private final SpeakingQuestionRepositoryPort questionRepositoryPort;
     private final FileStorageInputPort fileStorageInputPort;
     private final FileRepositoryPort fileRepositoryPort;
     private final AnswerHistoryRepositoryPort answerHistoryRepositoryPort;
@@ -64,8 +64,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         User user = userRepositoryPort.findById(command.userId())
                 .orElseThrow(() -> new ApplicationException(UserErrorCode.USER_NOT_FOUND, UserDetailMessageKey.USER_ID_NOT_FOUND));
 
-        Question question = questionRepositoryPort.findById(command.questionId())
-                .orElseThrow(() -> new ApplicationException(QuestionErrorCode.QUESTION_NOT_FOUND, QuestionDetailMessageKey.QUESTION_NOT_FOUND));
+        SpeakingQuestion speakingQuestion = questionRepositoryPort.findById(command.questionId())
+                .orElseThrow(() -> new ApplicationException(SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND, SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_NOT_FOUND));
 
         FileUploadCommand uploadCommand = new FileUploadCommand(
                 "recordings",
@@ -78,7 +78,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
 
         AnswerHistory answerHistory = AnswerHistory.builder()
                 .userId(user.getId())
-                .questionId(question.getId())
+                .questionId(speakingQuestion.getId())
                 .audioFileId(uploadResult.id())
                 .build();
         answerHistory = answerHistoryRepositoryPort.saveAnswerHistory(answerHistory);
@@ -123,14 +123,11 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         }
 
         Topic topic = null;
-        if (question.getObjectiveId() != null) {
-            topic = topicRepositoryPort.findByObjectiveId(question.getObjectiveId()).orElse(null);
-        }
-        String topicName = topic != null ? topic.getJapaneseName() : "General conversation";
+        String topicName = "General conversation";
 
         String rawLlmFeedback = aiAnalysisPort.analyzeSpeaking(
                 topicName,
-                question.getTitle(),
+                speakingQuestion.getTitle(),
                 azureAssessment.getTranscriptText(),
                 azureWordFeedbackJson
         );
@@ -200,6 +197,15 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 .build();
         answerHistoryRepositoryPort.saveContentAssessment(contentAssessment);
 
+        Double superScore = (speechAssessment.getAccuracyScore() +
+                speechAssessment.getPronunciationScore() +
+                speechAssessment.getCompletenessScore() +
+                speechAssessment.getFluencyScore() +
+                contentAssessment.getGrammarScore() +
+                contentAssessment.getVocabularyScore()) / 6;
+
+        System.out.println(superScore);
+        
         return new SpeakingAnalysisResult(answerHistory.getId(), overallScore);
     }
 
@@ -209,25 +215,25 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
 
         AnswerHistory history = answerHistoryRepositoryPort.findAnswerHistoryById(historyId)
                 .orElseThrow(() -> new ApplicationException(
-                        QuestionErrorCode.QUESTION_NOT_FOUND,
+                        SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
                         "Answer history not found with id: " + historyId
                 ));
 
-        Question question = questionRepositoryPort.findById(history.getQuestionId())
+        SpeakingQuestion speakingQuestion = questionRepositoryPort.findById(history.getQuestionId())
                 .orElseThrow(() -> new ApplicationException(
-                        QuestionErrorCode.QUESTION_NOT_FOUND,
+                        SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
                         "Question not found with id: " + history.getQuestionId()
                 ));
 
         SpeechAssessment speech = answerHistoryRepositoryPort.findSpeechAssessmentByAnswerHistoryId(historyId)
                 .orElseThrow(() -> new ApplicationException(
-                        QuestionErrorCode.QUESTION_NOT_FOUND,
+                        SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
                         "Speech assessment not found for history id: " + historyId
                 ));
 
         ContentAssessment content = answerHistoryRepositoryPort.findContentAssessmentByAnswerHistoryId(historyId)
                 .orElseThrow(() -> new ApplicationException(
-                        QuestionErrorCode.QUESTION_NOT_FOUND,
+                        SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
                         "Content assessment not found for history id: " + historyId
                 ));
 
@@ -236,7 +242,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             root = objectMapper.readTree(content.getAiFeedback());
         } catch (Exception e) {
             throw new ApplicationException(
-                    QuestionErrorCode.QUESTION_NOT_FOUND,
+                    SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
                     "Corrupted AI feedback data"
             );
         }
@@ -378,12 +384,6 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         String objectKey = fileRepositoryPort.findObjectKeyById(history.getAudioFileId());
 
         Long topicId = null;
-        if (question.getObjectiveId() != null) {
-            Topic topic = topicRepositoryPort.findByObjectiveId(question.getObjectiveId()).orElse(null);
-            if (topic != null) {
-                topicId = topic.getId();
-            }
-        }
 
         return new SpeakingHistoryDetailResult(
                 history.getId(),

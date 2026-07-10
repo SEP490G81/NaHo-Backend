@@ -4,7 +4,7 @@ import org.naho.book.port.out.TopicRepositoryPort;
 import org.naho.file.port.in.FileStorageInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.furigana.port.out.FuriganaGenerationPort;
-import org.naho.question.port.out.QuestionRepositoryPort;
+import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
 import org.naho.speech.llm.adapter.*;
 import org.naho.speech.llm.constant.OpenAiConfigProperties;
@@ -91,7 +91,7 @@ public class ChatConfig {
     @Bean
     public SpeakingAnalysisInputPort speakingAnalysisInputPort(
             UserRepositoryPort userRepositoryPort,
-            QuestionRepositoryPort questionRepositoryPort,
+            SpeakingQuestionRepositoryPort questionRepositoryPort,
             TopicRepositoryPort topicRepositoryPort,
             FileStorageInputPort fileStorageInputPort,
             FileRepositoryPort fileRepositoryPort,

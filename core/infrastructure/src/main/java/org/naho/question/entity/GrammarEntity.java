@@ -31,5 +31,5 @@ public class GrammarEntity extends BaseEntity {
     String explanation;
 
     @ManyToMany(mappedBy = "grammars")
-    List<QuestionEntity> questions;
+    List<SpeakingQuestionEntity> questions;
 }

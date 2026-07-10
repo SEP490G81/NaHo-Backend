@@ -6,6 +6,8 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.file.model.FileEntity;
 import org.naho.shared.persistence.BaseEntity;
+import org.naho.speech.azure.entity.ContentAssessmentEntity;
+import org.naho.speech.azure.entity.SpeechAssessmentEntity;
 import org.naho.user.entity.UserEntity;
 
 @SuperBuilder
@@ -22,10 +24,16 @@ public class AnswerHistoryEntity extends BaseEntity {
     UserEntity user;
 
     @ManyToOne
-    @JoinColumn(name = "question_id", nullable = false)
-    QuestionEntity question;
+    @JoinColumn(name = "speaking_question_id", nullable = false)
+    SpeakingQuestionEntity question;
 
     @OneToOne
     @JoinColumn(name = "audio_file_id", nullable = false)
     FileEntity audioFile;
+
+    @OneToOne(mappedBy = "answerHistory")
+    ContentAssessmentEntity contentAssessment;
+
+    @OneToOne(mappedBy = "answerHistory")
+    SpeechAssessmentEntity speechAssessment;
 }
