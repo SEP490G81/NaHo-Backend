@@ -1,5 +1,6 @@
 package org.naho.question.usecase;
 
+import org.naho.book.util.MarkupParserUtil;
 import org.naho.i18n.message.question.QuestionDetailMessageKey;
 import org.naho.question.command.UpdateQuestionCommand;
 import org.naho.question.exception.QuestionErrorCode;
@@ -8,7 +9,6 @@ import org.naho.question.port.in.UpdateQuestionInputPort;
 import org.naho.question.port.out.QuestionRepositoryPort;
 import org.naho.question.result.UpdateQuestionResult;
 import org.naho.shared.exception.ApplicationException;
-import org.naho.topic.util.MarkupParserUtil;
 
 import java.util.Optional;
 

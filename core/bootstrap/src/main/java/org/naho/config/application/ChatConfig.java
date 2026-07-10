@@ -1,5 +1,6 @@
 package org.naho.config.application;
 
+import org.naho.book.port.out.TopicRepositoryPort;
 import org.naho.file.port.in.FileStorageInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.furigana.port.out.FuriganaGenerationPort;
@@ -16,7 +17,6 @@ import org.naho.speech.llm.usecase.EndSessionUseCase;
 import org.naho.speech.llm.usecase.SpeakingAnalysisUseCase;
 import org.naho.speech.llm.usecase.SpeakingSessionUseCase;
 import org.naho.speech.llm.usecase.SuggestedTopicsUseCase;
-import org.naho.topic.port.out.TopicRepositoryPort;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

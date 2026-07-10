@@ -4,12 +4,12 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import org.naho.book.entity.LessonEntity;
+import org.naho.book.entity.ObjectiveEntity;
+import org.naho.book.entity.TopicEntity;
 import org.naho.point.type.PointTransactionType;
 import org.naho.question.entity.QuestionEntity;
 import org.naho.shared.persistence.BaseEntity;
-import org.naho.topic.entity.LessonEntity;
-import org.naho.topic.entity.ObjectiveEntity;
-import org.naho.topic.entity.TopicEntity;
 import org.naho.user.entity.UserEntity;
 
 import java.time.Instant;

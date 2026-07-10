@@ -321,7 +321,7 @@ class GoogleLoginTest {
                 when(roleRepositoryPort.findByName(RoleName.LEARNER))
                                 .thenReturn(Optional.of(role));
 
-                when(userRepositoryPort.save(any(User.class)))
+                when(userRepositoryPort.createNew(any(User.class)))
                                 .thenReturn(newUser);
 
                 when(tokenServicePort.generateRefreshToken(any(Instant.class)))
@@ -357,7 +357,7 @@ class GoogleLoginTest {
                                 .findByName(RoleName.LEARNER);
 
                 verify(userRepositoryPort, times(1))
-                                .save(argThat(user -> user.getFullName().equals("John Doe") &&
+                                .createNew(argThat(user -> user.getFullName().equals("John Doe") &&
                                                 user.getAvatarUrl().equals("http://image.png") &&
                                                 user.getProviderId().equals("google_sub123") &&
                                                 user.getStatus().equals(UserStatus.ACTIVE) &&

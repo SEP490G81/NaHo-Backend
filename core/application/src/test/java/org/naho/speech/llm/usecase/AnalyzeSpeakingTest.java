@@ -5,6 +5,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.naho.book.model.Topic;
+import org.naho.book.port.out.TopicRepositoryPort;
 import org.naho.file.command.FileUploadCommand;
 import org.naho.file.port.in.FileStorageInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
@@ -23,25 +25,19 @@ import org.naho.speech.llm.port.out.AiAnalysisPort;
 import org.naho.speech.llm.port.out.AnswerHistoryRepositoryPort;
 import org.naho.speech.llm.result.SpeakingAnalysisResult;
 import org.naho.speech.model.AnswerHistory;
-import org.naho.speech.model.ContentAssessment;
 import org.naho.speech.model.SpeechAssessment;
 import org.naho.speech.model.WordAssessment;
 import org.naho.speech.type.SpeechAssessmentErrorType;
-import org.naho.topic.model.Topic;
-import org.naho.topic.port.out.TopicRepositoryPort;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.model.User;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.naho.user.type.UserStatus;
 
-import java.io.ByteArrayInputStream;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
@@ -103,6 +99,7 @@ class AnalyzeSpeakingTest {
                 .objectiveId(3L)
                 .title("Question Title")
                 .description("Question Description")
+                .orderIndex(1.0)
                 .build();
 
         FileResult fileResult = new FileResult(10L, "recordings/key.wav", "recording.wav", "audio/wav", 100L);
@@ -150,6 +147,8 @@ class AnalyzeSpeakingTest {
                 .id(3L)
                 .japaneseName("Topic Japanese")
                 .japaneseDescription("Topic Desc")
+                .bookId(1L)
+                .orderIndex(1.0)
                 .build();
 
         String rawLlmFeedback = "{\"scores\": {\"vocabulary\": 8.0, \"grammar\": 8.0, \"naturalness\": 8.0}, \"userTranscript\": []}";
@@ -175,28 +174,28 @@ class AnalyzeSpeakingTest {
         verify(questionRepositoryPort, times(1)).findById(2L);
         verify(fileStorageInputPort, times(1)).uploadFile(argThat(cmd ->
                 cmd.getFolderName().equals("recordings") &&
-                cmd.getOriginalName().equals("test.wav") &&
-                cmd.getContentType().equals("audio/wav") &&
-                cmd.getSize() == 3
+                        cmd.getOriginalName().equals("test.wav") &&
+                        cmd.getContentType().equals("audio/wav") &&
+                        cmd.getSize() == 3
         ));
         verify(answerHistoryRepositoryPort, times(1)).saveAnswerHistory(argThat(history ->
                 history.getUserId().equals(1L) &&
-                history.getQuestionId().equals(2L) &&
-                history.getAudioFileId().equals(10L)
+                        history.getQuestionId().equals(2L) &&
+                        history.getAudioFileId().equals(10L)
         ));
         verify(azureSpeechServicePort, times(1)).assess(any(SpeechAssessmentCommand.class));
         verify(answerHistoryRepositoryPort, times(1)).saveSpeechAssessment(argThat(assessment ->
                 assessment.getAnswerHistoryId().equals(100L) &&
-                assessment.getTranscriptText().equals("こんにちは") &&
-                assessment.getPronunciationScore().equals(80.0)
+                        assessment.getTranscriptText().equals("こんにちは") &&
+                        assessment.getPronunciationScore().equals(80.0)
         ));
         verify(answerHistoryRepositoryPort, times(1)).saveAllWordAssessment(anyList());
         verify(topicRepositoryPort, times(1)).findByObjectiveId(3L);
         verify(aiAnalysisPort, times(1)).analyzeSpeaking(eq("Topic Japanese"), eq("Question Title"), eq("こんにちは"), anyString());
         verify(answerHistoryRepositoryPort, times(1)).saveContentAssessment(argThat(content ->
                 content.getAnswerHistoryId().equals(100L) &&
-                content.getVocabularyScore().equals(8.0) &&
-                content.getGrammarScore().equals(8.0)
+                        content.getVocabularyScore().equals(8.0) &&
+                        content.getGrammarScore().equals(8.0)
         ));
     }
 
@@ -224,6 +223,7 @@ class AnalyzeSpeakingTest {
                 .objectiveId(null)
                 .title("Question Title")
                 .description("Question Description")
+                .orderIndex(1.0)
                 .build();
 
         FileResult fileResult = new FileResult(10L, "recordings/key.wav", "recording.wav", "audio/wav", 100L);
@@ -308,6 +308,7 @@ class AnalyzeSpeakingTest {
                 .objectiveId(null)
                 .title("Question Title")
                 .description("Question Description")
+                .orderIndex(1.0)
                 .build();
 
         FileResult fileResult = new FileResult(10L, "recordings/key.wav", "recording.wav", "audio/wav", 100L);
@@ -367,9 +368,9 @@ class AnalyzeSpeakingTest {
 
         verify(answerHistoryRepositoryPort, times(1)).saveContentAssessment(argThat(content ->
                 content.getAnswerHistoryId().equals(100L) &&
-                content.getVocabularyScore().equals(0.0) &&
-                content.getGrammarScore().equals(0.0) &&
-                content.getAiFeedback().contains("\"overallScore\":8.0")
+                        content.getVocabularyScore().equals(0.0) &&
+                        content.getGrammarScore().equals(0.0) &&
+                        content.getAiFeedback().contains("\"overallScore\":8.0")
         ));
     }
 

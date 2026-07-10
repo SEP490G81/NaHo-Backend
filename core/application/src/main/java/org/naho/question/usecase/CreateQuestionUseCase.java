@@ -1,7 +1,10 @@
 package org.naho.question.usecase;
 
+import org.naho.book.exception.TopicErrorCode;
+import org.naho.book.port.out.ObjectiveRepositoryPort;
+import org.naho.book.util.MarkupParserUtil;
+import org.naho.i18n.message.book.ObjectiveDetailMessageKey;
 import org.naho.i18n.message.question.QuestionDetailMessageKey;
-import org.naho.i18n.message.topic.TopicDetailMessageKey;
 import org.naho.question.command.CreateQuestionCommand;
 import org.naho.question.exception.QuestionErrorCode;
 import org.naho.question.model.Question;
@@ -10,9 +13,6 @@ import org.naho.question.port.out.QuestionRepositoryPort;
 import org.naho.question.result.CreateQuestionResult;
 import org.naho.question.type.QuestionStatus;
 import org.naho.shared.exception.ApplicationException;
-import org.naho.topic.exception.TopicErrorCode;
-import org.naho.topic.port.out.ObjectiveRepositoryPort;
-import org.naho.topic.util.MarkupParserUtil;
 
 public class CreateQuestionUseCase implements CreateQuestionInputPort {
 
@@ -33,7 +33,7 @@ public class CreateQuestionUseCase implements CreateQuestionInputPort {
             if (!exists) {
                 throw new ApplicationException(
                         TopicErrorCode.OBJECTIVE_NOT_FOUND,
-                        TopicDetailMessageKey.OBJECTIVE_ID_NOT_FOUND,
+                        ObjectiveDetailMessageKey.OBJECTIVE_ID_NOT_FOUND,
                         command.objectiveId()
                 );
             }
@@ -65,7 +65,7 @@ public class CreateQuestionUseCase implements CreateQuestionInputPort {
             throw new ApplicationException(
                     QuestionErrorCode.QUESTION_ORDER_INDEX_INVALID,
                     QuestionDetailMessageKey.QUESTION_ORDER_INDEX_INVALID
-                );
+            );
         }
 
         // 4. Determine initial status based on Creator Role

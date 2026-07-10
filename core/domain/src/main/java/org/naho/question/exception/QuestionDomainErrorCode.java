@@ -5,7 +5,8 @@ import org.naho.shared.exception.ErrorCode;
 
 public enum QuestionDomainErrorCode implements ErrorCode {
     QUESTION_TITLE_EMPTY("QST_D001", QuestionTitleMessageKey.QUESTION_CREATION_FAILED_TITLE, 400),
-    QUESTION_DESCRIPTION_EMPTY("QST_D002", QuestionTitleMessageKey.QUESTION_CREATION_FAILED_TITLE, 400);
+    QUESTION_DESCRIPTION_EMPTY("QST_D002", QuestionTitleMessageKey.QUESTION_CREATION_FAILED_TITLE, 400),
+    QUESTION_ORDER_INDEX_EMPTY("QST_D003", QuestionTitleMessageKey.QUESTION_CREATION_FAILED_TITLE, 400);
 
     private final String code;
     private final String titleKey;

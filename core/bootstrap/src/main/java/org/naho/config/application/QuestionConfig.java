@@ -7,7 +7,6 @@ import org.naho.question.usecase.*;
 import org.naho.shared.port.out.EventPublisherPort;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.speech.llm.port.out.AiChatPort;
-import org.naho.topic.adapter.TopicRepositoryAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -23,7 +22,7 @@ public class QuestionConfig {
 
     @Bean
     public CreateQuestionInputPort createQuestionInputPort(QuestionRepositoryAdapter questionRepositoryAdapter,
-                                                           org.naho.topic.adapter.ObjectiveRepositoryAdapter objectiveRepositoryAdapter) {
+                                                           org.naho.book.adapter.ObjectiveRepositoryAdapter objectiveRepositoryAdapter) {
         return new CreateQuestionUseCase(questionRepositoryAdapter, objectiveRepositoryAdapter);
     }
 

@@ -9,6 +9,20 @@ CREATE TABLE answer_histories
     CONSTRAINT pk_answer_histories PRIMARY KEY (id)
 );
 
+CREATE TABLE books
+(
+    id                  BIGINT AUTO_INCREMENT NOT NULL,
+    created_time        datetime              NOT NULL,
+    modified_time       datetime              NULL,
+    title               VARCHAR(255)          NOT NULL,
+    `description`       TEXT                  NULL,
+    jlpt_level          VARCHAR(255)          NULL,
+    cefr_level          VARCHAR(255)          NULL,
+    order_index         DOUBLE                NOT NULL,
+    cover_image_file_id BIGINT                NULL,
+    CONSTRAINT pk_books PRIMARY KEY (id)
+);
+
 CREATE TABLE comments
 (
     id            BIGINT AUTO_INCREMENT NOT NULL,
@@ -81,7 +95,7 @@ CREATE TABLE lessons
     japanese_name_markup        TEXT                  NULL,
     japanese_description_markup TEXT                  NULL,
     status                      VARCHAR(50)           NULL,
-    order_index                 DOUBLE                NULL,
+    order_index                 DOUBLE                NOT NULL,
     topic_id                    BIGINT                NULL,
     CONSTRAINT pk_lessons PRIMARY KEY (id)
 );
@@ -96,7 +110,7 @@ CREATE TABLE objectives
     japanese_name_markup        TEXT                  NULL,
     japanese_description_markup TEXT                  NULL,
     status                      VARCHAR(50)           NULL,
-    order_index                 DOUBLE                NULL,
+    order_index                 DOUBLE                NOT NULL,
     lesson_id                   BIGINT                NULL,
     CONSTRAINT pk_objectives PRIMARY KEY (id)
 );
@@ -157,7 +171,7 @@ CREATE TABLE questions
     title_markup           VARCHAR(255)          NOT NULL,
     `description`          TEXT                  NULL,
     description_markup     TEXT                  NULL,
-    order_index            DOUBLE                NULL,
+    order_index            DOUBLE                NOT NULL,
     status                 VARCHAR(50)           NULL,
     question_audio_file_id BIGINT                NULL,
     objective_id           BIGINT                NULL,
@@ -245,10 +259,10 @@ CREATE TABLE topics
     japanese_name_markup        TEXT                  NULL,
     japanese_description_markup TEXT                  NULL,
     status                      VARCHAR(50)           NULL,
-    jlpt_level                  VARCHAR(2)            NULL,
-    order_index                 DOUBLE                NULL,
+    order_index                 DOUBLE                NOT NULL,
     cover_image_file_id         BIGINT                NULL,
     user_id                     BIGINT                NULL,
+    book_id                     BIGINT                NULL,
     CONSTRAINT pk_topics PRIMARY KEY (id)
 );
 
@@ -322,8 +336,20 @@ CREATE TABLE word_assessments
 ALTER TABLE answer_histories
     ADD CONSTRAINT uc_answer_histories_audio_file UNIQUE (audio_file_id);
 
+ALTER TABLE books
+    ADD CONSTRAINT uc_books_cover_image_file UNIQUE (cover_image_file_id);
+
+ALTER TABLE books
+    ADD CONSTRAINT uc_books_order_index UNIQUE (order_index);
+
 ALTER TABLE content_assessments
     ADD CONSTRAINT uc_content_assessments_answer_history UNIQUE (answer_history_id);
+
+ALTER TABLE lessons
+    ADD CONSTRAINT uc_lessons_order_index UNIQUE (order_index);
+
+ALTER TABLE objectives
+    ADD CONSTRAINT uc_objectives_order_index UNIQUE (order_index);
 
 ALTER TABLE permissions
     ADD CONSTRAINT uc_permissions_permission_code UNIQUE (permission_code);
@@ -333,6 +359,9 @@ ALTER TABLE personas
 
 ALTER TABLE personas
     ADD CONSTRAINT uc_personas_name UNIQUE (name);
+
+ALTER TABLE questions
+    ADD CONSTRAINT uc_questions_order_index UNIQUE (order_index);
 
 ALTER TABLE questions
     ADD CONSTRAINT uc_questions_question_audio_file UNIQUE (question_audio_file_id);
@@ -345,6 +374,9 @@ ALTER TABLE speech_assessments
 
 ALTER TABLE topics
     ADD CONSTRAINT uc_topics_cover_image_file UNIQUE (cover_image_file_id);
+
+ALTER TABLE topics
+    ADD CONSTRAINT uc_topics_order_index UNIQUE (order_index);
 
 ALTER TABLE users
     ADD CONSTRAINT uc_users_email UNIQUE (email);
@@ -366,6 +398,9 @@ ALTER TABLE answer_histories
 
 ALTER TABLE answer_histories
     ADD CONSTRAINT FK_ANSWER_HISTORIES_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+
+ALTER TABLE books
+    ADD CONSTRAINT FK_BOOKS_ON_COVER_IMAGE_FILE FOREIGN KEY (cover_image_file_id) REFERENCES files (id);
 
 ALTER TABLE comments
     ADD CONSTRAINT FK_COMMENTS_ON_PARENT FOREIGN KEY (parent_id) REFERENCES comments (id);
@@ -444,6 +479,9 @@ ALTER TABLE reports
 
 ALTER TABLE speech_assessments
     ADD CONSTRAINT FK_SPEECH_ASSESSMENTS_ON_ANSWER_HISTORY FOREIGN KEY (answer_history_id) REFERENCES answer_histories (id);
+
+ALTER TABLE topics
+    ADD CONSTRAINT FK_TOPICS_ON_BOOK FOREIGN KEY (book_id) REFERENCES books (id);
 
 ALTER TABLE topics
     ADD CONSTRAINT FK_TOPICS_ON_COVER_IMAGE_FILE FOREIGN KEY (cover_image_file_id) REFERENCES files (id);

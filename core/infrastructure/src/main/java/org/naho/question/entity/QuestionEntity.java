@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import org.naho.book.entity.ObjectiveEntity;
 import org.naho.file.model.FileEntity;
 import org.naho.point.entity.PointHistoryEntity;
 import org.naho.question.type.QuestionStatus;
@@ -11,7 +12,6 @@ import org.naho.shared.persistence.BaseEntity;
 import org.naho.social.entity.CommentEntity;
 import org.naho.social.entity.ReactionEntity;
 import org.naho.social.report.entity.ReportEntity;
-import org.naho.topic.entity.ObjectiveEntity;
 import org.naho.user.entity.UserEntity;
 
 import java.util.List;
@@ -37,7 +37,7 @@ public class QuestionEntity extends BaseEntity {
     @Column(name = "description_markup", columnDefinition = "TEXT")
     String descriptionMarkup;
 
-    @Column(name = "order_index")
+    @Column(name = "order_index", nullable = false, unique = true)
     Double orderIndex;
 
     @Column(length = 50)
