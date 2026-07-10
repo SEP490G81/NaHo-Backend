@@ -1,0 +1,60 @@
+package org.naho.book.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
+import org.naho.book.type.TopicStatus;
+import org.naho.file.model.FileEntity;
+import org.naho.point.entity.PointHistoryEntity;
+import org.naho.shared.persistence.BaseEntity;
+import org.naho.user.entity.UserEntity;
+
+import java.util.List;
+
+@SuperBuilder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "topics")
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class TopicEntity extends BaseEntity {
+    @Column(name = "japanese_name")
+    String japaneseName;
+
+    @Column(name = "japanese_description")
+    String japaneseDescription;
+
+    @Column(name = "japanese_name_markup", columnDefinition = "TEXT")
+    String japaneseNameMarkup;
+
+    @Column(name = "japanese_description_markup", columnDefinition = "TEXT")
+    String japaneseDescriptionMarkup;
+
+    @Column(length = 50)
+    @Enumerated(EnumType.STRING)
+    TopicStatus status;
+
+    @Column(name = "order_index", nullable = false, unique = true)
+    Double orderIndex;
+
+    @OneToOne
+    @JoinColumn(name = "cover_image_file_id")
+    FileEntity coverImageFile;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    UserEntity user;
+
+    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<LessonEntity> lessons;
+
+    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<PointHistoryEntity> pointHistories;
+
+    @ManyToOne
+    @JoinColumn(name = "book_id")
+    BookEntity book;
+}

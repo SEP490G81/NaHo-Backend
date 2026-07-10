@@ -1,0 +1,35 @@
+package org.naho.book.adapter;
+
+import lombok.RequiredArgsConstructor;
+import org.naho.book.model.Objective;
+import org.naho.book.port.out.ObjectiveRepositoryPort;
+import org.naho.book.repository.ObjectiveJpaRepository;
+import org.springframework.stereotype.Component;
+
+import java.util.Optional;
+
+@Component
+@RequiredArgsConstructor
+public class ObjectiveRepositoryAdapter implements ObjectiveRepositoryPort {
+
+    private final ObjectiveJpaRepository objectiveJpaRepository;
+
+    @Override
+    public boolean existsById(Long id) {
+        return objectiveJpaRepository.existsById(id);
+    }
+
+    @Override
+    public Optional<Objective> findById(Long id) {
+        return objectiveJpaRepository.findById(id).map(entity -> Objective.builder()
+                .id(entity.getId())
+                .lessonId(entity.getLesson() != null ? entity.getLesson().getId() : null)
+                .japaneseName(entity.getJapaneseName())
+                .japaneseDescription(entity.getJapaneseDescription())
+                .japaneseNameMarkup(entity.getJapaneseNameMarkup())
+                .japaneseDescriptionMarkup(entity.getJapaneseDescriptionMarkup())
+                .status(entity.getStatus())
+                .orderIndex(entity.getOrderIndex())
+                .build());
+    }
+}

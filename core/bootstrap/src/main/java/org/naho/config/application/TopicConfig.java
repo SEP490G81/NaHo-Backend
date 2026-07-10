@@ -1,11 +1,11 @@
 package org.naho.config.application;
 
+import org.naho.book.adapter.TopicListRepositoryAdapter;
+import org.naho.book.adapter.TopicRepositoryAdapter;
+import org.naho.book.port.in.*;
+import org.naho.book.usecase.*;
 import org.naho.question.port.out.QuestionRepositoryPort;
 import org.naho.shared.port.out.TransactionPort;
-import org.naho.topic.adapter.TopicListRepositoryAdapter;
-import org.naho.topic.adapter.TopicRepositoryAdapter;
-import org.naho.topic.port.in.*;
-import org.naho.topic.usecase.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

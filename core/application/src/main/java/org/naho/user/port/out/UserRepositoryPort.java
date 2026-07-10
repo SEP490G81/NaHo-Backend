@@ -20,6 +20,8 @@ public interface UserRepositoryPort {
 
     User save(User user);
 
+    User createNew(User user);
+
     Optional<User> findById(Long id);
 
     List<User> getListUser();

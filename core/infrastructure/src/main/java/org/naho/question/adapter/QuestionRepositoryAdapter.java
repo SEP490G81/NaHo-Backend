@@ -1,12 +1,12 @@
 package org.naho.question.adapter;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.book.repository.ObjectiveJpaRepository;
 import org.naho.file.repository.FileJpaRepository;
 import org.naho.question.model.Question;
 import org.naho.question.port.out.QuestionRepositoryPort;
 import org.naho.question.repository.QuestionJpaRepository;
 import org.naho.question.type.QuestionStatus;
-import org.naho.topic.repository.ObjectiveJpaRepository;
 import org.naho.user.repository.UserJpaRepository;
 import org.springframework.stereotype.Component;
 

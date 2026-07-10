@@ -14,6 +14,7 @@ public class User {
     private final Long id;
     private final List<Long> roleIds;
     private final List<Long> userSessionIds;
+    private Long pointSummaryId;
 
     private final Username username;
     private final Email email;
@@ -39,6 +40,7 @@ public class User {
         this.avatarUrl = builder.avatarUrl;
         this.roleIds = builder.roleIds;
         this.userSessionIds = builder.userSessionIds;
+        this.pointSummaryId = builder.pointSummaryId;
         this.username = builder.username;
         this.email = builder.email;
         this.hashPassword = builder.hashPassword;
@@ -83,6 +85,10 @@ public class User {
         this.providerId = providerId;
     }
 
+    public void setPointSummaryId(Long pointSummaryId) {
+        this.pointSummaryId = pointSummaryId;
+    }
+
     // Getters
     public Long getId() {
         return id;
@@ -98,6 +104,10 @@ public class User {
 
     public List<Long> getUserSessionIds() {
         return userSessionIds;
+    }
+
+    public Long getPointSummaryId() {
+        return pointSummaryId;
     }
 
     public Username getUsername() {
@@ -154,6 +164,7 @@ public class User {
         private Long id;
         private List<Long> roleIds;
         private List<Long> userSessionIds;
+        private Long pointSummaryId;
 
         private Username username;
         private Email email;
@@ -189,6 +200,11 @@ public class User {
 
         public Builder userSessionIds(List<Long> userSessionIds) {
             this.userSessionIds = userSessionIds;
+            return this;
+        }
+
+        public Builder pointSummaryId(Long pointSummaryId) {
+            this.pointSummaryId = pointSummaryId;
             return this;
         }
 

@@ -18,6 +18,8 @@ public final class QuestionDetailMessageKey {
             "question.description.empty";
     public static final String QUESTION_ORDER_INDEX_INVALID =
             "question.order_index.invalid";
+    public static final String QUESTION_ORDER_INDEX_EMPTY =
+            "question.order_index.empty";
     private QuestionDetailMessageKey() {
     }
 }

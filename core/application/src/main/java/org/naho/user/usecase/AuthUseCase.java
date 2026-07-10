@@ -126,7 +126,7 @@ public class AuthUseCase implements AuthInputPort {
                         .providerId(providerId)
                         .build();
 
-                currentUser = userRepositoryPort.save(newUser);
+                currentUser = userRepositoryPort.createNew(newUser);
             } else {
                 // if user is found by email, update providerId
                 emailUser.setProviderId(providerId);
@@ -172,7 +172,7 @@ public class AuthUseCase implements AuthInputPort {
                 savedUserSession.getId(),
                 SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
         ));
-        
+
         return new LoginResult(
                 accessToken,
                 refreshToken

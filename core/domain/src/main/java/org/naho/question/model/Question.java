@@ -59,6 +59,15 @@ public class Question {
         }
     }
 
+    private void validateOrderIndex(Double orderIndex) {
+        if (orderIndex == null) {
+            throw new DomainException(
+                    QuestionDomainErrorCode.QUESTION_ORDER_INDEX_EMPTY,
+                    QuestionDetailMessageKey.QUESTION_ORDER_INDEX_EMPTY
+            );
+        }
+    }
+
     public void update(String title,
                        String description,
                        String titleMarkup,
@@ -67,6 +76,7 @@ public class Question {
                        Long questionAudioFileId) {
         validateTitle(title);
         validateDescription(description);
+        validateOrderIndex(orderIndex);
 
         this.title = title;
         this.description = description;
@@ -208,6 +218,7 @@ public class Question {
             Question question = new Question(this);
             question.validateTitle(question.getTitle());
             question.validateDescription(question.getDescription());
+            question.validateOrderIndex(question.getOrderIndex());
             return question;
         }
     }
