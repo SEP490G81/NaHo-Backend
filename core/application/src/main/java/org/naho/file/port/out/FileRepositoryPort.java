@@ -14,4 +14,6 @@ public interface FileRepositoryPort {
     File findById(Long id);
 
     List<File> findAllByLeagueIds(List<Long> leagueIds);
+
+    List<File> findAllByBookIds(List<Long> ids);
 }

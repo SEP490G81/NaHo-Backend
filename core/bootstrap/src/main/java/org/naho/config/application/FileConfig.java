@@ -1,6 +1,7 @@
 package org.naho.config.application;
 
 import org.naho.file.mapper.FileResultMapper;
+import org.naho.file.port.in.CrudFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.file.usecase.CrudFileUseCase;
@@ -29,7 +30,7 @@ public class FileConfig {
     }
 
     @Bean
-    public CrudFileUseCase crudFileInputPort(
+    public CrudFileInputPort crudFileInputPort(
             FileRepositoryPort fileRepositoryPort,
             FileResultMapper fileResultMapper
     ) {

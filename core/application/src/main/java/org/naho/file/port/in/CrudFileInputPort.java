@@ -8,4 +8,6 @@ public interface CrudFileInputPort {
     FileResult findById(Long id);
 
     List<FileResult> findAllByLeagueIds(List<Long> leagueIds);
+
+    List<FileResult> findAllByBookIds(List<Long> ids);
 }
