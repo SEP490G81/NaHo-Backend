@@ -1,9 +1,12 @@
 package org.naho.config.application;
 
+import org.naho.question.port.in.SearchVocabulariesOfQuestionInputPort;
 import org.naho.question.port.out.VocabulariesQuestionPort;
+import org.naho.question.usecase.SearchVocabulariesOfQuestionUsecase;
 import org.naho.vocabulary.port.in.GetVocabulariesOfObjectiveInputPort;
 import org.naho.vocabulary.port.out.ExcelParserPort;
 import org.naho.vocabulary.port.out.SaveVocabularyPort;
+import org.naho.vocabulary.port.out.VocabularyPort;
 import org.naho.vocabulary.service.ImportVocabularyService;
 import org.naho.vocabulary.usecase.GetVocabulariesOfObjectiveUseCase;
 import org.naho.vocabulary.usecase.ImportVocabularyUseCase;
@@ -28,5 +31,12 @@ public class VocabularyConfig {
             VocabulariesQuestionPort vocabulariesQuestionPort
     ) {
         return new GetVocabulariesOfObjectiveUseCase(vocabulariesQuestionPort);
+    }
+
+    @Bean
+    public SearchVocabulariesOfQuestionInputPort searchVocabulariesOfQuestionInputPort(
+            VocabularyPort vocabularyPort
+    ) {
+        return new SearchVocabulariesOfQuestionUsecase(vocabularyPort);
     }
 }
