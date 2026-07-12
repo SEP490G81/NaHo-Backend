@@ -44,11 +44,11 @@ public class CreateSpeakingQuestionUseCase implements CreateSpeakingQuestionInpu
         return new CreateSpeakingQuestionResult(
                 savedSpeakingQuestion.getId(),
                 savedSpeakingQuestion.getUserId(),
+                savedSpeakingQuestion.getQuestionAudioFileId(),
                 savedSpeakingQuestion.getTitle(),
                 savedSpeakingQuestion.getTitleMarkup(),
                 savedSpeakingQuestion.getDescription(),
                 savedSpeakingQuestion.getDescriptionMarkup(),
-                savedSpeakingQuestion.getStatus()
-        );
+                savedSpeakingQuestion.getStatus());
     }
 }

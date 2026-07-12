@@ -3,6 +3,7 @@ package org.naho.question.port.out;
 import org.naho.question.model.SpeakingQuestion;
 import org.naho.question.type.QuestionStatus;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface SpeakingQuestionRepositoryPort {
@@ -20,6 +21,5 @@ public interface SpeakingQuestionRepositoryPort {
 
     void deleteById(Long id);
 
-
-
+    List<SpeakingQuestion> findByObjectiveId(Long objectiveId);
 }

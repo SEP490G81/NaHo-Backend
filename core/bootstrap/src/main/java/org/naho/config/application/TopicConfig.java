@@ -1,5 +1,6 @@
 package org.naho.config.application;
 
+import org.naho.book.adapter.LessonRepositoryAdapter;
 import org.naho.book.adapter.TopicListRepositoryAdapter;
 import org.naho.book.adapter.TopicRepositoryAdapter;
 import org.naho.book.port.in.*;
@@ -19,12 +20,12 @@ public class TopicConfig {
 
     @Bean
     public ListTopicInputPort listTopicUseCasePort(TopicListRepositoryAdapter topicListRepositoryAdapter) {
-        return new ListTopicUsecase(topicListRepositoryAdapter);
+        return new ListTopicUseCase(topicListRepositoryAdapter);
     }
 
     @Bean
-    public GetTopicDetailInputPort getTopicDetailInputPort(TopicRepositoryAdapter topicRepositoryAdapter) {
-        return new GetTopicDetailUseCase(topicRepositoryAdapter);
+    public GetTopicDetailInputPort getTopicDetailInputPort(TopicRepositoryAdapter topicRepositoryAdapter, LessonRepositoryAdapter lessonRepositoryAdapter) {
+        return new GetTopicDetailUseCase(topicRepositoryAdapter, lessonRepositoryAdapter);
     }
 
     @Bean
