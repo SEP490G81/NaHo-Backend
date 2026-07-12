@@ -8,6 +8,7 @@ import org.naho.book.mapper.LessonEntityMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -21,4 +22,10 @@ public class LessonRepositoryAdapter implements LessonRepositoryPort {
                 .map(lessonEntityMapper::entityToDomain)
                 .toList();
     }
+
+    @Override
+    public Optional<Lesson> findById(Long id) {
+        return lessonJpaRepository.findById(id).map(lessonEntityMapper::entityToDomain);
+    }
+
 }

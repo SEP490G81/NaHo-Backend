@@ -1,6 +1,5 @@
 package org.naho.book.adapter;
 
-import org.naho.book.entity.BookEntity;
 import org.naho.book.model.Book;
 import org.naho.book.port.out.BookRepositoryPort;
 import org.naho.book.repository.BookJpaRepository;
@@ -17,7 +16,7 @@ public class BookRepositoryAdapter implements BookRepositoryPort {
     private final BookEntityMapper bookEntityMapper;
 
     public BookRepositoryAdapter(BookJpaRepository bookJpaRepository,
-                                  BookEntityMapper bookEntityMapper) {
+            BookEntityMapper bookEntityMapper) {
         this.bookJpaRepository = bookJpaRepository;
         this.bookEntityMapper = bookEntityMapper;
     }
