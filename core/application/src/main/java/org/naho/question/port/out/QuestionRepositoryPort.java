@@ -3,6 +3,7 @@ package org.naho.question.port.out;
 import org.naho.question.model.Question;
 import org.naho.question.type.QuestionStatus;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface QuestionRepositoryPort {
@@ -25,5 +26,7 @@ public interface QuestionRepositoryPort {
     boolean existsByObjectiveIdAndTitle(Long objectiveId, String title);
 
     boolean existsByObjectiveIdAndTitleExcludeId(Long objectiveId, String title, Long id);
+
+    List<Question> findByObjectiveId(Long objectiveId);
 }
 

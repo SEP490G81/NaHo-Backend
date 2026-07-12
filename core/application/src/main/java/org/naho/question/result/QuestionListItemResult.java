@@ -4,8 +4,8 @@ import org.naho.question.type.QuestionStatus;
 
 public record QuestionListItemResult(
         Long id,
-        Long objectiveId,
         Long userId,
+        Long questionAudioFileId,
         String title,
         String titleMarkup,
         String description,

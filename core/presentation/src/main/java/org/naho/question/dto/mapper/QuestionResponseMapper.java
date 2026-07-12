@@ -17,7 +17,6 @@ public interface QuestionResponseMapper {
 
     QuestionDetailResponse updateResultToDetailResponse(UpdateQuestionResult result);
 
-    @Mapping(target = "createdTime", ignore = true)
     QuestionListItemResponse listResultToResponse(QuestionListItemResult item);
 
     List<QuestionListItemResponse> listResultToResponse(List<QuestionListItemResult> items);

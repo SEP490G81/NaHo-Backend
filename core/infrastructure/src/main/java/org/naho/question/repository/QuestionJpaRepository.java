@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface QuestionJpaRepository extends JpaRepository<QuestionEntity, Long> {
 
     @Query("SELECT CASE WHEN COUNT(ah) > 0 THEN true ELSE false END FROM AnswerHistoryEntity ah WHERE ah.question.objective.lesson.topic.id = :topicId")
@@ -29,4 +31,6 @@ public interface QuestionJpaRepository extends JpaRepository<QuestionEntity, Lon
     boolean existsByObjectiveIdAndTitle(Long objectiveId, String title);
 
     boolean existsByObjectiveIdAndTitleAndIdNot(Long objectiveId, String title, Long id);
+
+    List<QuestionEntity> findByObjectiveId(Long objectiveId);
 }

@@ -10,6 +10,7 @@ import org.naho.question.type.QuestionStatus;
 import org.naho.user.repository.UserJpaRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -118,5 +119,22 @@ public class QuestionRepositoryAdapter implements QuestionRepositoryPort {
                 .orderIndex(entity.getOrderIndex())
                 .status(entity.getStatus())
                 .build());
+    }
+
+    @Override
+    public List<Question> findByObjectiveId (Long objectiveId){
+        return questionJpaRepository.findByObjectiveId(objectiveId).stream()
+                              .map(entity -> Question.builder()
+                                      .id(entity.getId())
+                                      .questionAudioFileId(entity.getQuestionAudioFile() != null ? entity.getQuestionAudioFile().getId() : null)
+                                      .objectiveId(entity.getObjective() != null ? entity.getObjective().getId() : null)
+                                      .userId(entity.getUser() != null ? entity.getUser().getId() : null)
+                                      .title(entity.getTitle())
+                                      .titleMarkup(entity.getTitleMarkup())
+                                      .description(entity.getDescription())
+                                      .descriptionMarkup(entity.getDescriptionMarkup())
+                                      .orderIndex(entity.getOrderIndex())
+                                      .status(entity.getStatus())
+                                      .build()).toList();
     }
 }

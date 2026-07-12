@@ -24,7 +24,8 @@ public class MessageSourceConfig {
                 "classpath:i18n/point/point",
                 "classpath:i18n/book/book",
                 "classpath:i18n/topic/topic",
-                "classpath:i18n/lesson/lesson"
+                "classpath:i18n/lesson/lesson",
+                "classpath:i18n/objective/objective"
 
         );
 
