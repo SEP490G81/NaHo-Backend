@@ -5,7 +5,8 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.persona.entity.PersonaEntity;
-import org.naho.question.entity.QuestionEntity;
+import org.naho.point.entity.LeagueEntity;
+import org.naho.question.entity.SpeakingQuestionEntity;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.social.entity.CommentEntity;
 import org.naho.social.report.entity.ReportEntity;
@@ -40,9 +41,12 @@ public class FileEntity extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "question_id")
-    QuestionEntity question;
+    SpeakingQuestionEntity question;
 
     @ManyToOne
     @JoinColumn(name = "report_id") // Tên cột khóa ngoại trong DB của bạn
     ReportEntity report;    // Tên biến này BẮT BUỘC phải là "report" để khớp với mappedBy bên kia
+
+    @OneToOne(mappedBy = "iconFile")
+    LeagueEntity league;
 }

@@ -27,5 +27,5 @@ public class VocabularyEntity extends BaseEntity {
     String englishMeaningText;
 
     @ManyToMany(mappedBy = "vocabularies")
-    List<QuestionEntity> questions;
+    List<SpeakingQuestionEntity> questions;
 }

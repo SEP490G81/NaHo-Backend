@@ -8,14 +8,14 @@ import org.naho.book.port.in.GetObjectiveDetailInputPort;
 import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.book.result.ObjectiveDetailResult;
 import org.naho.i18n.message.book.ObjectiveDetailMessageKey;
-import org.naho.question.port.out.QuestionRepositoryPort;
-import org.naho.question.result.QuestionListItemResult;
+import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
+import org.naho.question.result.SpeakingQuestionListItemResult;
 import org.naho.shared.exception.ApplicationException;
 
 @RequiredArgsConstructor
 public class GetObjectiveDetailUseCase implements GetObjectiveDetailInputPort {
     private final ObjectiveRepositoryPort objectiveRepositoryPort;
-    private final QuestionRepositoryPort questionRepositoryPort;
+    private final SpeakingQuestionRepositoryPort questionRepositoryPort;
 
     @Override
     public ObjectiveDetailResult getObjectiveDetail(GetObjectiveDetailCommand command) {
@@ -26,7 +26,7 @@ public class GetObjectiveDetailUseCase implements GetObjectiveDetailInputPort {
                         command.id()));
 
         var questions = questionRepositoryPort.findByObjectiveId(command.id()).stream()
-                .map(question -> new QuestionListItemResult(
+                .map(question -> new SpeakingQuestionListItemResult(
                         question.getId(),
                         question.getUserId(),
                         question.getQuestionAudioFileId(),

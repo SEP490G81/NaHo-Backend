@@ -5,7 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.file.model.FileEntity;
-import org.naho.question.entity.QuestionEntity;
+import org.naho.question.entity.SpeakingQuestionEntity;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.social.entity.CommentEntity;
 import org.naho.social.type.ReportType;
@@ -40,8 +40,8 @@ public class ReportEntity extends BaseEntity {
     UserEntity user;
 
     @ManyToOne
-    @JoinColumn(name = "question_id")
-    QuestionEntity question;
+    @JoinColumn(name = "speaking_question_id")
+    SpeakingQuestionEntity question;
 
     @ManyToOne
     @JoinColumn(name = "comment_id")

@@ -24,9 +24,9 @@ public enum PointHistoryDomainErrorCode implements ErrorCode {
             PointHistoryTitleMessageKey.POINT_HISTORY_TRANSACTION_TIME_NOT_VALID_TITLE,
             400
     ),
-    POINT_HISTORY_QUESTION_ID_NOT_VALID(
+    POINT_HISTORY_LEARNING_PATH_NODE_ID_NOT_VALID(
             "POINT_HISTORY_005",
-            PointHistoryTitleMessageKey.POINT_HISTORY_QUESTION_ID_NOT_VALID_TITLE,
+            PointHistoryTitleMessageKey.POINT_HISTORY_LEARNING_PATH_NODE_ID_NOT_VALID_TITLE,
             400
     ),
     POINT_HISTORY_OBJECTIVE_ID_NOT_VALID(
@@ -42,6 +42,11 @@ public enum PointHistoryDomainErrorCode implements ErrorCode {
     POINT_HISTORY_TOPIC_ID_NOT_VALID(
             "POINT_HISTORY_008",
             PointHistoryTitleMessageKey.POINT_HISTORY_TOPIC_ID_NOT_VALID_TITLE,
+            400
+    ),
+    POINT_HISTORY_BOOK_ID_NOT_VALID(
+            "POINT_HISTORY_009",
+            PointHistoryTitleMessageKey.POINT_HISTORY_BOOK_ID_NOT_VALID_TITLE,
             400
     );
 

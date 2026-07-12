@@ -1,7 +1,7 @@
 package org.naho.book.result;
 
 import org.naho.book.type.TopicStatus;
-import org.naho.question.result.QuestionListItemResult;
+import org.naho.question.result.SpeakingQuestionListItemResult;
 
 import java.util.List;
 
@@ -13,6 +13,6 @@ public record ObjectiveDetailResult(
         String japaneseDescriptionMarkup,
         TopicStatus status,
         Double orderIndex,
-        List<QuestionListItemResult> questions
+        List<SpeakingQuestionListItemResult> questions
 ) {
 }

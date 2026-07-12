@@ -25,8 +25,9 @@ public class MessageSourceConfig {
                 "classpath:i18n/book/book",
                 "classpath:i18n/topic/topic",
                 "classpath:i18n/lesson/lesson",
-                "classpath:i18n/objective/objective"
-
+                "classpath:i18n/objective/objective",
+                "classpath:i18n/question/question",
+                "classpath:i18n/learning/learning"
         );
 
         messageSource.setDefaultEncoding(DEFAULT_ENCODING);

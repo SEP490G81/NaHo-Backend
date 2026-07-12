@@ -36,7 +36,7 @@ public class LessonEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     TopicStatus status;
 
-    @Column(name = "order_index", nullable = false, unique = true)
+    @Column(name = "order_index", nullable = false)
     Double orderIndex;
 
     @ManyToOne(fetch = FetchType.LAZY)

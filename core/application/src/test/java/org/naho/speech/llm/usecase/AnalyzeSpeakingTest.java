@@ -12,11 +12,11 @@ import org.naho.file.port.in.FileStorageInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.result.FileResult;
 import org.naho.furigana.port.out.FuriganaGenerationPort;
-import org.naho.i18n.message.question.QuestionDetailMessageKey;
+import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
 import org.naho.i18n.message.user.UserDetailMessageKey;
-import org.naho.question.exception.QuestionErrorCode;
-import org.naho.question.model.Question;
-import org.naho.question.port.out.QuestionRepositoryPort;
+import org.naho.question.exception.SpeakingQuestionErrorCode;
+import org.naho.question.model.SpeakingQuestion;
+import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
@@ -49,7 +49,7 @@ class AnalyzeSpeakingTest {
     private UserRepositoryPort userRepositoryPort;
 
     @Mock
-    private QuestionRepositoryPort questionRepositoryPort;
+    private SpeakingQuestionRepositoryPort questionRepositoryPort;
 
     @Mock
     private FileStorageInputPort fileStorageInputPort;
@@ -94,12 +94,10 @@ class AnalyzeSpeakingTest {
                 .status(UserStatus.ACTIVE)
                 .build();
 
-        Question question = Question.builder()
+        SpeakingQuestion speakingQuestion = SpeakingQuestion.builder()
                 .id(2L)
-                .objectiveId(3L)
                 .title("Question Title")
                 .description("Question Description")
-                .orderIndex(1.0)
                 .build();
 
         FileResult fileResult = new FileResult(10L, "recordings/key.wav", "recording.wav", "audio/wav", 100L);
@@ -154,13 +152,12 @@ class AnalyzeSpeakingTest {
         String rawLlmFeedback = "{\"scores\": {\"vocabulary\": 8.0, \"grammar\": 8.0, \"naturalness\": 8.0}, \"userTranscript\": []}";
 
         when(userRepositoryPort.findById(1L)).thenReturn(Optional.of(user));
-        when(questionRepositoryPort.findById(2L)).thenReturn(Optional.of(question));
+        when(questionRepositoryPort.findById(2L)).thenReturn(Optional.of(speakingQuestion));
         when(fileStorageInputPort.uploadFile(any(FileUploadCommand.class))).thenReturn(fileResult);
         when(answerHistoryRepositoryPort.saveAnswerHistory(any(AnswerHistory.class))).thenReturn(savedHistory);
         when(azureSpeechServicePort.assess(any(SpeechAssessmentCommand.class))).thenReturn(azureAssessment);
         when(answerHistoryRepositoryPort.saveSpeechAssessment(any(SpeechAssessment.class))).thenReturn(savedSpeechAssessment);
-        when(topicRepositoryPort.findByObjectiveId(3L)).thenReturn(Optional.of(topic));
-        when(aiAnalysisPort.analyzeSpeaking(eq("Topic Japanese"), eq("Question Title"), eq("こんにちは"), anyString())).thenReturn(rawLlmFeedback);
+        when(aiAnalysisPort.analyzeSpeaking(eq("General conversation"), eq("Question Title"), eq("こんにちは"), anyString())).thenReturn(rawLlmFeedback);
 
         // Act (When)
         SpeakingAnalysisResult result = speakingAnalysisUseCase.analyzeSpeaking(command);
@@ -190,8 +187,7 @@ class AnalyzeSpeakingTest {
                         assessment.getPronunciationScore().equals(80.0)
         ));
         verify(answerHistoryRepositoryPort, times(1)).saveAllWordAssessment(anyList());
-        verify(topicRepositoryPort, times(1)).findByObjectiveId(3L);
-        verify(aiAnalysisPort, times(1)).analyzeSpeaking(eq("Topic Japanese"), eq("Question Title"), eq("こんにちは"), anyString());
+        verify(aiAnalysisPort, times(1)).analyzeSpeaking(eq("General conversation"), eq("Question Title"), eq("こんにちは"), anyString());
         verify(answerHistoryRepositoryPort, times(1)).saveContentAssessment(argThat(content ->
                 content.getAnswerHistoryId().equals(100L) &&
                         content.getVocabularyScore().equals(8.0) &&
@@ -218,12 +214,10 @@ class AnalyzeSpeakingTest {
                 .status(UserStatus.ACTIVE)
                 .build();
 
-        Question question = Question.builder()
+        SpeakingQuestion speakingQuestion = SpeakingQuestion.builder()
                 .id(2L)
-                .objectiveId(null)
                 .title("Question Title")
                 .description("Question Description")
-                .orderIndex(1.0)
                 .build();
 
         FileResult fileResult = new FileResult(10L, "recordings/key.wav", "recording.wav", "audio/wav", 100L);
@@ -263,7 +257,7 @@ class AnalyzeSpeakingTest {
         String rawLlmFeedback = "{\"scores\": {\"vocabulary\": 8.0, \"grammar\": 8.0, \"naturalness\": 8.0}, \"userTranscript\": []}";
 
         when(userRepositoryPort.findById(1L)).thenReturn(Optional.of(user));
-        when(questionRepositoryPort.findById(2L)).thenReturn(Optional.of(question));
+        when(questionRepositoryPort.findById(2L)).thenReturn(Optional.of(speakingQuestion));
         when(fileStorageInputPort.uploadFile(any(FileUploadCommand.class))).thenReturn(fileResult);
         when(answerHistoryRepositoryPort.saveAnswerHistory(any(AnswerHistory.class))).thenReturn(savedHistory);
         when(azureSpeechServicePort.assess(any(SpeechAssessmentCommand.class))).thenReturn(azureAssessment);
@@ -303,12 +297,10 @@ class AnalyzeSpeakingTest {
                 .status(UserStatus.ACTIVE)
                 .build();
 
-        Question question = Question.builder()
+        SpeakingQuestion speakingQuestion = SpeakingQuestion.builder()
                 .id(2L)
-                .objectiveId(null)
                 .title("Question Title")
                 .description("Question Description")
-                .orderIndex(1.0)
                 .build();
 
         FileResult fileResult = new FileResult(10L, "recordings/key.wav", "recording.wav", "audio/wav", 100L);
@@ -349,7 +341,7 @@ class AnalyzeSpeakingTest {
         String corruptedFeedback = "{ invalid json }";
 
         when(userRepositoryPort.findById(1L)).thenReturn(Optional.of(user));
-        when(questionRepositoryPort.findById(2L)).thenReturn(Optional.of(question));
+        when(questionRepositoryPort.findById(2L)).thenReturn(Optional.of(speakingQuestion));
         when(fileStorageInputPort.uploadFile(any(FileUploadCommand.class))).thenReturn(fileResult);
         when(answerHistoryRepositoryPort.saveAnswerHistory(any(AnswerHistory.class))).thenReturn(savedHistory);
         when(azureSpeechServicePort.assess(any(SpeechAssessmentCommand.class))).thenReturn(azureAssessment);
@@ -436,8 +428,8 @@ class AnalyzeSpeakingTest {
                 () -> speakingAnalysisUseCase.analyzeSpeaking(command)
         );
 
-        assertEquals(QuestionErrorCode.QUESTION_NOT_FOUND, exception.getErrorCode());
-        assertEquals(QuestionDetailMessageKey.QUESTION_NOT_FOUND, exception.getMessage());
+        assertEquals(SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND, exception.getErrorCode());
+        assertEquals(SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_NOT_FOUND, exception.getMessage());
 
         verify(userRepositoryPort, times(1)).findById(1L);
         verify(questionRepositoryPort, times(1)).findById(2L);

@@ -15,6 +15,11 @@ import org.naho.shared.exception.ApplicationException;
 import org.naho.user.entity.UserEntity;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.repository.UserJpaRepository;
+import org.naho.book.repository.BookJpaRepository;
+import org.naho.book.repository.TopicJpaRepository;
+import org.naho.book.repository.LessonJpaRepository;
+import org.naho.book.repository.ObjectiveJpaRepository;
+import org.naho.learning.repository.LearningPathNodeJpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +33,11 @@ public class PointHistoryRepositoryAdapter implements PointHistoryRepositoryPort
     private final PointHistoryEntityMapper pointHistoryEntityMapper;
     private final PointHistoryJpaRepository pointHistoryJpaRepository;
     private final UserJpaRepository userJpaRepository;
+    private final BookJpaRepository bookJpaRepository;
+    private final TopicJpaRepository topicJpaRepository;
+    private final LessonJpaRepository lessonJpaRepository;
+    private final ObjectiveJpaRepository objectiveJpaRepository;
+    private final LearningPathNodeJpaRepository learningPathNodeJpaRepository;
 
     @Override
     public PointHistory save(PointHistory pointHistory) {
@@ -41,6 +51,23 @@ public class PointHistoryRepositoryAdapter implements PointHistoryRepositoryPort
                 ));
 
         entity.setUser(user);
+
+        if (pointHistory.getLearningPathNodeId() != null) {
+            entity.setLearningPathNode(learningPathNodeJpaRepository.getReferenceById(pointHistory.getLearningPathNodeId()));
+        }
+        if (pointHistory.getObjectiveId() != null) {
+            entity.setObjective(objectiveJpaRepository.getReferenceById(pointHistory.getObjectiveId()));
+        }
+        if (pointHistory.getLessonId() != null) {
+            entity.setLesson(lessonJpaRepository.getReferenceById(pointHistory.getLessonId()));
+        }
+        if (pointHistory.getTopicId() != null) {
+            entity.setTopic(topicJpaRepository.getReferenceById(pointHistory.getTopicId()));
+        }
+        if (pointHistory.getBookId() != null) {
+            entity.setBook(bookJpaRepository.getReferenceById(pointHistory.getBookId()));
+        }
+
         PointHistoryEntity savedPointHistory = pointHistoryJpaRepository.save(entity);
 
         return pointHistoryEntityMapper.entityToDomain(savedPointHistory);

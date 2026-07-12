@@ -9,7 +9,7 @@ import org.naho.file.model.FileEntity;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.repository.FileJpaRepository;
 import org.naho.i18n.message.file.FileDetailMessageKey;
-import org.naho.question.entity.QuestionEntity;
+import org.naho.question.entity.SpeakingQuestionEntity;
 import org.naho.shared.exception.InfrastructureException;
 import org.naho.social.entity.CommentEntity;
 import org.naho.social.report.entity.ReportEntity;
@@ -44,7 +44,7 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
             fileEntity.setComment(entityManager.getReference(CommentEntity.class, file.getCommentId()));
         }
         if (file.getQuestionId() != null) {
-            fileEntity.setQuestion(entityManager.getReference(QuestionEntity.class, file.getQuestionId()));
+            fileEntity.setQuestion(entityManager.getReference(SpeakingQuestionEntity.class, file.getQuestionId()));
         }
         if (file.getReportId() != null) {
             fileEntity.setReport(entityManager.getReference(ReportEntity.class, file.getReportId()));

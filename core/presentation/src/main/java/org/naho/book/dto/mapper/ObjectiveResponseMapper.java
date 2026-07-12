@@ -1,10 +1,11 @@
 package org.naho.book.dto.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.naho.book.dto.response.ObjectiveDetailResponse;
 import org.naho.book.result.ObjectiveDetailResult;
-import org.naho.question.dto.response.QuestionListItemResponse;
-import org.naho.question.result.QuestionListItemResult;
+import org.naho.question.dto.response.SpeakingQuestionListItemResponse;
+import org.naho.question.result.SpeakingQuestionListItemResult;
 
 import java.util.List;
 
@@ -13,7 +14,8 @@ public interface ObjectiveResponseMapper {
 
     ObjectiveDetailResponse detailResultToResponse(ObjectiveDetailResult result);
 
-    QuestionListItemResponse questionResultToResponse(QuestionListItemResult result);
+    @Mapping(target = "createdTime", ignore = true)
+    SpeakingQuestionListItemResponse questionResultToResponse(SpeakingQuestionListItemResult result);
 
-    List<QuestionListItemResponse> questionResultListToResponse(List<QuestionListItemResult> results);
+    List<SpeakingQuestionListItemResponse> questionResultListToResponse(List<SpeakingQuestionListItemResult> results);
 }

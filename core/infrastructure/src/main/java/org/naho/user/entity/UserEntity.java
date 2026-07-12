@@ -4,9 +4,12 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import org.naho.learning.entity.UserLearningProgressEntity;
+import org.naho.learning.entity.UserNodeProgressEntity;
 import org.naho.point.entity.PointHistoryEntity;
 import org.naho.point.entity.PointSummaryEntity;
-import org.naho.question.entity.QuestionEntity;
+import org.naho.point.entity.UserSeasonPointEntity;
+import org.naho.question.entity.SpeakingQuestionEntity;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.social.report.entity.ReportEntity;
 import org.naho.user.type.Gender;
@@ -77,7 +80,7 @@ public class UserEntity extends BaseEntity {
     List<UserSessionEntity> userSessions;
 
     @OneToMany(mappedBy = "user")
-    List<QuestionEntity> questions;
+    List<SpeakingQuestionEntity> questions;
 
     @OneToMany(mappedBy = "user")
     List<ReportEntity> reports;
@@ -88,4 +91,13 @@ public class UserEntity extends BaseEntity {
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "point_summary_id")
     PointSummaryEntity pointSummary;
+
+    @OneToMany(mappedBy = "user")
+    List<UserNodeProgressEntity> userNodeProgresses;
+
+    @OneToOne(mappedBy = "user")
+    UserLearningProgressEntity userLearningProgress;
+
+    @OneToMany(mappedBy = "user")
+    List<UserSeasonPointEntity> userSeasonPoints;
 }

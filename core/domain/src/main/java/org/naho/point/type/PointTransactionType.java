@@ -1,10 +1,11 @@
 package org.naho.point.type;
 
 public enum PointTransactionType {
-    QUESTION_COMPLETION,
+    LEARNING_PATH_NODE_COMPLETION,
     CAN_DO_COMPLETION,
     LESSON_COMPLETION,
     TOPIC_COMPLETION,
+    BOOK_COMPLETION,
     DAILY_REWARD,
     STREAK_BONUS,
     ACHIEVEMENT_REWARD,

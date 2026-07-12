@@ -4,4 +4,4 @@ ALTER TABLE reactions
 
 ALTER TABLE reactions
     ADD CONSTRAINT uk_reaction_user_question
-        UNIQUE (user_id, question_id);
+        UNIQUE (user_id, speaking_question_id);

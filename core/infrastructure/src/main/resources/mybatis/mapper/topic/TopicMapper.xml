@@ -37,7 +37,8 @@
         FROM topics t
         LEFT JOIN lessons l ON t.id = l.topic_id
         LEFT JOIN objectives o ON l.id = o.lesson_id
-        LEFT JOIN questions q ON o.id = q.objective_id
+        LEFT JOIN learning_path_nodes lpn ON o.id = lpn.objective_id
+        LEFT JOIN speaking_questions q ON lpn.speaking_question_id = q.id
         <include refid="Base_Where_Clause"/>
         GROUP BY
         t.id, t.japanese_name, t.japanese_description,

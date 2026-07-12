@@ -12,10 +12,11 @@ public class PointHistory {
     private final Long id;
     private final Long userId;
 
-    private final Long questionId;
+    private final Long learningPathNodeId;
     private final Long objectiveId;
     private final Long lessonId;
     private final Long topicId;
+    private final Long bookId;
 
     private Double point;
     private PointTransactionType transactionType;
@@ -24,10 +25,11 @@ public class PointHistory {
     private PointHistory(Builder builder) {
         this.id = builder.id;
         this.userId = builder.userId;
-        this.questionId = builder.questionId;
+        this.learningPathNodeId = builder.learningPathNodeId;
         this.objectiveId = builder.objectiveId;
         this.lessonId = builder.lessonId;
         this.topicId = builder.topicId;
+        this.bookId = builder.bookId;
         this.point = builder.point;
         this.transactionType = builder.transactionType;
         this.transactionTime = builder.transactionTime;
@@ -41,10 +43,11 @@ public class PointHistory {
 
         private Long id;
         private Long userId;
-        private Long questionId;
+        private Long learningPathNodeId;
         private Long objectiveId;
         private Long lessonId;
         private Long topicId;
+        private Long bookId;
         private Double point;
         private PointTransactionType transactionType;
         private Instant transactionTime;
@@ -62,8 +65,8 @@ public class PointHistory {
             return this;
         }
 
-        public Builder questionId(Long questionId) {
-            this.questionId = questionId;
+        public Builder learningPathNodeId(Long learningPathNodeId) {
+            this.learningPathNodeId = learningPathNodeId;
             return this;
         }
 
@@ -79,6 +82,11 @@ public class PointHistory {
 
         public Builder topicId(Long topicId) {
             this.topicId = topicId;
+            return this;
+        }
+
+        public Builder bookId(Long bookId) {
+            this.bookId = bookId;
             return this;
         }
 
@@ -126,10 +134,10 @@ public class PointHistory {
                 );
             }
 
-            if (transactionType.equals(PointTransactionType.QUESTION_COMPLETION) && questionId == null) {
+            if (transactionType.equals(PointTransactionType.LEARNING_PATH_NODE_COMPLETION) && learningPathNodeId == null) {
                 throw new DomainException(
-                        PointHistoryDomainErrorCode.POINT_HISTORY_QUESTION_ID_NOT_VALID,
-                        PointHistoryDetailMessageKey.POINT_HISTORY_QUESTION_ID_BLANK
+                        PointHistoryDomainErrorCode.POINT_HISTORY_LEARNING_PATH_NODE_ID_NOT_VALID,
+                        PointHistoryDetailMessageKey.POINT_HISTORY_LEARNING_PATH_NODE_ID_BLANK
                 );
             }
 
@@ -154,6 +162,13 @@ public class PointHistory {
                 );
             }
 
+            if (transactionType.equals(PointTransactionType.BOOK_COMPLETION) && bookId == null) {
+                throw new DomainException(
+                        PointHistoryDomainErrorCode.POINT_HISTORY_BOOK_ID_NOT_VALID,
+                        PointHistoryDetailMessageKey.POINT_HISTORY_BOOK_ID_BLANK
+                );
+            }
+
             return new PointHistory(this);
         }
     }
@@ -166,8 +181,8 @@ public class PointHistory {
         return userId;
     }
 
-    public Long getQuestionId() {
-        return questionId;
+    public Long getLearningPathNodeId() {
+        return learningPathNodeId;
     }
 
     public Long getObjectiveId() {
@@ -180,6 +195,10 @@ public class PointHistory {
 
     public Long getTopicId() {
         return topicId;
+    }
+
+    public Long getBookId() {
+        return bookId;
     }
 
     public Double getPoint() {

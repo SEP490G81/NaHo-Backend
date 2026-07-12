@@ -5,7 +5,7 @@ import org.naho.book.adapter.TopicListRepositoryAdapter;
 import org.naho.book.adapter.TopicRepositoryAdapter;
 import org.naho.book.port.in.*;
 import org.naho.book.usecase.*;
-import org.naho.question.port.out.QuestionRepositoryPort;
+import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.shared.port.out.TransactionPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,8 +35,8 @@ public class TopicConfig {
 
     @Bean
     public DeleteTopicInputPort deleteTopicInputPort(TopicRepositoryAdapter topicRepositoryAdapter,
-            QuestionRepositoryPort questionRepositoryPort,
-            TransactionPort transactionPort) {
+                                                     SpeakingQuestionRepositoryPort questionRepositoryPort,
+                                                     TransactionPort transactionPort) {
         return new DeleteTopicUseCase(topicRepositoryAdapter, questionRepositoryPort, transactionPort);
     }
 }

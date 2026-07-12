@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.book.type.CefrLevel;
 import org.naho.file.model.FileEntity;
+import org.naho.point.entity.PointHistoryEntity;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.user.type.JLPTLevel;
 
@@ -34,7 +35,7 @@ public class BookEntity extends BaseEntity {
     @Column(name = "cefr_level")
     CefrLevel cefrLevel;
 
-    @Column(name = "order_index", nullable = false, unique = true)
+    @Column(name = "order_index", nullable = false)
     Double orderIndex;
 
     @OneToOne
@@ -43,4 +44,7 @@ public class BookEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     List<TopicEntity> topics;
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<PointHistoryEntity> pointHistories;
 }
