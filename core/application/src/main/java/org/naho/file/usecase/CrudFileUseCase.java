@@ -35,4 +35,14 @@ public class CrudFileUseCase implements CrudFileInputPort {
                 .map(fileResultMapper::domainToResult)
                 .toList();
     }
+
+    @Override
+    public List<FileResult> findAllByBookIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) return List.of();
+        List<File> files = fileRepositoryPort.findAllByBookIds(ids);
+        return files
+                .stream()
+                .map(fileResultMapper::domainToResult)
+                .toList();
+    }
 }

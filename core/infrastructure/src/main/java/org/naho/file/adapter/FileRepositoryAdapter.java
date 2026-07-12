@@ -80,4 +80,14 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
                 .map(fileEntityMapper::entityToDomain)
                 .toList();
     }
+
+    @Override
+    public List<File> findAllByBookIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) return List.of();
+        List<FileEntity> fileEntityList = fileJpaRepository.findAllById(ids);
+        return fileEntityList
+                .stream()
+                .map(fileEntityMapper::entityToDomain)
+                .toList();
+    }
 }

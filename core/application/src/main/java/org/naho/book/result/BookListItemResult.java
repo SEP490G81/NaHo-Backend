@@ -1,6 +1,7 @@
 package org.naho.book.result;
 
 import org.naho.book.type.CefrLevel;
+import org.naho.file.result.FileResult;
 import org.naho.user.type.JLPTLevel;
 
 public record BookListItemResult(
@@ -10,6 +11,6 @@ public record BookListItemResult(
         JLPTLevel jlptLevel,
         CefrLevel cefrLevel,
         Double orderIndex,
-        Long coverImageFileId
+        FileResult coverImage
 ) {
 }
