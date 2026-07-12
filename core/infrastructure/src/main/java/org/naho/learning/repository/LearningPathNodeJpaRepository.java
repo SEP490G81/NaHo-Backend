@@ -4,6 +4,10 @@ import org.naho.learning.entity.LearningPathNodeEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface LearningPathNodeJpaRepository extends JpaRepository<LearningPathNodeEntity, Long> {
+    List<LearningPathNodeEntity> findAllByObjectiveId(Long objectiveId);
 }
+

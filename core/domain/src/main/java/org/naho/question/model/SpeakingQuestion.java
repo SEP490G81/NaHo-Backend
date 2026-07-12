@@ -1,4 +1,6 @@
 package org.naho.question.model;
+import org.naho.vocabulary.model.Vocabulary;
+
 
 import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
 import org.naho.question.exception.SpeakingQuestionDomainErrorCode;

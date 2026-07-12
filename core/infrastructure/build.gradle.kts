@@ -69,6 +69,9 @@ dependencies {
     // Sudachi
     implementation("com.worksap.nlp:sudachi:0.7.5")
 
+    // Apache POI for Excel
+    implementation("org.apache.poi:poi-ooxml:5.2.3")
+
     // other
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
