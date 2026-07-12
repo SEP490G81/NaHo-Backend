@@ -1,7 +1,7 @@
 package org.naho.speech.llm.adapter;
 
 import lombok.RequiredArgsConstructor;
-import org.naho.file.model.FileEntity;
+import org.naho.file.entity.FileEntity;
 import org.naho.file.repository.FileJpaRepository;
 import org.naho.question.entity.AnswerHistoryEntity;
 import org.naho.question.entity.SpeakingQuestionEntity;

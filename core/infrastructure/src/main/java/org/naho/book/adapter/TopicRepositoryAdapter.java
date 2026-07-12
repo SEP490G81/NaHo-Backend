@@ -6,7 +6,7 @@ import org.naho.book.model.Topic;
 import org.naho.book.port.out.TopicRepositoryPort;
 import org.naho.book.repository.BookJpaRepository;
 import org.naho.book.repository.TopicJpaRepository;
-import org.naho.file.model.FileEntity;
+import org.naho.file.entity.FileEntity;
 import org.naho.file.repository.FileJpaRepository;
 import org.naho.user.entity.UserEntity;
 import org.naho.user.repository.UserJpaRepository;

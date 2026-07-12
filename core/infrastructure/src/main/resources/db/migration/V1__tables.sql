@@ -104,7 +104,7 @@ CREATE TABLE leagues
     name          VARCHAR(255)          NOT NULL,
     `description` TEXT                  NULL,
     min_point     DOUBLE                NOT NULL,
-    max_point     DOUBLE                NOT NULL,
+    max_point     DOUBLE                NULL,
     icon_file_id  BIGINT                NOT NULL,
     CONSTRAINT pk_leagues PRIMARY KEY (id)
 );

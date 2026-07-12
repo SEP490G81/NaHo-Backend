@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-import org.naho.file.model.FileEntity;
+import org.naho.file.entity.FileEntity;
 import org.naho.learning.entity.LearningPathNodeEntity;
 import org.naho.question.type.QuestionStatus;
 import org.naho.shared.persistence.BaseEntity;
