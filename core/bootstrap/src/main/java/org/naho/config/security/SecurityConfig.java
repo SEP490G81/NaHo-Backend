@@ -32,6 +32,7 @@ public class SecurityConfig {
             "/api/v1/roles/**",
             "/api/v1/books/**",
             "/api/v1/reports/**",
+            "/api/v1/topics/**"
     };
 
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
