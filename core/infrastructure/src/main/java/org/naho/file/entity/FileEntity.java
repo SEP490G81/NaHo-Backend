@@ -1,4 +1,4 @@
-package org.naho.file.model;
+package org.naho.file.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -35,15 +35,15 @@ public class FileEntity extends BaseEntity {
     @OneToOne(mappedBy = "avatarFile")
     PersonaEntity persona;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment_id")
     CommentEntity comment;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id")
     SpeakingQuestionEntity question;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "report_id") // Tên cột khóa ngoại trong DB của bạn
     ReportEntity report;    // Tên biến này BẮT BUỘC phải là "report" để khớp với mappedBy bên kia
 

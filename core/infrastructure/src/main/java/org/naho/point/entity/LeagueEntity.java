@@ -4,8 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-import org.naho.file.model.FileEntity;
-import org.naho.point.type.LeagueName;
+import org.naho.file.entity.FileEntity;
 import org.naho.shared.persistence.BaseEntity;
 
 import java.util.List;
@@ -19,9 +18,8 @@ import java.util.List;
 @Table(name = "leagues")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class LeagueEntity extends BaseEntity {
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    LeagueName name;
+    String name;
 
     @Column(columnDefinition = "TEXT")
     String description;
@@ -29,7 +27,7 @@ public class LeagueEntity extends BaseEntity {
     @Column(name = "min_point", nullable = false)
     Double minPoint;
 
-    @Column(name = "max_point", nullable = false)
+    @Column(name = "max_point")
     Double maxPoint;
 
     @OneToOne

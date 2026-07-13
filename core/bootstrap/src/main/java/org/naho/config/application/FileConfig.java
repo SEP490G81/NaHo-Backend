@@ -1,8 +1,10 @@
 package org.naho.config.application;
 
 import org.naho.file.mapper.FileResultMapper;
+import org.naho.file.port.in.CrudFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileStorageServicePort;
+import org.naho.file.usecase.CrudFileUseCase;
 import org.naho.file.usecase.FileStorageUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +24,17 @@ public class FileConfig {
     ) {
         return new FileStorageUseCase(
                 fileStorageServicePort,
+                fileRepositoryPort,
+                fileResultMapper
+        );
+    }
+
+    @Bean
+    public CrudFileInputPort crudFileInputPort(
+            FileRepositoryPort fileRepositoryPort,
+            FileResultMapper fileResultMapper
+    ) {
+        return new CrudFileUseCase(
                 fileRepositoryPort,
                 fileResultMapper
         );

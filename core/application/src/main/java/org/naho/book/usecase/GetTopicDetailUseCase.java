@@ -4,7 +4,9 @@ import org.naho.book.command.GetTopicDetailCommand;
 import org.naho.book.exception.TopicErrorCode;
 import org.naho.book.model.Topic;
 import org.naho.book.port.in.GetTopicDetailInputPort;
+import org.naho.book.port.out.LessonRepositoryPort;
 import org.naho.book.port.out.TopicRepositoryPort;
+import org.naho.book.result.LessonListItemResult;
 import org.naho.book.result.TopicDetailResult;
 import org.naho.i18n.message.book.TopicDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
@@ -12,9 +14,11 @@ import org.naho.shared.exception.ApplicationException;
 public class GetTopicDetailUseCase implements GetTopicDetailInputPort {
 
     private final TopicRepositoryPort topicRepositoryPort;
+    private final LessonRepositoryPort lessonRepositoryPort;
 
-    public GetTopicDetailUseCase(TopicRepositoryPort topicRepositoryPort) {
+    public GetTopicDetailUseCase(TopicRepositoryPort topicRepositoryPort, LessonRepositoryPort lessonRepositoryPort) {
         this.topicRepositoryPort = topicRepositoryPort;
+        this.lessonRepositoryPort = lessonRepositoryPort;
     }
 
     @Override
@@ -25,6 +29,18 @@ public class GetTopicDetailUseCase implements GetTopicDetailInputPort {
                         TopicDetailMessageKey.TOPIC_ID_NOT_FOUND,
                         command.id()));
 
+        var lessons = lessonRepositoryPort.findByTopicId(command.id()).stream()
+                                .map(lesson -> new LessonListItemResult(
+                                        lesson.getId(),
+                                        lesson.getJapaneseName(),
+                                        lesson.getJapaneseDescription(),
+                                        lesson.getJapaneseNameMarkup(),
+                                        lesson.getJapaneseDescriptionMarkup(),
+                                        lesson.getStatus(),
+                                        lesson.getOrderIndex()
+                                        ))
+                                .toList();
+
         return new TopicDetailResult(
                 topic.getId(),
                 topic.getUserId(),
@@ -34,7 +50,8 @@ public class GetTopicDetailUseCase implements GetTopicDetailInputPort {
                 topic.getJapaneseDescriptionMarkup(),
                 topic.getStatus(),
                 topic.getOrderIndex(),
-                topic.getCoverImageFileId()
+                topic.getCoverImageFileId(),
+                lessons
         );
     }
 }

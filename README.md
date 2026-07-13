@@ -130,7 +130,7 @@ Dự án backend cấu hình kết nối database thông qua tệp cấu hình p
    mục [db/migration](file:///e:/Documents/Ky_9/SEP490/NaHo-Backend/core/infrastructure/src/main/resources/db/migration)
    và chạy:
     * `V1__tables.sql`: Khởi tạo cấu trúc các bảng (`users`, `roles`, `permissions`, `files`,...)
-    * `V2__users.sql`: Tự động chèn (seed) dữ liệu ban đầu cho các vai trò gồm: `ADMIN`, `TEACHER`, `STUDENT`.
+    * `V2__users_data.sql`: Tự động chèn (seed) dữ liệu ban đầu cho các vai trò gồm: `ADMIN`, `TEACHER`, `STUDENT`.
 
 ---
 

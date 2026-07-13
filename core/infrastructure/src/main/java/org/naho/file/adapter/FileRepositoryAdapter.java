@@ -2,10 +2,10 @@ package org.naho.file.adapter;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.naho.file.entity.FileEntity;
 import org.naho.file.exception.FileErrorCode;
 import org.naho.file.mapper.FileEntityMapper;
 import org.naho.file.model.File;
-import org.naho.file.model.FileEntity;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.repository.FileJpaRepository;
 import org.naho.i18n.message.file.FileDetailMessageKey;
@@ -14,6 +14,8 @@ import org.naho.shared.exception.InfrastructureException;
 import org.naho.social.entity.CommentEntity;
 import org.naho.social.report.entity.ReportEntity;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -57,5 +59,35 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
     @Override
     public void deleteById(Long id) {
         fileJpaRepository.deleteById(id);
+    }
+
+    @Override
+    public File findById(Long id) {
+        FileEntity entity = fileJpaRepository.findById(id)
+                .orElseThrow(() -> new InfrastructureException(
+                        FileErrorCode.FILE_NOT_FOUND,
+                        FileDetailMessageKey.FILE_NOT_FOUND,
+                        id
+                ));
+        return fileEntityMapper.entityToDomain(entity);
+    }
+
+    @Override
+    public List<File> findAllByLeagueIds(List<Long> leagueIds) {
+        List<FileEntity> fileEntityList = fileJpaRepository.findAllByLeague_IdIn(leagueIds);
+        return fileEntityList
+                .stream()
+                .map(fileEntityMapper::entityToDomain)
+                .toList();
+    }
+
+    @Override
+    public List<File> findAllByBookIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) return List.of();
+        List<FileEntity> fileEntityList = fileJpaRepository.findAllById(ids);
+        return fileEntityList
+                .stream()
+                .map(fileEntityMapper::entityToDomain)
+                .toList();
     }
 }

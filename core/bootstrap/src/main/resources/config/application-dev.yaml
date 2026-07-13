@@ -22,3 +22,5 @@ logging:
 app:
   cookie:
     secure: false
+  cloudfront:
+    domain: ${CLOUDFRONT_DOMAIN}
