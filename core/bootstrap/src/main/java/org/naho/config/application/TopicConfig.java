@@ -3,6 +3,7 @@ package org.naho.config.application;
 import org.naho.book.adapter.LessonRepositoryAdapter;
 import org.naho.book.adapter.TopicListRepositoryAdapter;
 import org.naho.book.adapter.TopicRepositoryAdapter;
+import org.naho.book.mapper.TopicResultMapper;
 import org.naho.book.port.in.*;
 import org.naho.book.usecase.*;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
@@ -14,13 +15,21 @@ import org.springframework.context.annotation.Configuration;
 public class TopicConfig {
 
     @Bean
+    public TopicResultMapper topicResultMapper() {
+        return new TopicResultMapper();
+    }
+
+    @Bean
     public CreateTopicInputPort createTopicInputPort(TopicRepositoryAdapter topicRepositoryAdapter) {
         return new CreateTopicUseCase(topicRepositoryAdapter);
     }
 
     @Bean
-    public ListTopicInputPort listTopicUseCasePort(TopicListRepositoryAdapter topicListRepositoryAdapter) {
-        return new ListTopicUseCase(topicListRepositoryAdapter);
+    public ListTopicInputPort listTopicUseCasePort(
+            TopicListRepositoryAdapter topicListRepositoryAdapter,
+            TopicResultMapper topicResultMapper
+    ) {
+        return new ListTopicUseCase(topicListRepositoryAdapter, topicResultMapper);
     }
 
     @Bean

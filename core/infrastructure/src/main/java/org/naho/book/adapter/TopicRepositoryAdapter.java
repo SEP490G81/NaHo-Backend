@@ -2,6 +2,7 @@ package org.naho.book.adapter;
 
 import org.naho.book.entity.BookEntity;
 import org.naho.book.entity.TopicEntity;
+import org.naho.book.mapper.TopicEntityMapper;
 import org.naho.book.model.Topic;
 import org.naho.book.port.out.TopicRepositoryPort;
 import org.naho.book.repository.BookJpaRepository;
@@ -21,15 +22,17 @@ public class TopicRepositoryAdapter implements TopicRepositoryPort {
     private final UserJpaRepository userJpaRepository;
     private final FileJpaRepository fileJpaRepository;
     private final BookJpaRepository bookJpaRepository;
+    private final TopicEntityMapper topicEntityMapper;
 
     public TopicRepositoryAdapter(TopicJpaRepository topicJpaRepository,
                                   UserJpaRepository userJpaRepository,
                                   FileJpaRepository fileJpaRepository,
-                                  BookJpaRepository bookJpaRepository) {
+                                  BookJpaRepository bookJpaRepository, TopicEntityMapper topicEntityMapper) {
         this.topicJpaRepository = topicJpaRepository;
         this.userJpaRepository = userJpaRepository;
         this.fileJpaRepository = fileJpaRepository;
         this.bookJpaRepository = bookJpaRepository;
+        this.topicEntityMapper = topicEntityMapper;
     }
 
     @Override
@@ -67,7 +70,7 @@ public class TopicRepositoryAdapter implements TopicRepositoryPort {
 
         TopicEntity savedEntity = topicJpaRepository.save(entity);
 
-        return toModel(savedEntity);
+        return topicEntityMapper.entityToDomain(savedEntity);
     }
 
     @Override
@@ -87,31 +90,16 @@ public class TopicRepositoryAdapter implements TopicRepositoryPort {
 
     @Override
     public Optional<Topic> findById(Long id) {
-        return topicJpaRepository.findById(id).map(this::toModel);
+        return topicJpaRepository.findById(id).map(topicEntityMapper::entityToDomain);
     }
 
     @Override
     public Optional<Topic> findByObjectiveId(Long objectiveId) {
-        return topicJpaRepository.findByObjectiveId(objectiveId).map(this::toModel);
+        return topicJpaRepository.findByObjectiveId(objectiveId).map(topicEntityMapper::entityToDomain);
     }
 
     @Override
     public void deleteById(Long id) {
         topicJpaRepository.deleteById(id);
-    }
-
-    private Topic toModel(TopicEntity entity) {
-        return Topic.builder()
-                .id(entity.getId())
-                .userId(entity.getUser() != null ? entity.getUser().getId() : null)
-                .japaneseName(entity.getJapaneseName())
-                .japaneseDescription(entity.getJapaneseDescription())
-                .japaneseNameMarkup(entity.getJapaneseNameMarkup())
-                .japaneseDescriptionMarkup(entity.getJapaneseDescriptionMarkup())
-                .status(entity.getStatus())
-                .orderIndex(entity.getOrderIndex())
-                .coverImageFileId(entity.getCoverImageFile() != null ? entity.getCoverImageFile().getId() : null)
-                .bookId(entity.getBook() != null ? entity.getBook().getId() : null)
-                .build();
     }
 }

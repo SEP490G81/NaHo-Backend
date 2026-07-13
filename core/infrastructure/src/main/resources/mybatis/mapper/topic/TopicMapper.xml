@@ -23,7 +23,7 @@
         <include refid="Base_Where_Clause"/>
     </select>
 
-    <select id="findTopics" resultType="org.naho.book.result.TopicListItemResult">
+    <select id="findTopics" resultType="org.naho.book.result.TopicResult">
         SELECT
         t.id AS id,
         t.japanese_name AS japaneseName,

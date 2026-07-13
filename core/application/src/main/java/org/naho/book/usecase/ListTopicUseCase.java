@@ -1,45 +1,43 @@
 package org.naho.book.usecase;
 
-import org.naho.book.command.ListTopicCommand;
+import org.naho.book.exception.TopicDomainErrorCode;
+import org.naho.book.mapper.TopicResultMapper;
+import org.naho.book.model.Topic;
 import org.naho.book.port.in.ListTopicInputPort;
 import org.naho.book.port.out.TopicListRepositoryPort;
-import org.naho.book.result.TopicListItemResult;
-import org.naho.book.result.TopicListResult;
-import org.naho.book.type.TopicStatus;
+import org.naho.book.result.TopicResult;
+import org.naho.i18n.message.book.TopicDetailMessageKey;
+import org.naho.shared.exception.ApplicationException;
 
 import java.util.List;
 
 public class ListTopicUseCase implements ListTopicInputPort {
 
     private final TopicListRepositoryPort topicListRepositoryPort;
+    private final TopicResultMapper topicResultMapper;
 
-    public ListTopicUseCase(TopicListRepositoryPort topicListRepositoryPort) {
+    public ListTopicUseCase(
+            TopicListRepositoryPort topicListRepositoryPort,
+            TopicResultMapper topicResultMapper
+    ) {
         this.topicListRepositoryPort = topicListRepositoryPort;
+        this.topicResultMapper = topicResultMapper;
     }
 
     @Override
-    public TopicListResult listTopics(ListTopicCommand query) {
-        // Enforce ACTIVE status for non-admin users
-        if (!query.isAdmin()) {
-            query = query.withForcedStatus(TopicStatus.PUBLISHED);
+    public List<TopicResult> findAllByBookId(Long bookId) {
+        if (bookId == null) {
+            throw new ApplicationException(
+                    TopicDomainErrorCode.BOOK_ID_EMPTY,
+                    TopicDetailMessageKey.BOOK_ID_EMPTY
+            );
         }
 
-        long totalElements = topicListRepositoryPort.countTopics(query);
+        List<Topic> topics = topicListRepositoryPort.findAllByBookId(bookId);
 
-        List<TopicListItemResult> items = List.of();
-        int totalPages = 0;
-
-        if (totalElements > 0) {
-            items = topicListRepositoryPort.findTopics(query);
-            totalPages = (int) Math.ceil((double) totalElements / query.size());
-        }
-
-        return new TopicListResult(
-                items,
-                query.page(),
-                query.size(),
-                totalPages,
-                totalElements
-        );
+        return topics
+                .stream()
+                .map(topicResultMapper::domainToResult)
+                .toList();
     }
 }
