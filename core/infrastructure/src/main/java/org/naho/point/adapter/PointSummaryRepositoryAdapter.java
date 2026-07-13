@@ -1,16 +1,14 @@
 package org.naho.point.adapter;
 
 import lombok.RequiredArgsConstructor;
-import org.naho.i18n.message.user.UserDetailMessageKey;
+import org.naho.i18n.message.point.PointSummaryDetailMessageKey;
 import org.naho.point.entity.PointSummaryEntity;
+import org.naho.point.exception.PointSummaryErrorCode;
 import org.naho.point.mapper.PointSummaryEntityMapper;
 import org.naho.point.model.PointSummary;
 import org.naho.point.port.out.PointSummaryRepositoryPort;
 import org.naho.point.repository.PointSummaryJpaRepository;
 import org.naho.shared.exception.ApplicationException;
-import org.naho.user.entity.UserEntity;
-import org.naho.user.exception.UserErrorCode;
-import org.naho.user.repository.UserJpaRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -20,7 +18,6 @@ import java.util.Optional;
 public class PointSummaryRepositoryAdapter implements PointSummaryRepositoryPort {
     private final PointSummaryJpaRepository pointSummaryJpaRepository;
     private final PointSummaryEntityMapper pointSummaryEntityMapper;
-    private final UserJpaRepository userJpaRepository;
 
     @Override
     public Optional<PointSummary> findById(Long id) {
@@ -30,16 +27,18 @@ public class PointSummaryRepositoryAdapter implements PointSummaryRepositoryPort
 
     @Override
     public PointSummary save(PointSummary pointSummary) {
-        PointSummaryEntity entity = pointSummaryEntityMapper.domainToEntity(pointSummary);
-
-        UserEntity user = userJpaRepository.findById(pointSummary.getUserId())
-                .orElseThrow(() -> new ApplicationException(
-                        UserErrorCode.USER_NOT_FOUND,
-                        UserDetailMessageKey.USER_ID_NOT_FOUND,
-                        pointSummary.getUserId()
-                ));
-
-        entity.setUser(user);
+        PointSummaryEntity entity;
+        if (pointSummary.getId() != null) {
+            entity = pointSummaryJpaRepository.findById(pointSummary.getId())
+                    .orElseThrow(() -> new ApplicationException(
+                            PointSummaryErrorCode.POINT_SUMMARY_NOT_FOUND,
+                            PointSummaryDetailMessageKey.POINT_SUMMARY_NOT_FOUND,
+                            pointSummary.getId()
+                    ));
+            entity.setTotalPoint(pointSummary.getTotalPoint());
+        } else {
+            entity = pointSummaryEntityMapper.domainToEntity(pointSummary);
+        }
         PointSummaryEntity savedEntity = pointSummaryJpaRepository.save(entity);
 
         return pointSummaryEntityMapper.entityToDomain(savedEntity);

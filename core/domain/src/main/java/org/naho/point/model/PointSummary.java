@@ -7,12 +7,10 @@ import org.naho.shared.exception.DomainException;
 public class PointSummary {
 
     private Long id;
-    private Long userId;
     private Double totalPoint;
 
     private PointSummary(Builder builder) {
         this.id = builder.id;
-        this.userId = builder.userId;
         this.totalPoint = builder.totalPoint;
     }
 
@@ -32,10 +30,6 @@ public class PointSummary {
         return id;
     }
 
-    public Long getUserId() {
-        return userId;
-    }
-
     public Double getTotalPoint() {
         return totalPoint;
     }
@@ -51,7 +45,6 @@ public class PointSummary {
     public static final class Builder {
 
         private Long id;
-        private Long userId;
         private Double totalPoint;
 
         private Builder() {
@@ -62,10 +55,6 @@ public class PointSummary {
             return this;
         }
 
-        public Builder userId(Long userId) {
-            this.userId = userId;
-            return this;
-        }
 
         public Builder totalPoint(Double totalPoint) {
             this.totalPoint = totalPoint;
@@ -73,12 +62,6 @@ public class PointSummary {
         }
 
         public PointSummary build() {
-            if (userId == null) {
-                throw new DomainException(
-                        PointSummaryDomainErrorCode.POINT_SUMMARY_USER_ID_NOT_VALID,
-                        PointSummaryDetailMessageKey.POINT_SUMMARY_USER_ID_BLANK
-                );
-            }
 
             if (totalPoint == null) {
                 throw new DomainException(

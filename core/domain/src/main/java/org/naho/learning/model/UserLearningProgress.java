@@ -1,18 +1,22 @@
 package org.naho.learning.model;
 
-import org.naho.i18n.message.learning.UserLearningProgressDetailMessageKey;
-import org.naho.learning.exception.UserLearningProgressDomainErrorCode;
-import org.naho.shared.exception.DomainException;
+import java.time.Instant;
 
 public class UserLearningProgress {
     private final Long id;
-    private final Long learningPathNodeId;
-    private final Long userId;
+    private final Long farthestAvailableNodeId;
+    private final Long lastLearningNodeId;
+    private final Instant lastLearningAt;
+    private final Integer currentStreak;
+    private final Integer longestStreak;
 
     private UserLearningProgress(Builder builder) {
         this.id = builder.id;
-        this.learningPathNodeId = builder.learningPathNodeId;
-        this.userId = builder.userId;
+        this.farthestAvailableNodeId = builder.farthestAvailableNodeId;
+        this.lastLearningNodeId = builder.lastLearningNodeId;
+        this.lastLearningAt = builder.lastLearningAt;
+        this.currentStreak = builder.currentStreak;
+        this.longestStreak = builder.longestStreak;
     }
 
     public static Builder builder() {
@@ -23,19 +27,33 @@ public class UserLearningProgress {
         return id;
     }
 
-    public Long getLearningPathNodeId() {
-        return learningPathNodeId;
+    public Long getFarthestAvailableNodeId() {
+        return farthestAvailableNodeId;
     }
 
-    public Long getUserId() {
-        return userId;
+    public Long getLastLearningNodeId() {
+        return lastLearningNodeId;
+    }
+
+    public Instant getLastLearningAt() {
+        return lastLearningAt;
+    }
+
+    public Integer getCurrentStreak() {
+        return currentStreak;
+    }
+
+    public Integer getLongestStreak() {
+        return longestStreak;
     }
 
     public static final class Builder {
-
         private Long id;
-        private Long learningPathNodeId;
-        private Long userId;
+        private Long farthestAvailableNodeId;
+        private Long lastLearningNodeId;
+        private Instant lastLearningAt;
+        private Integer currentStreak;
+        private Integer longestStreak;
 
         private Builder() {
         }
@@ -45,30 +63,32 @@ public class UserLearningProgress {
             return this;
         }
 
-        public Builder learningPathNodeId(Long learningPathNodeId) {
-            this.learningPathNodeId = learningPathNodeId;
+        public Builder farthestAvailableNodeId(Long farthestAvailableNodeId) {
+            this.farthestAvailableNodeId = farthestAvailableNodeId;
             return this;
         }
 
-        public Builder userId(Long userId) {
-            this.userId = userId;
+        public Builder lastLearningNodeId(Long lastLearningNodeId) {
+            this.lastLearningNodeId = lastLearningNodeId;
+            return this;
+        }
+
+        public Builder lastLearningAt(Instant lastLearningAt) {
+            this.lastLearningAt = lastLearningAt;
+            return this;
+        }
+
+        public Builder currentStreak(Integer currentStreak) {
+            this.currentStreak = currentStreak;
+            return this;
+        }
+
+        public Builder longestStreak(Integer longestStreak) {
+            this.longestStreak = longestStreak;
             return this;
         }
 
         public UserLearningProgress build() {
-            if (learningPathNodeId == null) {
-                throw new DomainException(
-                        UserLearningProgressDomainErrorCode.USER_LEARNING_PROGRESS_LEARNING_PATH_NODE_EMPTY,
-                        UserLearningProgressDetailMessageKey.USER_LEARNING_PROGRESS_LEARNING_PATH_NODE_EMPTY
-                );
-            }
-
-            if (userId == null) {
-                throw new DomainException(
-                        UserLearningProgressDomainErrorCode.USER_LEARNING_PROGRESS_USER_EMPTY,
-                        UserLearningProgressDetailMessageKey.USER_LEARNING_PROGRESS_USER_EMPTY
-                );
-            }
             return new UserLearningProgress(this);
         }
     }

@@ -20,6 +20,7 @@ public class UserResult {
     private final LocalDate dob;
     private final JLPTLevel jlptLevel;
     private final UserStatus status;
+    private final Long userLearningProgressId;
 
     private UserResult(Builder builder) {
         this.id = builder.id;
@@ -32,6 +33,7 @@ public class UserResult {
         this.avatarUrl = builder.avatarUrl;
         this.jlptLevel = builder.jlptLevel;
         this.status = builder.status;
+        this.userLearningProgressId = builder.userLearningProgressId;
     }
 
     public static Builder builder() {
@@ -78,6 +80,10 @@ public class UserResult {
         return status;
     }
 
+    public Long getUserLearningProgressId() {
+        return userLearningProgressId;
+    }
+
     public static class Builder {
         private Long id;
         private String username;
@@ -89,6 +95,7 @@ public class UserResult {
         private String avatarUrl;
         private JLPTLevel jlptLevel;
         private UserStatus status;
+        private Long userLearningProgressId;
 
         public Builder id(Long id) {
             this.id = id;
@@ -137,6 +144,11 @@ public class UserResult {
 
         public Builder status(UserStatus status) {
             this.status = status;
+            return this;
+        }
+
+        public Builder userLearningProgressId(Long userLearningProgressId) {
+            this.userLearningProgressId = userLearningProgressId;
             return this;
         }
 

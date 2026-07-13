@@ -11,15 +11,17 @@ CREATE TABLE answer_histories
 
 CREATE TABLE books
 (
-    id                  BIGINT AUTO_INCREMENT NOT NULL,
-    created_time        datetime              NOT NULL,
-    modified_time       datetime              NULL,
-    title               VARCHAR(255)          NOT NULL,
-    `description`       TEXT                  NULL,
-    jlpt_level          VARCHAR(255)          NULL,
-    cefr_level          VARCHAR(255)          NULL,
-    order_index         DOUBLE                NOT NULL,
-    cover_image_file_id BIGINT                NULL,
+    id                            BIGINT AUTO_INCREMENT NOT NULL,
+    created_time                  datetime              NOT NULL,
+    modified_time                 datetime              NULL,
+    title                         VARCHAR(255)          NOT NULL,
+    `description`                 TEXT                  NULL,
+    jlpt_level                    VARCHAR(255)          NULL,
+    cefr_level                    VARCHAR(255)          NULL,
+    order_index                   DOUBLE                NOT NULL,
+    first_node_global_order_index DOUBLE                NULL,
+    last_node_global_order_index  DOUBLE                NULL,
+    cover_image_file_id           BIGINT                NULL,
     CONSTRAINT pk_books PRIMARY KEY (id)
 );
 
@@ -126,31 +128,35 @@ CREATE TABLE learning_path_nodes
 
 CREATE TABLE lessons
 (
-    id                          BIGINT AUTO_INCREMENT NOT NULL,
-    created_time                datetime              NOT NULL,
-    modified_time               datetime              NULL,
-    japanese_name               VARCHAR(255)          NULL,
-    japanese_description        VARCHAR(255)          NULL,
-    japanese_name_markup        TEXT                  NULL,
-    japanese_description_markup TEXT                  NULL,
-    status                      VARCHAR(50)           NULL,
-    order_index                 DOUBLE                NOT NULL,
-    topic_id                    BIGINT                NULL,
+    id                            BIGINT AUTO_INCREMENT NOT NULL,
+    created_time                  datetime              NOT NULL,
+    modified_time                 datetime              NULL,
+    japanese_name                 VARCHAR(255)          NULL,
+    japanese_description          VARCHAR(255)          NULL,
+    japanese_name_markup          TEXT                  NULL,
+    japanese_description_markup   TEXT                  NULL,
+    status                        VARCHAR(50)           NULL,
+    order_index                   DOUBLE                NOT NULL,
+    first_node_global_order_index DOUBLE                NULL,
+    last_node_global_order_index  DOUBLE                NULL,
+    topic_id                      BIGINT                NULL,
     CONSTRAINT pk_lessons PRIMARY KEY (id)
 );
 
 CREATE TABLE objectives
 (
-    id                          BIGINT AUTO_INCREMENT NOT NULL,
-    created_time                datetime              NOT NULL,
-    modified_time               datetime              NULL,
-    japanese_name               VARCHAR(255)          NULL,
-    japanese_description        VARCHAR(255)          NULL,
-    japanese_name_markup        TEXT                  NULL,
-    japanese_description_markup TEXT                  NULL,
-    status                      VARCHAR(50)           NULL,
-    order_index                 DOUBLE                NOT NULL,
-    lesson_id                   BIGINT                NULL,
+    id                            BIGINT AUTO_INCREMENT NOT NULL,
+    created_time                  datetime              NOT NULL,
+    modified_time                 datetime              NULL,
+    japanese_name                 VARCHAR(255)          NULL,
+    japanese_description          VARCHAR(255)          NULL,
+    japanese_name_markup          TEXT                  NULL,
+    japanese_description_markup   TEXT                  NULL,
+    status                        VARCHAR(50)           NULL,
+    order_index                   DOUBLE                NOT NULL,
+    first_node_global_order_index DOUBLE                NULL,
+    last_node_global_order_index  DOUBLE                NULL,
+    lesson_id                     BIGINT                NULL,
     CONSTRAINT pk_objectives PRIMARY KEY (id)
 );
 
@@ -300,28 +306,33 @@ CREATE TABLE speech_assessments
 
 CREATE TABLE topics
 (
-    id                          BIGINT AUTO_INCREMENT NOT NULL,
-    created_time                datetime              NOT NULL,
-    modified_time               datetime              NULL,
-    japanese_name               VARCHAR(255)          NULL,
-    japanese_description        VARCHAR(255)          NULL,
-    japanese_name_markup        TEXT                  NULL,
-    japanese_description_markup TEXT                  NULL,
-    status                      VARCHAR(50)           NULL,
-    order_index                 DOUBLE                NOT NULL,
-    cover_image_file_id         BIGINT                NULL,
-    user_id                     BIGINT                NULL,
-    book_id                     BIGINT                NULL,
+    id                            BIGINT AUTO_INCREMENT NOT NULL,
+    created_time                  datetime              NOT NULL,
+    modified_time                 datetime              NULL,
+    japanese_name                 VARCHAR(255)          NULL,
+    japanese_description          VARCHAR(255)          NULL,
+    japanese_name_markup          TEXT                  NULL,
+    japanese_description_markup   TEXT                  NULL,
+    status                        VARCHAR(50)           NULL,
+    order_index                   DOUBLE                NOT NULL,
+    first_node_global_order_index DOUBLE                NULL,
+    last_node_global_order_index  DOUBLE                NULL,
+    cover_image_file_id           BIGINT                NULL,
+    user_id                       BIGINT                NULL,
+    book_id                       BIGINT                NULL,
     CONSTRAINT pk_topics PRIMARY KEY (id)
 );
 
 CREATE TABLE user_learning_progresses
 (
-    id                    BIGINT AUTO_INCREMENT NOT NULL,
-    created_time          datetime              NOT NULL,
-    modified_time         datetime              NULL,
-    learning_path_node_id BIGINT                NOT NULL,
-    user_id               BIGINT                NOT NULL,
+    id                         BIGINT AUTO_INCREMENT NOT NULL,
+    created_time               datetime              NOT NULL,
+    modified_time              datetime              NULL,
+    farthest_available_node_id BIGINT                NOT NULL,
+    last_learning_node_id      BIGINT                NULL,
+    last_learning_at           datetime              NULL,
+    current_streak             INT                   NULL,
+    longest_streak             INT                   NULL,
     CONSTRAINT pk_user_learning_progresses PRIMARY KEY (id)
 );
 
@@ -371,23 +382,21 @@ CREATE TABLE user_sessions
 
 CREATE TABLE users
 (
-    id                 BIGINT AUTO_INCREMENT NOT NULL,
-    created_time       datetime              NOT NULL,
-    modified_time      datetime              NULL,
-    username           VARCHAR(36)           NULL,
-    email              VARCHAR(255)          NOT NULL,
-    hash_password      VARCHAR(255)          NULL,
-    full_name          VARCHAR(255)          NULL,
-    gender             VARCHAR(10)           NULL,
-    dob                date                  NULL,
-    jlpt_level         VARCHAR(2)            NOT NULL,
-    status             VARCHAR(20)           NOT NULL,
-    current_streak     INT                   NULL,
-    longest_streak     INT                   NULL,
-    last_practice_date date                  NULL,
-    avatar_url         VARCHAR(2048)         NULL,
-    provider_id        VARCHAR(512)          NULL,
-    point_summary_id   BIGINT                NULL,
+    id                        BIGINT AUTO_INCREMENT NOT NULL,
+    created_time              datetime              NOT NULL,
+    modified_time             datetime              NULL,
+    username                  VARCHAR(36)           NULL,
+    email                     VARCHAR(255)          NOT NULL,
+    hash_password             VARCHAR(255)          NULL,
+    full_name                 VARCHAR(255)          NULL,
+    gender                    VARCHAR(10)           NULL,
+    dob                       date                  NULL,
+    jlpt_level                VARCHAR(2)            NOT NULL,
+    status                    VARCHAR(20)           NOT NULL,
+    avatar_url                VARCHAR(2048)         NULL,
+    provider_id               VARCHAR(512)          NULL,
+    point_summary_id          BIGINT                NULL,
+    user_learning_progress_id BIGINT                NULL,
     CONSTRAINT pk_users PRIMARY KEY (id)
 );
 
@@ -480,9 +489,6 @@ ALTER TABLE speech_assessments
 ALTER TABLE topics
     ADD CONSTRAINT uc_topics_cover_image_file UNIQUE (cover_image_file_id);
 
-ALTER TABLE user_learning_progresses
-    ADD CONSTRAINT uc_user_learning_progresses_user UNIQUE (user_id);
-
 ALTER TABLE users
     ADD CONSTRAINT uc_users_email UNIQUE (email);
 
@@ -491,6 +497,9 @@ ALTER TABLE users
 
 ALTER TABLE users
     ADD CONSTRAINT uc_users_provider UNIQUE (provider_id);
+
+ALTER TABLE users
+    ADD CONSTRAINT uc_users_user_learning_progress UNIQUE (user_learning_progress_id);
 
 ALTER TABLE users
     ADD CONSTRAINT uc_users_username UNIQUE (username);
@@ -612,11 +621,14 @@ ALTER TABLE topics
 ALTER TABLE users
     ADD CONSTRAINT FK_USERS_ON_POINT_SUMMARY FOREIGN KEY (point_summary_id) REFERENCES point_summary (id);
 
-ALTER TABLE user_learning_progresses
-    ADD CONSTRAINT FK_USER_LEARNING_PROGRESSES_ON_LEARNING_PATH_NODE FOREIGN KEY (learning_path_node_id) REFERENCES learning_path_nodes (id);
+ALTER TABLE users
+    ADD CONSTRAINT FK_USERS_ON_USER_LEARNING_PROGRESS FOREIGN KEY (user_learning_progress_id) REFERENCES user_learning_progresses (id);
 
 ALTER TABLE user_learning_progresses
-    ADD CONSTRAINT FK_USER_LEARNING_PROGRESSES_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+    ADD CONSTRAINT FK_USER_LEARNING_PROGRESSES_ON_FARTHEST_AVAILABLE_NODE FOREIGN KEY (farthest_available_node_id) REFERENCES learning_path_nodes (id);
+
+ALTER TABLE user_learning_progresses
+    ADD CONSTRAINT FK_USER_LEARNING_PROGRESSES_ON_LAST_LEARNING_NODE FOREIGN KEY (last_learning_node_id) REFERENCES learning_path_nodes (id);
 
 ALTER TABLE user_node_progresses
     ADD CONSTRAINT FK_USER_NODE_PROGRESSES_ON_LEARNING_PATH_NODE FOREIGN KEY (learning_path_node_id) REFERENCES learning_path_nodes (id);

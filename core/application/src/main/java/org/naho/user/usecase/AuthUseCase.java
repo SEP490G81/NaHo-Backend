@@ -11,7 +11,6 @@ import org.naho.user.command.GoogleLoginCommand;
 import org.naho.user.command.LogoutCommand;
 import org.naho.user.exception.RoleErrorCode;
 import org.naho.user.exception.UserErrorCode;
-import org.naho.user.mapper.UserResultMapper;
 import org.naho.user.model.Role;
 import org.naho.user.model.User;
 import org.naho.user.model.UserSession;
@@ -19,7 +18,6 @@ import org.naho.user.port.in.AuthInputPort;
 import org.naho.user.port.out.*;
 import org.naho.user.result.LoginResult;
 import org.naho.user.result.TokenResult;
-import org.naho.user.result.UserResult;
 import org.naho.user.type.RoleName;
 import org.naho.user.type.SessionRevokedReason;
 import org.naho.user.type.UserStatus;
@@ -34,7 +32,6 @@ public class AuthUseCase implements AuthInputPort {
     private final UserRepositoryPort userRepositoryPort;
     private final EncoderPort encoderPort;
     private final TokenServicePort tokenServicePort;
-    private final UserResultMapper userResultMapper;
     private final UserSessionRepositoryPort userSessionRepositoryPort;
     private final RoleRepositoryPort roleRepositoryPort;
     private final TransactionPort transactionPort;
@@ -45,7 +42,6 @@ public class AuthUseCase implements AuthInputPort {
             UserRepositoryPort userRepositoryPort,
             EncoderPort encoderPort,
             TokenServicePort tokenServicePort,
-            UserResultMapper userResultMapper,
             UserSessionRepositoryPort userSessionRepositoryPort,
             RoleRepositoryPort roleRepositoryPort,
             TransactionPort transactionPort,
@@ -55,24 +51,11 @@ public class AuthUseCase implements AuthInputPort {
         this.userRepositoryPort = userRepositoryPort;
         this.encoderPort = encoderPort;
         this.tokenServicePort = tokenServicePort;
-        this.userResultMapper = userResultMapper;
         this.userSessionRepositoryPort = userSessionRepositoryPort;
         this.roleRepositoryPort = roleRepositoryPort;
         this.transactionPort = transactionPort;
         this.userSessionServicePort = userSessionServicePort;
         this.userSessionEventPublisherPort = userSessionEventPublisherPort;
-    }
-
-    @Override
-    public UserResult findUserById(Long userId) {
-        User user = userRepositoryPort.findById(userId)
-                .orElseThrow(() -> new ApplicationException(
-                        UserErrorCode.USER_NOT_FOUND,
-                        UserDetailMessageKey.USER_ID_NOT_FOUND,
-                        userId
-                ));
-        List<String> roleNames = roleRepositoryPort.findRoleNamesByUserId(userId);
-        return userResultMapper.domainToResult(user, roleNames);
     }
 
     @Override

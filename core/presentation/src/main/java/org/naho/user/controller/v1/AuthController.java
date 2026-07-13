@@ -10,13 +10,11 @@ import org.naho.user.constant.TokenType;
 import org.naho.user.dto.mapper.LoginRequestMapper;
 import org.naho.user.dto.mapper.UserResponseMapper;
 import org.naho.user.dto.request.CredentialsLoginRequest;
-import org.naho.user.dto.response.UserResponse;
 import org.naho.user.helper.CookieFactory;
 import org.naho.user.helper.LoginRequestResolver;
 import org.naho.user.port.in.AuthInputPort;
 import org.naho.user.result.AccessTokenPayload;
 import org.naho.user.result.LoginResult;
-import org.naho.user.result.UserResult;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -32,17 +30,6 @@ public class AuthController {
     private final CookieFactory cookieFactory;
     private final UserResponseMapper userResponseMapper;
     private final LoginRequestResolver loginRequestResolver;
-
-    @ApiResponseMessage(message = UserDetailMessageKey.USER_GET_SUCCESSFULLY)
-    @GetMapping("/me")
-    public ResponseEntity<UserResponse> getCurrentLoggedUser(
-            @AuthenticationPrincipal AccessTokenPayload payload
-    ) {
-        UserResult result = authInputPort.findUserById(payload.userId());
-        UserResponse response = userResponseMapper.resultToResponse(result);
-
-        return ResponseEntity.ok(response);
-    }
 
     @ApiResponseMessage(message = UserDetailMessageKey.USER_LOGIN_SUCCESSFULLY)
     @PostMapping("/login")

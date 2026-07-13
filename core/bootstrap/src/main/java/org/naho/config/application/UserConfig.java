@@ -11,6 +11,20 @@ import ua_parser.Parser;
 
 @Configuration
 public class UserConfig {
+
+    @Bean
+    public CrudUserInputPort crudUserInputPort(
+            UserRepositoryPort userRepositoryPort,
+            UserResultMapper userResultMapper,
+            RoleRepositoryPort roleRepositoryPort
+    ) {
+        return new CrudUserUseCase(
+                userRepositoryPort,
+                userResultMapper,
+                roleRepositoryPort
+        );
+    }
+
     @Bean
     public Parser parser() {
         return new Parser();
@@ -26,7 +40,6 @@ public class UserConfig {
             UserRepositoryPort userRepositoryPort,
             EncoderPort encoderPort,
             TokenServicePort tokenServicePort,
-            UserResultMapper userResultMapper,
             UserSessionRepositoryPort userSessionRepositoryPort,
             RoleRepositoryPort roleRepositoryPort,
             TransactionPort transactionPort,
@@ -37,7 +50,6 @@ public class UserConfig {
                 userRepositoryPort,
                 encoderPort,
                 tokenServicePort,
-                userResultMapper,
                 userSessionRepositoryPort,
                 roleRepositoryPort,
                 transactionPort,

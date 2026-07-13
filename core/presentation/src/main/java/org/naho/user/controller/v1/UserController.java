@@ -11,13 +11,16 @@ import org.naho.user.dto.request.RegisterRequest;
 import org.naho.user.dto.request.UpdateStatusRequest;
 import org.naho.user.dto.response.RegisterResponse;
 import org.naho.user.dto.response.UserResponse;
+import org.naho.user.port.in.CrudUserInputPort;
 import org.naho.user.port.in.GetUserInputPort;
 import org.naho.user.port.in.RegisterInputPort;
 import org.naho.user.port.in.UpdateUserInputPort;
+import org.naho.user.result.AccessTokenPayload;
 import org.naho.user.result.RegisterResult;
 import org.naho.user.result.UserResult;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,10 +32,22 @@ public class UserController {
     private final GetUserInputPort getUserInputPort;
     private final UpdateUserInputPort updateUserInputPort;
     private final UserResponseMapper userResponseMapper;
+    private final CrudUserInputPort crudUserInputPort;
 
     private final RegisterInputPort registerInputPort;
     private final RegisterResponseMapper registerResponseMapper;
     private final RegisterRequestMapper registerRequestMapper;
+
+    @ApiResponseMessage(message = UserDetailMessageKey.USER_GET_SUCCESSFULLY)
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> getCurrentLoggedUser(
+            @AuthenticationPrincipal AccessTokenPayload payload
+    ) {
+        UserResult result = crudUserInputPort.findUserById(payload.userId());
+        UserResponse response = userResponseMapper.resultToResponse(result);
+
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping("/register")
     @ApiResponseMessage(message = UserDetailMessageKey.USER_REGISTER_SUCCESSFULLY)
@@ -44,7 +59,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getUser(@PathVariable("id") Long id) {
+    public ResponseEntity<UserResponse> getUser(@PathVariable Long id) {
         UserResult result = getUserInputPort.getUserById(id);
         return ResponseEntity.ok(userResponseMapper.resultToResponse(result));
     }
@@ -62,7 +77,7 @@ public class UserController {
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<UserResponse> updateStatus(
-            @PathVariable("id") Long id,
+            @PathVariable Long id,
             @RequestBody UpdateStatusRequest request
     ) {
         UserResult user = updateUserInputPort.updateStatus(id, request.newStatus());

@@ -7,13 +7,16 @@ import org.naho.user.valueobject.Dob;
 import org.naho.user.valueobject.Email;
 import org.naho.user.valueobject.Username;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public class User {
     private final Long id;
     private final List<Long> roleIds;
     private final List<Long> userSessionIds;
+    private Long pointSummaryId;
+    private Long userLearningProgressId;
+    private String providerId;
+
     private final Username username;
     private final Email email;
     private final String hashPassword;
@@ -22,12 +25,7 @@ public class User {
     private final Gender gender;
     private final Dob dob;
     private final JLPTLevel jlptLevel;
-    private final Integer currentStreak;
-    private final Integer longestStreak;
-    private final LocalDate lastPracticeDate;
-    private Long pointSummaryId;
     private UserStatus status;
-    private String providerId;
 
     // Private constructor
     private User(Builder builder) {
@@ -36,6 +34,7 @@ public class User {
         this.roleIds = builder.roleIds;
         this.userSessionIds = builder.userSessionIds;
         this.pointSummaryId = builder.pointSummaryId;
+        this.userLearningProgressId = builder.userLearningProgressId;
         this.username = builder.username;
         this.email = builder.email;
         this.hashPassword = builder.hashPassword;
@@ -44,9 +43,6 @@ public class User {
         this.dob = builder.dob;
         this.jlptLevel = builder.jlptLevel;
         this.status = builder.status;
-        this.currentStreak = builder.currentStreak;
-        this.longestStreak = builder.longestStreak;
-        this.lastPracticeDate = builder.lastPracticeDate;
         this.providerId = builder.providerId;
     }
 
@@ -62,8 +58,6 @@ public class User {
                 .hashPassword(hashPassword)
                 .status(UserStatus.ACTIVE)
                 .roleIds(roleIds)
-                .currentStreak(0)
-                .longestStreak(0)
                 .build();
     }
 
@@ -133,16 +127,12 @@ public class User {
         this.status = status;
     }
 
-    public Integer getCurrentStreak() {
-        return currentStreak;
+    public Long getUserLearningProgressId() {
+        return userLearningProgressId;
     }
 
-    public Integer getLongestStreak() {
-        return longestStreak;
-    }
-
-    public LocalDate getLastPracticeDate() {
-        return lastPracticeDate;
+    public void setUserLearningProgressId(Long userLearningProgressId) {
+        this.userLearningProgressId = userLearningProgressId;
     }
 
     public String getProviderId() {
@@ -160,6 +150,7 @@ public class User {
         private List<Long> roleIds;
         private List<Long> userSessionIds;
         private Long pointSummaryId;
+        private Long userLearningProgressId;
 
         private Username username;
         private Email email;
@@ -173,9 +164,6 @@ public class User {
 
         private JLPTLevel jlptLevel;
         private UserStatus status;
-        private Integer currentStreak;
-        private Integer longestStreak;
-        private LocalDate lastPracticeDate;
         private String providerId;
 
         public Builder id(Long id) {
@@ -200,6 +188,11 @@ public class User {
 
         public Builder pointSummaryId(Long pointSummaryId) {
             this.pointSummaryId = pointSummaryId;
+            return this;
+        }
+
+        public Builder userLearningProgressId(Long userLearningProgressId) {
+            this.userLearningProgressId = userLearningProgressId;
             return this;
         }
 
@@ -243,20 +236,6 @@ public class User {
             return this;
         }
 
-        public Builder currentStreak(Integer currentStreak) {
-            this.currentStreak = currentStreak;
-            return this;
-        }
-
-        public Builder longestStreak(Integer longestStreak) {
-            this.longestStreak = longestStreak;
-            return this;
-        }
-
-        public Builder lastPracticeDate(LocalDate lastPracticeDate) {
-            this.lastPracticeDate = lastPracticeDate;
-            return this;
-        }
 
         public Builder providerId(String providerId) {
             this.providerId = providerId;

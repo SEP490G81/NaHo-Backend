@@ -16,6 +16,8 @@ public class Topic {
     private String japaneseDescriptionMarkup;
     private TopicStatus status;
     private Double orderIndex;
+    private final Double firstNodeGlobalOrderIndex;
+    private final Double lastNodeGlobalOrderIndex;
 
     // Private constructor dùng cho Builder
     private Topic(Builder builder) {
@@ -29,6 +31,8 @@ public class Topic {
         this.japaneseDescriptionMarkup = builder.japaneseDescriptionMarkup;
         this.status = builder.status;
         this.orderIndex = builder.orderIndex;
+        this.firstNodeGlobalOrderIndex = builder.firstNodeGlobalOrderIndex;
+        this.lastNodeGlobalOrderIndex = builder.lastNodeGlobalOrderIndex;
     }
 
     public static Builder builder() {
@@ -130,6 +134,14 @@ public class Topic {
         return orderIndex;
     }
 
+    public Double getFirstNodeGlobalOrderIndex() {
+        return firstNodeGlobalOrderIndex;
+    }
+
+    public Double getLastNodeGlobalOrderIndex() {
+        return lastNodeGlobalOrderIndex;
+    }
+
     public Long getBookId() {
         return bookId;
     }
@@ -146,6 +158,8 @@ public class Topic {
         private String japaneseDescriptionMarkup;
         private TopicStatus status;
         private Double orderIndex;
+        private Double firstNodeGlobalOrderIndex;
+        private Double lastNodeGlobalOrderIndex;
 
         public Builder id(Long id) {
             this.id = id;
@@ -194,6 +208,16 @@ public class Topic {
 
         public Builder orderIndex(Double orderIndex) {
             this.orderIndex = orderIndex;
+            return this;
+        }
+
+        public Builder firstNodeGlobalOrderIndex(Double firstNodeGlobalOrderIndex) {
+            this.firstNodeGlobalOrderIndex = firstNodeGlobalOrderIndex;
+            return this;
+        }
+
+        public Builder lastNodeGlobalOrderIndex(Double lastNodeGlobalOrderIndex) {
+            this.lastNodeGlobalOrderIndex = lastNodeGlobalOrderIndex;
             return this;
         }
 

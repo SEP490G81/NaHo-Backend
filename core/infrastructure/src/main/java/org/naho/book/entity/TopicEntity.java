@@ -40,6 +40,12 @@ public class TopicEntity extends BaseEntity {
     @Column(name = "order_index", nullable = false)
     Double orderIndex;
 
+    @Column(name = "first_node_global_order_index")
+    Double firstNodeGlobalOrderIndex;
+
+    @Column(name = "last_node_global_order_index")
+    Double lastNodeGlobalOrderIndex;
+
     @OneToOne
     @JoinColumn(name = "cover_image_file_id")
     FileEntity coverImageFile;

@@ -3,7 +3,7 @@ package org.naho.book.usecase;
 import org.naho.book.model.Book;
 import org.naho.book.port.in.ListBooksInputPort;
 import org.naho.book.port.out.BookRepositoryPort;
-import org.naho.book.result.BookListItemResult;
+import org.naho.book.result.BookResult;
 import org.naho.file.port.in.CrudFileInputPort;
 import org.naho.file.result.FileResult;
 
@@ -23,7 +23,7 @@ public class ListBooksUseCase implements ListBooksInputPort {
     }
 
     @Override
-    public List<BookListItemResult> listBooks() {
+    public List<BookResult> listBooks() {
         List<Book> books = bookRepositoryPort.findAllBooks();
 
         List<Long> coverImageFileIds = books.stream()
@@ -43,7 +43,7 @@ public class ListBooksUseCase implements ListBooksInputPort {
                 ));
 
         return books.stream()
-                .map(book -> new BookListItemResult(
+                .map(book -> new BookResult(
                         book.getId(),
                         book.getTitle(),
                         book.getDescription(),

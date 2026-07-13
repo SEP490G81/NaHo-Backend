@@ -12,9 +12,11 @@ public class Book {
     private final Long coverImageFileId;
     private final JLPTLevel jlptLevel;
     private final CefrLevel cefrLevel;
-    private final Double orderIndex;
     private String title;
     private String description;
+    private final Double orderIndex;
+    private final Double firstNodeGlobalOrderIndex;
+    private final Double lastNodeGlobalOrderIndex;
 
     private Book(Builder builder) {
         this.id = builder.id;
@@ -24,6 +26,8 @@ public class Book {
         this.jlptLevel = builder.jlptLevel;
         this.cefrLevel = builder.cefrLevel;
         this.orderIndex = builder.orderIndex;
+        this.firstNodeGlobalOrderIndex = builder.firstNodeGlobalOrderIndex;
+        this.lastNodeGlobalOrderIndex = builder.lastNodeGlobalOrderIndex;
     }
 
     public static Builder builder() {
@@ -58,6 +62,14 @@ public class Book {
         return orderIndex;
     }
 
+    public Double getFirstNodeGlobalOrderIndex() {
+        return firstNodeGlobalOrderIndex;
+    }
+
+    public Double getLastNodeGlobalOrderIndex() {
+        return lastNodeGlobalOrderIndex;
+    }
+
     public static final class Builder {
 
         private Long id;
@@ -67,6 +79,8 @@ public class Book {
         private JLPTLevel jlptLevel;
         private CefrLevel cefrLevel;
         private Double orderIndex;
+        private Double firstNodeGlobalOrderIndex;
+        private Double lastNodeGlobalOrderIndex;
 
         private Builder() {
         }
@@ -103,6 +117,16 @@ public class Book {
 
         public Builder orderIndex(Double orderIndex) {
             this.orderIndex = orderIndex;
+            return this;
+        }
+
+        public Builder firstNodeGlobalOrderIndex(Double firstNodeGlobalOrderIndex) {
+            this.firstNodeGlobalOrderIndex = firstNodeGlobalOrderIndex;
+            return this;
+        }
+
+        public Builder lastNodeGlobalOrderIndex(Double lastNodeGlobalOrderIndex) {
+            this.lastNodeGlobalOrderIndex = lastNodeGlobalOrderIndex;
             return this;
         }
 

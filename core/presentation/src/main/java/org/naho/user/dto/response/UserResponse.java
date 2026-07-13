@@ -27,4 +27,5 @@ public class UserResponse {
     LocalDate dob;
     JLPTLevel jlptLevel;
     UserStatus status;
+    Long userLearningProgressId;
 }

@@ -64,6 +64,7 @@ public class UserSeasonPoint {
             return this;
         }
 
+
         public Builder seasonId(Long seasonId) {
             this.seasonId = seasonId;
             return this;

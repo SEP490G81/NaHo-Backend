@@ -15,6 +15,7 @@ import org.naho.user.model.User;
 public interface UserEntityMapper {
     @Mapping(target = "roleIds", source = "roles")
     @Mapping(target = "pointSummaryId", source = "pointSummary.id")
+    @Mapping(target = "userLearningProgressId", source = "userLearningProgress.id")
     @Mapping(target = "userSessionIds", ignore = true)
     User entityToDomain(UserEntity entity);
 

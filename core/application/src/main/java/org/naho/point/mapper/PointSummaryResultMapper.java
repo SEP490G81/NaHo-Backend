@@ -10,7 +10,6 @@ public class PointSummaryResultMapper {
         }
         return new PointSummaryResult(
                 domain.getId(),
-                domain.getUserId(),
                 domain.getTotalPoint()
         );
     }

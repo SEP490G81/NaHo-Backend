@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
-import org.naho.book.model.Topic;
 import org.naho.book.port.out.TopicRepositoryPort;
 import org.naho.file.command.FileUploadCommand;
 import org.naho.file.port.in.FileStorageInputPort;
@@ -122,7 +121,6 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             azureWordFeedbackJson = "[]";
         }
 
-        Topic topic = null;
         String topicName = "General conversation";
 
         String rawLlmFeedback = aiAnalysisPort.analyzeSpeaking(

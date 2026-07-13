@@ -4,7 +4,6 @@ import org.naho.user.command.CredentialsLoginCommand;
 import org.naho.user.command.GoogleLoginCommand;
 import org.naho.user.command.LogoutCommand;
 import org.naho.user.result.LoginResult;
-import org.naho.user.result.UserResult;
 
 public interface AuthInputPort {
     LoginResult credentialsLogin(CredentialsLoginCommand command);
@@ -14,8 +13,6 @@ public interface AuthInputPort {
     void logout(LogoutCommand command);
 
     LoginResult rotateToken(String refreshToken);
-
-    UserResult findUserById(Long userId);
 
     void logoutAllSessions(Long userId);
 }

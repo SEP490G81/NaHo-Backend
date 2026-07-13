@@ -55,15 +55,6 @@ public class UserEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     UserStatus status;
 
-    @Column(name = "current_streak")
-    Integer currentStreak;
-
-    @Column(name = "longest_streak")
-    Integer longestStreak;
-
-    @Column(name = "last_practice_date")
-    LocalDate lastPracticeDate;
-
     @Column(name = "avatar_url", length = 2048)
     String avatarUrl;
 
@@ -95,7 +86,8 @@ public class UserEntity extends BaseEntity {
     @OneToMany(mappedBy = "user")
     List<UserNodeProgressEntity> userNodeProgresses;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "user_learning_progress_id")
     UserLearningProgressEntity userLearningProgress;
 
     @OneToMany(mappedBy = "user")

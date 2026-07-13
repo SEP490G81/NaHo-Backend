@@ -21,6 +21,7 @@ public class UserResultMapper {
                 .avatarUrl(domain.getAvatarUrl())
                 .jlptLevel(domain.getJlptLevel())
                 .status(domain.getStatus())
+                .userLearningProgressId(domain.getUserLearningProgressId())
                 .build();
     }
 }
