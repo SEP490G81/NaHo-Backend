@@ -8,8 +8,8 @@ public record VocabulariesOfObjectiveResult(
 ) {
     public record VocabularyDetailResult(
             Long id,
-            String kana,
-            String kanji,
+            String reading,
+            String japanese,
             String vietnameseMeaningText,
             String englishMeaningText
     ) {

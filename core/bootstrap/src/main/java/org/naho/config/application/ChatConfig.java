@@ -18,6 +18,7 @@ import org.naho.speech.llm.usecase.SpeakingAnalysisUseCase;
 import org.naho.speech.llm.usecase.SpeakingSessionUseCase;
 import org.naho.speech.llm.usecase.SuggestedTopicsUseCase;
 import org.naho.user.port.out.UserRepositoryPort;
+import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -65,9 +66,10 @@ public class ChatConfig {
     public SpeakingSessionInputPort speakingSessionInputPort(
             AiChatPort aiChatPort,
             SessionStorePort sessionStorePort,
-            SpeechToTextPort speechToTextPort
+            SpeechToTextPort speechToTextPort,
+            PersonaRepositoryPort personaRepositoryPort
     ) {
-        return new SpeakingSessionUseCase(aiChatPort, sessionStorePort, speechToTextPort);
+        return new SpeakingSessionUseCase(aiChatPort, sessionStorePort, speechToTextPort, personaRepositoryPort);
     }
 
     @Bean

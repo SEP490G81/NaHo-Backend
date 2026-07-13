@@ -10,6 +10,9 @@ import org.naho.vocabulary.port.out.VocabularyPort;
 import org.naho.vocabulary.service.ImportVocabularyService;
 import org.naho.vocabulary.usecase.GetVocabulariesOfObjectiveUseCase;
 import org.naho.vocabulary.usecase.ImportVocabularyUseCase;
+import org.naho.vocabulary.port.in.ExportVocabularyInputPort;
+import org.naho.vocabulary.port.out.ExcelWriterPort;
+import org.naho.vocabulary.usecase.ExportVocabularyUseCase;
 import org.naho.shared.port.out.TransactionPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,5 +41,14 @@ public class VocabularyConfig {
             VocabularyPort vocabularyPort
     ) {
         return new SearchVocabulariesOfQuestionUsecase(vocabularyPort);
+    }
+
+    @Bean
+    public ExportVocabularyInputPort exportVocabularyInputPort(
+            VocabularyPort vocabularyPort,
+            VocabulariesQuestionPort vocabulariesQuestionPort,
+            ExcelWriterPort excelWriterPort
+    ) {
+        return new ExportVocabularyUseCase(vocabularyPort, vocabulariesQuestionPort, excelWriterPort);
     }
 }

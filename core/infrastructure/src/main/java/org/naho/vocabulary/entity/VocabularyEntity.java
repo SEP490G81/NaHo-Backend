@@ -23,12 +23,12 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class VocabularyEntity extends BaseEntity {
 
-    @Column(name = "kana")
-    String kana;
+    @Column(name = "reading")
+    String reading;
 
-    @Column(name = "kanji")
-    String kanji;
-
+    @Column(name = "japanese")
+    String japanese;
+//sửa kana -> cách đọc, kanji -> japanese
     @Column(name = "vietnamese_meaning_text")
     String vietnameseMeaningText;
 
@@ -42,4 +42,5 @@ public class VocabularyEntity extends BaseEntity {
     List<SpeakingQuestionEntity> speakingQuestions;
     @ManyToMany(mappedBy = "vocabularies")
     List<VocabularyQuestionEntity> vocabularyQuestions;
+
 }

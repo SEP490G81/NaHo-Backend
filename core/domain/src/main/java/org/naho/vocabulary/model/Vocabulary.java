@@ -2,19 +2,28 @@ package org.naho.vocabulary.model;
 
 public class Vocabulary {
     private final Long id;
-    private final String kana;
-    private final String kanji;
+    private final String reading;
+    private final String japanese;
     private final String vietnameseMeaningText;
     private final String englishMeaningText;
     private final Long questionId;
 
     private Vocabulary(Builder builder) {
         this.id = builder.id;
-        this.kana = builder.kana;
-        this.kanji = builder.kanji;
+        this.japanese = builder.japanese;
+        this.reading = containsKanji(builder.japanese) && builder.reading != null && !builder.reading.trim().isEmpty()
+                ? builder.reading.trim()
+                : null;
         this.vietnameseMeaningText = builder.vietnameseMeaningText;
         this.englishMeaningText = builder.englishMeaningText;
         this.questionId = builder.questionId;
+    }
+
+    private static boolean containsKanji(String s) {
+        if (s == null) {
+            return false;
+        }
+        return s.chars().anyMatch(c -> c >= 0x4E00 && c <= 0x9FAF);
     }
 
     public static Builder builder() {
@@ -25,12 +34,12 @@ public class Vocabulary {
         return id;
     }
 
-    public String getKana() {
-        return kana;
+    public String getReading() {
+        return reading;
     }
 
-    public String getKanji() {
-        return kanji;
+    public String getJapanese() {
+        return japanese;
     }
 
     public String getVietnameseMeaningText() {
@@ -47,8 +56,8 @@ public class Vocabulary {
 
     public static class Builder {
         private Long id;
-        private String kana;
-        private String kanji;
+        private String reading;
+        private String japanese;
         private String vietnameseMeaningText;
         private String englishMeaningText;
         private Long questionId;
@@ -58,13 +67,13 @@ public class Vocabulary {
             return this;
         }
 
-        public Builder kana(String kana) {
-            this.kana = kana;
+        public Builder reading(String reading) {
+            this.reading = reading;
             return this;
         }
 
-        public Builder kanji(String kanji) {
-            this.kanji = kanji;
+        public Builder japanese(String japanese) {
+            this.japanese = japanese;
             return this;
         }
 

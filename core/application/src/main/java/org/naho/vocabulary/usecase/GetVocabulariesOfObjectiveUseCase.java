@@ -25,8 +25,8 @@ public class GetVocabulariesOfObjectiveUseCase implements GetVocabulariesOfObjec
         List<VocabulariesOfObjectiveResult.VocabularyDetailResult> detailResults = listVocabulary.stream()
                 .map(vocab -> new VocabulariesOfObjectiveResult.VocabularyDetailResult(
                         vocab.getId(),
-                        vocab.getKana(),
-                        vocab.getKanji(),
+                        vocab.getReading(),
+                        vocab.getJapanese(),
                         vocab.getVietnameseMeaningText(),
                         vocab.getEnglishMeaningText()
                 ))

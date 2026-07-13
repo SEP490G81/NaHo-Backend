@@ -5,6 +5,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.naho.vocabulary.model.Vocabulary;
 import org.naho.vocabulary.port.out.ExcelParserPort;
 import org.springframework.stereotype.Component;
+import org.naho.shared.exception.ApplicationException;
+import org.naho.vocabulary.exception.VocabularyErrorCode;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -15,8 +17,8 @@ public class ExcelParserAdapter implements ExcelParserPort {
 
     /**
      * Expected Excel column order:
-     *  Col 0: Kana
-     *  Col 1: Kanji
+     *  Col 0: Reading
+     *  Col 1: Japanese
      *  Col 2: Vietnamese Meaning
      *  Col 3: English Meaning
      *  Col 4: objective_id  (Long - from objectives_reference.xlsx)
@@ -34,20 +36,20 @@ public class ExcelParserAdapter implements ExcelParserPort {
                     continue; // Skip header
                 }
 
-                String kana = getCellValueAsString(row.getCell(0));
-                String kanji = getCellValueAsString(row.getCell(1));
+                String reading = getCellValueAsString(row.getCell(0));
+                String japanese = getCellValueAsString(row.getCell(1));
                 String vietMeaning = getCellValueAsString(row.getCell(2));
                 String engMeaning = getCellValueAsString(row.getCell(3));
                 // col 4 = objective_id (reference only, not stored on Vocabulary)
                 Long questionId = getCellValueAsLong(row.getCell(5));
 
-                if (kana.isEmpty() && kanji.isEmpty() && vietMeaning.isEmpty()) {
+                if (reading.isEmpty() && japanese.isEmpty() && vietMeaning.isEmpty()) {
                     continue; // skip empty rows
                 }
 
                 Vocabulary vocabulary = Vocabulary.builder()
-                        .kana(kana)
-                        .kanji(kanji)
+                        .reading(reading)
+                        .japanese(japanese)
                         .vietnameseMeaningText(vietMeaning)
                         .englishMeaningText(engMeaning)
                         .questionId(questionId)
@@ -56,7 +58,7 @@ public class ExcelParserAdapter implements ExcelParserPort {
                 vocabularies.add(vocabulary);
             }
         } catch (Exception e) {
-            throw new RuntimeException("Failed to parse Excel file", e);
+            throw new ApplicationException(VocabularyErrorCode.VOCABULARY_IMPORT_INVALID_FILE, "vocabulary.import.invalid_file", e);
         }
         return vocabularies;
     }
@@ -69,7 +71,6 @@ public class ExcelParserAdapter implements ExcelParserPort {
             case STRING -> cell.getStringCellValue().trim();
             case NUMERIC -> {
                 double val = cell.getNumericCellValue();
-                // Avoid "1.0" for integer-like values
                 yield val == Math.floor(val) ? String.valueOf((long) val) : String.valueOf(val);
             }
             case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());

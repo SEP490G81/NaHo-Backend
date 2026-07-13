@@ -26,8 +26,8 @@ public class SearchVocabulariesOfQuestionUsecase implements SearchVocabulariesOf
         List<VocabulariesOfQuestionResult.VocabularyDetailResult> vocabularyDetailResultList = listVocabulary.stream().map(
                 vocab -> new VocabulariesOfQuestionResult.VocabularyDetailResult(
                         vocab.getId(),
-                        vocab.getKana(),
-                        vocab.getKanji(),
+                        vocab.getReading(),
+                        vocab.getJapanese(),
                         vocab.getVietnameseMeaningText(),
                         vocab.getEnglishMeaningText()
                 )

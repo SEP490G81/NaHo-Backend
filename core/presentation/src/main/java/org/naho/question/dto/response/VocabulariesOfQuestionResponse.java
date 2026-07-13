@@ -9,8 +9,8 @@ public record VocabulariesOfQuestionResponse(
 ) {
     public record VocabularyDetailResponse(
             Long id,
-            String kana,
-            String kanji,
+            String reading,
+            String japanese,
             String vietnameseMeaningText,
             String englishMeaningText
     ) {

@@ -89,8 +89,10 @@ public class SpeakingController {
 
     @PostMapping(value = "/session/start-free", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponseMessage(message = "Free session started successfully!")
-    public ResponseEntity<StartSessionResponse> startFreeSession() {
-        String sessionId = speakingSessionInputPort.startFreeSession();
+    public ResponseEntity<StartSessionResponse> startFreeSession(
+            @RequestParam(value = "personaId", required = false) Long personaId
+    ) {
+        String sessionId = speakingSessionInputPort.startFreeSession(personaId);
         return ResponseEntity.ok(new StartSessionResponse(sessionId));
     }
 

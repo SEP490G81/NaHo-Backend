@@ -30,8 +30,8 @@ public class SaveVocabularyAdapter implements SaveVocabularyPort {
 
         for (Vocabulary v : vocabularies) {
             VocabularyEntity entity = new VocabularyEntity();
-            entity.setKana(v.getKana());
-            entity.setKanji(v.getKanji());
+            entity.setReading(v.getReading());
+            entity.setJapanese(v.getJapanese());
             entity.setVietnameseMeaningText(v.getVietnameseMeaningText());
             entity.setEnglishMeaningText(v.getEnglishMeaningText());
 
