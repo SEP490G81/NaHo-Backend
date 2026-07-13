@@ -1,6 +1,6 @@
 package org.naho.speech.llm.result;
 
 public record SpeakingAnalysisResult(
-              Long historyId,
-              Double score) {
+        Long historyId,
+        Double score) {
 }

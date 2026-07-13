@@ -28,6 +28,26 @@ public class PointSummary {
         return new Builder();
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public Double getTotalPoint() {
+        return totalPoint;
+    }
+
+    public void setTotalPoint(Double totalPoint) {
+        this.totalPoint = totalPoint;
+    }
+
+    public void addPoint(Double point) {
+        this.totalPoint += point;
+    }
+
     public static final class Builder {
 
         private Long id;
@@ -68,25 +88,5 @@ public class PointSummary {
             }
             return new PointSummary(this);
         }
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public Double getTotalPoint() {
-        return totalPoint;
-    }
-
-    public void setTotalPoint(Double totalPoint) {
-        this.totalPoint = totalPoint;
-    }
-
-    public void addPoint(Double point) {
-        this.totalPoint += point;
     }
 }

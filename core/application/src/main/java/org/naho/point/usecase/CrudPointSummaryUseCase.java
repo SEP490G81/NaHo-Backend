@@ -64,7 +64,7 @@ public class CrudPointSummaryUseCase implements CrudPointSummaryInputPort {
                         PointSummaryDetailMessageKey.POINT_SUMMARY_NOT_FOUND_BY_USER_ID,
                         userId
                 ));
-        
+
         return pointSummaryResultMapper.domainToResult(pointSummary);
     }
 }

@@ -10,12 +10,11 @@ public class Book {
 
     private final Long id;
     private final Long coverImageFileId;
-
-    private String title;
-    private String description;
     private final JLPTLevel jlptLevel;
     private final CefrLevel cefrLevel;
     private final Double orderIndex;
+    private String title;
+    private String description;
 
     private Book(Builder builder) {
         this.id = builder.id;
@@ -29,6 +28,34 @@ public class Book {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Long getCoverImageFileId() {
+        return coverImageFileId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public JLPTLevel getJlptLevel() {
+        return jlptLevel;
+    }
+
+    public CefrLevel getCefrLevel() {
+        return cefrLevel;
+    }
+
+    public Double getOrderIndex() {
+        return orderIndex;
     }
 
     public static final class Builder {
@@ -110,33 +137,5 @@ public class Book {
 
             return new Book(this);
         }
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getCoverImageFileId() {
-        return coverImageFileId;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public JLPTLevel getJlptLevel() {
-        return jlptLevel;
-    }
-
-    public CefrLevel getCefrLevel() {
-        return cefrLevel;
-    }
-
-    public Double getOrderIndex() {
-        return orderIndex;
     }
 }

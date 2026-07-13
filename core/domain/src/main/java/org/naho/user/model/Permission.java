@@ -17,6 +17,10 @@ public class Permission {
         this.roleIds = builder.roleIds;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     // Getters
     public Long getId() {
         return id;
@@ -32,10 +36,6 @@ public class Permission {
 
     public Set<Long> getRoleIds() {
         return roleIds;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     // Builder class

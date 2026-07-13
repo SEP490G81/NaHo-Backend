@@ -19,6 +19,10 @@ public class ConversationStyle {
         this.formalityLevel = builder.formalityLevel;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public Long getId() {
         return id;
     }
@@ -33,10 +37,6 @@ public class ConversationStyle {
 
     public FormalityLevel getFormalityLevel() {
         return formalityLevel;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     public static class Builder {
@@ -73,7 +73,7 @@ public class ConversationStyle {
                         ConversationStyleDetailMessageKey.CONVERSATION_STYLE_PROMPT_BLANK
                 );
             }
-            
+
             if (formalityLevel == null) {
                 throw new DomainException(
                         ConversationStyleDomainErrorCode.CONVERSATION_STYLE_FORMALITY_LEVEL_NOT_VALID,

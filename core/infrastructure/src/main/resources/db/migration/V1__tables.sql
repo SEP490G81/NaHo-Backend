@@ -402,6 +402,8 @@ CREATE TABLE vocabularies
     id                      BIGINT AUTO_INCREMENT NOT NULL,
     created_time            datetime              NOT NULL,
     modified_time           datetime              NULL,
+    reading                 VARCHAR(255)          NULL,
+    japanese                VARCHAR(255)          NULL,
     vietnamese_meaning_text VARCHAR(255)          NULL,
     english_meaning_text    VARCHAR(255)          NULL,
     CONSTRAINT pk_vocabularies PRIMARY KEY (id)
@@ -413,6 +415,12 @@ CREATE TABLE vocabulary_questions
     created_time  datetime              NOT NULL,
     modified_time datetime              NULL,
     CONSTRAINT pk_vocabulary_questions PRIMARY KEY (id)
+);
+
+CREATE TABLE vocabulary_questions_vocabularies
+(
+    vocabulary_id          BIGINT NOT NULL,
+    vocabulary_question_id BIGINT NOT NULL
 );
 
 CREATE TABLE word_assessments
@@ -654,3 +662,9 @@ ALTER TABLE users_roles
 
 ALTER TABLE users_roles
     ADD CONSTRAINT fk_userol_on_user_entity FOREIGN KEY (user_id) REFERENCES users (id);
+
+ALTER TABLE vocabulary_questions_vocabularies
+    ADD CONSTRAINT fk_vocquevoc_on_vocabulary_entity FOREIGN KEY (vocabulary_id) REFERENCES vocabularies (id);
+
+ALTER TABLE vocabulary_questions_vocabularies
+    ADD CONSTRAINT fk_vocquevoc_on_vocabulary_question_entity FOREIGN KEY (vocabulary_question_id) REFERENCES vocabulary_questions (id);

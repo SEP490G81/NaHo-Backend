@@ -20,6 +20,10 @@ public class UserSeasonPoint {
         this.seasonPoint = builder.seasonPoint;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public Long getId() {
         return id;
     }
@@ -38,10 +42,6 @@ public class UserSeasonPoint {
 
     public Double getSeasonPoint() {
         return seasonPoint;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     public static final class Builder {

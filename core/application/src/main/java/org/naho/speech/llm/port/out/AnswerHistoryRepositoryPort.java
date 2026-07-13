@@ -10,10 +10,16 @@ import java.util.Optional;
 
 public interface AnswerHistoryRepositoryPort {
     AnswerHistory saveAnswerHistory(AnswerHistory answerHistory);
+
     SpeechAssessment saveSpeechAssessment(SpeechAssessment speechAssessment);
+
     ContentAssessment saveContentAssessment(ContentAssessment contentAssessment);
+
     List<WordAssessment> saveAllWordAssessment(List<WordAssessment> wordAssessmentList);
+
     Optional<AnswerHistory> findAnswerHistoryById(Long id);
+
     Optional<SpeechAssessment> findSpeechAssessmentByAnswerHistoryId(Long answerHistoryId);
+
     Optional<ContentAssessment> findContentAssessmentByAnswerHistoryId(Long answerHistoryId);
 }

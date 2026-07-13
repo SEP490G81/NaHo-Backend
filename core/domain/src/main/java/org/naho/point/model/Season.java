@@ -20,6 +20,10 @@ public class Season {
         this.endAt = builder.endAt;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public Long getId() {
         return id;
     }
@@ -34,10 +38,6 @@ public class Season {
 
     public Instant getEndAt() {
         return endAt;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     public static final class Builder {

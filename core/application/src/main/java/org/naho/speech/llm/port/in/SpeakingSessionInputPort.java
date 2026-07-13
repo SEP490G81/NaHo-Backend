@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 public interface SpeakingSessionInputPort {
     SpeakingTopicResult startTopicSession(StartSpeakingCommand command);
 
-    String startFreeSession();
+    String startFreeSession(Long personaId);
 
     ChatResult sendMessage(SendMessageWithSessionCommand command);
 

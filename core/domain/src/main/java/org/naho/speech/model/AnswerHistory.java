@@ -17,6 +17,10 @@ public class AnswerHistory {
         this.createdTime = builder.createdTime;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public Long getId() {
         return id;
     }
@@ -35,10 +39,6 @@ public class AnswerHistory {
 
     public Instant getCreatedTime() {
         return createdTime;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     public static class Builder {

@@ -9,7 +9,7 @@ public enum UserSessionDomainErrorCode implements ErrorCode {
             UserSessionTitleMessageKey.USER_SESSION_DEVICE_ID_NOT_VALID_TITLE,
             400
     );
-    
+
     private final String code;
     private final String titleKey;
     private final int statusCode;

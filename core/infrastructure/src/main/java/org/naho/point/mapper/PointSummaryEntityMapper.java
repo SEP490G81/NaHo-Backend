@@ -11,5 +11,7 @@ public interface PointSummaryEntityMapper {
     PointSummary entityToDomain(PointSummaryEntity entity);
 
     @Mapping(target = "user", ignore = true)
+    @Mapping(target = "createdTime", ignore = true)
+    @Mapping(target = "modifiedTime", ignore = true)
     PointSummaryEntity domainToEntity(PointSummary domain);
 }

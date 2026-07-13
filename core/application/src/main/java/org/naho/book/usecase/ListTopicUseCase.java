@@ -21,7 +21,7 @@ public class ListTopicUseCase implements ListTopicInputPort {
     public TopicListResult listTopics(ListTopicCommand query) {
         // Enforce ACTIVE status for non-admin users
         if (!query.isAdmin()) {
-            query = query.withForcedStatus(TopicStatus.ACTIVE);
+            query = query.withForcedStatus(TopicStatus.PUBLISHED);
         }
 
         long totalElements = topicListRepositoryPort.countTopics(query);

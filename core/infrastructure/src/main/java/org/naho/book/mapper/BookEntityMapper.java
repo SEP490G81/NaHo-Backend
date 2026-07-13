@@ -10,6 +10,9 @@ public interface BookEntityMapper {
 
     @Mapping(target = "coverImageFile", ignore = true)
     @Mapping(target = "topics", ignore = true)
+    @Mapping(target = "createdTime", ignore = true)
+    @Mapping(target = "modifiedTime", ignore = true)
+    @Mapping(target = "pointHistories", ignore = true)
     BookEntity domainToEntity(Book domain);
 
     @Mapping(target = "coverImageFileId", source = "coverImageFile.id")

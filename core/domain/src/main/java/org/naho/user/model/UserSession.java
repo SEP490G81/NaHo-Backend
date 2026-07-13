@@ -22,26 +22,6 @@ public class UserSession {
     private Instant revokedAt;
     private SessionRevokedReason revokedReason;
 
-    public boolean isRefreshTokenExpired() {
-        return refreshTokenExpiresAt != null && !refreshTokenExpiresAt.isAfter(Instant.now());
-    }
-
-    public boolean isRevoked() {
-        return revokedAt != null || revokedReason != null;
-    }
-
-    public void setRevokedAt(Instant revokedAt) {
-        this.revokedAt = revokedAt;
-    }
-
-    public void setRevokedReason(SessionRevokedReason revokedReason) {
-        this.revokedReason = revokedReason;
-    }
-
-    public void setLastUsedAt(Instant lastUsedAt) {
-        this.lastUsedAt = lastUsedAt;
-    }
-
     // Private constructor
     private UserSession(Builder builder) {
         this.id = builder.id;
@@ -61,6 +41,75 @@ public class UserSession {
     // Static builder method
     public static Builder builder() {
         return new Builder();
+    }
+
+    public boolean isRefreshTokenExpired() {
+        return refreshTokenExpiresAt != null && !refreshTokenExpiresAt.isAfter(Instant.now());
+    }
+
+    public boolean isRevoked() {
+        return revokedAt != null || revokedReason != null;
+    }
+
+    // Getters
+    public Long getId() {
+        return id;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public String getHashRefreshToken() {
+        return hashRefreshToken;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public String getUserAgent() {
+        return userAgent;
+    }
+
+    public String getIpAddress() {
+        return ipAddress;
+    }
+
+    public Instant getIssuedAt() {
+        return issuedAt;
+    }
+
+    public Instant getRefreshTokenExpiresAt() {
+        return refreshTokenExpiresAt;
+    }
+
+    public Instant getAccessTokenExpiresAt() {
+        return accessTokenExpiresAt;
+    }
+
+    public Instant getLastUsedAt() {
+        return lastUsedAt;
+    }
+
+    public void setLastUsedAt(Instant lastUsedAt) {
+        this.lastUsedAt = lastUsedAt;
+    }
+
+    public Instant getRevokedAt() {
+        return revokedAt;
+    }
+
+    public void setRevokedAt(Instant revokedAt) {
+        this.revokedAt = revokedAt;
+    }
+
+    public SessionRevokedReason getRevokedReason() {
+        return revokedReason;
+    }
+
+    public void setRevokedReason(SessionRevokedReason revokedReason) {
+        this.revokedReason = revokedReason;
     }
 
     // Builder class
@@ -147,54 +196,5 @@ public class UserSession {
             }
             return new UserSession(this);
         }
-    }
-
-    // Getters
-    public Long getId() {
-        return id;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public String getHashRefreshToken() {
-        return hashRefreshToken;
-    }
-
-    public String getDeviceId() {
-        return deviceId;
-    }
-
-    public String getUserAgent() {
-        return userAgent;
-    }
-
-    public String getIpAddress() {
-        return ipAddress;
-    }
-
-    public Instant getIssuedAt() {
-        return issuedAt;
-    }
-
-    public Instant getRefreshTokenExpiresAt() {
-        return refreshTokenExpiresAt;
-    }
-
-    public Instant getAccessTokenExpiresAt() {
-        return accessTokenExpiresAt;
-    }
-
-    public Instant getLastUsedAt() {
-        return lastUsedAt;
-    }
-
-    public Instant getRevokedAt() {
-        return revokedAt;
-    }
-
-    public SessionRevokedReason getRevokedReason() {
-        return revokedReason;
     }
 }

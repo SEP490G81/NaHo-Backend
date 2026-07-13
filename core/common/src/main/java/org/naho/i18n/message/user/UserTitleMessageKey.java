@@ -1,48 +1,35 @@
 package org.naho.i18n.message.user;
 
 public final class UserTitleMessageKey {
-    private UserTitleMessageKey() {
-    }
-
     public static final String USER_AGE_NOT_VALID_TITLE =
             "user.age.not.valid.title";
-
     public static final String USER_EMAIL_NOT_VALID_TITLE =
             "user.email.not.valid.title";
-
     public static final String USER_USERNAME_NOT_VALID_TITLE =
             "user.username.not.valid.title";
-
     public static final String USER_TIMEZONE_NOT_VALID_TITLE =
             "user.timezone.not.valid.title";
-
     public static final String USER_UNAUTHORIZED_TITLE =
             "user.unauthorized.title";
-
     public static final String USER_ACCESS_DENIED_TITLE =
             "user.access.denied.title";
-
     public static final String USER_NOT_FOUND_TITLE =
             "user.not.found.title";
-
     public static final String USER_LOGIN_FAILED_TITLE =
             "user.login.failed.title";
-
     public static final String USER_HASH_FAILED_TITLE =
             "user.hash.failed.title";
-
     public static final String USER_ALREADY_EXISTS_TITLE =
             "user.already.exists.title";
-
     public static final String USER_ROLE_NOT_VALID_TITLE =
             "user.role.not.valid.title";
-
     public static final String USER_PERSIST_FAILED_TITLE =
             "user.persist.failed.title";
-
     public static final String USER_INVALID_REFRESH_TOKEN_TITLE =
             "user.invalid.refresh.token.title";
-
     public static final String USER_GOOGLE_ID_TOKEN_NOT_VALID_TITLE =
             "user.google.id.token.not.valid.title";
+
+    private UserTitleMessageKey() {
+    }
 }

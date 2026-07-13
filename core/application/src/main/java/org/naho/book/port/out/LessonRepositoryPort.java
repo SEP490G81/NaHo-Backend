@@ -1,7 +1,6 @@
 package org.naho.book.port.out;
 
 import org.naho.book.model.Lesson;
-import org.naho.book.model.Topic;
 
 import java.util.List;
 import java.util.Optional;

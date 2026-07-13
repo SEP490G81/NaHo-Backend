@@ -1,8 +1,6 @@
 package org.naho.book.exception;
 
 import org.naho.i18n.message.book.LessonTitleMessageKey;
-import org.naho.i18n.message.book.TopicTitleMessageKey;
-import org.naho.i18n.message.book.ObjectiveTitleMessageKey;
 import org.naho.shared.exception.ErrorCode;
 
 public enum LessonErrorCode implements ErrorCode {

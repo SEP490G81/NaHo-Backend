@@ -1,5 +1,7 @@
 package org.naho.speech.llm.usecase;
 
+import org.naho.persona.model.Persona;
+import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.naho.speech.llm.command.SendAudioMessageCommand;
 import org.naho.speech.llm.command.SendMessageWithSessionCommand;
 import org.naho.speech.llm.command.StartSpeakingCommand;
@@ -35,18 +37,21 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
 
     private static final String FREE_INSTRUCTION =
             "- This is a free conversation. The learner can talk about any topic.\n"
-                    + "- Start by greeting tgithe learner and asking what they'd like to talk about.";
+                    + "- Start by greeting the learner and asking what they'd like to talk about.";
 
     private final AiChatPort aiChatPort;
     private final SessionStorePort sessionStorePort;
     private final SpeechToTextPort speechToTextPort;
+    private final PersonaRepositoryPort personaRepositoryPort;
 
     public SpeakingSessionUseCase(AiChatPort aiChatPort,
                                   SessionStorePort sessionStorePort,
-                                  SpeechToTextPort speechToTextPort) {
+                                  SpeechToTextPort speechToTextPort,
+                                  PersonaRepositoryPort personaRepositoryPort) {
         this.aiChatPort = aiChatPort;
         this.sessionStorePort = sessionStorePort;
         this.speechToTextPort = speechToTextPort;
+        this.personaRepositoryPort = personaRepositoryPort;
     }
 
 
@@ -71,13 +76,21 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     }
 
     @Override
-    public String startFreeSession() {
+    public String startFreeSession(Long personaId) {
         String sessionId = UUID.randomUUID().toString();
         sessionStorePort.initSession(sessionId);
         sessionStorePort.setTopic(sessionId, "Free conversation");
-        String prompt = SYSTEM_PROMPT_TEMPLATE.formatted(FREE_INSTRUCTION);
+
+        String customInstruction = FREE_INSTRUCTION;
+        if (personaId != null) {
+            Persona persona = personaRepositoryPort.findById(personaId)
+                    .orElseThrow(() -> new IllegalArgumentException("Persona with ID " + personaId + " not found"));
+            customInstruction += "\n- Your persona prompt: " + persona.getPrompt();
+        }
+
+        String prompt = SYSTEM_PROMPT_TEMPLATE.formatted(customInstruction);
         sessionStorePort.addMessage(sessionId, "system", prompt);
-        System.out.println("Free session started: " + sessionId);
+        System.out.println("Free session started: " + sessionId + (personaId != null ? " with Persona: " + personaId : ""));
         return sessionId;
     }
 

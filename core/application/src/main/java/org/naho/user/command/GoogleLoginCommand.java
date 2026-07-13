@@ -20,6 +20,10 @@ public class GoogleLoginCommand {
         this.ipAddress = builder.ipAddress;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public String getSub() {
         return sub;
     }
@@ -50,10 +54,6 @@ public class GoogleLoginCommand {
 
     public boolean isDeviceIdBlank() {
         return deviceId == null || deviceId.isBlank();
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     public static class Builder {

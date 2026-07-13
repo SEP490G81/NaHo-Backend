@@ -16,6 +16,7 @@ public final class SpeakingQuestionDetailMessageKey {
             "speaking_question.title.empty";
     public static final String SPEAKING_QUESTION_DESCRIPTION_EMPTY =
             "speaking_question.description.empty";
+
     private SpeakingQuestionDetailMessageKey() {
     }
 }

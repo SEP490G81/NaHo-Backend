@@ -4,6 +4,7 @@ import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
 import org.naho.question.exception.SpeakingQuestionDomainErrorCode;
 import org.naho.question.type.QuestionStatus;
 import org.naho.shared.exception.DomainException;
+import org.naho.vocabulary.model.Vocabulary;
 
 import java.util.List;
 
@@ -88,7 +89,6 @@ public class SpeakingQuestion {
     }
 
 
-
     public Long getUserId() {
         return userId;
     }
@@ -108,6 +108,7 @@ public class SpeakingQuestion {
     public String getDescriptionMarkup() {
         return descriptionMarkup;
     }
+
     public Double getOrderIndex() {
         return orderIndex;
     }
@@ -154,7 +155,6 @@ public class SpeakingQuestion {
         }
 
 
-
         public Builder userId(Long userId) {
             this.userId = userId;
             return this;
@@ -179,7 +179,6 @@ public class SpeakingQuestion {
             this.descriptionMarkup = descriptionMarkup;
             return this;
         }
-
 
 
         public Builder status(QuestionStatus status) {

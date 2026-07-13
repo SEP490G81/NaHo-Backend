@@ -14,24 +14,19 @@ public class User {
     private final Long id;
     private final List<Long> roleIds;
     private final List<Long> userSessionIds;
-    private Long pointSummaryId;
-
     private final Username username;
     private final Email email;
-
     private final String hashPassword;
-
     private final String avatarUrl;
     private final String fullName;
     private final Gender gender;
     private final Dob dob;
-
     private final JLPTLevel jlptLevel;
-    private UserStatus status;
     private final Integer currentStreak;
     private final Integer longestStreak;
     private final LocalDate lastPracticeDate;
-
+    private Long pointSummaryId;
+    private UserStatus status;
     private String providerId;
 
     // Private constructor
@@ -76,19 +71,6 @@ public class User {
         return status == UserStatus.ACTIVE;
     }
 
-    // Setters
-    public void setStatus(UserStatus status) {
-        this.status = status;
-    }
-
-    public void setProviderId(String providerId) {
-        this.providerId = providerId;
-    }
-
-    public void setPointSummaryId(Long pointSummaryId) {
-        this.pointSummaryId = pointSummaryId;
-    }
-
     // Getters
     public Long getId() {
         return id;
@@ -108,6 +90,10 @@ public class User {
 
     public Long getPointSummaryId() {
         return pointSummaryId;
+    }
+
+    public void setPointSummaryId(Long pointSummaryId) {
+        this.pointSummaryId = pointSummaryId;
     }
 
     public Username getUsername() {
@@ -142,6 +128,11 @@ public class User {
         return status;
     }
 
+    // Setters
+    public void setStatus(UserStatus status) {
+        this.status = status;
+    }
+
     public Integer getCurrentStreak() {
         return currentStreak;
     }
@@ -156,6 +147,10 @@ public class User {
 
     public String getProviderId() {
         return providerId;
+    }
+
+    public void setProviderId(String providerId) {
+        this.providerId = providerId;
     }
 
     // Builder class

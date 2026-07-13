@@ -1,10 +1,10 @@
 package org.naho.speech.azure.controller.v1;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.i18n.message.speech.SpeechDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
 import org.naho.speech.azure.command.TextToSpeechCommand;
-import org.naho.i18n.message.speech.SpeechDetailMessageKey;
 import org.naho.speech.azure.constant.AzureSpeechContentType;
 import org.naho.speech.azure.dto.mapper.PronunciationAssessmentMapper;
 import org.naho.speech.azure.dto.mapper.TextToSpeechRequestMapper;

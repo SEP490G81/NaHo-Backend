@@ -135,8 +135,9 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         double vocabScore = 0.0;
         double grammarScore = 0.0;
         double naturalnessScore = 0.0;
-        double pronScore10 = azureAssessment.getPronunciationScore() / 10.0;
-        double overallScore = Math.round(pronScore10 * 10.0) / 10.0;
+        double pronScore10 = azureAssessment.getPronunciationScore() != null ? azureAssessment.getPronunciationScore() / 10.0 : 0.0;
+        double fluencyScore10 = azureAssessment.getFluencyScore() != null ? azureAssessment.getFluencyScore() / 10.0 : 0.0;
+        double overallScore = 0.0;
 
         try {
             FeedbackResponse feedback = objectMapper.readValue(rawLlmFeedback, FeedbackResponse.class);
@@ -146,7 +147,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 naturalnessScore = feedback.scores().naturalness() != null ? feedback.scores().naturalness() : 0.0;
             }
 
-            overallScore = (pronScore10 + vocabScore + grammarScore + naturalnessScore) / 4.0;
+            overallScore = (pronScore10 + fluencyScore10 + vocabScore + grammarScore + naturalnessScore) / 5.0;
             overallScore = Math.round(overallScore * 10.0) / 10.0;
 
             JsonNode rootNode = objectMapper.readTree(rawLlmFeedback);
@@ -158,10 +159,10 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         } catch (Exception e) {
             e.printStackTrace();
             if (vocabScore > 0.0 || grammarScore > 0.0 || naturalnessScore > 0.0) {
-                overallScore = (pronScore10 + vocabScore + grammarScore + naturalnessScore) / 4.0;
+                overallScore = (pronScore10 + fluencyScore10 + vocabScore + grammarScore + naturalnessScore) / 5.0;
                 overallScore = Math.round(overallScore * 10.0) / 10.0;
             } else {
-                overallScore = Math.round(pronScore10 * 10.0) / 10.0;
+                overallScore = Math.round(((pronScore10 + fluencyScore10) / 2.0) * 10.0) / 10.0;
             }
             try {
                 ObjectNode fallbackNode = objectMapper.createObjectNode();
@@ -197,15 +198,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 .build();
         answerHistoryRepositoryPort.saveContentAssessment(contentAssessment);
 
-        Double superScore = (speechAssessment.getAccuracyScore() +
-                speechAssessment.getPronunciationScore() +
-                speechAssessment.getCompletenessScore() +
-                speechAssessment.getFluencyScore() +
-                contentAssessment.getGrammarScore() +
-                contentAssessment.getVocabularyScore()) / 6;
 
-        System.out.println(superScore);
-        
         return new SpeakingAnalysisResult(answerHistory.getId(), overallScore);
     }
 

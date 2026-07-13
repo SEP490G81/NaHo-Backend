@@ -18,6 +18,10 @@ public class ContentAssessment {
         this.translationText = builder.translationText;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     // Getter
     public Long getId() {
         return id;
@@ -41,10 +45,6 @@ public class ContentAssessment {
 
     public String getTranslationText() {
         return translationText;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     // Builder

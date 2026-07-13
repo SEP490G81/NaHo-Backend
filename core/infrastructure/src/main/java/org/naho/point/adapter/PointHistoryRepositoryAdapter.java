@@ -1,7 +1,12 @@
 package org.naho.point.adapter;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.book.repository.BookJpaRepository;
+import org.naho.book.repository.LessonJpaRepository;
+import org.naho.book.repository.ObjectiveJpaRepository;
+import org.naho.book.repository.TopicJpaRepository;
 import org.naho.i18n.message.user.UserDetailMessageKey;
+import org.naho.learning.repository.LearningPathNodeJpaRepository;
 import org.naho.pagination.PageData;
 import org.naho.pagination.PageMeta;
 import org.naho.point.command.PointHistoryQueryCommand;
@@ -15,11 +20,6 @@ import org.naho.shared.exception.ApplicationException;
 import org.naho.user.entity.UserEntity;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.repository.UserJpaRepository;
-import org.naho.book.repository.BookJpaRepository;
-import org.naho.book.repository.TopicJpaRepository;
-import org.naho.book.repository.LessonJpaRepository;
-import org.naho.book.repository.ObjectiveJpaRepository;
-import org.naho.learning.repository.LearningPathNodeJpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

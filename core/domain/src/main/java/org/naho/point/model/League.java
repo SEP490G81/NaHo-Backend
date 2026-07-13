@@ -22,6 +22,10 @@ public class League {
         this.maxPoint = builder.maxPoint;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public Long getId() {
         return id;
     }
@@ -44,10 +48,6 @@ public class League {
 
     public Double getMaxPoint() {
         return maxPoint;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     public static final class Builder {

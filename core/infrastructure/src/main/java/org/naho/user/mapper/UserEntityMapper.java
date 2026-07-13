@@ -25,5 +25,10 @@ public interface UserEntityMapper {
     @Mapping(target = "createdTime", ignore = true)
     @Mapping(target = "modifiedTime", ignore = true)
     @Mapping(target = "reports", ignore = true)
+    @Mapping(target = "pointHistories", ignore = true)
+    @Mapping(target = "pointSummary", ignore = true)
+    @Mapping(target = "userNodeProgresses", ignore = true)
+    @Mapping(target = "userLearningProgress", ignore = true)
+    @Mapping(target = "userSeasonPoints", ignore = true)
     UserEntity domainToEntity(User user);
 }

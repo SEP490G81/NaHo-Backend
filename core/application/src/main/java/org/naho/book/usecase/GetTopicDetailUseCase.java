@@ -30,16 +30,16 @@ public class GetTopicDetailUseCase implements GetTopicDetailInputPort {
                         command.id()));
 
         var lessons = lessonRepositoryPort.findByTopicId(command.id()).stream()
-                                .map(lesson -> new LessonListItemResult(
-                                        lesson.getId(),
-                                        lesson.getJapaneseName(),
-                                        lesson.getJapaneseDescription(),
-                                        lesson.getJapaneseNameMarkup(),
-                                        lesson.getJapaneseDescriptionMarkup(),
-                                        lesson.getStatus(),
-                                        lesson.getOrderIndex()
-                                        ))
-                                .toList();
+                .map(lesson -> new LessonListItemResult(
+                        lesson.getId(),
+                        lesson.getJapaneseName(),
+                        lesson.getJapaneseDescription(),
+                        lesson.getJapaneseNameMarkup(),
+                        lesson.getJapaneseDescriptionMarkup(),
+                        lesson.getStatus(),
+                        lesson.getOrderIndex()
+                ))
+                .toList();
 
         return new TopicDetailResult(
                 topic.getId(),

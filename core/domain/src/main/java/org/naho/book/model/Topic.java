@@ -8,9 +8,8 @@ import org.naho.shared.exception.DomainException;
 public class Topic {
     private final Long id;
     private final Long userId;
-    private Long coverImageFileId;
     private final Long bookId;
-
+    private Long coverImageFileId;
     private String japaneseName;
     private String japaneseDescription;
     private String japaneseNameMarkup;
@@ -36,8 +35,8 @@ public class Topic {
         return new Builder();
     }
 
-    private void validateBookId(Long bookId){
-        if(bookId == null){
+    private void validateBookId(Long bookId) {
+        if (bookId == null) {
             throw new DomainException(
                     TopicDomainErrorCode.BOOK_ID_EMPTY,
                     TopicDetailMessageKey.BOOK_ID_EMPTY
