@@ -1,9 +1,6 @@
 package org.naho.speech.azure.constant;
 
 public final class AzurePronunciationScoreKey {
-    private AzurePronunciationScoreKey() {
-    }
-
     public static final String N_BEST = "NBest";
     public static final String DISPLAY = "Display";
     public static final String PRONUNCIATION_ASSESSMENT = "PronunciationAssessment";
@@ -15,5 +12,8 @@ public final class AzurePronunciationScoreKey {
     public static final String WORD = "Word";
     public static final String ERROR_TYPE = "ErrorType";
     public static final String NONE = "None";
+
+    private AzurePronunciationScoreKey() {
+    }
 
 }

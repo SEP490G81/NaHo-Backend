@@ -3,8 +3,8 @@ package org.naho.question.usecase;
 import org.naho.question.command.SearchSpeakingQuestionsCommand;
 import org.naho.question.port.in.SearchSpeakingQuestionsInputPort;
 import org.naho.question.port.out.SpeakingQuestionListRepositoryPort;
-import org.naho.question.result.SpeakingQuestionListItemResult;
 import org.naho.question.result.SearchSpeakingQuestionsResult;
+import org.naho.question.result.SpeakingQuestionListItemResult;
 
 import java.util.List;
 

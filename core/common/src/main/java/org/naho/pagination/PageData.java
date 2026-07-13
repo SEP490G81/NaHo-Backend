@@ -15,6 +15,10 @@ public class PageData<T> {
         this.pageMeta = pageMeta;
     }
 
+    public static <T> Builder<T> builder() {
+        return new Builder<>();
+    }
+
     public List<T> getData() {
         return data;
     }
@@ -29,10 +33,6 @@ public class PageData<T> {
 
     public void setPageMeta(PageMeta pageMeta) {
         this.pageMeta = pageMeta;
-    }
-
-    public static <T> Builder<T> builder() {
-        return new Builder<>();
     }
 
     public static class Builder<T> {

@@ -1,8 +1,8 @@
 package org.naho.book.usecase;
 
+import org.naho.book.model.Book;
 import org.naho.book.port.in.ListBooksInputPort;
 import org.naho.book.port.out.BookRepositoryPort;
-import org.naho.book.model.Book;
 import org.naho.book.result.BookListItemResult;
 import org.naho.file.port.in.CrudFileInputPort;
 import org.naho.file.result.FileResult;

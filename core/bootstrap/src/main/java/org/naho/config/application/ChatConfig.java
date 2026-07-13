@@ -4,6 +4,7 @@ import org.naho.book.port.out.TopicRepositoryPort;
 import org.naho.file.port.in.FileStorageInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.furigana.port.out.FuriganaGenerationPort;
+import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
 import org.naho.speech.llm.adapter.*;
@@ -18,7 +19,6 @@ import org.naho.speech.llm.usecase.SpeakingAnalysisUseCase;
 import org.naho.speech.llm.usecase.SpeakingSessionUseCase;
 import org.naho.speech.llm.usecase.SuggestedTopicsUseCase;
 import org.naho.user.port.out.UserRepositoryPort;
-import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

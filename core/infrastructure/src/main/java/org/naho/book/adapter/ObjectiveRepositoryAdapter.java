@@ -5,7 +5,6 @@ import org.naho.book.mapper.ObjectiveEntityMapper;
 import org.naho.book.model.Objective;
 import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.book.repository.ObjectiveJpaRepository;
-import org.naho.book.result.ObjectiveListItemResult;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

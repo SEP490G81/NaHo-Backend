@@ -5,6 +5,7 @@ public final class FuriganaDetailMessageKey {
             "furigana.text.empty";
     public static final String FURIGANA_GENERATE_SUCCESSFULLY =
             "furigana.generate.successfully";
+
     private FuriganaDetailMessageKey() {
     }
 }

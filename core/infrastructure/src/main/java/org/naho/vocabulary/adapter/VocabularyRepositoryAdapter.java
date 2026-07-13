@@ -2,9 +2,9 @@ package org.naho.vocabulary.adapter;
 
 import lombok.RequiredArgsConstructor;
 import org.naho.question.entity.VocabularyQuestionEntity;
+import org.naho.question.repository.VocabularyQuestionJpaRepository;
 import org.naho.vocabulary.model.Vocabulary;
 import org.naho.vocabulary.port.out.VocabularyPort;
-import org.naho.question.repository.VocabularyQuestionJpaRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;

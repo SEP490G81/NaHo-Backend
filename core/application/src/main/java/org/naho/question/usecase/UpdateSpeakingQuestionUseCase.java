@@ -49,7 +49,6 @@ public class UpdateSpeakingQuestionUseCase implements UpdateSpeakingQuestionInpu
         String rawDescription = MarkupParserUtil.extractRawTextFromMarkup(command.descriptionMarkup());
 
 
-
         // 5. Update Domain Model
         speakingQuestion.update(
                 rawTitle,

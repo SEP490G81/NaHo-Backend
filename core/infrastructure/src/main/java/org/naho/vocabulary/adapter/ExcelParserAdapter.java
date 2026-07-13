@@ -1,12 +1,15 @@
 package org.naho.vocabulary.adapter;
 
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.naho.shared.exception.ApplicationException;
+import org.naho.vocabulary.exception.VocabularyErrorCode;
 import org.naho.vocabulary.model.Vocabulary;
 import org.naho.vocabulary.port.out.ExcelParserPort;
 import org.springframework.stereotype.Component;
-import org.naho.shared.exception.ApplicationException;
-import org.naho.vocabulary.exception.VocabularyErrorCode;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -17,12 +20,12 @@ public class ExcelParserAdapter implements ExcelParserPort {
 
     /**
      * Expected Excel column order:
-     *  Col 0: Reading
-     *  Col 1: Japanese
-     *  Col 2: Vietnamese Meaning
-     *  Col 3: English Meaning
-     *  Col 4: objective_id  (Long - from objectives_reference.xlsx)
-     *  Col 5: question_id   (Long - from questions_reference.xlsx)
+     * Col 0: Reading
+     * Col 1: Japanese
+     * Col 2: Vietnamese Meaning
+     * Col 3: English Meaning
+     * Col 4: objective_id  (Long - from objectives_reference.xlsx)
+     * Col 5: question_id   (Long - from questions_reference.xlsx)
      */
     @Override
     public List<Vocabulary> parseExcel(InputStream inputStream) {
@@ -84,8 +87,11 @@ public class ExcelParserAdapter implements ExcelParserPort {
         return switch (cell.getCellType()) {
             case NUMERIC -> (long) cell.getNumericCellValue();
             case STRING -> {
-                try { yield Long.parseLong(cell.getStringCellValue().trim()); }
-                catch (NumberFormatException e) { yield null; }
+                try {
+                    yield Long.parseLong(cell.getStringCellValue().trim());
+                } catch (NumberFormatException e) {
+                    yield null;
+                }
             }
             default -> null;
         };

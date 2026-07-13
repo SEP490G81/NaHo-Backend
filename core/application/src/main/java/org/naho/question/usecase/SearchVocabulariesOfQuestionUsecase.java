@@ -1,10 +1,10 @@
 package org.naho.question.usecase;
 
 import org.naho.question.command.LearningPathNodeCommand;
-import org.naho.vocabulary.model.Vocabulary;
 import org.naho.question.port.in.SearchVocabulariesOfQuestionInputPort;
-import org.naho.vocabulary.port.out.VocabularyPort;
 import org.naho.question.result.VocabulariesOfQuestionResult;
+import org.naho.vocabulary.model.Vocabulary;
+import org.naho.vocabulary.port.out.VocabularyPort;
 
 import java.util.List;
 
@@ -19,10 +19,10 @@ public class SearchVocabulariesOfQuestionUsecase implements SearchVocabulariesOf
 
     @Override
     public VocabulariesOfQuestionResult getVocabularyListOfQuestion(LearningPathNodeCommand learningPathNodeCommand) {
-         List<Vocabulary> listVocabulary =  vocabularyPort.findVocabularyList(learningPathNodeCommand.vocabulary_question_id());
-         if(listVocabulary.isEmpty()){
-             return null;
-         }
+        List<Vocabulary> listVocabulary = vocabularyPort.findVocabularyList(learningPathNodeCommand.vocabulary_question_id());
+        if (listVocabulary.isEmpty()) {
+            return null;
+        }
         List<VocabulariesOfQuestionResult.VocabularyDetailResult> vocabularyDetailResultList = listVocabulary.stream().map(
                 vocab -> new VocabulariesOfQuestionResult.VocabularyDetailResult(
                         vocab.getId(),
@@ -32,11 +32,11 @@ public class SearchVocabulariesOfQuestionUsecase implements SearchVocabulariesOf
                         vocab.getEnglishMeaningText()
                 )
         ).toList();
-         VocabulariesOfQuestionResult result = new VocabulariesOfQuestionResult(
-                 learningPathNodeCommand.id(),
-                 learningPathNodeCommand.vocabulary_question_id(),
-                 vocabularyDetailResultList
-         );
+        VocabulariesOfQuestionResult result = new VocabulariesOfQuestionResult(
+                learningPathNodeCommand.id(),
+                learningPathNodeCommand.vocabulary_question_id(),
+                vocabularyDetailResultList
+        );
         return result;
     }
 }

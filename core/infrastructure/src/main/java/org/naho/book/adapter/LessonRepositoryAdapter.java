@@ -1,10 +1,10 @@
 package org.naho.book.adapter;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.book.mapper.LessonEntityMapper;
 import org.naho.book.model.Lesson;
 import org.naho.book.port.out.LessonRepositoryPort;
 import org.naho.book.repository.LessonJpaRepository;
-import org.naho.book.mapper.LessonEntityMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

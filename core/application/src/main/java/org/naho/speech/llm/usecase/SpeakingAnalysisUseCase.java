@@ -199,7 +199,6 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         answerHistoryRepositoryPort.saveContentAssessment(contentAssessment);
 
 
-        
         return new SpeakingAnalysisResult(answerHistory.getId(), overallScore);
     }
 

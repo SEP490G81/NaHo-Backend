@@ -18,6 +18,10 @@ public class Chest {
         this.point = builder.point;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public Long getId() {
         return id;
     }
@@ -44,10 +48,6 @@ public class Chest {
 
     public void setPoint(Double point) {
         this.point = point;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     public static final class Builder {

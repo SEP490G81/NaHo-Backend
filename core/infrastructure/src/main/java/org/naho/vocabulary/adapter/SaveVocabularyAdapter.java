@@ -1,19 +1,15 @@
 package org.naho.vocabulary.adapter;
 
 import lombok.RequiredArgsConstructor;
-import org.naho.vocabulary.entity.VocabularyEntity;
 import org.naho.question.entity.VocabularyQuestionEntity;
+import org.naho.question.repository.VocabularyQuestionJpaRepository;
+import org.naho.vocabulary.entity.VocabularyEntity;
 import org.naho.vocabulary.model.Vocabulary;
 import org.naho.vocabulary.port.out.SaveVocabularyPort;
 import org.naho.vocabulary.repository.VocabularyJpaRepository;
-import org.naho.question.repository.VocabularyQuestionJpaRepository;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor

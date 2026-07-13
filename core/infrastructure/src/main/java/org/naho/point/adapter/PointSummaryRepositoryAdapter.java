@@ -41,7 +41,7 @@ public class PointSummaryRepositoryAdapter implements PointSummaryRepositoryPort
 
         entity.setUser(user);
         PointSummaryEntity savedEntity = pointSummaryJpaRepository.save(entity);
-        
+
         return pointSummaryEntityMapper.entityToDomain(savedEntity);
     }
 

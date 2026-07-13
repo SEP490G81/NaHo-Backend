@@ -5,15 +5,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.naho.i18n.message.user.UserDetailMessageKey;
+import org.naho.i18n.message.user.UserSessionDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
+import org.naho.shared.exception.DomainException;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.user.command.CredentialsLoginCommand;
-import org.naho.user.command.ForceLogoutCommand;
 import org.naho.user.exception.UserErrorCode;
-import org.naho.i18n.message.user.UserDetailMessageKey;
-import org.naho.shared.exception.DomainException;
 import org.naho.user.exception.UserSessionDomainErrorCode;
-import org.naho.i18n.message.user.UserSessionDetailMessageKey;
 import org.naho.user.mapper.UserResultMapper;
 import org.naho.user.model.User;
 import org.naho.user.model.UserSession;
@@ -28,9 +27,7 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -313,7 +310,7 @@ class CredentialsLoginTest {
                 roleRepositoryPort,
                 userSessionServicePort,
                 userSessionEventPublisherPort
-            );
+        );
     }
 
     @Test

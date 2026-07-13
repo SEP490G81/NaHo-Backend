@@ -15,6 +15,10 @@ public class UserLearningProgress {
         this.userId = builder.userId;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public Long getId() {
         return id;
     }
@@ -25,10 +29,6 @@ public class UserLearningProgress {
 
     public Long getUserId() {
         return userId;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     public static final class Builder {

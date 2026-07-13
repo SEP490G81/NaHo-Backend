@@ -20,6 +20,10 @@ public class Comment {
         this.content = builder.content;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public Long getId() {
         return id;
     }
@@ -38,10 +42,6 @@ public class Comment {
 
     public String getContent() {
         return content;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     public static class Builder {

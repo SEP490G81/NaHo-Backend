@@ -1,7 +1,7 @@
 package org.naho.persona.adapter;
 
 import lombok.RequiredArgsConstructor;
-import org.naho.file.model.FileEntity;
+import org.naho.file.entity.FileEntity;
 import org.naho.file.repository.FileJpaRepository;
 import org.naho.persona.entity.ConversationStyleEntity;
 import org.naho.persona.entity.PersonaEntity;

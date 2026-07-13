@@ -1,10 +1,7 @@
 package org.naho.question.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.learning.entity.LearningPathNodeEntity;
@@ -24,10 +21,12 @@ import java.util.List;
 public class VocabularyQuestionEntity extends BaseEntity {
     @OneToOne(mappedBy = "vocabularyQuestion")
     LearningPathNodeEntity learningPathNode;
+
+    @Builder.Default
     @ManyToMany
     @JoinTable(name = "vocabulary_questions_vocabularies",
-                    joinColumns = @JoinColumn(name = "vocabulary_question_id"),
-                    inverseJoinColumns = @JoinColumn(name = "vocabulary_id")
-            )
+            joinColumns = @JoinColumn(name = "vocabulary_question_id"),
+            inverseJoinColumns = @JoinColumn(name = "vocabulary_id")
+    )
     List<VocabularyEntity> vocabularies = new ArrayList<>();
 }

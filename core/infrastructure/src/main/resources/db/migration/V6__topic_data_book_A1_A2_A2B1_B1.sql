@@ -1,20 +1,16 @@
-INSERT INTO topics (
-    id,
-    user_id,
-    cover_image_file_id,
-    book_id,
-    japanese_name,
-    japanese_description,
-    japanese_name_markup,
-    japanese_description_markup,
-    status,
-    order_index,
-    created_time,
-    modified_time
-)
-VALUES
-    (
-        1,
+INSERT INTO topics (id,
+                    user_id,
+                    cover_image_file_id,
+                    book_id,
+                    japanese_name,
+                    japanese_description,
+                    japanese_name_markup,
+                    japanese_description_markup,
+                    status,
+                    order_index,
+                    created_time,
+                    modified_time)
+VALUES (1,
         1,
         NULL,
         1,
@@ -25,10 +21,8 @@ VALUES
         'ACTIVE',
         1.0,
         NOW(),
-        NULL
-    ),
-    (
-        2,
+        NULL),
+       (2,
         1,
         NULL,
         1,
@@ -39,10 +33,8 @@ VALUES
         'ACTIVE',
         2.0,
         NOW(),
-        NULL
-    ),
-    (
-        3,
+        NULL),
+       (3,
         1,
         NULL,
         1,
@@ -53,10 +45,8 @@ VALUES
         'ACTIVE',
         3.0,
         NOW(),
-        NULL
-    ),
-    (
-        4,
+        NULL),
+       (4,
         1,
         NULL,
         1,
@@ -67,10 +57,8 @@ VALUES
         'ACTIVE',
         4.0,
         NOW(),
-        NULL
-    ),
-    (
-        5,
+        NULL),
+       (5,
         1,
         NULL,
         1,
@@ -81,10 +69,8 @@ VALUES
         'ACTIVE',
         5.0,
         NOW(),
-        NULL
-    ),
-    (
-        6,
+        NULL),
+       (6,
         1,
         NULL,
         1,
@@ -95,10 +81,8 @@ VALUES
         'ACTIVE',
         6.0,
         NOW(),
-        NULL
-    ),
-    (
-        7,
+        NULL),
+       (7,
         1,
         NULL,
         1,
@@ -109,10 +93,8 @@ VALUES
         'ACTIVE',
         7.0,
         NOW(),
-        NULL
-    ),
-    (
-        8,
+        NULL),
+       (8,
         1,
         NULL,
         1,
@@ -123,10 +105,8 @@ VALUES
         'ACTIVE',
         8.0,
         NOW(),
-        NULL
-    ),
-    (
-        9,
+        NULL),
+       (9,
         1,
         NULL,
         1,
@@ -137,10 +117,8 @@ VALUES
         'ACTIVE',
         9.0,
         NOW(),
-        NULL
-    ),
-    (
-        10,
+        NULL),
+       (10,
         1,
         NULL,
         2,
@@ -151,10 +129,8 @@ VALUES
         'ACTIVE',
         10.0,
         NOW(),
-        NULL
-    ),
-    (
-        11,
+        NULL),
+       (11,
         1,
         NULL,
         2,
@@ -165,10 +141,8 @@ VALUES
         'ACTIVE',
         11.0,
         NOW(),
-        NULL
-    ),
-    (
-        12,
+        NULL),
+       (12,
         1,
         NULL,
         2,
@@ -179,10 +153,8 @@ VALUES
         'ACTIVE',
         12.0,
         NOW(),
-        NULL
-    ),
-    (
-        13,
+        NULL),
+       (13,
         1,
         NULL,
         2,
@@ -193,10 +165,8 @@ VALUES
         'ACTIVE',
         13.0,
         NOW(),
-        NULL
-    ),
-    (
-        14,
+        NULL),
+       (14,
         1,
         NULL,
         2,
@@ -207,10 +177,8 @@ VALUES
         'ACTIVE',
         14.0,
         NOW(),
-        NULL
-    ),
-    (
-        15,
+        NULL),
+       (15,
         1,
         NULL,
         2,
@@ -221,10 +189,8 @@ VALUES
         'ACTIVE',
         15.0,
         NOW(),
-        NULL
-    ),
-    (
-        16,
+        NULL),
+       (16,
         1,
         NULL,
         2,
@@ -235,10 +201,8 @@ VALUES
         'ACTIVE',
         16.0,
         NOW(),
-        NULL
-    ),
-    (
-        17,
+        NULL),
+       (17,
         1,
         NULL,
         2,
@@ -249,10 +213,8 @@ VALUES
         'ACTIVE',
         17.0,
         NOW(),
-        NULL
-    ),
-    (
-        18,
+        NULL),
+       (18,
         1,
         NULL,
         2,
@@ -263,10 +225,8 @@ VALUES
         'ACTIVE',
         18.0,
         NOW(),
-        NULL
-    ),
-    (
-        19,
+        NULL),
+       (19,
         1,
         NULL,
         2,
@@ -277,10 +237,8 @@ VALUES
         'ACTIVE',
         19.0,
         NOW(),
-        NULL
-    ),
-    (
-        20,
+        NULL),
+       (20,
         1,
         NULL,
         2,
@@ -291,10 +249,8 @@ VALUES
         'ACTIVE',
         20.0,
         NOW(),
-        NULL
-    ),
-    (
-        21,
+        NULL),
+       (21,
         1,
         NULL,
         2,
@@ -305,10 +261,8 @@ VALUES
         'ACTIVE',
         21.0,
         NOW(),
-        NULL
-    ),
-    (
-        22,
+        NULL),
+       (22,
         1,
         NULL,
         2,
@@ -319,10 +273,8 @@ VALUES
         'ACTIVE',
         22.0,
         NOW(),
-        NULL
-    ),
-    (
-        23,
+        NULL),
+       (23,
         1,
         NULL,
         2,
@@ -333,10 +285,8 @@ VALUES
         'ACTIVE',
         23.0,
         NOW(),
-        NULL
-    ),
-    (
-        24,
+        NULL),
+       (24,
         1,
         NULL,
         2,
@@ -347,10 +297,8 @@ VALUES
         'ACTIVE',
         24.0,
         NOW(),
-        NULL
-    ),
-    (
-        25,
+        NULL),
+       (25,
         1,
         NULL,
         2,
@@ -361,10 +309,8 @@ VALUES
         'ACTIVE',
         25.0,
         NOW(),
-        NULL
-    ),
-    (
-        26,
+        NULL),
+       (26,
         1,
         NULL,
         2,
@@ -375,10 +321,8 @@ VALUES
         'ACTIVE',
         26.0,
         NOW(),
-        NULL
-    ),
-    (
-        27,
+        NULL),
+       (27,
         1,
         NULL,
         2,
@@ -389,10 +333,8 @@ VALUES
         'ACTIVE',
         27.0,
         NOW(),
-        NULL
-    ),
-    (
-        28,
+        NULL),
+       (28,
         1,
         NULL,
         3,
@@ -403,10 +345,8 @@ VALUES
         'ACTIVE',
         28.0,
         NOW(),
-        NULL
-    ),
-    (
-        29,
+        NULL),
+       (29,
         1,
         NULL,
         3,
@@ -417,10 +357,8 @@ VALUES
         'ACTIVE',
         29.0,
         NOW(),
-        NULL
-    ),
-    (
-        30,
+        NULL),
+       (30,
         1,
         NULL,
         3,
@@ -431,10 +369,8 @@ VALUES
         'ACTIVE',
         30.0,
         NOW(),
-        NULL
-    ),
-    (
-        31,
+        NULL),
+       (31,
         1,
         NULL,
         3,
@@ -445,10 +381,8 @@ VALUES
         'ACTIVE',
         31.0,
         NOW(),
-        NULL
-    ),
-    (
-        32,
+        NULL),
+       (32,
         1,
         NULL,
         3,
@@ -459,10 +393,8 @@ VALUES
         'ACTIVE',
         32.0,
         NOW(),
-        NULL
-    ),
-    (
-        33,
+        NULL),
+       (33,
         1,
         NULL,
         3,
@@ -473,10 +405,8 @@ VALUES
         'ACTIVE',
         33.0,
         NOW(),
-        NULL
-    ),
-    (
-        34,
+        NULL),
+       (34,
         1,
         NULL,
         3,
@@ -487,10 +417,8 @@ VALUES
         'ACTIVE',
         34.0,
         NOW(),
-        NULL
-    ),
-    (
-        35,
+        NULL),
+       (35,
         1,
         NULL,
         3,
@@ -501,10 +429,8 @@ VALUES
         'ACTIVE',
         35.0,
         NOW(),
-        NULL
-    ),
-    (
-        36,
+        NULL),
+       (36,
         1,
         NULL,
         3,
@@ -515,10 +441,8 @@ VALUES
         'ACTIVE',
         36.0,
         NOW(),
-        NULL
-    ),
-    (
-        37,
+        NULL),
+       (37,
         1,
         NULL,
         4,
@@ -529,10 +453,8 @@ VALUES
         'ACTIVE',
         37.0,
         NOW(),
-        NULL
-    ),
-    (
-        38,
+        NULL),
+       (38,
         1,
         NULL,
         4,
@@ -543,10 +465,8 @@ VALUES
         'ACTIVE',
         38.0,
         NOW(),
-        NULL
-    ),
-    (
-        39,
+        NULL),
+       (39,
         1,
         NULL,
         4,
@@ -557,10 +477,8 @@ VALUES
         'ACTIVE',
         39.0,
         NOW(),
-        NULL
-    ),
-    (
-        40,
+        NULL),
+       (40,
         1,
         NULL,
         4,
@@ -571,10 +489,8 @@ VALUES
         'ACTIVE',
         40.0,
         NOW(),
-        NULL
-    ),
-    (
-        41,
+        NULL),
+       (41,
         1,
         NULL,
         4,
@@ -585,10 +501,8 @@ VALUES
         'ACTIVE',
         41.0,
         NOW(),
-        NULL
-    ),
-    (
-        42,
+        NULL),
+       (42,
         1,
         NULL,
         4,
@@ -599,10 +513,8 @@ VALUES
         'ACTIVE',
         42.0,
         NOW(),
-        NULL
-    ),
-    (
-        43,
+        NULL),
+       (43,
         1,
         NULL,
         4,
@@ -613,10 +525,8 @@ VALUES
         'ACTIVE',
         43.0,
         NOW(),
-        NULL
-    ),
-    (
-        44,
+        NULL),
+       (44,
         1,
         NULL,
         4,
@@ -627,10 +537,8 @@ VALUES
         'ACTIVE',
         44.0,
         NOW(),
-        NULL
-    ),
-    (
-        45,
+        NULL),
+       (45,
         1,
         NULL,
         4,
@@ -641,6 +549,5 @@ VALUES
         'ACTIVE',
         45.0,
         NOW(),
-        NULL
-    )
-    ;
+        NULL)
+;

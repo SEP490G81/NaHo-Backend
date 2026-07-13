@@ -29,6 +29,10 @@ public class UserNodeProgress {
         this.status = builder.status;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public Long getId() {
         return id;
     }
@@ -79,10 +83,6 @@ public class UserNodeProgress {
 
     public void setStatus(NodeStatus status) {
         this.status = status;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     public static final class Builder {

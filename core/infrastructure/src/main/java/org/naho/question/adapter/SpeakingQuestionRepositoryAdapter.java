@@ -42,7 +42,6 @@ public class SpeakingQuestionRepositoryAdapter implements SpeakingQuestionReposi
     }
 
 
-
     @Override
     public void deleteById(Long id) {
         speakingQuestionJpaRepository.deleteById(id);
@@ -61,7 +60,6 @@ public class SpeakingQuestionRepositoryAdapter implements SpeakingQuestionReposi
         entity.setDescription(speakingQuestion.getDescription());
         entity.setDescriptionMarkup(speakingQuestion.getDescriptionMarkup());
         entity.setStatus(speakingQuestion.getStatus());
-
 
 
         if (speakingQuestion.getUserId() != null) {

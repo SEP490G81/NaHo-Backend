@@ -3,8 +3,8 @@ package org.naho.question.adapter;
 import lombok.RequiredArgsConstructor;
 import org.naho.learning.entity.LearningPathNodeEntity;
 import org.naho.learning.repository.LearningPathNodeJpaRepository;
-import org.naho.vocabulary.model.Vocabulary;
 import org.naho.question.port.out.VocabulariesQuestionPort;
+import org.naho.vocabulary.model.Vocabulary;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

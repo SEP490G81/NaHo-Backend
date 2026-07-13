@@ -1,3 +1,4 @@
 package org.naho.user.dto.request;
 
-public record UpdateStatusRequest(String newStatus) {}
+public record UpdateStatusRequest(String newStatus) {
+}

@@ -1,5 +1,7 @@
 package org.naho.speech.llm.usecase;
 
+import org.naho.persona.model.Persona;
+import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.naho.speech.llm.command.SendAudioMessageCommand;
 import org.naho.speech.llm.command.SendMessageWithSessionCommand;
 import org.naho.speech.llm.command.StartSpeakingCommand;
@@ -11,8 +13,6 @@ import org.naho.speech.llm.result.AudioChatResult;
 import org.naho.speech.llm.result.ChatResult;
 import org.naho.speech.llm.result.SpeakingTopicResult;
 import org.naho.speech.llm.result.SpeechToTextResult;
-import org.naho.persona.port.out.PersonaRepositoryPort;
-import org.naho.persona.model.Persona;
 
 import java.util.List;
 import java.util.Map;

@@ -22,6 +22,7 @@ public interface ReportEntityMapper {
     @Mapping(target = "createdTime", ignore = true)
     @Mapping(target = "modifiedTime", ignore = true)
     @Mapping(target = "isResolved", source = "resolved")
+    @Mapping(target = "files", ignore = true)
     ReportEntity domainToEntity(Report report);
 
     default UserEntity mapUserIdToUserEntity(Long userId) {

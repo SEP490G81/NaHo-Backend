@@ -1,6 +1,7 @@
 package org.naho.book.dto.response;
 
 import org.naho.book.type.TopicStatus;
+
 import java.util.List;
 
 public record LessonDetailResponse(

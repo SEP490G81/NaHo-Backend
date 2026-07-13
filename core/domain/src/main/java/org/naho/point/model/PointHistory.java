@@ -39,6 +39,50 @@ public class PointHistory {
         return new Builder();
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public Long getLearningPathNodeId() {
+        return learningPathNodeId;
+    }
+
+    public Long getObjectiveId() {
+        return objectiveId;
+    }
+
+    public Long getLessonId() {
+        return lessonId;
+    }
+
+    public Long getTopicId() {
+        return topicId;
+    }
+
+    public Long getBookId() {
+        return bookId;
+    }
+
+    public Double getPoint() {
+        return point;
+    }
+
+    public PointTransactionType getTransactionType() {
+        return transactionType;
+    }
+
+    public Instant getTransactionTime() {
+        return transactionTime;
+    }
+
+    public void setTransactionTime(Instant transactionTime) {
+        this.transactionTime = transactionTime;
+    }
+
     public static final class Builder {
 
         private Long id;
@@ -171,49 +215,5 @@ public class PointHistory {
 
             return new PointHistory(this);
         }
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public Long getLearningPathNodeId() {
-        return learningPathNodeId;
-    }
-
-    public Long getObjectiveId() {
-        return objectiveId;
-    }
-
-    public Long getLessonId() {
-        return lessonId;
-    }
-
-    public Long getTopicId() {
-        return topicId;
-    }
-
-    public Long getBookId() {
-        return bookId;
-    }
-
-    public Double getPoint() {
-        return point;
-    }
-
-    public PointTransactionType getTransactionType() {
-        return transactionType;
-    }
-
-    public Instant getTransactionTime() {
-        return transactionTime;
-    }
-
-    public void setTransactionTime(Instant transactionTime) {
-        this.transactionTime = transactionTime;
     }
 }

@@ -32,14 +32,14 @@ public class SpeakingQuestionConfig {
 
     @Bean
     public DeleteSpeakingQuestionInputPort deleteSpeakingQuestionInputPort(SpeakingQuestionRepositoryAdapter speakingQuestionRepositoryAdapter,
-                                                                   TransactionPort transactionPort) {
+                                                                           TransactionPort transactionPort) {
         return new DeleteSpeakingQuestionUseCase(speakingQuestionRepositoryAdapter, transactionPort);
     }
 
     @Bean
     public ChangeSpeakingQuestionStatusInputPort changeSpeakingQuestionStatusInputPort(SpeakingQuestionRepositoryAdapter speakingQuestionRepositoryAdapter,
-                                                                               EventPublisherPort eventPublisherPort,
-                                                                               TransactionPort transactionPort) {
+                                                                                       EventPublisherPort eventPublisherPort,
+                                                                                       TransactionPort transactionPort) {
         return new ChangeSpeakingQuestionStatusUseCase(speakingQuestionRepositoryAdapter, eventPublisherPort, transactionPort);
     }
 
