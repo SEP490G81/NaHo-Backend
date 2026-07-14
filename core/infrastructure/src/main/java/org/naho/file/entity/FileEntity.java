@@ -10,6 +10,7 @@ import org.naho.question.entity.SpeakingQuestionEntity;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.social.entity.CommentEntity;
 import org.naho.social.report.entity.ReportEntity;
+import org.naho.user.entity.UserEntity;
 
 @SuperBuilder
 @Getter
@@ -49,4 +50,7 @@ public class FileEntity extends BaseEntity {
 
     @OneToOne(mappedBy = "iconFile")
     LeagueEntity league;
+
+    @OneToOne(mappedBy = "avatar")
+    UserEntity user;
 }

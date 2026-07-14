@@ -4,6 +4,8 @@ import org.naho.user.result.RoleResult;
 
 import java.util.List;
 
-public interface GetRoleInputPort {
+public interface CrudRoleInputPort {
     List<RoleResult> getAllRoles();
+
+    List<RoleResult> findAllByUserId(Long userId);
 }

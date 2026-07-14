@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import org.naho.file.entity.FileEntity;
 import org.naho.learning.entity.UserLearningProgressEntity;
 import org.naho.learning.entity.UserNodeProgressEntity;
 import org.naho.point.entity.PointHistoryEntity;
@@ -18,6 +19,7 @@ import org.naho.user.type.UserStatus;
 import org.naho.user.valueobject.Username;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @SuperBuilder
@@ -55,12 +57,6 @@ public class UserEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     UserStatus status;
 
-    @Column(name = "avatar_url", length = 2048)
-    String avatarUrl;
-
-    @Column(name = "provider_id", length = 512, unique = true)
-    String providerId;
-
     @ManyToMany
     @JoinTable(
             joinColumns = @JoinColumn(name = "user_id"),
@@ -69,6 +65,10 @@ public class UserEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "user")
     List<UserSessionEntity> userSessions;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<OAuthProviderEntity> oAuthProviders = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     List<SpeakingQuestionEntity> questions;
@@ -92,4 +92,8 @@ public class UserEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "user")
     List<UserSeasonPointEntity> userSeasonPoints;
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "avatar_file_id")
+    FileEntity avatar;
 }

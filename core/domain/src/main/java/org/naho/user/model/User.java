@@ -10,31 +10,34 @@ import org.naho.user.valueobject.Username;
 import java.util.List;
 
 public class User {
+
     private final Long id;
     private final List<Long> roleIds;
     private final List<Long> userSessionIds;
-    private Long pointSummaryId;
-    private Long userLearningProgressId;
-    private String providerId;
+    private final List<Long> oAuthProviderIds;
+
+    private final Long pointSummaryId;
+    private final Long userLearningProgressId;
+    private Long avatarFileId;
 
     private final Username username;
     private final Email email;
-    private final String hashPassword;
-    private final String avatarUrl;
-    private final String fullName;
-    private final Gender gender;
-    private final Dob dob;
-    private final JLPTLevel jlptLevel;
+    private String hashPassword;
+    private String fullName;
+    private Gender gender;
+    private Dob dob;
+    private JLPTLevel jlptLevel;
+
     private UserStatus status;
 
-    // Private constructor
     private User(Builder builder) {
         this.id = builder.id;
-        this.avatarUrl = builder.avatarUrl;
         this.roleIds = builder.roleIds;
         this.userSessionIds = builder.userSessionIds;
+        this.oAuthProviderIds = builder.oAuthProviderIds;
         this.pointSummaryId = builder.pointSummaryId;
         this.userLearningProgressId = builder.userLearningProgressId;
+        this.avatarFileId = builder.avatarFileId;
         this.username = builder.username;
         this.email = builder.email;
         this.hashPassword = builder.hashPassword;
@@ -43,12 +46,6 @@ public class User {
         this.dob = builder.dob;
         this.jlptLevel = builder.jlptLevel;
         this.status = builder.status;
-        this.providerId = builder.providerId;
-    }
-
-    // Static builder method
-    public static Builder builder() {
-        return new Builder();
     }
 
     public static User registerNewUser(String rawUsername, String hashPassword, String rawEmail, List<Long> roleIds) {
@@ -65,114 +62,54 @@ public class User {
         return status == UserStatus.ACTIVE;
     }
 
-    // Getters
-    public Long getId() {
-        return id;
+    public static Builder builder() {
+        return new Builder();
     }
 
-    public String getAvatarUrl() {
-        return avatarUrl;
+    public Builder toBuilder() {
+        return builder()
+                .id(id)
+                .roleIds(roleIds)
+                .userSessionIds(userSessionIds)
+                .pointSummaryId(pointSummaryId)
+                .userLearningProgressId(userLearningProgressId)
+                .avatarFileId(avatarFileId)
+                .username(username)
+                .email(email)
+                .hashPassword(hashPassword)
+                .fullName(fullName)
+                .gender(gender)
+                .dob(dob)
+                .jlptLevel(jlptLevel)
+                .status(status);
     }
 
-    public List<Long> getRoleIds() {
-        return roleIds;
-    }
-
-    public List<Long> getUserSessionIds() {
-        return userSessionIds;
-    }
-
-    public Long getPointSummaryId() {
-        return pointSummaryId;
-    }
-
-    public void setPointSummaryId(Long pointSummaryId) {
-        this.pointSummaryId = pointSummaryId;
-    }
-
-    public Username getUsername() {
-        return username;
-    }
-
-    public Email getEmail() {
-        return email;
-    }
-
-    public String getHashPassword() {
-        return hashPassword;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public Dob getDob() {
-        return dob;
-    }
-
-    public JLPTLevel getJlptLevel() {
-        return jlptLevel;
-    }
-
-    public UserStatus getStatus() {
-        return status;
-    }
-
-    // Setters
-    public void setStatus(UserStatus status) {
-        this.status = status;
-    }
-
-    public Long getUserLearningProgressId() {
-        return userLearningProgressId;
-    }
-
-    public void setUserLearningProgressId(Long userLearningProgressId) {
-        this.userLearningProgressId = userLearningProgressId;
-    }
-
-    public String getProviderId() {
-        return providerId;
-    }
-
-    public void setProviderId(String providerId) {
-        this.providerId = providerId;
-    }
-
-    // Builder class
-    public static class Builder {
+    public static final class Builder {
 
         private Long id;
         private List<Long> roleIds;
         private List<Long> userSessionIds;
+        private List<Long> oAuthProviderIds;
+
         private Long pointSummaryId;
         private Long userLearningProgressId;
+        private Long avatarFileId;
 
         private Username username;
         private Email email;
-
         private String hashPassword;
-
-        private String avatarUrl;
         private String fullName;
         private Gender gender;
         private Dob dob;
-
         private JLPTLevel jlptLevel;
+
         private UserStatus status;
-        private String providerId;
+
+        private Builder() {
+        }
 
         public Builder id(Long id) {
             this.id = id;
-            return this;
-        }
-
-        public Builder avatarUrl(String avatarUrl) {
-            this.avatarUrl = avatarUrl;
             return this;
         }
 
@@ -186,6 +123,11 @@ public class User {
             return this;
         }
 
+        public Builder oAuthProviderIds(List<Long> oAuthProviderIds) {
+            this.oAuthProviderIds = oAuthProviderIds;
+            return this;
+        }
+
         public Builder pointSummaryId(Long pointSummaryId) {
             this.pointSummaryId = pointSummaryId;
             return this;
@@ -193,6 +135,11 @@ public class User {
 
         public Builder userLearningProgressId(Long userLearningProgressId) {
             this.userLearningProgressId = userLearningProgressId;
+            return this;
+        }
+
+        public Builder avatarFileId(Long avatarFileId) {
+            this.avatarFileId = avatarFileId;
             return this;
         }
 
@@ -236,14 +183,96 @@ public class User {
             return this;
         }
 
-
-        public Builder providerId(String providerId) {
-            this.providerId = providerId;
-            return this;
-        }
-
         public User build() {
             return new User(this);
         }
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public List<Long> getRoleIds() {
+        return roleIds;
+    }
+
+    public List<Long> getUserSessionIds() {
+        return userSessionIds;
+    }
+
+    public List<Long> getOAuthProviderIds() {
+        return oAuthProviderIds;
+    }
+
+    public Long getPointSummaryId() {
+        return pointSummaryId;
+    }
+
+    public Long getUserLearningProgressId() {
+        return userLearningProgressId;
+    }
+
+    public Long getAvatarFileId() {
+        return avatarFileId;
+    }
+
+    public void setAvatarFileId(Long avatarFileId) {
+        this.avatarFileId = avatarFileId;
+    }
+
+    public Username getUsername() {
+        return username;
+    }
+
+    public Email getEmail() {
+        return email;
+    }
+
+    public String getHashPassword() {
+        return hashPassword;
+    }
+
+    public void setHashPassword(String hashPassword) {
+        this.hashPassword = hashPassword;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public Dob getDob() {
+        return dob;
+    }
+
+    public void setDob(Dob dob) {
+        this.dob = dob;
+    }
+
+    public JLPTLevel getJlptLevel() {
+        return jlptLevel;
+    }
+
+    public void setJlptLevel(JLPTLevel jlptLevel) {
+        this.jlptLevel = jlptLevel;
+    }
+
+    public UserStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(UserStatus status) {
+        this.status = status;
     }
 }

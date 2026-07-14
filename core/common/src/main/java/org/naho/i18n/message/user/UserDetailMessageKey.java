@@ -17,6 +17,8 @@ public final class UserDetailMessageKey {
             "user.timezone.not.found";
     public static final String USER_ID_NOT_FOUND =
             "user.id.not.found";
+    public static final String USER_ID_NULL =
+            "user.id.null";
     public static final String USER_EMAIL_NOT_FOUND =
             "user.email.not.found";
     public static final String USER_USERNAME_NOT_FOUND =
@@ -63,6 +65,14 @@ public final class UserDetailMessageKey {
             "user.google.id.token.not.valid";
     public static final String USER_GOOGLE_ID_TOKEN_NOT_FOUND =
             "user.google.id.token.not.found";
+    public static final String USER_OAUTH_PROVIDER_USER_ID_NULL =
+            "user.oauth.provider.user.id.null";
+    public static final String USER_OAUTH_PROVIDER_PROVIDER_USER_ID_BLANK =
+            "user.oauth.provider.provider.user.id.blank";
+    public static final String USER_OAUTH_PROVIDER_PROVIDER_NAME_NULL =
+            "user.oauth.provider.provider.name.null";
+    public static final String USER_OAUTH_PROVIDER_AVATAR_URL_BLANK =
+            "user.oauth.provider.avatar.url.blank";
 
     private UserDetailMessageKey() {
     }
