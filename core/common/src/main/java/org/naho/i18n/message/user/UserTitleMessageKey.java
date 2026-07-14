@@ -29,6 +29,8 @@ public final class UserTitleMessageKey {
             "user.invalid.refresh.token.title";
     public static final String USER_GOOGLE_ID_TOKEN_NOT_VALID_TITLE =
             "user.google.id.token.not.valid.title";
+    public static final String USER_OAUTH_PROVIDER_NOT_VALID_TITLE =
+            "user.oauth.provider.not.valid.title";
 
     private UserTitleMessageKey() {
     }

@@ -1,6 +1,8 @@
 package org.naho.user.port.out;
 
+import org.naho.user.model.OAuthProvider;
 import org.naho.user.model.User;
+import org.naho.user.type.OAuthProviderName;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,7 +12,7 @@ public interface UserRepositoryPort {
 
     Optional<User> findByEmail(String email);
 
-    Optional<User> findByProviderId(String providerId);
+    Optional<User> findByProviderUserIdAndProviderName(String providerUserId, OAuthProviderName providerName);
 
     Optional<User> findByUsernameOrEmail(String usernameOrEmail);
 
@@ -18,10 +20,10 @@ public interface UserRepositoryPort {
 
     boolean existsByEmail(String email);
 
-    User save(User user);
+    User save(User user, OAuthProvider oAuthProvider);
 
-    User createNew(User user);
-
+    User createNew(User user, OAuthProvider oAuthProvider);
+    
     Optional<User> findById(Long id);
 
     List<User> getListUser();

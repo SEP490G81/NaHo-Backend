@@ -143,6 +143,18 @@ CREATE TABLE lessons
     CONSTRAINT pk_lessons PRIMARY KEY (id)
 );
 
+CREATE TABLE o_auth_providers
+(
+    id               BIGINT AUTO_INCREMENT NOT NULL,
+    created_time     datetime              NOT NULL,
+    modified_time    datetime              NULL,
+    user_id          BIGINT                NOT NULL,
+    provider_user_id VARCHAR(255)          NOT NULL,
+    provider_name    SMALLINT              NOT NULL,
+    avatar_url       VARCHAR(255)          NULL,
+    CONSTRAINT pk_o_auth_providers PRIMARY KEY (id)
+);
+
 CREATE TABLE objectives
 (
     id                            BIGINT AUTO_INCREMENT NOT NULL,
@@ -393,10 +405,9 @@ CREATE TABLE users
     dob                       date                  NULL,
     jlpt_level                VARCHAR(2)            NOT NULL,
     status                    VARCHAR(20)           NOT NULL,
-    avatar_url                VARCHAR(2048)         NULL,
-    provider_id               VARCHAR(512)          NULL,
     point_summary_id          BIGINT                NULL,
     user_learning_progress_id BIGINT                NULL,
+    avatar_file_id            BIGINT                NULL,
     CONSTRAINT pk_users PRIMARY KEY (id)
 );
 
@@ -490,13 +501,13 @@ ALTER TABLE topics
     ADD CONSTRAINT uc_topics_cover_image_file UNIQUE (cover_image_file_id);
 
 ALTER TABLE users
+    ADD CONSTRAINT uc_users_avatar_file UNIQUE (avatar_file_id);
+
+ALTER TABLE users
     ADD CONSTRAINT uc_users_email UNIQUE (email);
 
 ALTER TABLE users
     ADD CONSTRAINT uc_users_point_summary UNIQUE (point_summary_id);
-
-ALTER TABLE users
-    ADD CONSTRAINT uc_users_provider UNIQUE (provider_id);
 
 ALTER TABLE users
     ADD CONSTRAINT uc_users_user_learning_progress UNIQUE (user_learning_progress_id);
@@ -558,6 +569,9 @@ ALTER TABLE lessons
 ALTER TABLE objectives
     ADD CONSTRAINT FK_OBJECTIVES_ON_LESSON FOREIGN KEY (lesson_id) REFERENCES lessons (id);
 
+ALTER TABLE o_auth_providers
+    ADD CONSTRAINT FK_O_AUTH_PROVIDERS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+
 ALTER TABLE personas
     ADD CONSTRAINT FK_PERSONAS_ON_AVATAR_FILE FOREIGN KEY (avatar_file_id) REFERENCES files (id);
 
@@ -617,6 +631,9 @@ ALTER TABLE topics
 
 ALTER TABLE topics
     ADD CONSTRAINT FK_TOPICS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+
+ALTER TABLE users
+    ADD CONSTRAINT FK_USERS_ON_AVATAR_FILE FOREIGN KEY (avatar_file_id) REFERENCES files (id);
 
 ALTER TABLE users
     ADD CONSTRAINT FK_USERS_ON_POINT_SUMMARY FOREIGN KEY (point_summary_id) REFERENCES point_summary (id);

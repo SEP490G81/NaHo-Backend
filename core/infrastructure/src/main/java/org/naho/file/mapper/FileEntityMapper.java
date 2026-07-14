@@ -27,6 +27,7 @@ public abstract class FileEntityMapper {
     @Mapping(target = "question", ignore = true)
     @Mapping(target = "report", ignore = true)
     @Mapping(target = "league", ignore = true)
+    @Mapping(target = "user", ignore = true)
     public abstract FileEntity domainToEntity(File domain);
 
     @Named("fullObjectKey")

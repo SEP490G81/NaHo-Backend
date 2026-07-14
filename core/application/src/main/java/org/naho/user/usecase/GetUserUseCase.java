@@ -6,7 +6,6 @@ import org.naho.user.exception.UserErrorCode;
 import org.naho.user.mapper.UserResultMapper;
 import org.naho.user.model.User;
 import org.naho.user.port.in.GetUserInputPort;
-import org.naho.user.port.out.RoleRepositoryPort;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.naho.user.result.UserResult;
 
@@ -15,23 +14,20 @@ import java.util.List;
 public class GetUserUseCase implements GetUserInputPort {
 
     private final UserRepositoryPort userRepositoryPort;
-    private final RoleRepositoryPort roleRepositoryPort;
     private final UserResultMapper userResultMapper;
 
     public GetUserUseCase(
             UserRepositoryPort userRepositoryPort,
-            RoleRepositoryPort roleRepositoryPort,
             UserResultMapper userResultMapper
     ) {
         this.userRepositoryPort = userRepositoryPort;
-        this.roleRepositoryPort = roleRepositoryPort;
         this.userResultMapper = userResultMapper;
     }
 
     @Override
     public List<UserResult> getListUsers() {
         List<User> listUsers = userRepositoryPort.getListUser();
-        return listUsers.stream().map(this::mapToResult).toList();
+        return listUsers.stream().map(userResultMapper::domainToResult).toList();
     }
 
     @Override
@@ -41,13 +37,13 @@ public class GetUserUseCase implements GetUserInputPort {
                         UserErrorCode.USER_NOT_FOUND,
                         UserDetailMessageKey.USER_GET_FAILED
                 ));
-        return mapToResult(user);
+        return userResultMapper.domainToResult(user);
     }
 
     @Override
     public List<UserResult> searchUsers(String userNameOrEmail, String role, String status, String jlptLevel) {
         List<User> users = userRepositoryPort.findByFilters(userNameOrEmail, role, status, jlptLevel);
-        return users.stream().map(this::mapToResult).toList();
+        return users.stream().map(userResultMapper::domainToResult).toList();
     }
 
     @Override
@@ -57,11 +53,6 @@ public class GetUserUseCase implements GetUserInputPort {
                         UserErrorCode.USER_NOT_FOUND,
                         UserDetailMessageKey.USER_GET_FAILED
                 ));
-        return mapToResult(user);
-    }
-
-    private UserResult mapToResult(User user) {
-        List<String> roleNames = roleRepositoryPort.findRoleNamesByUserId(user.getId());
-        return userResultMapper.domainToResult(user, roleNames);
+        return userResultMapper.domainToResult(user);
     }
 }

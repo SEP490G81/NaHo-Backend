@@ -10,8 +10,6 @@ import org.naho.user.port.out.RoleRepositoryPort;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.naho.user.result.UserResult;
 
-import java.util.List;
-
 public class CrudUserUseCase implements CrudUserInputPort {
 
     private final UserRepositoryPort userRepositoryPort;
@@ -31,13 +29,19 @@ public class CrudUserUseCase implements CrudUserInputPort {
 
     @Override
     public UserResult findUserById(Long userId) {
+        if (userId == null) {
+            throw new ApplicationException(
+                    UserErrorCode.USER_NOT_FOUND,
+                    UserDetailMessageKey.USER_ID_NULL
+            );
+        }
+
         User user = userRepositoryPort.findById(userId)
                 .orElseThrow(() -> new ApplicationException(
                         UserErrorCode.USER_NOT_FOUND,
                         UserDetailMessageKey.USER_ID_NOT_FOUND,
                         userId
                 ));
-        List<String> roleNames = roleRepositoryPort.findRoleNamesByUserId(userId);
-        return userResultMapper.domainToResult(user, roleNames);
+        return userResultMapper.domainToResult(user);
     }
 }

@@ -27,6 +27,12 @@ public enum UserDomainErrorCode implements ErrorCode {
             "USER_OO4",
             UserTitleMessageKey.USER_TIMEZONE_NOT_VALID_TITLE,
             400
+    ),
+
+    USER_OAUTH_PROVIDER_NOT_VALID(
+            "USER_005",
+            UserTitleMessageKey.USER_OAUTH_PROVIDER_NOT_VALID_TITLE,
+            400
     );
 
     private final String code;

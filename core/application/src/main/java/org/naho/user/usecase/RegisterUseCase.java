@@ -64,7 +64,7 @@ public class RegisterUseCase implements RegisterInputPort {
                 command.email(),
                 List.of(defaultRole.getId()));
 
-        User savedUser = userRepository.createNew(newUser);
+        User savedUser = userRepository.createNew(newUser, null);
 
         return new RegisterResult(
                 savedUser.getId() != null ? savedUser.getId().toString() : "",
