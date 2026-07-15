@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.naho.season.mybatis.SeasonQueryMapper">
+    <select id="findLatestSeasonNo" resultType="integer">
+        select max(s.season_no)
+        from seasons s
+    </select>
+
+    <select id="existsOverlappingSeason" resultType="boolean">
+    <![CDATA[
+        SELECT EXISTS (SELECT 1
+                       FROM seasons s
+                       WHERE s.start_at <= #{endAt}
+                         AND s.end_at >= #{startAt})
+        ]]>
+    </select>
+</mapper>
