@@ -15,6 +15,10 @@ public final class LearningPathNodeDetailMessageKey {
             "learning_path_node.chest_id.empty";
     public static final String LEARNING_PATH_NODE_GLOBAL_ORDER_INDEX_EMPTY =
             "learning_path_node.global_order_index.empty";
+    public static final String LEARNING_PATH_NODE_ID_NOT_FOUND =
+            "learning_path_node.id.not.found";
+    public static final String LEARNING_PATH_NODE_GET_DETAIL_SUCCESS =
+            "learning_path_node.get.detail.success";
 
     private LearningPathNodeDetailMessageKey() {
     }
