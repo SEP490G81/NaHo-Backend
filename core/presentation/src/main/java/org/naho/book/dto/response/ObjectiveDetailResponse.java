@@ -1,7 +1,7 @@
 package org.naho.book.dto.response;
 
 import org.naho.book.type.TopicStatus;
-import org.naho.question.dto.response.SpeakingQuestionListItemResponse;
+import org.naho.learning.dto.response.LearningPathNodeListItemResponse;
 
 import java.util.List;
 
@@ -13,6 +13,6 @@ public record ObjectiveDetailResponse(
         String japaneseDescriptionMarkup,
         TopicStatus status,
         Double orderIndex,
-        List<SpeakingQuestionListItemResponse> questions
+        List<LearningPathNodeListItemResponse> learningPathNodes
 ) {
 }
