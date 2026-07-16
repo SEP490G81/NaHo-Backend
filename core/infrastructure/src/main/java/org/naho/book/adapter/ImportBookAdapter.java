@@ -132,7 +132,7 @@ public class ImportBookAdapter implements ImportBookPort {
                     }
 
                     Cell nodeTypeCell = row.getCell(4);
-                    if (nodeTypeCell == null || nodeTypeCell.getCellType() == CellType.BLANK) {
+                    if (nodeTypeCell == null || nodeTypeCell.getStringCellValue().isBlank()) {
                         continue;
                     }
 
@@ -166,7 +166,7 @@ public class ImportBookAdapter implements ImportBookPort {
                             // để trống
                         }
                         case CHEST -> {
-                            // để trống
+                            Cell chestCell = row.getCell(5);
                         }
                     }
                 }
