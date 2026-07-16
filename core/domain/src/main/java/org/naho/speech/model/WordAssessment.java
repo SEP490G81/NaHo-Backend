@@ -21,6 +21,28 @@ public class WordAssessment {
         return new Builder();
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    // Getter
+
+    public String getWord() {
+        return word;
+    }
+
+    public Double getAccuracyScore() {
+        return accuracyScore;
+    }
+
+    public SpeechAssessmentErrorType getErrorType() {
+        return errorType;
+    }
+
+    public Long getSpeechAssessmentId() {
+        return speechAssessmentId;
+    }
+
     public static class Builder {
         private Long id;
         private String word;
@@ -56,27 +78,5 @@ public class WordAssessment {
         public WordAssessment build() {
             return new WordAssessment(this);
         }
-    }
-
-    // Getter
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getWord() {
-        return word;
-    }
-
-    public Double getAccuracyScore() {
-        return accuracyScore;
-    }
-
-    public SpeechAssessmentErrorType getErrorType() {
-        return errorType;
-    }
-
-    public Long getSpeechAssessmentId() {
-        return speechAssessmentId;
     }
 }

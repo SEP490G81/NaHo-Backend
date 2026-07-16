@@ -39,6 +39,12 @@ public class LessonEntity extends BaseEntity {
     @Column(name = "order_index", nullable = false)
     Double orderIndex;
 
+    @Column(name = "first_node_global_order_index")
+    Double firstNodeGlobalOrderIndex;
+
+    @Column(name = "last_node_global_order_index")
+    Double lastNodeGlobalOrderIndex;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "topic_id")
     TopicEntity topic;

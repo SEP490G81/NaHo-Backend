@@ -7,6 +7,8 @@ import lombok.experimental.SuperBuilder;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.user.entity.UserEntity;
 
+import java.time.Instant;
+
 @SuperBuilder
 @Getter
 @Setter
@@ -17,10 +19,22 @@ import org.naho.user.entity.UserEntity;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserLearningProgressEntity extends BaseEntity {
     @ManyToOne
-    @JoinColumn(name = "learning_path_node_id", nullable = false)
-    LearningPathNodeEntity learningPathNode;
+    @JoinColumn(name = "farthest_available_node_id", nullable = false)
+    LearningPathNodeEntity farthestAvailableNode;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "last_learning_node_id")
+    LearningPathNodeEntity lastLearningNode;
+
+    @Column(name = "last_learning_at")
+    Instant lastLearningAt;
+
+    @Column(name = "current_streak")
+    Integer currentStreak;
+
+    @Column(name = "longest_streak")
+    Integer longestStreak;
+
+    @OneToOne(mappedBy = "userLearningProgress")
     UserEntity user;
 }

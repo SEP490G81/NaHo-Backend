@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface GetReportInputPort {
     ReportResult getReport(GetReportCommand command);
+
     List<ReportResult> getReportsByContentManager();
+
     List<ReportResult> getReportsByAdmin();
 }

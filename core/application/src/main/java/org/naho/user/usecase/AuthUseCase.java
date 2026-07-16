@@ -11,7 +11,7 @@ import org.naho.user.command.GoogleLoginCommand;
 import org.naho.user.command.LogoutCommand;
 import org.naho.user.exception.RoleErrorCode;
 import org.naho.user.exception.UserErrorCode;
-import org.naho.user.mapper.UserResultMapper;
+import org.naho.user.model.OAuthProvider;
 import org.naho.user.model.Role;
 import org.naho.user.model.User;
 import org.naho.user.model.UserSession;
@@ -19,7 +19,7 @@ import org.naho.user.port.in.AuthInputPort;
 import org.naho.user.port.out.*;
 import org.naho.user.result.LoginResult;
 import org.naho.user.result.TokenResult;
-import org.naho.user.result.UserResult;
+import org.naho.user.type.OAuthProviderName;
 import org.naho.user.type.RoleName;
 import org.naho.user.type.SessionRevokedReason;
 import org.naho.user.type.UserStatus;
@@ -29,12 +29,9 @@ import java.time.Instant;
 import java.util.List;
 
 public class AuthUseCase implements AuthInputPort {
-    private static final String PROVIDER_GOOGLE = "google_";
-
     private final UserRepositoryPort userRepositoryPort;
     private final EncoderPort encoderPort;
     private final TokenServicePort tokenServicePort;
-    private final UserResultMapper userResultMapper;
     private final UserSessionRepositoryPort userSessionRepositoryPort;
     private final RoleRepositoryPort roleRepositoryPort;
     private final TransactionPort transactionPort;
@@ -45,7 +42,6 @@ public class AuthUseCase implements AuthInputPort {
             UserRepositoryPort userRepositoryPort,
             EncoderPort encoderPort,
             TokenServicePort tokenServicePort,
-            UserResultMapper userResultMapper,
             UserSessionRepositoryPort userSessionRepositoryPort,
             RoleRepositoryPort roleRepositoryPort,
             TransactionPort transactionPort,
@@ -55,24 +51,11 @@ public class AuthUseCase implements AuthInputPort {
         this.userRepositoryPort = userRepositoryPort;
         this.encoderPort = encoderPort;
         this.tokenServicePort = tokenServicePort;
-        this.userResultMapper = userResultMapper;
         this.userSessionRepositoryPort = userSessionRepositoryPort;
         this.roleRepositoryPort = roleRepositoryPort;
         this.transactionPort = transactionPort;
         this.userSessionServicePort = userSessionServicePort;
         this.userSessionEventPublisherPort = userSessionEventPublisherPort;
-    }
-
-    @Override
-    public UserResult findUserById(Long userId) {
-        User user = userRepositoryPort.findById(userId)
-                .orElseThrow(() -> new ApplicationException(
-                        UserErrorCode.USER_NOT_FOUND,
-                        UserDetailMessageKey.USER_ID_NOT_FOUND,
-                        userId
-                ));
-        List<String> roleNames = roleRepositoryPort.findRoleNamesByUserId(userId);
-        return userResultMapper.domainToResult(user, roleNames);
     }
 
     @Override
@@ -93,90 +76,6 @@ public class AuthUseCase implements AuthInputPort {
     @Override
     public LoginResult credentialsLogin(CredentialsLoginCommand command) {
         return transactionPort.execute(() -> doCredentialsLogin(command));
-    }
-
-    @Override
-    public LoginResult googleLogin(GoogleLoginCommand command) {
-        return transactionPort.execute(() -> doGoogleLogin(command));
-    }
-
-    private LoginResult doGoogleLogin(GoogleLoginCommand command) {
-        String providerId = PROVIDER_GOOGLE + command.getSub();
-        User currentUser = userRepositoryPort.findByProviderId(providerId)
-                .orElse(null);
-
-        if (currentUser == null) {
-            User emailUser = userRepositoryPort.findByEmail(command.getEmail())
-                    .orElse(null);
-            // if user is not found by providerId and email, create new
-            if (emailUser == null) {
-                Role learnerRole = roleRepositoryPort.findByName(RoleName.LEARNER)
-                        .orElseThrow(() -> new ApplicationException(
-                                RoleErrorCode.ROLE_NOT_FOUND,
-                                RoleDetailMessageKey.ROLE_ROLE_NAME_NOT_FOUND,
-                                RoleName.LEARNER.name()
-                        ));
-
-                User newUser = User.builder()
-                        .email(Email.of(command.getEmail()))
-                        .fullName(command.getFullName())
-                        .avatarUrl(command.getPictureUrl())
-                        .status(UserStatus.ACTIVE)
-                        .roleIds(List.of(learnerRole.getId()))
-                        .providerId(providerId)
-                        .build();
-
-                currentUser = userRepositoryPort.createNew(newUser);
-            } else {
-                // if user is found by email, update providerId
-                emailUser.setProviderId(providerId);
-                currentUser = userRepositoryPort.save(emailUser);
-            }
-        }
-
-        if (!currentUser.isActive()) {
-            throw new ApplicationException(
-                    UserErrorCode.USER_LOGIN_FAILED,
-                    UserDetailMessageKey.USER_ACCOUNT_NOT_ACTIVE);
-        }
-
-        userSessionServicePort.revokeAllSessionsByUserId(
-                currentUser.getId(),
-                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
-        );
-
-        Instant now = Instant.now();
-
-        TokenResult refreshToken = tokenServicePort.generateRefreshToken(now);
-
-        String hashRefreshToken = encoderPort.hashRefreshToken(refreshToken.value());
-
-        UserSession userSession = UserSession.builder()
-                .userId(currentUser.getId())
-                .hashRefreshToken(hashRefreshToken)
-                .deviceId(command.getDeviceId())
-                .userAgent(command.getUserAgent())
-                .ipAddress(command.getIpAddress())
-                .issuedAt(now)
-                .refreshTokenExpiresAt(refreshToken.expiresAt())
-                .accessTokenExpiresAt(tokenServicePort.getAccessTokenExpiry(now))
-                .lastUsedAt(now)
-                .build();
-
-        UserSession savedUserSession = userSessionRepositoryPort.save(userSession);
-
-        TokenResult accessToken = tokenServicePort.generateAccessToken(savedUserSession);
-
-        userSessionEventPublisherPort.publishForceLogoutEvent(new ForceLogoutCommand(
-                savedUserSession.getUserId(),
-                savedUserSession.getId(),
-                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
-        ));
-
-        return new LoginResult(
-                accessToken,
-                refreshToken
-        );
     }
 
     private LoginResult doCredentialsLogin(CredentialsLoginCommand command) {
@@ -214,6 +113,98 @@ public class AuthUseCase implements AuthInputPort {
                 .deviceId(command.deviceId())
                 .userAgent(command.userAgent())
                 .ipAddress(command.ipAddress())
+                .issuedAt(now)
+                .refreshTokenExpiresAt(refreshToken.expiresAt())
+                .accessTokenExpiresAt(tokenServicePort.getAccessTokenExpiry(now))
+                .lastUsedAt(now)
+                .build();
+
+        UserSession savedUserSession = userSessionRepositoryPort.save(userSession);
+
+        TokenResult accessToken = tokenServicePort.generateAccessToken(savedUserSession);
+
+        userSessionEventPublisherPort.publishForceLogoutEvent(new ForceLogoutCommand(
+                savedUserSession.getUserId(),
+                savedUserSession.getId(),
+                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
+        ));
+
+        return new LoginResult(
+                accessToken,
+                refreshToken
+        );
+    }
+
+
+    @Override
+    public LoginResult googleLogin(GoogleLoginCommand command) {
+        return transactionPort.execute(() -> doGoogleLogin(command));
+    }
+
+    private LoginResult doGoogleLogin(GoogleLoginCommand command) {
+        // Google provider id
+        String providerUserId = command.getSub();
+
+        User currentUser = userRepositoryPort
+                .findByProviderUserIdAndProviderName(providerUserId, OAuthProviderName.GOOGLE)
+                .orElse(null);
+
+        if (currentUser == null) {
+            OAuthProvider oAuthProvider = OAuthProvider.builder()
+                    .providerUserId(providerUserId)
+                    .providerName(OAuthProviderName.GOOGLE)
+                    .avatarUrl(command.getPictureUrl())
+                    .build();
+
+            User emailUser = userRepositoryPort.findByEmail(command.getEmail())
+                    .orElse(null);
+
+            // if user is not found by Google providerUserId and email, create new
+            if (emailUser == null) {
+                Role learnerRole = roleRepositoryPort.findByName(RoleName.LEARNER)
+                        .orElseThrow(() -> new ApplicationException(
+                                RoleErrorCode.ROLE_NOT_FOUND,
+                                RoleDetailMessageKey.ROLE_ROLE_NAME_NOT_FOUND,
+                                RoleName.LEARNER.name()
+                        ));
+
+                User newUser = User.builder()
+                        .email(Email.of(command.getEmail()))
+                        .fullName(command.getFullName())
+                        .status(UserStatus.ACTIVE)
+                        .roleIds(List.of(learnerRole.getId()))
+                        .build();
+
+                currentUser = userRepositoryPort.createNew(newUser, oAuthProvider);
+            } else {
+                // if user is found by email, update OAuthProvider (link to Google)
+                currentUser = userRepositoryPort.save(emailUser, oAuthProvider);
+            }
+        }
+
+        if (!currentUser.isActive()) {
+            throw new ApplicationException(
+                    UserErrorCode.USER_LOGIN_FAILED,
+                    UserDetailMessageKey.USER_ACCOUNT_NOT_ACTIVE);
+        }
+
+        userSessionServicePort.revokeAllSessionsByUserId(
+                currentUser.getId(),
+                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
+        );
+
+        Instant now = Instant.now();
+
+        TokenResult refreshToken = tokenServicePort.generateRefreshToken(now);
+
+        String hashRefreshToken = encoderPort.hashRefreshToken(refreshToken.value());
+
+        UserSession userSession = UserSession.builder()
+                .userId(currentUser.getId())
+                .hashRefreshToken(hashRefreshToken)
+                .deviceId(command.getDeviceId())
+                .userAgent(command.getUserAgent())
+                .ipAddress(command.getIpAddress())
                 .issuedAt(now)
                 .refreshTokenExpiresAt(refreshToken.expiresAt())
                 .accessTokenExpiresAt(tokenServicePort.getAccessTokenExpiry(now))

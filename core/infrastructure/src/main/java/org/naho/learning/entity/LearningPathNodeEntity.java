@@ -52,8 +52,11 @@ public class LearningPathNodeEntity extends BaseEntity {
     @OneToMany(mappedBy = "learningPathNode")
     List<UserNodeProgressEntity> userNodeProgresses;
 
-    @OneToMany(mappedBy = "learningPathNode")
-    List<UserLearningProgressEntity> userLearningProgresses;
+    @OneToMany(mappedBy = "farthestAvailableNode")
+    List<UserLearningProgressEntity> farthestAvailableNodes;
+
+    @OneToMany(mappedBy = "lastLearningNode")
+    List<UserLearningProgressEntity> lastLearningNodes;
 
     @OneToMany(mappedBy = "learningPathNode")
     List<PointHistoryEntity> pointHistories;

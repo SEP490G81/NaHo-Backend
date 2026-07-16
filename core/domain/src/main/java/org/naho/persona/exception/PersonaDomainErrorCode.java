@@ -13,6 +13,11 @@ public enum PersonaDomainErrorCode implements ErrorCode {
             "PERSONA_002",
             PersonaTitleMessageKey.PERSONA_PROMPT_NOT_VALID_TITLE,
             400
+    ),
+    PERSONA_NOT_FOUND(
+            "PERSONA_003",
+            PersonaTitleMessageKey.PERSONA_NOT_FOUND_TITLE,
+            404
     );
 
     private final String code;

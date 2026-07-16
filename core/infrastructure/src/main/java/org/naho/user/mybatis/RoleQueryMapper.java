@@ -12,4 +12,6 @@ public interface RoleQueryMapper {
     List<String> findRoleNamesByUserId(@Param("userId") Long userId);
 
     RoleEntity findByName(@Param("roleName") RoleName roleName);
+
+    List<RoleEntity> findAllByUserId(@Param("userId") Long userId);
 }

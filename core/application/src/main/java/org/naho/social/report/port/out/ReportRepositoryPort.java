@@ -8,5 +8,6 @@ import java.util.Optional;
 
 public interface ReportRepositoryPort {
     Optional<Report> findById(Long id);
+
     List<Report> findByReportTypeIn(List<ReportType> reportTypes);
 }

@@ -20,6 +20,10 @@ public class Persona {
         this.prompt = builder.prompt;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public Long getId() {
         return id;
     }
@@ -38,10 +42,6 @@ public class Persona {
 
     public String getPrompt() {
         return prompt;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     public static class Builder {

@@ -19,7 +19,7 @@ public enum CommentDomainErrorCode implements ErrorCode {
             CommentTitleMessageKey.COMMENT_CONTENT_NOT_VALID_TITLE,
             400
     );
-    
+
     private final String code;
     private final String titleKey;
     private final int statusCode;

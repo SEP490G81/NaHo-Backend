@@ -21,6 +21,10 @@ public class Reaction {
         this.reactionType = builder.reactionType;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public Long getId() {
         return id;
     }
@@ -39,10 +43,6 @@ public class Reaction {
 
     public ReactionType getReactionType() {
         return reactionType;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     public static class Builder {

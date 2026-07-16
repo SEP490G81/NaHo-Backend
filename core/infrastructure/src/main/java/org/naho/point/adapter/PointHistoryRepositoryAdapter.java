@@ -1,7 +1,12 @@
 package org.naho.point.adapter;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.book.repository.BookJpaRepository;
+import org.naho.book.repository.LessonJpaRepository;
+import org.naho.book.repository.ObjectiveJpaRepository;
+import org.naho.book.repository.TopicJpaRepository;
 import org.naho.i18n.message.user.UserDetailMessageKey;
+import org.naho.learning.repository.LearningPathNodeJpaRepository;
 import org.naho.pagination.PageData;
 import org.naho.pagination.PageMeta;
 import org.naho.point.command.PointHistoryQueryCommand;
@@ -15,11 +20,6 @@ import org.naho.shared.exception.ApplicationException;
 import org.naho.user.entity.UserEntity;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.repository.UserJpaRepository;
-import org.naho.book.repository.BookJpaRepository;
-import org.naho.book.repository.TopicJpaRepository;
-import org.naho.book.repository.LessonJpaRepository;
-import org.naho.book.repository.ObjectiveJpaRepository;
-import org.naho.learning.repository.LearningPathNodeJpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,88 +30,81 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class PointHistoryRepositoryAdapter implements PointHistoryRepositoryPort {
-    private final PointHistoryEntityMapper pointHistoryEntityMapper;
-    private final PointHistoryJpaRepository pointHistoryJpaRepository;
-    private final UserJpaRepository userJpaRepository;
-    private final BookJpaRepository bookJpaRepository;
-    private final TopicJpaRepository topicJpaRepository;
-    private final LessonJpaRepository lessonJpaRepository;
-    private final ObjectiveJpaRepository objectiveJpaRepository;
-    private final LearningPathNodeJpaRepository learningPathNodeJpaRepository;
+        private final PointHistoryEntityMapper pointHistoryEntityMapper;
+        private final PointHistoryJpaRepository pointHistoryJpaRepository;
+        private final UserJpaRepository userJpaRepository;
+        private final BookJpaRepository bookJpaRepository;
+        private final TopicJpaRepository topicJpaRepository;
+        private final LessonJpaRepository lessonJpaRepository;
+        private final ObjectiveJpaRepository objectiveJpaRepository;
+        private final LearningPathNodeJpaRepository learningPathNodeJpaRepository;
 
-    @Override
-    public PointHistory save(PointHistory pointHistory) {
-        PointHistoryEntity entity = pointHistoryEntityMapper.domainToEntity(pointHistory);
+        @Override
+        public PointHistory save(PointHistory pointHistory) {
+                PointHistoryEntity entity = pointHistoryEntityMapper.domainToEntity(pointHistory);
 
-        UserEntity user = userJpaRepository.findById(pointHistory.getUserId())
-                .orElseThrow(() -> new ApplicationException(
-                        UserErrorCode.USER_NOT_FOUND,
-                        UserDetailMessageKey.USER_ID_NOT_FOUND,
-                        pointHistory.getUserId()
-                ));
+                UserEntity user = userJpaRepository.findById(pointHistory.getUserId())
+                                .orElseThrow(() -> new ApplicationException(
+                                                UserErrorCode.USER_NOT_FOUND,
+                                                UserDetailMessageKey.USER_ID_NOT_FOUND,
+                                                pointHistory.getUserId()));
 
-        entity.setUser(user);
+                entity.setUser(user);
 
-        if (pointHistory.getLearningPathNodeId() != null) {
-            entity.setLearningPathNode(learningPathNodeJpaRepository.getReferenceById(pointHistory.getLearningPathNodeId()));
+                if (pointHistory.getLearningPathNodeId() != null) {
+                        entity.setLearningPathNode(learningPathNodeJpaRepository
+                                        .getReferenceById(pointHistory.getLearningPathNodeId()));
+                }
+                if (pointHistory.getObjectiveId() != null) {
+                        entity.setObjective(objectiveJpaRepository.getReferenceById(pointHistory.getObjectiveId()));
+                }
+                if (pointHistory.getLessonId() != null) {
+                        entity.setLesson(lessonJpaRepository.getReferenceById(pointHistory.getLessonId()));
+                }
+                if (pointHistory.getTopicId() != null) {
+                        entity.setTopic(topicJpaRepository.getReferenceById(pointHistory.getTopicId()));
+                }
+                if (pointHistory.getBookId() != null) {
+                        entity.setBook(bookJpaRepository.getReferenceById(pointHistory.getBookId()));
+                }
+
+                PointHistoryEntity savedPointHistory = pointHistoryJpaRepository.save(entity);
+
+                return pointHistoryEntityMapper.entityToDomain(savedPointHistory);
         }
-        if (pointHistory.getObjectiveId() != null) {
-            entity.setObjective(objectiveJpaRepository.getReferenceById(pointHistory.getObjectiveId()));
+
+        @Override
+        public PageData<PointHistory> findAllByUserId(PointHistoryQueryCommand command, Long userId) {
+                Pageable pageable = PageRequest.of(
+                                command.page(),
+                                command.size(),
+                                Sort.by(
+                                                Sort.Direction.valueOf(command.sortDirection().name()),
+                                                command.sortColumn().getColumnName()));
+
+                Specification<PointHistoryEntity> specification = Specification.allOf(
+                                PointHistorySpecification.hasUserId(userId),
+                                PointHistorySpecification.hasTransactionType(command.transactionType()),
+                                PointHistorySpecification.hasAmountType(command.amountType()),
+                                PointHistorySpecification.transactionTimeBetween(
+                                                command.transactionTimeFrom(),
+                                                command.transactionTimeTo()));
+
+                Page<PointHistoryEntity> page = pointHistoryJpaRepository.findAll(specification, pageable);
+
+                return PageData.<PointHistory>builder()
+                                .pageMeta(PageMeta.builder()
+                                                .currentPage(page.getNumber())
+                                                .pageSize(page.getSize())
+                                                .totalPages(page.getTotalPages())
+                                                .totalElements(page.getTotalElements())
+                                                .hasNext(page.hasNext())
+                                                .hasPrevious(page.hasPrevious())
+                                                .build())
+                                .data(page.getContent()
+                                                .stream()
+                                                .map(pointHistoryEntityMapper::entityToDomain)
+                                                .toList())
+                                .build();
         }
-        if (pointHistory.getLessonId() != null) {
-            entity.setLesson(lessonJpaRepository.getReferenceById(pointHistory.getLessonId()));
-        }
-        if (pointHistory.getTopicId() != null) {
-            entity.setTopic(topicJpaRepository.getReferenceById(pointHistory.getTopicId()));
-        }
-        if (pointHistory.getBookId() != null) {
-            entity.setBook(bookJpaRepository.getReferenceById(pointHistory.getBookId()));
-        }
-
-        PointHistoryEntity savedPointHistory = pointHistoryJpaRepository.save(entity);
-
-        return pointHistoryEntityMapper.entityToDomain(savedPointHistory);
-    }
-
-    @Override
-    public PageData<PointHistory> findAllByUserId(PointHistoryQueryCommand command, Long userId) {
-        Pageable pageable = PageRequest.of(
-                command.page(),
-                command.size(),
-                Sort.by(
-                        Sort.Direction.valueOf(command.sortDirection().name()),
-                        command.sortColumn().getColumnName()
-                )
-        );
-
-        Specification<PointHistoryEntity> specification =
-                Specification.allOf(
-                        PointHistorySpecification.hasUserId(userId),
-                        PointHistorySpecification.hasTransactionType(command.transactionType()),
-                        PointHistorySpecification.hasAmountType(command.amountType()),
-                        PointHistorySpecification.transactionTimeBetween(
-                                command.transactionTimeFrom(),
-                                command.transactionTimeTo()
-                        )
-                );
-
-        Page<PointHistoryEntity> page = pointHistoryJpaRepository.findAll(specification, pageable);
-
-        return PageData.<PointHistory>builder()
-                .pageMeta(PageMeta.builder()
-                        .currentPage(page.getNumber())
-                        .pageSize(page.getSize())
-                        .totalPages(page.getTotalPages())
-                        .totalElements(page.getTotalElements())
-                        .hasNext(page.hasNext())
-                        .hasPrevious(page.hasPrevious())
-                        .build()
-                )
-                .data(page.getContent()
-                        .stream()
-                        .map(pointHistoryEntityMapper::entityToDomain)
-                        .toList()
-                )
-                .build();
-    }
 }

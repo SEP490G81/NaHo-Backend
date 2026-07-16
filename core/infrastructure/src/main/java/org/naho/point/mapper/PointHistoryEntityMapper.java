@@ -13,6 +13,8 @@ public interface PointHistoryEntityMapper {
     @Mapping(target = "lesson", ignore = true)
     @Mapping(target = "topic", ignore = true)
     @Mapping(target = "book", ignore = true)
+    @Mapping(target = "createdTime", ignore = true)
+    @Mapping(target = "modifiedTime", ignore = true)
     PointHistoryEntity domainToEntity(PointHistory domain);
 
     @Mapping(target = "userId", source = "user.id")

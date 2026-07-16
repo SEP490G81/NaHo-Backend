@@ -4,7 +4,7 @@ import org.naho.i18n.message.learning.UserNodeProgressTitleMessageKey;
 import org.naho.shared.exception.ErrorCode;
 
 public enum UserNodeProgressDomainErrorCode implements ErrorCode {
-    USER_NODE_PROGRESS_LEARNING_PATH_NODE_EMPTY(
+    USER_NODE_PROGRESS_NODE_EMPTY(
             "USER_NODE_PROGRESS_001",
             UserNodeProgressTitleMessageKey.USER_NODE_PROGRESS_CREATION_FAILED_TITLE,
             400

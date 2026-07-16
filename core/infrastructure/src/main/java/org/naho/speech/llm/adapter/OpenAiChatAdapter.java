@@ -6,6 +6,7 @@ import org.naho.shared.exception.InfrastructureException;
 import org.naho.speech.llm.constant.OpenAiConfigProperties;
 import org.naho.speech.llm.exception.LlmApplicationError;
 import org.naho.speech.llm.port.out.AiChatPort;
+import org.naho.i18n.message.llm.LlmDetailMessageKey;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -64,21 +65,25 @@ public class OpenAiChatAdapter implements AiChatPort {
             if (response.statusCode() != 200) {
                 throw new InfrastructureException(
                         LlmApplicationError.LLM_API_ERROR,
-                        "OpenAI API error. Status: " + response.statusCode() + " | " + response.body());
+                        LlmDetailMessageKey.LLM_API_ERROR,
+                        "Status: " + response.statusCode() + " | " + response.body()
+                );
             }
             return extractContent(response.body());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new InfrastructureException(
                     LlmApplicationError.LLM_CONNECTION_TIMEOUT,
-                    "Request to OpenAI interrupted", e
+                    LlmDetailMessageKey.LLM_CONNECTION_TIMEOUT,
+                    e.getMessage()
             );
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
             throw new InfrastructureException(
                     LlmApplicationError.LLM_API_ERROR,
-                    "Cannot call OpenAI API: " + e.getMessage(), e
+                    LlmDetailMessageKey.LLM_API_ERROR,
+                    e.getMessage()
             );
         }
     }
@@ -94,7 +99,9 @@ public class OpenAiChatAdapter implements AiChatPort {
                 String errorBody = response.body().reduce("", (a, b) -> a + b);
                 throw new InfrastructureException(
                         LlmApplicationError.LLM_STREAMING_ERROR,
-                        "OpenAI streaming error. Status: " + response.statusCode() + " | " + errorBody);
+                        LlmDetailMessageKey.LLM_STREAMING_ERROR,
+                        "Status: " + response.statusCode() + " | " + errorBody
+                );
             }
 
             response.body().forEach(line -> {
@@ -113,14 +120,16 @@ public class OpenAiChatAdapter implements AiChatPort {
             Thread.currentThread().interrupt();
             throw new InfrastructureException(
                     LlmApplicationError.LLM_CONNECTION_TIMEOUT,
-                    "Streaming request interrupted", e
+                    LlmDetailMessageKey.LLM_CONNECTION_TIMEOUT,
+                    e.getMessage()
             );
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
             throw new InfrastructureException(
                     LlmApplicationError.LLM_STREAMING_ERROR,
-                    "OpenAI streaming error: " + e.getMessage(), e
+                    LlmDetailMessageKey.LLM_STREAMING_ERROR,
+                    e.getMessage()
             );
         }
     }
@@ -152,7 +161,8 @@ public class OpenAiChatAdapter implements AiChatPort {
         } catch (Exception e) {
             throw new InfrastructureException(
                     LlmApplicationError.LLM_PARSE_ERROR,
-                    "Cannot build request body: " + e.getMessage(), e
+                    LlmDetailMessageKey.LLM_PARSE_ERROR,
+                    e.getMessage()
             );
         }
     }
@@ -208,7 +218,8 @@ public class OpenAiChatAdapter implements AiChatPort {
         } catch (Exception e) {
             throw new InfrastructureException(
                     LlmApplicationError.LLM_PARSE_ERROR,
-                    "Cannot parse content from OpenAI response: " + responseJson, e
+                    LlmDetailMessageKey.LLM_PARSE_ERROR,
+                    e.getMessage()
             );
         }
     }

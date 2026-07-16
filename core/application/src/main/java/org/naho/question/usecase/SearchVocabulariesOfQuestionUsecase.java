@@ -5,6 +5,9 @@ import org.naho.vocabulary.model.Vocabulary;
 import org.naho.question.port.in.SearchVocabulariesOfQuestionInputPort;
 import org.naho.vocabulary.port.out.VocabularyPort;
 import org.naho.question.result.VocabulariesOfQuestionResult;
+import org.naho.shared.exception.ApplicationException;
+import org.naho.vocabulary.exception.VocabularyErrorCode;
+import org.naho.i18n.message.question.VocabularyQuestionDetailMessageKey;
 
 import java.util.List;
 
@@ -21,7 +24,11 @@ public class SearchVocabulariesOfQuestionUsecase implements SearchVocabulariesOf
     public VocabulariesOfQuestionResult getVocabularyListOfQuestion(LearningPathNodeCommand learningPathNodeCommand) {
          List<Vocabulary> listVocabulary =  vocabularyPort.findVocabularyList(learningPathNodeCommand.vocabulary_question_id());
          if(listVocabulary.isEmpty()){
-             return null;
+              throw new ApplicationException(
+                      VocabularyErrorCode.VOCABULARY_NOT_FOUND,
+                      VocabularyQuestionDetailMessageKey.VOCABULARY_NOT_FOUND,
+                      learningPathNodeCommand.vocabulary_question_id()
+              );
          }
         List<VocabulariesOfQuestionResult.VocabularyDetailResult> vocabularyDetailResultList = listVocabulary.stream().map(
                 vocab -> new VocabulariesOfQuestionResult.VocabularyDetailResult(

@@ -22,6 +22,10 @@ dependencyManagement {
     }
 }
 
+tasks.withType<JavaCompile> {
+    options.compilerArgs.add("-parameters")
+}
+
 dependencies {
     // project dependencies
     implementation(project(":core:domain"))

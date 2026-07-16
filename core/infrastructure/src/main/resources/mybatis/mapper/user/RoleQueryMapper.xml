@@ -12,15 +12,21 @@
 
     <select id="findRoleNamesByUserId" resultType="string">
         select r.role_name
-        from users u
-                 join users_roles ur on u.id = ur.user_id
-                 join roles r on ur.role_id = r.id
-        where u.id = #{userId}
+        from roles r
+                 join users_roles ur on r.id = ur.role_id
+        where ur.user_id = #{userId}
     </select>
 
     <select id="findByName" resultMap="RoleResultMap">
         SELECT id, role_name, description
         FROM roles
         WHERE role_name = #{roleName}
+    </select>
+
+    <select id="findAllByUserId" resultMap="RoleResultMap">
+        select r.id, r.role_name, r.description
+        from roles r
+                 join users_roles ur on r.id = ur.role_id
+        where ur.user_id = #{userId}
     </select>
 </mapper>

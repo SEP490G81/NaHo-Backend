@@ -1,5 +1,12 @@
 package org.naho.book.port.out;
 
-public interface BookRepositoryPort {
+import org.naho.book.model.Book;
 
+import java.util.List;
+import java.util.Optional;
+
+public interface BookRepositoryPort {
+    List<Book> findAllBooks();
+    Optional<Book> findById(Long id);
 }
+

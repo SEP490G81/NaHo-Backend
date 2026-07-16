@@ -4,12 +4,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.naho.speech.llm.command.SendAudioMessageCommand;
 import org.naho.speech.llm.command.SendMessageWithSessionCommand;
-import org.naho.speech.llm.command.StartSpeakingCommand;
+import org.naho.speech.llm.command.StartSpeakingConversationWithAICommand;
+import org.naho.speech.llm.command.StartSpeakingTopicCommand;
 import org.naho.speech.llm.dto.mapper.AudioChatResponseMapper;
 import org.naho.speech.llm.dto.mapper.ChatResponseMapper;
 import org.naho.speech.llm.dto.mapper.ScoringResponseMapper;
 import org.naho.speech.llm.dto.mapper.StartTopicResponseMapper;
 import org.naho.speech.llm.dto.mapper.SuggestedTopicsResponseMapper;
+import org.naho.speech.llm.dto.mapper.StartConversationResponseMapper;
 import org.naho.speech.llm.port.in.EndSessionInputPort;
 import org.naho.speech.llm.port.in.SpeakingSessionInputPort;
 import org.naho.speech.llm.port.in.SuggestedTopicsInputPort;
@@ -22,11 +24,13 @@ import org.naho.speech.llm.dto.response.ScoringResponse;
 import org.naho.speech.llm.dto.response.StartSessionResponse;
 import org.naho.speech.llm.dto.response.StartTopicResponse;
 import org.naho.speech.llm.dto.response.SuggestedTopicsResponse;
+import org.naho.speech.llm.dto.response.StartConversationResponse;
 import org.naho.speech.llm.result.AudioChatResult;
 import org.naho.speech.llm.result.ChatResult;
 import org.naho.speech.llm.result.ScoringResult;
 import org.naho.speech.llm.result.SpeakingTopicResult;
 import org.naho.speech.llm.result.SuggestedTopicsResult;
+import org.naho.speech.llm.result.StartConversationResult;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -61,6 +65,7 @@ public class SpeakingController {
     private final ChatResponseMapper chatResponseMapper;
     private final AudioChatResponseMapper audioChatResponseMapper;
     private final ScoringResponseMapper scoringResponseMapper;
+    private final StartConversationResponseMapper startConversationResponseMapper;
 
     // ─── Topics ─────────────────────────────────────────────────
 
@@ -82,21 +87,25 @@ public class SpeakingController {
     public ResponseEntity<StartTopicResponse> startTopicSession(
             @Valid @RequestBody StartTopicRequest request
     ) {
-        var command = new StartSpeakingCommand(request.topic());
+        var command = new StartSpeakingTopicCommand(request.topic());
         SpeakingTopicResult result = speakingSessionInputPort.startTopicSession(command);
         return ResponseEntity.ok(startTopicResponseMapper.resultToResponse(result));
     }
 
-    @PostMapping(value = "/session/start-free", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiResponseMessage(message = "Free session started successfully!")
-    public ResponseEntity<StartSessionResponse> startFreeSession(
-            @RequestParam(value = "personaId", required = false) Long personaId
+    @PostMapping(
+            value = "/session/{personaId}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @ApiResponseMessage(message = "Conversation started successfully!")
+    public ResponseEntity<StartConversationResponse> startConversationWithAISession(
+            @PathVariable("personaId") int personaId
     ) {
-        String sessionId = speakingSessionInputPort.startFreeSession(personaId);
-        return ResponseEntity.ok(new StartSessionResponse(sessionId));
+        var command = new StartSpeakingConversationWithAICommand(personaId);
+        StartConversationResult result = speakingSessionInputPort.startConversationWithAISession(command);
+        return ResponseEntity.ok(startConversationResponseMapper.resultToResponse(result));
     }
 
-    // ─── Text Message ───────────────────────────────────────────
+    //  Text Message
 
     @PostMapping(
             value = "/session/{sessionId}/message",

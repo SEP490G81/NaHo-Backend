@@ -6,27 +6,21 @@ import org.naho.user.exception.UserErrorCode;
 import org.naho.user.mapper.UserResultMapper;
 import org.naho.user.model.User;
 import org.naho.user.port.in.UpdateUserInputPort;
-import org.naho.user.port.out.RoleRepositoryPort;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.naho.user.result.UserResult;
 import org.naho.user.type.UserStatus;
-
-import java.util.List;
 
 public class UpdateUserUseCase implements UpdateUserInputPort {
 
     private final UserRepositoryPort userRepositoryPort;
     private final UserResultMapper userResultMapper;
-    private final RoleRepositoryPort roleRepositoryPort;
 
     public UpdateUserUseCase(
             UserRepositoryPort userRepositoryPort,
-            UserResultMapper userResultMapper,
-            RoleRepositoryPort roleRepositoryPort
+            UserResultMapper userResultMapper
     ) {
         this.userRepositoryPort = userRepositoryPort;
         this.userResultMapper = userResultMapper;
-        this.roleRepositoryPort = roleRepositoryPort;
     }
 
     @Override
@@ -47,9 +41,8 @@ public class UpdateUserUseCase implements UpdateUserInputPort {
             );
         }
 
-        User updatedUser = userRepositoryPort.save(user);
+        User updatedUser = userRepositoryPort.save(user, null);
 
-        List<String> roleNames = roleRepositoryPort.findRoleNamesByUserId(user.getId());
-        return userResultMapper.domainToResult(updatedUser, roleNames);
+        return userResultMapper.domainToResult(updatedUser);
     }
 }

@@ -6,6 +6,7 @@ import org.naho.shared.exception.InfrastructureException;
 import org.naho.speech.llm.constant.OpenAiConfigProperties;
 import org.naho.speech.llm.exception.LlmApplicationError;
 import org.naho.speech.llm.port.out.AiAnalysisPort;
+import org.naho.i18n.message.llm.LlmDetailMessageKey;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -27,75 +28,38 @@ public class OpenAiAnalysisAdapter implements AiAnalysisPort {
     }
 
     @Override
-    public String analyzeSpeaking(String topic, String question, String studentTranscript, String azureWordFeedbackJson) {
-        String systemPrompt = """
-                You are an expert Japanese language assessor.
-                Evaluate the student's spoken Japanese answer based on the context.
-                Focus on grammatical accuracy, vocabulary usage, and naturalness.
-                
-                Based on the student's transcript and the word-level pronunciation scores/errors from Azure Speech, perform a detailed evaluation.
-                
-                Return the results ONLY as a valid JSON object matching the following schema.
-                Do NOT include any markdown formatting (like ```json or ```), no leading/trailing comments, and no extra text. It must be a raw parseable JSON string.
-                
-                JSON Schema:
-                {
-                  "scores": {
-                    "vocabulary": <double 0.0-10.0>,
-                    "grammar": <double 0.0-10.0>,
-                    "naturalness": <double 0.0-10.0>
-                  },
-                  "userTranscript": [
-                    {
-                      "text": "<segment of user's answer>",
-                      "error": null
-                    },
-                    {
-                      "text": "<segment containing error>",
-                      "error": {
-                        "type": "Ngữ pháp / Sự tự nhiên / Từ vựng",
-                        "explanation": "<Vietnamese explanation of the error>",
-                        "suggestion": "<corrected Japanese version>"
-                      }
-                    }
-                  ],
-                  "aiSuggestion": {
-                    "jp": "<natural Japanese recommended response>",
-                    "furigana": "<the recommended response with furigana/hiragana for all kanji>",
-                    "vi": "<Vietnamese translation of the recommended response>"
-                  },
-                  "pronunciationNote": "<Overall pronunciation advice in Vietnamese based on the azure word feedback. Focus on what areas the student needs to improve, e.g., long vowels, double consonants, or typical errors.>",
-                  "wordNotes": {
-                    "<japanese_word>": "<Vietnamese feedback note for this specific word, e.g., 'Phát âm tốt', 'Chú ý kéo dài hơi', etc. Keep it very short and helpful.>"
-                  },
-                  "expressions": [
-                    {
-                      "jp": "<useful Japanese phrase related to this topic>",
-                      "furigana": "<furigana for the phrase>",
-                      "vi": "<Vietnamese translation>",
-                      "note": "<Vietnamese note on how/when to use it>"
-                    }
-                  ],
-                  "itVocab": [
-                    {
-                      "term": "<IT Japanese vocabulary, e.g., 進捗>",
-                      "reading": "<reading in hiragana>",
-                      "meaning": "<Vietnamese meaning>"
-                    }
-                  ]
-                }
-                
-                NOTE for itVocab: ONLY populate itVocab with 1-3 useful IT Japanese terms if the topic is IT/tech related. Otherwise, leave it as an empty list [].
-                """;
+    public String analyzeSpeaking(AiAnalysisPort.Context context) {
+        String systemPromptTemplate = loadPromptTemplate("/prompt_template/speaking_question_evaluation.prompt");
 
-        String userContent = String.format(
-                "Topic: %s\nQuestion: %s\nStudent Transcript: %s\nAzure Pronunciation Data: %s",
-                topic, question, studentTranscript, azureWordFeedbackJson
+        String systemPrompt = String.format(
+                systemPromptTemplate,
+                context.curriculum(),
+                context.level(),
+                context.stt(),
+                context.topic(),
+                context.lesson(),
+                context.canDoObjective(),
+                context.grammarFocus(),
+                context.vocabularyFocus(),
+                context.question(),
+                context.accuracy(),
+                context.fluency(),
+                context.completeness(),
+                context.prosody(),
+                context.studentTranscript(),
+                context.level(),
+                context.level(),
+                context.canDoObjective(),
+                context.level(),
+                context.accuracy(),
+                context.fluency(),
+                context.completeness(),
+                context.prosody()
         );
 
+        String userContent = "Please evaluate the learner's transcript based on the system prompt instruction.";
         String requestBody = buildRequestBody(systemPrompt, userContent);
 
-        System.out.println("Check key: " + properties.getApiKey());
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(LLM_URL))
                 .timeout(Duration.ofSeconds(60))
@@ -109,20 +73,23 @@ public class OpenAiAnalysisAdapter implements AiAnalysisPort {
             if (response.statusCode() != 200) {
                 throw new InfrastructureException(
                         LlmApplicationError.LLM_API_ERROR,
-                        "OpenAI Analysis API error. Status: " + response.statusCode() + " | " + response.body());
+                        LlmDetailMessageKey.LLM_API_ERROR,
+                        "Status: " + response.statusCode() + " | " + response.body()
+                );
             }
             return extractContent(response.body());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new InfrastructureException(
                     LlmApplicationError.LLM_CONNECTION_TIMEOUT,
-                    "Analysis request interrupted", e
+                    LlmDetailMessageKey.LLM_CONNECTION_TIMEOUT,
+                    e.getMessage()
             );
         } catch (Exception e) {
-            System.out.println("check key: " + properties.getApiKey());
             throw new InfrastructureException(
                     LlmApplicationError.LLM_API_ERROR,
-                    "Cannot call OpenAI Analysis API: " + e.getMessage(), e
+                    LlmDetailMessageKey.LLM_API_ERROR,
+                    e.getMessage()
             );
         }
     }
@@ -157,7 +124,8 @@ public class OpenAiAnalysisAdapter implements AiAnalysisPort {
         } catch (Exception e) {
             throw new InfrastructureException(
                     LlmApplicationError.LLM_PARSE_ERROR,
-                    "Cannot parse OpenAI response content: " + responseJson, e
+                    LlmDetailMessageKey.LLM_PARSE_ERROR,
+                    e.getMessage()
             );
         }
     }
@@ -165,5 +133,16 @@ public class OpenAiAnalysisAdapter implements AiAnalysisPort {
     private String escapeJson(String input) {
         if (input == null) return "\"\"";
         return new ObjectMapper().valueToTree(input).toString();
+    }
+
+    private String loadPromptTemplate(String path) {
+        try (var is = getClass().getResourceAsStream(path)) {
+            if (is == null) {
+                throw new IllegalStateException("Prompt template not found: " + path);
+            }
+            return new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load prompt template: " + path, e);
+        }
     }
 }

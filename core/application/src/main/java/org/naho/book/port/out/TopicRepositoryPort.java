@@ -1,6 +1,7 @@
 package org.naho.book.port.out;
 
 import org.naho.book.model.Topic;
+
 import java.util.Optional;
 
 public interface TopicRepositoryPort {

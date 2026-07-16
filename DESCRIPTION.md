@@ -8,7 +8,8 @@
 - Java thuần, không phụ thuộc vào công nghệ bên ngoài
 - Nó chứa các thư mục như:
 
-+ i18n: chứa các message constants (lưu ý: interface cổng ra `MessageService` định nghĩa ở module `application`, còn `MessageServiceAdapter` triển khai ở module `infrastructure`)
++ i18n: chứa các message constants (lưu ý: interface cổng ra `MessageService` định nghĩa ở module `application`, còn
+  `MessageServiceAdapter` triển khai ở module `infrastructure`)
 + logging: chứa các key được sử dụng trong logging
 + resources: có các messages.properties files
 
@@ -68,7 +69,8 @@
 + mybatis: interface sử dụng mybatis để thao tác với database
 + repository: chứa các JPA repository để thao tác với database
 
-- Thư mục shared là thư mục chia sẻ cho các modules khác và các package trong module này (bao gồm package `persistence` chứa `BaseEntity` và `BaseJpaRepository`)
+- Thư mục shared là thư mục chia sẻ cho các modules khác và các package trong module này (bao gồm package `persistence`
+  chứa `BaseEntity` và `BaseJpaRepository`)
 
 ## Module presentation
 
@@ -96,5 +98,6 @@
 - Được sử dụng công nghệ bên ngoài
 - Đây là nơi chứa hàm Main để chạy toàn bộ dự án
 - Ngoài ra còn là nơi để cấu hình bean, i18n, redis, s3, spring security
-- Chứa các file cấu hình `application.yaml` (ở thư mục gốc tài nguyên) và `application-dev.yaml`, `application-prod.yaml` (ở thư mục `config/`)
+- Chứa các file cấu hình `application.yaml` (ở thư mục gốc tài nguyên) và `application-dev.yaml`,
+  `application-prod.yaml` (ở thư mục `config/`)
 

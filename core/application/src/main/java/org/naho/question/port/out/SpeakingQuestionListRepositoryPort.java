@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface SpeakingQuestionListRepositoryPort {
     long countSpeakingQuestions(SearchSpeakingQuestionsCommand query);
+
     List<SpeakingQuestionListItemResult> findSpeakingQuestions(SearchSpeakingQuestionsCommand query);
 }

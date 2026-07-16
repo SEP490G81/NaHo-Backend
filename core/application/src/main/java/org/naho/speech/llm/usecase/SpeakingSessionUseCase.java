@@ -1,19 +1,24 @@
 package org.naho.speech.llm.usecase;
 
+import org.naho.persona.model.Persona;
+import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.naho.speech.llm.command.SendAudioMessageCommand;
 import org.naho.speech.llm.command.SendMessageWithSessionCommand;
-import org.naho.speech.llm.command.StartSpeakingCommand;
+import org.naho.speech.llm.command.StartSpeakingConversationWithAICommand;
+import org.naho.speech.llm.command.StartSpeakingTopicCommand;
 import org.naho.speech.llm.port.in.SpeakingSessionInputPort;
 import org.naho.speech.llm.port.out.AiChatPort;
 import org.naho.speech.llm.port.out.SessionStorePort;
 import org.naho.speech.llm.port.out.SpeechToTextPort;
-import org.naho.speech.llm.result.AudioChatResult;
-import org.naho.speech.llm.result.ChatResult;
-import org.naho.speech.llm.result.SpeakingTopicResult;
-import org.naho.speech.llm.result.SpeechToTextResult;
+import org.naho.speech.llm.result.*;
 import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.naho.persona.model.Persona;
+import org.naho.shared.exception.ApplicationException;
+import org.naho.persona.exception.PersonaErrorCode;
+import org.naho.i18n.message.persona.PersonaDetailMessageKey;
+import org.naho.speech.azure.port.out.TextToSpeechServicePort;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -43,20 +48,23 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     private final SessionStorePort sessionStorePort;
     private final SpeechToTextPort speechToTextPort;
     private final PersonaRepositoryPort personaRepositoryPort;
+    private final TextToSpeechServicePort textToSpeechServicePort;
 
     public SpeakingSessionUseCase(AiChatPort aiChatPort,
                                   SessionStorePort sessionStorePort,
                                   SpeechToTextPort speechToTextPort,
-                                  PersonaRepositoryPort personaRepositoryPort) {
+                                  PersonaRepositoryPort personaRepositoryPort,
+                                  TextToSpeechServicePort textToSpeechServicePort) {
         this.aiChatPort = aiChatPort;
         this.sessionStorePort = sessionStorePort;
         this.speechToTextPort = speechToTextPort;
         this.personaRepositoryPort = personaRepositoryPort;
+        this.textToSpeechServicePort = textToSpeechServicePort;
     }
 
 
     @Override
-    public SpeakingTopicResult startTopicSession(StartSpeakingCommand command) {
+    public SpeakingTopicResult startTopicSession(StartSpeakingTopicCommand command) {
         String sessionId = UUID.randomUUID().toString();
         String topic = command.topic();
         sessionStorePort.initSession(sessionId);
@@ -73,25 +81,6 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         System.out.println("[SpeakingSession] Topic session started: " + sessionId
                 + " | Topic: " + topic);
         return new SpeakingTopicResult(sessionId, topic, aiGreeting);
-    }
-
-    @Override
-    public String startFreeSession(Long personaId) {
-        String sessionId = UUID.randomUUID().toString();
-        sessionStorePort.initSession(sessionId);
-        sessionStorePort.setTopic(sessionId, "Free conversation");
-
-        String customInstruction = FREE_INSTRUCTION;
-        if (personaId != null) {
-            Persona persona = personaRepositoryPort.findById(personaId)
-                    .orElseThrow(() -> new IllegalArgumentException("Persona with ID " + personaId + " not found"));
-            customInstruction += "\n- Your persona prompt: " + persona.getPrompt();
-        }
-
-        String prompt = SYSTEM_PROMPT_TEMPLATE.formatted(customInstruction);
-        sessionStorePort.addMessage(sessionId, "system", prompt);
-        System.out.println("Free session started: " + sessionId + (personaId != null ? " with Persona: " + personaId : ""));
-        return sessionId;
     }
 
     @Override
@@ -124,6 +113,37 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         sessionStorePort.addMessage(sessionId, "assistant", reply);
         sessionStorePort.appendTranscript(sessionId,
                 "[Turn]\nUser: " + userMessage + "\nAssistant: " + reply + "\n");
+    }
+
+    @Override
+    public StartConversationResult startConversationWithAISession(StartSpeakingConversationWithAICommand startSpeakingConversationWithAICommand) {
+        String sessionId = UUID.randomUUID().toString();
+        Persona persona = personaRepositoryPort.findById((long) startSpeakingConversationWithAICommand.personaId())
+                .orElseThrow(() -> new ApplicationException(
+                        PersonaErrorCode.PERSONA_NOT_FOUND,
+                        PersonaDetailMessageKey.PERSONA_NOT_FOUND,
+                        startSpeakingConversationWithAICommand.personaId()
+                ));
+
+        sessionStorePort.initSession(sessionId);
+        sessionStorePort.setTopic(sessionId, "Conversation with " + persona.getName());
+
+        String customInstruction = FREE_INSTRUCTION + "\n- Your persona prompt: " + persona.getPrompt();
+        String prompt = SYSTEM_PROMPT_TEMPLATE.formatted(customInstruction);
+        sessionStorePort.addMessage(sessionId, "system", prompt);
+        sessionStorePort.addMessage(sessionId, "user", "こんにちは、話しましょう！");
+
+        List<Map<String, String>> messages = sessionStorePort.getConversationHistory(sessionId);
+        String aiGreeting = aiChatPort.chatWithContext(messages);
+        sessionStorePort.addMessage(sessionId, "assistant", aiGreeting);
+        sessionStorePort.appendTranscript(sessionId,
+                "[Turn]\nUser: こんにちは、話しましょう！\nAssistant: " + aiGreeting + "\n"
+        );
+
+        byte[] audioBytes = textToSpeechServicePort.textToSpeech(aiGreeting, "ja-JP-NanamiNeural", "ja-JP").audioData();
+        String audioBase64 = Base64.getEncoder().encodeToString(audioBytes);
+
+        return new StartConversationResult(sessionId, audioBase64, aiGreeting);
     }
 
     /**

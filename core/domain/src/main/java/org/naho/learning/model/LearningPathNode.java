@@ -28,6 +28,10 @@ public class LearningPathNode {
         this.nodeType = builder.nodeType;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public Long getId() {
         return id;
     }
@@ -62,10 +66,6 @@ public class LearningPathNode {
 
     public void setNodeType(NodeType nodeType) {
         this.nodeType = nodeType;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     public static final class Builder {

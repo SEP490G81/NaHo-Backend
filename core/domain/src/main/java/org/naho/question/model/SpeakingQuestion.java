@@ -6,6 +6,7 @@ import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
 import org.naho.question.exception.SpeakingQuestionDomainErrorCode;
 import org.naho.question.type.QuestionStatus;
 import org.naho.shared.exception.DomainException;
+import org.naho.vocabulary.model.Vocabulary;
 
 import java.util.List;
 
@@ -20,6 +21,8 @@ public class SpeakingQuestion {
     private String description;
     private String descriptionMarkup;
     private QuestionStatus status;
+    private Double orderIndex;
+    private Long objectiveId;
 
     // Private constructor dùng cho Builder
     private SpeakingQuestion(Builder builder) {
@@ -33,6 +36,8 @@ public class SpeakingQuestion {
         this.status = builder.status;
         this.grammars = builder.grammars;
         this.vocabularies = builder.vocabularies;
+        this.orderIndex = builder.orderIndex;
+        this.objectiveId = builder.objectiveId;
     }
 
     public static Builder builder() {
@@ -86,7 +91,6 @@ public class SpeakingQuestion {
     }
 
 
-
     public Long getUserId() {
         return userId;
     }
@@ -107,7 +111,13 @@ public class SpeakingQuestion {
         return descriptionMarkup;
     }
 
+    public Double getOrderIndex() {
+        return orderIndex;
+    }
 
+    public Long getObjectiveId() {
+        return objectiveId;
+    }
 
     public QuestionStatus getStatus() {
         return status;
@@ -133,6 +143,8 @@ public class SpeakingQuestion {
         private QuestionStatus status;
         private List<Grammar> grammars;
         private List<Vocabulary> vocabularies;
+        private Double orderIndex;
+        private Long objectiveId;
 
         public Builder id(Long id) {
             this.id = id;
@@ -143,7 +155,6 @@ public class SpeakingQuestion {
             this.questionAudioFileId = questionAudioFileId;
             return this;
         }
-
 
 
         public Builder userId(Long userId) {
@@ -172,7 +183,6 @@ public class SpeakingQuestion {
         }
 
 
-
         public Builder status(QuestionStatus status) {
             this.status = status;
             return this;
@@ -185,6 +195,16 @@ public class SpeakingQuestion {
 
         public Builder vocabularies(List<Vocabulary> vocabularies) {
             this.vocabularies = vocabularies;
+            return this;
+        }
+
+        public Builder orderIndex(Double orderIndex) {
+            this.orderIndex = orderIndex;
+            return this;
+        }
+
+        public Builder objectiveId(Long objectiveId) {
+            this.objectiveId = objectiveId;
             return this;
         }
 

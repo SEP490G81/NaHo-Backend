@@ -1,6 +1,10 @@
 package org.naho.config.application;
 
+import org.naho.file.port.in.CrudFileInputPort;
+import org.naho.point.port.in.CrudPointSummaryInputPort;
 import org.naho.shared.port.out.TransactionPort;
+import org.naho.user.mapper.OAuthProviderResultMapper;
+import org.naho.user.mapper.RoleResultMapper;
 import org.naho.user.mapper.UserResultMapper;
 import org.naho.user.port.in.*;
 import org.naho.user.port.out.*;
@@ -11,14 +15,70 @@ import ua_parser.Parser;
 
 @Configuration
 public class UserConfig {
+
     @Bean
     public Parser parser() {
         return new Parser();
     }
 
     @Bean
-    public UserResultMapper userResultMapper() {
-        return new UserResultMapper();
+    public RoleResultMapper roleResultMapper() {
+        return new RoleResultMapper();
+    }
+
+    @Bean
+    public OAuthProviderResultMapper oAuthProviderResultMapper() {
+        return new OAuthProviderResultMapper();
+    }
+
+    @Bean
+    public UserResultMapper userResultMapper(
+            CrudRoleInputPort crudRoleInputPort,
+            CrudOAuthProviderInputPort crudOAuthProviderInputPort,
+            CrudPointSummaryInputPort crudPointSummaryInputPort,
+            CrudFileInputPort crudFileInputPort
+    ) {
+        return new UserResultMapper(
+                crudRoleInputPort,
+                crudOAuthProviderInputPort,
+                crudPointSummaryInputPort,
+                crudFileInputPort
+        );
+    }
+
+    @Bean
+    public CrudUserInputPort crudUserInputPort(
+            UserRepositoryPort userRepositoryPort,
+            UserResultMapper userResultMapper,
+            RoleRepositoryPort roleRepositoryPort
+    ) {
+        return new CrudUserUseCase(
+                userRepositoryPort,
+                userResultMapper,
+                roleRepositoryPort
+        );
+    }
+
+    @Bean
+    public CrudRoleInputPort crudRoleInputPort(
+            RoleRepositoryPort roleRepositoryPort,
+            RoleResultMapper roleResultMapper
+    ) {
+        return new CrudRoleUseCase(
+                roleRepositoryPort,
+                roleResultMapper
+        );
+    }
+
+    @Bean
+    public CrudOAuthProviderInputPort crudOAuthProviderInputPort(
+            OAuthProviderRepositoryPort oAuthProviderRepositoryPort,
+            OAuthProviderResultMapper oAuthProviderResultMapper
+    ) {
+        return new CrudOAuthProviderUseCase(
+                oAuthProviderRepositoryPort,
+                oAuthProviderResultMapper
+        );
     }
 
     @Bean
@@ -26,7 +86,6 @@ public class UserConfig {
             UserRepositoryPort userRepositoryPort,
             EncoderPort encoderPort,
             TokenServicePort tokenServicePort,
-            UserResultMapper userResultMapper,
             UserSessionRepositoryPort userSessionRepositoryPort,
             RoleRepositoryPort roleRepositoryPort,
             TransactionPort transactionPort,
@@ -37,7 +96,6 @@ public class UserConfig {
                 userRepositoryPort,
                 encoderPort,
                 tokenServicePort,
-                userResultMapper,
                 userSessionRepositoryPort,
                 roleRepositoryPort,
                 transactionPort,
@@ -58,29 +116,19 @@ public class UserConfig {
     @Bean
     public GetUserInputPort getUserInputPort(
             UserRepositoryPort userRepositoryPort,
-            RoleRepositoryPort roleRepositoryPort,
             UserResultMapper userResultMapper
     ) {
-        return new GetUserUseCase(userRepositoryPort, roleRepositoryPort, userResultMapper);
+        return new GetUserUseCase(userRepositoryPort, userResultMapper);
     }
 
     @Bean
     public UpdateUserInputPort updateUserInputPort(
             UserRepositoryPort userRepositoryPort,
-            UserResultMapper userResultMapper,
-            RoleRepositoryPort roleRepositoryPort
+            UserResultMapper userResultMapper
     ) {
         return new UpdateUserUseCase(
                 userRepositoryPort,
-                userResultMapper,
-                roleRepositoryPort
+                userResultMapper
         );
-    }
-
-    @Bean
-    public GetRoleInputPort getRoleInputPort(
-            RoleRepositoryPort roleRepositoryPort
-    ) {
-        return new GetRoleUseCase(roleRepositoryPort);
     }
 }

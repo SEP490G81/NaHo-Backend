@@ -1,11 +1,13 @@
 package org.naho.book.adapter;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.book.mapper.ObjectiveEntityMapper;
 import org.naho.book.model.Objective;
 import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.book.repository.ObjectiveJpaRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -13,6 +15,7 @@ import java.util.Optional;
 public class ObjectiveRepositoryAdapter implements ObjectiveRepositoryPort {
 
     private final ObjectiveJpaRepository objectiveJpaRepository;
+    private final ObjectiveEntityMapper objectiveEntityMapper;
 
     @Override
     public boolean existsById(Long id) {
@@ -32,4 +35,12 @@ public class ObjectiveRepositoryAdapter implements ObjectiveRepositoryPort {
                 .orderIndex(entity.getOrderIndex())
                 .build());
     }
+
+    @Override
+    public List<Objective> findByLessonId(Long lessonId) {
+        return objectiveJpaRepository.findByLessonId(lessonId).stream()
+                .map(objectiveEntityMapper::entityToDomain)
+                .toList();
+    }
+
 }

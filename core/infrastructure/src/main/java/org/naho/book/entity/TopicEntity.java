@@ -5,7 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.book.type.TopicStatus;
-import org.naho.file.model.FileEntity;
+import org.naho.file.entity.FileEntity;
 import org.naho.point.entity.PointHistoryEntity;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.user.entity.UserEntity;
@@ -39,6 +39,12 @@ public class TopicEntity extends BaseEntity {
 
     @Column(name = "order_index", nullable = false)
     Double orderIndex;
+
+    @Column(name = "first_node_global_order_index")
+    Double firstNodeGlobalOrderIndex;
+
+    @Column(name = "last_node_global_order_index")
+    Double lastNodeGlobalOrderIndex;
 
     @OneToOne
     @JoinColumn(name = "cover_image_file_id")

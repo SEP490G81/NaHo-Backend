@@ -2,28 +2,21 @@ package org.naho.book.controller.v1;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.naho.book.command.ListTopicCommand;
 import org.naho.book.dto.mapper.TopicRequestMapper;
 import org.naho.book.dto.mapper.TopicResponseMapper;
 import org.naho.book.dto.request.CreateTopicRequest;
-import org.naho.book.dto.request.TopicFilterRequest;
 import org.naho.book.dto.request.UpdateTopicRequest;
 import org.naho.book.dto.response.CreateTopicResponse;
 import org.naho.book.dto.response.TopicDetailResponse;
-import org.naho.book.dto.response.TopicListItemResponse;
+import org.naho.book.dto.response.TopicResponse;
 import org.naho.book.port.in.*;
 import org.naho.book.result.CreateTopicResult;
-import org.naho.book.result.TopicListResult;
+import org.naho.book.result.TopicResult;
 import org.naho.i18n.message.book.TopicDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.user.port.out.RoleRepositoryPort;
 import org.naho.user.result.AccessTokenPayload;
 import org.naho.user.type.RoleName;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -61,31 +54,24 @@ public class TopicController {
         return ResponseEntity.ok(response);
     }
 
-    // GET LIST TOPIC
-    @GetMapping
+    // FIND ALL TOPICS BY BOOK
+    @GetMapping("/books/{bookId}")
     @ApiResponseMessage(message = TopicDetailMessageKey.TOPIC_GET_LIST_SUCCESS)
-    public ResponseEntity<Page<TopicListItemResponse>> listTopics(
-            @ModelAttribute TopicFilterRequest filter,
-            @PageableDefault(page = 0, size = 10, sort = "order_index", direction = Sort.Direction.ASC) Pageable pageable,
-            @AuthenticationPrincipal AccessTokenPayload payload
-    ) {
-        List<String> roleSet = roleRepositoryPort.findRoleNamesByUserId(payload.userId());
-        boolean isAdmin = roleSet.contains(RoleName.ADMIN.name()) ||
-                roleSet.contains(RoleName.CONTENT_MANAGER.name());
+    public ResponseEntity<List<TopicResponse>> listTopics(@PathVariable Long bookId) {
+        List<TopicResult> results = listTopicInputPort.findAllByBookId(bookId);
+        List<TopicResponse> responses = results
+                .stream()
+                .map(topicResponseMapper::resultToResponse)
+                .toList();
 
-        ListTopicCommand query = topicRequestMapper.toListCommand(filter, pageable, isAdmin);
-        TopicListResult result = listTopicInputPort.listTopics(query);
-        List<TopicListItemResponse> items = topicResponseMapper.listResultToResponse(result.items());
-
-        return ResponseEntity.ok(new PageImpl<>(items, pageable, result.totalElements()));
+        return ResponseEntity.ok(responses);
     }
-
 
     // GET TOPIC DETAIL
     @GetMapping("/{id}")
     @ApiResponseMessage(message = TopicDetailMessageKey.TOPIC_GET_DETAIL_SUCCESS)
     public ResponseEntity<TopicDetailResponse> getTopicDetail(
-            @PathVariable("id") Long id
+            @PathVariable Long id
     ) {
         var command = topicRequestMapper.toDetailCommand(id);
         var result = getTopicDetailInputPort.getTopicDetail(command);
@@ -97,7 +83,7 @@ public class TopicController {
     @PutMapping("/{id}")
     @ApiResponseMessage(message = TopicDetailMessageKey.TOPIC_UPDATE_SUCCESS)
     public ResponseEntity<TopicDetailResponse> updateTopic(
-            @PathVariable("id") Long id,
+            @PathVariable Long id,
             @RequestBody @Valid UpdateTopicRequest request,
             @AuthenticationPrincipal AccessTokenPayload payload
     ) {
@@ -116,7 +102,7 @@ public class TopicController {
     @DeleteMapping("/{id}")
     @ApiResponseMessage(message = TopicDetailMessageKey.TOPIC_DELETE_SUCCESS)
     public ResponseEntity<Void> deleteTopic(
-            @PathVariable("id") Long id,
+            @PathVariable Long id,
             @AuthenticationPrincipal AccessTokenPayload payload
     ) {
         List<String> roleSet = roleRepositoryPort.findRoleNamesByUserId(payload.userId());

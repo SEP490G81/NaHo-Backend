@@ -1,15 +1,12 @@
 package org.naho.question.usecase;
 
 import org.naho.book.util.MarkupParserUtil;
-import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
 import org.naho.question.command.CreateSpeakingQuestionCommand;
-import org.naho.question.exception.SpeakingQuestionErrorCode;
 import org.naho.question.model.SpeakingQuestion;
 import org.naho.question.port.in.CreateSpeakingQuestionInputPort;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.question.result.CreateSpeakingQuestionResult;
 import org.naho.question.type.QuestionStatus;
-import org.naho.shared.exception.ApplicationException;
 
 public class CreateSpeakingQuestionUseCase implements CreateSpeakingQuestionInputPort {
 
@@ -44,11 +41,11 @@ public class CreateSpeakingQuestionUseCase implements CreateSpeakingQuestionInpu
         return new CreateSpeakingQuestionResult(
                 savedSpeakingQuestion.getId(),
                 savedSpeakingQuestion.getUserId(),
+                savedSpeakingQuestion.getQuestionAudioFileId(),
                 savedSpeakingQuestion.getTitle(),
                 savedSpeakingQuestion.getTitleMarkup(),
                 savedSpeakingQuestion.getDescription(),
                 savedSpeakingQuestion.getDescriptionMarkup(),
-                savedSpeakingQuestion.getStatus()
-        );
+                savedSpeakingQuestion.getStatus());
     }
 }

@@ -33,6 +33,14 @@ public class RoleRepositoryAdapter implements RoleRepositoryPort {
     }
 
     @Override
+    public List<Role> findAllByUserId(Long userId) {
+        List<RoleEntity> roleEntityList = roleQueryMapper.findAllByUserId(userId);
+        return roleEntityList.stream()
+                .map(roleEntityMapper::entityToDomain)
+                .toList();
+    }
+
+    @Override
     public List<Role> findAll() {
         return roleJpaRepository.findAll().stream()
                 .map(roleEntityMapper::entityToDomain)

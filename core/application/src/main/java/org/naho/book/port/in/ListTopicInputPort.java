@@ -1,8 +1,9 @@
 package org.naho.book.port.in;
 
-import org.naho.book.command.ListTopicCommand;
-import org.naho.book.result.TopicListResult;
+import org.naho.book.result.TopicResult;
+
+import java.util.List;
 
 public interface ListTopicInputPort {
-    TopicListResult listTopics(ListTopicCommand query);
+    List<TopicResult> findAllByBookId(Long bookId);
 }

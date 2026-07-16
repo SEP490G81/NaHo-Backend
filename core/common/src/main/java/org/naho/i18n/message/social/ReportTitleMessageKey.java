@@ -9,5 +9,6 @@ public final class ReportTitleMessageKey {
     public static final String REPORT_COMMENT_ID_NOT_VALID_TITLE = "report.comment.id.not.valid.title";
     public static final String REPORT_GET_FAIL_TITLE = "report.get.fail.title";
 
-    private ReportTitleMessageKey() {}
+    private ReportTitleMessageKey() {
+    }
 }

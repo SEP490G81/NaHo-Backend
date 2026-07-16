@@ -9,7 +9,7 @@ import java.time.Instant;
 
 public class UserNodeProgress {
     private final Long id;
-    private final Long learningPathNodeId;
+    private final Long nodeId;
     private final Long userId;
 
     private Double bestScore;
@@ -20,7 +20,7 @@ public class UserNodeProgress {
 
     private UserNodeProgress(Builder builder) {
         this.id = builder.id;
-        this.learningPathNodeId = builder.learningPathNodeId;
+        this.nodeId = builder.nodeId;
         this.userId = builder.userId;
         this.bestScore = builder.bestScore;
         this.currentScore = builder.currentScore;
@@ -29,12 +29,16 @@ public class UserNodeProgress {
         this.status = builder.status;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public Long getId() {
         return id;
     }
 
     public Long getLearningPathNodeId() {
-        return learningPathNodeId;
+        return nodeId;
     }
 
     public Long getUserId() {
@@ -81,14 +85,10 @@ public class UserNodeProgress {
         this.status = status;
     }
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
     public static final class Builder {
 
         private Long id;
-        private Long learningPathNodeId;
+        private Long nodeId;
         private Long userId;
         private Double bestScore;
         private Double currentScore;
@@ -104,8 +104,8 @@ public class UserNodeProgress {
             return this;
         }
 
-        public Builder learningPathNodeId(Long learningPathNodeId) {
-            this.learningPathNodeId = learningPathNodeId;
+        public Builder nodeId(Long nodeId) {
+            this.nodeId = nodeId;
             return this;
         }
 
@@ -140,10 +140,10 @@ public class UserNodeProgress {
         }
 
         public UserNodeProgress build() {
-            if (learningPathNodeId == null) {
+            if (nodeId == null) {
                 throw new DomainException(
-                        UserNodeProgressDomainErrorCode.USER_NODE_PROGRESS_LEARNING_PATH_NODE_EMPTY,
-                        UserNodeProgressDetailMessageKey.USER_NODE_PROGRESS_LEARNING_PATH_NODE_EMPTY
+                        UserNodeProgressDomainErrorCode.USER_NODE_PROGRESS_NODE_EMPTY,
+                        UserNodeProgressDetailMessageKey.USER_NODE_PROGRESS_NODE_EMPTY
                 );
             }
 

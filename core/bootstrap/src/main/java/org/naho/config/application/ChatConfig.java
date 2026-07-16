@@ -1,9 +1,13 @@
 package org.naho.config.application;
 
 import org.naho.book.port.out.TopicRepositoryPort;
+import org.naho.book.port.out.BookRepositoryPort;
+import org.naho.book.port.out.LessonRepositoryPort;
+import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.file.port.in.FileStorageInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.furigana.port.out.FuriganaGenerationPort;
+import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
 import org.naho.speech.llm.adapter.*;
@@ -19,6 +23,7 @@ import org.naho.speech.llm.usecase.SpeakingSessionUseCase;
 import org.naho.speech.llm.usecase.SuggestedTopicsUseCase;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.naho.persona.port.out.PersonaRepositoryPort;
+import org.naho.speech.azure.port.out.TextToSpeechServicePort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -67,9 +72,10 @@ public class ChatConfig {
             AiChatPort aiChatPort,
             SessionStorePort sessionStorePort,
             SpeechToTextPort speechToTextPort,
-            PersonaRepositoryPort personaRepositoryPort
+            PersonaRepositoryPort personaRepositoryPort,
+            TextToSpeechServicePort textToSpeechServicePort
     ) {
-        return new SpeakingSessionUseCase(aiChatPort, sessionStorePort, speechToTextPort, personaRepositoryPort);
+        return new SpeakingSessionUseCase(aiChatPort, sessionStorePort, speechToTextPort, personaRepositoryPort, textToSpeechServicePort);
     }
 
     @Bean
@@ -95,6 +101,9 @@ public class ChatConfig {
             UserRepositoryPort userRepositoryPort,
             SpeakingQuestionRepositoryPort questionRepositoryPort,
             TopicRepositoryPort topicRepositoryPort,
+            LessonRepositoryPort lessonRepositoryPort,
+            ObjectiveRepositoryPort objectiveRepositoryPort,
+            BookRepositoryPort bookRepositoryPort,
             FileStorageInputPort fileStorageInputPort,
             FileRepositoryPort fileRepositoryPort,
             AnswerHistoryRepositoryPort answerHistoryRepositoryPort,
@@ -110,6 +119,9 @@ public class ChatConfig {
                 answerHistoryRepositoryPort,
                 azureSpeechServicePort,
                 topicRepositoryPort,
+                lessonRepositoryPort,
+                objectiveRepositoryPort,
+                bookRepositoryPort,
                 aiAnalysisPort,
                 furiganaGenerationPort
         );

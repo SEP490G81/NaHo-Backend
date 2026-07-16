@@ -2,16 +2,23 @@ package org.naho.file.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
+import org.naho.file.entity.FileEntity;
 import org.naho.file.model.File;
-import org.naho.file.model.FileEntity;
+import org.naho.point.constant.CloudFrontProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(componentModel = "spring")
-public interface FileEntityMapper {
+public abstract class FileEntityMapper {
+
+    @Autowired
+    private CloudFrontProperties cloudFrontProperties;
 
     @Mapping(target = "commentId", source = "comment.id")
     @Mapping(target = "questionId", source = "question.id")
     @Mapping(target = "reportId", source = "report.id")
-    File entityToDomain(FileEntity entity);
+    @Mapping(target = "objectKey", source = "objectKey", qualifiedByName = "fullObjectKey")
+    public abstract File entityToDomain(FileEntity entity);
 
     @Mapping(target = "createdTime", ignore = true)
     @Mapping(target = "modifiedTime", ignore = true)
@@ -19,5 +26,15 @@ public interface FileEntityMapper {
     @Mapping(target = "comment", ignore = true)
     @Mapping(target = "question", ignore = true)
     @Mapping(target = "report", ignore = true)
-    FileEntity domainToEntity(File domain);
+    @Mapping(target = "league", ignore = true)
+    @Mapping(target = "user", ignore = true)
+    public abstract FileEntity domainToEntity(File domain);
+
+    @Named("fullObjectKey")
+    protected String getFullObjectKey(String objectKey) {
+        if (objectKey == null) {
+            return null;
+        }
+        return cloudFrontProperties.getDomain() + objectKey;
+    }
 }

@@ -1,9 +1,10 @@
 package org.naho.user.dto.response;
 
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.FieldDefaults;
+import org.naho.file.result.FileResult;
+import org.naho.point.result.PointSummaryResult;
+import org.naho.user.result.OAuthProviderResult;
+import org.naho.user.result.RoleResult;
 import org.naho.user.type.Gender;
 import org.naho.user.type.JLPTLevel;
 import org.naho.user.type.UserStatus;
@@ -11,20 +12,24 @@ import org.naho.user.type.UserStatus;
 import java.time.LocalDate;
 import java.util.List;
 
-@Getter
-@Setter
 @Builder
-@FieldDefaults(level = lombok.AccessLevel.PRIVATE)
-public class UserResponse {
-    Long id;
-    String username;
-    List<String> roleNames;
-    String avatarUrl;
+public record UserResponse(
+        Long id,
+        List<RoleResult> roles,
+        List<Long> userSessionIds,
+        List<OAuthProviderResult> oAuthProviders,
 
-    String email;
-    String fullName;
-    Gender gender;
-    LocalDate dob;
-    JLPTLevel jlptLevel;
-    UserStatus status;
+        PointSummaryResult pointSummary,
+        Long userLearningProgressId,
+        FileResult avatar,
+
+        String username,
+        String email,
+        String fullName,
+        Gender gender,
+        LocalDate dob,
+        JLPTLevel jlptLevel,
+
+        UserStatus status
+) {
 }

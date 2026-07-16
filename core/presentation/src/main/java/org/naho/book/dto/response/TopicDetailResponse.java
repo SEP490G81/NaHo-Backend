@@ -2,6 +2,8 @@ package org.naho.book.dto.response;
 
 import org.naho.book.type.TopicStatus;
 
+import java.util.List;
+
 public record TopicDetailResponse(
         Long id,
         Long userId,
@@ -11,6 +13,7 @@ public record TopicDetailResponse(
         String japaneseDescriptionMarkup,
         TopicStatus status,
         Double orderIndex,
-        Long coverImageFileId
+        Long coverImageFileId,
+        List<LessonResponse> lessons
 ) {
 }

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -19,4 +20,6 @@ public interface TopicJpaRepository extends JpaRepository<TopicEntity, Long> {
 
     @Query("SELECT t FROM TopicEntity t JOIN t.lessons l JOIN l.objectives o WHERE o.id = :objectiveId")
     Optional<TopicEntity> findByObjectiveId(@Param("objectiveId") Long objectiveId);
+
+    List<TopicEntity> findAllByBook_Id(Long bookId);
 }

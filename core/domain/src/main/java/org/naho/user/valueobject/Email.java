@@ -7,10 +7,9 @@ import org.naho.user.exception.UserDomainErrorCode;
 import java.util.regex.Pattern;
 
 public class Email {
-    private final String value;
-
     private static final Pattern EMAIL_PATTERN =
             Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
+    private final String value;
 
     private Email(String value) {
         this.value = value;

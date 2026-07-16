@@ -10,6 +10,7 @@ import org.naho.question.type.QuestionStatus;
 import org.naho.user.repository.UserJpaRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -41,7 +42,6 @@ public class SpeakingQuestionRepositoryAdapter implements SpeakingQuestionReposi
     }
 
 
-
     @Override
     public void deleteById(Long id) {
         speakingQuestionJpaRepository.deleteById(id);
@@ -60,7 +60,6 @@ public class SpeakingQuestionRepositoryAdapter implements SpeakingQuestionReposi
         entity.setDescription(speakingQuestion.getDescription());
         entity.setDescriptionMarkup(speakingQuestion.getDescriptionMarkup());
         entity.setStatus(speakingQuestion.getStatus());
-
 
 
         if (speakingQuestion.getUserId() != null) {
@@ -99,5 +98,23 @@ public class SpeakingQuestionRepositoryAdapter implements SpeakingQuestionReposi
                 .descriptionMarkup(entity.getDescriptionMarkup())
                 .status(entity.getStatus())
                 .build());
+    }
+
+    @Override
+    public List<SpeakingQuestion> findByObjectiveId(Long objectiveId) {
+        return speakingQuestionJpaRepository.findByObjectiveId(objectiveId).stream()
+                .map(entity -> SpeakingQuestion.builder()
+                        .id(entity.getId())
+                        .questionAudioFileId(entity.getQuestionAudioFile() != null ? entity.getQuestionAudioFile().getId() : null)
+                        .userId(entity.getUser() != null ? entity.getUser().getId() : null)
+                        .title(entity.getTitle())
+                        .titleMarkup(entity.getTitleMarkup())
+                        .description(entity.getDescription())
+                        .descriptionMarkup(entity.getDescriptionMarkup())
+                        .status(entity.getStatus())
+                        .orderIndex(entity.getLearningPathNode() != null ? entity.getLearningPathNode().getOrderIndex() : null)
+                        .objectiveId(entity.getLearningPathNode() != null && entity.getLearningPathNode().getObjective() != null ? entity.getLearningPathNode().getObjective().getId() : null)
+                        .build())
+                .toList();
     }
 }

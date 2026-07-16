@@ -24,8 +24,6 @@ public class SaveVocabularyAdapter implements SaveVocabularyPort {
 
     @Override
     public void saveAll(List<Vocabulary> vocabularies) {
-        // Group vocabularies by their questionId for bulk linking
-        // questionId in the Excel = VocabularyQuestionEntity.id (the question row in DB)
         Map<Long, List<VocabularyEntity>> questionToVocabsMap = new HashMap<>();
 
         for (Vocabulary v : vocabularies) {
@@ -35,10 +33,8 @@ public class SaveVocabularyAdapter implements SaveVocabularyPort {
             entity.setVietnameseMeaningText(v.getVietnameseMeaningText());
             entity.setEnglishMeaningText(v.getEnglishMeaningText());
 
-            // Save vocabulary first to get its ID
             VocabularyEntity saved = vocabularyJpaRepository.save(entity);
 
-            // Group by questionId if present
             if (v.getQuestionId() != null) {
                 questionToVocabsMap
                         .computeIfAbsent(v.getQuestionId(), k -> new ArrayList<>())
@@ -46,7 +42,6 @@ public class SaveVocabularyAdapter implements SaveVocabularyPort {
             }
         }
 
-        // Link vocabularies to VocabularyQuestion (join table: vocabulary_questions_vocabularies)
         for (Map.Entry<Long, List<VocabularyEntity>> entry : questionToVocabsMap.entrySet()) {
             Long questionId = entry.getKey();
             List<VocabularyEntity> vocabsForQuestion = entry.getValue();
@@ -59,8 +54,7 @@ public class SaveVocabularyAdapter implements SaveVocabularyPort {
                 questionEntity.getVocabularies().addAll(vocabsForQuestion);
                 vocabularyQuestionJpaRepository.save(questionEntity);
             }
-            // If VocabularyQuestion doesn't exist in DB yet, skip linking
-            // (vocabularies are already saved; can be linked later)
+        
         }
     }
 }

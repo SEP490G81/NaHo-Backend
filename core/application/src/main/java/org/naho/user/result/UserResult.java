@@ -1,5 +1,7 @@
 package org.naho.user.result;
 
+import org.naho.file.result.FileResult;
+import org.naho.point.result.PointSummaryResult;
 import org.naho.user.type.Gender;
 import org.naho.user.type.JLPTLevel;
 import org.naho.user.type.UserStatus;
@@ -7,91 +9,85 @@ import org.naho.user.type.UserStatus;
 import java.time.LocalDate;
 import java.util.List;
 
-public class UserResult {
+public record UserResult(
+        Long id,
+        List<RoleResult> roles,
+        List<Long> userSessionIds,
+        List<OAuthProviderResult> oAuthProviders,
 
-    private final Long id;
-    private final String username;
-    private final List<String> roleNames;
-    private final String avatarUrl;
+        PointSummaryResult pointSummary,
+        Long userLearningProgressId,
+        FileResult avatar,
 
-    private final String email;
-    private final String fullName;
-    private final Gender gender;
-    private final LocalDate dob;
-    private final JLPTLevel jlptLevel;
-    private final UserStatus status;
+        String username,
+        String email,
+        String fullName,
+        Gender gender,
+        LocalDate dob,
+        JLPTLevel jlptLevel,
 
-    private UserResult(Builder builder) {
-        this.id = builder.id;
-        this.username = builder.username;
-        this.email = builder.email;
-        this.roleNames = builder.roleNames;
-        this.fullName = builder.fullName;
-        this.gender = builder.gender;
-        this.dob = builder.dob;
-        this.avatarUrl = builder.avatarUrl;
-        this.jlptLevel = builder.jlptLevel;
-        this.status = builder.status;
-    }
+        UserStatus status
+) {
 
     public static Builder builder() {
         return new Builder();
     }
 
-    public Long getId() {
-        return id;
-    }
+    public static final class Builder {
 
-    public String getUsername() {
-        return username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public List<String> getRoleNames() {
-        return roleNames;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public LocalDate getDob() {
-        return dob;
-    }
-
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
-
-    public JLPTLevel getJlptLevel() {
-        return jlptLevel;
-    }
-
-    public UserStatus getStatus() {
-        return status;
-    }
-
-    public static class Builder {
         private Long id;
+        private List<RoleResult> roles;
+        private List<Long> userSessionIds;
+        private List<OAuthProviderResult> oAuthProviders;
+
+        private PointSummaryResult pointSummary;
+        private Long userLearningProgressId;
+        private FileResult avatar;
+
         private String username;
         private String email;
-        private List<String> roleNames;
         private String fullName;
         private Gender gender;
         private LocalDate dob;
-        private String avatarUrl;
         private JLPTLevel jlptLevel;
+
         private UserStatus status;
+
+        private Builder() {
+        }
 
         public Builder id(Long id) {
             this.id = id;
+            return this;
+        }
+
+        public Builder roles(List<RoleResult> roles) {
+            this.roles = roles;
+            return this;
+        }
+
+        public Builder userSessionIds(List<Long> userSessionIds) {
+            this.userSessionIds = userSessionIds;
+            return this;
+        }
+
+        public Builder oAuthProviders(List<OAuthProviderResult> oAuthProviders) {
+            this.oAuthProviders = oAuthProviders;
+            return this;
+        }
+
+        public Builder pointSummary(PointSummaryResult pointSummary) {
+            this.pointSummary = pointSummary;
+            return this;
+        }
+
+        public Builder userLearningProgressId(Long userLearningProgressId) {
+            this.userLearningProgressId = userLearningProgressId;
+            return this;
+        }
+
+        public Builder avatar(FileResult avatar) {
+            this.avatar = avatar;
             return this;
         }
 
@@ -102,11 +98,6 @@ public class UserResult {
 
         public Builder email(String email) {
             this.email = email;
-            return this;
-        }
-
-        public Builder roleNames(List<String> roleNames) {
-            this.roleNames = roleNames;
             return this;
         }
 
@@ -125,11 +116,6 @@ public class UserResult {
             return this;
         }
 
-        public Builder avatarUrl(String avatarUrl) {
-            this.avatarUrl = avatarUrl;
-            return this;
-        }
-
         public Builder jlptLevel(JLPTLevel jlptLevel) {
             this.jlptLevel = jlptLevel;
             return this;
@@ -141,7 +127,22 @@ public class UserResult {
         }
 
         public UserResult build() {
-            return new UserResult(this);
+            return new UserResult(
+                    id,
+                    roles,
+                    userSessionIds,
+                    oAuthProviders,
+                    pointSummary,
+                    userLearningProgressId,
+                    avatar,
+                    username,
+                    email,
+                    fullName,
+                    gender,
+                    dob,
+                    jlptLevel,
+                    status
+            );
         }
     }
 }

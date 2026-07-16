@@ -2,14 +2,13 @@ package org.naho.point.model;
 
 import org.naho.i18n.message.point.LeagueDetailMessageKey;
 import org.naho.point.exception.LeagueDomainErrorCode;
-import org.naho.point.type.LeagueName;
 import org.naho.shared.exception.DomainException;
 
 public class League {
 
     private final Long id;
     private final Long iconFileId;
-    private final LeagueName name;
+    private final String name;
     private final String description;
     private final Double minPoint;
     private final Double maxPoint;
@@ -23,6 +22,10 @@ public class League {
         this.maxPoint = builder.maxPoint;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public Long getId() {
         return id;
     }
@@ -31,7 +34,7 @@ public class League {
         return iconFileId;
     }
 
-    public LeagueName getName() {
+    public String getName() {
         return name;
     }
 
@@ -47,14 +50,10 @@ public class League {
         return maxPoint;
     }
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
     public static final class Builder {
         private Long id;
         private Long iconFileId;
-        private LeagueName name;
+        private String name;
         private String description;
         private Double minPoint;
         private Double maxPoint;
@@ -72,7 +71,7 @@ public class League {
             return this;
         }
 
-        public Builder name(LeagueName name) {
+        public Builder name(String name) {
             this.name = name;
             return this;
         }
@@ -114,14 +113,7 @@ public class League {
                 );
             }
 
-            if (maxPoint == null) {
-                throw new DomainException(
-                        LeagueDomainErrorCode.LEAGUE_MAX_POINT_EMPTY,
-                        LeagueDetailMessageKey.LEAGUE_MAX_POINT_EMPTY
-                );
-            }
-
-            if (minPoint >= maxPoint) {
+            if (maxPoint != null && minPoint >= maxPoint) {
                 throw new DomainException(
                         LeagueDomainErrorCode.LEAGUE_MIN_POINT_GREATER_THAN_OR_EQUAL_TO_MAX_POINT,
                         LeagueDetailMessageKey.LEAGUE_MIN_POINT_GREATER_THAN_OR_EQUAL_TO_MAX_POINT

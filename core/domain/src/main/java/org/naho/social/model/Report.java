@@ -27,6 +27,10 @@ public class Report {
         this.isResolved = builder.isResolved;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public Long getId() {
         return id;
     }
@@ -57,10 +61,6 @@ public class Report {
 
     public boolean isResolved() {
         return isResolved;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     public static class Builder {
