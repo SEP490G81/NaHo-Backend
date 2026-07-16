@@ -9,6 +9,11 @@ public final class BookDetailMessageKey {
     public static final String BOOK_GET_LIST_SUCCESS = "book.detail.get_list_success";
     public static final String BOOK_GET_DETAIL_SUCCESS = "book.detail.get_detail_success";
     public static final String BOOK_ID_NOT_FOUND = "book.id.not.found";
+    public static final String BOOK_IMPORT_FAILED = "book.detail.import_failed";
+    public static final String BOOK_IMPORT_SUCCESS = "book.detail.import_success";
+    public static final String BOOK_IMPORT_TOPIC_NULL = "book.detail.import.topic_null";
+    public static final String BOOK_IMPORT_LESSON_NULL = "book.detail.import.lesson_null";
+    public static final String BOOK_IMPORT_OBJECTIVE_NULL = "book.detail.import.objective_null";
 
     private BookDetailMessageKey() {
     }

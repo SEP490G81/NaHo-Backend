@@ -1,17 +1,16 @@
-package org.naho.book.exception;
+package org.naho.season.exception;
 
-import org.naho.i18n.message.book.BookTitleMessageKey;
+import org.naho.i18n.message.season.SeasonTitleMessageKey;
 import org.naho.shared.exception.ErrorCode;
 
-public enum BookErrorCode implements ErrorCode {
-    BOOK_NOT_FOUND("BOOK_A001", BookTitleMessageKey.BOOK_GET_FAIL_TITLE, 404),
-    BOOK_IMPORT_FAILED("BOOK_A002", BookTitleMessageKey.BOOK_CREATION_FAILED_TITLE, 400);
+public enum SeasonErrorCode implements ErrorCode {
+    SEASON_OVERLAPPING("SEASON_A001", SeasonTitleMessageKey.SEASON_CREATION_FAILED_TITLE, 400);
 
     private final String code;
     private final String titleKey;
     private final int statusCode;
 
-    BookErrorCode(String code, String titleKey, int statusCode) {
+    SeasonErrorCode(String code, String titleKey, int statusCode) {
         this.code = code;
         this.titleKey = titleKey;
         this.statusCode = statusCode;

@@ -286,7 +286,7 @@ CREATE TABLE speaking_questions
     description_markup     TEXT                  NULL,
     status                 VARCHAR(50)           NULL,
     question_audio_file_id BIGINT                NULL,
-    user_id                BIGINT                NOT NULL,
+    user_id                BIGINT                NULL,
     CONSTRAINT pk_speaking_questions PRIMARY KEY (id)
 );
 

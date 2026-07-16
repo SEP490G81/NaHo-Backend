@@ -46,7 +46,7 @@ public class SpeakingQuestionEntity extends BaseEntity {
     FileEntity questionAudioFile;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     UserEntity user;
 
     @ManyToMany
