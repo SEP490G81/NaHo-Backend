@@ -9,6 +9,7 @@ import org.naho.learning.entity.LearningPathNodeEntity;
 import org.naho.point.entity.PointHistoryEntity;
 import org.naho.shared.persistence.BaseEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @SuperBuilder
@@ -52,6 +53,7 @@ public class ObjectiveEntity extends BaseEntity {
     @OneToMany(mappedBy = "objective", cascade = CascadeType.ALL, orphanRemoval = true)
     List<PointHistoryEntity> pointHistories;
 
-    @OneToMany(mappedBy = "objective")
-    List<LearningPathNodeEntity> learningPathNodes;
+    @Builder.Default
+    @OneToMany(mappedBy = "objective", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<LearningPathNodeEntity> learningPathNodes = new ArrayList<>();
 }

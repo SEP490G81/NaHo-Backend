@@ -10,6 +10,7 @@ import org.naho.point.entity.PointHistoryEntity;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.user.type.JLPTLevel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @SuperBuilder
@@ -48,8 +49,9 @@ public class BookEntity extends BaseEntity {
     @JoinColumn(name = "cover_image_file_id")
     FileEntity coverImageFile;
 
+    @Builder.Default
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<TopicEntity> topics;
+    List<TopicEntity> topics = new ArrayList<>();
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     List<PointHistoryEntity> pointHistories;
