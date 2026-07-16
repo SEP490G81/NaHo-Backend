@@ -11,9 +11,17 @@ import org.naho.book.port.out.ImportBookPort;
 import org.naho.book.repository.BookJpaRepository;
 import org.naho.book.type.TopicStatus;
 import org.naho.i18n.message.book.BookDetailMessageKey;
+import org.naho.i18n.message.question.ChestDetailMessageKey;
+import org.naho.i18n.message.question.VocabularyQuestionDetailMessageKey;
 import org.naho.learning.entity.LearningPathNodeEntity;
 import org.naho.learning.type.NodeType;
+import org.naho.question.entity.ChestEntity;
 import org.naho.question.entity.SpeakingQuestionEntity;
+import org.naho.question.entity.VocabularyQuestionEntity;
+import org.naho.question.exception.ChestErrorCode;
+import org.naho.question.exception.VocabularyQuestionErrorCode;
+import org.naho.question.repository.ChestJpaRepository;
+import org.naho.question.repository.VocabularyQuestionJpaRepository;
 import org.naho.question.type.QuestionStatus;
 import org.naho.shared.exception.InfrastructureException;
 import org.springframework.stereotype.Component;
@@ -26,6 +34,8 @@ import java.io.InputStream;
 @RequiredArgsConstructor
 public class ImportBookAdapter implements ImportBookPort {
     private final BookJpaRepository bookJpaRepository;
+    private final VocabularyQuestionJpaRepository vocabularyQuestionJpaRepository;
+    private final ChestJpaRepository chestJpaRepository;
 
     @Override
     @Transactional
@@ -163,10 +173,29 @@ public class ImportBookAdapter implements ImportBookPort {
                             learningPathNodeEntity.setSpeakingQuestion(speakingQuestionEntity);
                         }
                         case VOCABULARY_QUESTION -> {
-                            // để trống
+                            Cell vocabularyQuestionCell = row.getCell(5);
+                            Long vocabularyQuestionId = (long) vocabularyQuestionCell.getNumericCellValue();
+                            VocabularyQuestionEntity vocabularyQuestionEntity = vocabularyQuestionJpaRepository
+                                    .findById(vocabularyQuestionId)
+                                    .orElseThrow(() -> new InfrastructureException(
+                                            VocabularyQuestionErrorCode.VOCABULARY_QUESTION_NOT_FOUND,
+                                            VocabularyQuestionDetailMessageKey.VOCABULARY_QUESTION_NOT_FOUND,
+                                            vocabularyQuestionId
+                                    ));
+
+                            learningPathNodeEntity.setVocabularyQuestion(vocabularyQuestionEntity);
                         }
                         case CHEST -> {
                             Cell chestCell = row.getCell(5);
+                            Long chestId = (long) chestCell.getNumericCellValue();
+                            ChestEntity chestEntity = chestJpaRepository.findById(chestId)
+                                    .orElseThrow(() -> new InfrastructureException(
+                                            ChestErrorCode.CHEST_NOT_FOUND,
+                                            ChestDetailMessageKey.CHEST_NOT_FOUND,
+                                            chestId
+                                    ));
+
+                            learningPathNodeEntity.setChest(chestEntity);
                         }
                     }
                 }
