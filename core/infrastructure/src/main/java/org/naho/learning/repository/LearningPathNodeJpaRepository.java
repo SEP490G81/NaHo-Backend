@@ -1,13 +1,14 @@
 package org.naho.learning.repository;
 
 import org.naho.learning.entity.LearningPathNodeEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.naho.shared.persistence.BaseJpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
-@Repository
-public interface LearningPathNodeJpaRepository extends JpaRepository<LearningPathNodeEntity, Long> {
+public interface LearningPathNodeJpaRepository extends BaseJpaRepository<LearningPathNodeEntity> {
     List<LearningPathNodeEntity> findAllByObjectiveId(Long objectiveId);
+
+    Optional<LearningPathNodeEntity> findFirstByOrderByGlobalOrderIndexAsc();
 }
 

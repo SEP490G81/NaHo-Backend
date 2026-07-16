@@ -12,5 +12,5 @@ public interface LearningPathNodeEntityMapper {
     @Mapping(target = "speakingQuestionId", source = "speakingQuestion.id")
     @Mapping(target = "vocabularyQuestionId", source = "vocabularyQuestion.id")
     @Mapping(target = "chestId", source = "chest.id")
-    LearningPathNode toModel(LearningPathNodeEntity entity);
+    LearningPathNode entityToDomain(LearningPathNodeEntity entity);
 }

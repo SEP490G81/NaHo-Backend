@@ -1,7 +1,11 @@
 package org.naho.config.application;
 
 import org.naho.learning.adapter.LearningPathNodeRepositoryAdapter;
+import org.naho.learning.adapter.UserLearningProgressRepositoryAdapter;
+import org.naho.learning.mapper.UserLearningProgressResultMapper;
+import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
 import org.naho.learning.port.in.GetLearningPathNodeDetailInputPort;
+import org.naho.learning.usecase.CrudUserLearningProgressUseCase;
 import org.naho.learning.usecase.GetLearningPathNodeDetailUseCase;
 import org.naho.question.adapter.SpeakingQuestionRepositoryAdapter;
 import org.naho.question.adapter.VocabularyQuestionRepositoryAdapter;
@@ -24,6 +28,24 @@ public class LearningConfig {
                 speakingQuestionRepositoryAdapter,
                 vocabularyQuestionRepositoryAdapter,
                 chestRepositoryAdapter
+        );
+    }
+
+    @Bean
+    public UserLearningProgressResultMapper userLearningProgressResultMapper() {
+        return new UserLearningProgressResultMapper();
+    }
+
+    @Bean
+    public CrudUserLearningProgressInputPort crudUserLearningProgressInputPort(
+            UserLearningProgressRepositoryAdapter userLearningProgressRepositoryAdapter,
+            LearningPathNodeRepositoryAdapter learningPathNodeRepositoryAdapter,
+            UserLearningProgressResultMapper userLearningProgressResultMapper
+    ) {
+        return new CrudUserLearningProgressUseCase(
+                userLearningProgressRepositoryAdapter,
+                learningPathNodeRepositoryAdapter,
+                userLearningProgressResultMapper
         );
     }
 }
