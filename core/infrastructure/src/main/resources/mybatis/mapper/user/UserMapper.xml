@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.naho.user.mybatis.UserQueryMapper">
+    <select id="findByProviderUserIdAndProviderName" resultType="org.naho.user.entity.UserEntity">
+        select u.*
+        from users u
+                 join o_auth_providers o on u.id = o.user_id
+        where o.provider_user_id = #{providerUserId}
+          and o.provider_name = #{providerName}
+    </select>
+
+    <resultMap id="LeaderboardUserResultMap" type="org.naho.user.entity.UserEntity">
+        <!-- ================= User ================= -->
+        <id property="id" column="user_id"/>
+        <result property="username" column="username"/>
+        <result property="email" column="email"/>
+        <result property="fullName" column="full_name"/>
+        <!-- ================= Avatar ================= -->
+        <association property="avatar" javaType="org.naho.file.entity.FileEntity">
+            <id property="id" column="avatar_file_id"/>
+            <result property="objectKey" column="object_key"/>
+        </association>
+        <!-- ================= Learning Progress ================= -->
+        <association property="userLearningProgress" javaType="org.naho.learning.entity.UserLearningProgressEntity">
+            <id property="id" column="user_learning_progress_id"/>
+            <result property="totalPoint" column="total_point"/>
+        </association>
+        <!-- ================= OAuth Providers ================= -->
+        <collection property="oAuthProviders" ofType="org.naho.user.entity.OAuthProviderEntity">
+            <id property="id" column="o_auth_provider_id"/>
+            <result property="avatarUrl" column="avatar_url"/>
+        </collection>
+    </resultMap>
+
+    <select id="findTop10OrderByTotalPointInLeague" resultMap="LeaderboardUserResultMap">
+        <![CDATA[
+        select
+            -- user info
+            u.id   as user_id,
+            u.username,
+            u.email,
+            u.full_name,
+
+            -- avatar file info
+            f.id   as avatar_file_id,
+            f.object_key,
+
+            -- user learning progress info
+            ulp.id as user_learning_progress_id,
+            ulp.total_point,
+
+            -- oAuthProvider info
+            oap.id as o_auth_provider_id,
+            oap.avatar_url
+        from users u
+                 join user_learning_progresses ulp
+                      on u.user_learning_progress_id = ulp.id
+                 left join files f
+                           on u.avatar_file_id = f.id
+                 left join o_auth_providers oap
+                           on u.id = oap.user_id
+                 join leagues l
+                      on l.id = #{leagueId}
+        where u.status = 'ACTIVE'
+          and ulp.total_point >= l.min_point
+          and (l.max_point is null or ulp.total_point <= l.max_point)
+        order by ulp.total_point desc
+        limit 10
+        ]]>
+    </select>
+</mapper>

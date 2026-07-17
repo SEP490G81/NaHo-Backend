@@ -8,5 +8,3 @@ VALUES (1, NOW(), NULL),
        (7, NOW(), NULL),
        (8, NOW(), NULL),
        (9, NOW(), NULL);
-
-

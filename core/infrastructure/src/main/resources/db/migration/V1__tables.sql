@@ -1,8 +1,8 @@
 CREATE TABLE answer_histories
 (
     id                   BIGINT AUTO_INCREMENT NOT NULL,
-    created_time         datetime              NOT NULL,
-    modified_time        datetime              NULL,
+    created_time         datetime(6)           NOT NULL,
+    modified_time        datetime(6)           NULL,
     user_id              BIGINT                NOT NULL,
     speaking_question_id BIGINT                NOT NULL,
     audio_file_id        BIGINT                NOT NULL,
@@ -12,8 +12,8 @@ CREATE TABLE answer_histories
 CREATE TABLE books
 (
     id                            BIGINT AUTO_INCREMENT NOT NULL,
-    created_time                  datetime              NOT NULL,
-    modified_time                 datetime              NULL,
+    created_time                  datetime(6)           NOT NULL,
+    modified_time                 datetime(6)           NULL,
     title                         VARCHAR(255)          NOT NULL,
     `description`                 TEXT                  NULL,
     jlpt_level                    VARCHAR(255)          NULL,
@@ -28,8 +28,8 @@ CREATE TABLE books
 CREATE TABLE chests
 (
     id            BIGINT AUTO_INCREMENT NOT NULL,
-    created_time  datetime              NOT NULL,
-    modified_time datetime              NULL,
+    created_time  datetime(6)           NOT NULL,
+    modified_time datetime(6)           NULL,
     title         VARCHAR(255)          NOT NULL,
     `description` TEXT                  NULL,
     point         DOUBLE                NOT NULL,
@@ -39,8 +39,8 @@ CREATE TABLE chests
 CREATE TABLE comments
 (
     id                   BIGINT AUTO_INCREMENT NOT NULL,
-    created_time         datetime              NOT NULL,
-    modified_time        datetime              NULL,
+    created_time         datetime(6)           NOT NULL,
+    modified_time        datetime(6)           NULL,
     content              TEXT                  NOT NULL,
     user_id              BIGINT                NOT NULL,
     speaking_question_id BIGINT                NOT NULL,
@@ -51,8 +51,8 @@ CREATE TABLE comments
 CREATE TABLE content_assessments
 (
     id                BIGINT AUTO_INCREMENT NOT NULL,
-    created_time      datetime              NOT NULL,
-    modified_time     datetime              NULL,
+    created_time      datetime(6)           NOT NULL,
+    modified_time     datetime(6)           NULL,
     vocabulary_score  DOUBLE                NOT NULL,
     grammar_score     DOUBLE                NOT NULL,
     ai_feedback       TEXT                  NOT NULL,
@@ -64,8 +64,8 @@ CREATE TABLE content_assessments
 CREATE TABLE conversation_styles
 (
     id              BIGINT AUTO_INCREMENT NOT NULL,
-    created_time    datetime              NOT NULL,
-    modified_time   datetime              NULL,
+    created_time    datetime(6)           NOT NULL,
+    modified_time   datetime(6)           NULL,
     `description`   VARCHAR(512)          NULL,
     prompt          TEXT                  NOT NULL,
     formality_level VARCHAR(255)          NOT NULL,
@@ -75,8 +75,8 @@ CREATE TABLE conversation_styles
 CREATE TABLE files
 (
     id            BIGINT AUTO_INCREMENT NOT NULL,
-    created_time  datetime              NOT NULL,
-    modified_time datetime              NULL,
+    created_time  datetime(6)           NOT NULL,
+    modified_time datetime(6)           NULL,
     object_key    VARCHAR(2048)         NOT NULL,
     original_name VARCHAR(255)          NOT NULL,
     content_type  VARCHAR(100)          NOT NULL,
@@ -90,8 +90,8 @@ CREATE TABLE files
 CREATE TABLE grammars
 (
     id                      BIGINT AUTO_INCREMENT NOT NULL,
-    created_time            datetime              NOT NULL,
-    modified_time           datetime              NULL,
+    created_time            datetime(6)           NOT NULL,
+    modified_time           datetime(6)           NULL,
     vietnamese_meaning_text TEXT                  NULL,
     english_meaning_text    TEXT                  NULL,
     explanation             MEDIUMTEXT            NULL,
@@ -101,8 +101,8 @@ CREATE TABLE grammars
 CREATE TABLE leagues
 (
     id            BIGINT AUTO_INCREMENT NOT NULL,
-    created_time  datetime              NOT NULL,
-    modified_time datetime              NULL,
+    created_time  datetime(6)           NOT NULL,
+    modified_time datetime(6)           NULL,
     name          VARCHAR(255)          NOT NULL,
     `description` TEXT                  NULL,
     min_point     DOUBLE                NOT NULL,
@@ -114,8 +114,8 @@ CREATE TABLE leagues
 CREATE TABLE learning_path_nodes
 (
     id                     BIGINT AUTO_INCREMENT NOT NULL,
-    created_time           datetime              NOT NULL,
-    modified_time          datetime              NULL,
+    created_time           datetime(6)           NOT NULL,
+    modified_time          datetime(6)           NULL,
     global_order_index     DOUBLE                NOT NULL,
     order_index            DOUBLE                NOT NULL,
     node_type              VARCHAR(255)          NOT NULL,
@@ -129,8 +129,8 @@ CREATE TABLE learning_path_nodes
 CREATE TABLE lessons
 (
     id                            BIGINT AUTO_INCREMENT NOT NULL,
-    created_time                  datetime              NOT NULL,
-    modified_time                 datetime              NULL,
+    created_time                  datetime(6)           NOT NULL,
+    modified_time                 datetime(6)           NULL,
     japanese_name                 VARCHAR(255)          NULL,
     japanese_description          VARCHAR(255)          NULL,
     japanese_name_markup          TEXT                  NULL,
@@ -146,8 +146,8 @@ CREATE TABLE lessons
 CREATE TABLE o_auth_providers
 (
     id               BIGINT AUTO_INCREMENT NOT NULL,
-    created_time     datetime              NOT NULL,
-    modified_time    datetime              NULL,
+    created_time     datetime(6)           NOT NULL,
+    modified_time    datetime(6)           NULL,
     user_id          BIGINT                NOT NULL,
     provider_user_id VARCHAR(255)          NOT NULL,
     provider_name    SMALLINT              NOT NULL,
@@ -158,8 +158,8 @@ CREATE TABLE o_auth_providers
 CREATE TABLE objectives
 (
     id                            BIGINT AUTO_INCREMENT NOT NULL,
-    created_time                  datetime              NOT NULL,
-    modified_time                 datetime              NULL,
+    created_time                  datetime(6)           NOT NULL,
+    modified_time                 datetime(6)           NULL,
     japanese_name                 VARCHAR(255)          NULL,
     japanese_description          VARCHAR(255)          NULL,
     japanese_name_markup          TEXT                  NULL,
@@ -175,8 +175,8 @@ CREATE TABLE objectives
 CREATE TABLE permissions
 (
     id              BIGINT AUTO_INCREMENT NOT NULL,
-    created_time    datetime              NOT NULL,
-    modified_time   datetime              NULL,
+    created_time    datetime(6)           NOT NULL,
+    modified_time   datetime(6)           NULL,
     permission_code VARCHAR(100)          NOT NULL,
     `description`   VARCHAR(255)          NULL,
     CONSTRAINT pk_permissions PRIMARY KEY (id)
@@ -185,8 +185,8 @@ CREATE TABLE permissions
 CREATE TABLE personas
 (
     id                              BIGINT AUTO_INCREMENT NOT NULL,
-    created_time                    datetime              NOT NULL,
-    modified_time                   datetime              NULL,
+    created_time                    datetime(6)           NOT NULL,
+    modified_time                   datetime(6)           NULL,
     name                            VARCHAR(255)          NOT NULL,
     prompt                          TEXT                  NOT NULL,
     avatar_file_id                  BIGINT                NULL,
@@ -197,11 +197,11 @@ CREATE TABLE personas
 CREATE TABLE point_histories
 (
     id                    BIGINT AUTO_INCREMENT NOT NULL,
-    created_time          datetime              NOT NULL,
-    modified_time         datetime              NULL,
+    created_time          datetime(6)           NOT NULL,
+    modified_time         datetime(6)           NULL,
     point                 DOUBLE                NOT NULL,
     transaction_type      VARCHAR(255)          NOT NULL,
-    transaction_time      datetime              NOT NULL,
+    transaction_time      datetime(6)           NOT NULL,
     user_id               BIGINT                NOT NULL,
     learning_path_node_id BIGINT                NULL,
     objective_id          BIGINT                NULL,
@@ -211,20 +211,11 @@ CREATE TABLE point_histories
     CONSTRAINT pk_point_histories PRIMARY KEY (id)
 );
 
-CREATE TABLE point_summary
-(
-    id            BIGINT AUTO_INCREMENT NOT NULL,
-    created_time  datetime              NOT NULL,
-    modified_time datetime              NULL,
-    total_point   DOUBLE                NOT NULL,
-    CONSTRAINT pk_point_summary PRIMARY KEY (id)
-);
-
 CREATE TABLE reactions
 (
     id                   BIGINT AUTO_INCREMENT NOT NULL,
-    created_time         datetime              NOT NULL,
-    modified_time        datetime              NULL,
+    created_time         datetime(6)           NOT NULL,
+    modified_time        datetime(6)           NULL,
     reaction_type        VARCHAR(255)          NOT NULL,
     user_id              BIGINT                NOT NULL,
     comment_id           BIGINT                NULL,
@@ -235,8 +226,8 @@ CREATE TABLE reactions
 CREATE TABLE reports
 (
     id                   BIGINT AUTO_INCREMENT NOT NULL,
-    created_time         datetime              NOT NULL,
-    modified_time        datetime              NULL,
+    created_time         datetime(6)           NOT NULL,
+    modified_time        datetime(6)           NULL,
     title                VARCHAR(255)          NOT NULL,
     `description`        TEXT                  NOT NULL,
     report_type          VARCHAR(50)           NOT NULL,
@@ -250,8 +241,8 @@ CREATE TABLE reports
 CREATE TABLE roles
 (
     id            BIGINT AUTO_INCREMENT NOT NULL,
-    created_time  datetime              NOT NULL,
-    modified_time datetime              NULL,
+    created_time  datetime(6)           NOT NULL,
+    modified_time datetime(6)           NULL,
     role_name     VARCHAR(20)           NOT NULL,
     `description` VARCHAR(255)          NULL,
     CONSTRAINT pk_roles PRIMARY KEY (id)
@@ -264,22 +255,11 @@ CREATE TABLE roles_permissions
     CONSTRAINT pk_roles_permissions PRIMARY KEY (permission_id, role_id)
 );
 
-CREATE TABLE seasons
-(
-    id            BIGINT AUTO_INCREMENT NOT NULL,
-    created_time  datetime              NOT NULL,
-    modified_time datetime              NULL,
-    season_no     INT                   NOT NULL,
-    start_at      datetime              NOT NULL,
-    end_at        datetime              NOT NULL,
-    CONSTRAINT pk_seasons PRIMARY KEY (id)
-);
-
 CREATE TABLE speaking_questions
 (
     id                     BIGINT AUTO_INCREMENT NOT NULL,
-    created_time           datetime              NOT NULL,
-    modified_time          datetime              NULL,
+    created_time           datetime(6)           NOT NULL,
+    modified_time          datetime(6)           NULL,
     title                  VARCHAR(255)          NOT NULL,
     title_markup           VARCHAR(255)          NOT NULL,
     `description`          TEXT                  NULL,
@@ -305,8 +285,8 @@ CREATE TABLE speaking_questions_vocabularies
 CREATE TABLE speech_assessments
 (
     id                  BIGINT AUTO_INCREMENT NOT NULL,
-    created_time        datetime              NOT NULL,
-    modified_time       datetime              NULL,
+    created_time        datetime(6)           NOT NULL,
+    modified_time       datetime(6)           NULL,
     transcript_text     TEXT                  NOT NULL,
     accuracy_score      DOUBLE                NOT NULL,
     fluency_score       DOUBLE                NOT NULL,
@@ -319,8 +299,8 @@ CREATE TABLE speech_assessments
 CREATE TABLE topics
 (
     id                            BIGINT AUTO_INCREMENT NOT NULL,
-    created_time                  datetime              NOT NULL,
-    modified_time                 datetime              NULL,
+    created_time                  datetime(6)           NOT NULL,
+    modified_time                 datetime(6)           NULL,
     japanese_name                 VARCHAR(255)          NULL,
     japanese_description          VARCHAR(255)          NULL,
     japanese_name_markup          TEXT                  NULL,
@@ -338,11 +318,12 @@ CREATE TABLE topics
 CREATE TABLE user_learning_progresses
 (
     id                         BIGINT AUTO_INCREMENT NOT NULL,
-    created_time               datetime              NOT NULL,
-    modified_time              datetime              NULL,
+    created_time               datetime(6)           NOT NULL,
+    modified_time              datetime(6)           NULL,
     farthest_available_node_id BIGINT                NOT NULL,
     last_learning_node_id      BIGINT                NULL,
-    last_learning_at           datetime              NULL,
+    last_learning_at           datetime(6)           NULL,
+    total_point                DOUBLE                NOT NULL,
     current_streak             INT                   NULL,
     longest_streak             INT                   NULL,
     CONSTRAINT pk_user_learning_progresses PRIMARY KEY (id)
@@ -351,28 +332,16 @@ CREATE TABLE user_learning_progresses
 CREATE TABLE user_node_progresses
 (
     id                    BIGINT AUTO_INCREMENT NOT NULL,
-    created_time          datetime              NOT NULL,
-    modified_time         datetime              NULL,
+    created_time          datetime(6)           NOT NULL,
+    modified_time         datetime(6)           NULL,
     best_score            DOUBLE                NULL,
     current_score         DOUBLE                NULL,
     attempt_count         INT                   NULL,
-    completed_at          datetime              NULL,
+    completed_at          datetime(6)           NULL,
     status                VARCHAR(255)          NULL,
     learning_path_node_id BIGINT                NOT NULL,
     user_id               BIGINT                NOT NULL,
     CONSTRAINT pk_user_node_progresses PRIMARY KEY (id)
-);
-
-CREATE TABLE user_season_points
-(
-    id            BIGINT AUTO_INCREMENT NOT NULL,
-    created_time  datetime              NOT NULL,
-    modified_time datetime              NULL,
-    season_point  DOUBLE                NOT NULL,
-    user_id       BIGINT                NOT NULL,
-    season_id     BIGINT                NOT NULL,
-    league_id     BIGINT                NOT NULL,
-    CONSTRAINT pk_user_season_points PRIMARY KEY (id)
 );
 
 CREATE TABLE user_sessions
@@ -383,11 +352,11 @@ CREATE TABLE user_sessions
     device_id                VARCHAR(100)          NULL,
     user_agent               TEXT                  NULL,
     ip_address               VARCHAR(45)           NULL,
-    issued_at                datetime              NOT NULL,
-    refresh_token_expires_at datetime              NOT NULL,
-    access_token_expires_at  datetime              NOT NULL,
-    last_used_at             datetime              NULL,
-    revoked_at               datetime              NULL,
+    issued_at                datetime(6)           NOT NULL,
+    refresh_token_expires_at datetime(6)           NOT NULL,
+    access_token_expires_at  datetime(6)           NOT NULL,
+    last_used_at             datetime(6)           NULL,
+    revoked_at               datetime(6)           NULL,
     revoked_reason           VARCHAR(50)           NULL,
     CONSTRAINT pk_user_sessions PRIMARY KEY (id)
 );
@@ -395,8 +364,8 @@ CREATE TABLE user_sessions
 CREATE TABLE users
 (
     id                        BIGINT AUTO_INCREMENT NOT NULL,
-    created_time              datetime              NOT NULL,
-    modified_time             datetime              NULL,
+    created_time              datetime(6)           NOT NULL,
+    modified_time             datetime(6)           NULL,
     username                  VARCHAR(36)           NULL,
     email                     VARCHAR(255)          NOT NULL,
     hash_password             VARCHAR(255)          NULL,
@@ -405,7 +374,6 @@ CREATE TABLE users
     dob                       date                  NULL,
     jlpt_level                VARCHAR(2)            NOT NULL,
     status                    VARCHAR(20)           NOT NULL,
-    point_summary_id          BIGINT                NULL,
     user_learning_progress_id BIGINT                NULL,
     avatar_file_id            BIGINT                NULL,
     CONSTRAINT pk_users PRIMARY KEY (id)
@@ -420,8 +388,8 @@ CREATE TABLE users_roles
 CREATE TABLE vocabularies
 (
     id                      BIGINT AUTO_INCREMENT NOT NULL,
-    created_time            datetime              NOT NULL,
-    modified_time           datetime              NULL,
+    created_time            datetime(6)           NOT NULL,
+    modified_time           datetime(6)           NULL,
     reading                 VARCHAR(255)          NULL,
     japanese                VARCHAR(255)          NULL,
     vietnamese_meaning_text VARCHAR(255)          NULL,
@@ -432,8 +400,8 @@ CREATE TABLE vocabularies
 CREATE TABLE vocabulary_questions
 (
     id            BIGINT AUTO_INCREMENT NOT NULL,
-    created_time  datetime              NOT NULL,
-    modified_time datetime              NULL,
+    created_time  datetime(6)           NOT NULL,
+    modified_time datetime(6)           NULL,
     CONSTRAINT pk_vocabulary_questions PRIMARY KEY (id)
 );
 
@@ -446,8 +414,8 @@ CREATE TABLE vocabulary_questions_vocabularies
 CREATE TABLE word_assessments
 (
     id                   BIGINT AUTO_INCREMENT NOT NULL,
-    created_time         datetime              NOT NULL,
-    modified_time        datetime              NULL,
+    created_time         datetime(6)           NOT NULL,
+    modified_time        datetime(6)           NULL,
     word                 VARCHAR(255)          NOT NULL,
     accuracy_score       DOUBLE                NOT NULL,
     error_type           VARCHAR(255)          NOT NULL,
@@ -505,9 +473,6 @@ ALTER TABLE users
 
 ALTER TABLE users
     ADD CONSTRAINT uc_users_email UNIQUE (email);
-
-ALTER TABLE users
-    ADD CONSTRAINT uc_users_point_summary UNIQUE (point_summary_id);
 
 ALTER TABLE users
     ADD CONSTRAINT uc_users_user_learning_progress UNIQUE (user_learning_progress_id);
@@ -636,9 +601,6 @@ ALTER TABLE users
     ADD CONSTRAINT FK_USERS_ON_AVATAR_FILE FOREIGN KEY (avatar_file_id) REFERENCES files (id);
 
 ALTER TABLE users
-    ADD CONSTRAINT FK_USERS_ON_POINT_SUMMARY FOREIGN KEY (point_summary_id) REFERENCES point_summary (id);
-
-ALTER TABLE users
     ADD CONSTRAINT FK_USERS_ON_USER_LEARNING_PROGRESS FOREIGN KEY (user_learning_progress_id) REFERENCES user_learning_progresses (id);
 
 ALTER TABLE user_learning_progresses
@@ -652,15 +614,6 @@ ALTER TABLE user_node_progresses
 
 ALTER TABLE user_node_progresses
     ADD CONSTRAINT FK_USER_NODE_PROGRESSES_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
-
-ALTER TABLE user_season_points
-    ADD CONSTRAINT FK_USER_SEASON_POINTS_ON_LEAGUE FOREIGN KEY (league_id) REFERENCES leagues (id);
-
-ALTER TABLE user_season_points
-    ADD CONSTRAINT FK_USER_SEASON_POINTS_ON_SEASON FOREIGN KEY (season_id) REFERENCES seasons (id);
-
-ALTER TABLE user_season_points
-    ADD CONSTRAINT FK_USER_SEASON_POINTS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
 ALTER TABLE user_sessions
     ADD CONSTRAINT FK_USER_SESSIONS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.naho.book.mybatis.BookQueryMapper">
+    <select id="findFirstNodeGlobalOrderIndexById" resultType="double">
+        select min(lpn.global_order_index)
+        from learning_path_nodes lpn
+                 join objectives o on lpn.objective_id = o.id
+                 join lessons l on o.lesson_id = l.id
+                 join topics t on l.topic_id = t.id
+        where t.book_id = #{bookId}
+    </select>
+
+    <select id="findLastNodeGlobalOrderIndexById" resultType="double">
+        select max(lpn.global_order_index)
+        from learning_path_nodes lpn
+                 join objectives o on lpn.objective_id = o.id
+                 join lessons l on o.lesson_id = l.id
+                 join topics t on l.topic_id = t.id
+        where t.book_id = #{bookId}
+    </select>
+</mapper>

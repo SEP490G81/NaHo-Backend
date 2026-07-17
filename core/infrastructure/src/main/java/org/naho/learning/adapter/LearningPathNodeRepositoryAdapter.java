@@ -1,10 +1,9 @@
 package org.naho.learning.adapter;
 
 import lombok.RequiredArgsConstructor;
-import org.naho.learning.entity.LearningPathNodeEntity;
+import org.naho.learning.mapper.LearningPathNodeEntityMapper;
 import org.naho.learning.model.LearningPathNode;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
-import org.naho.learning.mapper.LearningPathNodeEntityMapper;
 import org.naho.learning.repository.LearningPathNodeJpaRepository;
 import org.springframework.stereotype.Component;
 
@@ -21,12 +20,21 @@ public class LearningPathNodeRepositoryAdapter implements LearningPathNodeReposi
     @Override
     public List<LearningPathNode> findByObjectiveId(Long objectiveId) {
         return learningPathNodeJpaRepository.findAllByObjectiveId(objectiveId).stream()
-                .map(learningPathNodeEntityMapper::toModel)
+                .map(learningPathNodeEntityMapper::entityToDomain)
                 .toList();
     }
 
     @Override
     public Optional<LearningPathNode> findById(Long id) {
-        return learningPathNodeJpaRepository.findById(id).map(learningPathNodeEntityMapper::toModel);
+        return learningPathNodeJpaRepository
+                .findById(id)
+                .map(learningPathNodeEntityMapper::entityToDomain);
+    }
+
+    @Override
+    public Optional<LearningPathNode> findFirstLearningPathNode() {
+        return learningPathNodeJpaRepository
+                .findFirstByOrderByGlobalOrderIndexAsc()
+                .map(learningPathNodeEntityMapper::entityToDomain);
     }
 }

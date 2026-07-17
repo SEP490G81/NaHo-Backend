@@ -1,7 +1,6 @@
 package org.naho.user.result;
 
 import org.naho.file.result.FileResult;
-import org.naho.point.result.PointSummaryResult;
 import org.naho.user.type.Gender;
 import org.naho.user.type.JLPTLevel;
 import org.naho.user.type.UserStatus;
@@ -15,7 +14,6 @@ public record UserResult(
         List<Long> userSessionIds,
         List<OAuthProviderResult> oAuthProviders,
 
-        PointSummaryResult pointSummary,
         Long userLearningProgressId,
         FileResult avatar,
 
@@ -40,7 +38,6 @@ public record UserResult(
         private List<Long> userSessionIds;
         private List<OAuthProviderResult> oAuthProviders;
 
-        private PointSummaryResult pointSummary;
         private Long userLearningProgressId;
         private FileResult avatar;
 
@@ -73,11 +70,6 @@ public record UserResult(
 
         public Builder oAuthProviders(List<OAuthProviderResult> oAuthProviders) {
             this.oAuthProviders = oAuthProviders;
-            return this;
-        }
-
-        public Builder pointSummary(PointSummaryResult pointSummary) {
-            this.pointSummary = pointSummary;
             return this;
         }
 
@@ -132,7 +124,6 @@ public record UserResult(
                     roles,
                     userSessionIds,
                     oAuthProviders,
-                    pointSummary,
                     userLearningProgressId,
                     avatar,
                     username,
