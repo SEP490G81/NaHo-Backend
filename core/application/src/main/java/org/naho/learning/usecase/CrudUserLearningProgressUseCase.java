@@ -47,7 +47,7 @@ public class CrudUserLearningProgressUseCase implements CrudUserLearningProgress
                     UserLearningProgress.init(firstLearningPathNode.getId());
 
             currentUserLearningProgress =
-                    userLearningProgressRepositoryPort.save(userLearningProgress, userId);
+                    userLearningProgressRepositoryPort.createNew(userLearningProgress, userId);
         }
 
         return userLearningProgressResultMapper.domainToResult(currentUserLearningProgress);

@@ -8,7 +8,7 @@ import org.naho.learning.model.UserLearningProgress;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
 import org.naho.learning.repository.LearningPathNodeJpaRepository;
 import org.naho.learning.repository.UserLearningProgressJpaRepository;
-import org.naho.shared.exception.ApplicationException;
+import org.naho.shared.exception.InfrastructureException;
 import org.naho.user.entity.UserEntity;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.repository.UserJpaRepository;
@@ -26,6 +26,29 @@ public class UserLearningProgressRepositoryAdapter implements UserLearningProgre
     private final UserLearningProgressEntityMapper userLearningProgressEntityMapper;
 
     @Override
+    public UserLearningProgress createNew(UserLearningProgress userLearningProgress, Long userId) {
+        UserLearningProgressEntity userLearningProgressEntity =
+                userLearningProgressEntityMapper.domainToEntity(userLearningProgress);
+
+        UserEntity user = userJpaRepository.findById(userId)
+                .orElseThrow(() -> new InfrastructureException(
+                        UserErrorCode.USER_NOT_FOUND,
+                        UserDetailMessageKey.USER_ID_NOT_FOUND,
+                        userId
+                ));
+
+        userLearningProgressEntity.setUser(user);
+
+        UserLearningProgressEntity savedUserLearningProgressEntity =
+                userLearningProgressJpaRepository.save(userLearningProgressEntity);
+
+        user.setUserLearningProgress(savedUserLearningProgressEntity);
+        userJpaRepository.save(user);
+
+        return userLearningProgressEntityMapper.entityToDomain(savedUserLearningProgressEntity);
+    }
+
+    @Override
     public Optional<UserLearningProgress> findUserLearningProgressByUserId(Long userId) {
         return userLearningProgressJpaRepository
                 .findByUserId(userId)
@@ -33,36 +56,12 @@ public class UserLearningProgressRepositoryAdapter implements UserLearningProgre
     }
 
     @Override
-    public UserLearningProgress save(UserLearningProgress userLearningProgress, Long userId) {
-        UserLearningProgressEntity entity =
+    public UserLearningProgress save(UserLearningProgress userLearningProgress) {
+        UserLearningProgressEntity userLearningProgressEntity =
                 userLearningProgressEntityMapper.domainToEntity(userLearningProgress);
 
-        UserEntity user = userJpaRepository.findById(userId)
-                .orElseThrow(() -> new ApplicationException(
-                        UserErrorCode.USER_NOT_FOUND,
-                        UserDetailMessageKey.USER_ID_NOT_FOUND,
-                        userId
-                ));
-
-        entity.setUser(user);
-
-        if (userLearningProgress.getFarthestAvailableNodeId() != null) {
-            entity.setFarthestAvailableNode(learningPathNodeJpaRepository
-                    .getReferenceById(userLearningProgress.getFarthestAvailableNodeId())
-            );
-        }
-
-        if (userLearningProgress.getLastLearningNodeId() != null) {
-            entity.setLastLearningNode(learningPathNodeJpaRepository
-                    .getReferenceById(userLearningProgress.getLastLearningNodeId())
-            );
-        }
-
-        UserLearningProgressEntity savedEntity = userLearningProgressJpaRepository.save(entity);
-
-        user.setUserLearningProgress(savedEntity);
-        userJpaRepository.save(user);
-
+        UserLearningProgressEntity savedEntity =
+                userLearningProgressJpaRepository.save(userLearningProgressEntity);
         return userLearningProgressEntityMapper.entityToDomain(savedEntity);
     }
 }

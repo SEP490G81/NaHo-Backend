@@ -35,12 +35,16 @@ public class PointHistoryController {
     public ResponseEntity<PointHistoryResponse> createPointHistory(
             @RequestBody PointHistoryRequest pointHistoryRequest
     ) {
-        PointHistoryCommand command = pointHistoryRequestMapper.requestToCommand(pointHistoryRequest);
-        PointHistoryResult result = crudPointHistoryInputPort.createPointHistory(command);
+        PointHistoryCommand command =
+                pointHistoryRequestMapper.requestToCommand(pointHistoryRequest);
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(pointHistoryResponseMapper.resultToResponse(result));
+        PointHistoryResult result =
+                crudPointHistoryInputPort.createPointHistory(command);
+
+        PointHistoryResponse response =
+                pointHistoryResponseMapper.resultToResponse(result);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @ApiResponseMessage(message = PointHistoryDetailMessageKey.POINT_HISTORY_GET_ALL_SUCCESS)
