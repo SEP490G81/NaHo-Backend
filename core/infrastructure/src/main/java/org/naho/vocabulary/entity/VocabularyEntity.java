@@ -28,7 +28,8 @@ public class VocabularyEntity extends BaseEntity {
 
     @Column(name = "japanese")
     String japanese;
-//sửa kana -> cách đọc, kanji -> japanese
+    //sửa kana -> cách đọc, kanji -> japanese
+
     @Column(name = "vietnamese_meaning_text")
     String vietnameseMeaningText;
 

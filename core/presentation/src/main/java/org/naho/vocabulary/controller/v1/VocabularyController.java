@@ -3,6 +3,7 @@ package org.naho.vocabulary.controller.v1;
 import lombok.RequiredArgsConstructor;
 import org.naho.i18n.message.question.VocabularyQuestionDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
+import org.naho.shared.exception.BaseException;
 import org.naho.vocabulary.dto.mapper.VocabularyObjectiveResponseMapper;
 import org.naho.vocabulary.dto.response.VocabulariesOfObjectiveResponse;
 import org.naho.vocabulary.port.in.ExportVocabularyInputPort;

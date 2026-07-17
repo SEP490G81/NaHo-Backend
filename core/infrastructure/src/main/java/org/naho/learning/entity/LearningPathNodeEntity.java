@@ -37,15 +37,15 @@ public class LearningPathNodeEntity extends BaseEntity {
     @JoinColumn(name = "objective_id", nullable = false)
     ObjectiveEntity objective;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "speaking_question_id")
     SpeakingQuestionEntity speakingQuestion;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "vocabulary_question_id")
     VocabularyQuestionEntity vocabularyQuestion;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "chest_id")
     ChestEntity chest;
 

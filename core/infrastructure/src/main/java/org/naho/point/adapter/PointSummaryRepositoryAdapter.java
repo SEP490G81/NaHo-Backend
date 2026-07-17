@@ -33,7 +33,8 @@ public class PointSummaryRepositoryAdapter implements PointSummaryRepositoryPort
                     .orElseThrow(() -> new ApplicationException(
                             PointSummaryErrorCode.POINT_SUMMARY_NOT_FOUND,
                             PointSummaryDetailMessageKey.POINT_SUMMARY_NOT_FOUND,
-                            pointSummary.getId()));
+                            pointSummary.getId()
+                    ));
             entity.setTotalPoint(pointSummary.getTotalPoint());
         } else {
             entity = pointSummaryEntityMapper.domainToEntity(pointSummary);

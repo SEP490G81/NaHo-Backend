@@ -6,16 +6,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.ThreadContext;
 import org.naho.i18n.MessageService;
-import org.naho.logging.ErrorLoggingKey;
-import org.naho.logging.HttpLoggingKey;
-import org.naho.shared.constant.ProblemDetailProperty;
 import org.naho.shared.exception.ErrorCode;
+import org.naho.shared.logging.ErrorLogContextWriter;
+import org.naho.shared.response.ProblemDetailResponse;
 import org.naho.user.exception.UserErrorCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ProblemDetail;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -40,24 +37,25 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
             AuthenticationException authException
     ) throws IOException, ServletException {
         ErrorCode errorCode = UserErrorCode.USER_UNAUTHORIZED;
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
+        String errorMessage = messageService.getMessage(authException.getMessage());
 
-        // create problem detail
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
+        ProblemDetailResponse problemDetailResponse = ProblemDetailResponse
+                .builder(status)
+                .type(errorCode.getTypeUri())
+                .title(messageService.getMessage(errorCode.getTitleKey()))
+                .detail(errorMessage)
+                .instance(URI.create(request.getRequestURI()))
+                .errorCode(errorCode.getCode())
+                .timestamp(Instant.now().toString())
+                .build();
 
-        // set default fields
-        problemDetail.setType(URI.create("https://naho.org/problem/authentication-error"));
-        problemDetail.setTitle(messageService.getMessage(errorCode.getTitleKey()));
-        problemDetail.setDetail(messageService.getMessage(authException.getMessage()));
-        problemDetail.setInstance(URI.create(request.getRequestURI()));
-
-        // set custom fields
-        problemDetail.setProperty(ProblemDetailProperty.ERROR_CODE, errorCode.getCode());
-        problemDetail.setProperty(ProblemDetailProperty.TRACE_ID, ThreadContext.get(ProblemDetailProperty.TRACE_ID));
-        problemDetail.setProperty(ProblemDetailProperty.TIMESTAMP, Instant.now().toString());
-        ThreadContext.put(HttpLoggingKey.HTTP_STATUS_CODE, String.valueOf(HttpStatus.UNAUTHORIZED.value()));
-        ThreadContext.put(ErrorLoggingKey.ERROR_CODE, errorCode.getCode());
-        ThreadContext.put(ErrorLoggingKey.ERROR_MESSAGE, authException.getMessage());
-        ThreadContext.put(ErrorLoggingKey.ERROR_TYPE, authException.getClass().getSimpleName());
+        ErrorLogContextWriter.builder()
+                .status(status)
+                .errorCode(errorCode)
+                .exception(authException)
+                .errorMessage(errorMessage)
+                .write();
 
         log.warn(messageService.getMessage(errorCode.getTitleKey()), authException);
 
@@ -65,6 +63,6 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.setContentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
-        objectMapper.writeValue(response.getOutputStream(), problemDetail);
+        objectMapper.writeValue(response.getOutputStream(), problemDetailResponse);
     }
 }

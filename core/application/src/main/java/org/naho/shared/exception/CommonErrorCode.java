@@ -13,6 +13,11 @@ public enum CommonErrorCode implements ErrorCode {
             "COMMON_A002",
             CommonTitleMessageKey.COMMON_CANNOT_READ_JSON_TITLE,
             500
+    ),
+    COMMON_INVALID_REQUEST(
+            "COMMON_A003",
+            CommonTitleMessageKey.COMMON_INVALID_REQUEST_TITLE,
+            400
     );
 
     private final String code;

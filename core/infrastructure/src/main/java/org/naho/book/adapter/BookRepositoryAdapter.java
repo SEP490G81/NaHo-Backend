@@ -31,9 +31,8 @@ public class BookRepositoryAdapter implements BookRepositoryPort {
     }
 
     @Override
-    public Optional<Book> findById(Long id) {
-        if (id == null) return Optional.empty();
-        return bookJpaRepository.findById(id)
+    public Optional<Book> findById(Long bookId) {
+        return bookJpaRepository.findById(bookId)
                 .map(bookEntityMapper::entityToDomain);
     }
 }

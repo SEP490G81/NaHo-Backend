@@ -2,6 +2,8 @@ package org.naho.vocabulary.adapter;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.naho.shared.exception.ApplicationException;
+import org.naho.vocabulary.exception.VocabularyErrorCode;
 import org.naho.vocabulary.model.Vocabulary;
 import org.naho.vocabulary.port.out.ExcelParserPort;
 import org.springframework.stereotype.Component;
@@ -84,8 +86,11 @@ public class ExcelParserAdapter implements ExcelParserPort {
         return switch (cell.getCellType()) {
             case NUMERIC -> (long) cell.getNumericCellValue();
             case STRING -> {
-                try { yield Long.parseLong(cell.getStringCellValue().trim()); }
-                catch (NumberFormatException e) { yield null; }
+                try {
+                    yield Long.parseLong(cell.getStringCellValue().trim());
+                } catch (NumberFormatException e) {
+                    yield null;
+                }
             }
             default -> null;
         };

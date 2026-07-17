@@ -1,6 +1,8 @@
 package org.naho.vocabulary.usecase;
 
 import org.naho.question.port.out.VocabulariesQuestionPort;
+import org.naho.shared.exception.ApplicationException;
+import org.naho.vocabulary.exception.VocabularyErrorCode;
 import org.naho.vocabulary.model.Vocabulary;
 import org.naho.vocabulary.port.in.ExportVocabularyInputPort;
 import org.naho.vocabulary.port.out.ExcelWriterPort;

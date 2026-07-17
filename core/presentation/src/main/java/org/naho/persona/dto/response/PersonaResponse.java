@@ -6,4 +6,5 @@ public record PersonaResponse(
         String prompt,
         Long avatarFileId,
         Long suggestedConversationStyleId
-) {}
+) {
+}

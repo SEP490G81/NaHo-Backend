@@ -8,14 +8,14 @@ import org.naho.book.port.in.GetObjectiveDetailInputPort;
 import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.book.result.ObjectiveDetailResult;
 import org.naho.i18n.message.book.ObjectiveDetailMessageKey;
-import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
-import org.naho.question.result.SpeakingQuestionListItemResult;
+import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
+import org.naho.learning.result.LearningPathNodeListItemResult;
 import org.naho.shared.exception.ApplicationException;
 
 @RequiredArgsConstructor
 public class GetObjectiveDetailUseCase implements GetObjectiveDetailInputPort {
     private final ObjectiveRepositoryPort objectiveRepositoryPort;
-    private final SpeakingQuestionRepositoryPort questionRepositoryPort;
+    private final LearningPathNodeRepositoryPort learningPathNodeRepositoryPort;
 
     @Override
     public ObjectiveDetailResult getObjectiveDetail(GetObjectiveDetailCommand command) {
@@ -25,17 +25,16 @@ public class GetObjectiveDetailUseCase implements GetObjectiveDetailInputPort {
                         ObjectiveDetailMessageKey.OBJECTIVE_ID_NOT_FOUND,
                         command.id()));
 
-        var questions = questionRepositoryPort.findByObjectiveId(command.id()).stream()
-                .map(question -> new SpeakingQuestionListItemResult(
-                        question.getId(),
-                        question.getUserId(),
-                        question.getQuestionAudioFileId(),
-                        question.getTitle(),
-                        question.getTitleMarkup(),
-                        question.getDescription(),
-                        question.getDescriptionMarkup(),
-                        question.getOrderIndex(),
-                        question.getStatus()
+        var nodes = learningPathNodeRepositoryPort.findByObjectiveId(command.id()).stream()
+                .map(node -> new LearningPathNodeListItemResult(
+                        node.getId(),
+                        node.getObjectiveId(),
+                        node.getSpeakingQuestionId(),
+                        node.getVocabularyQuestionId(),
+                        node.getChestId(),
+                        node.getGlobalOrderIndex(),
+                        node.getOrderIndex(),
+                        node.getNodeType()
                 ))
                 .toList();
 
@@ -47,7 +46,7 @@ public class GetObjectiveDetailUseCase implements GetObjectiveDetailInputPort {
                 objective.getJapaneseDescriptionMarkup(),
                 objective.getStatus(),
                 objective.getOrderIndex(),
-                questions
+                nodes
         );
     }
 }

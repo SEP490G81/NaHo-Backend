@@ -10,6 +10,7 @@ import org.naho.point.entity.PointHistoryEntity;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.user.entity.UserEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @SuperBuilder
@@ -54,8 +55,9 @@ public class TopicEntity extends BaseEntity {
     @JoinColumn(name = "user_id")
     UserEntity user;
 
+    @Builder.Default
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<LessonEntity> lessons;
+    List<LessonEntity> lessons = new ArrayList<>();
 
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
     List<PointHistoryEntity> pointHistories;

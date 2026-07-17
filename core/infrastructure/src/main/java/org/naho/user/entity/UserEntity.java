@@ -9,7 +9,7 @@ import org.naho.learning.entity.UserLearningProgressEntity;
 import org.naho.learning.entity.UserNodeProgressEntity;
 import org.naho.point.entity.PointHistoryEntity;
 import org.naho.point.entity.PointSummaryEntity;
-import org.naho.point.entity.UserSeasonPointEntity;
+import org.naho.season.entity.UserSeasonPointEntity;
 import org.naho.question.entity.SpeakingQuestionEntity;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.social.report.entity.ReportEntity;
