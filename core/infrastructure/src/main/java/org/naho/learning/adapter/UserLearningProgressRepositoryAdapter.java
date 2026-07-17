@@ -34,7 +34,8 @@ public class UserLearningProgressRepositoryAdapter implements UserLearningProgre
 
     @Override
     public UserLearningProgress save(UserLearningProgress userLearningProgress, Long userId) {
-        UserLearningProgressEntity entity = userLearningProgressEntityMapper.domainToEntity(userLearningProgress);
+        UserLearningProgressEntity entity =
+                userLearningProgressEntityMapper.domainToEntity(userLearningProgress);
 
         UserEntity user = userJpaRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(
@@ -46,10 +47,15 @@ public class UserLearningProgressRepositoryAdapter implements UserLearningProgre
         entity.setUser(user);
 
         if (userLearningProgress.getFarthestAvailableNodeId() != null) {
-            entity.setFarthestAvailableNode(learningPathNodeJpaRepository.getReferenceById(userLearningProgress.getFarthestAvailableNodeId()));
+            entity.setFarthestAvailableNode(learningPathNodeJpaRepository
+                    .getReferenceById(userLearningProgress.getFarthestAvailableNodeId())
+            );
         }
+
         if (userLearningProgress.getLastLearningNodeId() != null) {
-            entity.setLastLearningNode(learningPathNodeJpaRepository.getReferenceById(userLearningProgress.getLastLearningNodeId()));
+            entity.setLastLearningNode(learningPathNodeJpaRepository
+                    .getReferenceById(userLearningProgress.getLastLearningNodeId())
+            );
         }
 
         UserLearningProgressEntity savedEntity = userLearningProgressJpaRepository.save(entity);
