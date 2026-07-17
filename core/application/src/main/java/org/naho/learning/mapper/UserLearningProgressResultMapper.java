@@ -12,6 +12,7 @@ public class UserLearningProgressResultMapper {
                 .lastLearningAt(domain.getLastLearningAt())
                 .currentStreak(domain.getCurrentStreak())
                 .longestStreak(domain.getLongestStreak())
+                .totalPoint(domain.getTotalPoint())
                 .build();
     }
 }

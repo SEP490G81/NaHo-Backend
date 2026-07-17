@@ -1,17 +1,16 @@
 package org.naho.point.usecase;
 
-import org.naho.i18n.message.point.PointSummaryDetailMessageKey;
+import org.naho.learning.exception.UserLearningProgressErrorCode;
+import org.naho.learning.model.UserLearningProgress;
+import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
 import org.naho.pagination.PageData;
 import org.naho.point.command.PointHistoryCommand;
 import org.naho.point.command.PointHistoryQueryCommand;
-import org.naho.point.exception.PointSummaryErrorCode;
 import org.naho.point.mapper.PointHistoryCommandMapper;
 import org.naho.point.mapper.PointHistoryResultMapper;
 import org.naho.point.model.PointHistory;
-import org.naho.point.model.PointSummary;
 import org.naho.point.port.in.CrudPointHistoryInputPort;
 import org.naho.point.port.out.PointHistoryRepositoryPort;
-import org.naho.point.port.out.PointSummaryRepositoryPort;
 import org.naho.point.result.PointHistoryResult;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.TransactionPort;
@@ -22,7 +21,7 @@ public class CrudPointHistoryUseCase implements CrudPointHistoryInputPort {
     private final PointHistoryCommandMapper pointHistoryCommandMapper;
     private final PointHistoryResultMapper pointHistoryResultMapper;
     private final PointHistoryRepositoryPort pointHistoryRepositoryPort;
-    private final PointSummaryRepositoryPort pointSummaryRepositoryPort;
+    private final UserLearningProgressRepositoryPort userLearningProgressRepositoryPort;
     private final TransactionPort transactionPort;
 
     public CrudPointHistoryUseCase(
@@ -30,13 +29,13 @@ public class CrudPointHistoryUseCase implements CrudPointHistoryInputPort {
             PointHistoryResultMapper pointHistoryResultMapper,
             PointHistoryRepositoryPort pointHistoryRepositoryPort,
             TransactionPort transactionPort,
-            PointSummaryRepositoryPort pointSummaryRepositoryPort
+            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort
     ) {
         this.pointHistoryCommandMapper = pointHistoryCommandMapper;
         this.pointHistoryResultMapper = pointHistoryResultMapper;
         this.pointHistoryRepositoryPort = pointHistoryRepositoryPort;
         this.transactionPort = transactionPort;
-        this.pointSummaryRepositoryPort = pointSummaryRepositoryPort;
+        this.userLearningProgressRepositoryPort = userLearningProgressRepositoryPort;
     }
 
     @Override
@@ -61,17 +60,17 @@ public class CrudPointHistoryUseCase implements CrudPointHistoryInputPort {
     private PointHistoryResult doCreatePointHistory(PointHistoryCommand command) {
         Instant now = Instant.now();
 
-        // update point of history to point summary
-        PointSummary pointSummary = pointSummaryRepositoryPort.findByUserId(command.userId())
+        // update point of history to user learning progress
+        UserLearningProgress progress = userLearningProgressRepositoryPort.findUserLearningProgressByUserId(command.userId())
                 .orElseThrow(() -> new ApplicationException(
-                        PointSummaryErrorCode.POINT_SUMMARY_NOT_FOUND,
-                        PointSummaryDetailMessageKey.POINT_SUMMARY_NOT_FOUND_BY_USER_ID,
+                        UserLearningProgressErrorCode.USER_LEARNING_PROGRESS_NOT_FOUND,
+                        "user_learning_progress.not_found.by_user_id",
                         command.userId()
                 ));
 
-        pointSummary.addPoint(command.point());
+        progress.addPoint(command.point());
 
-        pointSummaryRepositoryPort.save(pointSummary);
+        userLearningProgressRepositoryPort.save(progress, command.userId());
 
         // create point history
         PointHistory pointHistory = pointHistoryCommandMapper.commandToDomain(command, now);

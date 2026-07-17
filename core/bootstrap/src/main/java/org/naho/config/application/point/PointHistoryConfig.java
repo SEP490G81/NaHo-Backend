@@ -1,9 +1,9 @@
 package org.naho.config.application.point;
 
+import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
 import org.naho.point.mapper.PointHistoryCommandMapper;
 import org.naho.point.mapper.PointHistoryResultMapper;
 import org.naho.point.port.out.PointHistoryRepositoryPort;
-import org.naho.point.port.out.PointSummaryRepositoryPort;
 import org.naho.point.usecase.CrudPointHistoryUseCase;
 import org.naho.shared.port.out.TransactionPort;
 import org.springframework.context.annotation.Bean;
@@ -27,15 +27,14 @@ public class PointHistoryConfig {
             PointHistoryResultMapper pointHistoryResultMapper,
             PointHistoryRepositoryPort pointHistoryRepositoryPort,
             TransactionPort transactionPort,
-            PointSummaryRepositoryPort pointSummaryRepositoryPort
+            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort
     ) {
         return new CrudPointHistoryUseCase(
                 pointHistoryCommandMapper,
                 pointHistoryResultMapper,
                 pointHistoryRepositoryPort,
                 transactionPort,
-                pointSummaryRepositoryPort
+                userLearningProgressRepositoryPort
         );
     }
-
 }

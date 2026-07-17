@@ -1,7 +1,7 @@
 package org.naho.book.repository;
 
 import org.naho.book.entity.TopicEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.naho.shared.persistence.BaseJpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface TopicJpaRepository extends JpaRepository<TopicEntity, Long> {
+public interface TopicJpaRepository extends BaseJpaRepository<TopicEntity> {
     boolean existsByJapaneseNameAndBookId(String japaneseName, Long bookId);
 
     boolean existsByJapaneseNameAndBookIdAndIdNot(String japaneseName, Long bookId, Long id);

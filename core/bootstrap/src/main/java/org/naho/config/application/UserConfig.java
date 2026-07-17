@@ -1,7 +1,6 @@
 package org.naho.config.application;
 
 import org.naho.file.port.in.CrudFileInputPort;
-import org.naho.point.port.in.CrudPointSummaryInputPort;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.user.mapper.OAuthProviderResultMapper;
 import org.naho.user.mapper.RoleResultMapper;
@@ -35,13 +34,11 @@ public class UserConfig {
     public UserResultMapper userResultMapper(
             CrudRoleInputPort crudRoleInputPort,
             CrudOAuthProviderInputPort crudOAuthProviderInputPort,
-            CrudPointSummaryInputPort crudPointSummaryInputPort,
             CrudFileInputPort crudFileInputPort
     ) {
         return new UserResultMapper(
                 crudRoleInputPort,
                 crudOAuthProviderInputPort,
-                crudPointSummaryInputPort,
                 crudFileInputPort
         );
     }

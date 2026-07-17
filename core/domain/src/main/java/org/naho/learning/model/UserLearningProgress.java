@@ -9,6 +9,7 @@ public class UserLearningProgress {
     private Instant lastLearningAt;
     private final Integer currentStreak;
     private final Integer longestStreak;
+    private Double totalPoint;
 
     private UserLearningProgress(Builder builder) {
         this.id = builder.id;
@@ -17,16 +18,18 @@ public class UserLearningProgress {
         this.lastLearningAt = builder.lastLearningAt;
         this.currentStreak = builder.currentStreak;
         this.longestStreak = builder.longestStreak;
+        this.totalPoint = builder.totalPoint;
     }
 
-    private UserLearningProgress(Long farthestAvailableNodeId, Integer currentStreak, Integer longestStreak) {
+    private UserLearningProgress(Long farthestAvailableNodeId, Integer currentStreak, Integer longestStreak, Double totalPoint) {
         this.farthestAvailableNodeId = farthestAvailableNodeId;
         this.currentStreak = currentStreak;
         this.longestStreak = longestStreak;
+        this.totalPoint = totalPoint;
     }
 
     public static UserLearningProgress init(Long farthestAvailableNodeId) {
-        return new UserLearningProgress(farthestAvailableNodeId, 0, 0);
+        return new UserLearningProgress(farthestAvailableNodeId, 0, 0, 0.0);
     }
 
     public static Builder builder() {
@@ -57,6 +60,21 @@ public class UserLearningProgress {
         return longestStreak;
     }
 
+    public Double getTotalPoint() {
+        return totalPoint;
+    }
+
+    public void setTotalPoint(Double totalPoint) {
+        this.totalPoint = totalPoint;
+    }
+
+    public void addPoint(Double point) {
+        if (this.totalPoint == null) {
+            this.totalPoint = 0.0;
+        }
+        this.totalPoint += point;
+    }
+
     public static final class Builder {
         private Long id;
         private Long farthestAvailableNodeId;
@@ -64,6 +82,7 @@ public class UserLearningProgress {
         private Instant lastLearningAt;
         private Integer currentStreak;
         private Integer longestStreak;
+        private Double totalPoint;
 
         private Builder() {
         }
@@ -95,6 +114,11 @@ public class UserLearningProgress {
 
         public Builder longestStreak(Integer longestStreak) {
             this.longestStreak = longestStreak;
+            return this;
+        }
+
+        public Builder totalPoint(Double totalPoint) {
+            this.totalPoint = totalPoint;
             return this;
         }
 

@@ -16,7 +16,6 @@ public class User {
     private final List<Long> userSessionIds;
     private final List<Long> oAuthProviderIds;
 
-    private final Long pointSummaryId;
     private final Long userLearningProgressId;
     private Long avatarFileId;
 
@@ -35,7 +34,6 @@ public class User {
         this.roleIds = builder.roleIds;
         this.userSessionIds = builder.userSessionIds;
         this.oAuthProviderIds = builder.oAuthProviderIds;
-        this.pointSummaryId = builder.pointSummaryId;
         this.userLearningProgressId = builder.userLearningProgressId;
         this.avatarFileId = builder.avatarFileId;
         this.username = builder.username;
@@ -71,7 +69,6 @@ public class User {
                 .id(id)
                 .roleIds(roleIds)
                 .userSessionIds(userSessionIds)
-                .pointSummaryId(pointSummaryId)
                 .userLearningProgressId(userLearningProgressId)
                 .avatarFileId(avatarFileId)
                 .username(username)
@@ -91,7 +88,6 @@ public class User {
         private List<Long> userSessionIds;
         private List<Long> oAuthProviderIds;
 
-        private Long pointSummaryId;
         private Long userLearningProgressId;
         private Long avatarFileId;
 
@@ -125,11 +121,6 @@ public class User {
 
         public Builder oAuthProviderIds(List<Long> oAuthProviderIds) {
             this.oAuthProviderIds = oAuthProviderIds;
-            return this;
-        }
-
-        public Builder pointSummaryId(Long pointSummaryId) {
-            this.pointSummaryId = pointSummaryId;
             return this;
         }
 
@@ -202,10 +193,6 @@ public class User {
 
     public List<Long> getOAuthProviderIds() {
         return oAuthProviderIds;
-    }
-
-    public Long getPointSummaryId() {
-        return pointSummaryId;
     }
 
     public Long getUserLearningProgressId() {

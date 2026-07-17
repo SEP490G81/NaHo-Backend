@@ -90,3 +90,6 @@ app:
   s3:
     bucket-name: naho-bucket
     region: ap-southeast-1
+
+  static-resources:
+    base-location: file:///D:/Ki_9/SEP490/Graduation_Project/code/sources/

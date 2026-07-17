@@ -6,6 +6,7 @@ import org.mapstruct.Named;
 import org.naho.user.entity.OAuthProviderEntity;
 import org.naho.user.entity.UserEntity;
 import org.naho.user.model.User;
+import org.naho.user.result.LeaderboardUserResult;
 
 import java.util.List;
 
@@ -18,7 +19,6 @@ import java.util.List;
 )
 public interface UserEntityMapper {
     @Mapping(target = "roleIds", source = "roles")
-    @Mapping(target = "pointSummaryId", source = "pointSummary.id")
     @Mapping(target = "userLearningProgressId", source = "userLearningProgress.id")
     @Mapping(target = "userSessionIds", ignore = true)
     @Mapping(target = "oAuthProviderIds", source = "OAuthProviders", qualifiedByName = "getOAuthProviderIds")
@@ -33,16 +33,24 @@ public interface UserEntityMapper {
     @Mapping(target = "modifiedTime", ignore = true)
     @Mapping(target = "reports", ignore = true)
     @Mapping(target = "pointHistories", ignore = true)
-    @Mapping(target = "pointSummary", ignore = true)
     @Mapping(target = "userNodeProgresses", ignore = true)
     @Mapping(target = "userLearningProgress", ignore = true)
-    @Mapping(target = "userSeasonPoints", ignore = true)
     @Mapping(target = "oAuthProviders", ignore = true)
     @Mapping(target = "avatar", ignore = true)
     UserEntity domainToEntity(User user);
 
+    @Mapping(target = "avatarObjectKey", source = "avatar.objectKey")
+    @Mapping(target = "oAuthAvatarUrl", source = "OAuthProviders", qualifiedByName = "getOAuthProviderAvatarUrls")
+    @Mapping(target = "totalPoint", source = "userLearningProgress.totalPoint")
+    LeaderboardUserResult entityToLeaderboardResult(UserEntity entity);
+
     @Named("getOAuthProviderIds")
     default List<Long> getOAuthProviderIds(List<OAuthProviderEntity> oAuthProviders) {
         return oAuthProviders.stream().map(OAuthProviderEntity::getId).toList();
+    }
+
+    @Named("getOAuthProviderAvatarUrls")
+    default List<String> getOAuthProviderAvatarUrl(List<OAuthProviderEntity> oAuthProviders) {
+        return oAuthProviders.stream().map(OAuthProviderEntity::getAvatarUrl).toList();
     }
 }

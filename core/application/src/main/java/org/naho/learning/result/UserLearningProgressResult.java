@@ -8,7 +8,8 @@ public record UserLearningProgressResult(
         Long lastLearningNodeId,
         Instant lastLearningAt,
         Integer currentStreak,
-        Integer longestStreak
+        Integer longestStreak,
+        Double totalPoint
 ) {
 
     public static Builder builder() {
@@ -22,6 +23,7 @@ public record UserLearningProgressResult(
         private Instant lastLearningAt;
         private Integer currentStreak;
         private Integer longestStreak;
+        private Double totalPoint;
 
         public Builder id(Long id) {
             this.id = id;
@@ -53,6 +55,11 @@ public record UserLearningProgressResult(
             return this;
         }
 
+        public Builder totalPoint(Double totalPoint) {
+            this.totalPoint = totalPoint;
+            return this;
+        }
+
         public UserLearningProgressResult build() {
             return new UserLearningProgressResult(
                     id,
@@ -60,7 +67,8 @@ public record UserLearningProgressResult(
                     lastLearningNodeId,
                     lastLearningAt,
                     currentStreak,
-                    longestStreak
+                    longestStreak,
+                    totalPoint
             );
         }
     }

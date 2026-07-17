@@ -2,7 +2,6 @@ package org.naho.user.dto.response;
 
 import lombok.Builder;
 import org.naho.file.result.FileResult;
-import org.naho.point.result.PointSummaryResult;
 import org.naho.user.result.OAuthProviderResult;
 import org.naho.user.result.RoleResult;
 import org.naho.user.type.Gender;
@@ -19,7 +18,6 @@ public record UserResponse(
         List<Long> userSessionIds,
         List<OAuthProviderResult> oAuthProviders,
 
-        PointSummaryResult pointSummary,
         Long userLearningProgressId,
         FileResult avatar,
 

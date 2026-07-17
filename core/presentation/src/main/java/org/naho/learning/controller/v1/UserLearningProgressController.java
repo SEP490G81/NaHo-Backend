@@ -1,11 +1,11 @@
 package org.naho.learning.controller.v1;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.i18n.message.learning.UserLearningProgressDetailMessageKey;
 import org.naho.learning.dto.mapper.UserLearningProgressResponseMapper;
 import org.naho.learning.dto.response.UserLearningProgressResponse;
 import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
 import org.naho.learning.result.UserLearningProgressResult;
-import org.naho.i18n.message.learning.UserLearningProgressDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.ResponseEntity;

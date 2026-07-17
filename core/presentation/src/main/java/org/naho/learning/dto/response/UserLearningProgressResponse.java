@@ -8,6 +8,7 @@ public record UserLearningProgressResponse(
         Long lastLearningNodeId,
         Instant lastLearningAt,
         Integer currentStreak,
-        Integer longestStreak
+        Integer longestStreak,
+        Double totalPoint
 ) {
 }

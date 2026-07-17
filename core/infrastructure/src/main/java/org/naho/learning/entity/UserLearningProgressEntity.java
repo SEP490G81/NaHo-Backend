@@ -29,6 +29,9 @@ public class UserLearningProgressEntity extends BaseEntity {
     @Column(name = "last_learning_at")
     Instant lastLearningAt;
 
+    @Column(name = "total_point", nullable = false)
+    Double totalPoint;
+
     @Column(name = "current_streak")
     Integer currentStreak;
 
