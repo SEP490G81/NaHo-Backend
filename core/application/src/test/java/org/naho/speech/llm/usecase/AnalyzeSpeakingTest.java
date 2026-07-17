@@ -7,6 +7,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.naho.book.model.Topic;
 import org.naho.book.port.out.TopicRepositoryPort;
+import org.naho.book.port.out.BookRepositoryPort;
+import org.naho.book.port.out.LessonRepositoryPort;
+import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.file.command.FileUploadCommand;
 import org.naho.file.port.in.FileStorageInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
@@ -71,6 +74,15 @@ class AnalyzeSpeakingTest {
 
         @Mock
         private FuriganaGenerationPort furiganaGenerarationPort;
+
+        @Mock
+        private BookRepositoryPort bookRepositoryPort;
+
+        @Mock
+        private LessonRepositoryPort lessonRepositoryPort;
+
+        @Mock
+        private ObjectiveRepositoryPort objectiveRepositoryPort;
 
         @InjectMocks
         private SpeakingAnalysisUseCase speakingAnalysisUseCase;

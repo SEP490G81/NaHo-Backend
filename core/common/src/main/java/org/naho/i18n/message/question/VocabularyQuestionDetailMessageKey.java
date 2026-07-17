@@ -7,6 +7,7 @@ public final class VocabularyQuestionDetailMessageKey {
     public static final String VOCABULARY_EXPORT_SUCCESS = "vocabulary.export.success.detail";
     public static final String VOCABULARY_NOT_FOUND = "vocabulary.not_found";
     public static final String VOCABULARY_OBJECTIVE_NOT_FOUND = "vocabulary.objective.not_found";
+    public static final String VOCABULARY_QUESTION_NOT_FOUND = "vocabulary_question.not.found";
 
     private VocabularyQuestionDetailMessageKey() {
     }
