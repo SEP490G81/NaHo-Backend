@@ -21,7 +21,7 @@ public class OAuthProviderRepositoryAdapter implements OAuthProviderRepositoryPo
     public List<OAuthProvider> findAllByUser_Id(Long userId) {
         List<OAuthProviderEntity> oAuthProviderEntityList =
                 oAuthProviderJpaRepository.findAllByUser_Id(userId);
-        
+
         return oAuthProviderEntityList.stream()
                 .map(oAuthProviderEntityMapper::entityToDomain)
                 .toList();

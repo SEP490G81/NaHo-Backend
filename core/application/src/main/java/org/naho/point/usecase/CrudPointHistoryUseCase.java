@@ -1,5 +1,6 @@
 package org.naho.point.usecase;
 
+import org.naho.i18n.message.learning.UserLearningProgressDetailMessageKey;
 import org.naho.learning.exception.UserLearningProgressErrorCode;
 import org.naho.learning.model.UserLearningProgress;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
@@ -14,8 +15,6 @@ import org.naho.point.port.out.PointHistoryRepositoryPort;
 import org.naho.point.result.PointHistoryResult;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.TransactionPort;
-
-import java.time.Instant;
 
 public class CrudPointHistoryUseCase implements CrudPointHistoryInputPort {
     private final PointHistoryCommandMapper pointHistoryCommandMapper;
@@ -43,6 +42,26 @@ public class CrudPointHistoryUseCase implements CrudPointHistoryInputPort {
         return transactionPort.execute(() -> doCreatePointHistory(command));
     }
 
+    private PointHistoryResult doCreatePointHistory(PointHistoryCommand command) {
+        UserLearningProgress progress = userLearningProgressRepositoryPort
+                .findUserLearningProgressByUserId(command.userId())
+                .orElseThrow(() -> new ApplicationException(
+                        UserLearningProgressErrorCode.USER_LEARNING_PROGRESS_NOT_FOUND,
+                        UserLearningProgressDetailMessageKey.USER_LEARNING_PROGRESS_NOT_FOUND_BY_USER_ID,
+                        command.userId()
+                ));
+
+        progress.addPoint(command.point());
+
+        userLearningProgressRepositoryPort.save(progress);
+
+        PointHistory pointHistory = pointHistoryCommandMapper.commandToDomain(command);
+
+        PointHistory savedPointHistory = pointHistoryRepositoryPort.save(pointHistory);
+
+        return pointHistoryResultMapper.domainToResult(savedPointHistory);
+    }
+
     @Override
     public PageData<PointHistoryResult> findAllByUserId(PointHistoryQueryCommand command, Long userId) {
         PageData<PointHistory> pageData = pointHistoryRepositoryPort.findAllByUserId(command, userId);
@@ -55,28 +74,5 @@ public class CrudPointHistoryUseCase implements CrudPointHistoryInputPort {
                         .toList()
                 )
                 .build();
-    }
-
-    private PointHistoryResult doCreatePointHistory(PointHistoryCommand command) {
-        Instant now = Instant.now();
-
-        // update point of history to user learning progress
-        UserLearningProgress progress = userLearningProgressRepositoryPort.findUserLearningProgressByUserId(command.userId())
-                .orElseThrow(() -> new ApplicationException(
-                        UserLearningProgressErrorCode.USER_LEARNING_PROGRESS_NOT_FOUND,
-                        "user_learning_progress.not_found.by_user_id",
-                        command.userId()
-                ));
-
-        progress.addPoint(command.point());
-
-        userLearningProgressRepositoryPort.save(progress, command.userId());
-
-        // create point history
-        PointHistory pointHistory = pointHistoryCommandMapper.commandToDomain(command, now);
-
-        PointHistory savedPointHistory = pointHistoryRepositoryPort.save(pointHistory);
-
-        return pointHistoryResultMapper.domainToResult(savedPointHistory);
     }
 }

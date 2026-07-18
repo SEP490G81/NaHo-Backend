@@ -4,12 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.naho.i18n.message.question.VocabularyQuestionDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.shared.exception.BaseException;
+import org.naho.shared.exception.PresentationException;
 import org.naho.vocabulary.dto.mapper.VocabularyObjectiveResponseMapper;
 import org.naho.vocabulary.dto.response.VocabulariesOfObjectiveResponse;
+import org.naho.vocabulary.exception.VocabularyErrorCode;
 import org.naho.vocabulary.port.in.ExportVocabularyInputPort;
 import org.naho.vocabulary.port.in.GetVocabulariesOfObjectiveInputPort;
+import org.naho.vocabulary.port.in.ImportVocabularyPort;
 import org.naho.vocabulary.result.VocabulariesOfObjectiveResult;
-import org.naho.vocabulary.usecase.ImportVocabularyUseCase;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +25,7 @@ import java.io.ByteArrayInputStream;
 @RequiredArgsConstructor
 public class VocabularyController {
 
-    private final ImportVocabularyUseCase importVocabularyUseCase;
+    private final ImportVocabularyPort importVocabularyPort;
     private final GetVocabulariesOfObjectiveInputPort getVocabulariesOfObjectiveInputPort;
     private final VocabularyObjectiveResponseMapper vocabularyObjectiveResponseMapper;
     private final ExportVocabularyInputPort exportVocabularyInputPort;
@@ -33,13 +35,14 @@ public class VocabularyController {
     @ApiResponseMessage(message = VocabularyQuestionDetailMessageKey.VOCABULARY_IMPORT_SUCCESS)
     public ResponseEntity<Void> importVocabulary(@RequestPart("file") MultipartFile file) {
         try {
-            importVocabularyUseCase.importVocabulary(file.getInputStream());
+            importVocabularyPort.importVocabulary(file.getInputStream());
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            if (e instanceof BaseException) {
-                throw (BaseException) e;
-            }
-            throw new RuntimeException("Failed to import vocabulary: " + e.getMessage(), e);
+            throw new PresentationException(
+                    VocabularyErrorCode.VOCABULARY_IMPORT_INVALID_FILE,
+                    VocabularyQuestionDetailMessageKey.VOCABULARY_IMPORT_INVALID_FILE,
+                    e.getMessage()
+            );
         }
     }
 

@@ -17,10 +17,9 @@ public class User {
     private final List<Long> oAuthProviderIds;
 
     private final Long userLearningProgressId;
-    private Long avatarFileId;
-
     private final Username username;
     private final Email email;
+    private Long avatarFileId;
     private String hashPassword;
     private String fullName;
     private Gender gender;
@@ -56,12 +55,12 @@ public class User {
                 .build();
     }
 
-    public boolean isActive() {
-        return status == UserStatus.ACTIVE;
-    }
-
     public static Builder builder() {
         return new Builder();
+    }
+
+    public boolean isActive() {
+        return status == UserStatus.ACTIVE;
     }
 
     public Builder toBuilder() {
@@ -79,6 +78,90 @@ public class User {
                 .dob(dob)
                 .jlptLevel(jlptLevel)
                 .status(status);
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public List<Long> getRoleIds() {
+        return roleIds;
+    }
+
+    public List<Long> getUserSessionIds() {
+        return userSessionIds;
+    }
+
+    public List<Long> getOAuthProviderIds() {
+        return oAuthProviderIds;
+    }
+
+    public Long getUserLearningProgressId() {
+        return userLearningProgressId;
+    }
+
+    public Long getAvatarFileId() {
+        return avatarFileId;
+    }
+
+    public void setAvatarFileId(Long avatarFileId) {
+        this.avatarFileId = avatarFileId;
+    }
+
+    public Username getUsername() {
+        return username;
+    }
+
+    public Email getEmail() {
+        return email;
+    }
+
+    public String getHashPassword() {
+        return hashPassword;
+    }
+
+    public void setHashPassword(String hashPassword) {
+        this.hashPassword = hashPassword;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public Dob getDob() {
+        return dob;
+    }
+
+    public void setDob(Dob dob) {
+        this.dob = dob;
+    }
+
+    public JLPTLevel getJlptLevel() {
+        return jlptLevel;
+    }
+
+    public void setJlptLevel(JLPTLevel jlptLevel) {
+        this.jlptLevel = jlptLevel;
+    }
+
+    public UserStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(UserStatus status) {
+        this.status = status;
     }
 
     public static final class Builder {
@@ -177,89 +260,5 @@ public class User {
         public User build() {
             return new User(this);
         }
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public List<Long> getRoleIds() {
-        return roleIds;
-    }
-
-    public List<Long> getUserSessionIds() {
-        return userSessionIds;
-    }
-
-    public List<Long> getOAuthProviderIds() {
-        return oAuthProviderIds;
-    }
-
-    public Long getUserLearningProgressId() {
-        return userLearningProgressId;
-    }
-
-    public Long getAvatarFileId() {
-        return avatarFileId;
-    }
-
-    public void setAvatarFileId(Long avatarFileId) {
-        this.avatarFileId = avatarFileId;
-    }
-
-    public Username getUsername() {
-        return username;
-    }
-
-    public Email getEmail() {
-        return email;
-    }
-
-    public String getHashPassword() {
-        return hashPassword;
-    }
-
-    public void setHashPassword(String hashPassword) {
-        this.hashPassword = hashPassword;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
-    public Dob getDob() {
-        return dob;
-    }
-
-    public void setDob(Dob dob) {
-        this.dob = dob;
-    }
-
-    public JLPTLevel getJlptLevel() {
-        return jlptLevel;
-    }
-
-    public void setJlptLevel(JLPTLevel jlptLevel) {
-        this.jlptLevel = jlptLevel;
-    }
-
-    public UserStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(UserStatus status) {
-        this.status = status;
     }
 }

@@ -8,14 +8,14 @@ import org.naho.shared.exception.DomainException;
 public class Objective {
     private final Long id;
     private final Long lessonId;
+    private final Double firstNodeGlobalOrderIndex;
+    private final Double lastNodeGlobalOrderIndex;
     private String japaneseName;
     private String japaneseDescription;
     private String japaneseNameMarkup;
     private String japaneseDescriptionMarkup;
     private TopicStatus status;
     private Double orderIndex;
-    private final Double firstNodeGlobalOrderIndex;
-    private final Double lastNodeGlobalOrderIndex;
 
     private Objective(Builder builder) {
         this.id = builder.id;

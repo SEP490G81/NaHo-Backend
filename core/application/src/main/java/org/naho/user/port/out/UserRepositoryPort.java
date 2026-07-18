@@ -32,4 +32,6 @@ public interface UserRepositoryPort {
     List<User> findByFilters(String userNameOrMail, String role, String status, String jlptLevel);
 
     List<LeaderboardUserResult> findTop10OrderByTotalPointInLeague(Long leagueId);
+
+    Optional<LeaderboardUserResult> findTopOfUserByUserId(Long userId);
 }

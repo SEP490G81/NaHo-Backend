@@ -11,5 +11,5 @@ public interface LeagueRepositoryPort {
 
     Map<Long, File> findAllByLeagueId(List<Long> leagueIds);
 
-    
+
 }

@@ -1,17 +1,16 @@
 package org.naho.config.application;
 
 import org.naho.question.port.in.SearchVocabulariesOfQuestionInputPort;
-import org.naho.question.port.out.SaveGrammarPort;
 import org.naho.question.port.out.VocabulariesQuestionPort;
 import org.naho.question.usecase.SearchVocabulariesOfQuestionUsecase;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.vocabulary.port.in.ExportVocabularyInputPort;
 import org.naho.vocabulary.port.in.GetVocabulariesOfObjectiveInputPort;
-import org.naho.vocabulary.port.out.ExcelParserPort;
+import org.naho.vocabulary.port.in.ImportVocabularyPort;
 import org.naho.vocabulary.port.out.ExcelWriterPort;
 import org.naho.vocabulary.port.out.SaveVocabularyPort;
+import org.naho.vocabulary.port.out.VocabularyExcelParserPort;
 import org.naho.vocabulary.port.out.VocabularyPort;
-import org.naho.vocabulary.service.ImportVocabularyService;
 import org.naho.vocabulary.usecase.ExportVocabularyUseCase;
 import org.naho.vocabulary.usecase.GetVocabulariesOfObjectiveUseCase;
 import org.naho.vocabulary.usecase.ImportVocabularyUseCase;
@@ -22,23 +21,26 @@ import org.springframework.context.annotation.Configuration;
 public class VocabularyConfig {
 
     @Bean
-    public ImportVocabularyUseCase importVocabularyUseCase(
-            ExcelParserPort excelParserPort,
+    public ImportVocabularyPort importVocabularyUseCase(
+            VocabularyExcelParserPort vocabularyExcelParserPort,
             SaveVocabularyPort saveVocabularyPort,
-            SaveGrammarPort saveGrammarPort,
-            TransactionPort transactionPort) {
-        return new ImportVocabularyService(excelParserPort, saveVocabularyPort, saveGrammarPort, transactionPort);
+            TransactionPort transactionPort
+    ) {
+        return new ImportVocabularyUseCase(vocabularyExcelParserPort, saveVocabularyPort, transactionPort);
     }
+
 
     @Bean
     public GetVocabulariesOfObjectiveInputPort getVocabulariesOfObjectiveInputPort(
-            VocabulariesQuestionPort vocabulariesQuestionPort) {
+            VocabulariesQuestionPort vocabulariesQuestionPort
+    ) {
         return new GetVocabulariesOfObjectiveUseCase(vocabulariesQuestionPort);
     }
 
     @Bean
     public SearchVocabulariesOfQuestionInputPort searchVocabulariesOfQuestionInputPort(
-            VocabularyPort vocabularyPort) {
+            VocabularyPort vocabularyPort
+    ) {
         return new SearchVocabulariesOfQuestionUsecase(vocabularyPort);
     }
 
@@ -46,7 +48,9 @@ public class VocabularyConfig {
     public ExportVocabularyInputPort exportVocabularyInputPort(
             VocabularyPort vocabularyPort,
             VocabulariesQuestionPort vocabulariesQuestionPort,
-            ExcelWriterPort excelWriterPort) {
+            ExcelWriterPort excelWriterPort
+    ) {
         return new ExportVocabularyUseCase(vocabularyPort, vocabulariesQuestionPort, excelWriterPort);
     }
 }
+

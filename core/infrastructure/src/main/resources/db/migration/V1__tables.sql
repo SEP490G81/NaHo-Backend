@@ -92,9 +92,10 @@ CREATE TABLE grammars
     id                      BIGINT AUTO_INCREMENT NOT NULL,
     created_time            datetime(6)           NOT NULL,
     modified_time           datetime(6)           NULL,
+    reading                 VARCHAR(255)          NULL,
+    japanese                VARCHAR(255)          NULL,
     vietnamese_meaning_text TEXT                  NULL,
     english_meaning_text    TEXT                  NULL,
-    explanation             MEDIUMTEXT            NULL,
     CONSTRAINT pk_grammars PRIMARY KEY (id)
 );
 
@@ -272,14 +273,22 @@ CREATE TABLE speaking_questions
 
 CREATE TABLE speaking_questions_grammars
 (
-    grammar_id           BIGINT NOT NULL,
-    speaking_question_id BIGINT NOT NULL
+    id                   BIGINT AUTO_INCREMENT NOT NULL,
+    created_time         datetime(6)           NOT NULL,
+    modified_time        datetime(6)           NULL,
+    speaking_question_id BIGINT                NOT NULL,
+    grammar_id           BIGINT                NOT NULL,
+    CONSTRAINT pk_speaking_questions_grammars PRIMARY KEY (id)
 );
 
 CREATE TABLE speaking_questions_vocabularies
 (
-    speaking_question_id BIGINT NOT NULL,
-    vocabulary_id        BIGINT NOT NULL
+    id                   BIGINT AUTO_INCREMENT NOT NULL,
+    created_time         datetime(6)           NOT NULL,
+    modified_time        datetime(6)           NULL,
+    speaking_question_id BIGINT                NOT NULL,
+    vocabulary_id        BIGINT                NOT NULL,
+    CONSTRAINT pk_speaking_questions_vocabularies PRIMARY KEY (id)
 );
 
 CREATE TABLE speech_assessments
@@ -579,11 +588,23 @@ ALTER TABLE reports
 ALTER TABLE reports
     ADD CONSTRAINT FK_REPORTS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
+ALTER TABLE speaking_questions_grammars
+    ADD CONSTRAINT FK_SPEAKING_QUESTIONS_GRAMMARS_ON_GRAMMAR FOREIGN KEY (grammar_id) REFERENCES grammars (id);
+
+ALTER TABLE speaking_questions_grammars
+    ADD CONSTRAINT FK_SPEAKING_QUESTIONS_GRAMMARS_ON_SPEAKING_QUESTION FOREIGN KEY (speaking_question_id) REFERENCES speaking_questions (id);
+
 ALTER TABLE speaking_questions
     ADD CONSTRAINT FK_SPEAKING_QUESTIONS_ON_QUESTION_AUDIO_FILE FOREIGN KEY (question_audio_file_id) REFERENCES files (id);
 
 ALTER TABLE speaking_questions
     ADD CONSTRAINT FK_SPEAKING_QUESTIONS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+
+ALTER TABLE speaking_questions_vocabularies
+    ADD CONSTRAINT FK_SPEAKING_QUESTIONS_VOCABULARIES_ON_SPEAKING_QUESTION FOREIGN KEY (speaking_question_id) REFERENCES speaking_questions (id);
+
+ALTER TABLE speaking_questions_vocabularies
+    ADD CONSTRAINT FK_SPEAKING_QUESTIONS_VOCABULARIES_ON_VOCABULARY FOREIGN KEY (vocabulary_id) REFERENCES vocabularies (id);
 
 ALTER TABLE speech_assessments
     ADD CONSTRAINT FK_SPEECH_ASSESSMENTS_ON_ANSWER_HISTORY FOREIGN KEY (answer_history_id) REFERENCES answer_histories (id);
@@ -626,18 +647,6 @@ ALTER TABLE roles_permissions
 
 ALTER TABLE roles_permissions
     ADD CONSTRAINT fk_rolper_on_role_entity FOREIGN KEY (role_id) REFERENCES roles (id);
-
-ALTER TABLE speaking_questions_grammars
-    ADD CONSTRAINT fk_spequegra_on_grammar_entity FOREIGN KEY (grammar_id) REFERENCES grammars (id);
-
-ALTER TABLE speaking_questions_grammars
-    ADD CONSTRAINT fk_spequegra_on_speaking_question_entity FOREIGN KEY (speaking_question_id) REFERENCES speaking_questions (id);
-
-ALTER TABLE speaking_questions_vocabularies
-    ADD CONSTRAINT fk_spequevoc_on_speaking_question_entity FOREIGN KEY (speaking_question_id) REFERENCES speaking_questions (id);
-
-ALTER TABLE speaking_questions_vocabularies
-    ADD CONSTRAINT fk_spequevoc_on_vocabulary_entity FOREIGN KEY (vocabulary_id) REFERENCES vocabularies (id);
 
 ALTER TABLE users_roles
     ADD CONSTRAINT fk_userol_on_role_entity FOREIGN KEY (role_id) REFERENCES roles (id);

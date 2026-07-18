@@ -9,12 +9,14 @@ import org.naho.shared.exception.BootstrapException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
 
+@Order(3)
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -33,7 +35,7 @@ public class BookDataInitializer implements ApplicationRunner {
             log.info("Book Data existed!");
         } else {
             try (InputStream inputStream = resourceLoader
-                    .getResource(staticResourcesBaseLocation + "books/data.xlsx")
+                    .getResource(staticResourcesBaseLocation + "books/book_data.xlsx")
                     .getInputStream()) {
 
                 log.info("Initializing Book Data...");

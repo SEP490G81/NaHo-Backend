@@ -11,63 +11,118 @@
           and o.provider_name = #{providerName}
     </select>
 
-    <resultMap id="LeaderboardUserResultMap" type="org.naho.user.entity.UserEntity">
-        <!-- ================= User ================= -->
+    <resultMap id="LeaderboardUserResultMap" type="org.naho.user.result.LeaderboardUserResult">
         <id property="id" column="user_id"/>
+        <result property="leagueId" column="league_id"/>
+        <result property="rank" column="position"/>
         <result property="username" column="username"/>
         <result property="email" column="email"/>
         <result property="fullName" column="full_name"/>
-        <!-- ================= Avatar ================= -->
-        <association property="avatar" javaType="org.naho.file.entity.FileEntity">
-            <id property="id" column="avatar_file_id"/>
-            <result property="objectKey" column="object_key"/>
-        </association>
-        <!-- ================= Learning Progress ================= -->
-        <association property="userLearningProgress" javaType="org.naho.learning.entity.UserLearningProgressEntity">
-            <id property="id" column="user_learning_progress_id"/>
-            <result property="totalPoint" column="total_point"/>
-        </association>
-        <!-- ================= OAuth Providers ================= -->
-        <collection property="oAuthProviders" ofType="org.naho.user.entity.OAuthProviderEntity">
-            <id property="id" column="o_auth_provider_id"/>
-            <result property="avatarUrl" column="avatar_url"/>
+        <result property="avatarObjectKey" column="object_key"/>
+        <result property="totalPoint" column="total_point"/>
+
+        <collection
+                property="oAuthAvatarUrl"
+                javaType="java.util.ArrayList"
+                ofType="java.lang.String"
+        >
+            <result column="avatar_url"/>
         </collection>
     </resultMap>
 
     <select id="findTop10OrderByTotalPointInLeague" resultMap="LeaderboardUserResultMap">
         <![CDATA[
-        select
-            -- user info
-            u.id   as user_id,
-            u.username,
-            u.email,
-            u.full_name,
+        SELECT leaderboard.user_id,
+               leaderboard.league_id,
+               leaderboard.position,
+               leaderboard.username,
+               leaderboard.email,
+               leaderboard.full_name,
 
-            -- avatar file info
-            f.id   as avatar_file_id,
-            f.object_key,
+               leaderboard.object_key,
 
-            -- user learning progress info
-            ulp.id as user_learning_progress_id,
-            ulp.total_point,
+               leaderboard.total_point,
+               oap.avatar_url
+        FROM (SELECT ROW_NUMBER() OVER (
+            ORDER BY
+                ulp.total_point DESC,
+                ulp.modified_time IS NULL,
+                ulp.modified_time DESC,
+                ulp.created_time DESC
+            )             AS position,
+                     u.id AS user_id,
+                     l.id AS league_id,
+                     u.username,
+                     u.email,
+                     u.full_name,
+                     f.object_key,
+                     ulp.total_point
+              FROM users u
+                       JOIN user_learning_progresses ulp
+                            ON u.user_learning_progress_id = ulp.id
+                       LEFT JOIN files f
+                                 ON u.avatar_file_id = f.id
+                       JOIN leagues l
+                            ON l.id = #{leagueId}
 
-            -- oAuthProvider info
-            oap.id as o_auth_provider_id,
-            oap.avatar_url
-        from users u
-                 join user_learning_progresses ulp
-                      on u.user_learning_progress_id = ulp.id
-                 left join files f
-                           on u.avatar_file_id = f.id
-                 left join o_auth_providers oap
-                           on u.id = oap.user_id
-                 join leagues l
-                      on l.id = #{leagueId}
-        where u.status = 'ACTIVE'
-          and ulp.total_point >= l.min_point
-          and (l.max_point is null or ulp.total_point <= l.max_point)
-        order by ulp.total_point desc
-        limit 10
+              WHERE u.status = 'ACTIVE'
+                AND ulp.total_point >= l.min_point
+                AND (
+                  l.max_point IS NULL
+                      OR ulp.total_point <= l.max_point
+                  )) leaderboard
+                 LEFT JOIN o_auth_providers oap
+                           ON leaderboard.user_id = oap.user_id
+        where leaderboard.position <= 10
+        ORDER BY leaderboard.position
+        ]]>
+    </select>
+
+    <select id="findTopOfUserByUserId" resultMap="LeaderboardUserResultMap">
+        <![CDATA[
+        WITH `user_current_league` AS
+                 (SELECT l.id AS league_id,
+                         l.min_point,
+                         l.max_point
+                  FROM users u
+                           JOIN user_learning_progresses ulp
+                                ON u.user_learning_progress_id = ulp.id
+                           JOIN leagues l
+                                ON l.min_point <= ulp.total_point
+                                    AND (l.max_point IS NULL OR l.max_point >= ulp.total_point)
+                  WHERE u.status = 'ACTIVE'
+                    AND u.id = #{userId}),
+             leaderboard AS
+                 (SELECT ROW_NUMBER() OVER (
+                     ORDER BY
+                         ulp.total_point DESC,
+                         ulp.modified_time IS NULL,
+                         ulp.modified_time DESC,
+                         ulp.created_time DESC
+                     )        AS position,
+                         u.id AS user_id,
+                         `user_current_league`.league_id,
+                         u.username,
+                         u.email,
+                         u.full_name,
+                         f.object_key,
+                         ulp.total_point
+                  FROM users u
+                           JOIN user_learning_progresses ulp
+                                ON u.user_learning_progress_id = ulp.id
+                           LEFT JOIN files f
+                                     ON u.avatar_file_id = f.id
+                           CROSS JOIN `user_current_league`
+                  WHERE u.status = 'ACTIVE'
+                    AND ulp.total_point >= `user_current_league`.min_point
+                    AND (`user_current_league`.max_point IS NULL
+                      OR ulp.total_point <= `user_current_league`.max_point))
+        SELECT leaderboard.*,
+               oap.avatar_url
+        FROM leaderboard
+                 LEFT JOIN o_auth_providers oap
+                           ON leaderboard.user_id = oap.user_id
+        WHERE leaderboard.user_id = #{userId}
         ]]>
     </select>
 </mapper>

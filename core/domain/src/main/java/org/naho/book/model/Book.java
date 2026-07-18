@@ -12,11 +12,11 @@ public class Book {
     private final Long coverImageFileId;
     private final JLPTLevel jlptLevel;
     private final CefrLevel cefrLevel;
-    private String title;
-    private String description;
     private final Double orderIndex;
     private final Double firstNodeGlobalOrderIndex;
     private final Double lastNodeGlobalOrderIndex;
+    private String title;
+    private String description;
 
     private Book(Builder builder) {
         this.id = builder.id;

@@ -6,7 +6,6 @@ import org.mapstruct.Named;
 import org.naho.user.entity.OAuthProviderEntity;
 import org.naho.user.entity.UserEntity;
 import org.naho.user.model.User;
-import org.naho.user.result.LeaderboardUserResult;
 
 import java.util.List;
 
@@ -38,11 +37,6 @@ public interface UserEntityMapper {
     @Mapping(target = "oAuthProviders", ignore = true)
     @Mapping(target = "avatar", ignore = true)
     UserEntity domainToEntity(User user);
-
-    @Mapping(target = "avatarObjectKey", source = "avatar.objectKey")
-    @Mapping(target = "oAuthAvatarUrl", source = "OAuthProviders", qualifiedByName = "getOAuthProviderAvatarUrls")
-    @Mapping(target = "totalPoint", source = "userLearningProgress.totalPoint")
-    LeaderboardUserResult entityToLeaderboardResult(UserEntity entity);
 
     @Named("getOAuthProviderIds")
     default List<Long> getOAuthProviderIds(List<OAuthProviderEntity> oAuthProviders) {
