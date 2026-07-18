@@ -9,4 +9,6 @@ public interface CrudLeagueInputPort {
     List<LeagueResult> findAll();
 
     List<LeaderboardUserResult> findTop10OrderByTotalPointInLeague(Long leagueId);
+
+    LeaderboardUserResult findTopOfUserByUserId(Long userId);
 }

@@ -134,12 +134,12 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
     @Override
     public List<LeaderboardUserResult> findTop10OrderByTotalPointInLeague(Long leagueId) {
-        List<UserEntity> userEntityList =
-                userQueryMapper.findTop10OrderByTotalPointInLeague(leagueId);
+        return userQueryMapper.findTop10OrderByTotalPointInLeague(leagueId);
+    }
 
-        return userEntityList.stream()
-                .map(userEntityMapper::entityToLeaderboardResult)
-                .toList();
+    @Override
+    public Optional<LeaderboardUserResult> findTopOfUserByUserId(Long userId) {
+        return userQueryMapper.findTopOfUserByUserId(userId);
     }
 
     @Override

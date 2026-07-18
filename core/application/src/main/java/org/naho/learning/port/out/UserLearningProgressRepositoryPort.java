@@ -7,5 +7,7 @@ import java.util.Optional;
 public interface UserLearningProgressRepositoryPort {
     Optional<UserLearningProgress> findUserLearningProgressByUserId(Long userId);
 
-    UserLearningProgress save(UserLearningProgress userLearningProgress, Long userId);
+    UserLearningProgress save(UserLearningProgress userLearningProgress);
+
+    UserLearningProgress createNew(UserLearningProgress userLearningProgress, Long userId);
 }

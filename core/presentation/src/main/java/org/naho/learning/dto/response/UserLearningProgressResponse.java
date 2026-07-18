@@ -1,5 +1,7 @@
 package org.naho.learning.dto.response;
 
+import org.naho.user.dto.response.LeaderboardUserResponse;
+
 import java.time.Instant;
 
 public record UserLearningProgressResponse(
@@ -9,6 +11,7 @@ public record UserLearningProgressResponse(
         Instant lastLearningAt,
         Integer currentStreak,
         Integer longestStreak,
-        Double totalPoint
+        Double totalPoint,
+        LeaderboardUserResponse leaderboardUser
 ) {
 }
