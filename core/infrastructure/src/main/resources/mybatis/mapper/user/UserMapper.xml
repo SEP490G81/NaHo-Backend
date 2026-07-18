@@ -36,38 +36,49 @@
 
     <select id="findTop10OrderByTotalPointInLeague" resultMap="LeaderboardUserResultMap">
         <![CDATA[
-        select
-            -- user info
-            u.id   as user_id,
-            u.username,
-            u.email,
-            u.full_name,
+        SELECT *
+        FROM (SELECT ROW_NUMBER() OVER (
+            ORDER BY
+                ulp.total_point DESC,
+                ulp.modified_time IS NULL,
+                ulp.modified_time DESC,
+                ulp.created_time DESC
+            ) AS rank,
 
-            -- avatar file info
-            f.id   as avatar_file_id,
-            f.object_key,
+        -- user info
+        u.id AS user_id,
+        u.username,
+        u.email,
+        u.full_name,
 
-            -- user learning progress info
-            ulp.id as user_learning_progress_id,
-            ulp.total_point,
+        -- avatar
+        f.id AS avatar_file_id,
+        f.object_key,
 
-            -- oAuthProvider info
-            oap.id as o_auth_provider_id,
-            oap.avatar_url
-        from users u
-                 join user_learning_progresses ulp
-                      on u.user_learning_progress_id = ulp.id
-                 left join files f
-                           on u.avatar_file_id = f.id
-                 left join o_auth_providers oap
-                           on u.id = oap.user_id
-                 join leagues l
-                      on l.id = #{leagueId}
-        where u.status = 'ACTIVE'
-          and ulp.total_point >= l.min_point
-          and (l.max_point is null or ulp.total_point <= l.max_point)
-        order by ulp.total_point desc
-        limit 10
+        -- learning progress
+        ulp.id AS user_learning_progress_id,
+        ulp.total_point,
+
+        -- oauth
+        oap.id AS o_auth_provider_id,
+        oap.avatar_url
+
+              FROM users u
+                  JOIN user_learning_progresses ulp
+              ON u.user_learning_progress_id = ulp.id
+                  LEFT JOIN files f
+                  ON u.avatar_file_id = f.id
+                  LEFT JOIN o_auth_providers oap
+                  ON u.id = oap.user_id
+                  JOIN leagues l
+                  ON l.id = #{leagueId}
+
+              WHERE u.status = 'ACTIVE'
+                AND ulp.total_point >= l.min_point
+                AND (l.max_point IS NULL
+                 OR ulp.total_point <= l.max_point)) leaderboard
+        ORDER BY rank
+        LIMIT 10;
         ]]>
     </select>
 </mapper>

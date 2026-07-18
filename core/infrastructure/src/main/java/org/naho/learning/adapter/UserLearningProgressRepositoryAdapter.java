@@ -6,7 +6,6 @@ import org.naho.learning.entity.UserLearningProgressEntity;
 import org.naho.learning.mapper.UserLearningProgressEntityMapper;
 import org.naho.learning.model.UserLearningProgress;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
-import org.naho.learning.repository.LearningPathNodeJpaRepository;
 import org.naho.learning.repository.UserLearningProgressJpaRepository;
 import org.naho.shared.exception.InfrastructureException;
 import org.naho.user.entity.UserEntity;
@@ -22,7 +21,6 @@ public class UserLearningProgressRepositoryAdapter implements UserLearningProgre
 
     private final UserLearningProgressJpaRepository userLearningProgressJpaRepository;
     private final UserJpaRepository userJpaRepository;
-    private final LearningPathNodeJpaRepository learningPathNodeJpaRepository;
     private final UserLearningProgressEntityMapper userLearningProgressEntityMapper;
 
     @Override
