@@ -39,11 +39,6 @@ public interface UserEntityMapper {
     @Mapping(target = "avatar", ignore = true)
     UserEntity domainToEntity(User user);
 
-    @Mapping(target = "avatarObjectKey", source = "avatar.objectKey")
-    @Mapping(target = "oAuthAvatarUrl", source = "OAuthProviders", qualifiedByName = "getOAuthProviderAvatarUrls")
-    @Mapping(target = "totalPoint", source = "userLearningProgress.totalPoint")
-    LeaderboardUserResult entityToLeaderboardResult(UserEntity entity);
-
     @Named("getOAuthProviderIds")
     default List<Long> getOAuthProviderIds(List<OAuthProviderEntity> oAuthProviders) {
         return oAuthProviders.stream().map(OAuthProviderEntity::getId).toList();
