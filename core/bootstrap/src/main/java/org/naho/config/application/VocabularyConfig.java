@@ -1,6 +1,7 @@
 package org.naho.config.application;
 
 import org.naho.question.port.in.SearchVocabulariesOfQuestionInputPort;
+import org.naho.question.port.out.SaveGrammarPort;
 import org.naho.question.port.out.VocabulariesQuestionPort;
 import org.naho.question.usecase.SearchVocabulariesOfQuestionUsecase;
 import org.naho.shared.port.out.TransactionPort;
@@ -24,9 +25,10 @@ public class VocabularyConfig {
     public ImportVocabularyUseCase importVocabularyUseCase(
             ExcelParserPort excelParserPort,
             SaveVocabularyPort saveVocabularyPort,
+            SaveGrammarPort saveGrammarPort,
             TransactionPort transactionPort
     ) {
-        return new ImportVocabularyService(excelParserPort, saveVocabularyPort, transactionPort);
+        return new ImportVocabularyService(excelParserPort, saveVocabularyPort, saveGrammarPort, transactionPort);
     }
 
     @Bean
@@ -52,3 +54,4 @@ public class VocabularyConfig {
         return new ExportVocabularyUseCase(vocabularyPort, vocabulariesQuestionPort, excelWriterPort);
     }
 }
+

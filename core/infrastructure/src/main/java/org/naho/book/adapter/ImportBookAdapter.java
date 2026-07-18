@@ -18,6 +18,8 @@ import org.naho.learning.type.NodeType;
 import org.naho.question.entity.ChestEntity;
 import org.naho.question.entity.GrammarEntity;
 import org.naho.question.entity.SpeakingQuestionEntity;
+import org.naho.question.entity.SpeakingQuestionGrammarEntity;
+import org.naho.question.entity.SpeakingQuestionVocabularyEntity;
 import org.naho.question.entity.VocabularyQuestionEntity;
 import org.naho.question.exception.ChestErrorCode;
 import org.naho.question.exception.VocabularyQuestionErrorCode;
@@ -214,8 +216,16 @@ public class ImportBookAdapter implements ImportBookPort {
                                         .toList();
 
                                 List<GrammarEntity> grammarEntityList = grammarJpaRepository.findAllByIdIn(grammarIds);
+                                List<SpeakingQuestionGrammarEntity> sqGrammars = grammarEntityList.stream()
+                                        .map(g -> {
+                                            SpeakingQuestionGrammarEntity sqg = new SpeakingQuestionGrammarEntity();
+                                            sqg.setSpeakingQuestion(speakingQuestionEntity);
+                                            sqg.setGrammar(g);
+                                            return sqg;
+                                        })
+                                        .toList();
 
-                                speakingQuestionEntity.setGrammars(grammarEntityList);
+                                speakingQuestionEntity.setGrammars(sqGrammars);
                             }
 
                             // add vocabularies to speaking question
@@ -228,8 +238,16 @@ public class ImportBookAdapter implements ImportBookPort {
 
                                 List<VocabularyEntity> vocabularyEntityList = vocabularyJpaRepository
                                         .findAllByIdIn(vocabularyIds);
+                                List<SpeakingQuestionVocabularyEntity> sqVocabularies = vocabularyEntityList.stream()
+                                        .map(v -> {
+                                            SpeakingQuestionVocabularyEntity sqv = new SpeakingQuestionVocabularyEntity();
+                                            sqv.setSpeakingQuestion(speakingQuestionEntity);
+                                            sqv.setVocabulary(v);
+                                            return sqv;
+                                        })
+                                        .toList();
 
-                                speakingQuestionEntity.setVocabularies(vocabularyEntityList);
+                                speakingQuestionEntity.setVocabularies(sqVocabularies);
                             }
 
                             learningPathNodeEntity.setSpeakingQuestion(speakingQuestionEntity);
