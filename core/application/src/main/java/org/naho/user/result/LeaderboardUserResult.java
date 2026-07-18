@@ -5,6 +5,7 @@ import java.util.List;
 
 public class LeaderboardUserResult {
     private Long id;
+    private Long leagueId;
     private Integer rank;
     private String username;
     private String email;
@@ -16,8 +17,9 @@ public class LeaderboardUserResult {
     public LeaderboardUserResult() {
     }
 
-    public LeaderboardUserResult(Long id, Integer rank, String username, String email, String fullName, String avatarObjectKey, List<String> oAuthAvatarUrl, Double totalPoint) {
+    public LeaderboardUserResult(Long id, Long leagueId, Integer rank, String username, String email, String fullName, String avatarObjectKey, List<String> oAuthAvatarUrl, Double totalPoint) {
         this.id = id;
+        this.leagueId = leagueId;
         this.rank = rank;
         this.username = username;
         this.email = email;
@@ -33,6 +35,14 @@ public class LeaderboardUserResult {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getLeagueId() {
+        return leagueId;
+    }
+
+    public void setLeagueId(Long leagueId) {
+        this.leagueId = leagueId;
     }
 
     public Integer getRank() {

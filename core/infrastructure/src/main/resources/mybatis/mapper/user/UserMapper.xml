@@ -12,7 +12,8 @@
     </select>
 
     <resultMap id="LeaderboardUserResultMap" type="org.naho.user.result.LeaderboardUserResult">
-        <id property="id" column="id"/>
+        <id property="id" column="user_id"/>
+        <result property="leagueId" column="league_id"/>
         <result property="rank" column="position"/>
         <result property="username" column="username"/>
         <result property="email" column="email"/>
@@ -31,7 +32,8 @@
 
     <select id="findTop10OrderByTotalPointInLeague" resultMap="LeaderboardUserResultMap">
         <![CDATA[
-        SELECT leaderboard.id,
+        SELECT leaderboard.user_id,
+               leaderboard.league_id,
                leaderboard.position,
                leaderboard.username,
                leaderboard.email,
@@ -47,8 +49,9 @@
                 ulp.modified_time IS NULL,
                 ulp.modified_time DESC,
                 ulp.created_time DESC
-            ) AS position,
-                     u.id,
+            )             AS position,
+                     u.id AS user_id,
+                     l.id AS league_id,
                      u.username,
                      u.email,
                      u.full_name,
@@ -71,9 +74,20 @@
                       OR ulp.total_point <= l.max_point
                   )) leaderboard
                  LEFT JOIN o_auth_providers oap
-                           ON leaderboard.id = oap.user_id
+                           ON leaderboard.user_id = oap.user_id
         where leaderboard.position <= 10
         ORDER BY leaderboard.position
+        ]]>
+    </select>
+
+    <select id="findTopOfUserByUserId" resultMap="LeaderboardUserResultMap">
+        <![CDATA[
+        select *
+        from users u
+                 JOIN user_learning_progresses ulp
+                      ON u.user_learning_progress_id = ulp.id
+                 LEFT JOIN files f
+                           ON u.avatar_file_id = f.id
         ]]>
     </select>
 </mapper>
