@@ -44,8 +44,7 @@ public class BookDataInitializer implements ApplicationRunner {
             } catch (IOException e) {
                 throw new BootstrapException(
                         BookErrorCode.BOOK_IMPORT_FAILED,
-                        e.getMessage()
-                );
+                        e.getMessage());
             }
         }
     }

@@ -1,10 +1,8 @@
 package org.naho.vocabulary.port.out;
 
-import org.naho.vocabulary.model.Vocabulary;
-
+import org.naho.vocabulary.model.VocabularyGrammarImportResult;
 import java.io.InputStream;
-import java.util.List;
 
 public interface ExcelParserPort {
-    List<Vocabulary> parseExcel(InputStream inputStream);
+    VocabularyGrammarImportResult parseExcel(InputStream inputStream);
 }
