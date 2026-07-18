@@ -92,4 +92,4 @@ app:
     region: ap-southeast-1
 
   static-resources:
-    base-location: file:E:\Documents\Ky_9\SEP490\SEP490_Project\Developments\
+    base-location: ${STATIC_RESOURCES_BASE_LOCATION}
