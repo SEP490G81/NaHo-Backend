@@ -68,7 +68,7 @@ public class CrudUserLearningProgressUseCase implements CrudUserLearningProgress
                 userLearningProgressResultMapper.domainToResult(currentUserLearningProgress);
 
         userLearningProgressResult.setLeaderboardUser(leaderboardUserResult);
-        
+
         return userLearningProgressResult;
     }
 }

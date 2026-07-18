@@ -6,7 +6,6 @@ import org.mapstruct.Named;
 import org.naho.user.entity.OAuthProviderEntity;
 import org.naho.user.entity.UserEntity;
 import org.naho.user.model.User;
-import org.naho.user.result.LeaderboardUserResult;
 
 import java.util.List;
 

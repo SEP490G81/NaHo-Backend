@@ -17,13 +17,13 @@ public class ExcelWriterAdapter implements ExcelWriterPort {
     @Override
     public ByteArrayInputStream writeVocabulariesToExcel(List<Vocabulary> vocabularies) {
         try (Workbook workbook = new XSSFWorkbook();
-                ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
             Sheet sheet = workbook.createSheet("Vocabularies");
 
             // Create Header Row
             Row headerRow = sheet.createRow(0);
-            String[] headers = { "Reading", "Japanese", "Vietnamese Meaning", "English Meaning" };
+            String[] headers = {"Reading", "Japanese", "Vietnamese Meaning", "English Meaning"};
 
             // Header font and style
             Font headerFont = workbook.createFont();

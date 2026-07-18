@@ -9,6 +9,8 @@ public class Topic {
     private final Long id;
     private final Long userId;
     private final Long bookId;
+    private final Double firstNodeGlobalOrderIndex;
+    private final Double lastNodeGlobalOrderIndex;
     private Long coverImageFileId;
     private String japaneseName;
     private String japaneseDescription;
@@ -16,8 +18,6 @@ public class Topic {
     private String japaneseDescriptionMarkup;
     private TopicStatus status;
     private Double orderIndex;
-    private final Double firstNodeGlobalOrderIndex;
-    private final Double lastNodeGlobalOrderIndex;
 
     // Private constructor dùng cho Builder
     private Topic(Builder builder) {

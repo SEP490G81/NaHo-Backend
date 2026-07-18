@@ -652,16 +652,25 @@ ALTER TABLE vocabulary_questions_vocabularies
     ADD CONSTRAINT fk_vocquevoc_on_vocabulary_question_entity FOREIGN KEY (vocabulary_question_id) REFERENCES vocabulary_questions (id);
 
 -- Cập nhật bảng grammars
-ALTER TABLE grammars ADD COLUMN reading VARCHAR(255) NULL;
-ALTER TABLE grammars ADD COLUMN japanese VARCHAR(255) NULL;
-ALTER TABLE grammars DROP COLUMN explanation;
+ALTER TABLE grammars
+    ADD COLUMN reading VARCHAR(255) NULL;
+ALTER TABLE grammars
+    ADD COLUMN japanese VARCHAR(255) NULL;
+ALTER TABLE grammars
+    DROP COLUMN explanation;
 
 -- Cập nhật bảng trung gian speaking_questions_vocabularies
-ALTER TABLE speaking_questions_vocabularies ADD COLUMN id BIGINT AUTO_INCREMENT PRIMARY KEY;
-ALTER TABLE speaking_questions_vocabularies ADD COLUMN created_time DATETIME(6) NOT NULL;
-ALTER TABLE speaking_questions_vocabularies ADD COLUMN modified_time DATETIME(6) NULL;
+ALTER TABLE speaking_questions_vocabularies
+    ADD COLUMN id BIGINT AUTO_INCREMENT PRIMARY KEY;
+ALTER TABLE speaking_questions_vocabularies
+    ADD COLUMN created_time DATETIME(6) NOT NULL;
+ALTER TABLE speaking_questions_vocabularies
+    ADD COLUMN modified_time DATETIME(6) NULL;
 
 -- Cập nhật bảng trung gian speaking_questions_grammars
-ALTER TABLE speaking_questions_grammars ADD COLUMN id BIGINT AUTO_INCREMENT PRIMARY KEY;
-ALTER TABLE speaking_questions_grammars ADD COLUMN created_time DATETIME(6) NOT NULL;
-ALTER TABLE speaking_questions_grammars ADD COLUMN modified_time DATETIME(6) NULL;
+ALTER TABLE speaking_questions_grammars
+    ADD COLUMN id BIGINT AUTO_INCREMENT PRIMARY KEY;
+ALTER TABLE speaking_questions_grammars
+    ADD COLUMN created_time DATETIME(6) NOT NULL;
+ALTER TABLE speaking_questions_grammars
+    ADD COLUMN modified_time DATETIME(6) NULL;

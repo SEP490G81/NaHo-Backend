@@ -23,7 +23,8 @@ public record LearningPathNodeDetailResponse(
             String description,
             String descriptionMarkup,
             QuestionStatus status
-    ) {}
+    ) {
+    }
 
     public record VocabularyQuestionDetailResponse(
             Long id,
@@ -35,7 +36,8 @@ public record LearningPathNodeDetailResponse(
                 String japanese,
                 String vietnameseMeaningText,
                 String englishMeaningText
-        ) {}
+        ) {
+        }
     }
 
     public record ChestDetailResponse(
@@ -43,5 +45,6 @@ public record LearningPathNodeDetailResponse(
             String title,
             String description,
             Double point
-    ) {}
+    ) {
+    }
 }

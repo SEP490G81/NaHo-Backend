@@ -37,6 +37,10 @@ public class UserLearningProgressResult {
         this.leaderboardUser = leaderboardUser;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public Long getId() {
         return id;
     }
@@ -99,10 +103,6 @@ public class UserLearningProgressResult {
 
     public void setLeaderboardUser(LeaderboardUserResult leaderboardUser) {
         this.leaderboardUser = leaderboardUser;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     public static class Builder {

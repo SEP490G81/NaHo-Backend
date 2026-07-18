@@ -12,7 +12,6 @@ import org.naho.social.entity.CommentEntity;
 import org.naho.social.entity.ReactionEntity;
 import org.naho.social.report.entity.ReportEntity;
 import org.naho.user.entity.UserEntity;
-import org.naho.vocabulary.entity.VocabularyEntity;
 
 import java.util.List;
 

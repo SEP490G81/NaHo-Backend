@@ -3,12 +3,12 @@ package org.naho.learning.model;
 import java.time.Instant;
 
 public class UserLearningProgress {
-    private Long id;
     private final Long farthestAvailableNodeId;
-    private Long lastLearningNodeId;
-    private Instant lastLearningAt;
     private final Integer currentStreak;
     private final Integer longestStreak;
+    private Long id;
+    private Long lastLearningNodeId;
+    private Instant lastLearningAt;
     private Double totalPoint;
 
     private UserLearningProgress(Builder builder) {
