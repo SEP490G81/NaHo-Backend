@@ -6,7 +6,6 @@ public class Vocabulary {
     private final String japanese;
     private final String vietnameseMeaningText;
     private final String englishMeaningText;
-    private final Long questionId;
 
     private Vocabulary(Builder builder) {
         this.id = builder.id;
@@ -16,7 +15,6 @@ public class Vocabulary {
                 : null;
         this.vietnameseMeaningText = builder.vietnameseMeaningText;
         this.englishMeaningText = builder.englishMeaningText;
-        this.questionId = builder.questionId;
     }
 
     private static boolean containsKanji(String s) {
@@ -50,17 +48,12 @@ public class Vocabulary {
         return englishMeaningText;
     }
 
-    public Long getQuestionId() {
-        return questionId;
-    }
-
     public static class Builder {
         private Long id;
         private String reading;
         private String japanese;
         private String vietnameseMeaningText;
         private String englishMeaningText;
-        private Long questionId;
 
         public Builder id(Long id) {
             this.id = id;
@@ -84,11 +77,6 @@ public class Vocabulary {
 
         public Builder englishMeaningText(String e) {
             this.englishMeaningText = e;
-            return this;
-        }
-
-        public Builder questionId(Long questionId) {
-            this.questionId = questionId;
             return this;
         }
 

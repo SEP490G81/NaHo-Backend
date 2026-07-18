@@ -92,4 +92,4 @@ app:
     region: ap-southeast-1
 
   static-resources:
-    base-location: file:///Users/truc/Documents/SEP490/Code/sources/
+    base-location: ${STATIC_RESOURCES_BASE_LOCATION}

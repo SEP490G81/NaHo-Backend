@@ -2,15 +2,17 @@ package org.naho.question.model;
 
 public class Grammar {
     private final Long id;
+    private final String reading;
+    private final String japanese;
     private final String vietnameseMeaningText;
     private final String englishMeaningText;
-    private final String explanation;
 
     private Grammar(Builder builder) {
         this.id = builder.id;
+        this.reading = builder.reading;
+        this.japanese = builder.japanese;
         this.vietnameseMeaningText = builder.vietnameseMeaningText;
         this.englishMeaningText = builder.englishMeaningText;
-        this.explanation = builder.explanation;
     }
 
     public static Builder builder() {
@@ -21,6 +23,14 @@ public class Grammar {
         return id;
     }
 
+    public String getReading() {
+        return reading;
+    }
+
+    public String getJapanese() {
+        return japanese;
+    }
+
     public String getVietnameseMeaningText() {
         return vietnameseMeaningText;
     }
@@ -29,18 +39,25 @@ public class Grammar {
         return englishMeaningText;
     }
 
-    public String getExplanation() {
-        return explanation;
-    }
-
     public static class Builder {
         private Long id;
+        private String reading;
+        private String japanese;
         private String vietnameseMeaningText;
         private String englishMeaningText;
-        private String explanation;
 
         public Builder id(Long id) {
             this.id = id;
+            return this;
+        }
+
+        public Builder reading(String reading) {
+            this.reading = reading;
+            return this;
+        }
+
+        public Builder japanese(String japanese) {
+            this.japanese = japanese;
             return this;
         }
 
@@ -54,13 +71,9 @@ public class Grammar {
             return this;
         }
 
-        public Builder explanation(String explanation) {
-            this.explanation = explanation;
-            return this;
-        }
-
         public Grammar build() {
             return new Grammar(this);
         }
     }
 }
+

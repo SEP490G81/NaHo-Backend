@@ -6,11 +6,11 @@ import org.naho.question.usecase.SearchVocabulariesOfQuestionUsecase;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.vocabulary.port.in.ExportVocabularyInputPort;
 import org.naho.vocabulary.port.in.GetVocabulariesOfObjectiveInputPort;
-import org.naho.vocabulary.port.out.ExcelParserPort;
+import org.naho.vocabulary.port.in.ImportVocabularyPort;
 import org.naho.vocabulary.port.out.ExcelWriterPort;
 import org.naho.vocabulary.port.out.SaveVocabularyPort;
+import org.naho.vocabulary.port.out.VocabularyExcelParserPort;
 import org.naho.vocabulary.port.out.VocabularyPort;
-import org.naho.vocabulary.service.ImportVocabularyService;
 import org.naho.vocabulary.usecase.ExportVocabularyUseCase;
 import org.naho.vocabulary.usecase.GetVocabulariesOfObjectiveUseCase;
 import org.naho.vocabulary.usecase.ImportVocabularyUseCase;
@@ -21,13 +21,14 @@ import org.springframework.context.annotation.Configuration;
 public class VocabularyConfig {
 
     @Bean
-    public ImportVocabularyUseCase importVocabularyUseCase(
-            ExcelParserPort excelParserPort,
+    public ImportVocabularyPort importVocabularyUseCase(
+            VocabularyExcelParserPort vocabularyExcelParserPort,
             SaveVocabularyPort saveVocabularyPort,
             TransactionPort transactionPort
     ) {
-        return new ImportVocabularyService(excelParserPort, saveVocabularyPort, transactionPort);
+        return new ImportVocabularyUseCase(vocabularyExcelParserPort, saveVocabularyPort, transactionPort);
     }
+
 
     @Bean
     public GetVocabulariesOfObjectiveInputPort getVocabulariesOfObjectiveInputPort(
@@ -52,3 +53,4 @@ public class VocabularyConfig {
         return new ExportVocabularyUseCase(vocabularyPort, vocabulariesQuestionPort, excelWriterPort);
     }
 }
+
