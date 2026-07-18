@@ -3,6 +3,7 @@ package org.naho.user.mybatis;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.naho.user.entity.UserEntity;
+import org.naho.user.result.LeaderboardUserResult;
 import org.naho.user.type.OAuthProviderName;
 
 import java.util.List;
@@ -15,5 +16,5 @@ public interface UserQueryMapper {
             @Param("providerName") OAuthProviderName providerName
     );
 
-    List<UserEntity> findTop10OrderByTotalPointInLeague(@Param("leagueId") Long leagueId);
+    List<LeaderboardUserResult> findTop10OrderByTotalPointInLeague(@Param("leagueId") Long leagueId);
 }
