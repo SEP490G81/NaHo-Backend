@@ -27,14 +27,12 @@ public class PointHistoryConfig {
             PointHistoryResultMapper pointHistoryResultMapper,
             PointHistoryRepositoryPort pointHistoryRepositoryPort,
             TransactionPort transactionPort,
-            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort
-    ) {
+            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort) {
         return new CrudPointHistoryUseCase(
                 pointHistoryCommandMapper,
                 pointHistoryResultMapper,
                 pointHistoryRepositoryPort,
                 transactionPort,
-                userLearningProgressRepositoryPort
-        );
+                userLearningProgressRepositoryPort);
     }
 }

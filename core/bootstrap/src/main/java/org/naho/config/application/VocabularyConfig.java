@@ -26,22 +26,19 @@ public class VocabularyConfig {
             ExcelParserPort excelParserPort,
             SaveVocabularyPort saveVocabularyPort,
             SaveGrammarPort saveGrammarPort,
-            TransactionPort transactionPort
-    ) {
+            TransactionPort transactionPort) {
         return new ImportVocabularyService(excelParserPort, saveVocabularyPort, saveGrammarPort, transactionPort);
     }
 
     @Bean
     public GetVocabulariesOfObjectiveInputPort getVocabulariesOfObjectiveInputPort(
-            VocabulariesQuestionPort vocabulariesQuestionPort
-    ) {
+            VocabulariesQuestionPort vocabulariesQuestionPort) {
         return new GetVocabulariesOfObjectiveUseCase(vocabulariesQuestionPort);
     }
 
     @Bean
     public SearchVocabulariesOfQuestionInputPort searchVocabulariesOfQuestionInputPort(
-            VocabularyPort vocabularyPort
-    ) {
+            VocabularyPort vocabularyPort) {
         return new SearchVocabulariesOfQuestionUsecase(vocabularyPort);
     }
 
@@ -49,9 +46,7 @@ public class VocabularyConfig {
     public ExportVocabularyInputPort exportVocabularyInputPort(
             VocabularyPort vocabularyPort,
             VocabulariesQuestionPort vocabulariesQuestionPort,
-            ExcelWriterPort excelWriterPort
-    ) {
+            ExcelWriterPort excelWriterPort) {
         return new ExportVocabularyUseCase(vocabularyPort, vocabulariesQuestionPort, excelWriterPort);
     }
 }
-
