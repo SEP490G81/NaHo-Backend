@@ -10,6 +10,7 @@ import org.naho.learning.usecase.GetLearningPathNodeDetailUseCase;
 import org.naho.question.adapter.SpeakingQuestionRepositoryAdapter;
 import org.naho.question.adapter.VocabularyQuestionRepositoryAdapter;
 import org.naho.question.adapter.ChestRepositoryAdapter;
+import org.naho.user.port.out.UserRepositoryPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -40,12 +41,14 @@ public class LearningConfig {
     public CrudUserLearningProgressInputPort crudUserLearningProgressInputPort(
             UserLearningProgressRepositoryAdapter userLearningProgressRepositoryAdapter,
             LearningPathNodeRepositoryAdapter learningPathNodeRepositoryAdapter,
-            UserLearningProgressResultMapper userLearningProgressResultMapper
+            UserLearningProgressResultMapper userLearningProgressResultMapper,
+            UserRepositoryPort userRepositoryPort
     ) {
         return new CrudUserLearningProgressUseCase(
                 userLearningProgressRepositoryAdapter,
                 learningPathNodeRepositoryAdapter,
-                userLearningProgressResultMapper
+                userLearningProgressResultMapper,
+                userRepositoryPort
         );
     }
 }

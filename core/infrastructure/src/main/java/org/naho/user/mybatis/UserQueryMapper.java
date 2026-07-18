@@ -18,5 +18,5 @@ public interface UserQueryMapper {
 
     List<LeaderboardUserResult> findTop10OrderByTotalPointInLeague(@Param("leagueId") Long leagueId);
 
-    LeaderboardUserResult findTopOfUserByUserId(@Param("userId") Long userId);
+    Optional<LeaderboardUserResult> findTopOfUserByUserId(@Param("userId") Long userId);
 }

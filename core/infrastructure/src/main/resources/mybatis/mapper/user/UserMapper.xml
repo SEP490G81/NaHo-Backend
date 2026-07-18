@@ -55,9 +55,7 @@
                      u.username,
                      u.email,
                      u.full_name,
-
                      f.object_key,
-
                      ulp.total_point
               FROM users u
                        JOIN user_learning_progresses ulp
@@ -82,12 +80,49 @@
 
     <select id="findTopOfUserByUserId" resultMap="LeaderboardUserResultMap">
         <![CDATA[
-        select *
-        from users u
-                 JOIN user_learning_progresses ulp
-                      ON u.user_learning_progress_id = ulp.id
-                 LEFT JOIN files f
-                           ON u.avatar_file_id = f.id
+        WITH `user_current_league` AS
+                 (SELECT l.id AS league_id,
+                         l.min_point,
+                         l.max_point
+                  FROM users u
+                           JOIN user_learning_progresses ulp
+                                ON u.user_learning_progress_id = ulp.id
+                           JOIN leagues l
+                                ON l.min_point <= ulp.total_point
+                                    AND (l.max_point IS NULL OR l.max_point >= ulp.total_point)
+                  WHERE u.status = 'ACTIVE'
+                    AND u.id = #{userId}),
+             leaderboard AS
+                 (SELECT ROW_NUMBER() OVER (
+                     ORDER BY
+                         ulp.total_point DESC,
+                         ulp.modified_time IS NULL,
+                         ulp.modified_time DESC,
+                         ulp.created_time DESC
+                     )        AS position,
+                         u.id AS user_id,
+                         `user_current_league`.league_id,
+                         u.username,
+                         u.email,
+                         u.full_name,
+                         f.object_key,
+                         ulp.total_point
+                  FROM users u
+                           JOIN user_learning_progresses ulp
+                                ON u.user_learning_progress_id = ulp.id
+                           LEFT JOIN files f
+                                     ON u.avatar_file_id = f.id
+                           CROSS JOIN `user_current_league`
+                  WHERE u.status = 'ACTIVE'
+                    AND ulp.total_point >= `user_current_league`.min_point
+                    AND (`user_current_league`.max_point IS NULL
+                      OR ulp.total_point <= `user_current_league`.max_point))
+        SELECT leaderboard.*,
+               oap.avatar_url
+        FROM leaderboard
+                 LEFT JOIN o_auth_providers oap
+                           ON leaderboard.user_id = oap.user_id
+        WHERE leaderboard.user_id = #{userId}
         ]]>
     </select>
 </mapper>

@@ -138,6 +138,11 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
+    public Optional<LeaderboardUserResult> findTopOfUserByUserId(Long userId) {
+        return userQueryMapper.findTopOfUserByUserId(userId);
+    }
+
+    @Override
     public Optional<User> findById(Long id) {
         return userJpaRepository.findById(id)
                 .map(userEntityMapper::entityToDomain);
