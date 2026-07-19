@@ -4,6 +4,7 @@ import org.naho.book.entity.BookEntity;
 import org.naho.book.entity.TopicEntity;
 import org.naho.book.mapper.TopicEntityMapper;
 import org.naho.book.model.Topic;
+import org.naho.book.mybatis.TopicQueryMapper;
 import org.naho.book.port.out.TopicRepositoryPort;
 import org.naho.book.repository.BookJpaRepository;
 import org.naho.book.repository.TopicJpaRepository;
@@ -23,16 +24,18 @@ public class TopicRepositoryAdapter implements TopicRepositoryPort {
     private final FileJpaRepository fileJpaRepository;
     private final BookJpaRepository bookJpaRepository;
     private final TopicEntityMapper topicEntityMapper;
+    private final TopicQueryMapper topicQueryMapper;
 
     public TopicRepositoryAdapter(TopicJpaRepository topicJpaRepository,
                                   UserJpaRepository userJpaRepository,
                                   FileJpaRepository fileJpaRepository,
-                                  BookJpaRepository bookJpaRepository, TopicEntityMapper topicEntityMapper) {
+                                  BookJpaRepository bookJpaRepository, TopicEntityMapper topicEntityMapper, TopicQueryMapper topicQueryMapper) {
         this.topicJpaRepository = topicJpaRepository;
         this.userJpaRepository = userJpaRepository;
         this.fileJpaRepository = fileJpaRepository;
         this.bookJpaRepository = bookJpaRepository;
         this.topicEntityMapper = topicEntityMapper;
+        this.topicQueryMapper = topicQueryMapper;
     }
 
     @Override
@@ -101,5 +104,12 @@ public class TopicRepositoryAdapter implements TopicRepositoryPort {
     @Override
     public void deleteById(Long id) {
         topicJpaRepository.deleteById(id);
+    }
+
+    @Override
+    public Optional<Topic> findBySpeakingQuestionId(Long speakingQuestionId) {
+        return topicQueryMapper
+                .findBySpeakingQuestionId(speakingQuestionId)
+                .map(topicEntityMapper::entityToDomain);
     }
 }

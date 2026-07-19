@@ -2,6 +2,7 @@ package org.naho.book.adapter;
 
 import org.naho.book.mapper.BookEntityMapper;
 import org.naho.book.model.Book;
+import org.naho.book.mybatis.BookQueryMapper;
 import org.naho.book.port.out.BookRepositoryPort;
 import org.naho.book.repository.BookJpaRepository;
 import org.springframework.data.domain.Sort;
@@ -15,11 +16,13 @@ public class BookRepositoryAdapter implements BookRepositoryPort {
 
     private final BookJpaRepository bookJpaRepository;
     private final BookEntityMapper bookEntityMapper;
+    private final BookQueryMapper bookQueryMapper;
 
     public BookRepositoryAdapter(BookJpaRepository bookJpaRepository,
-                                 BookEntityMapper bookEntityMapper) {
+                                 BookEntityMapper bookEntityMapper, BookQueryMapper bookQueryMapper) {
         this.bookJpaRepository = bookJpaRepository;
         this.bookEntityMapper = bookEntityMapper;
+        this.bookQueryMapper = bookQueryMapper;
     }
 
     @Override
@@ -33,6 +36,13 @@ public class BookRepositoryAdapter implements BookRepositoryPort {
     @Override
     public Optional<Book> findById(Long bookId) {
         return bookJpaRepository.findById(bookId)
+                .map(bookEntityMapper::entityToDomain);
+    }
+
+    @Override
+    public Optional<Book> findBySpeakingQuestionId(Long speakingQuestionId) {
+        return bookQueryMapper
+                .findBySpeakingQuestionId(speakingQuestionId)
                 .map(bookEntityMapper::entityToDomain);
     }
 }

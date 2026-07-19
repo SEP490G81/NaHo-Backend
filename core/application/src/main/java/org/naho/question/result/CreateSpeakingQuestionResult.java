@@ -5,7 +5,7 @@ import org.naho.question.type.QuestionStatus;
 public record CreateSpeakingQuestionResult(
         Long id,
         Long userId,
-        Long questionAudioFileId,
+        Long speakingQuestionAudioFileId,
         String title,
         String titleMarkup,
         String description,

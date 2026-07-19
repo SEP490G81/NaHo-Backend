@@ -15,7 +15,6 @@ public abstract class FileEntityMapper {
     private CloudFrontProperties cloudFrontProperties;
 
     @Mapping(target = "commentId", source = "comment.id")
-    @Mapping(target = "questionId", source = "question.id")
     @Mapping(target = "reportId", source = "report.id")
     @Mapping(target = "objectKey", source = "objectKey", qualifiedByName = "fullObjectKey")
     public abstract File entityToDomain(FileEntity entity);
@@ -24,7 +23,7 @@ public abstract class FileEntityMapper {
     @Mapping(target = "modifiedTime", ignore = true)
     @Mapping(target = "persona", ignore = true)
     @Mapping(target = "comment", ignore = true)
-    @Mapping(target = "question", ignore = true)
+    @Mapping(target = "speakingQuestion", ignore = true)
     @Mapping(target = "report", ignore = true)
     @Mapping(target = "league", ignore = true)
     @Mapping(target = "user", ignore = true)

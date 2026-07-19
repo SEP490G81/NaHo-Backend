@@ -18,7 +18,9 @@ import org.naho.i18n.message.chest.ChestDetailMessageKey;
 import org.naho.i18n.message.question.VocabularyQuestionDetailMessageKey;
 import org.naho.learning.entity.LearningPathNodeEntity;
 import org.naho.learning.type.NodeType;
-import org.naho.question.entity.*;
+import org.naho.question.entity.GrammarEntity;
+import org.naho.question.entity.SpeakingQuestionEntity;
+import org.naho.question.entity.VocabularyQuestionEntity;
 import org.naho.question.exception.VocabularyQuestionErrorCode;
 import org.naho.question.repository.GrammarJpaRepository;
 import org.naho.question.repository.VocabularyQuestionJpaRepository;
@@ -213,19 +215,7 @@ public class ImportBookAdapter implements ImportBookPort {
                                         .toList();
 
                                 List<GrammarEntity> grammarEntityList = grammarJpaRepository.findAllByIdIn(grammarIds);
-                                List<SpeakingQuestionGrammarEntity> sqGrammars =
-                                        new ArrayList<>(
-                                                grammarEntityList.stream()
-                                                        .map(g -> {
-                                                            SpeakingQuestionGrammarEntity sqg =
-                                                                    new SpeakingQuestionGrammarEntity();
-                                                            sqg.setSpeakingQuestion(speakingQuestionEntity);
-                                                            sqg.setGrammar(g);
-                                                            return sqg;
-                                                        })
-                                                        .toList()
-                                        );
-                                speakingQuestionEntity.setGrammars(sqGrammars);
+                                speakingQuestionEntity.setGrammars(grammarEntityList);
                             }
 
                             // add vocabularies to speaking question
@@ -238,19 +228,7 @@ public class ImportBookAdapter implements ImportBookPort {
 
                                 List<VocabularyEntity> vocabularyEntityList = vocabularyJpaRepository
                                         .findAllByIdIn(vocabularyIds);
-                                List<SpeakingQuestionVocabularyEntity> sqVocabularies =
-                                        new ArrayList<>(
-                                                vocabularyEntityList.stream()
-                                                        .map(v -> {
-                                                            SpeakingQuestionVocabularyEntity sqv =
-                                                                    new SpeakingQuestionVocabularyEntity();
-                                                            sqv.setSpeakingQuestion(speakingQuestionEntity);
-                                                            sqv.setVocabulary(v);
-                                                            return sqv;
-                                                        })
-                                                        .toList()
-                                        );
-                                speakingQuestionEntity.setVocabularies(sqVocabularies);
+                                speakingQuestionEntity.setVocabularies(vocabularyEntityList);
                             }
 
                             learningPathNodeEntity.setSpeakingQuestion(speakingQuestionEntity);

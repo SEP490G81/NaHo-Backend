@@ -40,13 +40,12 @@ public class FileEntity extends BaseEntity {
     @JoinColumn(name = "comment_id")
     CommentEntity comment;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "question_id")
-    SpeakingQuestionEntity question;
+    @OneToOne(mappedBy = "speakingQuestionAudioFile")
+    SpeakingQuestionEntity speakingQuestion;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "report_id") // Tên cột khóa ngoại trong DB của bạn
-    ReportEntity report;    // Tên biến này BẮT BUỘC phải là "report" để khớp với mappedBy bên kia
+    ReportEntity report; // Tên biến này BẮT BUỘC phải là "report" để khớp với mappedBy bên kia
 
     @OneToOne(mappedBy = "iconFile")
     LeagueEntity league;

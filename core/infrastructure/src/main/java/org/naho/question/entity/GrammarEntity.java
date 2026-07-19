@@ -1,7 +1,10 @@
 package org.naho.question.entity;
 
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
@@ -30,6 +33,6 @@ public class GrammarEntity extends BaseEntity {
     @Column(name = "english_meaning_text", columnDefinition = "TEXT")
     String englishMeaningText;
 
-    @OneToMany(mappedBy = "grammar", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<SpeakingQuestionGrammarEntity> questions;
+    @ManyToMany(mappedBy = "grammars")
+    List<SpeakingQuestionEntity> speakingQuestions;
 }

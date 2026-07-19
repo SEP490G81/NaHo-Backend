@@ -4,17 +4,17 @@ ALTER TABLE leagues
 
 -- Insert SVG files for leagues into files table
 INSERT INTO files (id, created_time, modified_time, object_key, original_name, content_type, size, comment_id,
-                   question_id, report_id)
-VALUES (1, NOW(), NULL, 'leagues/bronze.svg', 'bronze.svg', 'image/svg+xml', 974, NULL, NULL, NULL),
-       (2, NOW(), NULL, 'leagues/silver.svg', 'silver.svg', 'image/svg+xml', 974, NULL, NULL, NULL),
-       (3, NOW(), NULL, 'leagues/gold.svg', 'gold.svg', 'image/svg+xml', 970, NULL, NULL, NULL),
-       (4, NOW(), NULL, 'leagues/sapphire.svg', 'sapphire.svg', 'image/svg+xml', 1268, NULL, NULL, NULL),
-       (5, NOW(), NULL, 'leagues/ruby.svg', 'ruby.svg', 'image/svg+xml', 1260, NULL, NULL, NULL),
-       (6, NOW(), NULL, 'leagues/emerald.svg', 'emerald.svg', 'image/svg+xml', 1266, NULL, NULL, NULL),
-       (7, NOW(), NULL, 'leagues/amethyst.svg', 'amethyst.svg', 'image/svg+xml', 1442, NULL, NULL, NULL),
-       (8, NOW(), NULL, 'leagues/pearl.svg', 'pearl.svg', 'image/svg+xml', 1436, NULL, NULL, NULL),
-       (9, NOW(), NULL, 'leagues/obsidian.svg', 'obsidian.svg', 'image/svg+xml', 1442, NULL, NULL, NULL),
-       (10, NOW(), NULL, 'leagues/diamond.svg', 'diamond.svg', 'image/svg+xml', 1164, NULL, NULL, NULL);
+                   report_id)
+VALUES (1, NOW(), NULL, 'leagues/bronze.svg', 'bronze.svg', 'image/svg+xml', 974, NULL, NULL),
+       (2, NOW(), NULL, 'leagues/silver.svg', 'silver.svg', 'image/svg+xml', 974, NULL, NULL),
+       (3, NOW(), NULL, 'leagues/gold.svg', 'gold.svg', 'image/svg+xml', 970, NULL, NULL),
+       (4, NOW(), NULL, 'leagues/sapphire.svg', 'sapphire.svg', 'image/svg+xml', 1268, NULL, NULL),
+       (5, NOW(), NULL, 'leagues/ruby.svg', 'ruby.svg', 'image/svg+xml', 1260, NULL, NULL),
+       (6, NOW(), NULL, 'leagues/emerald.svg', 'emerald.svg', 'image/svg+xml', 1266, NULL, NULL),
+       (7, NOW(), NULL, 'leagues/amethyst.svg', 'amethyst.svg', 'image/svg+xml', 1442, NULL, NULL),
+       (8, NOW(), NULL, 'leagues/pearl.svg', 'pearl.svg', 'image/svg+xml', 1436, NULL, NULL),
+       (9, NOW(), NULL, 'leagues/obsidian.svg', 'obsidian.svg', 'image/svg+xml', 1442, NULL, NULL),
+       (10, NOW(), NULL, 'leagues/diamond.svg', 'diamond.svg', 'image/svg+xml', 1164, NULL, NULL);
 
 -- Insert league levels into leagues table
 INSERT INTO leagues (id, created_time, modified_time, name, description, min_point, max_point, icon_file_id)

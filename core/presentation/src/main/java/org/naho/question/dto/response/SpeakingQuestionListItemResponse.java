@@ -7,7 +7,7 @@ import java.time.ZonedDateTime;
 public record SpeakingQuestionListItemResponse(
         Long id,
         Long userId,
-        Long questionAudioFileId,
+        Long speakingQuestionAudioFileId,
         String title,
         String titleMarkup,
         String description,

@@ -2,20 +2,20 @@ package org.naho.question.repository;
 
 import org.naho.question.entity.SpeakingQuestionEntity;
 import org.naho.question.type.QuestionStatus;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.naho.shared.persistence.BaseJpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface SpeakingQuestionJpaRepository extends JpaRepository<SpeakingQuestionEntity, Long> {
+public interface SpeakingQuestionJpaRepository extends BaseJpaRepository<SpeakingQuestionEntity> {
 
     @Query("SELECT CASE WHEN COUNT(ah) > 0 THEN true ELSE false END FROM AnswerHistoryEntity ah " +
-            "JOIN ah.question.learningPathNode lpn WHERE lpn.objective.lesson.topic.id = :topicId")
+            "JOIN ah.speakingQuestion.learningPathNode lpn WHERE lpn.objective.lesson.topic.id = :topicId")
     boolean existsAnswerHistoryByTopicId(@Param("topicId") Long topicId);
 
-    @Query("SELECT CASE WHEN COUNT(ah) > 0 THEN true ELSE false END FROM AnswerHistoryEntity ah WHERE ah.question.id = :questionId")
+    @Query("SELECT CASE WHEN COUNT(ah) > 0 THEN true ELSE false END FROM AnswerHistoryEntity ah WHERE ah.speakingQuestion.id = :questionId")
     boolean existsAnswerHistoryByQuestionId(@Param("questionId") Long questionId);
 
     @Modifying
