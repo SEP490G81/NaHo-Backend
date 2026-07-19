@@ -75,6 +75,8 @@ public class UpdateTopicUseCase implements UpdateTopicInputPort {
                 savedTopic.getJapaneseDescriptionMarkup(),
                 savedTopic.getStatus(),
                 savedTopic.getOrderIndex(),
+                savedTopic.getFirstNodeGlobalOrderIndex(),
+                savedTopic.getLastNodeGlobalOrderIndex(),
                 savedTopic.getCoverImageFileId(),
                 java.util.List.of()
         );

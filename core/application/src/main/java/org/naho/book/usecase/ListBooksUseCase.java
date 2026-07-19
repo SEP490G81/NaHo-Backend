@@ -50,6 +50,8 @@ public class ListBooksUseCase implements ListBooksInputPort {
                         book.getJlptLevel(),
                         book.getCefrLevel(),
                         book.getOrderIndex(),
+                        book.getFirstNodeGlobalOrderIndex(),
+                        book.getLastNodeGlobalOrderIndex(),
                         book.getCoverImageFileId() != null ? fileResultMap.get(book.getCoverImageFileId()) : null
                 ))
                 .toList();

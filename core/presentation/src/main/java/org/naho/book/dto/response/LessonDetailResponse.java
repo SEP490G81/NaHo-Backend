@@ -12,5 +12,7 @@ public record LessonDetailResponse(
         String japaneseDescriptionMarkup,
         TopicStatus status,
         Double orderIndex,
+        Double firstNodeGlobalOrderIndex,
+        Double lastNodeGlobalOrderIndex,
         List<ObjectiveResponse> objectives) {
 }

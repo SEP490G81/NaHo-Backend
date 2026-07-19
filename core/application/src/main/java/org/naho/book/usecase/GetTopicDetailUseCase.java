@@ -37,7 +37,9 @@ public class GetTopicDetailUseCase implements GetTopicDetailInputPort {
                         lesson.getJapaneseNameMarkup(),
                         lesson.getJapaneseDescriptionMarkup(),
                         lesson.getStatus(),
-                        lesson.getOrderIndex()
+                        lesson.getOrderIndex(),
+                        lesson.getFirstNodeGlobalOrderIndex(),
+                        lesson.getLastNodeGlobalOrderIndex()
                 ))
                 .toList();
 
@@ -50,6 +52,8 @@ public class GetTopicDetailUseCase implements GetTopicDetailInputPort {
                 topic.getJapaneseDescriptionMarkup(),
                 topic.getStatus(),
                 topic.getOrderIndex(),
+                topic.getFirstNodeGlobalOrderIndex(),
+                topic.getLastNodeGlobalOrderIndex(),
                 topic.getCoverImageFileId(),
                 lessons
         );
