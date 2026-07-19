@@ -268,14 +268,22 @@ CREATE TABLE speaking_questions
 
 CREATE TABLE speaking_questions_grammars
 (
+    id                   BIGINT AUTO_INCREMENT NOT NULL,
+    created_time         datetime(6)           NULL,
+    modified_time        datetime(6)           NULL,
     grammar_id           BIGINT NOT NULL,
-    speaking_question_id BIGINT NOT NULL
+    speaking_question_id BIGINT NOT NULL,
+    CONSTRAINT pk_speaking_questions_grammars PRIMARY KEY (id)
 );
 
 CREATE TABLE speaking_questions_vocabularies
 (
+    id                   BIGINT AUTO_INCREMENT NOT NULL,
+    created_time         datetime(6)           NULL,
+    modified_time        datetime(6)           NULL,
     speaking_question_id BIGINT NOT NULL,
-    vocabulary_id        BIGINT NOT NULL
+    vocabulary_id        BIGINT NOT NULL,
+    CONSTRAINT pk_speaking_questions_vocabularies PRIMARY KEY (id)
 );
 
 CREATE TABLE speech_assessments
@@ -631,18 +639,3 @@ ALTER TABLE vocabulary_questions_vocabularies
 
 ALTER TABLE vocabulary_questions_vocabularies
     ADD CONSTRAINT fk_vocquevoc_on_vocabulary_question_entity FOREIGN KEY (vocabulary_question_id) REFERENCES vocabulary_questions (id);
-
--- Cập nhật bảng grammars
-ALTER TABLE grammars ADD COLUMN reading VARCHAR(255) NULL;
-ALTER TABLE grammars ADD COLUMN japanese VARCHAR(255) NULL;
-ALTER TABLE grammars DROP COLUMN explanation;
-
--- Cập nhật bảng trung gian speaking_questions_vocabularies
-ALTER TABLE speaking_questions_vocabularies ADD COLUMN id BIGINT AUTO_INCREMENT PRIMARY KEY;
-ALTER TABLE speaking_questions_vocabularies ADD COLUMN created_time DATETIME(6) NOT NULL;
-ALTER TABLE speaking_questions_vocabularies ADD COLUMN modified_time DATETIME(6) NULL;
-
--- Cập nhật bảng trung gian speaking_questions_grammars
-ALTER TABLE speaking_questions_grammars ADD COLUMN id BIGINT AUTO_INCREMENT PRIMARY KEY;
-ALTER TABLE speaking_questions_grammars ADD COLUMN created_time DATETIME(6) NOT NULL;
-ALTER TABLE speaking_questions_grammars ADD COLUMN modified_time DATETIME(6) NULL;

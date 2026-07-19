@@ -8,10 +8,10 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -40,10 +40,15 @@ public class VnPayPaymentGatewayAdapter implements PaymentGatewayPort {
 
     @Override
     public PaymentInitializationResult initialize(PaymentOrder paymentOrder, PaymentCustomerContext customerContext) {
+        String normalizedTmnCode = normalizeRequiredConfig("app.vnpay.tmn-code", tmnCode);
+        String normalizedHashSecret = normalizeRequiredConfig("app.vnpay.hash-secret", hashSecret);
+        String normalizedPaymentUrl = normalizeRequiredConfig("app.vnpay.payment-url", paymentUrl);
+        String normalizedReturnUrl = normalizeRequiredConfig("app.vnpay.return-url", returnUrl);
+
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String vnp_OrderType = "other";
-        
+
         long amountInCents = paymentOrder.getAmount().amount().multiply(new java.math.BigDecimal(100)).longValue();
         String vnp_Amount = String.valueOf(amountInCents);
 
@@ -52,24 +57,27 @@ public class VnPayPaymentGatewayAdapter implements PaymentGatewayPort {
         String vnp_CreateDate = nowJp.format(formatter);
         String vnp_TxnRef = paymentOrder.getOrderCode();
         String vnp_OrderInfo = "Thanh toan don hang " + paymentOrder.getOrderCode();
-        
+
         String locale = customerContext.locale();
         String vnp_Locale = (locale != null && (locale.equalsIgnoreCase("en") || locale.equalsIgnoreCase("us"))) ? "en" : "vn";
-        
+
         String clientIp = customerContext.clientIp();
         String vnp_IpAddr = (clientIp != null && !clientIp.isBlank()) ? clientIp : "127.0.0.1";
+        if (vnp_IpAddr.contains(":") || vnp_IpAddr.equals("0:0:0:0:0:0:0:1") || vnp_IpAddr.equals("::1")) {
+            vnp_IpAddr = "127.0.0.1";
+        }
 
         Map<String, String> vnp_Params = new HashMap<>();
         vnp_Params.put("vnp_Version", vnp_Version);
         vnp_Params.put("vnp_Command", vnp_Command);
-        vnp_Params.put("vnp_TmnCode", tmnCode);
+        vnp_Params.put("vnp_TmnCode", normalizedTmnCode);
         vnp_Params.put("vnp_Amount", vnp_Amount);
         vnp_Params.put("vnp_CurrCode", "VND");
         vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
         vnp_Params.put("vnp_OrderInfo", vnp_OrderInfo);
         vnp_Params.put("vnp_OrderType", vnp_OrderType);
         vnp_Params.put("vnp_Locale", vnp_Locale);
-        vnp_Params.put("vnp_ReturnUrl", returnUrl);
+        vnp_Params.put("vnp_ReturnUrl", normalizedReturnUrl);
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
         vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
 
@@ -89,37 +97,55 @@ public class VnPayPaymentGatewayAdapter implements PaymentGatewayPort {
 
         String queryUrl = String.join("&", queryPairs);
         String hashData = String.join("&", hashPairs);
-        String vnp_SecureHash = hmacSHA512(hashSecret, hashData);
+        String vnp_SecureHash = hmacSHA512(normalizedHashSecret, hashData);
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
 
-        URI paymentUri = URI.create(paymentUrl + "?" + queryUrl);
+        URI paymentUri = URI.create(normalizedPaymentUrl + "?" + queryUrl);
         Instant expiresTime = paymentOrder.getExpiresTime();
 
         return new PaymentInitializationResult(paymentUri, expiresTime, Map.of());
     }
 
     public boolean verifySignature(Map<String, String> fields, String secureHash) {
+        if (fields == null || secureHash == null || secureHash.isBlank()) {
+            return false;
+        }
+
         List<String> fieldNames = new ArrayList<>(fields.keySet());
         Collections.sort(fieldNames);
-        
+
         List<String> pairs = new ArrayList<>();
         for (String fieldName : fieldNames) {
+            if (!fieldName.startsWith("vnp_")
+                    || fieldName.equals("vnp_SecureHash")
+                    || fieldName.equals("vnp_SecureHashType")) {
+                continue;
+            }
             String fieldValue = fields.get(fieldName);
             if (fieldValue != null && !fieldValue.isEmpty()) {
                 pairs.add(fieldName + "=" + encode(fieldValue));
             }
         }
-        
-        String calculatedHash = hmacSHA512(hashSecret, String.join("&", pairs));
-        return calculatedHash.equalsIgnoreCase(secureHash);
+
+        String normalizedHashSecret = normalizeRequiredConfig("app.vnpay.hash-secret", hashSecret);
+        String calculatedHash = hmacSHA512(normalizedHashSecret, String.join("&", pairs));
+
+        return MessageDigest.isEqual(
+                calculatedHash.toLowerCase(Locale.ROOT).getBytes(StandardCharsets.US_ASCII),
+                secureHash.toLowerCase(Locale.ROOT).getBytes(StandardCharsets.US_ASCII)
+        );
     }
 
     private String encode(String value) {
-        try {
-            return URLEncoder.encode(value, StandardCharsets.UTF_8.toString()).replace("+", "%20");
-        } catch (UnsupportedEncodingException e) {
-            return value;
+        return URLEncoder.encode(value, StandardCharsets.US_ASCII);
+    }
+
+    private String normalizeRequiredConfig(String propertyName, String value) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalStateException(propertyName + " must not be blank");
         }
+
+        return value.strip();
     }
 
     public static String hmacSHA512(final String key, final String data) {

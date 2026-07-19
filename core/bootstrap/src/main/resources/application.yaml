@@ -93,9 +93,10 @@ app:
 
   vnpay:
     tmn-code: AS09APAU
-    hash-secret: J3ABXBPFAL757MPBL40LK1JMZ2QSFBFC
+    hash-secret: ${VNPAY_SECRET_KEY}
     payment-url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
     return-url: https://groggily-override-wrongly.ngrok-free.dev/api/v1/payments/vnpay-return
+    timeout: 15 # minute
 
   static-resources:
     base-location: ${STATIC_RESOURCES_BASE_LOCATION}

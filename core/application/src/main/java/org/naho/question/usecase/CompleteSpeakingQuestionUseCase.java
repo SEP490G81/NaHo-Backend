@@ -2,15 +2,18 @@ package org.naho.question.usecase;
 
 import org.naho.i18n.message.learning.LearningPathNodeDetailMessageKey;
 import org.naho.i18n.message.learning.UserLearningProgressDetailMessageKey;
+import org.naho.learning.command.UpdateUserStreakCommand;
 import org.naho.learning.exception.LearningPathNodeErrorCode;
 import org.naho.learning.exception.UserLearningProgressErrorCode;
 import org.naho.learning.model.LearningPathNode;
 import org.naho.learning.model.UserLearningProgress;
 import org.naho.learning.model.UserNodeProgress;
+import org.naho.learning.port.in.UserLearningStreakInputPort;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
 import org.naho.learning.port.out.UserNodeProgressRepositoryPort;
 import org.naho.learning.type.NodeStatus;
+import org.naho.learning.usecase.UserLearningStreakUseCase;
 import org.naho.point.command.PointHistoryCommand;
 import org.naho.point.port.in.CrudPointHistoryInputPort;
 import org.naho.point.type.PointTransactionType;
@@ -18,33 +21,33 @@ import org.naho.question.command.CompleteSpeakingQuestionCommand;
 import org.naho.question.port.in.CompleteSpeakingQuestionInputPort;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.TransactionPort;
-import org.naho.user.port.out.UserRepositoryPort;
 
 import java.time.Instant;
+import java.time.ZoneId;
 
 public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestionInputPort {
 
     private final LearningPathNodeRepositoryPort learningPathNodeRepositoryPort;
-    private final UserRepositoryPort userRepositoryPort;
     private final UserNodeProgressRepositoryPort userNodeProgressRepositoryPort;
     private final UserLearningProgressRepositoryPort userLearningProgressRepositoryPort;
     private final CrudPointHistoryInputPort crudPointHistoryInputPort;
     private final TransactionPort transactionPort;
+    private final UserLearningStreakInputPort userLearningStreakInputPort;
 
     public CompleteSpeakingQuestionUseCase(
             LearningPathNodeRepositoryPort learningPathNodeRepositoryPort,
-            UserRepositoryPort userRepositoryPort,
             UserNodeProgressRepositoryPort userNodeProgressRepositoryPort,
             UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
             CrudPointHistoryInputPort crudPointHistoryInputPort,
-            TransactionPort transactionPort
+            TransactionPort transactionPort,
+            UserLearningStreakInputPort userLearningStreakInputPort
     ) {
         this.learningPathNodeRepositoryPort = learningPathNodeRepositoryPort;
-        this.userRepositoryPort = userRepositoryPort;
         this.userNodeProgressRepositoryPort = userNodeProgressRepositoryPort;
         this.userLearningProgressRepositoryPort = userLearningProgressRepositoryPort;
         this.crudPointHistoryInputPort = crudPointHistoryInputPort;
         this.transactionPort = transactionPort;
+        this.userLearningStreakInputPort = userLearningStreakInputPort;
     }
 
     @Override
@@ -138,15 +141,14 @@ public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestion
         progress.setLastLearningNodeId(speakingQuestionLearningPathNode.getId());
 
         // chỉnh lại streak của người dùng
-        Integer currentStreak = progress.getCurrentStreak() + 1;
-
-        progress.setCurrentStreak(currentStreak);
-
-        if (progress.getLongestStreak() < currentStreak) {
-            progress.setLongestStreak(currentStreak);
-        }
-
-        progress.setLastLearningAt(now);
+        progress = userLearningStreakInputPort.updateUserLearningStreak(
+                UpdateUserStreakCommand.builder()
+                        .userLearningProgress(progress)
+                        .userId(command.userId())
+                        .now(now)
+                        .zoneId(ZoneId.of(UserLearningStreakUseCase.HO_CHI_MINH_ZONE_ID))
+                        .build()
+        );
 
         userLearningProgressRepositoryPort.save(progress);
 
