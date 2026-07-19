@@ -196,36 +196,66 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         String sttVal = (objective != null && objective.getOrderIndex() != null) ? String.valueOf(objective.getOrderIndex()) : "N/A";
         String topicVal = (topic != null) ? topic.getJapaneseName() : "N/A";
         String lessonVal = (lesson != null) ? lesson.getJapaneseName() : "N/A";
-        String canDoObjectiveVal = (objective != null) ? (objective.getJapaneseDescription() == null ? objective.getJapaneseName() : objective.getJapaneseDescription()) : "N/A";
+
+        String canDoObjectiveVal;
+        if (objective != null) {
+            canDoObjectiveVal = (objective.getJapaneseDescription() != null && !objective.getJapaneseDescription().isBlank())
+                    ? objective.getJapaneseDescription()
+                    : objective.getJapaneseName();
+        } else {
+            canDoObjectiveVal = "N/A";
+        }
 
         StringBuilder grammarFocusSb = new StringBuilder();
         if (speakingQuestion.getGrammars() != null) {
             for (Grammar grammar : speakingQuestion.getGrammars()) {
                 if (!grammarFocusSb.isEmpty()) {
-                    grammarFocusSb.append(", ");
+                    grammarFocusSb.append("\n");
                 }
-                grammarFocusSb.append(grammar.getVietnameseMeaningText());
+                String ja = grammar.getJapanese() != null ? grammar.getJapanese() : "";
+                String vi = grammar.getVietnameseMeaningText() != null ? grammar.getVietnameseMeaningText() : "";
+                if (!ja.isEmpty() && !vi.isEmpty()) {
+                    grammarFocusSb.append("- ").append(ja).append("（").append(vi).append("）");
+                } else if (!ja.isEmpty()) {
+                    grammarFocusSb.append("- ").append(ja);
+                } else {
+                    grammarFocusSb.append("- ").append(vi);
+                }
             }
         }
-
-        String grammarFocusVal = grammarFocusSb.isEmpty() ? "N/A" : grammarFocusSb.toString();
+        String grammarFocusVal = grammarFocusSb.isEmpty() ? "N/A (no specific grammar focus for this lesson)" : grammarFocusSb.toString();
 
         StringBuilder vocabFocusSb = new StringBuilder();
         if (speakingQuestion.getVocabularies() != null) {
             for (var v : speakingQuestion.getVocabularies()) {
                 if (!vocabFocusSb.isEmpty()) {
-                    vocabFocusSb.append(", ");
+                    vocabFocusSb.append("\n");
                 }
-                String wordText = v.getJapanese() != null ? v.getJapanese() : (v.getReading() != null ? v.getReading() : "");
-                vocabFocusSb.append(wordText);
+                String japanese = v.getJapanese() != null ? v.getJapanese() : "";
+                String reading = v.getReading() != null ? v.getReading() : "";
+                String vi = v.getVietnameseMeaningText() != null ? v.getVietnameseMeaningText() : "";
+                StringBuilder entry = new StringBuilder("- ");
+                entry.append(japanese);
+                if (!reading.isEmpty()) {
+                    entry.append("（").append(reading).append("）");
+                }
+                if (!vi.isEmpty()) {
+                    entry.append(" = ").append(vi);
+                }
+                vocabFocusSb.append(entry);
             }
         }
-        String vocabFocusVal = vocabFocusSb.isEmpty() ? "N/A" : vocabFocusSb.toString();
+        String vocabFocusVal = vocabFocusSb.isEmpty() ? "N/A (no specific vocabulary focus for this lesson)" : vocabFocusSb.toString();
+
+        String questionTitleVal = speakingQuestion.getTitle() != null ? speakingQuestion.getTitle() : "N/A";
+        String questionDescriptionVal = speakingQuestion.getDescription() != null && !speakingQuestion.getDescription().isBlank()
+                ? speakingQuestion.getDescription()
+                : questionTitleVal;
 
         double accuracy = azureAssessment.getAccuracyScore() != null ? azureAssessment.getAccuracyScore() : 0.0;
         double fluency = azureAssessment.getFluencyScore() != null ? azureAssessment.getFluencyScore() : 0.0;
         double completeness = azureAssessment.getCompletenessScore() != null ? azureAssessment.getCompletenessScore() : 0.0;
-        double prosody = azureAssessment.getPronunciationScore() != null ? azureAssessment.getPronunciationScore() : 0.0;
+        double overallPronunciation = azureAssessment.getPronunciationScore() != null ? azureAssessment.getPronunciationScore() : 0.0;
         String studentTranscript = azureAssessment.getTranscriptText() != null ? azureAssessment.getTranscriptText() : "";
 
         var evaluationContext = new AiAnalysisPort.Context(
@@ -237,11 +267,12 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 canDoObjectiveVal,
                 grammarFocusVal,
                 vocabFocusVal,
-                speakingQuestion.getTitle(),
+                questionTitleVal,
+                questionDescriptionVal,
                 accuracy,
                 fluency,
                 completeness,
-                prosody,
+                overallPronunciation,
                 studentTranscript
         );
 
@@ -257,32 +288,29 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         try {
             JsonNode rootNode = objectMapper.readTree(rawLlmFeedback);
 
-            // Extract vocabulary score
             double rawVocab = 0.0;
             if (rootNode.has("vocabulary") && rootNode.path("vocabulary").has("score")) {
                 rawVocab = rootNode.path("vocabulary").path("score").asDouble(0.0);
             } else if (rootNode.has("scores")) {
                 rawVocab = rootNode.path("scores").path("vocabulary").asDouble(0.0);
             }
-            vocabScore = rawVocab > 10.0 ? rawVocab / 2.5 : rawVocab;
+            vocabScore = Math.min(rawVocab / 2.5, 10.0);
 
-            // Extract grammar score
             double rawGrammar = 0.0;
             if (rootNode.has("grammar") && rootNode.path("grammar").has("score")) {
                 rawGrammar = rootNode.path("grammar").path("score").asDouble(0.0);
             } else if (rootNode.has("scores")) {
                 rawGrammar = rootNode.path("scores").path("grammar").asDouble(0.0);
             }
-            grammarScore = rawGrammar > 10.0 ? rawGrammar / 2.5 : rawGrammar;
+            grammarScore = Math.min(rawGrammar / 2.5, 10.0);
 
-            // Extract naturalness score
             double rawNaturalness = 0.0;
             if (rootNode.has("naturalness") && rootNode.path("naturalness").has("score")) {
                 rawNaturalness = rootNode.path("naturalness").path("score").asDouble(0.0);
             } else if (rootNode.has("scores")) {
                 rawNaturalness = rootNode.path("scores").path("naturalness").asDouble(0.0);
             }
-            naturalnessScore = rawNaturalness > 10.0 ? rawNaturalness / 2.5 : rawNaturalness;
+            naturalnessScore = Math.min(rawNaturalness / 2.5, 10.0);
 
             overallScore = (pronScore10 + fluencyScore10 + vocabScore + grammarScore + naturalnessScore) / 5.0;
             overallScore = Math.round(overallScore * 10.0) / 10.0;
@@ -291,23 +319,20 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 objectNode.put("durationSec", command.durationSec());
                 objectNode.put("overallScore", overallScore);
 
-                // Add backward-compatible scores node
                 ObjectNode scoresNode = objectMapper.createObjectNode();
                 scoresNode.put("vocabulary", vocabScore);
                 scoresNode.put("grammar", grammarScore);
                 scoresNode.put("naturalness", naturalnessScore);
                 objectNode.set("scores", scoresNode);
 
-                // Add backward-compatible aiSuggestion node
                 ObjectNode sugNode = objectMapper.createObjectNode();
                 String correctedJa = rootNode.path("overall").path("correctedAnswerJa").asText("");
                 String correctedVi = rootNode.path("overall").path("correctedAnswerVi").asText("");
                 sugNode.put("jp", correctedJa);
-                sugNode.put("furigana", correctedJa); // Can generate furigana or keep as is
+                sugNode.put("furigana", correctedJa);
                 sugNode.put("vi", correctedVi);
                 objectNode.set("aiSuggestion", sugNode);
 
-                // Add backward-compatible userTranscript node
                 var utNode = objectMapper.createArrayNode();
                 var mistakes = rootNode.path("grammar").path("mistakes");
                 if (mistakes.isArray() && !mistakes.isEmpty()) {
@@ -329,10 +354,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 }
                 objectNode.set("userTranscript", utNode);
 
-                // Add backward-compatible pronunciationNote
                 objectNode.put("pronunciationNote", rootNode.path("overall").path("summaryVi").asText(""));
 
-                // Add empty placeholders for wordNotes, expressions, itVocab if they are missing
                 if (!objectNode.has("wordNotes")) {
                     objectNode.putObject("wordNotes");
                 }
