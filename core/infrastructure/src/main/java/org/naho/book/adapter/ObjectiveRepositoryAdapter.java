@@ -33,16 +33,9 @@ public class ObjectiveRepositoryAdapter implements ObjectiveRepositoryPort {
 
     @Override
     public Optional<Objective> findById(Long id) {
-        return objectiveJpaRepository.findById(id).map(entity -> Objective.builder()
-                .id(entity.getId())
-                .lessonId(entity.getLesson() != null ? entity.getLesson().getId() : null)
-                .japaneseName(entity.getJapaneseName())
-                .japaneseDescription(entity.getJapaneseDescription())
-                .japaneseNameMarkup(entity.getJapaneseNameMarkup())
-                .japaneseDescriptionMarkup(entity.getJapaneseDescriptionMarkup())
-                .status(entity.getStatus())
-                .orderIndex(entity.getOrderIndex())
-                .build());
+        return objectiveJpaRepository
+                .findById(id)
+                .map(objectiveEntityMapper::entityToDomain);
     }
 
     @Override

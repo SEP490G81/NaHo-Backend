@@ -12,6 +12,8 @@ public record LessonDetailResult(
         String japaneseDescriptionMarkup,
         TopicStatus status,
         Double orderIndex,
+        Double firstNodeGlobalOrderIndex,
+        Double lastNodeGlobalOrderIndex,
         List<ObjectiveListItemResult> objectives
 ) {
 }

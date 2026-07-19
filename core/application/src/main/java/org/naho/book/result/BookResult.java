@@ -11,6 +11,8 @@ public record BookResult(
         JLPTLevel jlptLevel,
         CefrLevel cefrLevel,
         Double orderIndex,
+        Double firstNodeGlobalOrderIndex,
+        Double lastNodeGlobalOrderIndex,
         FileResult coverImage
 ) {
 }

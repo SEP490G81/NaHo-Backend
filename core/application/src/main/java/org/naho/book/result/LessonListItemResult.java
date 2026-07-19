@@ -10,6 +10,8 @@ public record LessonListItemResult(
         String japaneseNameMarkup,
         String japaneseDescriptionMarkup,
         TopicStatus status,
-        Double orderIndex
+        Double orderIndex,
+        Double firstNodeGlobalOrderIndex,
+        Double lastNodeGlobalOrderIndex
 ) {
 }

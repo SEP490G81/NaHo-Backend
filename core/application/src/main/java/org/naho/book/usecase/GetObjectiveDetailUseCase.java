@@ -53,6 +53,8 @@ public class GetObjectiveDetailUseCase implements GetObjectiveDetailInputPort {
                 objective.getJapaneseDescriptionMarkup(),
                 objective.getStatus(),
                 objective.getOrderIndex(),
+                objective.getFirstNodeGlobalOrderIndex(),
+                objective.getLastNodeGlobalOrderIndex(),
                 nodes
         );
     }

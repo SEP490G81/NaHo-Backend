@@ -37,7 +37,9 @@ public class GetLessonDetailUseCase implements GetLessonDetailInputPort {
                         objective.getJapaneseNameMarkup(),
                         objective.getJapaneseDescriptionMarkup(),
                         objective.getStatus(),
-                        objective.getOrderIndex()
+                        objective.getOrderIndex(),
+                        objective.getFirstNodeGlobalOrderIndex(),
+                        objective.getLastNodeGlobalOrderIndex()
                 ))
                 .toList();
 
@@ -49,6 +51,8 @@ public class GetLessonDetailUseCase implements GetLessonDetailInputPort {
                 lesson.getJapaneseDescriptionMarkup(),
                 lesson.getStatus(),
                 lesson.getOrderIndex(),
+                lesson.getFirstNodeGlobalOrderIndex(),
+                lesson.getLastNodeGlobalOrderIndex(),
                 objectives
         );
     }
