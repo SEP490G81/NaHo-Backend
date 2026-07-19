@@ -5,6 +5,7 @@ import java.time.Instant;
 public class UserLearningProgress {
     private Long id;
     private Long farthestAvailableNodeId;
+    private Double farthestAvailableNodeGlobalOrderIndex;
     private Long lastLearningNodeId;
     private Integer currentStreak;
     private Integer longestStreak;
@@ -14,6 +15,7 @@ public class UserLearningProgress {
     private UserLearningProgress(Builder builder) {
         this.id = builder.id;
         this.farthestAvailableNodeId = builder.farthestAvailableNodeId;
+        this.farthestAvailableNodeGlobalOrderIndex = builder.farthestAvailableNodeGlobalOrderIndex;
         this.lastLearningNodeId = builder.lastLearningNodeId;
         this.lastLearningAt = builder.lastLearningAt;
         this.currentStreak = builder.currentStreak;
@@ -50,6 +52,14 @@ public class UserLearningProgress {
 
     public void setFarthestAvailableNodeId(Long farthestAvailableNodeId) {
         this.farthestAvailableNodeId = farthestAvailableNodeId;
+    }
+
+    public Double getFarthestAvailableNodeGlobalOrderIndex() {
+        return farthestAvailableNodeGlobalOrderIndex;
+    }
+
+    public void setFarthestAvailableNodeGlobalOrderIndex(Double farthestAvailableNodeGlobalOrderIndex) {
+        this.farthestAvailableNodeGlobalOrderIndex = farthestAvailableNodeGlobalOrderIndex;
     }
 
     public Long getLastLearningNodeId() {
@@ -103,6 +113,7 @@ public class UserLearningProgress {
     public static final class Builder {
         private Long id;
         private Long farthestAvailableNodeId;
+        private Double farthestAvailableNodeGlobalOrderIndex;
         private Long lastLearningNodeId;
         private Instant lastLearningAt;
         private Integer currentStreak;
@@ -119,6 +130,11 @@ public class UserLearningProgress {
 
         public Builder farthestAvailableNodeId(Long farthestAvailableNodeId) {
             this.farthestAvailableNodeId = farthestAvailableNodeId;
+            return this;
+        }
+
+        public Builder farthestAvailableNodeGlobalOrderIndex(Double farthestAvailableNodeGlobalOrderIndex) {
+            this.farthestAvailableNodeGlobalOrderIndex = farthestAvailableNodeGlobalOrderIndex;
             return this;
         }
 

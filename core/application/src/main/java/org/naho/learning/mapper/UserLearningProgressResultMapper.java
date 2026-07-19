@@ -13,6 +13,7 @@ public class UserLearningProgressResultMapper {
         return UserLearningProgressResult.builder()
                 .id(domain.getId())
                 .farthestAvailableNodeId(domain.getFarthestAvailableNodeId())
+                .farthestAvailableNodeGlobalOrderIndex(domain.getFarthestAvailableNodeGlobalOrderIndex())
                 .lastLearningNodeId(domain.getLastLearningNodeId())
                 .lastLearningAt(domain.getLastLearningAt())
                 .currentStreak(domain.getCurrentStreak())

@@ -15,6 +15,7 @@ public abstract class UserLearningProgressEntityMapper {
     @Autowired
     private LearningPathNodeJpaRepository learningPathNodeJpaRepository;
 
+    @Mapping(target = "farthestAvailableNodeGlobalOrderIndex", source = "farthestAvailableNode.globalOrderIndex")
     @Mapping(target = "farthestAvailableNodeId", source = "farthestAvailableNode.id")
     @Mapping(target = "lastLearningNodeId", source = "lastLearningNode.id")
     public abstract UserLearningProgress entityToDomain(UserLearningProgressEntity entity);
