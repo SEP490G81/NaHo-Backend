@@ -9,6 +9,7 @@ public class UserLearningProgressResult {
     private Long farthestAvailableNodeId;
     private Double farthestAvailableNodeGlobalOrderIndex;
     private Long lastLearningNodeId;
+    private Double lastLearningNodeGlobalOrderIndex;
     private Instant lastLearningAt;
     private Integer currentStreak;
     private Integer longestStreak;
@@ -23,6 +24,7 @@ public class UserLearningProgressResult {
             Long farthestAvailableNodeId,
             Double farthestAvailableNodeGlobalOrderIndex,
             Long lastLearningNodeId,
+            Double lastLearningNodeGlobalOrderIndex,
             Instant lastLearningAt,
             Integer currentStreak,
             Integer longestStreak,
@@ -33,6 +35,7 @@ public class UserLearningProgressResult {
         this.farthestAvailableNodeId = farthestAvailableNodeId;
         this.farthestAvailableNodeGlobalOrderIndex = farthestAvailableNodeGlobalOrderIndex;
         this.lastLearningNodeId = lastLearningNodeId;
+        this.lastLearningNodeGlobalOrderIndex = lastLearningNodeGlobalOrderIndex;
         this.lastLearningAt = lastLearningAt;
         this.currentStreak = currentStreak;
         this.longestStreak = longestStreak;
@@ -74,6 +77,14 @@ public class UserLearningProgressResult {
 
     public void setLastLearningNodeId(Long lastLearningNodeId) {
         this.lastLearningNodeId = lastLearningNodeId;
+    }
+
+    public Double getLastLearningNodeGlobalOrderIndex() {
+        return lastLearningNodeGlobalOrderIndex;
+    }
+
+    public void setLastLearningNodeGlobalOrderIndex(Double lastLearningNodeGlobalOrderIndex) {
+        this.lastLearningNodeGlobalOrderIndex = lastLearningNodeGlobalOrderIndex;
     }
 
     public Instant getLastLearningAt() {
@@ -121,6 +132,7 @@ public class UserLearningProgressResult {
         private Long farthestAvailableNodeId;
         private Double farthestAvailableNodeGlobalOrderIndex;
         private Long lastLearningNodeId;
+        private Double lastLearningNodeGlobalOrderIndex;
         private Instant lastLearningAt;
         private Integer currentStreak;
         private Integer longestStreak;
@@ -144,6 +156,11 @@ public class UserLearningProgressResult {
 
         public Builder lastLearningNodeId(Long lastLearningNodeId) {
             this.lastLearningNodeId = lastLearningNodeId;
+            return this;
+        }
+
+        public Builder lastLearningNodeGlobalOrderIndex(Double lastLearningNodeGlobalOrderIndex) {
+            this.lastLearningNodeGlobalOrderIndex = lastLearningNodeGlobalOrderIndex;
             return this;
         }
 
@@ -178,6 +195,7 @@ public class UserLearningProgressResult {
                     farthestAvailableNodeId,
                     farthestAvailableNodeGlobalOrderIndex,
                     lastLearningNodeId,
+                    lastLearningNodeGlobalOrderIndex,
                     lastLearningAt,
                     currentStreak,
                     longestStreak,
