@@ -47,7 +47,7 @@ public class UserLearningProgressRepositoryAdapter implements UserLearningProgre
     }
 
     @Override
-    public Optional<UserLearningProgress> findUserLearningProgressByUserId(Long userId) {
+    public Optional<UserLearningProgress> findByUserId(Long userId) {
         return userLearningProgressJpaRepository
                 .findByUserId(userId)
                 .map(userLearningProgressEntityMapper::entityToDomain);

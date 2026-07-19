@@ -7,7 +7,7 @@ import lombok.experimental.SuperBuilder;
 import org.naho.book.entity.ObjectiveEntity;
 import org.naho.learning.type.NodeType;
 import org.naho.point.entity.PointHistoryEntity;
-import org.naho.question.entity.ChestEntity;
+import org.naho.chest.entity.ChestEntity;
 import org.naho.question.entity.SpeakingQuestionEntity;
 import org.naho.question.entity.VocabularyQuestionEntity;
 import org.naho.shared.persistence.BaseEntity;

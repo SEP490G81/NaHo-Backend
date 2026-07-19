@@ -205,10 +205,6 @@ CREATE TABLE point_histories
     transaction_time      datetime(6)           NOT NULL,
     user_id               BIGINT                NOT NULL,
     learning_path_node_id BIGINT                NULL,
-    objective_id          BIGINT                NULL,
-    lesson_id             BIGINT                NULL,
-    topic_id              BIGINT                NULL,
-    book_id               BIGINT                NULL,
     CONSTRAINT pk_point_histories PRIMARY KEY (id)
 );
 
@@ -553,19 +549,7 @@ ALTER TABLE personas
     ADD CONSTRAINT FK_PERSONAS_ON_SUGGESTED_CONVERSATION_STYLE FOREIGN KEY (suggested_conversation_style_id) REFERENCES conversation_styles (id);
 
 ALTER TABLE point_histories
-    ADD CONSTRAINT FK_POINT_HISTORIES_ON_BOOK FOREIGN KEY (book_id) REFERENCES books (id);
-
-ALTER TABLE point_histories
     ADD CONSTRAINT FK_POINT_HISTORIES_ON_LEARNING_PATH_NODE FOREIGN KEY (learning_path_node_id) REFERENCES learning_path_nodes (id);
-
-ALTER TABLE point_histories
-    ADD CONSTRAINT FK_POINT_HISTORIES_ON_LESSON FOREIGN KEY (lesson_id) REFERENCES lessons (id);
-
-ALTER TABLE point_histories
-    ADD CONSTRAINT FK_POINT_HISTORIES_ON_OBJECTIVE FOREIGN KEY (objective_id) REFERENCES objectives (id);
-
-ALTER TABLE point_histories
-    ADD CONSTRAINT FK_POINT_HISTORIES_ON_TOPIC FOREIGN KEY (topic_id) REFERENCES topics (id);
 
 ALTER TABLE point_histories
     ADD CONSTRAINT FK_POINT_HISTORIES_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);

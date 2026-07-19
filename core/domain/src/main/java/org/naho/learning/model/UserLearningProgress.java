@@ -3,11 +3,11 @@ package org.naho.learning.model;
 import java.time.Instant;
 
 public class UserLearningProgress {
-    private final Long farthestAvailableNodeId;
-    private final Integer currentStreak;
-    private final Integer longestStreak;
     private Long id;
+    private Long farthestAvailableNodeId;
     private Long lastLearningNodeId;
+    private Integer currentStreak;
+    private Integer longestStreak;
     private Instant lastLearningAt;
     private Double totalPoint;
 
@@ -66,6 +66,30 @@ public class UserLearningProgress {
 
     public void setTotalPoint(Double totalPoint) {
         this.totalPoint = totalPoint;
+    }
+
+    public void setFarthestAvailableNodeId(Long farthestAvailableNodeId) {
+        this.farthestAvailableNodeId = farthestAvailableNodeId;
+    }
+
+    public void setCurrentStreak(Integer currentStreak) {
+        this.currentStreak = currentStreak;
+    }
+
+    public void setLongestStreak(Integer longestStreak) {
+        this.longestStreak = longestStreak;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setLastLearningNodeId(Long lastLearningNodeId) {
+        this.lastLearningNodeId = lastLearningNodeId;
+    }
+
+    public void setLastLearningAt(Instant lastLearningAt) {
+        this.lastLearningAt = lastLearningAt;
     }
 
     public void addPoint(Double point) {

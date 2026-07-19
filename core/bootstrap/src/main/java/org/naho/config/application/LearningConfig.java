@@ -7,7 +7,7 @@ import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
 import org.naho.learning.port.in.GetLearningPathNodeDetailInputPort;
 import org.naho.learning.usecase.CrudUserLearningProgressUseCase;
 import org.naho.learning.usecase.GetLearningPathNodeDetailUseCase;
-import org.naho.question.adapter.ChestRepositoryAdapter;
+import org.naho.chest.adapter.ChestRepositoryAdapter;
 import org.naho.question.adapter.SpeakingQuestionRepositoryAdapter;
 import org.naho.question.adapter.VocabularyQuestionRepositoryAdapter;
 import org.naho.user.port.out.UserRepositoryPort;
