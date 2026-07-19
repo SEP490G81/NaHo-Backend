@@ -40,24 +40,48 @@ public class UserLearningProgress {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public Long getFarthestAvailableNodeId() {
         return farthestAvailableNodeId;
+    }
+
+    public void setFarthestAvailableNodeId(Long farthestAvailableNodeId) {
+        this.farthestAvailableNodeId = farthestAvailableNodeId;
     }
 
     public Long getLastLearningNodeId() {
         return lastLearningNodeId;
     }
 
+    public void setLastLearningNodeId(Long lastLearningNodeId) {
+        this.lastLearningNodeId = lastLearningNodeId;
+    }
+
     public Instant getLastLearningAt() {
         return lastLearningAt;
+    }
+
+    public void setLastLearningAt(Instant lastLearningAt) {
+        this.lastLearningAt = lastLearningAt;
     }
 
     public Integer getCurrentStreak() {
         return currentStreak;
     }
 
+    public void setCurrentStreak(Integer currentStreak) {
+        this.currentStreak = currentStreak;
+    }
+
     public Integer getLongestStreak() {
         return longestStreak;
+    }
+
+    public void setLongestStreak(Integer longestStreak) {
+        this.longestStreak = longestStreak;
     }
 
     public Double getTotalPoint() {
@@ -66,30 +90,6 @@ public class UserLearningProgress {
 
     public void setTotalPoint(Double totalPoint) {
         this.totalPoint = totalPoint;
-    }
-
-    public void setFarthestAvailableNodeId(Long farthestAvailableNodeId) {
-        this.farthestAvailableNodeId = farthestAvailableNodeId;
-    }
-
-    public void setCurrentStreak(Integer currentStreak) {
-        this.currentStreak = currentStreak;
-    }
-
-    public void setLongestStreak(Integer longestStreak) {
-        this.longestStreak = longestStreak;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setLastLearningNodeId(Long lastLearningNodeId) {
-        this.lastLearningNodeId = lastLearningNodeId;
-    }
-
-    public void setLastLearningAt(Instant lastLearningAt) {
-        this.lastLearningAt = lastLearningAt;
     }
 
     public void addPoint(Double point) {

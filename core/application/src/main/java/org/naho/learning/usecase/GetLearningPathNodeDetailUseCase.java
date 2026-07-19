@@ -1,9 +1,9 @@
 package org.naho.learning.usecase;
 
 import lombok.RequiredArgsConstructor;
-import org.naho.grammar.result.GrammarDetailResult;
 import org.naho.chest.exception.ChestErrorCode;
 import org.naho.chest.port.out.ChestRepositoryPort;
+import org.naho.grammar.result.GrammarDetailResult;
 import org.naho.i18n.message.chest.ChestDetailMessageKey;
 import org.naho.i18n.message.learning.LearningPathNodeDetailMessageKey;
 import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
@@ -13,7 +13,9 @@ import org.naho.learning.exception.LearningPathNodeErrorCode;
 import org.naho.learning.model.LearningPathNode;
 import org.naho.learning.port.in.GetLearningPathNodeDetailInputPort;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
-import org.naho.learning.result.*;
+import org.naho.learning.result.ChestDetailResult;
+import org.naho.learning.result.LearningPathNodeDetailResult;
+import org.naho.learning.type.NodeType;
 import org.naho.question.exception.SpeakingQuestionErrorCode;
 import org.naho.question.exception.VocabularyQuestionErrorCode;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
@@ -45,78 +47,79 @@ public class GetLearningPathNodeDetailUseCase implements GetLearningPathNodeDeta
         VocabularyQuestionDetailResult vocabularyQuestionResult = null;
         ChestDetailResult chestResult = null;
 
-        switch (node.getNodeType()) {
-            case SPEAKING_QUESTION -> {
-                if (node.getSpeakingQuestionId() != null) {
-                    var sq = speakingQuestionRepositoryPort.findById(node.getSpeakingQuestionId())
-                            .orElseThrow(() -> new ApplicationException(
-                                    SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
-                                    SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_NOT_FOUND,
-                                    node.getSpeakingQuestionId()));
-                    var vocabList = sq.getVocabularies() == null ? List.<VocabularyDetailResult>of() : sq.getVocabularies().stream()
-                            .map(v -> new VocabularyDetailResult(
-                                    v.getId(),
-                                    v.getReading(),
-                                    v.getJapanese(),
-                                    v.getVietnameseMeaningText(),
-                                    v.getEnglishMeaningText()))
-                            .toList();
-                    var grammarList = sq.getGrammars() == null ? List.<GrammarDetailResult>of() : sq.getGrammars().stream()
-                            .map(g -> new GrammarDetailResult(
-                                    g.getId(),
-                                    g.getReading(),
-                                    g.getJapanese(),
-                                    g.getVietnameseMeaningText(),
-                                    g.getEnglishMeaningText()))
-                            .toList();
+        NodeType nodeType = node.getNodeType();
 
-                    speakingQuestionResult = new SpeakingQuestionDetailResult(
-                            sq.getId(),
-                            sq.getUserId(),
-                            sq.getTitle(),
-                            sq.getTitleMarkup(),
-                            sq.getDescription(),
-                            sq.getDescriptionMarkup(),
-                            sq.getStatus(),
-                            vocabList,
-                            grammarList);
-                }
-            }
-            case VOCABULARY_QUESTION -> {
-                if (node.getVocabularyQuestionId() != null) {
-                    var vq = vocabularyQuestionRepositoryPort
-                            .findById(node.getVocabularyQuestionId())
-                            .orElseThrow(() -> new ApplicationException(
-                                    VocabularyQuestionErrorCode.VOCABULARY_QUESTION_NOT_FOUND,
-                                    VocabularyQuestionDetailMessageKey.VOCABULARY_QUESTION_NOT_FOUND,
-                                    node.getVocabularyQuestionId()));
-                    var vocabList = vq.getVocabularies().stream()
-                            .map(v -> new VocabularyDetailResult(
-                                    v.getId(),
-                                    v.getReading(),
-                                    v.getJapanese(),
-                                    v.getVietnameseMeaningText(),
-                                    v.getEnglishMeaningText()))
-                            .toList();
-                    vocabularyQuestionResult = new VocabularyQuestionDetailResult(
-                            vq.getId(),
-                            vocabList);
-                }
-            }
-            case CHEST -> {
-                if (node.getChestId() != null) {
-                    var chest = chestRepositoryPort.findById(node.getChestId())
-                            .orElseThrow(() -> new ApplicationException(
-                                    ChestErrorCode.CHEST_NOT_FOUND,
-                                    ChestDetailMessageKey.CHEST_NOT_FOUND,
-                                    node.getChestId()));
-                    chestResult = new ChestDetailResult(
-                            chest.getId(),
-                            chest.getTitle(),
-                            chest.getDescription(),
-                            chest.getPoint());
-                }
-            }
+        if (nodeType.equals(NodeType.SPEAKING_QUESTION)
+                && node.getSpeakingQuestionId() != null) {
+            var sq = speakingQuestionRepositoryPort.findById(node.getSpeakingQuestionId())
+                    .orElseThrow(() -> new ApplicationException(
+                            SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
+                            SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_NOT_FOUND,
+                            node.getSpeakingQuestionId())
+                    );
+            
+            var vocabList = sq.getVocabularies() == null ? List.<VocabularyDetailResult>of() : sq.getVocabularies().stream()
+                    .map(v -> new VocabularyDetailResult(
+                            v.getId(),
+                            v.getReading(),
+                            v.getJapanese(),
+                            v.getVietnameseMeaningText(),
+                            v.getEnglishMeaningText()))
+                    .toList();
+            var grammarList = sq.getGrammars() == null ? List.<GrammarDetailResult>of() : sq.getGrammars().stream()
+                    .map(g -> new GrammarDetailResult(
+                            g.getId(),
+                            g.getReading(),
+                            g.getJapanese(),
+                            g.getVietnameseMeaningText(),
+                            g.getEnglishMeaningText()))
+                    .toList();
+
+            speakingQuestionResult = new SpeakingQuestionDetailResult(
+                    sq.getId(),
+                    sq.getUserId(),
+                    sq.getTitle(),
+                    sq.getTitleMarkup(),
+                    sq.getDescription(),
+                    sq.getDescriptionMarkup(),
+                    sq.getStatus(),
+                    vocabList,
+                    grammarList
+            );
+        } else if (nodeType.equals(NodeType.VOCABULARY_QUESTION)
+                && node.getVocabularyQuestionId() != null) {
+            var vq = vocabularyQuestionRepositoryPort
+                    .findById(node.getVocabularyQuestionId())
+                    .orElseThrow(() -> new ApplicationException(
+                            VocabularyQuestionErrorCode.VOCABULARY_QUESTION_NOT_FOUND,
+                            VocabularyQuestionDetailMessageKey.VOCABULARY_QUESTION_NOT_FOUND,
+                            node.getVocabularyQuestionId()));
+            var vocabList = vq.getVocabularies().stream()
+                    .map(v -> new VocabularyDetailResult(
+                            v.getId(),
+                            v.getReading(),
+                            v.getJapanese(),
+                            v.getVietnameseMeaningText(),
+                            v.getEnglishMeaningText()))
+                    .toList();
+            vocabularyQuestionResult = new VocabularyQuestionDetailResult(
+                    vq.getId(),
+                    vocabList
+            );
+        } else if (nodeType.equals(NodeType.CHEST)
+                && node.getChestId() != null) {
+            var chest = chestRepositoryPort.findById(node.getChestId())
+                    .orElseThrow(() -> new ApplicationException(
+                            ChestErrorCode.CHEST_NOT_FOUND,
+                            ChestDetailMessageKey.CHEST_NOT_FOUND,
+                            node.getChestId()));
+
+            chestResult = new ChestDetailResult(
+                    chest.getId(),
+                    chest.getTitle(),
+                    chest.getDescription(),
+                    chest.getPoint()
+            );
         }
 
         return new LearningPathNodeDetailResult(
@@ -127,6 +130,7 @@ public class GetLearningPathNodeDetailUseCase implements GetLearningPathNodeDeta
                 node.getOrderIndex(),
                 speakingQuestionResult,
                 vocabularyQuestionResult,
-                chestResult);
+                chestResult
+        );
     }
 }

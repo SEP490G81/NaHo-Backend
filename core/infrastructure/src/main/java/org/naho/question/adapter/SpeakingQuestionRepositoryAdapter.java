@@ -3,13 +3,13 @@ package org.naho.question.adapter;
 import lombok.RequiredArgsConstructor;
 import org.naho.file.repository.FileJpaRepository;
 import org.naho.question.entity.SpeakingQuestionEntity;
-import org.naho.question.model.SpeakingQuestion;
 import org.naho.question.model.Grammar;
-import org.naho.vocabulary.model.Vocabulary;
+import org.naho.question.model.SpeakingQuestion;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.question.repository.SpeakingQuestionJpaRepository;
 import org.naho.question.type.QuestionStatus;
 import org.naho.user.repository.UserJpaRepository;
+import org.naho.vocabulary.model.Vocabulary;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

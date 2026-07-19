@@ -1,7 +1,7 @@
 package org.naho.chest.model;
 
-import org.naho.i18n.message.chest.ChestDetailMessageKey;
 import org.naho.chest.exception.ChestDomainErrorCode;
+import org.naho.i18n.message.chest.ChestDetailMessageKey;
 import org.naho.shared.exception.DomainException;
 
 public class Chest {
