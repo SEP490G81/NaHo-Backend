@@ -1,4 +1,4 @@
-package org.naho.question.mapper;
+package org.naho.question.mybatis;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -8,7 +8,7 @@ import org.naho.question.result.SpeakingQuestionListItemResult;
 import java.util.List;
 
 @Mapper
-public interface SpeakingQuestionMapper {
+public interface SpeakingQuestionQueryMapper {
 
     long countSpeakingQuestions(@Param("query") SearchSpeakingQuestionsCommand query);
 

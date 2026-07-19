@@ -27,26 +27,24 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
 
     @Override
     public String findObjectKeyById(Long id) {
-        if (id == null) return null;
+        if (id == null)
+            return null;
         FileEntity file = fileJpaRepository.findById(id)
                 .orElseThrow(() -> new InfrastructureException(
                         FileErrorCode.FILE_NOT_FOUND,
                         FileDetailMessageKey.FILE_NOT_FOUND,
-                        id
-                ));
+                        id));
         return file.getObjectKey();
     }
 
     @Override
     public File save(File file) {
-        if (file == null) return null;
+        if (file == null)
+            return null;
         FileEntity fileEntity = fileEntityMapper.domainToEntity(file);
 
         if (file.getCommentId() != null) {
             fileEntity.setComment(entityManager.getReference(CommentEntity.class, file.getCommentId()));
-        }
-        if (file.getQuestionId() != null) {
-            fileEntity.setQuestion(entityManager.getReference(SpeakingQuestionEntity.class, file.getQuestionId()));
         }
         if (file.getReportId() != null) {
             fileEntity.setReport(entityManager.getReference(ReportEntity.class, file.getReportId()));
@@ -67,8 +65,7 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
                 .orElseThrow(() -> new InfrastructureException(
                         FileErrorCode.FILE_NOT_FOUND,
                         FileDetailMessageKey.FILE_NOT_FOUND,
-                        id
-                ));
+                        id));
         return fileEntityMapper.entityToDomain(entity);
     }
 
@@ -83,7 +80,8 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
 
     @Override
     public List<File> findAllByBookIds(List<Long> ids) {
-        if (ids == null || ids.isEmpty()) return List.of();
+        if (ids == null || ids.isEmpty())
+            return List.of();
         List<FileEntity> fileEntityList = fileJpaRepository.findAllById(ids);
         return fileEntityList
                 .stream()

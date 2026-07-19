@@ -1,5 +1,6 @@
 package org.naho.persona.usecase;
 
+import org.naho.persona.command.CreatePersonaCommand;
 import org.naho.persona.model.Persona;
 import org.naho.persona.port.in.CreatePersonaInputPort;
 import org.naho.persona.port.out.PersonaRepositoryPort;
@@ -13,12 +14,12 @@ public class CreatePersonaUseCase implements CreatePersonaInputPort {
     }
 
     @Override
-    public Persona createPersona(String name, String prompt, Long avatarFileId, Long suggestedConversationStyleId) {
+    public Persona createPersona(CreatePersonaCommand command) {
         Persona persona = Persona.builder()
-                .name(name)
-                .prompt(prompt)
-                .avatarFileId(avatarFileId)
-                .suggestedConversationStyleId(suggestedConversationStyleId)
+                .name(command.name())
+                .prompt(command.prompt())
+                .avatarFileId(command.avatarFileId())
+                .suggestedConversationStyleId(command.suggestedConversationStyleId())
                 .build();
         return personaRepositoryPort.save(persona);
     }

@@ -8,7 +8,6 @@ public class File {
 
     private final Long id;
     private final Long commentId;
-    private final Long questionId;
     private final Long reportId;
     private final String objectKey;
     private final String originalName;
@@ -18,7 +17,6 @@ public class File {
     private File(Builder builder) {
         this.id = builder.id;
         this.commentId = builder.commentId;
-        this.questionId = builder.questionId;
         this.reportId = builder.reportId;
         this.objectKey = builder.objectKey;
         this.originalName = builder.originalName;
@@ -36,10 +34,6 @@ public class File {
 
     public Long getCommentId() {
         return commentId;
-    }
-
-    public Long getQuestionId() {
-        return questionId;
     }
 
     public Long getReportId() {
@@ -66,7 +60,6 @@ public class File {
 
         private Long id;
         private Long commentId;
-        private Long questionId;
         private Long reportId;
         private String objectKey;
         private String originalName;
@@ -80,11 +73,6 @@ public class File {
 
         public Builder commentId(Long commentId) {
             this.commentId = commentId;
-            return this;
-        }
-
-        public Builder questionId(Long questionId) {
-            this.questionId = questionId;
             return this;
         }
 
@@ -117,22 +105,19 @@ public class File {
             if (objectKey == null || objectKey.isBlank()) {
                 throw new DomainException(
                         FileDomainErrorCode.FILE_OBJECT_KEY_EMPTY,
-                        FileDetailMessageKey.FILE_EMPTY
-                );
+                        FileDetailMessageKey.FILE_EMPTY);
             }
 
             if (originalName == null || originalName.isBlank()) {
                 throw new DomainException(
                         FileDomainErrorCode.FILE_ORIGINAL_NAME_EMPTY,
-                        FileDetailMessageKey.FILE_ORIGINAL_NAME_EMPTY
-                );
+                        FileDetailMessageKey.FILE_ORIGINAL_NAME_EMPTY);
             }
 
             if (size == null || size <= 0) {
                 throw new DomainException(
                         FileDomainErrorCode.FILE_SIZE_INVALID,
-                        FileDetailMessageKey.FILE_EMPTY
-                );
+                        FileDetailMessageKey.FILE_EMPTY);
             }
 
             return new File(this);

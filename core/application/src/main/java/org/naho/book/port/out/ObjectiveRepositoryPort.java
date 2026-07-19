@@ -10,5 +10,7 @@ public interface ObjectiveRepositoryPort {
 
     Optional<Objective> findById(Long id);
 
+    Optional<Objective> findBySpeakingQuestionId(Long speakingQuestionId);
+
     List<Objective> findByLessonId(Long lessonId);
 }

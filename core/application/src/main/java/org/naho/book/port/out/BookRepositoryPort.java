@@ -9,4 +9,6 @@ public interface BookRepositoryPort {
     List<Book> findAllBooks();
 
     Optional<Book> findById(Long bookId);
+
+    Optional<Book> findBySpeakingQuestionId(Long speakingQuestionId);
 }

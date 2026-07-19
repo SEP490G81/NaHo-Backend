@@ -13,13 +13,13 @@ public interface FileRequestMapper {
     default FileUploadCommand multipartFileAndFolderNameToCommand(MultipartFile file, String folderName) {
         if (file == null || file.isEmpty()) return null;
         try {
-            return new FileUploadCommand(
-                    folderName,
-                    file.getOriginalFilename(),
-                    file.getInputStream(),
-                    file.getContentType(),
-                    file.getSize()
-            );
+            return FileUploadCommand.builder()
+                    .folderName(folderName)
+                    .originalName(file.getOriginalFilename())
+                    .inputStream(file.getInputStream())
+                    .contentType(file.getContentType())
+                    .size(file.getSize())
+                    .build();
         } catch (IOException e) {
             throw new PresentationException(
                     FileErrorCode.FILE_UPLOAD_FAILED,

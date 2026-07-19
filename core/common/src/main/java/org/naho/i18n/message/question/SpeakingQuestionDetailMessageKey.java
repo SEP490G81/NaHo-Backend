@@ -16,7 +16,9 @@ public final class SpeakingQuestionDetailMessageKey {
             "speaking_question.title.empty";
     public static final String SPEAKING_QUESTION_DESCRIPTION_EMPTY =
             "speaking_question.description.empty";
-
+    public static final String ANSWER_HISTORY_NOT_FOUND = "answer_history.not_found";
+    public static final String SPEECH_ASSESSMENT_NOT_FOUND = "speech_assessment.not_found";
+    public static final String CONTENT_ASSESSMENT_NOT_FOUND = "content_assessment.not_found";
     private SpeakingQuestionDetailMessageKey() {
     }
 }

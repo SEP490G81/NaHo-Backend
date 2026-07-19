@@ -5,14 +5,14 @@ import java.time.Instant;
 public class AnswerHistory {
     private Long id;
     private Long userId;
-    private Long questionId;
+    private Long speakingQuestionId;
     private Long audioFileId;
     private Instant createdTime;
 
     private AnswerHistory(Builder builder) {
         this.id = builder.id;
         this.userId = builder.userId;
-        this.questionId = builder.questionId;
+        this.speakingQuestionId = builder.speakingQuestionId;
         this.audioFileId = builder.audioFileId;
         this.createdTime = builder.createdTime;
     }
@@ -29,8 +29,8 @@ public class AnswerHistory {
         return userId;
     }
 
-    public Long getQuestionId() {
-        return questionId;
+    public Long getSpeakingQuestionId() {
+        return speakingQuestionId;
     }
 
     public Long getAudioFileId() {
@@ -44,7 +44,7 @@ public class AnswerHistory {
     public static class Builder {
         private Long id;
         private Long userId;
-        private Long questionId;
+        private Long speakingQuestionId;
         private Long audioFileId;
         private Instant createdTime;
 
@@ -58,8 +58,8 @@ public class AnswerHistory {
             return this;
         }
 
-        public Builder questionId(Long questionId) {
-            this.questionId = questionId;
+        public Builder speakingQuestionId(Long speakingQuestionId) {
+            this.speakingQuestionId = speakingQuestionId;
             return this;
         }
 

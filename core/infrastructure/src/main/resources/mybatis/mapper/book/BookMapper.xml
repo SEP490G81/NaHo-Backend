@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.naho.book.mybatis.BookQueryMapper">
+    <resultMap id="BookResultMap" type="org.naho.book.entity.BookEntity">
+        <id property="id" column="id"/>
+        <result property="createdTime" column="created_time"/>
+        <result property="modifiedTime" column="modified_time"/>
+        <result property="title" column="title"/>
+        <result property="description" column="description"/>
+        <result property="jlptLevel" column="jlpt_level"/>
+        <result property="cefrLevel" column="cefr_level"/>
+        <result property="orderIndex" column="order_index"/>
+        <result property="firstNodeGlobalOrderIndex" column="first_node_global_order_index"/>
+        <result property="lastNodeGlobalOrderIndex" column="last_node_global_order_index"/>
+        <association property="coverImageFile" javaType="org.naho.file.entity.FileEntity">
+            <id property="id" column="cover_image_file_id"/>
+        </association>
+    </resultMap>
+
     <select id="findFirstNodeGlobalOrderIndexById" resultType="double">
         select min(lpn.global_order_index)
         from learning_path_nodes lpn
@@ -17,5 +33,16 @@
                  join lessons l on o.lesson_id = l.id
                  join topics t on l.topic_id = t.id
         where t.book_id = #{bookId}
+    </select>
+
+    <select id="findBySpeakingQuestionId" resultMap="BookResultMap">
+        select b.*
+        from speaking_questions sq
+                 join learning_path_nodes lpn on sq.id = lpn.speaking_question_id
+                 join objectives o on lpn.objective_id = o.id
+                 join lessons l on o.lesson_id = l.id
+                 join topics t on l.topic_id = t.id
+                 join books b on t.book_id = b.id
+        where sq.id = #{speakingQuestionId}
     </select>
 </mapper>

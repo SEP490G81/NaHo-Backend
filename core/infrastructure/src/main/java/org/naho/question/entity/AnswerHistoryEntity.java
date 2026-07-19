@@ -25,7 +25,7 @@ public class AnswerHistoryEntity extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "speaking_question_id", nullable = false)
-    SpeakingQuestionEntity question;
+    SpeakingQuestionEntity speakingQuestion;
 
     @OneToOne
     @JoinColumn(name = "audio_file_id", nullable = false)

@@ -8,6 +8,9 @@ import org.naho.vocabulary.port.in.ExportVocabularyInputPort;
 import org.naho.vocabulary.port.out.ExcelWriterPort;
 import org.naho.vocabulary.port.out.VocabularyPort;
 
+import org.naho.shared.exception.ApplicationException;
+import org.naho.vocabulary.exception.VocabularyErrorCode;
+
 import java.io.ByteArrayInputStream;
 import java.util.List;
 

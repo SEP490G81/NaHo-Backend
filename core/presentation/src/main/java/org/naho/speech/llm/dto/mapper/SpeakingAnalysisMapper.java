@@ -15,7 +15,7 @@ public class SpeakingAnalysisMapper {
 
     public SpeakingAnalysisResponse toResponse(SpeakingAnalysisResult result) {
         if (result == null) return null;
-        return new SpeakingAnalysisResponse("h-" + result.historyId(), result.score());
+        return new SpeakingAnalysisResponse(result.historyId(), result.score());
     }
 
     public SpeakingHistoryDetailResponse toDetailResponse(SpeakingHistoryDetailResult result) {
@@ -82,9 +82,9 @@ public class SpeakingAnalysisMapper {
         );
 
         return new SpeakingHistoryDetailResponse(
-                "h-" + result.historyId(),
-                result.topicId() != null ? "t-" + result.topicId() : null,
-                result.questionId() != null ? "q-" + result.questionId() : null,
+                result.historyId(),
+                result.topicId() != null ? result.topicId() : null,
+                result.questionId() != null ? result.questionId() : null,
                 result.practicedAt() != null ? ISO_FORMATTER.format(result.practicedAt()) : null,
                 result.durationSec(),
                 result.score(),

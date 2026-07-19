@@ -33,15 +33,13 @@ public class SpeakingAnalysisController {
     @ApiResponseMessage(message = "Phân tích phát âm thành công!")
     public ResponseEntity<SpeakingAnalysisResponse> uploadAudioAndAnalyzeSpeaking(
             @RequestPart("file") MultipartFile file,
-            @RequestParam("topicId") Long topicId,
-            @RequestParam("questionId") Long questionId,
+            @RequestParam("speakingQuestionId") Long speakingQuestionId,
             @RequestParam("durationSec") Integer durationSec,
             @AuthenticationPrincipal AccessTokenPayload payload
     ) throws IOException {
         SpeakingAnalysisCommand command = new SpeakingAnalysisCommand(
                 payload.userId(),
-                topicId,
-                questionId,
+                speakingQuestionId,
                 file.getBytes(),
                 file.getContentType(),
                 file.getOriginalFilename(),
@@ -55,15 +53,8 @@ public class SpeakingAnalysisController {
     @GetMapping(value = "/history/{historyId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponseMessage(message = "Lấy chi tiết lịch sử thành công!")
     public ResponseEntity<SpeakingHistoryDetailResponse> getSpeakingHistoryDetail(
-            @PathVariable("historyId") String historyIdStr
+            @PathVariable("historyId") Long historyId
     ) {
-        Long historyId;
-        if (historyIdStr.startsWith("h-")) {
-            historyId = Long.parseLong(historyIdStr.substring(2));
-        } else {
-            historyId = Long.parseLong(historyIdStr);
-        }
-
         var result = speakingAnalysisInputPort.getHistoryDetail(historyId);
         return ResponseEntity.ok(speakingAnalysisMapper.toDetailResponse(result));
     }

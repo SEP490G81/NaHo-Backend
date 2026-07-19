@@ -41,13 +41,13 @@ public class AnswerHistoryRepositoryAdapter implements AnswerHistoryRepositoryPo
     @Override
     public AnswerHistory saveAnswerHistory(AnswerHistory domain) {
         UserEntity user = userJpaRepository.getReferenceById(domain.getUserId());
-        SpeakingQuestionEntity question = questionJpaRepository.getReferenceById(domain.getQuestionId());
+        SpeakingQuestionEntity question = questionJpaRepository.getReferenceById(domain.getSpeakingQuestionId());
         FileEntity file = fileJpaRepository.getReferenceById(domain.getAudioFileId());
 
         AnswerHistoryEntity entity = AnswerHistoryEntity.builder()
                 .id(domain.getId())
                 .user(user)
-                .question(question)
+                .speakingQuestion(question)
                 .audioFile(file)
                 .build();
 
@@ -55,7 +55,7 @@ public class AnswerHistoryRepositoryAdapter implements AnswerHistoryRepositoryPo
         return AnswerHistory.builder()
                 .id(saved.getId())
                 .userId(saved.getUser().getId())
-                .questionId(saved.getQuestion().getId())
+                .speakingQuestionId(saved.getSpeakingQuestion().getId())
                 .audioFileId(saved.getAudioFile().getId())
                 .createdTime(saved.getCreatedTime())
                 .build();
@@ -139,7 +139,7 @@ public class AnswerHistoryRepositoryAdapter implements AnswerHistoryRepositoryPo
         return answerHistoryJpaRepository.findById(id).map(entity -> AnswerHistory.builder()
                 .id(entity.getId())
                 .userId(entity.getUser().getId())
-                .questionId(entity.getQuestion().getId())
+                .speakingQuestionId(entity.getSpeakingQuestion().getId())
                 .audioFileId(entity.getAudioFile().getId())
                 .createdTime(entity.getCreatedTime())
                 .build());

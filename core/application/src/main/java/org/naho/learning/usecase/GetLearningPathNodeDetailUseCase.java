@@ -1,6 +1,6 @@
 package org.naho.learning.usecase;
 
-import lombok.RequiredArgsConstructor;
+
 import org.naho.chest.exception.ChestErrorCode;
 import org.naho.chest.port.out.ChestRepositoryPort;
 import org.naho.grammar.result.GrammarDetailResult;
@@ -27,12 +27,23 @@ import org.naho.vocabulary.result.VocabularyQuestionDetailResult;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 public class GetLearningPathNodeDetailUseCase implements GetLearningPathNodeDetailInputPort {
     private final LearningPathNodeRepositoryPort learningPathNodeRepositoryPort;
     private final SpeakingQuestionRepositoryPort speakingQuestionRepositoryPort;
     private final VocabularyQuestionRepositoryPort vocabularyQuestionRepositoryPort;
     private final ChestRepositoryPort chestRepositoryPort;
+
+    public GetLearningPathNodeDetailUseCase(
+            LearningPathNodeRepositoryPort learningPathNodeRepositoryPort,
+            SpeakingQuestionRepositoryPort speakingQuestionRepositoryPort,
+            VocabularyQuestionRepositoryPort vocabularyQuestionRepositoryPort,
+            ChestRepositoryPort chestRepositoryPort
+    ) {
+        this.learningPathNodeRepositoryPort = learningPathNodeRepositoryPort;
+        this.speakingQuestionRepositoryPort = speakingQuestionRepositoryPort;
+        this.vocabularyQuestionRepositoryPort = vocabularyQuestionRepositoryPort;
+        this.chestRepositoryPort = chestRepositoryPort;
+    }
 
     @Override
     public LearningPathNodeDetailResult getLearningPathNodeDetail(GetLearningPathNodeDetailCommand command) {

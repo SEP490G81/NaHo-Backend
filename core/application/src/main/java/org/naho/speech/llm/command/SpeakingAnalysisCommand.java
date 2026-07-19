@@ -2,8 +2,7 @@ package org.naho.speech.llm.command;
 
 public record SpeakingAnalysisCommand(
         Long userId,
-        Long topicId,
-        Long questionId,
+        Long speakingQuestionId,
         byte[] audioBytes,
         String contentType,
         String originalFilename,
