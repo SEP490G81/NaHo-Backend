@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -212,15 +213,18 @@ public class ImportBookAdapter implements ImportBookPort {
                                         .toList();
 
                                 List<GrammarEntity> grammarEntityList = grammarJpaRepository.findAllByIdIn(grammarIds);
-                                List<SpeakingQuestionGrammarEntity> sqGrammars = grammarEntityList.stream()
-                                        .map(g -> {
-                                            SpeakingQuestionGrammarEntity sqg = new SpeakingQuestionGrammarEntity();
-                                            sqg.setSpeakingQuestion(speakingQuestionEntity);
-                                            sqg.setGrammar(g);
-                                            return sqg;
-                                        })
-                                        .toList();
-
+                                List<SpeakingQuestionGrammarEntity> sqGrammars =
+                                        new ArrayList<>(
+                                                grammarEntityList.stream()
+                                                        .map(g -> {
+                                                            SpeakingQuestionGrammarEntity sqg =
+                                                                    new SpeakingQuestionGrammarEntity();
+                                                            sqg.setSpeakingQuestion(speakingQuestionEntity);
+                                                            sqg.setGrammar(g);
+                                                            return sqg;
+                                                        })
+                                                        .toList()
+                                        );
                                 speakingQuestionEntity.setGrammars(sqGrammars);
                             }
 
@@ -234,15 +238,18 @@ public class ImportBookAdapter implements ImportBookPort {
 
                                 List<VocabularyEntity> vocabularyEntityList = vocabularyJpaRepository
                                         .findAllByIdIn(vocabularyIds);
-                                List<SpeakingQuestionVocabularyEntity> sqVocabularies = vocabularyEntityList.stream()
-                                        .map(v -> {
-                                            SpeakingQuestionVocabularyEntity sqv = new SpeakingQuestionVocabularyEntity();
-                                            sqv.setSpeakingQuestion(speakingQuestionEntity);
-                                            sqv.setVocabulary(v);
-                                            return sqv;
-                                        })
-                                        .toList();
-
+                                List<SpeakingQuestionVocabularyEntity> sqVocabularies =
+                                        new ArrayList<>(
+                                                vocabularyEntityList.stream()
+                                                        .map(v -> {
+                                                            SpeakingQuestionVocabularyEntity sqv =
+                                                                    new SpeakingQuestionVocabularyEntity();
+                                                            sqv.setSpeakingQuestion(speakingQuestionEntity);
+                                                            sqv.setVocabulary(v);
+                                                            return sqv;
+                                                        })
+                                                        .toList()
+                                        );
                                 speakingQuestionEntity.setVocabularies(sqVocabularies);
                             }
 
@@ -257,6 +264,19 @@ public class ImportBookAdapter implements ImportBookPort {
                                             VocabularyQuestionErrorCode.VOCABULARY_QUESTION_NOT_FOUND,
                                             VocabularyQuestionDetailMessageKey.VOCABULARY_QUESTION_NOT_FOUND,
                                             vocabularyQuestionId));
+
+                            // add vocabularies to vocabulary question
+                            Cell vocabularyCell = row.getCell(7);
+                            if (vocabularyCell != null && vocabularyCell.getCellType() != CellType.BLANK) {
+                                List<Long> vocabularyIds = Arrays
+                                        .stream(vocabularyCell.getStringCellValue().trim().split(","))
+                                        .map(Long::parseLong)
+                                        .toList();
+
+                                List<VocabularyEntity> vocabularyEntityList = vocabularyJpaRepository
+                                        .findAllByIdIn(vocabularyIds);
+                                vocabularyQuestionEntity.setVocabularies(new ArrayList<>(vocabularyEntityList));
+                            }
 
                             learningPathNodeEntity.setVocabularyQuestion(vocabularyQuestionEntity);
                         }
