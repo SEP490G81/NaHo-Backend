@@ -9,6 +9,7 @@ public record UserLearningProgressResponse(
         Long farthestAvailableNodeId,
         Double farthestAvailableNodeGlobalOrderIndex,
         Long lastLearningNodeId,
+        Double lastLearningNodeGlobalOrderIndex,
         Instant lastLearningAt,
         Integer currentStreak,
         Integer longestStreak,

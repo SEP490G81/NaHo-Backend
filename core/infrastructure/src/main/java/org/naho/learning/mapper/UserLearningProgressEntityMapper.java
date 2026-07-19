@@ -18,6 +18,7 @@ public abstract class UserLearningProgressEntityMapper {
     @Mapping(target = "farthestAvailableNodeGlobalOrderIndex", source = "farthestAvailableNode.globalOrderIndex")
     @Mapping(target = "farthestAvailableNodeId", source = "farthestAvailableNode.id")
     @Mapping(target = "lastLearningNodeId", source = "lastLearningNode.id")
+    @Mapping(target = "lastLearningNodeGlobalOrderIndex", source = "lastLearningNode.globalOrderIndex")
     public abstract UserLearningProgress entityToDomain(UserLearningProgressEntity entity);
 
     @Mapping(

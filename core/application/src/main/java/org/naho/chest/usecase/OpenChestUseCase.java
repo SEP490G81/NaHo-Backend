@@ -139,6 +139,7 @@ public class OpenChestUseCase implements OpenChestInputPort {
         }
 
         progress.setLastLearningNodeId(chestLearningPathNode.getId());
+        progress.setLastLearningNodeGlobalOrderIndex(chestLearningPathNode.getGlobalOrderIndex());
 
         // chỉnh lại streak của người dùng
         progress = userLearningStreakInputPort.updateUserLearningStreak(

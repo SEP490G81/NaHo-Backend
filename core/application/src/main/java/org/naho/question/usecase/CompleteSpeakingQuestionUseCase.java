@@ -139,6 +139,7 @@ public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestion
         }
 
         progress.setLastLearningNodeId(speakingQuestionLearningPathNode.getId());
+        progress.setLastLearningNodeGlobalOrderIndex(speakingQuestionLearningPathNode.getGlobalOrderIndex());
 
         // chỉnh lại streak của người dùng
         progress = userLearningStreakInputPort.updateUserLearningStreak(

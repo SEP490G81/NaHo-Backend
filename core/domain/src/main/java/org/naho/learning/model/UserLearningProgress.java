@@ -7,6 +7,7 @@ public class UserLearningProgress {
     private Long farthestAvailableNodeId;
     private Double farthestAvailableNodeGlobalOrderIndex;
     private Long lastLearningNodeId;
+    private Double lastLearningNodeGlobalOrderIndex;
     private Integer currentStreak;
     private Integer longestStreak;
     private Instant lastLearningAt;
@@ -17,6 +18,7 @@ public class UserLearningProgress {
         this.farthestAvailableNodeId = builder.farthestAvailableNodeId;
         this.farthestAvailableNodeGlobalOrderIndex = builder.farthestAvailableNodeGlobalOrderIndex;
         this.lastLearningNodeId = builder.lastLearningNodeId;
+        this.lastLearningNodeGlobalOrderIndex = builder.lastLearningNodeGlobalOrderIndex;
         this.lastLearningAt = builder.lastLearningAt;
         this.currentStreak = builder.currentStreak;
         this.longestStreak = builder.longestStreak;
@@ -70,6 +72,14 @@ public class UserLearningProgress {
         this.lastLearningNodeId = lastLearningNodeId;
     }
 
+    public Double getLastLearningNodeGlobalOrderIndex() {
+        return lastLearningNodeGlobalOrderIndex;
+    }
+
+    public void setLastLearningNodeGlobalOrderIndex(Double lastLearningNodeGlobalOrderIndex) {
+        this.lastLearningNodeGlobalOrderIndex = lastLearningNodeGlobalOrderIndex;
+    }
+
     public Instant getLastLearningAt() {
         return lastLearningAt;
     }
@@ -115,6 +125,7 @@ public class UserLearningProgress {
         private Long farthestAvailableNodeId;
         private Double farthestAvailableNodeGlobalOrderIndex;
         private Long lastLearningNodeId;
+        private Double lastLearningNodeGlobalOrderIndex;
         private Instant lastLearningAt;
         private Integer currentStreak;
         private Integer longestStreak;
@@ -140,6 +151,11 @@ public class UserLearningProgress {
 
         public Builder lastLearningNodeId(Long lastLearningNodeId) {
             this.lastLearningNodeId = lastLearningNodeId;
+            return this;
+        }
+
+        public Builder lastLearningNodeGlobalOrderIndex(Double lastLearningNodeGlobalOrderIndex) {
+            this.lastLearningNodeGlobalOrderIndex = lastLearningNodeGlobalOrderIndex;
             return this;
         }
 

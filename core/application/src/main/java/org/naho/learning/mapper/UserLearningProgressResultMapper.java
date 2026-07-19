@@ -15,6 +15,7 @@ public class UserLearningProgressResultMapper {
                 .farthestAvailableNodeId(domain.getFarthestAvailableNodeId())
                 .farthestAvailableNodeGlobalOrderIndex(domain.getFarthestAvailableNodeGlobalOrderIndex())
                 .lastLearningNodeId(domain.getLastLearningNodeId())
+                .lastLearningNodeGlobalOrderIndex(domain.getLastLearningNodeGlobalOrderIndex())
                 .lastLearningAt(domain.getLastLearningAt())
                 .currentStreak(domain.getCurrentStreak())
                 .longestStreak(domain.getLongestStreak())
