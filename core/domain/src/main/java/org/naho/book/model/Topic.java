@@ -67,12 +67,12 @@ public class Topic {
     }
 
     private void validateJapaneseDescription(String japaneseDescription) {
-        if (japaneseDescription == null || japaneseDescription.isBlank()) {
-            throw new DomainException(
-                    TopicDomainErrorCode.TOPIC_DESCRIPTION_EMPTY,
-                    TopicDetailMessageKey.TOPIC_DESCRIPTION_EMPTY
-            );
-        }
+//        if (japaneseDescription == null || japaneseDescription.isBlank()) {
+//            throw new DomainException(
+//                    TopicDomainErrorCode.TOPIC_DESCRIPTION_EMPTY,
+//                    TopicDetailMessageKey.TOPIC_DESCRIPTION_EMPTY
+//            );
+//        }
     }
 
     public void update(String japaneseName,

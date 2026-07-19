@@ -1,4 +1,4 @@
-package org.naho.learning.result;
+package org.naho.vocabulary.result;
 
 import java.util.List;
 

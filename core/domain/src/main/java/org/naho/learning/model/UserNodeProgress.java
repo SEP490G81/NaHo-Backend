@@ -9,7 +9,7 @@ import java.time.Instant;
 
 public class UserNodeProgress {
     private final Long id;
-    private final Long nodeId;
+    private final Long learningPathNodeId;
     private final Long userId;
 
     private Double bestScore;
@@ -20,7 +20,7 @@ public class UserNodeProgress {
 
     private UserNodeProgress(Builder builder) {
         this.id = builder.id;
-        this.nodeId = builder.nodeId;
+        this.learningPathNodeId = builder.learningPathNodeId;
         this.userId = builder.userId;
         this.bestScore = builder.bestScore;
         this.currentScore = builder.currentScore;
@@ -38,7 +38,7 @@ public class UserNodeProgress {
     }
 
     public Long getLearningPathNodeId() {
-        return nodeId;
+        return learningPathNodeId;
     }
 
     public Long getUserId() {
@@ -88,7 +88,7 @@ public class UserNodeProgress {
     public static final class Builder {
 
         private Long id;
-        private Long nodeId;
+        private Long learningPathNodeId;
         private Long userId;
         private Double bestScore;
         private Double currentScore;
@@ -104,8 +104,8 @@ public class UserNodeProgress {
             return this;
         }
 
-        public Builder nodeId(Long nodeId) {
-            this.nodeId = nodeId;
+        public Builder learningPathNodeId(Long learningPathNodeId) {
+            this.learningPathNodeId = learningPathNodeId;
             return this;
         }
 
@@ -140,7 +140,7 @@ public class UserNodeProgress {
         }
 
         public UserNodeProgress build() {
-            if (nodeId == null) {
+            if (learningPathNodeId == null) {
                 throw new DomainException(
                         UserNodeProgressDomainErrorCode.USER_NODE_PROGRESS_NODE_EMPTY,
                         UserNodeProgressDetailMessageKey.USER_NODE_PROGRESS_NODE_EMPTY

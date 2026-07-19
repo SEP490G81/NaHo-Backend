@@ -38,7 +38,7 @@ public class CrudUserLearningProgressUseCase implements CrudUserLearningProgress
     public UserLearningProgressResult findUserLearningProgressByUserId(Long userId) {
         // if user learned a node, return current progress
         UserLearningProgress currentUserLearningProgress = userLearningProgressRepositoryPort
-                .findUserLearningProgressByUserId(userId)
+                .findByUserId(userId)
                 .orElse(null);
 
         // if user doesn't learn any node, create new

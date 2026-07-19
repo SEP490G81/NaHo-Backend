@@ -16,4 +16,9 @@ public class TransactionAdapter implements TransactionPort {
     public <T> T execute(Supplier<T> action) {
         return transactionTemplate.execute(status -> action.get());
     }
+
+    @Override
+    public void execute(Runnable action) {
+        transactionTemplate.executeWithoutResult(status -> action.run());
+    }
 }

@@ -1,9 +1,9 @@
-package org.naho.question.adapter;
+package org.naho.chest.adapter;
 
 import lombok.RequiredArgsConstructor;
-import org.naho.question.model.Chest;
-import org.naho.question.port.out.ChestRepositoryPort;
-import org.naho.question.repository.ChestJpaRepository;
+import org.naho.chest.model.Chest;
+import org.naho.chest.port.out.ChestRepositoryPort;
+import org.naho.chest.repository.ChestJpaRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
