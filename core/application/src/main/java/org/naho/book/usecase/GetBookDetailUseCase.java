@@ -40,6 +40,8 @@ public class GetBookDetailUseCase implements GetBookDetailInputPort {
                 book.getJlptLevel(),
                 book.getCefrLevel(),
                 book.getOrderIndex(),
+                book.getFirstNodeGlobalOrderIndex(),
+                book.getLastNodeGlobalOrderIndex(),
                 coverImage
         );
     }

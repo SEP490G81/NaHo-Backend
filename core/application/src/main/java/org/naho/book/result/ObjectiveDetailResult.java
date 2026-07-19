@@ -13,6 +13,8 @@ public record ObjectiveDetailResult(
         String japaneseDescriptionMarkup,
         TopicStatus status,
         Double orderIndex,
+        Double firstNodeGlobalOrderIndex,
+        Double lastNodeGlobalOrderIndex,
         List<LearningPathNodeListItemResult> learningPathNodes
 ) {
 }

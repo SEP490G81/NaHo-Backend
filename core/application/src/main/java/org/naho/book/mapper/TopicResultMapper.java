@@ -16,6 +16,8 @@ public class TopicResultMapper {
                 .japaneseDescriptionMarkup(domain.getJapaneseDescriptionMarkup())
                 .status(domain.getStatus())
                 .orderIndex(domain.getOrderIndex())
+                .firstNodeGlobalOrderIndex(domain.getFirstNodeGlobalOrderIndex())
+                .lastNodeGlobalOrderIndex(domain.getLastNodeGlobalOrderIndex())
                 .build();
     }
 }

@@ -12,7 +12,9 @@ public record TopicResult(
         String japaneseNameMarkup,
         String japaneseDescriptionMarkup,
         TopicStatus status,
-        Double orderIndex
+        Double orderIndex,
+        Double firstNodeGlobalOrderIndex,
+        Double lastNodeGlobalOrderIndex
 ) {
 
     public static Builder builder() {
@@ -30,6 +32,8 @@ public record TopicResult(
         private String japaneseDescriptionMarkup;
         private TopicStatus status;
         private Double orderIndex;
+        private Double firstNodeGlobalOrderIndex;
+        private Double lastNodeGlobalOrderIndex;
 
         private Builder() {
         }
@@ -84,6 +88,16 @@ public record TopicResult(
             return this;
         }
 
+        public Builder firstNodeGlobalOrderIndex(Double firstNodeGlobalOrderIndex) {
+            this.firstNodeGlobalOrderIndex = firstNodeGlobalOrderIndex;
+            return this;
+        }
+
+        public Builder lastNodeGlobalOrderIndex(Double lastNodeGlobalOrderIndex) {
+            this.lastNodeGlobalOrderIndex = lastNodeGlobalOrderIndex;
+            return this;
+        }
+
         public TopicResult build() {
             return new TopicResult(
                     id,
@@ -95,7 +109,9 @@ public record TopicResult(
                     japaneseNameMarkup,
                     japaneseDescriptionMarkup,
                     status,
-                    orderIndex
+                    orderIndex,
+                    firstNodeGlobalOrderIndex,
+                    lastNodeGlobalOrderIndex
             );
         }
     }
