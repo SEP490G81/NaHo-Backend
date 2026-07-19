@@ -1,6 +1,6 @@
-package org.naho.question.exception;
+package org.naho.chest.exception;
 
-import org.naho.i18n.message.question.ChestTitleMessageKey;
+import org.naho.i18n.message.chest.ChestTitleMessageKey;
 import org.naho.shared.exception.ErrorCode;
 
 public enum ChestDomainErrorCode implements ErrorCode {

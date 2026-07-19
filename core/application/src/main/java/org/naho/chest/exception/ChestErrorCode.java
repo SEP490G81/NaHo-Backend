@@ -1,10 +1,11 @@
-package org.naho.question.exception;
+package org.naho.chest.exception;
 
-import org.naho.i18n.message.question.ChestTitleMessageKey;
+import org.naho.i18n.message.chest.ChestTitleMessageKey;
 import org.naho.shared.exception.ErrorCode;
 
 public enum ChestErrorCode implements ErrorCode {
-    CHEST_NOT_FOUND("CHEST_A001", ChestTitleMessageKey.CHEST_NOT_FOUND_TITLE, 404);
+    CHEST_NOT_FOUND("CHEST_A001", ChestTitleMessageKey.CHEST_NOT_FOUND_TITLE, 404),
+    CHEST_ALREADY_OPENED("CHEST_A002", ChestTitleMessageKey.CHEST_OPEN_FAILED_TITLE, 400);
 
     private final String code;
     private final String titleKey;

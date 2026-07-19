@@ -12,10 +12,6 @@ public class PointHistoryResultMapper {
                 domain.getId(),
                 domain.getUserId(),
                 domain.getLearningPathNodeId(),
-                domain.getObjectiveId(),
-                domain.getLessonId(),
-                domain.getTopicId(),
-                domain.getBookId(),
                 domain.getPoint(),
                 domain.getTransactionType(),
                 domain.getTransactionTime()

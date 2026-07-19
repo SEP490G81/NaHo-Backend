@@ -2,8 +2,10 @@ package org.naho.learning.usecase;
 
 import lombok.RequiredArgsConstructor;
 import org.naho.grammar.result.GrammarDetailResult;
+import org.naho.chest.exception.ChestErrorCode;
+import org.naho.chest.port.out.ChestRepositoryPort;
+import org.naho.i18n.message.chest.ChestDetailMessageKey;
 import org.naho.i18n.message.learning.LearningPathNodeDetailMessageKey;
-import org.naho.i18n.message.question.ChestDetailMessageKey;
 import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
 import org.naho.i18n.message.question.VocabularyQuestionDetailMessageKey;
 import org.naho.learning.command.GetLearningPathNodeDetailCommand;
@@ -12,10 +14,8 @@ import org.naho.learning.model.LearningPathNode;
 import org.naho.learning.port.in.GetLearningPathNodeDetailInputPort;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.learning.result.*;
-import org.naho.question.exception.ChestErrorCode;
 import org.naho.question.exception.SpeakingQuestionErrorCode;
 import org.naho.question.exception.VocabularyQuestionErrorCode;
-import org.naho.question.port.out.ChestRepositoryPort;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.question.port.out.VocabularyQuestionRepositoryPort;
 import org.naho.question.result.SpeakingQuestionDetailResult;
@@ -38,7 +38,8 @@ public class GetLearningPathNodeDetailUseCase implements GetLearningPathNodeDeta
                 .orElseThrow(() -> new ApplicationException(
                         LearningPathNodeErrorCode.LEARNING_PATH_NODE_NOT_FOUND,
                         LearningPathNodeDetailMessageKey.LEARNING_PATH_NODE_ID_NOT_FOUND,
-                        command.id()));
+                        command.id()
+                ));
 
         SpeakingQuestionDetailResult speakingQuestionResult = null;
         VocabularyQuestionDetailResult vocabularyQuestionResult = null;

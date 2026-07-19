@@ -1,10 +1,6 @@
 package org.naho.point.adapter;
 
 import lombok.RequiredArgsConstructor;
-import org.naho.book.repository.BookJpaRepository;
-import org.naho.book.repository.LessonJpaRepository;
-import org.naho.book.repository.ObjectiveJpaRepository;
-import org.naho.book.repository.TopicJpaRepository;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.learning.repository.LearningPathNodeJpaRepository;
 import org.naho.pagination.PageData;
@@ -33,15 +29,12 @@ public class PointHistoryRepositoryAdapter implements PointHistoryRepositoryPort
     private final PointHistoryEntityMapper pointHistoryEntityMapper;
     private final PointHistoryJpaRepository pointHistoryJpaRepository;
     private final UserJpaRepository userJpaRepository;
-    private final BookJpaRepository bookJpaRepository;
-    private final TopicJpaRepository topicJpaRepository;
-    private final LessonJpaRepository lessonJpaRepository;
-    private final ObjectiveJpaRepository objectiveJpaRepository;
     private final LearningPathNodeJpaRepository learningPathNodeJpaRepository;
 
     @Override
     public PointHistory save(PointHistory pointHistory) {
-        PointHistoryEntity entity = pointHistoryEntityMapper.domainToEntity(pointHistory);
+        PointHistoryEntity pointHistoryEntity =
+                pointHistoryEntityMapper.domainToEntity(pointHistory);
 
         UserEntity user = userJpaRepository.findById(pointHistory.getUserId())
                 .orElseThrow(() -> new ApplicationException(
@@ -50,25 +43,18 @@ public class PointHistoryRepositoryAdapter implements PointHistoryRepositoryPort
                         pointHistory.getUserId()
                 ));
 
-        entity.setUser(user);
+        pointHistoryEntity.setUser(user);
 
         if (pointHistory.getLearningPathNodeId() != null) {
-            entity.setLearningPathNode(learningPathNodeJpaRepository.getReferenceById(pointHistory.getLearningPathNodeId()));
-        }
-        if (pointHistory.getObjectiveId() != null) {
-            entity.setObjective(objectiveJpaRepository.getReferenceById(pointHistory.getObjectiveId()));
-        }
-        if (pointHistory.getLessonId() != null) {
-            entity.setLesson(lessonJpaRepository.getReferenceById(pointHistory.getLessonId()));
-        }
-        if (pointHistory.getTopicId() != null) {
-            entity.setTopic(topicJpaRepository.getReferenceById(pointHistory.getTopicId()));
-        }
-        if (pointHistory.getBookId() != null) {
-            entity.setBook(bookJpaRepository.getReferenceById(pointHistory.getBookId()));
+            pointHistoryEntity.setLearningPathNode(
+                    learningPathNodeJpaRepository.getReferenceById(
+                            pointHistory.getLearningPathNodeId()
+                    )
+            );
         }
 
-        PointHistoryEntity savedPointHistory = pointHistoryJpaRepository.save(entity);
+        PointHistoryEntity savedPointHistory =
+                pointHistoryJpaRepository.save(pointHistoryEntity);
 
         return pointHistoryEntityMapper.entityToDomain(savedPointHistory);
     }

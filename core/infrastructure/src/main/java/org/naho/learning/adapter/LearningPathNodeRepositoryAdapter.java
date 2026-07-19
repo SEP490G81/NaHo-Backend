@@ -37,4 +37,11 @@ public class LearningPathNodeRepositoryAdapter implements LearningPathNodeReposi
                 .findFirstByOrderByGlobalOrderIndexAsc()
                 .map(learningPathNodeEntityMapper::entityToDomain);
     }
+
+    @Override
+    public Optional<LearningPathNode> findByChestId(Long chestId) {
+        return learningPathNodeJpaRepository
+                .findByChestId(chestId)
+                .map(learningPathNodeEntityMapper::entityToDomain);
+    }
 }

@@ -1,4 +1,4 @@
-package org.naho.question.entity;
+package org.naho.chest.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
