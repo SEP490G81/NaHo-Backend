@@ -52,12 +52,12 @@ public class SpeakingQuestion {
     }
 
     private void validateDescription(String description) {
-        if (description == null || description.isBlank()) {
-            throw new DomainException(
-                    SpeakingQuestionDomainErrorCode.SPEAKING_QUESTION_DESCRIPTION_EMPTY,
-                    SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_DESCRIPTION_EMPTY
-            );
-        }
+//        if (description == null || description.isBlank()) {
+//            throw new DomainException(
+//                    SpeakingQuestionDomainErrorCode.SPEAKING_QUESTION_DESCRIPTION_EMPTY,
+//                    SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_DESCRIPTION_EMPTY
+//            );
+//        }
     }
 
     public void update(String title,

@@ -1,6 +1,7 @@
 package org.naho.learning.usecase;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.grammar.result.GrammarDetailResult;
 import org.naho.i18n.message.learning.LearningPathNodeDetailMessageKey;
 import org.naho.i18n.message.question.ChestDetailMessageKey;
 import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
@@ -17,7 +18,12 @@ import org.naho.question.exception.VocabularyQuestionErrorCode;
 import org.naho.question.port.out.ChestRepositoryPort;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.question.port.out.VocabularyQuestionRepositoryPort;
+import org.naho.question.result.SpeakingQuestionDetailResult;
 import org.naho.shared.exception.ApplicationException;
+import org.naho.vocabulary.result.VocabularyDetailResult;
+import org.naho.vocabulary.result.VocabularyQuestionDetailResult;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 public class GetLearningPathNodeDetailUseCase implements GetLearningPathNodeDetailInputPort {
@@ -46,6 +52,23 @@ public class GetLearningPathNodeDetailUseCase implements GetLearningPathNodeDeta
                                     SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
                                     SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_NOT_FOUND,
                                     node.getSpeakingQuestionId()));
+                    var vocabList = sq.getVocabularies() == null ? List.<VocabularyDetailResult>of() : sq.getVocabularies().stream()
+                            .map(v -> new VocabularyDetailResult(
+                                    v.getId(),
+                                    v.getReading(),
+                                    v.getJapanese(),
+                                    v.getVietnameseMeaningText(),
+                                    v.getEnglishMeaningText()))
+                            .toList();
+                    var grammarList = sq.getGrammars() == null ? List.<GrammarDetailResult>of() : sq.getGrammars().stream()
+                            .map(g -> new GrammarDetailResult(
+                                    g.getId(),
+                                    g.getReading(),
+                                    g.getJapanese(),
+                                    g.getVietnameseMeaningText(),
+                                    g.getEnglishMeaningText()))
+                            .toList();
+
                     speakingQuestionResult = new SpeakingQuestionDetailResult(
                             sq.getId(),
                             sq.getUserId(),
@@ -53,7 +76,9 @@ public class GetLearningPathNodeDetailUseCase implements GetLearningPathNodeDeta
                             sq.getTitleMarkup(),
                             sq.getDescription(),
                             sq.getDescriptionMarkup(),
-                            sq.getStatus());
+                            sq.getStatus(),
+                            vocabList,
+                            grammarList);
                 }
             }
             case VOCABULARY_QUESTION -> {

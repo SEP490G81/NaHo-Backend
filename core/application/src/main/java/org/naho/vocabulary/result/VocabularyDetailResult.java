@@ -1,4 +1,4 @@
-package org.naho.learning.result;
+package org.naho.vocabulary.result;
 
 public record VocabularyDetailResult(
         Long id,

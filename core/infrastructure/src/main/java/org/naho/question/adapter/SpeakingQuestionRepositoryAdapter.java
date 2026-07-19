@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.naho.file.repository.FileJpaRepository;
 import org.naho.question.entity.SpeakingQuestionEntity;
 import org.naho.question.model.SpeakingQuestion;
+import org.naho.question.model.Grammar;
+import org.naho.vocabulary.model.Vocabulary;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.question.repository.SpeakingQuestionJpaRepository;
 import org.naho.question.type.QuestionStatus;
@@ -82,6 +84,8 @@ public class SpeakingQuestionRepositoryAdapter implements SpeakingQuestionReposi
                 .description(savedEntity.getDescription())
                 .descriptionMarkup(savedEntity.getDescriptionMarkup())
                 .status(savedEntity.getStatus())
+                .vocabularies(mapVocabularies(savedEntity))
+                .grammars(mapGrammars(savedEntity))
                 .build();
     }
 
@@ -97,6 +101,8 @@ public class SpeakingQuestionRepositoryAdapter implements SpeakingQuestionReposi
                 .description(entity.getDescription())
                 .descriptionMarkup(entity.getDescriptionMarkup())
                 .status(entity.getStatus())
+                .vocabularies(mapVocabularies(entity))
+                .grammars(mapGrammars(entity))
                 .build());
     }
 
@@ -114,6 +120,38 @@ public class SpeakingQuestionRepositoryAdapter implements SpeakingQuestionReposi
                         .status(entity.getStatus())
                         .orderIndex(entity.getLearningPathNode() != null ? entity.getLearningPathNode().getOrderIndex() : null)
                         .objectiveId(entity.getLearningPathNode() != null && entity.getLearningPathNode().getObjective() != null ? entity.getLearningPathNode().getObjective().getId() : null)
+                        .vocabularies(mapVocabularies(entity))
+                        .grammars(mapGrammars(entity))
+                        .build())
+                .toList();
+    }
+
+    private List<Vocabulary> mapVocabularies(SpeakingQuestionEntity entity) {
+        if (entity.getVocabularies() == null) {
+            return List.of();
+        }
+        return entity.getVocabularies().stream()
+                .map(sqv -> Vocabulary.builder()
+                        .id(sqv.getVocabulary().getId())
+                        .reading(sqv.getVocabulary().getReading())
+                        .japanese(sqv.getVocabulary().getJapanese())
+                        .vietnameseMeaningText(sqv.getVocabulary().getVietnameseMeaningText())
+                        .englishMeaningText(sqv.getVocabulary().getEnglishMeaningText())
+                        .build())
+                .toList();
+    }
+
+    private List<Grammar> mapGrammars(SpeakingQuestionEntity entity) {
+        if (entity.getGrammars() == null) {
+            return List.of();
+        }
+        return entity.getGrammars().stream()
+                .map(sqg -> Grammar.builder()
+                        .id(sqg.getGrammar().getId())
+                        .reading(sqg.getGrammar().getReading())
+                        .japanese(sqg.getGrammar().getJapanese())
+                        .vietnameseMeaningText(sqg.getGrammar().getVietnameseMeaningText())
+                        .englishMeaningText(sqg.getGrammar().getEnglishMeaningText())
                         .build())
                 .toList();
     }
