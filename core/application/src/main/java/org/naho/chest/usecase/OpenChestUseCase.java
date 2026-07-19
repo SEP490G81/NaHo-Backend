@@ -123,6 +123,7 @@ public class OpenChestUseCase implements OpenChestInputPort {
         Long currentFarthestAvailableNodeId = progress.getFarthestAvailableNodeId();
         if (currentFarthestAvailableNodeId == null) {
             progress.setFarthestAvailableNodeId(chestLearningPathNode.getId());
+            progress.setFarthestAvailableNodeGlobalOrderIndex(chestLearningPathNode.getGlobalOrderIndex());
         } else {
             LearningPathNode currentFarthestAvailableNode = learningPathNodeRepositoryPort
                     .findById(currentFarthestAvailableNodeId)
@@ -133,6 +134,7 @@ public class OpenChestUseCase implements OpenChestInputPort {
             if (currentFarthestAvailableNode.getGlobalOrderIndex() < chestLearningPathNode
                     .getGlobalOrderIndex()) {
                 progress.setFarthestAvailableNodeId(chestLearningPathNode.getId());
+                progress.setFarthestAvailableNodeGlobalOrderIndex(chestLearningPathNode.getGlobalOrderIndex());
             }
         }
 
