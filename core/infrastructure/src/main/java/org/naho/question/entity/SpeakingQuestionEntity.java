@@ -12,7 +12,6 @@ import org.naho.social.entity.CommentEntity;
 import org.naho.social.entity.ReactionEntity;
 import org.naho.social.report.entity.ReportEntity;
 import org.naho.user.entity.UserEntity;
-import org.naho.vocabulary.entity.VocabularyEntity;
 
 import java.util.List;
 
@@ -49,17 +48,11 @@ public class SpeakingQuestionEntity extends BaseEntity {
     @JoinColumn(name = "user_id")
     UserEntity user;
 
-    @ManyToMany
-    @JoinTable(name = "speaking_questions_grammars", joinColumns = @JoinColumn(name = "speaking_question_id"), inverseJoinColumns = @JoinColumn(name = "grammar_id"))
-    List<GrammarEntity> grammars;
+    @OneToMany(mappedBy = "speakingQuestion", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<SpeakingQuestionGrammarEntity> grammars;
 
-    @ManyToMany
-    @JoinTable(
-            name = "speaking_questions_vocabularies",
-            joinColumns = @JoinColumn(name = "speaking_question_id"),
-            inverseJoinColumns = @JoinColumn(name = "vocabulary_id")
-    )
-    List<VocabularyEntity> vocabularies;
+    @OneToMany(mappedBy = "speakingQuestion", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<SpeakingQuestionVocabularyEntity> vocabularies;
 
     @OneToMany(mappedBy = "question")
     List<CommentEntity> comments;

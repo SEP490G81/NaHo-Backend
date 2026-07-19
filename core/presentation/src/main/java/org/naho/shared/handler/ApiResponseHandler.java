@@ -50,8 +50,7 @@ public class ApiResponseHandler implements ResponseBodyAdvice<Object> {
             Class<? extends HttpMessageConverter<?>> selectedConverterType,
             ServerHttpRequest request, ServerHttpResponse response
     ) {
-        if (body == null ||
-                body instanceof ApiResponse<?> ||
+        if (body instanceof ApiResponse<?> ||
                 body instanceof ProblemDetail ||
                 body instanceof ByteArrayHttpMessageConverter ||
                 body instanceof String) {

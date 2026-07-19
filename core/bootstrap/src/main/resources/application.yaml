@@ -90,3 +90,6 @@ app:
   s3:
     bucket-name: naho-bucket
     region: ap-southeast-1
+
+  static-resources:
+    base-location: ${STATIC_RESOURCES_BASE_LOCATION}

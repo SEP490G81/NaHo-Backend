@@ -2,6 +2,7 @@ package org.naho.user.port.out;
 
 import org.naho.user.model.OAuthProvider;
 import org.naho.user.model.User;
+import org.naho.user.result.LeaderboardUserResult;
 import org.naho.user.type.OAuthProviderName;
 
 import java.util.List;
@@ -23,10 +24,14 @@ public interface UserRepositoryPort {
     User save(User user, OAuthProvider oAuthProvider);
 
     User createNew(User user, OAuthProvider oAuthProvider);
-    
+
     Optional<User> findById(Long id);
 
     List<User> getListUser();
 
     List<User> findByFilters(String userNameOrMail, String role, String status, String jlptLevel);
+
+    List<LeaderboardUserResult> findTop10OrderByTotalPointInLeague(Long leagueId);
+
+    Optional<LeaderboardUserResult> findTopOfUserByUserId(Long userId);
 }

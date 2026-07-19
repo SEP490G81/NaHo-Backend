@@ -16,8 +16,8 @@ Rubric này được tổng hợp từ bốn nguồn tham chiếu:
    kể chuyện, mô tả sự kiện và kinh nghiệm, xử lý các tình huống phát sinh khi đi lại hay trong cuộc sống thường ngày,
    dù vẫn còn hạn chế về độ phức tạp ngôn ngữ.
 
-3. **Giáo trình Shin Kanzen Master N3**: Tập trung vào các cấu trúc ngữ pháp trung cấp (
-   〜ても、〜ために、〜ようにする、〜らしい、〜はずだ...), vốn từ vựng chức năng phong phú, khả năng kết nối câu và đoạn văn một
+3. **Giáo trình Shin Kanzen Master N3**: Tập trung vào các cấu trúc ngữ pháp trung cấp
+   (〜ても、〜ために、〜ようにする、〜らしい、〜はずだ...), vốn từ vựng chức năng phong phú, khả năng kết nối câu và đoạn văn một
    cách mạch lạc.
 
 4. **Phỏng vấn tiếng Nhật trung cấp (OPI/ACTFL-J, phỏng vấn xin việc mô phỏng, hội thoại tình huống N3)**: Tiêu chí đánh
@@ -25,13 +25,13 @@ Rubric này được tổng hợp từ bốn nguồn tham chiếu:
 
 ## Tổng quan cấu trúc rubric
 
-| Tiêu chí          | Trọng số (gợi ý) | Thang điểm |
-|-------------------|------------------|------------|
-| Grammar（文法）       | 25%              | 1–5        |
-| Vocabulary（語彙）    | 20%              | 1–5        |
-| Fluency（流暢さ）      | 20%              | 1–5        |
-| Pronunciation（発音） | 15%              | 1–5        |
-| Content（内容・談話能力）  | 20%              | 1–5        |
+| Tiêu chí                  | Trọng số (gợi ý) | Thang điểm |
+|---------------------------|------------------|------------|
+| Grammar（文法）           | 25%              | 1–5        |
+| Vocabulary（語彙）        | 20%              | 1–5        |
+| Fluency（流暢さ）         | 20%              | 1–5        |
+| Pronunciation（発音）     | 15%              | 1–5        |
+| Content（内容・談話能力） | 20%              | 1–5        |
 
 **Điểm tổng (có trọng số):** Tối đa 5.0 điểm  
 **Quy đổi năng lực:**
@@ -151,7 +151,7 @@ nối, và các biểu đạt đặc trưng tiếng Nhật như collocations, id
 - Vốn từ chức năng (từ nối, trạng từ) hạn chế; câu thiếu kết nối tự nhiên.
 - Thỉnh thoảng phải dùng tiếng Anh hoặc ngôn ngữ mẹ đẻ thay thế, hoặc mô tả vòng vo.
 - Từ vựng đủ để truyền đạt ý chính nhưng thiếu độ tinh tế.
-- **Ví dụ tham chiếu:** 「私は料理が好きです。毎日料理します。いろんな料理を作ります。料理は楽しいです。」(→ vốn từ hạn chế,
+- **Ví dụ tham chiếu:** 「私は料理が好きです。毎日料理します。いろんな料理を作ります。料理は楽しいです。」 (→ vốn từ hạn chế,
   lặp lại nhiều)
 
 #### Điểm 2 — Dưới trung bình（やや不十分）
@@ -269,8 +269,8 @@ bigeminate nasals (撥音), pitch accent ở mức độ nhận biết, và into
 - Pitch accent tương đối tự nhiên trong các từ thông dụng; không gây nhầm nghĩa.
 - Không có ảnh hưởng đáng kể của âm tiết mẹ đẻ lên phát âm tiếng Nhật.
 - Nhịp điệu (rhythm) và mora timing tự nhiên; không nghe như đọc từng chữ.
-- **Ví dụ:** Phân biệt rõ: 橋(はし)/箸(はし)/端(はし) theo ngữ cảnh; phát âm đúng 女優(じょゆう)、電車(でんしゃ)、空港(
-  くうこう).
+- **Ví dụ:** Phân biệt rõ: 橋 (はし)/箸 (はし)/端 (はし) theo ngữ cảnh; phát âm đúng 女優 (じょゆう)、電車 (でんしゃ)、空港
+  (くうこう).
 
 #### Điểm 4 — Khá tốt（良好）
 
@@ -280,7 +280,7 @@ bigeminate nasals (撥音), pitch accent ở mức độ nhận biết, và into
 - Pitch accent không hoàn hảo nhưng không gây nhầm nghĩa trong phần lớn trường hợp.
 - Ảnh hưởng nhẹ của tiếng mẹ đẻ nhưng không cản trở giao tiếp.
 - Nhịp nói tương đối tự nhiên; đôi khi bị gián đoạn do suy nghĩ.
-- **Ví dụ:** Phát âm đúng các từ quen thuộc nhưng có thể nhầm tone trong 友達(ともだち) hay 学生(がくせい).
+- **Ví dụ:** Phát âm đúng các từ quen thuộc nhưng có thể nhầm tone trong 友達 (ともだち) hay 学生 (がくせい).
 
 #### Điểm 3 — Trung bình（普通）
 
@@ -290,17 +290,17 @@ bigeminate nasals (撥音), pitch accent ở mức độ nhận biết, và into
 - Pitch accent sai nhiều nhưng ngữ cảnh giúp người nghe hiểu đúng nghĩa.
 - Nhịp nói bị ảnh hưởng bởi tiếng mẹ đẻ (ví dụ: người Việt hay bị tone-sandhi, nhấn trọng âm không đúng).
 - Người nghe bản ngữ cần tập trung nhưng vẫn hiểu được.
-- **Ví dụ:** Hay nhầm ちょっと/ちよっと; nói 電話(でんわ) không đúng âm mũi; intonation câu hỏi dùng kiểu tiếng Anh.
+- **Ví dụ:** Hay nhầm ちょっと/ちよっと; nói 電話 (でんわ) không đúng âm mũi; intonation câu hỏi dùng kiểu tiếng Anh.
 
 #### Điểm 2 — Dưới trung bình（やや不十分）
 
 - Phát âm không rõ; người nghe thường phải đoán nghĩa hoặc yêu cầu nhắc lại.
-- Lỗi âm dài/ngắn nghiêm trọng và liên tục gây nhầm từ (ví dụ: おじさん vs おじいさん, 来る(くる) vs 区(く)...).
+- Lỗi âm dài/ngắn nghiêm trọng và liên tục gây nhầm từ (ví dụ: おじさん vs おじいさん, 来る (くる) vs 区 (く)...).
 - Intonation thường không phù hợp; ảnh hưởng mạnh của ngôn ngữ mẹ đẻ.
 - Nhịp điệu không tự nhiên; nói từng chữ hoặc ngắt không đúng chỗ.
 - Phát âm sai một số phụ âm cơ bản (ざ/じゃ、つ/す、ら/だ...) ảnh hưởng đến việc hiểu.
-- **Ví dụ:** Không phân biệt được 父(ちち)/乳(ちち); nói 病院(びょういん) không ra âm びょ; ảnh hưởng thanh điệu tiếng
-  Việt rõ rệt.
+- **Ví dụ:** Không phân biệt được 父 (ちち)/乳 (ちち); nói 病院 (びょういん) không ra âm びょ; ảnh hưởng thanh điệu
+  tiếng Việt rõ rệt.
 
 #### Điểm 1 — Không đạt（不十分）
 
@@ -343,8 +343,8 @@ Người học N3/B1 có thể:
 - So sánh và đối chiếu hai quan điểm hoặc tình huống một cách cân bằng.
 - Biết điều chỉnh ngôn ngữ và nội dung theo đối tượng và tình huống (kính ngữ cơ bản khi cần).
 - Phản ứng linh hoạt với câu hỏi bất ngờ hoặc chuyển chủ đề.
-- Sử dụng chiến lược giao tiếp tinh tế: xác nhận hiểu (〜ということですか？), yêu cầu làm rõ lịch sự (
-  もう少し詳しく教えていただけますか？), nối tiếp lịch sự...
+- Sử dụng chiến lược giao tiếp tinh tế: xác nhận hiểu (〜ということですか？), yêu cầu làm rõ lịch sự
+  (もう少し詳しく教えていただけますか？), nối tiếp lịch sự...
 - Nội dung phù hợp văn hóa: không vi phạm các quy tắc lịch sự và khoảng cách xã hội Nhật Bản.
 - **Ví dụ tham chiếu (câu hỏi: 日本語の勉強で一番難しいことは何ですか？):**
   「一番難しいのは漢字だと思います。理由は、形が複雑で覚えるのに時間がかかるからです。たとえば、「薔薇」という字は書くのがとても難しくて、何度練習しても忘れてしまいます。でも、漢字がわかるようになると、読める文章が増えてとても嬉しいので、頑張り続けています。」

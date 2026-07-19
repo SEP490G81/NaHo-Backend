@@ -6,7 +6,6 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.book.type.TopicStatus;
 import org.naho.file.entity.FileEntity;
-import org.naho.point.entity.PointHistoryEntity;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.user.entity.UserEntity;
 
@@ -58,9 +57,6 @@ public class TopicEntity extends BaseEntity {
     @Builder.Default
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
     List<LessonEntity> lessons = new ArrayList<>();
-
-    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<PointHistoryEntity> pointHistories;
 
     @ManyToOne
     @JoinColumn(name = "book_id")

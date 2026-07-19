@@ -18,7 +18,6 @@ import java.util.List;
 )
 public interface UserEntityMapper {
     @Mapping(target = "roleIds", source = "roles")
-    @Mapping(target = "pointSummaryId", source = "pointSummary.id")
     @Mapping(target = "userLearningProgressId", source = "userLearningProgress.id")
     @Mapping(target = "userSessionIds", ignore = true)
     @Mapping(target = "oAuthProviderIds", source = "OAuthProviders", qualifiedByName = "getOAuthProviderIds")
@@ -33,10 +32,8 @@ public interface UserEntityMapper {
     @Mapping(target = "modifiedTime", ignore = true)
     @Mapping(target = "reports", ignore = true)
     @Mapping(target = "pointHistories", ignore = true)
-    @Mapping(target = "pointSummary", ignore = true)
     @Mapping(target = "userNodeProgresses", ignore = true)
     @Mapping(target = "userLearningProgress", ignore = true)
-    @Mapping(target = "userSeasonPoints", ignore = true)
     @Mapping(target = "oAuthProviders", ignore = true)
     @Mapping(target = "avatar", ignore = true)
     UserEntity domainToEntity(User user);
@@ -44,5 +41,10 @@ public interface UserEntityMapper {
     @Named("getOAuthProviderIds")
     default List<Long> getOAuthProviderIds(List<OAuthProviderEntity> oAuthProviders) {
         return oAuthProviders.stream().map(OAuthProviderEntity::getId).toList();
+    }
+
+    @Named("getOAuthProviderAvatarUrls")
+    default List<String> getOAuthProviderAvatarUrl(List<OAuthProviderEntity> oAuthProviders) {
+        return oAuthProviders.stream().map(OAuthProviderEntity::getAvatarUrl).toList();
     }
 }

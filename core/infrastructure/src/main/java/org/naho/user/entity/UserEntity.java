@@ -8,8 +8,6 @@ import org.naho.file.entity.FileEntity;
 import org.naho.learning.entity.UserLearningProgressEntity;
 import org.naho.learning.entity.UserNodeProgressEntity;
 import org.naho.point.entity.PointHistoryEntity;
-import org.naho.point.entity.PointSummaryEntity;
-import org.naho.season.entity.UserSeasonPointEntity;
 import org.naho.question.entity.SpeakingQuestionEntity;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.social.report.entity.ReportEntity;
@@ -79,19 +77,12 @@ public class UserEntity extends BaseEntity {
     @OneToMany(mappedBy = "user")
     List<PointHistoryEntity> pointHistories;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "point_summary_id")
-    PointSummaryEntity pointSummary;
-
     @OneToMany(mappedBy = "user")
     List<UserNodeProgressEntity> userNodeProgresses;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_learning_progress_id")
     UserLearningProgressEntity userLearningProgress;
-
-    @OneToMany(mappedBy = "user")
-    List<UserSeasonPointEntity> userSeasonPoints;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "avatar_file_id")

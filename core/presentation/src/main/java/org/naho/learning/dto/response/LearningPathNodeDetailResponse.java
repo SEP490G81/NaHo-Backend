@@ -22,8 +22,28 @@ public record LearningPathNodeDetailResponse(
             String titleMarkup,
             String description,
             String descriptionMarkup,
-            QuestionStatus status
-    ) {}
+            QuestionStatus status,
+            List<VocabularyDetailResponse> vocabularies,
+            List<GrammarDetailResponse> grammars
+    ) {
+        public record VocabularyDetailResponse(
+                Long id,
+                String reading,
+                String japanese,
+                String vietnameseMeaningText,
+                String englishMeaningText
+        ) {
+        }
+
+        public record GrammarDetailResponse(
+                Long id,
+                String reading,
+                String japanese,
+                String vietnameseMeaningText,
+                String englishMeaningText
+        ) {
+        }
+    }
 
     public record VocabularyQuestionDetailResponse(
             Long id,
@@ -35,7 +55,8 @@ public record LearningPathNodeDetailResponse(
                 String japanese,
                 String vietnameseMeaningText,
                 String englishMeaningText
-        ) {}
+        ) {
+        }
     }
 
     public record ChestDetailResponse(
@@ -43,5 +64,6 @@ public record LearningPathNodeDetailResponse(
             String title,
             String description,
             Double point
-    ) {}
+    ) {
+    }
 }

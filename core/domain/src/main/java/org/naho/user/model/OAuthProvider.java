@@ -21,6 +21,10 @@ public class OAuthProvider {
         this.avatarUrl = builder.avatarUrl;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public Long getId() {
         return id;
     }
@@ -39,10 +43,6 @@ public class OAuthProvider {
 
     public String getAvatarUrl() {
         return avatarUrl;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     public static final class Builder {

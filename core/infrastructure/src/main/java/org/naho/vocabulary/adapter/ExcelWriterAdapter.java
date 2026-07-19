@@ -23,7 +23,7 @@ public class ExcelWriterAdapter implements ExcelWriterPort {
 
             // Create Header Row
             Row headerRow = sheet.createRow(0);
-            String[] headers = {"Reading", "Japanese", "Vietnamese Meaning", "English Meaning", "Question ID"};
+            String[] headers = {"Reading", "Japanese", "Vietnamese Meaning", "English Meaning"};
 
             // Header font and style
             Font headerFont = workbook.createFont();
@@ -51,15 +51,11 @@ public class ExcelWriterAdapter implements ExcelWriterPort {
                 // Col 1: Japanese
                 row.createCell(1).setCellValue(vocab.getJapanese() != null ? vocab.getJapanese() : "");
                 // Col 2: Vietnamese
-                row.createCell(2).setCellValue(vocab.getVietnameseMeaningText() != null ? vocab.getVietnameseMeaningText() : "");
+                row.createCell(2)
+                        .setCellValue(vocab.getVietnameseMeaningText() != null ? vocab.getVietnameseMeaningText() : "");
                 // Col 3: English
-                row.createCell(3).setCellValue(vocab.getEnglishMeaningText() != null ? vocab.getEnglishMeaningText() : "");
-                // Col 4: Question ID
-                if (vocab.getQuestionId() != null) {
-                    row.createCell(4).setCellValue(vocab.getQuestionId());
-                } else {
-                    row.createCell(4).setCellValue("");
-                }
+                row.createCell(3)
+                        .setCellValue(vocab.getEnglishMeaningText() != null ? vocab.getEnglishMeaningText() : "");
             }
 
             // Auto-size columns

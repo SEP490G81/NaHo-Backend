@@ -125,8 +125,8 @@ Dự án backend cấu hình kết nối database thông qua tệp cấu hình p
    tệp [application-dev.yaml](file:///e:/Documents/Ky_9/SEP490/NaHo-Backend/core/bootstrap/src/main/resources/config/application-dev.yaml)
    và sửa lại thông số `username` và `password` cho khớp với máy của bạn.
 4. **Database Migration (Flyway)**:
-   Bạn **không cần** tự chạy bất cứ script SQL nào để tạo bảng. Dự án tích hợp **Flyway**.
-   Khi bạn chạy ứng dụng lần đầu tiên, Flyway sẽ tự động quét thư
+   Bạn **không cần** tự chạy bất cứ script SQL nào để tạo bảng. Dự án tích hợp **Flyway**. Khi bạn chạy ứng dụng lần đầu
+   tiên, Flyway sẽ tự động quét thư
    mục [db/migration](file:///e:/Documents/Ky_9/SEP490/NaHo-Backend/core/infrastructure/src/main/resources/db/migration)
    và chạy:
     * `V1__tables.sql`: Khởi tạo cấu trúc các bảng (`users`, `roles`, `permissions`, `files`,...)
@@ -156,7 +156,7 @@ Bạn có thể build ứng dụng để kiểm tra lỗi biên dịch thông qu
 2. Nhấp đúp chuột để mở
    tệp [ApplicationBootstrap.java](file:///e:/Documents/Ky_9/SEP490/NaHo-Backend/core/bootstrap/src/main/java/org/naho/ApplicationBootstrap.java).
 3. Nhấp chuột phải vào biểu tượng Run màu xanh lá bên cạnh tên class hoặc trong phương thức `main` và chọn **Run '
-   ApplicationBootstrap.main()'**.
+   ApplicationBootstrap.main ()'**.
 4. Spring Boot sẽ khởi động ở cổng `8386` (cấu hình
    trong [application.yaml](file:///e:/Documents/Ky_9/SEP490/NaHo-Backend/core/bootstrap/src/main/resources/application.yaml)).
 

@@ -25,6 +25,10 @@ public class ProblemDetailResponse extends ProblemDetail {
         super(other);
     }
 
+    public static Builder builder(HttpStatus status) {
+        return new Builder(status);
+    }
+
     public String getErrorCode() {
         return errorCode;
     }
@@ -39,10 +43,6 @@ public class ProblemDetailResponse extends ProblemDetail {
 
     public List<FieldErrorResponse> getFieldErrors() {
         return fieldErrors;
-    }
-
-    public static Builder builder(HttpStatus status) {
-        return new Builder(status);
     }
 
     public static class Builder {

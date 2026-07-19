@@ -9,4 +9,8 @@ public interface LearningPathNodeRepositoryPort {
     List<LearningPathNode> findByObjectiveId(Long objectiveId);
 
     Optional<LearningPathNode> findById(Long id);
+
+    Optional<LearningPathNode> findFirstLearningPathNode();
+
+    Optional<LearningPathNode> findByChestId(Long chestId);
 }

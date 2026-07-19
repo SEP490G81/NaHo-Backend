@@ -16,12 +16,10 @@ public class User {
     private final List<Long> userSessionIds;
     private final List<Long> oAuthProviderIds;
 
-    private final Long pointSummaryId;
     private final Long userLearningProgressId;
-    private Long avatarFileId;
-
     private final Username username;
     private final Email email;
+    private Long avatarFileId;
     private String hashPassword;
     private String fullName;
     private Gender gender;
@@ -35,7 +33,6 @@ public class User {
         this.roleIds = builder.roleIds;
         this.userSessionIds = builder.userSessionIds;
         this.oAuthProviderIds = builder.oAuthProviderIds;
-        this.pointSummaryId = builder.pointSummaryId;
         this.userLearningProgressId = builder.userLearningProgressId;
         this.avatarFileId = builder.avatarFileId;
         this.username = builder.username;
@@ -58,12 +55,12 @@ public class User {
                 .build();
     }
 
-    public boolean isActive() {
-        return status == UserStatus.ACTIVE;
-    }
-
     public static Builder builder() {
         return new Builder();
+    }
+
+    public boolean isActive() {
+        return status == UserStatus.ACTIVE;
     }
 
     public Builder toBuilder() {
@@ -71,7 +68,6 @@ public class User {
                 .id(id)
                 .roleIds(roleIds)
                 .userSessionIds(userSessionIds)
-                .pointSummaryId(pointSummaryId)
                 .userLearningProgressId(userLearningProgressId)
                 .avatarFileId(avatarFileId)
                 .username(username)
@@ -82,110 +78,6 @@ public class User {
                 .dob(dob)
                 .jlptLevel(jlptLevel)
                 .status(status);
-    }
-
-    public static final class Builder {
-
-        private Long id;
-        private List<Long> roleIds;
-        private List<Long> userSessionIds;
-        private List<Long> oAuthProviderIds;
-
-        private Long pointSummaryId;
-        private Long userLearningProgressId;
-        private Long avatarFileId;
-
-        private Username username;
-        private Email email;
-        private String hashPassword;
-        private String fullName;
-        private Gender gender;
-        private Dob dob;
-        private JLPTLevel jlptLevel;
-
-        private UserStatus status;
-
-        private Builder() {
-        }
-
-        public Builder id(Long id) {
-            this.id = id;
-            return this;
-        }
-
-        public Builder roleIds(List<Long> roleIds) {
-            this.roleIds = roleIds;
-            return this;
-        }
-
-        public Builder userSessionIds(List<Long> userSessionIds) {
-            this.userSessionIds = userSessionIds;
-            return this;
-        }
-
-        public Builder oAuthProviderIds(List<Long> oAuthProviderIds) {
-            this.oAuthProviderIds = oAuthProviderIds;
-            return this;
-        }
-
-        public Builder pointSummaryId(Long pointSummaryId) {
-            this.pointSummaryId = pointSummaryId;
-            return this;
-        }
-
-        public Builder userLearningProgressId(Long userLearningProgressId) {
-            this.userLearningProgressId = userLearningProgressId;
-            return this;
-        }
-
-        public Builder avatarFileId(Long avatarFileId) {
-            this.avatarFileId = avatarFileId;
-            return this;
-        }
-
-        public Builder username(Username username) {
-            this.username = username;
-            return this;
-        }
-
-        public Builder email(Email email) {
-            this.email = email;
-            return this;
-        }
-
-        public Builder hashPassword(String hashPassword) {
-            this.hashPassword = hashPassword;
-            return this;
-        }
-
-        public Builder fullName(String fullName) {
-            this.fullName = fullName;
-            return this;
-        }
-
-        public Builder gender(Gender gender) {
-            this.gender = gender;
-            return this;
-        }
-
-        public Builder dob(Dob dob) {
-            this.dob = dob;
-            return this;
-        }
-
-        public Builder jlptLevel(JLPTLevel jlptLevel) {
-            this.jlptLevel = jlptLevel;
-            return this;
-        }
-
-        public Builder status(UserStatus status) {
-            this.status = status;
-            return this;
-        }
-
-        public User build() {
-            return new User(this);
-        }
     }
 
     public Long getId() {
@@ -202,10 +94,6 @@ public class User {
 
     public List<Long> getOAuthProviderIds() {
         return oAuthProviderIds;
-    }
-
-    public Long getPointSummaryId() {
-        return pointSummaryId;
     }
 
     public Long getUserLearningProgressId() {
@@ -274,5 +162,103 @@ public class User {
 
     public void setStatus(UserStatus status) {
         this.status = status;
+    }
+
+    public static final class Builder {
+
+        private Long id;
+        private List<Long> roleIds;
+        private List<Long> userSessionIds;
+        private List<Long> oAuthProviderIds;
+
+        private Long userLearningProgressId;
+        private Long avatarFileId;
+
+        private Username username;
+        private Email email;
+        private String hashPassword;
+        private String fullName;
+        private Gender gender;
+        private Dob dob;
+        private JLPTLevel jlptLevel;
+
+        private UserStatus status;
+
+        private Builder() {
+        }
+
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder roleIds(List<Long> roleIds) {
+            this.roleIds = roleIds;
+            return this;
+        }
+
+        public Builder userSessionIds(List<Long> userSessionIds) {
+            this.userSessionIds = userSessionIds;
+            return this;
+        }
+
+        public Builder oAuthProviderIds(List<Long> oAuthProviderIds) {
+            this.oAuthProviderIds = oAuthProviderIds;
+            return this;
+        }
+
+        public Builder userLearningProgressId(Long userLearningProgressId) {
+            this.userLearningProgressId = userLearningProgressId;
+            return this;
+        }
+
+        public Builder avatarFileId(Long avatarFileId) {
+            this.avatarFileId = avatarFileId;
+            return this;
+        }
+
+        public Builder username(Username username) {
+            this.username = username;
+            return this;
+        }
+
+        public Builder email(Email email) {
+            this.email = email;
+            return this;
+        }
+
+        public Builder hashPassword(String hashPassword) {
+            this.hashPassword = hashPassword;
+            return this;
+        }
+
+        public Builder fullName(String fullName) {
+            this.fullName = fullName;
+            return this;
+        }
+
+        public Builder gender(Gender gender) {
+            this.gender = gender;
+            return this;
+        }
+
+        public Builder dob(Dob dob) {
+            this.dob = dob;
+            return this;
+        }
+
+        public Builder jlptLevel(JLPTLevel jlptLevel) {
+            this.jlptLevel = jlptLevel;
+            return this;
+        }
+
+        public Builder status(UserStatus status) {
+            this.status = status;
+            return this;
+        }
+
+        public User build() {
+            return new User(this);
+        }
     }
 }

@@ -18,7 +18,7 @@ public interface TopicResponseMapper {
     CreateTopicResponse createResultToResponse(CreateTopicResult result);
 
     TopicResponse resultToResponse(TopicResult result);
-    
+
     TopicDetailResponse detailResultToResponse(TopicDetailResult result);
 
     LessonResponse lessonResultToResponse(LessonListItemResult result);

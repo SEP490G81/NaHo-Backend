@@ -6,7 +6,7 @@ import org.naho.point.model.PointHistory;
 import java.time.Instant;
 
 public class PointHistoryCommandMapper {
-    public PointHistory commandToDomain(PointHistoryCommand command, Instant transactionTime) {
+    public PointHistory commandToDomain(PointHistoryCommand command) {
         if (command == null) {
             return null;
         }
@@ -14,13 +14,9 @@ public class PointHistoryCommandMapper {
                 .id(command.id())
                 .userId(command.userId())
                 .learningPathNodeId(command.learningPathNodeId())
-                .objectiveId(command.objectiveId())
-                .lessonId(command.lessonId())
-                .topicId(command.topicId())
-                .bookId(command.bookId())
                 .point(command.point())
                 .transactionType(command.transactionType())
-                .transactionTime(transactionTime)
+                .transactionTime(Instant.now())
                 .build();
     }
 }

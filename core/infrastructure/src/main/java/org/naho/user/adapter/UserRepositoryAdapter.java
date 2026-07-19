@@ -1,7 +1,6 @@
 package org.naho.user.adapter;
 
 import lombok.RequiredArgsConstructor;
-import org.naho.point.entity.PointSummaryEntity;
 import org.naho.user.entity.OAuthProviderEntity;
 import org.naho.user.entity.UserEntity;
 import org.naho.user.mapper.OAuthProviderEntityMapper;
@@ -11,6 +10,7 @@ import org.naho.user.model.User;
 import org.naho.user.mybatis.UserQueryMapper;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.naho.user.repository.UserJpaRepository;
+import org.naho.user.result.LeaderboardUserResult;
 import org.naho.user.type.JLPTLevel;
 import org.naho.user.type.OAuthProviderName;
 import org.naho.user.type.RoleName;
@@ -66,7 +66,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     @Override
     public User save(User user, OAuthProvider oAuthProvider) {
         UserEntity userEntity = userEntityMapper.domainToEntity(user);
-        
+
         if (oAuthProvider != null) {
             OAuthProviderEntity oAuthProviderEntity =
                     oAuthProviderEntityMapper.domainToEntity(oAuthProvider);
@@ -81,12 +81,6 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     @Override
     public User createNew(User user, OAuthProvider oAuthProvider) {
         UserEntity userEntity = userEntityMapper.domainToEntity(user);
-        // default point summary
-        userEntity.setPointSummary(
-                PointSummaryEntity.builder()
-                        .totalPoint(0.0)
-                        .build()
-        );
 
         if (oAuthProvider != null) {
             OAuthProviderEntity oAuthProviderEntity =
@@ -136,6 +130,16 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         return userJpaRepository.findByFilters(formattedNameOrMail, roleEnum, statusEnum, jlptLevelEnum).stream()
                 .map(userEntityMapper::entityToDomain)
                 .toList();
+    }
+
+    @Override
+    public List<LeaderboardUserResult> findTop10OrderByTotalPointInLeague(Long leagueId) {
+        return userQueryMapper.findTop10OrderByTotalPointInLeague(leagueId);
+    }
+
+    @Override
+    public Optional<LeaderboardUserResult> findTopOfUserByUserId(Long userId) {
+        return userQueryMapper.findTopOfUserByUserId(userId);
     }
 
     @Override

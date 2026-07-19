@@ -13,10 +13,6 @@ public class PointHistory {
     private final Long userId;
 
     private final Long learningPathNodeId;
-    private final Long objectiveId;
-    private final Long lessonId;
-    private final Long topicId;
-    private final Long bookId;
 
     private Double point;
     private PointTransactionType transactionType;
@@ -26,10 +22,6 @@ public class PointHistory {
         this.id = builder.id;
         this.userId = builder.userId;
         this.learningPathNodeId = builder.learningPathNodeId;
-        this.objectiveId = builder.objectiveId;
-        this.lessonId = builder.lessonId;
-        this.topicId = builder.topicId;
-        this.bookId = builder.bookId;
         this.point = builder.point;
         this.transactionType = builder.transactionType;
         this.transactionTime = builder.transactionTime;
@@ -49,22 +41,6 @@ public class PointHistory {
 
     public Long getLearningPathNodeId() {
         return learningPathNodeId;
-    }
-
-    public Long getObjectiveId() {
-        return objectiveId;
-    }
-
-    public Long getLessonId() {
-        return lessonId;
-    }
-
-    public Long getTopicId() {
-        return topicId;
-    }
-
-    public Long getBookId() {
-        return bookId;
     }
 
     public Double getPoint() {
@@ -88,10 +64,6 @@ public class PointHistory {
         private Long id;
         private Long userId;
         private Long learningPathNodeId;
-        private Long objectiveId;
-        private Long lessonId;
-        private Long topicId;
-        private Long bookId;
         private Double point;
         private PointTransactionType transactionType;
         private Instant transactionTime;
@@ -111,26 +83,6 @@ public class PointHistory {
 
         public Builder learningPathNodeId(Long learningPathNodeId) {
             this.learningPathNodeId = learningPathNodeId;
-            return this;
-        }
-
-        public Builder objectiveId(Long objectiveId) {
-            this.objectiveId = objectiveId;
-            return this;
-        }
-
-        public Builder lessonId(Long lessonId) {
-            this.lessonId = lessonId;
-            return this;
-        }
-
-        public Builder topicId(Long topicId) {
-            this.topicId = topicId;
-            return this;
-        }
-
-        public Builder bookId(Long bookId) {
-            this.bookId = bookId;
             return this;
         }
 
@@ -182,34 +134,6 @@ public class PointHistory {
                 throw new DomainException(
                         PointHistoryDomainErrorCode.POINT_HISTORY_LEARNING_PATH_NODE_ID_NOT_VALID,
                         PointHistoryDetailMessageKey.POINT_HISTORY_LEARNING_PATH_NODE_ID_BLANK
-                );
-            }
-
-            if (transactionType.equals(PointTransactionType.CAN_DO_COMPLETION) && objectiveId == null) {
-                throw new DomainException(
-                        PointHistoryDomainErrorCode.POINT_HISTORY_OBJECTIVE_ID_NOT_VALID,
-                        PointHistoryDetailMessageKey.POINT_HISTORY_OBJECTIVE_ID_BLANK
-                );
-            }
-
-            if (transactionType.equals(PointTransactionType.LESSON_COMPLETION) && lessonId == null) {
-                throw new DomainException(
-                        PointHistoryDomainErrorCode.POINT_HISTORY_LESSON_ID_NOT_VALID,
-                        PointHistoryDetailMessageKey.POINT_HISTORY_LESSON_ID_BLANK
-                );
-            }
-
-            if (transactionType.equals(PointTransactionType.TOPIC_COMPLETION) && topicId == null) {
-                throw new DomainException(
-                        PointHistoryDomainErrorCode.POINT_HISTORY_TOPIC_ID_NOT_VALID,
-                        PointHistoryDetailMessageKey.POINT_HISTORY_TOPIC_ID_BLANK
-                );
-            }
-
-            if (transactionType.equals(PointTransactionType.BOOK_COMPLETION) && bookId == null) {
-                throw new DomainException(
-                        PointHistoryDomainErrorCode.POINT_HISTORY_BOOK_ID_NOT_VALID,
-                        PointHistoryDetailMessageKey.POINT_HISTORY_BOOK_ID_BLANK
                 );
             }
 
