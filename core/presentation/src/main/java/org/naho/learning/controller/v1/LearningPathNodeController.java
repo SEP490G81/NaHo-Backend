@@ -24,7 +24,7 @@ public class LearningPathNodeController {
     @GetMapping("/{id}")
     @ApiResponseMessage(message = LearningPathNodeDetailMessageKey.LEARNING_PATH_NODE_GET_DETAIL_SUCCESS)
     public ResponseEntity<LearningPathNodeDetailResponse> getLearningPathNodeDetail(
-            @PathVariable("id") Long id
+            @PathVariable Long id
     ) {
         var command = new GetLearningPathNodeDetailCommand(id);
         var result = getLearningPathNodeDetailInputPort.getLearningPathNodeDetail(command);

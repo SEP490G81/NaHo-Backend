@@ -12,6 +12,8 @@ import org.naho.user.entity.UserEntity;
 import org.naho.user.repository.UserJpaRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 @RequiredArgsConstructor
 public class UserNodeProgressRepositoryAdapter implements UserNodeProgressRepositoryPort {
@@ -42,5 +44,12 @@ public class UserNodeProgressRepositoryAdapter implements UserNodeProgressReposi
                 userNodeProgressJpaRepository.save(userNodeProgressEntity);
 
         return userNodeProgressEntityMapper.entityToDomain(savedEntity);
+    }
+
+    @Override
+    public Optional<UserNodeProgress> findByLearningPathNodeIdAndUserId(Long learningPathNodeId, Long userId) {
+        return userNodeProgressJpaRepository
+                .findByLearningPathNode_IdAndUser_Id(learningPathNodeId, userId)
+                .map(userNodeProgressEntityMapper::entityToDomain);
     }
 }

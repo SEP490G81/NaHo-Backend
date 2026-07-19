@@ -13,4 +13,6 @@ public interface LearningPathNodeRepositoryPort {
     Optional<LearningPathNode> findFirstLearningPathNode();
 
     Optional<LearningPathNode> findByChestId(Long chestId);
+
+    Optional<LearningPathNode> findBySpeakingQuestionId(Long speakingQuestionId);
 }

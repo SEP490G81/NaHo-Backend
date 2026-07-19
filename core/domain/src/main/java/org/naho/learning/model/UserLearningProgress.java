@@ -92,11 +92,12 @@ public class UserLearningProgress {
         this.totalPoint = totalPoint;
     }
 
-    public void addPoint(Double point) {
+    public Double addPoint(Double point) {
         if (this.totalPoint == null) {
             this.totalPoint = 0.0;
         }
         this.totalPoint += point;
+        return point;
     }
 
     public static final class Builder {

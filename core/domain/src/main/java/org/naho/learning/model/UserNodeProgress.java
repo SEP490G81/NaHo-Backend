@@ -29,6 +29,16 @@ public class UserNodeProgress {
         this.status = builder.status;
     }
 
+    public void increaseAttemptCount() {
+        this.attemptCount = this.attemptCount == null ? 1 : this.attemptCount + 1;
+    }
+
+    public void updateBestScore(Double bestScore) {
+        if (this.bestScore == null || this.bestScore < bestScore) {
+            this.bestScore = bestScore;
+        }
+    }
+
     public static Builder builder() {
         return new Builder();
     }

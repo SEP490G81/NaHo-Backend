@@ -19,9 +19,11 @@ import org.naho.file.result.FileResult;
 import org.naho.furigana.port.out.FuriganaGenerationPort;
 import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
 import org.naho.i18n.message.user.UserDetailMessageKey;
+import org.naho.question.command.CompleteSpeakingQuestionCommand;
 import org.naho.question.exception.SpeakingQuestionErrorCode;
 import org.naho.question.model.Grammar;
 import org.naho.question.model.SpeakingQuestion;
+import org.naho.question.port.in.CompleteSpeakingQuestionInputPort;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.TransactionPort;
@@ -64,6 +66,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     private final AiAnalysisPort aiAnalysisPort;
     private final FuriganaGenerationPort furiganaGenerationPort;
     private final TransactionPort transactionPort;
+    private final CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public SpeakingAnalysisUseCase(
@@ -79,7 +82,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             BookRepositoryPort bookRepositoryPort,
             AiAnalysisPort aiAnalysisPort,
             FuriganaGenerationPort furiganaGenerationPort,
-            TransactionPort transactionPort
+            TransactionPort transactionPort,
+            CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort
     ) {
         this.userRepositoryPort = userRepositoryPort;
         this.speakingQuestionRepositoryPort = speakingQuestionRepositoryPort;
@@ -94,6 +98,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         this.aiAnalysisPort = aiAnalysisPort;
         this.furiganaGenerationPort = furiganaGenerationPort;
         this.transactionPort = transactionPort;
+        this.completeSpeakingQuestionInputPort = completeSpeakingQuestionInputPort;
     }
 
     public static final String RECORDS_FORDER_NAME = "recordings";
@@ -382,7 +387,14 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 .build();
         answerHistoryRepositoryPort.saveContentAssessment(contentAssessment);
 
-
+        completeSpeakingQuestionInputPort.completeSpeakingQuestion(
+                CompleteSpeakingQuestionCommand.builder()
+                        .speakingQuestionId(speakingQuestion.getId())
+                        .userId(command.userId())
+                        .overallScore(overallScore)
+                        .build()
+        );
+        
         return new SpeakingAnalysisResult(answerHistory.getId(), overallScore);
     }
 

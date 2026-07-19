@@ -24,6 +24,7 @@ import org.naho.speech.llm.usecase.SuggestedTopicsUseCase;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.naho.speech.azure.port.out.TextToSpeechServicePort;
+import org.naho.question.port.in.CompleteSpeakingQuestionInputPort;
 import org.naho.shared.port.out.TransactionPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -111,7 +112,8 @@ public class ChatConfig {
             AzureSpeechServicePort azureSpeechServicePort,
             AiAnalysisPort aiAnalysisPort,
             FuriganaGenerationPort furiganaGenerationPort,
-            TransactionPort transactionPort
+            TransactionPort transactionPort,
+            CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort
     ) {
         return new SpeakingAnalysisUseCase(
                 userRepositoryPort,
@@ -126,7 +128,8 @@ public class ChatConfig {
                 bookRepositoryPort,
                 aiAnalysisPort,
                 furiganaGenerationPort,
-                transactionPort
+                transactionPort,
+                completeSpeakingQuestionInputPort
         );
     }
 }
