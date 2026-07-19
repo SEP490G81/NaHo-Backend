@@ -44,4 +44,11 @@ public class LearningPathNodeRepositoryAdapter implements LearningPathNodeReposi
                 .findByChestId(chestId)
                 .map(learningPathNodeEntityMapper::entityToDomain);
     }
+
+    @Override
+    public Optional<LearningPathNode> findBySpeakingQuestionId(Long speakingQuestionId) {
+        return learningPathNodeJpaRepository
+                .findBySpeakingQuestion_Id(speakingQuestionId)
+                .map(learningPathNodeEntityMapper::entityToDomain);
+    }
 }

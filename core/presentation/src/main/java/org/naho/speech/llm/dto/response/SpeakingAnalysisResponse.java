@@ -1,7 +1,7 @@
 package org.naho.speech.llm.dto.response;
 
 public record SpeakingAnalysisResponse(
-        String historyId,
+        Long historyId,
         Double score
 ) {
 }

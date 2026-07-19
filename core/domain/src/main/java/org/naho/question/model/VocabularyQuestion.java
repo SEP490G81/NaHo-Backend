@@ -15,16 +15,16 @@ public class VocabularyQuestion {
         this.vocabularies = builder.vocabularies != null ? builder.vocabularies : new ArrayList<>();
     }
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
     public Long getId() {
         return id;
     }
 
     public List<Vocabulary> getVocabularies() {
         return vocabularies;
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     public static final class Builder {

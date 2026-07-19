@@ -12,6 +12,7 @@ import org.naho.social.entity.CommentEntity;
 import org.naho.social.entity.ReactionEntity;
 import org.naho.social.report.entity.ReportEntity;
 import org.naho.user.entity.UserEntity;
+import org.naho.vocabulary.entity.VocabularyEntity;
 
 import java.util.List;
 
@@ -41,18 +42,24 @@ public class SpeakingQuestionEntity extends BaseEntity {
     QuestionStatus status;
 
     @OneToOne
-    @JoinColumn(name = "question_audio_file_id")
-    FileEntity questionAudioFile;
+    @JoinColumn(name = "speaking_question_audio_file_id")
+    FileEntity speakingQuestionAudioFile;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     UserEntity user;
 
-    @OneToMany(mappedBy = "speakingQuestion", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<SpeakingQuestionGrammarEntity> grammars;
+    @ManyToMany
+    @JoinTable(name = "speaking_questions_grammars",
+            joinColumns = @JoinColumn(name = "speaking_question_id"),
+            inverseJoinColumns = @JoinColumn(name = "grammar_id"))
+    List<GrammarEntity> grammars;
 
-    @OneToMany(mappedBy = "speakingQuestion", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<SpeakingQuestionVocabularyEntity> vocabularies;
+    @ManyToMany
+    @JoinTable(name = "speaking_questions_vocabularies",
+            joinColumns = @JoinColumn(name = "speaking_question_id"),
+            inverseJoinColumns = @JoinColumn(name = "vocabulary_id"))
+    List<VocabularyEntity> vocabularies;
 
     @OneToMany(mappedBy = "question")
     List<CommentEntity> comments;
@@ -65,4 +72,7 @@ public class SpeakingQuestionEntity extends BaseEntity {
 
     @OneToOne(mappedBy = "speakingQuestion")
     LearningPathNodeEntity learningPathNode;
+
+    @OneToMany(mappedBy = "speakingQuestion")
+    List<AnswerHistoryEntity> answerHistories;
 }

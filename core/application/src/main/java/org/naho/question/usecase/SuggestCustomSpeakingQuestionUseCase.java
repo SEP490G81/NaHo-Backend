@@ -1,6 +1,6 @@
 package org.naho.question.usecase;
 
-import lombok.RequiredArgsConstructor;
+
 import org.naho.question.command.SuggestCustomSpeakingQuestionCommand;
 import org.naho.question.port.in.SuggestCustomSpeakingQuestionInputPort;
 import org.naho.question.result.SuggestCustomSpeakingQuestionResult;
@@ -9,10 +9,13 @@ import org.naho.speech.llm.port.out.AiChatPort;
 import java.util.List;
 import java.util.Map;
 
-@RequiredArgsConstructor
 public class SuggestCustomSpeakingQuestionUseCase implements SuggestCustomSpeakingQuestionInputPort {
 
     private final AiChatPort aiChatPort;
+
+    public SuggestCustomSpeakingQuestionUseCase(AiChatPort aiChatPort) {
+        this.aiChatPort = aiChatPort;
+    }
 
     @Override
     public SuggestCustomSpeakingQuestionResult suggestCustomSpeakingQuestion(SuggestCustomSpeakingQuestionCommand command) {

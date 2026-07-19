@@ -5,7 +5,7 @@
     <sql id="Base_Select_List">
         q.id as id,
         q.user_id as userId,
-        q.question_audio_file_id as questionAudioFileId,
+        q.speaking_question_audio_file_id as speakingQuestionAudioFileId,
         q.title as title,
         q.title_markup as titleMarkup,
         q.description as description,

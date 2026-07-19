@@ -43,13 +43,13 @@ class UploadFileTest {
     void UTCID01_Should_UploadFile_Successfully() {
         // Arrange (Given)
         InputStream inputStream = mock(InputStream.class);
-        FileUploadCommand command = new FileUploadCommand(
-                "avatars",
-                "avatar.png",
-                inputStream,
-                "image/png",
-                1024L
-        );
+        FileUploadCommand command = FileUploadCommand.builder()
+                .folderName("avatars")
+                .originalName("avatar.png")
+                .inputStream(inputStream)
+                .contentType("image/png")
+                .size(1024L)
+                .build();
 
         File savedFile = File.builder()
                 .id(10L)
@@ -119,13 +119,13 @@ class UploadFileTest {
         assertEquals(FileDetailMessageKey.FILE_EMPTY, exceptionNullCommand.getMessage());
 
         // Test with null inputStream in command
-        FileUploadCommand commandNullStream = new FileUploadCommand(
-                "avatars",
-                "avatar.png",
-                null,
-                "image/png",
-                1024L
-        );
+        FileUploadCommand commandNullStream = FileUploadCommand.builder()
+                .folderName("avatars")
+                .originalName("avatar.png")
+                .inputStream(null)
+                .contentType("image/png")
+                .size(1024L)
+                .build();
         ApplicationException exceptionNullStream = assertThrows(
                 ApplicationException.class,
                 () -> fileStorageUseCase.uploadFile(commandNullStream)
@@ -134,13 +134,13 @@ class UploadFileTest {
         assertEquals(FileDetailMessageKey.FILE_EMPTY, exceptionNullStream.getMessage());
 
         // Test folderName empty
-        FileUploadCommand commandNullFolder = new FileUploadCommand(
-                "",
-                "avatar.png",
-                mock(InputStream.class),
-                "image/png",
-                1024L
-        );
+        FileUploadCommand commandNullFolder = FileUploadCommand.builder()
+                .folderName("")
+                .originalName("avatar.png")
+                .inputStream(mock(InputStream.class))
+                .contentType("image/png")
+                .size(1024L)
+                .build();
         ApplicationException exceptionNullFolder = assertThrows(
                 ApplicationException.class,
                 () -> fileStorageUseCase.uploadFile(commandNullFolder)
@@ -155,13 +155,13 @@ class UploadFileTest {
     void UTCID03_Should_ThrowException_When_RepositorySaveFails() {
         // Arrange (Given)
         InputStream inputStream = mock(InputStream.class);
-        FileUploadCommand command = new FileUploadCommand(
-                "avatars",
-                "avatar.png",
-                inputStream,
-                "image/png",
-                1024L
-        );
+        FileUploadCommand command = FileUploadCommand.builder()
+                .folderName("avatars")
+                .originalName("avatar.png")
+                .inputStream(inputStream)
+                .contentType("image/png")
+                .size(1024L)
+                .build();
 
         when(fileRepositoryPort.save(any(File.class)))
                 .thenThrow(new RuntimeException("Database error"));
@@ -185,13 +185,13 @@ class UploadFileTest {
     void UTCID04_Should_ThrowException_When_StorageUploadFails() {
         // Arrange (Given)
         InputStream inputStream = mock(InputStream.class);
-        FileUploadCommand command = new FileUploadCommand(
-                "avatars",
-                "avatar.png",
-                inputStream,
-                "image/png",
-                1024L
-        );
+        FileUploadCommand command = FileUploadCommand.builder()
+                .folderName("avatars")
+                .originalName("avatar.png")
+                .inputStream(inputStream)
+                .contentType("image/png")
+                .size(1024L)
+                .build();
 
         File savedFile = File.builder()
                 .id(10L)
@@ -238,21 +238,21 @@ class UploadFileTest {
     void UTCID05_Should_ThrowException_When_OriginalNameIsEmpty() {
         // Arrange (Given)
         InputStream inputStream = mock(InputStream.class);
-        FileUploadCommand commandNullName = new FileUploadCommand(
-                "avatars",
-                null,
-                inputStream,
-                "image/png",
-                1024L
-        );
+        FileUploadCommand commandNullName = FileUploadCommand.builder()
+                .folderName("avatars")
+                .originalName(null)
+                .inputStream(inputStream)
+                .contentType("image/png")
+                .size(1024L)
+                .build();
 
-        FileUploadCommand commandBlankName = new FileUploadCommand(
-                "avatars",
-                "  ",
-                inputStream,
-                "image/png",
-                1024L
-        );
+        FileUploadCommand commandBlankName = FileUploadCommand.builder()
+                .folderName("avatars")
+                .originalName("  ")
+                .inputStream(inputStream)
+                .contentType("image/png")
+                .size(1024L)
+                .build();
 
         // Act (When) & Assert (Then) for null originalName
         DomainException exceptionNull = assertThrows(
@@ -277,21 +277,21 @@ class UploadFileTest {
     void UTCID06_Should_ThrowException_When_SizeZeroOrNegative() {
         // Arrange (Given)
         InputStream inputStream = mock(InputStream.class);
-        FileUploadCommand commandZeroSize = new FileUploadCommand(
-                "avatars",
-                "avatar.png",
-                inputStream,
-                "image/png",
-                0L
-        );
+        FileUploadCommand commandZeroSize = FileUploadCommand.builder()
+                .folderName("avatars")
+                .originalName("avatar.png")
+                .inputStream(inputStream)
+                .contentType("image/png")
+                .size(0L)
+                .build();
 
-        FileUploadCommand commandNegativeSize = new FileUploadCommand(
-                "avatars",
-                "avatar.png",
-                inputStream,
-                "image/png",
-                -10L
-        );
+        FileUploadCommand commandNegativeSize = FileUploadCommand.builder()
+                .folderName("avatars")
+                .originalName("avatar.png")
+                .inputStream(inputStream)
+                .contentType("image/png")
+                .size(-10L)
+                .build();
 
         // Act (When) & Assert (Then) for zero size
         DomainException exceptionZero = assertThrows(

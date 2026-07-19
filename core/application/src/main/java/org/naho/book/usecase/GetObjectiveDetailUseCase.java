@@ -1,6 +1,6 @@
 package org.naho.book.usecase;
 
-import lombok.RequiredArgsConstructor;
+
 import org.naho.book.command.GetObjectiveDetailCommand;
 import org.naho.book.exception.ObjectiveErrorCode;
 import org.naho.book.model.Objective;
@@ -12,10 +12,17 @@ import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.learning.result.LearningPathNodeListItemResult;
 import org.naho.shared.exception.ApplicationException;
 
-@RequiredArgsConstructor
 public class GetObjectiveDetailUseCase implements GetObjectiveDetailInputPort {
     private final ObjectiveRepositoryPort objectiveRepositoryPort;
     private final LearningPathNodeRepositoryPort learningPathNodeRepositoryPort;
+
+    public GetObjectiveDetailUseCase(
+            ObjectiveRepositoryPort objectiveRepositoryPort,
+            LearningPathNodeRepositoryPort learningPathNodeRepositoryPort
+    ) {
+        this.objectiveRepositoryPort = objectiveRepositoryPort;
+        this.learningPathNodeRepositoryPort = learningPathNodeRepositoryPort;
+    }
 
     @Override
     public ObjectiveDetailResult getObjectiveDetail(GetObjectiveDetailCommand command) {

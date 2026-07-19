@@ -82,7 +82,6 @@ CREATE TABLE files
     content_type  VARCHAR(100)          NOT NULL,
     size          BIGINT                NOT NULL,
     comment_id    BIGINT                NULL,
-    question_id   BIGINT                NULL,
     report_id     BIGINT                NULL,
     CONSTRAINT pk_files PRIMARY KEY (id)
 );
@@ -254,37 +253,29 @@ CREATE TABLE roles_permissions
 
 CREATE TABLE speaking_questions
 (
-    id                     BIGINT AUTO_INCREMENT NOT NULL,
-    created_time           datetime(6)           NOT NULL,
-    modified_time          datetime(6)           NULL,
-    title                  VARCHAR(255)          NOT NULL,
-    title_markup           VARCHAR(255)          NOT NULL,
-    `description`          TEXT                  NULL,
-    description_markup     TEXT                  NULL,
-    status                 VARCHAR(50)           NULL,
-    question_audio_file_id BIGINT                NULL,
-    user_id                BIGINT                NULL,
+    id                              BIGINT AUTO_INCREMENT NOT NULL,
+    created_time                    datetime(6)           NOT NULL,
+    modified_time                   datetime(6)           NULL,
+    title                           VARCHAR(255)          NOT NULL,
+    title_markup                    VARCHAR(255)          NOT NULL,
+    `description`                   TEXT                  NULL,
+    description_markup              TEXT                  NULL,
+    status                          VARCHAR(50)           NULL,
+    speaking_question_audio_file_id BIGINT                NULL,
+    user_id                         BIGINT                NULL,
     CONSTRAINT pk_speaking_questions PRIMARY KEY (id)
 );
 
 CREATE TABLE speaking_questions_grammars
 (
-    id                   BIGINT AUTO_INCREMENT NOT NULL,
-    created_time         datetime(6)           NOT NULL,
-    modified_time        datetime(6)           NULL,
-    speaking_question_id BIGINT                NOT NULL,
-    grammar_id           BIGINT                NOT NULL,
-    CONSTRAINT pk_speaking_questions_grammars PRIMARY KEY (id)
+    grammar_id           BIGINT NOT NULL,
+    speaking_question_id BIGINT NOT NULL
 );
 
 CREATE TABLE speaking_questions_vocabularies
 (
-    id                   BIGINT AUTO_INCREMENT NOT NULL,
-    created_time         datetime(6)           NOT NULL,
-    modified_time        datetime(6)           NULL,
-    speaking_question_id BIGINT                NOT NULL,
-    vocabulary_id        BIGINT                NOT NULL,
-    CONSTRAINT pk_speaking_questions_vocabularies PRIMARY KEY (id)
+    speaking_question_id BIGINT NOT NULL,
+    vocabulary_id        BIGINT NOT NULL
 );
 
 CREATE TABLE speech_assessments
@@ -465,7 +456,7 @@ ALTER TABLE roles
     ADD CONSTRAINT uc_roles_role_name UNIQUE (role_name);
 
 ALTER TABLE speaking_questions
-    ADD CONSTRAINT uc_speaking_questions_question_audio_file UNIQUE (question_audio_file_id);
+    ADD CONSTRAINT uc_speaking_questions_speaking_question_audio_file UNIQUE (speaking_question_audio_file_id);
 
 ALTER TABLE speech_assessments
     ADD CONSTRAINT uc_speech_assessments_answer_history UNIQUE (answer_history_id);
@@ -511,9 +502,6 @@ ALTER TABLE content_assessments
 
 ALTER TABLE files
     ADD CONSTRAINT FK_FILES_ON_COMMENT FOREIGN KEY (comment_id) REFERENCES comments (id);
-
-ALTER TABLE files
-    ADD CONSTRAINT FK_FILES_ON_QUESTION FOREIGN KEY (question_id) REFERENCES speaking_questions (id);
 
 ALTER TABLE files
     ADD CONSTRAINT FK_FILES_ON_REPORT FOREIGN KEY (report_id) REFERENCES reports (id);
@@ -572,23 +560,11 @@ ALTER TABLE reports
 ALTER TABLE reports
     ADD CONSTRAINT FK_REPORTS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
-ALTER TABLE speaking_questions_grammars
-    ADD CONSTRAINT FK_SPEAKING_QUESTIONS_GRAMMARS_ON_GRAMMAR FOREIGN KEY (grammar_id) REFERENCES grammars (id);
-
-ALTER TABLE speaking_questions_grammars
-    ADD CONSTRAINT FK_SPEAKING_QUESTIONS_GRAMMARS_ON_SPEAKING_QUESTION FOREIGN KEY (speaking_question_id) REFERENCES speaking_questions (id);
-
 ALTER TABLE speaking_questions
-    ADD CONSTRAINT FK_SPEAKING_QUESTIONS_ON_QUESTION_AUDIO_FILE FOREIGN KEY (question_audio_file_id) REFERENCES files (id);
+    ADD CONSTRAINT FK_SPEAKING_QUESTIONS_ON_SPEAKING_QUESTION_AUDIO_FILE FOREIGN KEY (speaking_question_audio_file_id) REFERENCES files (id);
 
 ALTER TABLE speaking_questions
     ADD CONSTRAINT FK_SPEAKING_QUESTIONS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
-
-ALTER TABLE speaking_questions_vocabularies
-    ADD CONSTRAINT FK_SPEAKING_QUESTIONS_VOCABULARIES_ON_SPEAKING_QUESTION FOREIGN KEY (speaking_question_id) REFERENCES speaking_questions (id);
-
-ALTER TABLE speaking_questions_vocabularies
-    ADD CONSTRAINT FK_SPEAKING_QUESTIONS_VOCABULARIES_ON_VOCABULARY FOREIGN KEY (vocabulary_id) REFERENCES vocabularies (id);
 
 ALTER TABLE speech_assessments
     ADD CONSTRAINT FK_SPEECH_ASSESSMENTS_ON_ANSWER_HISTORY FOREIGN KEY (answer_history_id) REFERENCES answer_histories (id);
@@ -631,6 +607,18 @@ ALTER TABLE roles_permissions
 
 ALTER TABLE roles_permissions
     ADD CONSTRAINT fk_rolper_on_role_entity FOREIGN KEY (role_id) REFERENCES roles (id);
+
+ALTER TABLE speaking_questions_grammars
+    ADD CONSTRAINT fk_spequegra_on_grammar_entity FOREIGN KEY (grammar_id) REFERENCES grammars (id);
+
+ALTER TABLE speaking_questions_grammars
+    ADD CONSTRAINT fk_spequegra_on_speaking_question_entity FOREIGN KEY (speaking_question_id) REFERENCES speaking_questions (id);
+
+ALTER TABLE speaking_questions_vocabularies
+    ADD CONSTRAINT fk_spequevoc_on_speaking_question_entity FOREIGN KEY (speaking_question_id) REFERENCES speaking_questions (id);
+
+ALTER TABLE speaking_questions_vocabularies
+    ADD CONSTRAINT fk_spequevoc_on_vocabulary_entity FOREIGN KEY (vocabulary_id) REFERENCES vocabularies (id);
 
 ALTER TABLE users_roles
     ADD CONSTRAINT fk_userol_on_role_entity FOREIGN KEY (role_id) REFERENCES roles (id);

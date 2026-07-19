@@ -13,19 +13,18 @@ public class SpeakingQuestion {
     private final Long userId;
     private final List<Grammar> grammars;
     private final List<Vocabulary> vocabularies;
-    private Long questionAudioFileId;
+    private Long speakingQuestionAudioFileId;
     private String title;
     private String titleMarkup;
     private String description;
     private String descriptionMarkup;
     private QuestionStatus status;
-    private Double orderIndex;
-    private Long objectiveId;
+    private final Double orderIndex;
 
     // Private constructor dùng cho Builder
     private SpeakingQuestion(Builder builder) {
         this.id = builder.id;
-        this.questionAudioFileId = builder.questionAudioFileId;
+        this.speakingQuestionAudioFileId = builder.speakingQuestionAudioFileId;
         this.userId = builder.userId;
         this.title = builder.title;
         this.titleMarkup = builder.titleMarkup;
@@ -35,7 +34,6 @@ public class SpeakingQuestion {
         this.grammars = builder.grammars;
         this.vocabularies = builder.vocabularies;
         this.orderIndex = builder.orderIndex;
-        this.objectiveId = builder.objectiveId;
     }
 
     public static Builder builder() {
@@ -64,7 +62,7 @@ public class SpeakingQuestion {
                        String description,
                        String titleMarkup,
                        String descriptionMarkup,
-                       Long questionAudioFileId) {
+                       Long speakingQuestionAudioFileId) {
         validateTitle(title);
         validateDescription(description);
 
@@ -72,7 +70,7 @@ public class SpeakingQuestion {
         this.description = description;
         this.titleMarkup = titleMarkup;
         this.descriptionMarkup = descriptionMarkup;
-        this.questionAudioFileId = questionAudioFileId;
+        this.speakingQuestionAudioFileId = speakingQuestionAudioFileId;
     }
 
     public void changeStatus(QuestionStatus newStatus) {
@@ -84,8 +82,8 @@ public class SpeakingQuestion {
         return id;
     }
 
-    public Long getQuestionAudioFileId() {
-        return questionAudioFileId;
+    public Long getSpeakingQuestionAudioFileId() {
+        return speakingQuestionAudioFileId;
     }
 
 
@@ -113,9 +111,6 @@ public class SpeakingQuestion {
         return orderIndex;
     }
 
-    public Long getObjectiveId() {
-        return objectiveId;
-    }
 
     public QuestionStatus getStatus() {
         return status;
@@ -132,7 +127,7 @@ public class SpeakingQuestion {
     // Builder
     public static class Builder {
         private Long id;
-        private Long questionAudioFileId;
+        private Long speakingQuestionAudioFileId;
         private Long userId;
         private String title;
         private String titleMarkup;
@@ -142,15 +137,14 @@ public class SpeakingQuestion {
         private List<Grammar> grammars;
         private List<Vocabulary> vocabularies;
         private Double orderIndex;
-        private Long objectiveId;
 
         public Builder id(Long id) {
             this.id = id;
             return this;
         }
 
-        public Builder questionAudioFileId(Long questionAudioFileId) {
-            this.questionAudioFileId = questionAudioFileId;
+        public Builder speakingQuestionAudioFileId(Long speakingQuestionAudioFileId) {
+            this.speakingQuestionAudioFileId = speakingQuestionAudioFileId;
             return this;
         }
 
@@ -201,10 +195,6 @@ public class SpeakingQuestion {
             return this;
         }
 
-        public Builder objectiveId(Long objectiveId) {
-            this.objectiveId = objectiveId;
-            return this;
-        }
 
         public SpeakingQuestion build() {
             SpeakingQuestion speakingQuestion = new SpeakingQuestion(this);

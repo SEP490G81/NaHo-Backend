@@ -3,9 +3,9 @@ package org.naho.speech.llm.dto.response;
 import java.util.List;
 
 public record SpeakingHistoryDetailResponse(
-        String historyId,
-        String topicId,
-        String questionId,
+        Long historyId,
+        Long topicId,
+        Long questionId,
         String practicedAt,
         Integer durationSec,
         Double score,

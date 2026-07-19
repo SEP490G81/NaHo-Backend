@@ -63,4 +63,37 @@
         LIMIT #{query.size} OFFSET #{offset}
     </select>
 
+    <resultMap id="TopicResultMap" type="org.naho.book.entity.TopicEntity">
+        <id property="id" column="id"/>
+        <result property="createdTime" column="created_time"/>
+        <result property="modifiedTime" column="modified_time"/>
+        <result property="japaneseName" column="japanese_name"/>
+        <result property="japaneseDescription" column="japanese_description"/>
+        <result property="japaneseNameMarkup" column="japanese_name_markup"/>
+        <result property="japaneseDescriptionMarkup" column="japanese_description_markup"/>
+        <result property="status" column="status"/>
+        <result property="orderIndex" column="order_index"/>
+        <result property="firstNodeGlobalOrderIndex" column="first_node_global_order_index"/>
+        <result property="lastNodeGlobalOrderIndex" column="last_node_global_order_index"/>
+        <association property="coverImageFile" javaType="org.naho.file.entity.FileEntity">
+            <id property="id" column="cover_image_file_id"/>
+        </association>
+        <association property="user" javaType="org.naho.user.entity.UserEntity">
+            <id property="id" column="user_id"/>
+        </association>
+        <association property="book" javaType="org.naho.book.entity.BookEntity">
+            <id property="id" column="book_id"/>
+        </association>
+    </resultMap>
+
+    <select id="findBySpeakingQuestionId" resultMap="TopicResultMap">
+        select t.*
+        from speaking_questions sq
+                 join learning_path_nodes lpn on sq.id = lpn.speaking_question_id
+                 join objectives o on lpn.objective_id = o.id
+                 join lessons l on o.lesson_id = l.id
+                 join topics t on l.topic_id = t.id
+        where sq.id = #{speakingQuestionId}
+    </select>
+
 </mapper>

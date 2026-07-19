@@ -4,6 +4,9 @@ import org.naho.question.port.out.VocabulariesQuestionPort;
 import org.naho.vocabulary.model.Vocabulary;
 import org.naho.vocabulary.port.in.GetVocabulariesOfObjectiveInputPort;
 import org.naho.vocabulary.result.VocabulariesOfObjectiveResult;
+import org.naho.shared.exception.ApplicationException;
+import org.naho.vocabulary.exception.VocabularyErrorCode;
+import org.naho.i18n.message.question.VocabularyQuestionDetailMessageKey;
 
 import java.util.List;
 
@@ -19,7 +22,11 @@ public class GetVocabulariesOfObjectiveUseCase implements GetVocabulariesOfObjec
     public VocabulariesOfObjectiveResult getVocabularyListOfObjective(int objectiveId) {
         List<Vocabulary> listVocabulary = vocabulariesQuestionPort.findVocabularyListOfObjective(objectiveId);
         if (listVocabulary.isEmpty()) {
-            return null;
+            throw new ApplicationException(
+                    VocabularyErrorCode.VOCABULARY_NOT_FOUND,
+                    VocabularyQuestionDetailMessageKey.VOCABULARY_OBJECTIVE_NOT_FOUND,
+                    objectiveId
+            );
         }
 
         List<VocabulariesOfObjectiveResult.VocabularyDetailResult> detailResults = listVocabulary.stream()

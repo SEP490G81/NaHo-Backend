@@ -12,5 +12,7 @@ public interface LearningPathNodeJpaRepository extends BaseJpaRepository<Learnin
     Optional<LearningPathNodeEntity> findFirstByOrderByGlobalOrderIndexAsc();
 
     Optional<LearningPathNodeEntity> findByChestId(Long chestId);
+
+    Optional<LearningPathNodeEntity> findBySpeakingQuestion_Id(Long speakingQuestionId);
 }
 

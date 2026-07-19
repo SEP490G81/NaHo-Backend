@@ -7,6 +7,7 @@ import org.naho.speech.llm.constant.OpenAiConfigProperties;
 import org.naho.speech.llm.exception.LlmApplicationError;
 import org.naho.speech.llm.port.out.AiScoringPort;
 import org.naho.speech.llm.result.ScoringResult;
+import org.naho.i18n.message.llm.LlmDetailMessageKey;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -21,76 +22,6 @@ import java.util.Map;
 public class OpenAiScoringAdapter implements AiScoringPort {
 
     private static final String LLM_URL = "https://api.openai.com/v1/chat/completions";
-
-    private static final String SCORING_SYSTEM_PROMPT = """
-            You are a strict Japanese speaking evaluator for conversational AI language learning. \
-            Evaluate the learner fairly and consistently based on real communicative ability. \
-            Focus on: fluency, pronunciation, grammar, vocabulary, interaction, naturalness, coherence. \
-            Do not over-score weak communication.
-            
-            SCORING GUIDELINES
-            0-20: Cannot communicate meaningfully.
-            21-40: Very limited Japanese with major breakdowns.
-            41-60: Basic communication possible but unnatural and error-prone.
-            61-75: Functional conversation with noticeable mistakes.
-            76-85: Strong conversational ability with mostly natural responses.
-            86-93: Advanced fluent communication with high naturalness.
-            94-100: Near-native conversational Japanese.
-            
-            EVALUATION RULES
-            - Fluency: Evaluate speaking flow, pauses, hesitation, fillers, and response speed.
-            - Pronunciation: Evaluate intelligibility, sound clarity, rhythm, and naturalness. Do not heavily penalize understandable foreign accents.
-            - Grammar: Evaluate particles, conjugation, sentence structure, and grammatical accuracy.
-            - Vocabulary: Evaluate variety, appropriateness, and expression quality.
-            - Interaction: Evaluate relevance, turn-taking, conversational continuation, and engagement.
-            - Naturalness: Evaluate whether responses sound like authentic modern Japanese.
-            - Coherence: Evaluate logical flow and topic consistency.
-            
-            IMPORTANT CALIBRATION
-            - Frequent grammar mistakes should not score above 75.
-            - Excessive hesitation lowers fluency.
-            - Robotic or textbook-only responses lower naturalness.
-            - Very short responses lower interaction and vocabulary scores.
-            - Scores above 90 require highly natural Japanese.
-            
-            SPEECH METADATA USAGE
-            If provided, use: speech_rate_wpm, average_pause_ms, filler_count, pronunciation_score.
-            High filler count and long pauses reduce fluency.
-            
-            JLPT ESTIMATION
-            Estimate: N5 / N4 / N3 / N2 / N1
-            
-            FEEDBACK RULES
-            Feedback must be: concise, specific, actionable. Avoid generic praise.
-            
-            OUTPUT: Return ONLY valid JSON — no markdown fences, no extra text.
-            {
-            "overall_score": <integer 0-100>,
-            "jlpt_estimate": "N5|N4|N3|N2|N1",
-            "scores": {
-                "fluency": <integer 0-100>,
-                "pronunciation": <integer 0-100>,
-                "grammar": <integer 0-100>,
-                "vocabulary": <integer 0-100>,
-                "interaction": <integer 0-100>,
-                "naturalness": <integer 0-100>,
-                "coherence": <integer 0-100>
-            },
-            "summary": "<string>",
-            "strengths": ["<string>", ...],
-            "weaknesses": ["<string>", ...],
-            "feedback": {
-                "fluency": "<string>",
-                "grammar": "<string>",
-                "vocabulary": "<string>",
-                "interaction": "<string>",
-                "naturalness": "<string>"
-            },
-            "improved_expressions": [
-                { "original": "<string>", "improved": "<string>" }
-            ]
-            }
-            """;
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -128,7 +59,9 @@ public class OpenAiScoringAdapter implements AiScoringPort {
             if (response.statusCode() != 200) {
                 throw new InfrastructureException(
                         LlmApplicationError.LLM_API_ERROR,
-                        "Scoring API error. Status: " + response.statusCode() + " | " + response.body());
+                        LlmDetailMessageKey.LLM_API_ERROR,
+                        "Status: " + response.statusCode() + " | " + response.body()
+                );
             }
             String rawContent = extractContent(response.body());
             System.out.println("[OpenAiScoringAdapter] Raw JSON: " + rawContent);
@@ -137,12 +70,14 @@ public class OpenAiScoringAdapter implements AiScoringPort {
             Thread.currentThread().interrupt();
             throw new InfrastructureException(
                     LlmApplicationError.LLM_CONNECTION_TIMEOUT,
-                    "Scoring request interrupted", e
+                    LlmDetailMessageKey.LLM_CONNECTION_TIMEOUT,
+                    e.getMessage()
             );
         } catch (Exception e) {
             throw new InfrastructureException(
                     LlmApplicationError.LLM_API_ERROR,
-                    "Cannot call scoring API: " + e.getMessage(), e
+                    LlmDetailMessageKey.LLM_API_ERROR,
+                    e.getMessage()
             );
         }
     }
@@ -163,7 +98,8 @@ public class OpenAiScoringAdapter implements AiScoringPort {
     }
 
     private String buildScoringRequestBody(String userContent) {
-        String escapedSystem = escapeJson(SCORING_SYSTEM_PROMPT);
+        String systemPrompt = loadPromptTemplate("/prompt_template/scoring_session.prompt");
+        String escapedSystem = escapeJson(systemPrompt);
         String escapedContent = escapeJson(userContent);
         return """
                 {
@@ -185,7 +121,8 @@ public class OpenAiScoringAdapter implements AiScoringPort {
         } catch (Exception e) {
             throw new InfrastructureException(
                     LlmApplicationError.LLM_PARSE_ERROR,
-                    "Cannot parse content field from response: " + responseJson, e
+                    LlmDetailMessageKey.LLM_PARSE_ERROR,
+                    e.getMessage()
             );
         }
     }
@@ -277,7 +214,9 @@ public class OpenAiScoringAdapter implements AiScoringPort {
         } catch (Exception e) {
             throw new InfrastructureException(
                     LlmApplicationError.LLM_PARSE_ERROR,
-                    "Cannot parse scoring JSON: " + cleaned, e);
+                    LlmDetailMessageKey.LLM_PARSE_ERROR,
+                    e.getMessage()
+            );
         }
     }
 
@@ -289,5 +228,16 @@ public class OpenAiScoringAdapter implements AiScoringPort {
                 .replace("\n", "\\n")
                 .replace("\r", "\\r")
                 .replace("\t", "\\t");
+    }
+
+    private String loadPromptTemplate(String path) {
+        try (var is = getClass().getResourceAsStream(path)) {
+            if (is == null) {
+                throw new IllegalStateException("Prompt template not found: " + path);
+            }
+            return new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load prompt template: " + path, e);
+        }
     }
 }
