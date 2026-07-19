@@ -153,7 +153,8 @@ public class AzureSpeechServiceHelper {
                         "-y",
                         "-i", inputFile.toString(),
                         "-vn",
-                        "-af", "silenceremove=start_periods=1:start_duration=0.2:start_threshold=-45dB:stop_periods=1:stop_duration=0.2:stop_threshold=-45dB",
+                        // Tạm thời bỏ bộ lọc silenceremove để tránh bị mất đoạn ghi âm sau khi lặng im
+                        // "-af", "silenceremove=start_periods=1:start_duration=0.2:start_threshold=-45dB:stop_periods=1:stop_duration=0.2:stop_threshold=-45dB",
                         "-acodec", "pcm_s16le",
                         "-ac", "1",
                         "-ar", "16000",
