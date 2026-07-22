@@ -18,9 +18,10 @@ public class ChestRepositoryAdapter implements ChestRepositoryPort {
     public Optional<Chest> findById(Long id) {
         return chestJpaRepository.findById(id).map(entity -> Chest.builder()
                 .id(entity.getId())
-                .title(entity.getTitle())
+                .chestType(entity.getChestType())
                 .description(entity.getDescription())
-                .point(entity.getPoint())
+                .minPoint(entity.getMinPoint())
+                .maxPoint(entity.getMaxPoint())
                 .build());
     }
 }

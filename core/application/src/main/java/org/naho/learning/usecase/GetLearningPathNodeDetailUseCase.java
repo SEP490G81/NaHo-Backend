@@ -127,9 +127,10 @@ public class GetLearningPathNodeDetailUseCase implements GetLearningPathNodeDeta
 
             chestResult = new ChestDetailResult(
                     chest.getId(),
-                    chest.getTitle(),
+                    chest.getChestType(),
                     chest.getDescription(),
-                    chest.getPoint()
+                    chest.getMinPoint(),
+                    chest.getMaxPoint()
             );
         }
 

@@ -1,9 +1,12 @@
 package org.naho.learning.result;
 
+import org.naho.chest.type.ChestType;
+
 public record ChestDetailResult(
         Long id,
-        String title,
+        ChestType chestType,
         String description,
-        Double point
+        Double minPoint,
+        Double maxPoint
 ) {
 }

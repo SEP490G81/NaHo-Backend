@@ -99,11 +99,13 @@ public class OpenChestUseCase implements OpenChestInputPort {
             );
         }
 
+        double awardedPoint = chest.getRandomPoint();
+
         UserNodeProgress userNodeProgress = UserNodeProgress.builder()
                 .learningPathNodeId(chestLearningPathNode.getId())
                 .userId(user.getId())
-                .bestScore(chest.getPoint())
-                .currentScore(chest.getPoint())
+                .bestScore(awardedPoint)
+                .currentScore(awardedPoint)
                 .attemptCount(1)
                 .completedAt(now)
                 .status(NodeStatus.COMPLETED)
@@ -118,7 +120,7 @@ public class OpenChestUseCase implements OpenChestInputPort {
                         UserLearningProgressDetailMessageKey.USER_LEARNING_PROGRESS_NOT_FOUND_BY_USER_ID,
                         command.userId()));
 
-        progress.addPoint(chest.getPoint());
+        progress.addPoint(awardedPoint);
 
         Long currentFarthestAvailableNodeId = progress.getFarthestAvailableNodeId();
         if (currentFarthestAvailableNodeId == null) {
@@ -155,7 +157,7 @@ public class OpenChestUseCase implements OpenChestInputPort {
 
         PointHistoryCommand pointHistoryCommand = PointHistoryCommand.builder()
                 .userId(user.getId())
-                .point(chest.getPoint())
+                .point(awardedPoint)
                 .transactionType(PointTransactionType.LEARNING_PATH_NODE_COMPLETION)
                 .learningPathNodeId(chestLearningPathNode.getId())
                 .build();

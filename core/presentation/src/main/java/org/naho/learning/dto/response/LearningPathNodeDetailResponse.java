@@ -1,5 +1,6 @@
 package org.naho.learning.dto.response;
 
+import org.naho.chest.type.ChestType;
 import org.naho.learning.type.NodeType;
 import org.naho.question.type.QuestionStatus;
 
@@ -61,9 +62,10 @@ public record LearningPathNodeDetailResponse(
 
     public record ChestDetailResponse(
             Long id,
-            String title,
+            ChestType chestType,
             String description,
-            Double point
+            Double minPoint,
+            Double maxPoint
     ) {
     }
 }
