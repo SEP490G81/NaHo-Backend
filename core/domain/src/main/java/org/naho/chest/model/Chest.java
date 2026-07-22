@@ -12,8 +12,8 @@ public class Chest {
     private final Long id;
     private ChestType chestType;
     private String description;
-    private Double minPoint;
-    private Double maxPoint;
+    private Integer minPoint;
+    private Integer maxPoint;
 
     private Chest(Builder builder) {
         this.id = builder.id;
@@ -47,27 +47,24 @@ public class Chest {
         this.description = description;
     }
 
-    public Double getMinPoint() {
+    public Integer getMinPoint() {
         return minPoint;
     }
 
-    public void setMinPoint(Double minPoint) {
+    public void setMinPoint(Integer minPoint) {
         this.minPoint = minPoint;
     }
 
-    public Double getMaxPoint() {
+    public Integer getMaxPoint() {
         return maxPoint;
     }
 
-    public void setMaxPoint(Double maxPoint) {
+    public void setMaxPoint(Integer maxPoint) {
         this.maxPoint = maxPoint;
     }
 
-    public double getRandomPoint() {
-        if (minPoint.equals(maxPoint)) {
-            return minPoint;
-        }
-        return ThreadLocalRandom.current().nextDouble(minPoint, maxPoint);
+    public int getRandomPoint() {
+        return ThreadLocalRandom.current().nextInt(minPoint, maxPoint + 1);
     }
 
     public static final class Builder {
@@ -75,8 +72,8 @@ public class Chest {
         private Long id;
         private ChestType chestType;
         private String description;
-        private Double minPoint;
-        private Double maxPoint;
+        private Integer minPoint;
+        private Integer maxPoint;
 
         private Builder() {
         }
@@ -96,12 +93,12 @@ public class Chest {
             return this;
         }
 
-        public Builder minPoint(Double minPoint) {
+        public Builder minPoint(Integer minPoint) {
             this.minPoint = minPoint;
             return this;
         }
 
-        public Builder maxPoint(Double maxPoint) {
+        public Builder maxPoint(Integer maxPoint) {
             this.maxPoint = maxPoint;
             return this;
         }

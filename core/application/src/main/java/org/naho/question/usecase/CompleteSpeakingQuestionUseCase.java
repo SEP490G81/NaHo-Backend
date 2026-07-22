@@ -118,26 +118,20 @@ public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestion
             userNodeProgressRepositoryPort.save(currentUserNodeProgress);
         }
 
-        // nếu node này xa hơn node xa nhất hiện tại mà người dùng đã học thì cập nhật
-        Long currentFarthestAvailableNodeId = progress.getFarthestAvailableNodeId();
-        if (currentFarthestAvailableNodeId == null) {
+        // nếu người dùng chưa từng học node nào
+        // hoặc nếu người dùng học node này xa hơn node xa nhất mà họ đã từng học
+        // thì update node xa nhất
+        if (progress.getFarthestAvailableNodeId() == null ||
+                progress.getFarthestAvailableNodeGlobalOrderIndex() <
+                        speakingQuestionLearningPathNode.getGlobalOrderIndex()) {
             progress.setFarthestAvailableNodeId(speakingQuestionLearningPathNode.getId());
-            progress.setFarthestAvailableNodeGlobalOrderIndex(speakingQuestionLearningPathNode.getGlobalOrderIndex());
-        } else {
-            LearningPathNode currentFarthestAvailableNode = learningPathNodeRepositoryPort
-                    .findById(currentFarthestAvailableNodeId)
-                    .orElseThrow(() -> new ApplicationException(
-                            LearningPathNodeErrorCode.LEARNING_PATH_NODE_NOT_FOUND,
-                            LearningPathNodeDetailMessageKey.LEARNING_PATH_NODE_ID_NOT_FOUND,
-                            currentFarthestAvailableNodeId
-                    ));
-            if (currentFarthestAvailableNode.getGlobalOrderIndex() <
-                    speakingQuestionLearningPathNode.getGlobalOrderIndex()) {
-                progress.setFarthestAvailableNodeId(speakingQuestionLearningPathNode.getId());
-                progress.setFarthestAvailableNodeGlobalOrderIndex(speakingQuestionLearningPathNode.getGlobalOrderIndex());
-            }
+
+            progress.setFarthestAvailableNodeGlobalOrderIndex(
+                    speakingQuestionLearningPathNode.getGlobalOrderIndex()
+            );
         }
 
+        // update node cuối cùng mà người dùng học
         progress.setLastLearningNodeId(speakingQuestionLearningPathNode.getId());
         progress.setLastLearningNodeGlobalOrderIndex(speakingQuestionLearningPathNode.getGlobalOrderIndex());
 

@@ -30,9 +30,10 @@ CREATE TABLE chests
     id            BIGINT AUTO_INCREMENT NOT NULL,
     created_time  datetime(6)           NOT NULL,
     modified_time datetime(6)           NULL,
-    title         VARCHAR(255)          NOT NULL,
+    chest_type    VARCHAR(255)          NOT NULL,
     `description` TEXT                  NULL,
-    point         DOUBLE                NOT NULL,
+    min_point     INT                   NOT NULL,
+    max_point     INT                   NOT NULL,
     CONSTRAINT pk_chests PRIMARY KEY (id)
 );
 
@@ -430,9 +431,6 @@ ALTER TABLE content_assessments
 
 ALTER TABLE leagues
     ADD CONSTRAINT uc_leagues_icon_file UNIQUE (icon_file_id);
-
-ALTER TABLE learning_path_nodes
-    ADD CONSTRAINT uc_learning_path_nodes_chest UNIQUE (chest_id);
 
 ALTER TABLE learning_path_nodes
     ADD CONSTRAINT uc_learning_path_nodes_global_order_index UNIQUE (global_order_index);

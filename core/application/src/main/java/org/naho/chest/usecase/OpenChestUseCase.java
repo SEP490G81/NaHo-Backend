@@ -90,6 +90,7 @@ public class OpenChestUseCase implements OpenChestInputPort {
                         LearningPathNodeErrorCode.LEARNING_PATH_NODE_NOT_FOUND,
                         LearningPathNodeDetailMessageKey.LEARNING_PATH_NODE_ID_NOT_FOUND));
 
+        // nếu người dùng đã từng mở rương này rồi thì không cho mở nữa
         if (userNodeProgressRepositoryPort.existsByLearningPathNodeId(
                 chestLearningPathNode.getId()
         )) {
@@ -99,8 +100,10 @@ public class OpenChestUseCase implements OpenChestInputPort {
             );
         }
 
+        // nhận điểm ngẫu nhiên
         double awardedPoint = chest.getRandomPoint();
 
+        // tạo ra UserNodeProgress mới trên node này
         UserNodeProgress userNodeProgress = UserNodeProgress.builder()
                 .learningPathNodeId(chestLearningPathNode.getId())
                 .userId(user.getId())
@@ -113,6 +116,7 @@ public class OpenChestUseCase implements OpenChestInputPort {
 
         userNodeProgressRepositoryPort.save(userNodeProgress);
 
+        // Lấy thông tin về thành tích học tập của người dùng
         UserLearningProgress progress = userLearningProgressRepositoryPort
                 .findByUserId(command.userId())
                 .orElseThrow(() -> new ApplicationException(
@@ -120,26 +124,23 @@ public class OpenChestUseCase implements OpenChestInputPort {
                         UserLearningProgressDetailMessageKey.USER_LEARNING_PROGRESS_NOT_FOUND_BY_USER_ID,
                         command.userId()));
 
+        // thêm điểm
         progress.addPoint(awardedPoint);
 
-        Long currentFarthestAvailableNodeId = progress.getFarthestAvailableNodeId();
-        if (currentFarthestAvailableNodeId == null) {
+        // nếu người dùng chưa từng học node nào
+        // hoặc nếu người dùng học node này xa hơn node xa nhất mà họ đã từng học
+        // thì update node xa nhất
+        if (progress.getFarthestAvailableNodeId() == null ||
+                progress.getFarthestAvailableNodeGlobalOrderIndex() <
+                        chestLearningPathNode.getGlobalOrderIndex()) {
             progress.setFarthestAvailableNodeId(chestLearningPathNode.getId());
-            progress.setFarthestAvailableNodeGlobalOrderIndex(chestLearningPathNode.getGlobalOrderIndex());
-        } else {
-            LearningPathNode currentFarthestAvailableNode = learningPathNodeRepositoryPort
-                    .findById(currentFarthestAvailableNodeId)
-                    .orElseThrow(() -> new ApplicationException(
-                            LearningPathNodeErrorCode.LEARNING_PATH_NODE_NOT_FOUND,
-                            LearningPathNodeDetailMessageKey.LEARNING_PATH_NODE_ID_NOT_FOUND,
-                            currentFarthestAvailableNodeId));
-            if (currentFarthestAvailableNode.getGlobalOrderIndex() < chestLearningPathNode
-                    .getGlobalOrderIndex()) {
-                progress.setFarthestAvailableNodeId(chestLearningPathNode.getId());
-                progress.setFarthestAvailableNodeGlobalOrderIndex(chestLearningPathNode.getGlobalOrderIndex());
-            }
+
+            progress.setFarthestAvailableNodeGlobalOrderIndex(
+                    chestLearningPathNode.getGlobalOrderIndex()
+            );
         }
 
+        // update node cuối cùng người dùng học
         progress.setLastLearningNodeId(chestLearningPathNode.getId());
         progress.setLastLearningNodeGlobalOrderIndex(chestLearningPathNode.getGlobalOrderIndex());
 
@@ -155,6 +156,7 @@ public class OpenChestUseCase implements OpenChestInputPort {
 
         userLearningProgressRepositoryPort.save(progress);
 
+        // Lưu lịch sử nhận điểm của người dùng
         PointHistoryCommand pointHistoryCommand = PointHistoryCommand.builder()
                 .userId(user.getId())
                 .point(awardedPoint)

@@ -1,17 +1,15 @@
 package org.naho.chest.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.chest.type.ChestType;
 import org.naho.learning.entity.LearningPathNodeEntity;
 import org.naho.shared.persistence.BaseEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @SuperBuilder
 @Getter
@@ -30,11 +28,12 @@ public class ChestEntity extends BaseEntity {
     String description;
 
     @Column(name = "min_point", nullable = false)
-    Double minPoint;
+    Integer minPoint;
 
     @Column(name = "max_point", nullable = false)
-    Double maxPoint;
+    Integer maxPoint;
 
-    @OneToOne(mappedBy = "chest")
-    LearningPathNodeEntity learningPathNode;
+    @Builder.Default
+    @OneToMany(mappedBy = "chest")
+    List<LearningPathNodeEntity> learningPathNodes = new ArrayList<>();
 }

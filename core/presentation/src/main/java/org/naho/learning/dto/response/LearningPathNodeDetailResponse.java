@@ -64,8 +64,8 @@ public record LearningPathNodeDetailResponse(
             Long id,
             ChestType chestType,
             String description,
-            Double minPoint,
-            Double maxPoint
+            Integer minPoint,
+            Integer maxPoint
     ) {
     }
 }
