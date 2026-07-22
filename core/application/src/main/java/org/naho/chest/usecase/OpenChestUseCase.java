@@ -20,10 +20,10 @@ import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
 import org.naho.learning.port.out.UserNodeProgressRepositoryPort;
 import org.naho.learning.type.NodeStatus;
-import org.naho.learning.usecase.UserLearningStreakUseCase;
 import org.naho.point.command.PointHistoryCommand;
 import org.naho.point.port.in.CrudPointHistoryInputPort;
 import org.naho.point.type.PointTransactionType;
+import org.naho.shared.constant.SystemZoneId;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.user.exception.UserErrorCode;
@@ -31,7 +31,6 @@ import org.naho.user.model.User;
 import org.naho.user.port.out.UserRepositoryPort;
 
 import java.time.Instant;
-import java.time.ZoneId;
 
 public class OpenChestUseCase implements OpenChestInputPort {
 
@@ -150,7 +149,7 @@ public class OpenChestUseCase implements OpenChestInputPort {
                         .userLearningProgress(progress)
                         .userId(command.userId())
                         .now(now)
-                        .zoneId(ZoneId.of(UserLearningStreakUseCase.HO_CHI_MINH_ZONE_ID))
+                        .zoneId(SystemZoneId.HO_CHI_MINH_ZONE_ID)
                         .build()
         );
 
