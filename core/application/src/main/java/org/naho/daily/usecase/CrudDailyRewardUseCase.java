@@ -4,13 +4,16 @@ import org.naho.chest.mapper.ChestResultMapper;
 import org.naho.chest.model.Chest;
 import org.naho.chest.port.out.ChestRepositoryPort;
 import org.naho.chest.result.ChestResult;
+import org.naho.daily.exception.DailyRewardErrorCode;
 import org.naho.daily.mapper.DailyRewardResultMapper;
 import org.naho.daily.model.DailyReward;
 import org.naho.daily.port.in.CrudDailyRewardInputPort;
 import org.naho.daily.port.out.DailyRewardRepositoryPort;
 import org.naho.daily.result.DailyRewardResult;
 import org.naho.daily.valueobject.RewardYearMonth;
+import org.naho.i18n.message.daily.DailyRewardDetailMessageKey;
 import org.naho.shared.constant.SystemZoneId;
+import org.naho.shared.exception.ApplicationException;
 
 import java.time.YearMonth;
 import java.util.List;
@@ -39,10 +42,9 @@ public class CrudDailyRewardUseCase implements CrudDailyRewardInputPort {
 
     @Override
     public List<DailyRewardResult> getCurrentMonthDailyRewards() {
-        String rewardYearMonth =
-                RewardYearMonth.of(
-                        YearMonth.now(SystemZoneId.HO_CHI_MINH_ZONE_ID)
-                ).getValue();
+        String rewardYearMonth = RewardYearMonth
+                .of(YearMonth.now(SystemZoneId.HO_CHI_MINH_ZONE_ID))
+                .getValue();
 
         List<DailyReward> dailyRewards =
                 dailyRewardRepositoryPort.findAllByRewardYearMonthOrderByDayOfMonth(rewardYearMonth);
@@ -73,4 +75,19 @@ public class CrudDailyRewardUseCase implements CrudDailyRewardInputPort {
                 .toList();
     }
 
+    @Override
+    public List<DailyRewardResult> createCurrentMonthDailyRewards() {
+        YearMonth yearMonth = YearMonth.now(SystemZoneId.HO_CHI_MINH_ZONE_ID);
+        RewardYearMonth rewardYearMonth = RewardYearMonth.of(yearMonth);
+
+        if (dailyRewardRepositoryPort.existsByRewardYearMonth(rewardYearMonth.getValue())) {
+            throw new ApplicationException(
+                    DailyRewardErrorCode.DAILY_REWARD_ALREADY_EXISTS,
+                    DailyRewardDetailMessageKey.DAILY_REWARD_ALREADY_EXISTS,
+                    rewardYearMonth.getValue()
+            );
+        }
+
+        return List.of();
+    }
 }

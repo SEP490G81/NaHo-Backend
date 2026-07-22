@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface CrudDailyRewardInputPort {
     List<DailyRewardResult> getCurrentMonthDailyRewards();
+
+    List<DailyRewardResult> createCurrentMonthDailyRewards();
 }

@@ -26,4 +26,9 @@ public class DailyRewardRepositoryAdapter implements DailyRewardRepositoryPort {
                 .map(dailyEntityMapper::entityToDomain)
                 .toList();
     }
+
+    @Override
+    public boolean existsByRewardYearMonth(String rewardYearMonth) {
+        return dailyRewardJpaRepository.existsByRewardYearMonth(rewardYearMonth);
+    }
 }

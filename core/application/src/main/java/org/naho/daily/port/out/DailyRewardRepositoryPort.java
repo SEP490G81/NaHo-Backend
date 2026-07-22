@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface DailyRewardRepositoryPort {
     List<DailyReward> findAllByRewardYearMonthOrderByDayOfMonth(String rewardYearMonth);
+
+    boolean existsByRewardYearMonth(String rewardYearMonth);
 }
