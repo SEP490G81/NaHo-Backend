@@ -1,8 +1,15 @@
 package org.naho.speech.llm.adapter;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.naho.book.entity.LessonEntity;
+import org.naho.book.entity.ObjectiveEntity;
+import org.naho.book.entity.TopicEntity;
 import org.naho.file.entity.FileEntity;
 import org.naho.file.repository.FileJpaRepository;
+import org.naho.learning.entity.LearningPathNodeEntity;
+import org.naho.point.constant.CloudFrontProperties;
 import org.naho.question.entity.AnswerHistoryEntity;
 import org.naho.question.entity.SpeakingQuestionEntity;
 import org.naho.question.repository.AnswerHistoryJpaRepository;
@@ -13,13 +20,20 @@ import org.naho.speech.azure.entity.WordAssessmentEntity;
 import org.naho.speech.azure.repository.ContentAssessmentJpaRepository;
 import org.naho.speech.azure.repository.SpeechAssessmentJpaRepository;
 import org.naho.speech.azure.repository.WordAssessmentJpaRepository;
+import org.naho.speech.llm.command.SpeakingHistoryFilterCommand;
 import org.naho.speech.llm.port.out.AnswerHistoryRepositoryPort;
+import org.naho.speech.llm.result.SpeakingHistoryListItemResult;
+import org.naho.speech.llm.result.SpeakingHistoryListResult;
 import org.naho.speech.model.AnswerHistory;
 import org.naho.speech.model.ContentAssessment;
 import org.naho.speech.model.SpeechAssessment;
 import org.naho.speech.model.WordAssessment;
 import org.naho.user.entity.UserEntity;
 import org.naho.user.repository.UserJpaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -37,6 +51,8 @@ public class AnswerHistoryRepositoryAdapter implements AnswerHistoryRepositoryPo
     private final UserJpaRepository userJpaRepository;
     private final SpeakingQuestionJpaRepository questionJpaRepository;
     private final FileJpaRepository fileJpaRepository;
+    private final CloudFrontProperties cloudFrontProperties;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public AnswerHistory saveAnswerHistory(AnswerHistory domain) {
@@ -179,5 +195,70 @@ public class AnswerHistoryRepositoryAdapter implements AnswerHistoryRepositoryPo
                 .translationText(entity.getTranslationText())
                 .answerHistoryId(entity.getAnswerHistory().getId())
                 .build());
+    }
+
+    @Override
+    public SpeakingHistoryListResult findUserAnswerHistories(SpeakingHistoryFilterCommand command) {
+        Long userId = command != null ? command.userId() : null;
+        Long questionId = command != null ? command.speakingQuestionId() : null;
+        Long topicId = command != null ? command.topicId() : null;
+        String search = command != null ? command.search() : null;
+
+        int pageNumber = (command != null && command.page() > 0) ? command.page() - 1 : 0;
+        int pageSize = (command != null && command.size() > 0) ? command.size() : 10;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "createdTime"));
+
+        Page<AnswerHistoryEntity> entityPage = answerHistoryJpaRepository.findByUserIdAndFilters(userId, questionId, topicId, search, pageable);
+
+        List<SpeakingHistoryListItemResult> items = entityPage.getContent().stream().map(entity -> {
+            SpeakingQuestionEntity sq = entity.getSpeakingQuestion();
+            Long sqId = sq != null ? sq.getId() : null;
+            String sqTitle = sq != null ? sq.getTitle() : null;
+
+            LearningPathNodeEntity lpn = sq != null ? sq.getLearningPathNode() : null;
+            ObjectiveEntity obj = lpn != null ? lpn.getObjective() : null;
+            LessonEntity les = obj != null ? obj.getLesson() : null;
+            TopicEntity t = les != null ? les.getTopic() : null;
+
+            Long tId = t != null ? t.getId() : null;
+            String tName = t != null ? t.getJapaneseName() : null;
+
+            String audioUrl = null;
+            if (entity.getAudioFile() != null && entity.getAudioFile().getObjectKey() != null) {
+                audioUrl = cloudFrontProperties.getDomain() + entity.getAudioFile().getObjectKey();
+            }
+
+            Double score = 0.0;
+            Integer durationSec = 0;
+            ContentAssessmentEntity ca = entity.getContentAssessment();
+            if (ca != null && ca.getAiFeedback() != null && !ca.getAiFeedback().isBlank()) {
+                try {
+                    JsonNode root = objectMapper.readTree(ca.getAiFeedback());
+                    score = root.path("overallScore").asDouble(0.0);
+                    durationSec = root.path("durationSec").asInt(0);
+                } catch (Exception ignored) {
+                }
+            }
+
+            return new SpeakingHistoryListItemResult(
+                    entity.getId(),
+                    sqId,
+                    sqTitle,
+                    tId,
+                    tName,
+                    score,
+                    durationSec,
+                    audioUrl,
+                    entity.getCreatedTime()
+            );
+        }).toList();
+
+        return new SpeakingHistoryListResult(
+                items,
+                entityPage.getNumber() + 1,
+                entityPage.getSize(),
+                entityPage.getTotalPages(),
+                entityPage.getTotalElements()
+        );
     }
 }
