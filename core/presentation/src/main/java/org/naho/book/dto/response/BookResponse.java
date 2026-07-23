@@ -11,6 +11,8 @@ public record BookResponse(
         JLPTLevel jlptLevel,
         CefrLevel cefrLevel,
         Double orderIndex,
+        Double firstNodeGlobalOrderIndex,
+        Double lastNodeGlobalOrderIndex,
         FileResponse coverImage
 ) {
 }

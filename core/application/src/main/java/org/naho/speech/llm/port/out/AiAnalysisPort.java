@@ -10,11 +10,12 @@ public interface AiAnalysisPort {
         String canDoObjective,
         String grammarFocus,
         String vocabularyFocus,
-        String question,
+        String questionTitle,
+        String questionDescription,
         double accuracy,
         double fluency,
         double completeness,
-        double prosody,
+        double overallPronunciation,
         String studentTranscript
     ) {}
 

@@ -122,6 +122,7 @@ public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestion
         Long currentFarthestAvailableNodeId = progress.getFarthestAvailableNodeId();
         if (currentFarthestAvailableNodeId == null) {
             progress.setFarthestAvailableNodeId(speakingQuestionLearningPathNode.getId());
+            progress.setFarthestAvailableNodeGlobalOrderIndex(speakingQuestionLearningPathNode.getGlobalOrderIndex());
         } else {
             LearningPathNode currentFarthestAvailableNode = learningPathNodeRepositoryPort
                     .findById(currentFarthestAvailableNodeId)
@@ -132,13 +133,13 @@ public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestion
                     ));
             if (currentFarthestAvailableNode.getGlobalOrderIndex() <
                     speakingQuestionLearningPathNode.getGlobalOrderIndex()) {
-                progress.setFarthestAvailableNodeId(
-                        speakingQuestionLearningPathNode.getId()
-                );
+                progress.setFarthestAvailableNodeId(speakingQuestionLearningPathNode.getId());
+                progress.setFarthestAvailableNodeGlobalOrderIndex(speakingQuestionLearningPathNode.getGlobalOrderIndex());
             }
         }
 
         progress.setLastLearningNodeId(speakingQuestionLearningPathNode.getId());
+        progress.setLastLearningNodeGlobalOrderIndex(speakingQuestionLearningPathNode.getGlobalOrderIndex());
 
         // chỉnh lại streak của người dùng
         progress = userLearningStreakInputPort.updateUserLearningStreak(

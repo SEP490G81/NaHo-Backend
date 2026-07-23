@@ -78,9 +78,9 @@ app:
 
   openai:
     api-key: ${LLM_API_KEY}
-    chat-model: gpt-4.1-mini
+    chat-model: gpt-4o-mini
     scoring-model: gpt-4o
-    max-tokens: 1000
+    max-tokens: 10000
     temperature: 0.7
 
   azure:

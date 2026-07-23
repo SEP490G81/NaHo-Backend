@@ -41,20 +41,16 @@ public class OpenAiAnalysisAdapter implements AiAnalysisPort {
                 context.canDoObjective(),
                 context.grammarFocus(),
                 context.vocabularyFocus(),
-                context.question(),
-                context.accuracy(),
-                context.fluency(),
-                context.completeness(),
-                context.prosody(),
+                context.questionTitle(),
+                context.questionDescription(),
+                String.format("%.1f", context.accuracy()),
+                String.format("%.1f", context.fluency()),
+                String.format("%.1f", context.completeness()),
+                String.format("%.1f", context.overallPronunciation()),
                 context.studentTranscript(),
                 context.level(),
                 context.level(),
-                context.canDoObjective(),
-                context.level(),
-                context.accuracy(),
-                context.fluency(),
-                context.completeness(),
-                context.prosody()
+                context.level()
         );
 
         String userContent = "Please evaluate the learner's transcript based on the system prompt instruction.";

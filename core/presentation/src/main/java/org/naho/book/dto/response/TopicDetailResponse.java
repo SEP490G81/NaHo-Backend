@@ -13,6 +13,8 @@ public record TopicDetailResponse(
         String japaneseDescriptionMarkup,
         TopicStatus status,
         Double orderIndex,
+        Double firstNodeGlobalOrderIndex,
+        Double lastNodeGlobalOrderIndex,
         Long coverImageFileId,
         List<LessonResponse> lessons
 ) {
