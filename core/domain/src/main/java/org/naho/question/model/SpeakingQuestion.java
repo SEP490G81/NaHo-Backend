@@ -19,7 +19,6 @@ public class SpeakingQuestion {
     private String description;
     private String descriptionMarkup;
     private QuestionStatus status;
-    private final Double orderIndex;
 
     // Private constructor dùng cho Builder
     private SpeakingQuestion(Builder builder) {
@@ -33,7 +32,6 @@ public class SpeakingQuestion {
         this.status = builder.status;
         this.grammars = builder.grammars;
         this.vocabularies = builder.vocabularies;
-        this.orderIndex = builder.orderIndex;
     }
 
     public static Builder builder() {
@@ -44,25 +42,24 @@ public class SpeakingQuestion {
         if (title == null || title.isBlank()) {
             throw new DomainException(
                     SpeakingQuestionDomainErrorCode.SPEAKING_QUESTION_TITLE_EMPTY,
-                    SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_TITLE_EMPTY
-            );
+                    SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_TITLE_EMPTY);
         }
     }
 
     private void validateDescription(String description) {
-//        if (description == null || description.isBlank()) {
-//            throw new DomainException(
-//                    SpeakingQuestionDomainErrorCode.SPEAKING_QUESTION_DESCRIPTION_EMPTY,
-//                    SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_DESCRIPTION_EMPTY
-//            );
-//        }
+        // if (description == null || description.isBlank()) {
+        // throw new DomainException(
+        // SpeakingQuestionDomainErrorCode.SPEAKING_QUESTION_DESCRIPTION_EMPTY,
+        // SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_DESCRIPTION_EMPTY
+        // );
+        // }
     }
 
     public void update(String title,
-                       String description,
-                       String titleMarkup,
-                       String descriptionMarkup,
-                       Long speakingQuestionAudioFileId) {
+            String description,
+            String titleMarkup,
+            String descriptionMarkup,
+            Long speakingQuestionAudioFileId) {
         validateTitle(title);
         validateDescription(description);
 
@@ -86,7 +83,6 @@ public class SpeakingQuestion {
         return speakingQuestionAudioFileId;
     }
 
-
     public Long getUserId() {
         return userId;
     }
@@ -106,11 +102,6 @@ public class SpeakingQuestion {
     public String getDescriptionMarkup() {
         return descriptionMarkup;
     }
-
-    public Double getOrderIndex() {
-        return orderIndex;
-    }
-
 
     public QuestionStatus getStatus() {
         return status;
@@ -136,7 +127,6 @@ public class SpeakingQuestion {
         private QuestionStatus status;
         private List<Grammar> grammars;
         private List<Vocabulary> vocabularies;
-        private Double orderIndex;
 
         public Builder id(Long id) {
             this.id = id;
@@ -147,7 +137,6 @@ public class SpeakingQuestion {
             this.speakingQuestionAudioFileId = speakingQuestionAudioFileId;
             return this;
         }
-
 
         public Builder userId(Long userId) {
             this.userId = userId;
@@ -174,7 +163,6 @@ public class SpeakingQuestion {
             return this;
         }
 
-
         public Builder status(QuestionStatus status) {
             this.status = status;
             return this;
@@ -189,12 +177,6 @@ public class SpeakingQuestion {
             this.vocabularies = vocabularies;
             return this;
         }
-
-        public Builder orderIndex(Double orderIndex) {
-            this.orderIndex = orderIndex;
-            return this;
-        }
-
 
         public SpeakingQuestion build() {
             SpeakingQuestion speakingQuestion = new SpeakingQuestion(this);

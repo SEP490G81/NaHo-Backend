@@ -1,5 +1,6 @@
 package org.naho.config.application;
 
+import org.naho.chest.mapper.ChestResultMapper;
 import org.naho.chest.port.in.OpenChestInputPort;
 import org.naho.chest.port.out.ChestRepositoryPort;
 import org.naho.chest.usecase.OpenChestUseCase;
@@ -15,6 +16,11 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ChestConfig {
+
+    @Bean
+    public ChestResultMapper chestResultMapper() {
+        return new ChestResultMapper();
+    }
 
     @Bean
     public OpenChestInputPort openChestInputPort(

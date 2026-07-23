@@ -10,7 +10,6 @@ public record SpeakingQuestionListItemResult(
         String titleMarkup,
         String description,
         String descriptionMarkup,
-        Double orderIndex,
         QuestionStatus status
 ) {
 }

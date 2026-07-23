@@ -10,7 +10,6 @@
         q.title_markup as titleMarkup,
         q.description as description,
         q.description_markup as descriptionMarkup,
-        null as orderIndex,
         q.status as status
     </sql>
 

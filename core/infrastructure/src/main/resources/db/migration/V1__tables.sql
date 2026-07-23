@@ -30,9 +30,10 @@ CREATE TABLE chests
     id            BIGINT AUTO_INCREMENT NOT NULL,
     created_time  datetime(6)           NOT NULL,
     modified_time datetime(6)           NULL,
-    title         VARCHAR(255)          NOT NULL,
+    chest_type    VARCHAR(255)          NOT NULL,
     `description` TEXT                  NULL,
-    point         DOUBLE                NOT NULL,
+    min_point     INT                   NOT NULL,
+    max_point     INT                   NOT NULL,
     CONSTRAINT pk_chests PRIMARY KEY (id)
 );
 
@@ -70,6 +71,17 @@ CREATE TABLE conversation_styles
     prompt          TEXT                  NOT NULL,
     formality_level VARCHAR(255)          NOT NULL,
     CONSTRAINT pk_conversation_styles PRIMARY KEY (id)
+);
+
+CREATE TABLE daily_rewards
+(
+    id                BIGINT AUTO_INCREMENT NOT NULL,
+    created_time      datetime(6)           NOT NULL,
+    modified_time     datetime(6)           NULL,
+    reward_year_month VARCHAR(255)          NOT NULL,
+    day_of_month      INT                   NOT NULL,
+    chest_id          BIGINT                NOT NULL,
+    CONSTRAINT pk_daily_rewards PRIMARY KEY (id)
 );
 
 CREATE TABLE files
@@ -319,6 +331,17 @@ CREATE TABLE topics
     CONSTRAINT pk_topics PRIMARY KEY (id)
 );
 
+CREATE TABLE user_daily_attendances
+(
+    id              BIGINT AUTO_INCREMENT NOT NULL,
+    created_time    datetime(6)           NOT NULL,
+    modified_time   datetime(6)           NULL,
+    attendance_date date                  NOT NULL,
+    user_id         BIGINT                NOT NULL,
+    daily_reward_id BIGINT                NOT NULL,
+    CONSTRAINT pk_user_daily_attendances PRIMARY KEY (id)
+);
+
 CREATE TABLE user_learning_progresses
 (
     id                         BIGINT AUTO_INCREMENT NOT NULL,
@@ -440,9 +463,6 @@ ALTER TABLE leagues
     ADD CONSTRAINT uc_leagues_icon_file UNIQUE (icon_file_id);
 
 ALTER TABLE learning_path_nodes
-    ADD CONSTRAINT uc_learning_path_nodes_chest UNIQUE (chest_id);
-
-ALTER TABLE learning_path_nodes
     ADD CONSTRAINT uc_learning_path_nodes_global_order_index UNIQUE (global_order_index);
 
 ALTER TABLE learning_path_nodes
@@ -507,6 +527,9 @@ ALTER TABLE comments
 
 ALTER TABLE content_assessments
     ADD CONSTRAINT FK_CONTENT_ASSESSMENTS_ON_ANSWER_HISTORY FOREIGN KEY (answer_history_id) REFERENCES answer_histories (id);
+
+ALTER TABLE daily_rewards
+    ADD CONSTRAINT FK_DAILY_REWARDS_ON_CHEST FOREIGN KEY (chest_id) REFERENCES chests (id);
 
 ALTER TABLE files
     ADD CONSTRAINT FK_FILES_ON_COMMENT FOREIGN KEY (comment_id) REFERENCES comments (id);
@@ -591,6 +614,12 @@ ALTER TABLE users
 
 ALTER TABLE users
     ADD CONSTRAINT FK_USERS_ON_USER_LEARNING_PROGRESS FOREIGN KEY (user_learning_progress_id) REFERENCES user_learning_progresses (id);
+
+ALTER TABLE user_daily_attendances
+    ADD CONSTRAINT FK_USER_DAILY_ATTENDANCES_ON_DAILY_REWARD FOREIGN KEY (daily_reward_id) REFERENCES daily_rewards (id);
+
+ALTER TABLE user_daily_attendances
+    ADD CONSTRAINT FK_USER_DAILY_ATTENDANCES_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
 ALTER TABLE user_learning_progresses
     ADD CONSTRAINT FK_USER_LEARNING_PROGRESSES_ON_FARTHEST_AVAILABLE_NODE FOREIGN KEY (farthest_available_node_id) REFERENCES learning_path_nodes (id);

@@ -1,14 +1,16 @@
 package org.naho.chest.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import org.naho.chest.type.ChestType;
+import org.naho.daily.entity.DailyRewardEntity;
 import org.naho.learning.entity.LearningPathNodeEntity;
 import org.naho.shared.persistence.BaseEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @SuperBuilder
 @Getter
@@ -19,15 +21,24 @@ import org.naho.shared.persistence.BaseEntity;
 @Table(name = "chests")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ChestEntity extends BaseEntity {
-    @Column(nullable = false)
-    String title;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "chest_type", nullable = false)
+    ChestType chestType;
 
     @Column(columnDefinition = "TEXT")
     String description;
 
-    @Column(nullable = false)
-    Double point;
+    @Column(name = "min_point", nullable = false)
+    Integer minPoint;
 
-    @OneToOne(mappedBy = "chest")
-    LearningPathNodeEntity learningPathNode;
+    @Column(name = "max_point", nullable = false)
+    Integer maxPoint;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "chest")
+    List<LearningPathNodeEntity> learningPathNodes = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "chest")
+    List<DailyRewardEntity> dailyRewards = new ArrayList<>();
 }

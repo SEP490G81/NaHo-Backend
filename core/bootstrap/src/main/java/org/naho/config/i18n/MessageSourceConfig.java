@@ -30,6 +30,7 @@ public class MessageSourceConfig {
                 "classpath:i18n/question/question",
                 "classpath:i18n/chest/chest",
                 "classpath:i18n/learning/learning",
+                "classpath:i18n/daily/daily",
                 "classpath:i18n/payment/payment",
                 "classpath:i18n/subscription/subscription"
         );
