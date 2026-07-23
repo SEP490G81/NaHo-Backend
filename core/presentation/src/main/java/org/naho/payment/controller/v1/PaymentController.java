@@ -17,7 +17,9 @@ import org.naho.payment.port.out.PaymentGatewayResolver;
 import org.naho.payment.result.ConfirmPaymentResult;
 import org.naho.payment.result.CreatePaymentResult;
 import org.naho.payment.result.PaymentOrderResult;
+import org.naho.payment.type.ConfirmPaymentStatus;
 import org.naho.payment.type.PaymentProvider;
+import org.naho.payment.type.PaymentStatus;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.user.result.AccessTokenPayload;
@@ -89,44 +91,15 @@ public class PaymentController {
         }
 
         try {
-            String vnp_TxnRef = queryParams.get("vnp_TxnRef");
-            String vnp_TransactionNo = queryParams.get("vnp_TransactionNo");
-            String vnp_AmountStr = queryParams.get("vnp_Amount");
-            String vnp_ResponseCode = queryParams.get("vnp_ResponseCode");
-            String vnp_PayDateStr = queryParams.get("vnp_PayDate");
-
-            BigDecimal amount = new BigDecimal(vnp_AmountStr).divide(new BigDecimal(100));
-            Money paidAmount = new Money(amount, Currency.getInstance("VND"));
-            boolean successful = "00".equals(vnp_ResponseCode);
-
-            Instant providerTransactionTime;
-            try {
-                providerTransactionTime = ZonedDateTime.parse(
-                        vnp_PayDateStr,
-                        DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.of("Asia/Ho_Chi_Minh"))
-                ).toInstant();
-            } catch (Exception e) {
-                providerTransactionTime = Instant.now();
-            }
-
-            ConfirmPaymentCommand command = new ConfirmPaymentCommand(
-                    PaymentProvider.VNPAY,
-                    vnp_TxnRef,
-                    vnp_TransactionNo,
-                    paidAmount,
-                    successful,
-                    providerTransactionTime,
-                    queryParams
-            );
-
+            ConfirmPaymentCommand command = buildVnPayConfirmCommand(queryParams);
             ConfirmPaymentResult result = confirmPaymentInputPort.confirmPayment(command);
 
             switch (result.status()) {
-                case "SUCCESS" -> {
+                case SUCCESS -> {
                     response.put("RspCode", "00");
                     response.put("Message", "Confirm success");
                 }
-                case "ALREADY_PAID", "DUPLICATE" -> {
+                case ALREADY_PAID, DUPLICATE -> {
                     response.put("RspCode", "02");
                     response.put("Message", "Order already confirmed");
                 }
@@ -173,20 +146,60 @@ public class PaymentController {
             return ResponseEntity.ok(response);
         }
 
-        String vnp_ResponseCode = queryParams.get("vnp_ResponseCode");
-        String vnp_TxnRef = queryParams.get("vnp_TxnRef");
+        try {
+            ConfirmPaymentCommand command = buildVnPayConfirmCommand(queryParams);
+            ConfirmPaymentResult result = confirmPaymentInputPort.confirmPayment(command);
 
-        if ("00".equals(vnp_ResponseCode)) {
-            response.put("status", "PAID");
+            String vnp_TxnRef = queryParams.get("vnp_TxnRef");
             response.put("orderCode", vnp_TxnRef);
-            response.put("message", "Thanh toán thành công qua VNPAY!");
-        } else {
-            response.put("status", "FAILED");
-            response.put("orderCode", vnp_TxnRef);
-            response.put("message", "Thanh toán không thành công. Mã lỗi: " + vnp_ResponseCode);
+
+            if (command.successful() && (result.status() == ConfirmPaymentStatus.SUCCESS || result.status() == ConfirmPaymentStatus.ALREADY_PAID || result.status() == ConfirmPaymentStatus.DUPLICATE)) {
+                response.put("status", PaymentStatus.PAID.name());
+                response.put("message", "Thanh toán thành công qua VNPAY!");
+            } else {
+                response.put("status", PaymentStatus.FAILED.name());
+                response.put("message", "Thanh toán không thành công. Trạng thái: " + result.status());
+            }
+        } catch (Exception e) {
+            response.put("status", "ERROR");
+            response.put("message", "Lỗi xử lý phản hồi thanh toán: " + e.getMessage());
         }
 
         return ResponseEntity.ok(response);
+    }
+
+    private ConfirmPaymentCommand buildVnPayConfirmCommand(Map<String, String> queryParams) {
+        String vnp_TxnRef = queryParams.get("vnp_TxnRef");
+        String vnp_TransactionNo = queryParams.get("vnp_TransactionNo");
+        String vnp_AmountStr = queryParams.get("vnp_Amount");
+        String vnp_ResponseCode = queryParams.get("vnp_ResponseCode");
+        String vnp_PayDateStr = queryParams.get("vnp_PayDate");
+
+        BigDecimal amount = (vnp_AmountStr != null && !vnp_AmountStr.isBlank())
+                ? new BigDecimal(vnp_AmountStr).divide(new BigDecimal(100))
+                : BigDecimal.ZERO;
+        Money paidAmount = new Money(amount, Currency.getInstance("VND"));
+        boolean successful = "00".equals(vnp_ResponseCode);
+
+        Instant providerTransactionTime;
+        try {
+            providerTransactionTime = ZonedDateTime.parse(
+                    vnp_PayDateStr,
+                    DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.of("Asia/Ho_Chi_Minh"))
+            ).toInstant();
+        } catch (Exception e) {
+            providerTransactionTime = Instant.now();
+        }
+
+        return new ConfirmPaymentCommand(
+                PaymentProvider.VNPAY,
+                vnp_TxnRef,
+                vnp_TransactionNo != null ? vnp_TransactionNo : "VNP_" + vnp_TxnRef,
+                paidAmount,
+                successful,
+                providerTransactionTime,
+                queryParams
+        );
     }
 
     @GetMapping("/{orderCode}")

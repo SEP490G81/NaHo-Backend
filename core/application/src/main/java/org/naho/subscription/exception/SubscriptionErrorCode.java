@@ -5,7 +5,8 @@ import org.naho.shared.exception.ErrorCode;
 
 public enum SubscriptionErrorCode implements ErrorCode {
     PLAN_NOT_FOUND("SUB_A001", SubscriptionTitleMessageKey.SUBSCRIPTION_INVALID_TITLE, 404),
-    PLAN_UNAVAILABLE("SUB_A002", SubscriptionTitleMessageKey.SUBSCRIPTION_INVALID_TITLE, 400);
+    PLAN_UNAVAILABLE("SUB_A002", SubscriptionTitleMessageKey.SUBSCRIPTION_INVALID_TITLE, 400),
+    ALREADY_ACTIVE_HIGHER_OR_EQUAL_PLAN("SUB_A003", SubscriptionTitleMessageKey.SUBSCRIPTION_INVALID_TITLE, 400);
 
     private final String code;
     private final String titleKey;

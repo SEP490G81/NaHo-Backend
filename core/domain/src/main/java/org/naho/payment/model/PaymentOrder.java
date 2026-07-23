@@ -20,7 +20,7 @@ public class PaymentOrder {
     private String providerTransactionId;
     private final Instant createdTime; // Thời gian tạo hóa đơn
     private final Instant expiresTime; // Thời gian hết hạn thanh toán
-    private Instant paidTime; //Thời gian xác nhận đã thanh toán thành công
+    private Instant paidTime; // Thời gian xác nhận đã thanh toán thành công
     private Instant modifiedTime;// Thời gian cập nhật hóa đơn
 
     private PaymentOrder(Builder builder) {
@@ -48,8 +48,7 @@ public class PaymentOrder {
             Long subscriptionPlanId,
             Money amount,
             Instant now,
-            Instant expiresTime
-    ) {
+            Instant expiresTime) {
         return builder()
                 .orderCode(orderCode)
                 .userId(userId)
@@ -66,8 +65,7 @@ public class PaymentOrder {
         if (status != PaymentStatus.PENDING) {
             throw new DomainException(
                     PaymentDomainErrorCode.PAYMENT_INVALID_STATE,
-                    PaymentDetailMessageKey.PAYMENT_INVALID_STATE
-            );
+                    PaymentDetailMessageKey.PAYMENT_INVALID_STATE);
         }
         this.provider = Objects.requireNonNull(provider);
         this.modifiedTime = now;
@@ -88,8 +86,7 @@ public class PaymentOrder {
         if (status != PaymentStatus.PENDING && status != PaymentStatus.PROCESSING) {
             throw new DomainException(
                     PaymentDomainErrorCode.PAYMENT_INVALID_STATE,
-                    PaymentDetailMessageKey.PAYMENT_INVALID_STATE
-            );
+                    PaymentDetailMessageKey.PAYMENT_INVALID_STATE);
         }
 
         ensureNotExpired(now);
@@ -97,8 +94,7 @@ public class PaymentOrder {
         if (!amount.hasSameValue(paidAmount)) {
             throw new DomainException(
                     PaymentDomainErrorCode.PAYMENT_AMOUNT_EMPTY,
-                    PaymentDetailMessageKey.PAYMENT_AMOUNT_EMPTY
-            );
+                    PaymentDetailMessageKey.PAYMENT_AMOUNT_EMPTY);
         }
 
         this.providerTransactionId = Objects.requireNonNull(providerTransactionId);
@@ -111,8 +107,7 @@ public class PaymentOrder {
         if (status == PaymentStatus.PAID) {
             throw new DomainException(
                     PaymentDomainErrorCode.PAYMENT_INVALID_STATE,
-                    PaymentDetailMessageKey.PAYMENT_INVALID_STATE
-            );
+                    PaymentDetailMessageKey.PAYMENT_INVALID_STATE);
         }
         this.status = PaymentStatus.FAILED;
         this.modifiedTime = now;
@@ -146,8 +141,7 @@ public class PaymentOrder {
         if (status != PaymentStatus.PENDING) {
             throw new DomainException(
                     PaymentDomainErrorCode.PAYMENT_INVALID_STATE,
-                    PaymentDetailMessageKey.PAYMENT_INVALID_STATE
-            );
+                    PaymentDetailMessageKey.PAYMENT_INVALID_STATE);
         }
     }
 
@@ -155,24 +149,58 @@ public class PaymentOrder {
         if (isExpiredAt(now)) {
             throw new DomainException(
                     PaymentDomainErrorCode.PAYMENT_EXPIRATION_INVALID,
-                    PaymentDetailMessageKey.PAYMENT_EXPIRATION_INVALID
-            );
+                    PaymentDetailMessageKey.PAYMENT_EXPIRATION_INVALID);
         }
     }
 
     // Getters
-    public Long getId() { return id; }
-    public String getOrderCode() { return orderCode; }
-    public Long getUserId() { return userId; }
-    public Long getSubscriptionPlanId() { return subscriptionPlanId; }
-    public Money getAmount() { return amount; }
-    public PaymentProvider getProvider() { return provider; }
-    public PaymentStatus getStatus() { return status; }
-    public String getProviderTransactionId() { return providerTransactionId; }
-    public Instant getCreatedTime() { return createdTime; }
-    public Instant getExpiresTime() { return expiresTime; }
-    public Instant getPaidTime() { return paidTime; }
-    public Instant getModifiedTime() { return modifiedTime; }
+    public Long getId() {
+        return id;
+    }
+
+    public String getOrderCode() {
+        return orderCode;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public Long getSubscriptionPlanId() {
+        return subscriptionPlanId;
+    }
+
+    public Money getAmount() {
+        return amount;
+    }
+
+    public PaymentProvider getProvider() {
+        return provider;
+    }
+
+    public PaymentStatus getStatus() {
+        return status;
+    }
+
+    public String getProviderTransactionId() {
+        return providerTransactionId;
+    }
+
+    public Instant getCreatedTime() {
+        return createdTime;
+    }
+
+    public Instant getExpiresTime() {
+        return expiresTime;
+    }
+
+    public Instant getPaidTime() {
+        return paidTime;
+    }
+
+    public Instant getModifiedTime() {
+        return modifiedTime;
+    }
 
     public static final class Builder {
         private Long id;
@@ -188,39 +216,91 @@ public class PaymentOrder {
         private Instant paidTime;
         private Instant modifiedTime;
 
-        private Builder() {}
+        private Builder() {
+        }
 
-        public Builder id(Long id) { this.id = id; return this; }
-        public Builder orderCode(String orderCode) { this.orderCode = orderCode; return this; }
-        public Builder userId(Long userId) { this.userId = userId; return this; }
-        public Builder subscriptionPlanId(Long subscriptionPlanId) { this.subscriptionPlanId = subscriptionPlanId; return this; }
-        public Builder amount(Money amount) { this.amount = amount; return this; }
-        public Builder provider(PaymentProvider provider) { this.provider = provider; return this; }
-        public Builder status(PaymentStatus status) { this.status = status; return this; }
-        public Builder providerTransactionId(String providerTransactionId) { this.providerTransactionId = providerTransactionId; return this; }
-        public Builder createdTime(Instant createdTime) { this.createdTime = createdTime; return this; }
-        public Builder expiresTime(Instant expiresTime) { this.expiresTime = expiresTime; return this; }
-        public Builder paidTime(Instant paidTime) { this.paidTime = paidTime; return this; }
-        public Builder modifiedTime(Instant modifiedTime) { this.modifiedTime = modifiedTime; return this; }
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder orderCode(String orderCode) {
+            this.orderCode = orderCode;
+            return this;
+        }
+
+        public Builder userId(Long userId) {
+            this.userId = userId;
+            return this;
+        }
+
+        public Builder subscriptionPlanId(Long subscriptionPlanId) {
+            this.subscriptionPlanId = subscriptionPlanId;
+            return this;
+        }
+
+        public Builder amount(Money amount) {
+            this.amount = amount;
+            return this;
+        }
+
+        public Builder provider(PaymentProvider provider) {
+            this.provider = provider;
+            return this;
+        }
+
+        public Builder status(PaymentStatus status) {
+            this.status = status;
+            return this;
+        }
+
+        public Builder providerTransactionId(String providerTransactionId) {
+            this.providerTransactionId = providerTransactionId;
+            return this;
+        }
+
+        public Builder createdTime(Instant createdTime) {
+            this.createdTime = createdTime;
+            return this;
+        }
+
+        public Builder expiresTime(Instant expiresTime) {
+            this.expiresTime = expiresTime;
+            return this;
+        }
+
+        public Builder paidTime(Instant paidTime) {
+            this.paidTime = paidTime;
+            return this;
+        }
+
+        public Builder modifiedTime(Instant modifiedTime) {
+            this.modifiedTime = modifiedTime;
+            return this;
+        }
 
         public PaymentOrder build() {
             if (orderCode == null || orderCode.isBlank()) {
-                throw new DomainException(PaymentDomainErrorCode.PAYMENT_ORDER_CODE_EMPTY, PaymentDetailMessageKey.PAYMENT_ORDER_CODE_EMPTY);
+                throw new DomainException(PaymentDomainErrorCode.PAYMENT_ORDER_CODE_EMPTY,
+                        PaymentDetailMessageKey.PAYMENT_ORDER_CODE_EMPTY);
             }
             if (userId == null) {
-                throw new DomainException(PaymentDomainErrorCode.PAYMENT_USER_ID_EMPTY, PaymentDetailMessageKey.PAYMENT_USER_ID_EMPTY);
+                throw new DomainException(PaymentDomainErrorCode.PAYMENT_USER_ID_EMPTY,
+                        PaymentDetailMessageKey.PAYMENT_USER_ID_EMPTY);
             }
             if (subscriptionPlanId == null) {
-                throw new DomainException(PaymentDomainErrorCode.PAYMENT_PLAN_ID_EMPTY, PaymentDetailMessageKey.PAYMENT_PLAN_ID_EMPTY);
+                throw new DomainException(PaymentDomainErrorCode.PAYMENT_PLAN_ID_EMPTY,
+                        PaymentDetailMessageKey.PAYMENT_PLAN_ID_EMPTY);
             }
             if (amount == null) {
-                throw new DomainException(PaymentDomainErrorCode.PAYMENT_AMOUNT_EMPTY, PaymentDetailMessageKey.PAYMENT_AMOUNT_EMPTY);
+                throw new DomainException(PaymentDomainErrorCode.PAYMENT_AMOUNT_EMPTY,
+                        PaymentDetailMessageKey.PAYMENT_AMOUNT_EMPTY);
             }
             if (createdTime == null) {
-                throw new DomainException(PaymentDomainErrorCode.PAYMENT_EXPIRATION_INVALID, PaymentDetailMessageKey.PAYMENT_EXPIRATION_INVALID);
+                createdTime = Instant.now();
             }
             if (expiresTime == null || !expiresTime.isAfter(createdTime)) {
-                throw new DomainException(PaymentDomainErrorCode.PAYMENT_EXPIRATION_INVALID, PaymentDetailMessageKey.PAYMENT_EXPIRATION_INVALID);
+                expiresTime = createdTime.plus(java.time.Duration.ofMinutes(5));
             }
             if (provider == null) {
                 provider = PaymentProvider.UNASSIGNED;

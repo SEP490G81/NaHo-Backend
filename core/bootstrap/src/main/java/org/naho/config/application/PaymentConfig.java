@@ -18,6 +18,8 @@ import org.naho.subscription.usecase.GetActiveSubscriptionUseCase;
 import org.naho.subscription.usecase.ListActivePlansUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @Configuration
 public class PaymentConfig {
@@ -26,13 +28,18 @@ public class PaymentConfig {
         public CreatePaymentInputPort createPaymentInputPort(
                         SubscriptionPlanRepositoryPort planRepositoryPort,
                         PaymentOrderRepositoryPort paymentOrderRepositoryPort,
+                        UserSubscriptionRepositoryPort userSubscriptionRepositoryPort,
                         PaymentGatewayResolver gatewayResolver,
-                        PaymentOrderCodeGenerator orderCodeGenerator) {
-                return new CreatePaymentUseCase(
+                        PaymentOrderCodeGenerator orderCodeGenerator,
+                        PlatformTransactionManager transactionManager) {
+                CreatePaymentUseCase target = new CreatePaymentUseCase(
                                 planRepositoryPort,
                                 paymentOrderRepositoryPort,
+                                userSubscriptionRepositoryPort,
                                 gatewayResolver,
                                 orderCodeGenerator);
+                TransactionTemplate template = new TransactionTemplate(transactionManager);
+                return command -> template.execute(status -> target.createPayment(command));
         }
 
         @Bean
@@ -40,18 +47,24 @@ public class PaymentConfig {
                         PaymentOrderRepositoryPort orderRepositoryPort,
                         PaymentTransactionRepositoryPort transactionRepositoryPort,
                         SubscriptionPlanRepositoryPort planRepositoryPort,
-                        UserSubscriptionRepositoryPort subscriptionRepositoryPort) {
-                return new ConfirmPaymentUseCase(
+                        UserSubscriptionRepositoryPort subscriptionRepositoryPort,
+                        PlatformTransactionManager transactionManager) {
+                ConfirmPaymentUseCase target = new ConfirmPaymentUseCase(
                                 orderRepositoryPort,
                                 transactionRepositoryPort,
                                 planRepositoryPort,
                                 subscriptionRepositoryPort);
+                TransactionTemplate template = new TransactionTemplate(transactionManager);
+                return command -> template.execute(status -> target.confirmPayment(command));
         }
 
         @Bean
         public GetPaymentInputPort getPaymentInputPort(
-                        PaymentOrderRepositoryPort orderRepositoryPort) {
-                return new GetPaymentUseCase(orderRepositoryPort);
+                        PaymentOrderRepositoryPort orderRepositoryPort,
+                        PlatformTransactionManager transactionManager) {
+                GetPaymentUseCase target = new GetPaymentUseCase(orderRepositoryPort);
+                TransactionTemplate template = new TransactionTemplate(transactionManager);
+                return orderCode -> template.execute(status -> target.getPaymentByOrderCode(orderCode));
         }
 
         @Bean

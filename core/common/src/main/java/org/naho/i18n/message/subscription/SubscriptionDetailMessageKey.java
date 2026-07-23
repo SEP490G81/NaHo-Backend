@@ -14,5 +14,10 @@ public final class SubscriptionDetailMessageKey {
     public static final String SUBSCRIPTION_STATUS_EMPTY = "subscription.status.empty";
     public static final String SUBSCRIPTION_TIME_INVALID = "subscription.time.invalid";
 
+    public static final String PLAN_NOT_FOUND = "subscription.plan.not_found";
+    public static final String PLAN_UNAVAILABLE = "subscription.plan.unavailable";
+    public static final String PLAN_FREE_NOT_PURCHASABLE = "subscription.plan.free_not_purchasable";
+    public static final String PLAN_ALREADY_ACTIVE_OR_HIGHER = "subscription.plan.already_active_or_higher";
+
     private SubscriptionDetailMessageKey() {}
 }

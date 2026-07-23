@@ -43,7 +43,10 @@ public class UserSubscriptionRepositoryAdapter implements UserSubscriptionReposi
 
     @Override
     public Optional<UserSubscription> findActiveByUserId(Long userId, Instant now) {
-        return subscriptionJpaRepository.findActiveSubscription(userId, SubscriptionStatus.ACTIVE, now)
+        subscriptionJpaRepository.updateExpiredSubscriptions(now);
+        return subscriptionJpaRepository.findActiveSubscriptions(userId, SubscriptionStatus.ACTIVE, now)
+                .stream()
+                .findFirst()
                 .map(subscriptionEntityMapper::entityToDomain);
     }
 

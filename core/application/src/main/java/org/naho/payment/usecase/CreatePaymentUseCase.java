@@ -9,25 +9,30 @@ import org.naho.shared.exception.ApplicationException;
 import org.naho.subscription.exception.SubscriptionErrorCode;
 import org.naho.subscription.model.SubscriptionPlan;
 import org.naho.subscription.port.out.SubscriptionPlanRepositoryPort;
+import org.naho.subscription.port.out.UserSubscriptionRepositoryPort;
+import org.naho.subscription.type.PlanTier;
 
 import java.time.Duration;
 import java.time.Instant;
 
 public class CreatePaymentUseCase implements CreatePaymentInputPort {
 
-        private static final Duration PAYMENT_EXPIRATION = Duration.ofMinutes(15);
+        private static final Duration PAYMENT_EXPIRATION = Duration.ofMinutes(5);
 
         private final SubscriptionPlanRepositoryPort planRepositoryPort;
         private final PaymentOrderRepositoryPort paymentOrderRepositoryPort;
+        private final UserSubscriptionRepositoryPort subscriptionRepositoryPort;
         private final PaymentGatewayResolver gatewayResolver;
         private final PaymentOrderCodeGenerator orderCodeGenerator;
 
         public CreatePaymentUseCase(SubscriptionPlanRepositoryPort planRepositoryPort,
                         PaymentOrderRepositoryPort paymentOrderRepositoryPort,
+                        UserSubscriptionRepositoryPort subscriptionRepositoryPort,
                         PaymentGatewayResolver gatewayResolver,
                         PaymentOrderCodeGenerator orderCodeGenerator) {
                 this.planRepositoryPort = planRepositoryPort;
                 this.paymentOrderRepositoryPort = paymentOrderRepositoryPort;
+                this.subscriptionRepositoryPort = subscriptionRepositoryPort;
                 this.gatewayResolver = gatewayResolver;
                 this.orderCodeGenerator = orderCodeGenerator;
         }
@@ -46,6 +51,25 @@ public class CreatePaymentUseCase implements CreatePaymentInputPort {
                                         SubscriptionErrorCode.PLAN_UNAVAILABLE,
                                         "subscription.plan.unavailable");
                 }
+
+                if (plan.getTier() == PlanTier.FREE) {
+                        throw new ApplicationException(
+                                        SubscriptionErrorCode.PLAN_UNAVAILABLE,
+                                        "subscription.plan.free_not_purchasable");
+                }
+
+                subscriptionRepositoryPort.findActiveByUserId(command.userId(), now)
+                                .ifPresent(activeSub -> {
+                                        planRepositoryPort.findById(activeSub.getSubscriptionPlanId())
+                                                        .ifPresent(activePlan -> {
+                                                                if (activePlan.getTier()
+                                                                                .isHigherOrEqualThan(plan.getTier())) {
+                                                                        throw new ApplicationException(
+                                                                                        SubscriptionErrorCode.ALREADY_ACTIVE_HIGHER_OR_EQUAL_PLAN,
+                                                                                        "subscription.plan.already_active_or_higher");
+                                                                }
+                                                        });
+                                });
 
                 String orderCode = orderCodeGenerator.generate();
 

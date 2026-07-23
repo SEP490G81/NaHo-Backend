@@ -19,7 +19,7 @@ public interface PaymentTransactionEntityMapper {
     @Mapping(target = "amountAmount", source = "amount.amount")
     @Mapping(target = "amountCurrency", expression = "java(domain.getAmount().currency().getCurrencyCode())")
     @Mapping(target = "metadata", expression = "java(mapToJson(domain.getMetadata()))")
-    @Mapping(target = "createdTime", ignore = true)
+    @Mapping(target = "createdTime", source = "createdTime")
     @Mapping(target = "modifiedTime", ignore = true)
     PaymentTransactionEntity domainToEntity(PaymentTransaction domain);
 

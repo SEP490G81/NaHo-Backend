@@ -5,7 +5,10 @@ import org.naho.payment.model.PaymentOrder;
 import org.naho.payment.port.in.GetPaymentInputPort;
 import org.naho.payment.port.out.PaymentOrderRepositoryPort;
 import org.naho.payment.result.PaymentOrderResult;
+import org.naho.payment.type.PaymentStatus;
 import org.naho.shared.exception.ApplicationException;
+
+import java.time.Instant;
 
 public class GetPaymentUseCase implements GetPaymentInputPort {
 
@@ -21,6 +24,12 @@ public class GetPaymentUseCase implements GetPaymentInputPort {
                 .orElseThrow(() -> new ApplicationException(
                         PaymentErrorCode.PAYMENT_ORDER_NOT_FOUND,
                         "payment.order.not_found"));
+
+        Instant now = Instant.now();
+        if (order.getStatus() == PaymentStatus.PENDING && order.isExpiredAt(now)) {
+            order.expire(now);
+            orderRepositoryPort.save(order);
+        }
 
         return new PaymentOrderResult(
                 order.getId(),

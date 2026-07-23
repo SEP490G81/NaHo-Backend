@@ -53,8 +53,11 @@ public class VnPayPaymentGatewayAdapter implements PaymentGatewayPort {
         String vnp_Amount = String.valueOf(amountInCents);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-        ZonedDateTime nowJp = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
-        String vnp_CreateDate = nowJp.format(formatter);
+        ZonedDateTime nowVn = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
+        String vnp_CreateDate = nowVn.format(formatter);
+        ZonedDateTime expireVn = ZonedDateTime.ofInstant(paymentOrder.getExpiresTime(), ZoneId.of("Asia/Ho_Chi_Minh"));
+        String vnp_ExpireDate = expireVn.format(formatter);
+
         String vnp_TxnRef = paymentOrder.getOrderCode();
         String vnp_OrderInfo = "Thanh toan don hang " + paymentOrder.getOrderCode();
 
@@ -80,6 +83,7 @@ public class VnPayPaymentGatewayAdapter implements PaymentGatewayPort {
         vnp_Params.put("vnp_ReturnUrl", normalizedReturnUrl);
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
         vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
+        vnp_Params.put("vnp_ExpireDate", vnp_ExpireDate);
 
         List<String> fieldNames = new ArrayList<>(vnp_Params.keySet());
         Collections.sort(fieldNames);

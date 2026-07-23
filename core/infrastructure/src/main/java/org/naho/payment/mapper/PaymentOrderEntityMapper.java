@@ -11,8 +11,8 @@ public interface PaymentOrderEntityMapper {
     @Mapping(target = "subscriptionPlan", ignore = true)
     @Mapping(target = "amountAmount", source = "amount.amount")
     @Mapping(target = "amountCurrency", expression = "java(domain.getAmount().currency().getCurrencyCode())")
-    @Mapping(target = "createdTime", ignore = true)
-    @Mapping(target = "modifiedTime", ignore = true)
+    @Mapping(target = "createdTime", source = "createdTime")
+    @Mapping(target = "modifiedTime", source = "modifiedTime")
     PaymentOrderEntity domainToEntity(PaymentOrder domain);
 
     default PaymentOrder entityToDomain(PaymentOrderEntity entity) {
@@ -32,7 +32,7 @@ public interface PaymentOrderEntityMapper {
                 .provider(entity.getProvider())
                 .status(entity.getStatus())
                 .providerTransactionId(entity.getProviderTransactionId())
-                .createdTime(entity.getCreatedTime())
+                .createdTime(entity.getCreatedTime() != null ? entity.getCreatedTime() : java.time.Instant.now())
                 .expiresTime(entity.getExpiresTime())
                 .paidTime(entity.getPaidTime())
                 .modifiedTime(entity.getModifiedTime())
