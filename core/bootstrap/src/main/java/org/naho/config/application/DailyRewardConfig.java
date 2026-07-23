@@ -3,9 +3,14 @@ package org.naho.config.application;
 import org.naho.chest.mapper.ChestResultMapper;
 import org.naho.chest.port.out.ChestRepositoryPort;
 import org.naho.daily.mapper.DailyRewardResultMapper;
+import org.naho.daily.mapper.UserDailyAttendanceResultMapper;
 import org.naho.daily.port.in.CrudDailyRewardInputPort;
 import org.naho.daily.port.out.DailyRewardRepositoryPort;
+import org.naho.daily.port.out.UserDailyAttendanceRepositoryPort;
 import org.naho.daily.usecase.CrudDailyRewardUseCase;
+import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
+import org.naho.point.port.in.CrudPointHistoryInputPort;
+import org.naho.shared.port.out.TransactionPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -24,17 +29,30 @@ public class DailyRewardConfig {
     }
 
     @Bean
+    public UserDailyAttendanceResultMapper userDailyAttendanceResultMapper() {
+        return new UserDailyAttendanceResultMapper();
+    }
+
+    @Bean
     public CrudDailyRewardInputPort crudDailyRewardInputPort(
             DailyRewardRepositoryPort dailyRewardRepositoryPort,
             DailyRewardResultMapper dailyRewardResultMapper,
             ChestRepositoryPort chestRepositoryPort,
-            ChestResultMapper chestResultMapper
+            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
+            UserDailyAttendanceRepositoryPort userDailyAttendanceRepositoryPort,
+            UserDailyAttendanceResultMapper userDailyAttendanceResultMapper,
+            CrudPointHistoryInputPort crudPointHistoryInputPort,
+            TransactionPort transactionPort
     ) {
         return new CrudDailyRewardUseCase(
                 dailyRewardRepositoryPort,
                 dailyRewardResultMapper,
                 chestRepositoryPort,
-                chestResultMapper
+                userLearningProgressRepositoryPort,
+                userDailyAttendanceRepositoryPort,
+                userDailyAttendanceResultMapper,
+                crudPointHistoryInputPort,
+                transactionPort
         );
     }
 }

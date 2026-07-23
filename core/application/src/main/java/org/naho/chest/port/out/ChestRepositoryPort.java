@@ -10,4 +10,6 @@ public interface ChestRepositoryPort {
     Optional<Chest> findById(Long id);
 
     List<Chest> findAllByIdIn(Collection<Long> ids);
+
+    Optional<Chest> findByDailyRewardId(Long dailyRewardId);
 }
