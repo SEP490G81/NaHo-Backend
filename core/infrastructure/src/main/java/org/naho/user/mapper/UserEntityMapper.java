@@ -36,6 +36,7 @@ public interface UserEntityMapper {
     @Mapping(target = "userLearningProgress", ignore = true)
     @Mapping(target = "oAuthProviders", ignore = true)
     @Mapping(target = "avatar", ignore = true)
+    @Mapping(target = "userDailyAttendances", ignore = true)
     UserEntity domainToEntity(User user);
 
     @Named("getOAuthProviderIds")

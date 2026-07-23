@@ -280,14 +280,22 @@ CREATE TABLE speaking_questions
 
 CREATE TABLE speaking_questions_grammars
 (
+    id                   BIGINT AUTO_INCREMENT NOT NULL,
+    created_time         datetime(6)           NULL,
+    modified_time        datetime(6)           NULL,
     grammar_id           BIGINT NOT NULL,
-    speaking_question_id BIGINT NOT NULL
+    speaking_question_id BIGINT NOT NULL,
+    CONSTRAINT pk_speaking_questions_grammars PRIMARY KEY (id)
 );
 
 CREATE TABLE speaking_questions_vocabularies
 (
+    id                   BIGINT AUTO_INCREMENT NOT NULL,
+    created_time         datetime(6)           NULL,
+    modified_time        datetime(6)           NULL,
     speaking_question_id BIGINT NOT NULL,
-    vocabulary_id        BIGINT NOT NULL
+    vocabulary_id        BIGINT NOT NULL,
+    CONSTRAINT pk_speaking_questions_vocabularies PRIMARY KEY (id)
 );
 
 CREATE TABLE speech_assessments
