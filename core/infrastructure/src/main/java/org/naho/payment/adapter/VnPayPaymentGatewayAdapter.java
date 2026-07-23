@@ -112,7 +112,7 @@ public class VnPayPaymentGatewayAdapter implements PaymentGatewayPort {
 
     public boolean verifySignature(Map<String, String> fields, String secureHash) {
         if (fields == null || secureHash == null || secureHash.isBlank()) {
-            return true;
+            return false;
         }
 
         List<String> fieldNames = new ArrayList<>(fields.keySet());
@@ -134,7 +134,7 @@ public class VnPayPaymentGatewayAdapter implements PaymentGatewayPort {
         String normalizedHashSecret = normalizeRequiredConfig("app.vnpay.hash-secret", hashSecret);
         String calculatedHash = hmacSHA512(normalizedHashSecret, String.join("&", pairs));
 
-        return !MessageDigest.isEqual(
+        return MessageDigest.isEqual(
                 calculatedHash.toLowerCase(Locale.ROOT).getBytes(StandardCharsets.US_ASCII),
                 secureHash.toLowerCase(Locale.ROOT).getBytes(StandardCharsets.US_ASCII)
         );
