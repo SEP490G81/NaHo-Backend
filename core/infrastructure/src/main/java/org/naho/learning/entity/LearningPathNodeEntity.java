@@ -45,7 +45,7 @@ public class LearningPathNodeEntity extends BaseEntity {
     @JoinColumn(name = "vocabulary_question_id")
     VocabularyQuestionEntity vocabularyQuestion;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "chest_id")
     ChestEntity chest;
 

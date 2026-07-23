@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import org.naho.daily.entity.UserDailyAttendanceEntity;
 import org.naho.file.entity.FileEntity;
 import org.naho.learning.entity.UserLearningProgressEntity;
 import org.naho.learning.entity.UserNodeProgressEntity;
@@ -79,6 +80,9 @@ public class UserEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "user")
     List<UserNodeProgressEntity> userNodeProgresses;
+
+    @OneToMany(mappedBy = "user")
+    List<UserDailyAttendanceEntity> userDailyAttendances;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_learning_progress_id")

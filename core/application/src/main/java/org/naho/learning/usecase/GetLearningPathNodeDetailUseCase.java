@@ -3,6 +3,7 @@ package org.naho.learning.usecase;
 
 import org.naho.chest.exception.ChestErrorCode;
 import org.naho.chest.port.out.ChestRepositoryPort;
+import org.naho.chest.result.ChestResult;
 import org.naho.grammar.result.GrammarDetailResult;
 import org.naho.i18n.message.chest.ChestDetailMessageKey;
 import org.naho.i18n.message.learning.LearningPathNodeDetailMessageKey;
@@ -13,7 +14,6 @@ import org.naho.learning.exception.LearningPathNodeErrorCode;
 import org.naho.learning.model.LearningPathNode;
 import org.naho.learning.port.in.GetLearningPathNodeDetailInputPort;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
-import org.naho.learning.result.ChestDetailResult;
 import org.naho.learning.result.LearningPathNodeDetailResult;
 import org.naho.learning.type.NodeType;
 import org.naho.question.exception.SpeakingQuestionErrorCode;
@@ -56,7 +56,7 @@ public class GetLearningPathNodeDetailUseCase implements GetLearningPathNodeDeta
 
         SpeakingQuestionDetailResult speakingQuestionResult = null;
         VocabularyQuestionDetailResult vocabularyQuestionResult = null;
-        ChestDetailResult chestResult = null;
+        ChestResult chestResult = null;
 
         NodeType nodeType = node.getNodeType();
 
@@ -68,7 +68,7 @@ public class GetLearningPathNodeDetailUseCase implements GetLearningPathNodeDeta
                             SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_NOT_FOUND,
                             node.getSpeakingQuestionId())
                     );
-            
+
             var vocabList = sq.getVocabularies() == null ? List.<VocabularyDetailResult>of() : sq.getVocabularies().stream()
                     .map(v -> new VocabularyDetailResult(
                             v.getId(),
@@ -125,11 +125,12 @@ public class GetLearningPathNodeDetailUseCase implements GetLearningPathNodeDeta
                             ChestDetailMessageKey.CHEST_NOT_FOUND,
                             node.getChestId()));
 
-            chestResult = new ChestDetailResult(
+            chestResult = new ChestResult(
                     chest.getId(),
-                    chest.getTitle(),
+                    chest.getChestType(),
                     chest.getDescription(),
-                    chest.getPoint()
+                    chest.getMinPoint(),
+                    chest.getMaxPoint()
             );
         }
 

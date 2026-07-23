@@ -19,7 +19,6 @@ public class SpeakingQuestion {
     private String description;
     private String descriptionMarkup;
     private QuestionStatus status;
-    private final Double orderIndex;
 
     // Private constructor dùng cho Builder
     private SpeakingQuestion(Builder builder) {
@@ -33,7 +32,6 @@ public class SpeakingQuestion {
         this.status = builder.status;
         this.grammars = builder.grammars;
         this.vocabularies = builder.vocabularies;
-        this.orderIndex = builder.orderIndex;
     }
 
     public static Builder builder() {
@@ -107,11 +105,6 @@ public class SpeakingQuestion {
         return descriptionMarkup;
     }
 
-    public Double getOrderIndex() {
-        return orderIndex;
-    }
-
-
     public QuestionStatus getStatus() {
         return status;
     }
@@ -136,7 +129,6 @@ public class SpeakingQuestion {
         private QuestionStatus status;
         private List<Grammar> grammars;
         private List<Vocabulary> vocabularies;
-        private Double orderIndex;
 
         public Builder id(Long id) {
             this.id = id;
@@ -189,12 +181,6 @@ public class SpeakingQuestion {
             this.vocabularies = vocabularies;
             return this;
         }
-
-        public Builder orderIndex(Double orderIndex) {
-            this.orderIndex = orderIndex;
-            return this;
-        }
-
 
         public SpeakingQuestion build() {
             SpeakingQuestion speakingQuestion = new SpeakingQuestion(this);

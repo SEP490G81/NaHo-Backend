@@ -4,7 +4,7 @@ import org.naho.i18n.message.chest.ChestTitleMessageKey;
 import org.naho.shared.exception.ErrorCode;
 
 public enum ChestDomainErrorCode implements ErrorCode {
-    CHEST_TITLE_EMPTY(
+    CHEST_TYPE_EMPTY(
             "CHEST_001",
             ChestTitleMessageKey.CHEST_CREATION_FAILED_TITLE,
             400
