@@ -184,6 +184,40 @@ CREATE TABLE objectives
     CONSTRAINT pk_objectives PRIMARY KEY (id)
 );
 
+CREATE TABLE payment_orders
+(
+    id                      BIGINT AUTO_INCREMENT NOT NULL,
+    created_time            datetime(6)           NOT NULL,
+    modified_time           datetime(6)           NULL,
+    order_code              VARCHAR(255)          NOT NULL,
+    user_id                 BIGINT                NOT NULL,
+    subscription_plan_id    BIGINT                NOT NULL,
+    amount_amount           DECIMAL               NOT NULL,
+    amount_currency         VARCHAR(255)          NOT NULL,
+    provider                VARCHAR(255)          NOT NULL,
+    status                  VARCHAR(255)          NOT NULL,
+    provider_transaction_id VARCHAR(255)          NULL,
+    expires_time            datetime(6)           NOT NULL,
+    paid_time               datetime(6)           NULL,
+    CONSTRAINT pk_payment_orders PRIMARY KEY (id)
+);
+
+CREATE TABLE payment_transactions
+(
+    id                        BIGINT AUTO_INCREMENT NOT NULL,
+    created_time              datetime(6)           NOT NULL,
+    modified_time             datetime(6)           NULL,
+    payment_order_id          BIGINT                NOT NULL,
+    provider                  VARCHAR(255)          NOT NULL,
+    provider_transaction_id   VARCHAR(255)          NOT NULL,
+    amount_amount             DECIMAL               NOT NULL,
+    amount_currency           VARCHAR(255)          NOT NULL,
+    successful                BIT(1)                NOT NULL,
+    provider_transaction_time datetime(6)           NULL,
+    metadata                  TEXT                  NULL,
+    CONSTRAINT pk_payment_transactions PRIMARY KEY (id)
+);
+
 CREATE TABLE permissions
 (
     id              BIGINT AUTO_INCREMENT NOT NULL,
@@ -280,22 +314,14 @@ CREATE TABLE speaking_questions
 
 CREATE TABLE speaking_questions_grammars
 (
-    id                   BIGINT AUTO_INCREMENT NOT NULL,
-    created_time         datetime(6)           NULL,
-    modified_time        datetime(6)           NULL,
     grammar_id           BIGINT NOT NULL,
-    speaking_question_id BIGINT NOT NULL,
-    CONSTRAINT pk_speaking_questions_grammars PRIMARY KEY (id)
+    speaking_question_id BIGINT NOT NULL
 );
 
 CREATE TABLE speaking_questions_vocabularies
 (
-    id                   BIGINT AUTO_INCREMENT NOT NULL,
-    created_time         datetime(6)           NULL,
-    modified_time        datetime(6)           NULL,
     speaking_question_id BIGINT NOT NULL,
-    vocabulary_id        BIGINT NOT NULL,
-    CONSTRAINT pk_speaking_questions_vocabularies PRIMARY KEY (id)
+    vocabulary_id        BIGINT NOT NULL
 );
 
 CREATE TABLE speech_assessments
@@ -310,6 +336,31 @@ CREATE TABLE speech_assessments
     pronunciation_score DOUBLE                NOT NULL,
     answer_history_id   BIGINT                NOT NULL,
     CONSTRAINT pk_speech_assessments PRIMARY KEY (id)
+);
+
+CREATE TABLE subscription_plans
+(
+    id                                 BIGINT AUTO_INCREMENT NOT NULL,
+    created_time                       datetime(6)           NOT NULL,
+    modified_time                      datetime(6)           NULL,
+    code                               VARCHAR(255)          NOT NULL,
+    name                               VARCHAR(255)          NOT NULL,
+    `description`                      TEXT                  NULL,
+    tier                               VARCHAR(255)          NOT NULL,
+    price_amount                       DECIMAL               NOT NULL,
+    price_currency                     VARCHAR(255)          NOT NULL,
+    duration_days                      INT                   NOT NULL,
+    monthly_assessment_limit           INT                   NOT NULL,
+    monthly_assessment_audio_seconds   BIGINT                NOT NULL,
+    max_assessment_audio_seconds       INT                   NOT NULL,
+    monthly_conversation_seconds       BIGINT                NOT NULL,
+    max_conversation_session_seconds   INT                   NOT NULL,
+    max_conversation_turns_per_session INT                   NOT NULL,
+    full_curriculum_access             BIT(1)                NOT NULL,
+    progress_analytics_enabled         BIT(1)                NOT NULL,
+    sample_answer_enabled              BIT(1)                NOT NULL,
+    status                             VARCHAR(255)          NOT NULL,
+    CONSTRAINT pk_subscription_plans PRIMARY KEY (id)
 );
 
 CREATE TABLE topics
@@ -386,6 +437,20 @@ CREATE TABLE user_sessions
     revoked_at               datetime(6)           NULL,
     revoked_reason           VARCHAR(50)           NULL,
     CONSTRAINT pk_user_sessions PRIMARY KEY (id)
+);
+
+CREATE TABLE user_subscriptions
+(
+    id                   BIGINT AUTO_INCREMENT NOT NULL,
+    created_time         datetime(6)           NOT NULL,
+    modified_time        datetime(6)           NULL,
+    user_id              BIGINT                NOT NULL,
+    subscription_plan_id BIGINT                NOT NULL,
+    payment_order_id     BIGINT                NULL,
+    status               VARCHAR(255)          NOT NULL,
+    start_time           datetime(6)           NOT NULL,
+    end_time             datetime(6)           NOT NULL,
+    CONSTRAINT pk_user_subscriptions PRIMARY KEY (id)
 );
 
 CREATE TABLE users
@@ -471,6 +536,9 @@ ALTER TABLE learning_path_nodes
 ALTER TABLE learning_path_nodes
     ADD CONSTRAINT uc_learning_path_nodes_vocabulary_question UNIQUE (vocabulary_question_id);
 
+ALTER TABLE payment_orders
+    ADD CONSTRAINT uc_payment_orders_order_code UNIQUE (order_code);
+
 ALTER TABLE permissions
     ADD CONSTRAINT uc_permissions_permission_code UNIQUE (permission_code);
 
@@ -488,6 +556,9 @@ ALTER TABLE speaking_questions
 
 ALTER TABLE speech_assessments
     ADD CONSTRAINT uc_speech_assessments_answer_history UNIQUE (answer_history_id);
+
+ALTER TABLE subscription_plans
+    ADD CONSTRAINT uc_subscription_plans_code UNIQUE (code);
 
 ALTER TABLE topics
     ADD CONSTRAINT uc_topics_cover_image_file UNIQUE (cover_image_file_id);
@@ -560,6 +631,12 @@ ALTER TABLE objectives
 
 ALTER TABLE o_auth_providers
     ADD CONSTRAINT FK_O_AUTH_PROVIDERS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+
+ALTER TABLE payment_orders
+    ADD CONSTRAINT FK_PAYMENT_ORDERS_ON_SUBSCRIPTION_PLAN FOREIGN KEY (subscription_plan_id) REFERENCES subscription_plans (id);
+
+ALTER TABLE payment_transactions
+    ADD CONSTRAINT FK_PAYMENT_TRANSACTIONS_ON_PAYMENT_ORDER FOREIGN KEY (payment_order_id) REFERENCES payment_orders (id);
 
 ALTER TABLE personas
     ADD CONSTRAINT FK_PERSONAS_ON_AVATAR_FILE FOREIGN KEY (avatar_file_id) REFERENCES files (id);
@@ -635,6 +712,12 @@ ALTER TABLE user_node_progresses
 
 ALTER TABLE user_sessions
     ADD CONSTRAINT FK_USER_SESSIONS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+
+ALTER TABLE user_subscriptions
+    ADD CONSTRAINT FK_USER_SUBSCRIPTIONS_ON_PAYMENT_ORDER FOREIGN KEY (payment_order_id) REFERENCES payment_orders (id);
+
+ALTER TABLE user_subscriptions
+    ADD CONSTRAINT FK_USER_SUBSCRIPTIONS_ON_SUBSCRIPTION_PLAN FOREIGN KEY (subscription_plan_id) REFERENCES subscription_plans (id);
 
 ALTER TABLE word_assessments
     ADD CONSTRAINT FK_WORD_ASSESSMENTS_ON_SPEECH_ASSESSMENT FOREIGN KEY (speech_assessment_id) REFERENCES speech_assessments (id);
