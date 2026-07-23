@@ -68,6 +68,16 @@ public class PaymentConfig {
         }
 
         @Bean
+        public org.naho.payment.port.in.CancelPaymentInputPort cancelPaymentInputPort(
+                        PaymentOrderRepositoryPort orderRepositoryPort,
+                        PlatformTransactionManager transactionManager) {
+                org.naho.payment.usecase.CancelPaymentUseCase target = new org.naho.payment.usecase.CancelPaymentUseCase(
+                                orderRepositoryPort);
+                TransactionTemplate template = new TransactionTemplate(transactionManager);
+                return command -> template.execute(status -> target.cancelPayment(command));
+        }
+
+        @Bean
         public ListActivePlansInputPort listActivePlansInputPort(
                         SubscriptionPlanRepositoryPort planRepositoryPort) {
                 return new ListActivePlansUseCase(planRepositoryPort);
@@ -75,7 +85,10 @@ public class PaymentConfig {
 
         @Bean
         public GetActiveSubscriptionInputPort getActiveSubscriptionInputPort(
-                        UserSubscriptionRepositoryPort subscriptionRepositoryPort) {
-                return new GetActiveSubscriptionUseCase(subscriptionRepositoryPort);
+                        UserSubscriptionRepositoryPort subscriptionRepositoryPort,
+                        PlatformTransactionManager transactionManager) {
+                GetActiveSubscriptionUseCase target = new GetActiveSubscriptionUseCase(subscriptionRepositoryPort);
+                TransactionTemplate template = new TransactionTemplate(transactionManager);
+                return userId -> template.execute(status -> target.getActiveSubscription(userId));
         }
 }

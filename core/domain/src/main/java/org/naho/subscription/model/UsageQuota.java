@@ -8,7 +8,6 @@ public record UsageQuota(
         int monthlyAssessmentLimit,
         long monthlyAssessmentAudioSeconds,
         int maxAssessmentAudioSeconds,
-
         long monthlyConversationSeconds,
         int maxConversationSessionSeconds,
         int maxConversationTurnsPerSession) {

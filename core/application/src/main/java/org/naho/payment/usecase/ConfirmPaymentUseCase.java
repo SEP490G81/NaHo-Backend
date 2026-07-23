@@ -18,80 +18,85 @@ import java.time.Instant;
 
 public class ConfirmPaymentUseCase implements ConfirmPaymentInputPort {
 
-        private final PaymentOrderRepositoryPort orderRepositoryPort;
-        private final PaymentTransactionRepositoryPort transactionRepositoryPort;
-        private final SubscriptionPlanRepositoryPort planRepositoryPort;
-        private final UserSubscriptionRepositoryPort subscriptionRepositoryPort;
+    private final PaymentOrderRepositoryPort orderRepositoryPort;
+    private final PaymentTransactionRepositoryPort transactionRepositoryPort;
+    private final SubscriptionPlanRepositoryPort planRepositoryPort;
+    private final UserSubscriptionRepositoryPort subscriptionRepositoryPort;
 
-        public ConfirmPaymentUseCase(PaymentOrderRepositoryPort orderRepositoryPort,
-                        PaymentTransactionRepositoryPort transactionRepositoryPort,
-                        SubscriptionPlanRepositoryPort planRepositoryPort,
-                        UserSubscriptionRepositoryPort subscriptionRepositoryPort) {
-                this.orderRepositoryPort = orderRepositoryPort;
-                this.transactionRepositoryPort = transactionRepositoryPort;
-                this.planRepositoryPort = planRepositoryPort;
-                this.subscriptionRepositoryPort = subscriptionRepositoryPort;
+    public ConfirmPaymentUseCase(PaymentOrderRepositoryPort orderRepositoryPort,
+            PaymentTransactionRepositoryPort transactionRepositoryPort,
+            SubscriptionPlanRepositoryPort planRepositoryPort,
+            UserSubscriptionRepositoryPort subscriptionRepositoryPort) {
+        this.orderRepositoryPort = orderRepositoryPort;
+        this.transactionRepositoryPort = transactionRepositoryPort;
+        this.planRepositoryPort = planRepositoryPort;
+        this.subscriptionRepositoryPort = subscriptionRepositoryPort;
+    }
+
+    @Override
+    public ConfirmPaymentResult confirmPayment(ConfirmPaymentCommand command) {
+        Instant now = Instant.now();
+
+        if (transactionRepositoryPort.existsByProviderAndTransactionId(
+                command.provider(),
+                command.providerTransactionId())) {
+            return ConfirmPaymentResult.duplicate(command.orderCode());
         }
 
-        @Override
-        public ConfirmPaymentResult confirmPayment(ConfirmPaymentCommand command) {
-                Instant now = Instant.now();
+        PaymentOrder order = orderRepositoryPort.findByOrderCodeForUpdate(command.orderCode())
+                .orElseThrow(() -> new ApplicationException(
+                        PaymentErrorCode.PAYMENT_ORDER_NOT_FOUND,
+                        "payment.order.not_found"));
 
-                if (transactionRepositoryPort.existsByProviderAndTransactionId(
-                                command.provider(),
-                                command.providerTransactionId())) {
-                        return ConfirmPaymentResult.duplicate(command.orderCode());
-                }
-
-                PaymentOrder order = orderRepositoryPort.findByOrderCodeForUpdate(command.orderCode())
-                                .orElseThrow(() -> new ApplicationException(
-                                                PaymentErrorCode.PAYMENT_ORDER_NOT_FOUND,
-                                                "payment.order.not_found"));
-
-                if (order.isPaid()) {
-                        return ConfirmPaymentResult.alreadyPaid(order.getOrderCode());
-                }
-
-                PaymentTransaction transaction = PaymentTransaction.received(
-                                order.getId(),
-                                command.provider(),
-                                command.providerTransactionId(),
-                                command.paidAmount(),
-                                command.successful(),
-                                command.providerTransactionTime(),
-                                command.metadata(),
-                                now);
-
-                transactionRepositoryPort.save(transaction);
-
-                if (!command.successful()) {
-                        order.markFailed(now);
-                        orderRepositoryPort.save(order);
-                        return ConfirmPaymentResult.failed(order.getOrderCode());
-                }
-
-                order.markPaid(
-                                command.providerTransactionId(),
-                                command.paidAmount(),
-                                now);
-
-                SubscriptionPlan plan = planRepositoryPort.findById(order.getSubscriptionPlanId())
-                                .orElseThrow(() -> new ApplicationException(
-                                                PaymentErrorCode.PLAN_NOT_FOUND,
-                                                "subscription.plan.not_found"));
-
-                if (!subscriptionRepositoryPort.existsByPaymentOrderId(order.getId())) {
-                        UserSubscription subscription = UserSubscription.activate(
-                                        order.getUserId(),
-                                        plan.getId(),
-                                        order.getId(),
-                                        plan.getDurationDays(),
-                                        now);
-                        subscriptionRepositoryPort.save(subscription);
-                }
-
-                orderRepositoryPort.save(order);
-
-                return ConfirmPaymentResult.success(order.getOrderCode());
+        if (order.isPaid()) {
+            return ConfirmPaymentResult.alreadyPaid(order.getOrderCode());
         }
+
+        PaymentTransaction transaction = PaymentTransaction.received(
+                order.getId(),
+                command.provider(),
+                command.providerTransactionId(),
+                command.paidAmount(),
+                command.successful(),
+                command.providerTransactionTime(),
+                command.metadata(),
+                now);
+
+        transactionRepositoryPort.save(transaction);
+
+        if (!command.successful()) {
+            if (order.isExpiredAt(now)) {
+                order.expire(now); // Chuyển trạng thái chuẩn sang EXPIRED nếu đã quá 5 phút
+            } else {
+                order.markFailed(now); // Chuyển sang FAILED nếu thất bại trong thời hạn 5 phút (ví dụ: sai OTP, tài
+                                       // khoản không đủ tiền)
+            }
+            orderRepositoryPort.save(order);
+            return ConfirmPaymentResult.failed(order.getOrderCode());
+        }
+
+        order.markPaid(
+                command.providerTransactionId(),
+                command.paidAmount(),
+                now);
+
+        SubscriptionPlan plan = planRepositoryPort.findById(order.getSubscriptionPlanId())
+                .orElseThrow(() -> new ApplicationException(
+                        PaymentErrorCode.PLAN_NOT_FOUND,
+                        "subscription.plan.not_found"));
+
+        if (!subscriptionRepositoryPort.existsByPaymentOrderId(order.getId())) {
+            UserSubscription subscription = UserSubscription.activate(
+                    order.getUserId(),
+                    plan.getId(),
+                    order.getId(),
+                    plan.getDurationDays(),
+                    now);
+            subscriptionRepositoryPort.save(subscription);
+        }
+
+        orderRepositoryPort.save(order);
+
+        return ConfirmPaymentResult.success(order.getOrderCode());
+    }
 }
