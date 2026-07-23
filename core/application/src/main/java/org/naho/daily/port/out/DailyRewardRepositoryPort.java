@@ -8,4 +8,6 @@ public interface DailyRewardRepositoryPort {
     List<DailyReward> findAllByRewardYearMonthOrderByDayOfMonth(String rewardYearMonth);
 
     boolean existsByRewardYearMonth(String rewardYearMonth);
+
+    List<DailyReward> saveAll(List<DailyReward> dailyRewards);
 }

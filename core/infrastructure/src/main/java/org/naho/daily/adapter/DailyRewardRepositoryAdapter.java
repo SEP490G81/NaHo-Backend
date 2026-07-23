@@ -31,4 +31,18 @@ public class DailyRewardRepositoryAdapter implements DailyRewardRepositoryPort {
     public boolean existsByRewardYearMonth(String rewardYearMonth) {
         return dailyRewardJpaRepository.existsByRewardYearMonth(rewardYearMonth);
     }
+
+    @Override
+    public List<DailyReward> saveAll(List<DailyReward> dailyRewards) {
+        List<DailyRewardEntity> dailyRewardEntityList = dailyRewards.stream()
+                .map(dailyEntityMapper::domainToEntity)
+                .toList();
+
+        List<DailyRewardEntity> savedDailyRewardEntityList =
+                dailyRewardJpaRepository.saveAll(dailyRewardEntityList);
+
+        return savedDailyRewardEntityList.stream()
+                .map(dailyEntityMapper::entityToDomain)
+                .toList();
+    }
 }

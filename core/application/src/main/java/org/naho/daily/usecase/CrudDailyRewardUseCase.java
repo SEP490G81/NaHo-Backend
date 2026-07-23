@@ -1,9 +1,7 @@
 package org.naho.daily.usecase;
 
 import org.naho.chest.mapper.ChestResultMapper;
-import org.naho.chest.model.Chest;
 import org.naho.chest.port.out.ChestRepositoryPort;
-import org.naho.chest.result.ChestResult;
 import org.naho.daily.exception.DailyRewardErrorCode;
 import org.naho.daily.mapper.DailyRewardResultMapper;
 import org.naho.daily.model.DailyReward;
@@ -15,11 +13,11 @@ import org.naho.i18n.message.daily.DailyRewardDetailMessageKey;
 import org.naho.shared.constant.SystemZoneId;
 import org.naho.shared.exception.ApplicationException;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class CrudDailyRewardUseCase implements CrudDailyRewardInputPort {
 
@@ -49,30 +47,7 @@ public class CrudDailyRewardUseCase implements CrudDailyRewardInputPort {
         List<DailyReward> dailyRewards =
                 dailyRewardRepositoryPort.findAllByRewardYearMonthOrderByDayOfMonth(rewardYearMonth);
 
-        // lấy danh sách các chestIds từ dailyRewards
-        Set<Long> chestIds = dailyRewards.stream()
-                .map(DailyReward::getChestId)
-                .collect(Collectors.toUnmodifiableSet());
-
-        // tạo 1 map gồm:
-        // key là chest id
-        // value là chest result
-        Map<Long, ChestResult> chestResults =
-                chestRepositoryPort.findAllByIdIn(chestIds)
-                        .stream()
-                        .collect(Collectors.toUnmodifiableMap(
-                                Chest::getId,
-                                chestResultMapper::domainToResult
-                        ));
-
-        return dailyRewards.stream()
-                .map(dailyReward ->
-                        dailyRewardResultMapper.domainToResult(
-                                dailyReward,
-                                chestResults.get(dailyReward.getChestId())
-                        )
-                )
-                .toList();
+        return dailyRewardResultMapper.domainListToResultList(dailyRewards);
     }
 
     @Override
@@ -88,6 +63,31 @@ public class CrudDailyRewardUseCase implements CrudDailyRewardInputPort {
             );
         }
 
-        return List.of();
+        int daysInMonth = yearMonth.lengthOfMonth();
+        List<DailyReward> dailyRewards = new ArrayList<>();
+
+        for (int day = 1; day <= daysInMonth; day++) {
+            LocalDate localDate = yearMonth.atDay(day);
+
+            DailyReward dailyReward = DailyReward.builder()
+                    .rewardYearMonth(rewardYearMonth)
+                    .dayOfMonth(day)
+                    .build();
+
+            if (day == daysInMonth) { // nếu là cuối tháng
+                dailyReward.setChestId(4L);
+            } else if (day == 15) { // nếu là ngày 15 hàng tháng
+                dailyReward.setChestId(3L);
+            } else if (localDate.getDayOfWeek() == DayOfWeek.SUNDAY) { // nếu là Chủ Nhật
+                dailyReward.setChestId(2L);
+            } else { // các ngày còn lại
+                dailyReward.setChestId(1L);
+            }
+
+            dailyRewards.add(dailyReward);
+        }
+
+        List<DailyReward> savedDailyRewards = dailyRewardRepositoryPort.saveAll(dailyRewards);
+        return dailyRewardResultMapper.domainListToResultList(savedDailyRewards);
     }
 }

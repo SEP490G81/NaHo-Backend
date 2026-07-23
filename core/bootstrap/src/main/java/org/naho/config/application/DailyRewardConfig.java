@@ -13,8 +13,14 @@ import org.springframework.context.annotation.Configuration;
 public class DailyRewardConfig {
 
     @Bean
-    public DailyRewardResultMapper dailyRewardResultMapper() {
-        return new DailyRewardResultMapper();
+    public DailyRewardResultMapper dailyRewardResultMapper(
+            ChestRepositoryPort chestRepositoryPort,
+            ChestResultMapper chestResultMapper
+    ) {
+        return new DailyRewardResultMapper(
+                chestRepositoryPort,
+                chestResultMapper
+        );
     }
 
     @Bean

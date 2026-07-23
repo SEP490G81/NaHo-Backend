@@ -8,16 +8,19 @@ import org.naho.shared.exception.DomainException;
 public class DailyReward {
 
     private final Long id;
-    private final Long chestId;
-
     private final RewardYearMonth rewardYearMonth;
     private final Integer dayOfMonth;
+    private Long chestId;
 
     private DailyReward(Builder builder) {
         this.id = builder.id;
         this.chestId = builder.chestId;
         this.rewardYearMonth = builder.rewardYearMonth;
         this.dayOfMonth = builder.dayOfMonth;
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     public Long getId() {
@@ -36,8 +39,8 @@ public class DailyReward {
         return dayOfMonth;
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public void setChestId(Long chestId) {
+        this.chestId = chestId;
     }
 
     public static final class Builder {
