@@ -1,10 +1,10 @@
 package org.naho.daily.dto.response;
 
-import org.naho.chest.result.ChestResult;
+import org.naho.chest.dto.response.ChestResponse;
 
 public record DailyRewardResponse(
         Long id,
-        ChestResult chest,
+        ChestResponse chest,
         String rewardYearMonth,
         Integer dayOfMonth
 ) {

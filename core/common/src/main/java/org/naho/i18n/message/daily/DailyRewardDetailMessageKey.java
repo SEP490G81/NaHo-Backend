@@ -13,6 +13,8 @@ public final class DailyRewardDetailMessageKey {
             "daily.reward.not.found";
     public static final String DAILY_REWARD_GET_CURRENT_MONTH_SUCCESS =
             "daily.reward.get.current.month.success";
+    public static final String DAILY_REWARD_CREATE_CURRENT_MONTH_SUCCESS =
+            "daily.reward.create.current.month.success";
     public static final String DAILY_REWARD_ALREADY_EXISTS =
             "daily.reward.already.exists";
 

@@ -55,6 +55,7 @@ public class CrudDailyRewardUseCase implements CrudDailyRewardInputPort {
         YearMonth yearMonth = YearMonth.now(SystemZoneId.HO_CHI_MINH_ZONE_ID);
         RewardYearMonth rewardYearMonth = RewardYearMonth.of(yearMonth);
 
+        // nếu tháng này đã tồn tại thì ném ra lỗi
         if (dailyRewardRepositoryPort.existsByRewardYearMonth(rewardYearMonth.getValue())) {
             throw new ApplicationException(
                     DailyRewardErrorCode.DAILY_REWARD_ALREADY_EXISTS,
@@ -78,7 +79,7 @@ public class CrudDailyRewardUseCase implements CrudDailyRewardInputPort {
                 dailyReward.setChestId(4L);
             } else if (day == 15) { // nếu là ngày 15 hàng tháng
                 dailyReward.setChestId(3L);
-            } else if (localDate.getDayOfWeek() == DayOfWeek.SUNDAY) { // nếu là Chủ Nhật
+            } else if (localDate.getDayOfWeek().equals(DayOfWeek.SUNDAY)) { // nếu là Chủ Nhật
                 dailyReward.setChestId(2L);
             } else { // các ngày còn lại
                 dailyReward.setChestId(1L);

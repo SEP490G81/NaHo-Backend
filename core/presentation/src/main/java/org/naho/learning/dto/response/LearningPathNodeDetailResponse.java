@@ -1,6 +1,6 @@
 package org.naho.learning.dto.response;
 
-import org.naho.chest.type.ChestType;
+import org.naho.chest.dto.response.ChestResponse;
 import org.naho.learning.type.NodeType;
 import org.naho.question.type.QuestionStatus;
 
@@ -14,7 +14,7 @@ public record LearningPathNodeDetailResponse(
         Double orderIndex,
         SpeakingQuestionDetailResponse speakingQuestion,
         VocabularyQuestionDetailResponse vocabularyQuestion,
-        ChestDetailResponse chest
+        ChestResponse chest
 ) {
     public record SpeakingQuestionDetailResponse(
             Long id,
@@ -58,14 +58,5 @@ public record LearningPathNodeDetailResponse(
                 String englishMeaningText
         ) {
         }
-    }
-
-    public record ChestDetailResponse(
-            Long id,
-            ChestType chestType,
-            String description,
-            Integer minPoint,
-            Integer maxPoint
-    ) {
     }
 }

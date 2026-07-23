@@ -7,8 +7,10 @@ import org.naho.daily.port.in.CrudDailyRewardInputPort;
 import org.naho.daily.result.DailyRewardResult;
 import org.naho.i18n.message.daily.DailyRewardDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,5 +33,16 @@ public class DailyRewardController {
                 .toList();
 
         return ResponseEntity.ok(responses);
+    }
+
+    @ApiResponseMessage(message = DailyRewardDetailMessageKey.DAILY_REWARD_CREATE_CURRENT_MONTH_SUCCESS)
+    @PostMapping("/current-month")
+    public ResponseEntity<List<DailyRewardResponse>> createCurrentMonthDailyRewards() {
+        List<DailyRewardResult> results = crudDailyRewardInputPort.createCurrentMonthDailyRewards();
+        List<DailyRewardResponse> responses = results.stream()
+                .map(dailyRewardResponseMapper::resultToResponse)
+                .toList();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
 }
