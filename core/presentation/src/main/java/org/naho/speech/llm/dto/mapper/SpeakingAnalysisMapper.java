@@ -2,8 +2,10 @@ package org.naho.speech.llm.dto.mapper;
 
 import org.naho.speech.llm.dto.response.SpeakingAnalysisResponse;
 import org.naho.speech.llm.dto.response.SpeakingHistoryDetailResponse;
+import org.naho.speech.llm.dto.response.SpeakingHistoryListItemResponse;
 import org.naho.speech.llm.result.SpeakingAnalysisResult;
 import org.naho.speech.llm.result.SpeakingHistoryDetailResult;
+import org.naho.speech.llm.result.SpeakingHistoryListItemResult;
 import org.springframework.stereotype.Component;
 
 import java.time.format.DateTimeFormatter;
@@ -15,7 +17,24 @@ public class SpeakingAnalysisMapper {
 
     public SpeakingAnalysisResponse toResponse(SpeakingAnalysisResult result) {
         if (result == null) return null;
-        return new SpeakingAnalysisResponse(result.historyId(), result.score());
+        return new SpeakingAnalysisResponse(result.historyId(), result.score(), result.audioUrl());
+    }
+
+    public SpeakingHistoryListItemResponse toListItemResponse(SpeakingHistoryListItemResult result) {
+        if (result == null) return null;
+        return new SpeakingHistoryListItemResponse(
+                result.historyId(),
+                result.speakingQuestionId(),
+                result.speakingQuestionTitle(),
+                result.topicId(),
+                result.topicName(),
+                result.learningPathNodeId(),
+                result.bookId(),
+                result.score(),
+                result.durationSec(),
+                result.audioUrl(),
+                result.practicedAt() != null ? ISO_FORMATTER.format(result.practicedAt()) : null
+        );
     }
 
     public SpeakingHistoryDetailResponse toDetailResponse(SpeakingHistoryDetailResult result) {
@@ -83,8 +102,12 @@ public class SpeakingAnalysisMapper {
 
         return new SpeakingHistoryDetailResponse(
                 result.historyId(),
-                result.topicId() != null ? result.topicId() : null,
-                result.questionId() != null ? result.questionId() : null,
+                result.topicId(),
+                result.questionId(),
+                result.speakingQuestionTitle(),
+                result.topicName(),
+                result.learningPathNodeId(),
+                result.bookId(),
                 result.practicedAt() != null ? ISO_FORMATTER.format(result.practicedAt()) : null,
                 result.durationSec(),
                 result.score(),

@@ -12,6 +12,7 @@ import org.naho.book.port.out.BookRepositoryPort;
 import org.naho.book.port.out.LessonRepositoryPort;
 import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.book.port.out.TopicRepositoryPort;
+import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.file.command.FileUploadCommand;
 import org.naho.file.port.in.FileStorageInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
@@ -30,11 +31,14 @@ import org.naho.shared.port.out.TransactionPort;
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
 import org.naho.speech.llm.command.SpeakingAnalysisCommand;
+import org.naho.speech.llm.command.SpeakingHistoryFilterCommand;
 import org.naho.speech.llm.port.in.SpeakingAnalysisInputPort;
 import org.naho.speech.llm.port.out.AiAnalysisPort;
 import org.naho.speech.llm.port.out.AnswerHistoryRepositoryPort;
 import org.naho.speech.llm.result.SpeakingAnalysisResult;
 import org.naho.speech.llm.result.SpeakingHistoryDetailResult;
+import org.naho.speech.llm.result.SpeakingHistoryListItemResult;
+import org.naho.speech.llm.result.SpeakingHistoryListResult;
 import org.naho.speech.model.AnswerHistory;
 import org.naho.speech.model.ContentAssessment;
 import org.naho.speech.model.SpeechAssessment;
@@ -63,6 +67,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     private final LessonRepositoryPort lessonRepositoryPort;
     private final ObjectiveRepositoryPort objectiveRepositoryPort;
     private final BookRepositoryPort bookRepositoryPort;
+    private final LearningPathNodeRepositoryPort learningPathNodeRepositoryPort;
     private final AiAnalysisPort aiAnalysisPort;
     private final FuriganaGenerationPort furiganaGenerationPort;
     private final TransactionPort transactionPort;
@@ -80,6 +85,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             LessonRepositoryPort lessonRepositoryPort,
             ObjectiveRepositoryPort objectiveRepositoryPort,
             BookRepositoryPort bookRepositoryPort,
+            LearningPathNodeRepositoryPort learningPathNodeRepositoryPort,
             AiAnalysisPort aiAnalysisPort,
             FuriganaGenerationPort furiganaGenerationPort,
             TransactionPort transactionPort,
@@ -95,6 +101,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         this.lessonRepositoryPort = lessonRepositoryPort;
         this.objectiveRepositoryPort = objectiveRepositoryPort;
         this.bookRepositoryPort = bookRepositoryPort;
+        this.learningPathNodeRepositoryPort = learningPathNodeRepositoryPort;
         this.aiAnalysisPort = aiAnalysisPort;
         this.furiganaGenerationPort = furiganaGenerationPort;
         this.transactionPort = transactionPort;
@@ -417,8 +424,11 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                         .overallScore(overallScore)
                         .build()
         );
+
+        org.naho.file.model.File audioFile = fileRepositoryPort.findById(uploadResult.id());
+        String audioUrl = audioFile != null ? audioFile.getObjectKey() : null;
         
-        return new SpeakingAnalysisResult(answerHistory.getId(), overallScore);
+        return new SpeakingAnalysisResult(answerHistory.getId(), overallScore, audioUrl);
     }
 
     @Override
@@ -597,20 +607,39 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 itVocab
         );
 
-        String objectKey = fileRepositoryPort.findObjectKeyById(history.getAudioFileId());
+        org.naho.file.model.File audioFile = fileRepositoryPort.findById(history.getAudioFileId());
+        String audioUrl = audioFile != null ? audioFile.getObjectKey() : null;
 
-        Long topicId = null;
+        Topic topic = topicRepositoryPort.findBySpeakingQuestionId(speakingQuestion.getId()).orElse(null);
+        Long topicId = topic != null ? topic.getId() : null;
+        String topicName = topic != null ? topic.getJapaneseName() : null;
+
+        Book book = bookRepositoryPort.findBySpeakingQuestionId(speakingQuestion.getId()).orElse(null);
+        Long bookId = book != null ? book.getId() : null;
+
+        org.naho.learning.model.LearningPathNode lpn =
+                learningPathNodeRepositoryPort.findBySpeakingQuestionId(speakingQuestion.getId()).orElse(null);
+        Long learningPathNodeId = lpn != null ? lpn.getId() : null;
 
         return new SpeakingHistoryDetailResult(
                 history.getId(),
                 topicId,
                 history.getSpeakingQuestionId(),
+                speakingQuestion.getTitle(),
+                topicName,
+                learningPathNodeId,
+                bookId,
                 history.getCreatedTime() != null ? history.getCreatedTime() : Instant.now(),
                 durationSec,
                 overallScore,
-                objectKey,
+                audioUrl,
                 report
         );
+    }
+
+    @Override
+    public SpeakingHistoryListResult getUserHistoryList(SpeakingHistoryFilterCommand command) {
+        return answerHistoryRepositoryPort.findUserAnswerHistories(command);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
