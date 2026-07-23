@@ -4,6 +4,7 @@ import org.naho.book.port.out.TopicRepositoryPort;
 import org.naho.book.port.out.BookRepositoryPort;
 import org.naho.book.port.out.LessonRepositoryPort;
 import org.naho.book.port.out.ObjectiveRepositoryPort;
+import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.file.port.in.FileStorageInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.furigana.port.out.FuriganaGenerationPort;
@@ -106,6 +107,7 @@ public class ChatConfig {
             LessonRepositoryPort lessonRepositoryPort,
             ObjectiveRepositoryPort objectiveRepositoryPort,
             BookRepositoryPort bookRepositoryPort,
+            LearningPathNodeRepositoryPort learningPathNodeRepositoryPort,
             FileStorageInputPort fileStorageInputPort,
             FileRepositoryPort fileRepositoryPort,
             AnswerHistoryRepositoryPort answerHistoryRepositoryPort,
@@ -126,6 +128,7 @@ public class ChatConfig {
                 lessonRepositoryPort,
                 objectiveRepositoryPort,
                 bookRepositoryPort,
+                learningPathNodeRepositoryPort,
                 aiAnalysisPort,
                 furiganaGenerationPort,
                 transactionPort,

@@ -218,10 +218,16 @@ public class AnswerHistoryRepositoryAdapter implements AnswerHistoryRepositoryPo
             LearningPathNodeEntity lpn = sq != null ? sq.getLearningPathNode() : null;
             ObjectiveEntity obj = lpn != null ? lpn.getObjective() : null;
             LessonEntity les = obj != null ? obj.getLesson() : null;
+
+            Long lpnId = lpn != null ? lpn.getId() : null;
+
             TopicEntity t = les != null ? les.getTopic() : null;
 
             Long tId = t != null ? t.getId() : null;
             String tName = t != null ? t.getJapaneseName() : null;
+
+            org.naho.book.entity.BookEntity book = t != null ? t.getBook() : null;
+            Long bookId = book != null ? book.getId() : null;
 
             String audioUrl = null;
             if (entity.getAudioFile() != null && entity.getAudioFile().getObjectKey() != null) {
@@ -246,6 +252,8 @@ public class AnswerHistoryRepositoryAdapter implements AnswerHistoryRepositoryPo
                     sqTitle,
                     tId,
                     tName,
+                    lpnId,
+                    bookId,
                     score,
                     durationSec,
                     audioUrl,

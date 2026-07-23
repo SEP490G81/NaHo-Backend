@@ -28,6 +28,8 @@ public class SpeakingAnalysisMapper {
                 result.speakingQuestionTitle(),
                 result.topicId(),
                 result.topicName(),
+                result.learningPathNodeId(),
+                result.bookId(),
                 result.score(),
                 result.durationSec(),
                 result.audioUrl(),
@@ -100,8 +102,12 @@ public class SpeakingAnalysisMapper {
 
         return new SpeakingHistoryDetailResponse(
                 result.historyId(),
-                result.topicId() != null ? result.topicId() : null,
-                result.questionId() != null ? result.questionId() : null,
+                result.topicId(),
+                result.questionId(),
+                result.speakingQuestionTitle(),
+                result.topicName(),
+                result.learningPathNodeId(),
+                result.bookId(),
                 result.practicedAt() != null ? ISO_FORMATTER.format(result.practicedAt()) : null,
                 result.durationSec(),
                 result.score(),

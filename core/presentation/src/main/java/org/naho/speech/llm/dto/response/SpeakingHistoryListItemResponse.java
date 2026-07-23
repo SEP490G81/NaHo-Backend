@@ -6,6 +6,8 @@ public record SpeakingHistoryListItemResponse(
         String speakingQuestionTitle,
         Long topicId,
         String topicName,
+        Long learningPathNodeId,
+        Long bookId,
         Double score,
         Integer durationSec,
         String audioUrl,

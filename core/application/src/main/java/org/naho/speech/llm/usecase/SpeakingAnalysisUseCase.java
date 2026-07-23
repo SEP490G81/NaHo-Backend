@@ -12,6 +12,7 @@ import org.naho.book.port.out.BookRepositoryPort;
 import org.naho.book.port.out.LessonRepositoryPort;
 import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.book.port.out.TopicRepositoryPort;
+import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.file.command.FileUploadCommand;
 import org.naho.file.port.in.FileStorageInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
@@ -66,6 +67,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     private final LessonRepositoryPort lessonRepositoryPort;
     private final ObjectiveRepositoryPort objectiveRepositoryPort;
     private final BookRepositoryPort bookRepositoryPort;
+    private final LearningPathNodeRepositoryPort learningPathNodeRepositoryPort;
     private final AiAnalysisPort aiAnalysisPort;
     private final FuriganaGenerationPort furiganaGenerationPort;
     private final TransactionPort transactionPort;
@@ -83,6 +85,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             LessonRepositoryPort lessonRepositoryPort,
             ObjectiveRepositoryPort objectiveRepositoryPort,
             BookRepositoryPort bookRepositoryPort,
+            LearningPathNodeRepositoryPort learningPathNodeRepositoryPort,
             AiAnalysisPort aiAnalysisPort,
             FuriganaGenerationPort furiganaGenerationPort,
             TransactionPort transactionPort,
@@ -98,6 +101,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         this.lessonRepositoryPort = lessonRepositoryPort;
         this.objectiveRepositoryPort = objectiveRepositoryPort;
         this.bookRepositoryPort = bookRepositoryPort;
+        this.learningPathNodeRepositoryPort = learningPathNodeRepositoryPort;
         this.aiAnalysisPort = aiAnalysisPort;
         this.furiganaGenerationPort = furiganaGenerationPort;
         this.transactionPort = transactionPort;
@@ -608,11 +612,23 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
 
         Topic topic = topicRepositoryPort.findBySpeakingQuestionId(speakingQuestion.getId()).orElse(null);
         Long topicId = topic != null ? topic.getId() : null;
+        String topicName = topic != null ? topic.getJapaneseName() : null;
+
+        Book book = bookRepositoryPort.findBySpeakingQuestionId(speakingQuestion.getId()).orElse(null);
+        Long bookId = book != null ? book.getId() : null;
+
+        org.naho.learning.model.LearningPathNode lpn =
+                learningPathNodeRepositoryPort.findBySpeakingQuestionId(speakingQuestion.getId()).orElse(null);
+        Long learningPathNodeId = lpn != null ? lpn.getId() : null;
 
         return new SpeakingHistoryDetailResult(
                 history.getId(),
                 topicId,
                 history.getSpeakingQuestionId(),
+                speakingQuestion.getTitle(),
+                topicName,
+                learningPathNodeId,
+                bookId,
                 history.getCreatedTime() != null ? history.getCreatedTime() : Instant.now(),
                 durationSec,
                 overallScore,
