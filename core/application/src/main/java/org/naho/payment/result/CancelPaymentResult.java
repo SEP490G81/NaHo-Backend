@@ -4,10 +4,9 @@ import org.naho.payment.type.PaymentStatus;
 
 public record CancelPaymentResult(
         String orderCode,
-        PaymentStatus status,
-        String message
+        PaymentStatus status
 ) {
     public static CancelPaymentResult success(String orderCode) {
-        return new CancelPaymentResult(orderCode, PaymentStatus.CANCELLED, "payment.order.cancel_success");
+        return new CancelPaymentResult(orderCode, PaymentStatus.CANCELLED);
     }
 }

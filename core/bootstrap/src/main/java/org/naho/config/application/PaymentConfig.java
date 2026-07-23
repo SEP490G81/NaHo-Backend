@@ -32,13 +32,19 @@ public class PaymentConfig {
                         PaymentGatewayResolver gatewayResolver,
                         PaymentOrderCodeGenerator orderCodeGenerator,
                         PlatformTransactionManager transactionManager) {
+
+                // 1. Tạo instance UseCase thuần Java (POJO)
                 CreatePaymentUseCase target = new CreatePaymentUseCase(
                                 planRepositoryPort,
                                 paymentOrderRepositoryPort,
                                 userSubscriptionRepositoryPort,
                                 gatewayResolver,
                                 orderCodeGenerator);
+
+                // 2. Khởi tạo bộ quản lý Transaction của Spring
                 TransactionTemplate template = new TransactionTemplate(transactionManager);
+
+                // 3. Trả về Lambda bọc UseCase trong Transaction
                 return command -> template.execute(status -> target.createPayment(command));
         }
 

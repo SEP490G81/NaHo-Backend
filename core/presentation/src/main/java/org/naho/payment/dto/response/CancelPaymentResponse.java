@@ -12,5 +12,4 @@ import lombok.Setter;
 public class CancelPaymentResponse {
     private String orderCode;
     private String status;
-    private String message;
 }
