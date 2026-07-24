@@ -10,16 +10,7 @@ public class UserDailyAttendanceResultMapper {
                 .userId(domain.getUserId())
                 .dailyRewardId(domain.getDailyRewardId())
                 .attendanceDate(domain.getAttendanceDate())
-                .build();
-    }
-
-    public UserDailyAttendanceResult domainToResult(UserDailyAttendance domain, Integer earnedPoint) {
-        return UserDailyAttendanceResult.builder()
-                .id(domain.getId())
-                .userId(domain.getUserId())
-                .dailyRewardId(domain.getDailyRewardId())
-                .attendanceDate(domain.getAttendanceDate())
-                .earnedPoint(earnedPoint)
+                .earnedPoint(domain.getEarnedPoint())
                 .build();
     }
 }

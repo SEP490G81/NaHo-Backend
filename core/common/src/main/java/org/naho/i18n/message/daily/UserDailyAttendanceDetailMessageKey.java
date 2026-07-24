@@ -13,6 +13,8 @@ public final class UserDailyAttendanceDetailMessageKey {
             "user.daily.attendance.already.exists";
     public static final String USER_DAILY_ATTENDANCE_NOT_FOUND =
             "user.daily.attendance.not.found";
+    public static final String USER_DAILY_ATTENDANCE_GET_CURRENT_MONTH_SUCCESS =
+            "user.daily.attendance.get.current.month.success";
 
     private UserDailyAttendanceDetailMessageKey() {
     }

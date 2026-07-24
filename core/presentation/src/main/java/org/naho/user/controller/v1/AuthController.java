@@ -8,7 +8,6 @@ import org.naho.user.command.CredentialsLoginCommand;
 import org.naho.user.command.LogoutCommand;
 import org.naho.user.constant.TokenType;
 import org.naho.user.dto.mapper.LoginRequestMapper;
-import org.naho.user.dto.mapper.UserResponseMapper;
 import org.naho.user.dto.request.CredentialsLoginRequest;
 import org.naho.user.helper.CookieFactory;
 import org.naho.user.helper.LoginRequestResolver;
@@ -28,7 +27,6 @@ public class AuthController {
     private final AuthInputPort authInputPort;
     private final LoginRequestMapper loginRequestMapper;
     private final CookieFactory cookieFactory;
-    private final UserResponseMapper userResponseMapper;
     private final LoginRequestResolver loginRequestResolver;
 
     @ApiResponseMessage(message = UserDetailMessageKey.USER_LOGIN_SUCCESSFULLY)

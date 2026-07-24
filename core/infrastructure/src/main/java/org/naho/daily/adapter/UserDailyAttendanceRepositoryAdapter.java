@@ -9,6 +9,7 @@ import org.naho.daily.repository.UserDailyAttendanceJpaRepository;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -35,5 +36,14 @@ public class UserDailyAttendanceRepositoryAdapter implements UserDailyAttendance
     @Override
     public boolean existsByUser_IdAndAttendanceDate(Long userId, LocalDate attendanceDate) {
         return userDailyAttendanceJpaRepository.existsByUser_IdAndAttendanceDate(userId, attendanceDate);
+    }
+
+    @Override
+    public List<UserDailyAttendance> findAllByUser_IdAndAttendanceDateBetween(Long userId, LocalDate attendanceDateAfter, LocalDate attendanceDateBefore) {
+        return userDailyAttendanceJpaRepository
+                .findAllByUser_IdAndAttendanceDateBetween(userId, attendanceDateAfter, attendanceDateBefore)
+                .stream()
+                .map(userDailyAttendanceEntityMapper::entityToDomain)
+                .toList();
     }
 }

@@ -20,6 +20,9 @@ import java.time.LocalDate;
 public class UserDailyAttendanceEntity extends BaseEntity {
     @Column(name = "attendance_date", nullable = false)
     LocalDate attendanceDate;
+
+    @Column(name = "earned_point", nullable = false)
+    Integer earnedPoint;
     
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
