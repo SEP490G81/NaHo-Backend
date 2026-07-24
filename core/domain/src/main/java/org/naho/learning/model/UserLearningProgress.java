@@ -25,23 +25,33 @@ public class UserLearningProgress {
         this.totalPoint = builder.totalPoint;
     }
 
-    private UserLearningProgress(Long farthestAvailableNodeId, Integer currentStreak, Integer longestStreak, Double totalPoint) {
+    private UserLearningProgress(
+            Long farthestAvailableNodeId,
+            Double farthestAvailableNodeGlobalOrderIndex,
+            Integer currentStreak,
+            Integer longestStreak,
+            Double totalPoint
+    ) {
         this.farthestAvailableNodeId = farthestAvailableNodeId;
+        this.farthestAvailableNodeGlobalOrderIndex = farthestAvailableNodeGlobalOrderIndex;
         this.currentStreak = currentStreak;
         this.longestStreak = longestStreak;
         this.totalPoint = totalPoint;
     }
 
-    public static UserLearningProgress init(Long farthestAvailableNodeId) {
-        return new UserLearningProgress(farthestAvailableNodeId, 0, 0, 0.0);
+    public static UserLearningProgress init(
+            Long farthestAvailableNodeId,
+            Double farthestAvailableNodeGlobalOrderIndex
+    ) {
+        return new UserLearningProgress(
+                farthestAvailableNodeId,
+                farthestAvailableNodeGlobalOrderIndex,
+                0,
+                0,
+                0.0
+        );
     }
-
-    public static UserLearningProgress init(Long farthestAvailableNodeId, Double farthestAvailableNodeGlobalOrderIndex) {
-        UserLearningProgress progress = new UserLearningProgress(farthestAvailableNodeId, 0, 0, 0.0);
-        progress.setFarthestAvailableNodeGlobalOrderIndex(farthestAvailableNodeGlobalOrderIndex);
-        return progress;
-    }
-
+    
     public static Builder builder() {
         return new Builder();
     }

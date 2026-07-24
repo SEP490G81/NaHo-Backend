@@ -14,6 +14,8 @@ public final class UserLearningProgressDetailMessageKey {
             "user_learning_progress.already_exists.by_user_id";
     public static final String USER_LEARNING_PROGRESS_STREAK_NULL =
             "user_learning_progress.streak.null";
+    public static final String USER_LEARNING_PROGRESS_INVALID =
+            "user_learning_progress.invalid";
 
     private UserLearningProgressDetailMessageKey() {
 

@@ -1,7 +1,8 @@
 package org.naho.chest.port.in;
 
 import org.naho.chest.command.OpenChestCommand;
+import org.naho.chest.result.OpenChestResult;
 
 public interface OpenChestInputPort {
-    void openChest(OpenChestCommand command);
+    OpenChestResult openChest(OpenChestCommand command);
 }

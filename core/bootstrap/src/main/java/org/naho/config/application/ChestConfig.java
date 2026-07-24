@@ -4,6 +4,7 @@ import org.naho.chest.mapper.ChestResultMapper;
 import org.naho.chest.port.in.OpenChestInputPort;
 import org.naho.chest.port.out.ChestRepositoryPort;
 import org.naho.chest.usecase.OpenChestUseCase;
+import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
 import org.naho.learning.port.in.UserLearningStreakInputPort;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
@@ -31,7 +32,8 @@ public class ChestConfig {
             TransactionPort transactionPort,
             LearningPathNodeRepositoryPort learningPathNodeRepositoryPort,
             UserNodeProgressRepositoryPort userNodeProgressRepositoryPort,
-            UserLearningStreakInputPort userLearningStreakInputPort
+            UserLearningStreakInputPort userLearningStreakInputPort,
+            CrudUserLearningProgressInputPort crudUserLearningProgressInputPort
     ) {
         return new OpenChestUseCase(
                 chestRepositoryPort,
@@ -41,7 +43,8 @@ public class ChestConfig {
                 transactionPort,
                 learningPathNodeRepositoryPort,
                 userNodeProgressRepositoryPort,
-                userLearningStreakInputPort
+                userLearningStreakInputPort,
+                crudUserLearningProgressInputPort
         );
     }
 }
