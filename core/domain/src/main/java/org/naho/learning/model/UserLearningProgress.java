@@ -36,6 +36,12 @@ public class UserLearningProgress {
         return new UserLearningProgress(farthestAvailableNodeId, 0, 0, 0.0);
     }
 
+    public static UserLearningProgress init(Long farthestAvailableNodeId, Double farthestAvailableNodeGlobalOrderIndex) {
+        UserLearningProgress progress = new UserLearningProgress(farthestAvailableNodeId, 0, 0, 0.0);
+        progress.setFarthestAvailableNodeGlobalOrderIndex(farthestAvailableNodeGlobalOrderIndex);
+        return progress;
+    }
+
     public static Builder builder() {
         return new Builder();
     }

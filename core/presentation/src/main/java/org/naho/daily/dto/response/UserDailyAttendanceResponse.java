@@ -6,6 +6,7 @@ public record UserDailyAttendanceResponse(
         Long id,
         Long userId,
         Long dailyRewardId,
-        LocalDate attendanceDate
+        LocalDate attendanceDate,
+        Integer earnedPoint
 ) {
 }

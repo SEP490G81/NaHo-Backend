@@ -3,6 +3,7 @@ package org.naho.user.usecase;
 import org.naho.i18n.message.user.RoleDetailMessageKey;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.i18n.message.user.UserTitleMessageKey;
+import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.user.command.CredentialsLoginCommand;
@@ -37,6 +38,7 @@ public class AuthUseCase implements AuthInputPort {
     private final TransactionPort transactionPort;
     private final UserSessionServicePort userSessionServicePort;
     private final UserSessionEventPublisherPort userSessionEventPublisherPort;
+    private final CrudUserLearningProgressInputPort crudUserLearningProgressInputPort;
 
     public AuthUseCase(
             UserRepositoryPort userRepositoryPort,
@@ -46,7 +48,8 @@ public class AuthUseCase implements AuthInputPort {
             RoleRepositoryPort roleRepositoryPort,
             TransactionPort transactionPort,
             UserSessionServicePort userSessionServicePort,
-            UserSessionEventPublisherPort userSessionEventPublisherPort
+            UserSessionEventPublisherPort userSessionEventPublisherPort,
+            CrudUserLearningProgressInputPort crudUserLearningProgressInputPort
     ) {
         this.userRepositoryPort = userRepositoryPort;
         this.encoderPort = encoderPort;
@@ -56,6 +59,7 @@ public class AuthUseCase implements AuthInputPort {
         this.transactionPort = transactionPort;
         this.userSessionServicePort = userSessionServicePort;
         this.userSessionEventPublisherPort = userSessionEventPublisherPort;
+        this.crudUserLearningProgressInputPort = crudUserLearningProgressInputPort;
     }
 
     @Override
@@ -176,6 +180,9 @@ public class AuthUseCase implements AuthInputPort {
                         .build();
 
                 currentUser = userRepositoryPort.createNew(newUser, oAuthProvider);
+
+                // init user learning progress
+                crudUserLearningProgressInputPort.initUserLearningProgress(currentUser.getId());
             } else {
                 // if user is found by email, update OAuthProvider (link to Google)
                 currentUser = userRepositoryPort.save(emailUser, oAuthProvider);

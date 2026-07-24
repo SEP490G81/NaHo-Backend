@@ -10,4 +10,6 @@ public interface UserLearningProgressRepositoryPort {
     UserLearningProgress save(UserLearningProgress userLearningProgress);
 
     UserLearningProgress createNew(UserLearningProgress userLearningProgress, Long userId);
+
+    boolean existsByUserId(Long userId);
 }

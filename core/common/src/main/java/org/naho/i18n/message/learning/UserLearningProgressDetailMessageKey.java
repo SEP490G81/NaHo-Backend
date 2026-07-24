@@ -10,6 +10,8 @@ public final class UserLearningProgressDetailMessageKey {
             "user_learning_progress.get.success";
     public static final String USER_LEARNING_PROGRESS_NOT_FOUND_BY_USER_ID =
             "user_learning_progress.not_found.by_user_id";
+    public static final String USER_LEARNING_PROGRESS_ALREADY_EXISTS_BY_USER_ID =
+            "user_learning_progress.already_exists.by_user_id";
     public static final String USER_LEARNING_PROGRESS_STREAK_NULL =
             "user_learning_progress.streak.null";
 

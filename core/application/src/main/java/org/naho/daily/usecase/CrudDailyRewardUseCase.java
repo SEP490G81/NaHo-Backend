@@ -195,6 +195,6 @@ public class CrudDailyRewardUseCase implements CrudDailyRewardInputPort {
         UserDailyAttendance savedUserDailyAttendance =
                 userDailyAttendanceRepositoryPort.save(userDailyAttendance);
 
-        return userDailyAttendanceResultMapper.domainToResult(savedUserDailyAttendance);
+        return userDailyAttendanceResultMapper.domainToResult(savedUserDailyAttendance, (int) earnedPoint);
     }
 }

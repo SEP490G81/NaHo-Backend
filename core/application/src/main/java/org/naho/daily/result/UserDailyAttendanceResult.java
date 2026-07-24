@@ -6,7 +6,8 @@ public record UserDailyAttendanceResult(
         Long id,
         Long userId,
         Long dailyRewardId,
-        LocalDate attendanceDate
+        LocalDate attendanceDate,
+        Integer earnedPoint
 ) {
 
     public static Builder builder() {
@@ -18,6 +19,7 @@ public record UserDailyAttendanceResult(
         private Long userId;
         private Long dailyRewardId;
         private LocalDate attendanceDate;
+        private Integer earnedPoint;
 
         public Builder id(Long id) {
             this.id = id;
@@ -39,12 +41,18 @@ public record UserDailyAttendanceResult(
             return this;
         }
 
+        public Builder earnedPoint(Integer earnedPoint) {
+            this.earnedPoint = earnedPoint;
+            return this;
+        }
+
         public UserDailyAttendanceResult build() {
             return new UserDailyAttendanceResult(
                     id,
                     userId,
                     dailyRewardId,
-                    attendanceDate
+                    attendanceDate,
+                    earnedPoint
             );
         }
     }

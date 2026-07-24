@@ -8,6 +8,7 @@ import org.naho.daily.port.in.CrudDailyRewardInputPort;
 import org.naho.daily.port.out.DailyRewardRepositoryPort;
 import org.naho.daily.port.out.UserDailyAttendanceRepositoryPort;
 import org.naho.daily.usecase.CrudDailyRewardUseCase;
+import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
 import org.naho.point.port.in.CrudPointHistoryInputPort;
 import org.naho.shared.port.out.TransactionPort;
@@ -42,6 +43,7 @@ public class DailyRewardConfig {
             UserDailyAttendanceRepositoryPort userDailyAttendanceRepositoryPort,
             UserDailyAttendanceResultMapper userDailyAttendanceResultMapper,
             CrudPointHistoryInputPort crudPointHistoryInputPort,
+            CrudUserLearningProgressInputPort crudUserLearningProgressInputPort,
             TransactionPort transactionPort
     ) {
         return new CrudDailyRewardUseCase(
@@ -52,6 +54,7 @@ public class DailyRewardConfig {
                 userDailyAttendanceRepositoryPort,
                 userDailyAttendanceResultMapper,
                 crudPointHistoryInputPort,
+                crudUserLearningProgressInputPort,
                 transactionPort
         );
     }
