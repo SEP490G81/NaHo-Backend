@@ -1,7 +1,8 @@
 package org.naho.speech.llm.port.out;
 
+import org.naho.pagination.PageData;
 import org.naho.speech.llm.command.SpeakingHistoryFilterCommand;
-import org.naho.speech.llm.result.SpeakingHistoryListResult;
+import org.naho.speech.llm.result.SpeakingHistoryListItemResult;
 import org.naho.speech.model.AnswerHistory;
 import org.naho.speech.model.ContentAssessment;
 import org.naho.speech.model.SpeechAssessment;
@@ -25,5 +26,5 @@ public interface AnswerHistoryRepositoryPort {
 
     Optional<ContentAssessment> findContentAssessmentByAnswerHistoryId(Long answerHistoryId);
 
-    SpeakingHistoryListResult findUserAnswerHistories(SpeakingHistoryFilterCommand command);
+    PageData<SpeakingHistoryListItemResult> findUserAnswerHistories(SpeakingHistoryFilterCommand command);
 }

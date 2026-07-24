@@ -68,7 +68,7 @@ public class GetLearningPathNodeDetailUseCase implements GetLearningPathNodeDeta
                             SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_NOT_FOUND,
                             node.getSpeakingQuestionId())
                     );
-            
+
             var vocabList = sq.getVocabularies() == null ? List.<VocabularyDetailResult>of() : sq.getVocabularies().stream()
                     .map(v -> new VocabularyDetailResult(
                             v.getId(),

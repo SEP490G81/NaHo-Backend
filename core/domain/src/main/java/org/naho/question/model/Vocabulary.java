@@ -7,6 +7,7 @@ public class Vocabulary {
     private final String vietnameseMeaningText;
     private final String englishMeaningText;
     private final Long questionId;
+
     private Vocabulary(Builder builder) {
         this.id = builder.id;
         this.kana = builder.kana;
@@ -20,12 +21,29 @@ public class Vocabulary {
         return new Builder();
     }
 
-    public Long getId() { return id; }
-    public String getKana() { return kana; }
-    public String getKanji() { return kanji; }
-    public String getVietnameseMeaningText() { return vietnameseMeaningText; }
-    public String getEnglishMeaningText() { return englishMeaningText; }
-    public Long getQuestionId() { return questionId; }
+    public Long getId() {
+        return id;
+    }
+
+    public String getKana() {
+        return kana;
+    }
+
+    public String getKanji() {
+        return kanji;
+    }
+
+    public String getVietnameseMeaningText() {
+        return vietnameseMeaningText;
+    }
+
+    public String getEnglishMeaningText() {
+        return englishMeaningText;
+    }
+
+    public Long getQuestionId() {
+        return questionId;
+    }
 
     public static class Builder {
         private Long id;
@@ -35,13 +53,38 @@ public class Vocabulary {
         private String englishMeaningText;
         private Long questionId;
 
-        public Builder id(Long id) { this.id = id; return this; }
-        public Builder kana(String kana) { this.kana = kana; return this; }
-        public Builder kanji(String kanji) { this.kanji = kanji; return this; }
-        public Builder vietnameseMeaningText(String v) { this.vietnameseMeaningText = v; return this; }
-        public Builder englishMeaningText(String e) { this.englishMeaningText = e; return this; }
-        public Builder questionId(Long questionId) { this.questionId = questionId; return this; }
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
 
-        public Vocabulary build() { return new Vocabulary(this); }
+        public Builder kana(String kana) {
+            this.kana = kana;
+            return this;
+        }
+
+        public Builder kanji(String kanji) {
+            this.kanji = kanji;
+            return this;
+        }
+
+        public Builder vietnameseMeaningText(String v) {
+            this.vietnameseMeaningText = v;
+            return this;
+        }
+
+        public Builder englishMeaningText(String e) {
+            this.englishMeaningText = e;
+            return this;
+        }
+
+        public Builder questionId(Long questionId) {
+            this.questionId = questionId;
+            return this;
+        }
+
+        public Vocabulary build() {
+            return new Vocabulary(this);
+        }
     }
 }

@@ -23,7 +23,9 @@ import org.naho.speech.azure.repository.WordAssessmentJpaRepository;
 import org.naho.speech.llm.command.SpeakingHistoryFilterCommand;
 import org.naho.speech.llm.port.out.AnswerHistoryRepositoryPort;
 import org.naho.speech.llm.result.SpeakingHistoryListItemResult;
-import org.naho.speech.llm.result.SpeakingHistoryListResult;
+import org.naho.pagination.PageData;
+import org.naho.pagination.PageMeta;
+import org.naho.point.constant.CloudFrontProperties;
 import org.naho.speech.model.AnswerHistory;
 import org.naho.speech.model.ContentAssessment;
 import org.naho.speech.model.SpeechAssessment;
@@ -198,7 +200,7 @@ public class AnswerHistoryRepositoryAdapter implements AnswerHistoryRepositoryPo
     }
 
     @Override
-    public SpeakingHistoryListResult findUserAnswerHistories(SpeakingHistoryFilterCommand command) {
+    public org.naho.pagination.PageData<SpeakingHistoryListItemResult> findUserAnswerHistories(SpeakingHistoryFilterCommand command) {
         Long userId = command != null ? command.userId() : null;
         Long questionId = command != null ? command.speakingQuestionId() : null;
         Long topicId = command != null ? command.topicId() : null;
@@ -261,12 +263,16 @@ public class AnswerHistoryRepositoryAdapter implements AnswerHistoryRepositoryPo
             );
         }).toList();
 
-        return new SpeakingHistoryListResult(
-                items,
-                entityPage.getNumber() + 1,
-                entityPage.getSize(),
-                entityPage.getTotalPages(),
-                entityPage.getTotalElements()
-        );
+        return org.naho.pagination.PageData.<SpeakingHistoryListItemResult>builder()
+                .pageMeta(org.naho.pagination.PageMeta.builder()
+                        .currentPage(entityPage.getNumber())
+                        .pageSize(entityPage.getSize())
+                        .totalPages(entityPage.getTotalPages())
+                        .totalElements(entityPage.getTotalElements())
+                        .hasNext(entityPage.hasNext())
+                        .hasPrevious(entityPage.hasPrevious())
+                        .build())
+                .data(items)
+                .build();
     }
 }

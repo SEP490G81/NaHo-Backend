@@ -17,10 +17,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+import org.naho.pagination.PageData;
 import org.naho.speech.llm.command.SpeakingHistoryFilterCommand;
 import org.naho.speech.llm.dto.request.SpeakingHistoryFilterRequest;
 import org.naho.speech.llm.dto.response.SpeakingHistoryListItemResponse;
-import org.springframework.data.domain.Page;
+import org.naho.speech.llm.result.SpeakingHistoryListItemResult;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -58,9 +59,9 @@ public class SpeakingAnalysisController {
         return ResponseEntity.status(HttpStatus.CREATED).body(speakingAnalysisMapper.toResponse(result));
     }
 
-    @GetMapping(value = "/history", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/histories", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponseMessage(message = "Lấy danh sách lịch sử làm bài thành công!")
-    public ResponseEntity<Page<SpeakingHistoryListItemResponse>> getUserHistoryList(
+    public ResponseEntity<PageData<SpeakingHistoryListItemResponse>> getUserHistoryList(
             @ModelAttribute SpeakingHistoryFilterRequest filter,
             @PageableDefault(page = 0, size = 10, sort = "createdTime", direction = Sort.Direction.DESC) Pageable pageable,
             @AuthenticationPrincipal AccessTokenPayload payload
@@ -70,17 +71,24 @@ public class SpeakingAnalysisController {
                 filter != null ? filter.speakingQuestionId() : null,
                 filter != null ? filter.topicId() : null,
                 filter != null ? filter.search() : null,
-                pageable.getPageNumber() + 1,
+                pageable.getPageNumber(),
                 pageable.getPageSize()
         );
-        var resultList = speakingAnalysisInputPort.getUserHistoryList(command);
-        var responseItems = resultList.items().stream()
-                .map(speakingAnalysisMapper::toListItemResponse)
-                .toList();
-        return ResponseEntity.ok(new org.springframework.data.domain.PageImpl<>(responseItems, pageable, resultList.totalElements()));
+        PageData<SpeakingHistoryListItemResult> result = speakingAnalysisInputPort.getUserHistoryList(command);
+
+        PageData<SpeakingHistoryListItemResponse> response = PageData.<SpeakingHistoryListItemResponse>builder()
+                .pageMeta(result.getPageMeta())
+                .data(result.getData()
+                        .stream()
+                        .map(speakingAnalysisMapper::toListItemResponse)
+                        .toList()
+                )
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping(value = "/history/{historyId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/histories/{historyId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponseMessage(message = "Lấy chi tiết lịch sử thành công!")
     public ResponseEntity<SpeakingHistoryDetailResponse> getSpeakingHistoryDetail(
             @PathVariable("historyId") Long historyId

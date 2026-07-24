@@ -22,14 +22,14 @@ public class SearchVocabulariesOfQuestionUsecase implements SearchVocabulariesOf
 
     @Override
     public VocabulariesOfQuestionResult getVocabularyListOfQuestion(LearningPathNodeCommand learningPathNodeCommand) {
-         List<Vocabulary> listVocabulary =  vocabularyPort.findVocabularyList(learningPathNodeCommand.vocabulary_question_id());
-         if(listVocabulary.isEmpty()){
-              throw new ApplicationException(
-                      VocabularyErrorCode.VOCABULARY_NOT_FOUND,
-                      VocabularyQuestionDetailMessageKey.VOCABULARY_NOT_FOUND,
-                      learningPathNodeCommand.vocabulary_question_id()
-              );
-         }
+        List<Vocabulary> listVocabulary = vocabularyPort.findVocabularyList(learningPathNodeCommand.vocabulary_question_id());
+        if (listVocabulary.isEmpty()) {
+            throw new ApplicationException(
+                    VocabularyErrorCode.VOCABULARY_NOT_FOUND,
+                    VocabularyQuestionDetailMessageKey.VOCABULARY_NOT_FOUND,
+                    learningPathNodeCommand.vocabulary_question_id()
+            );
+        }
         List<VocabulariesOfQuestionResult.VocabularyDetailResult> vocabularyDetailResultList = listVocabulary.stream().map(
                 vocab -> new VocabulariesOfQuestionResult.VocabularyDetailResult(
                         vocab.getId(),
@@ -39,11 +39,11 @@ public class SearchVocabulariesOfQuestionUsecase implements SearchVocabulariesOf
                         vocab.getEnglishMeaningText()
                 )
         ).toList();
-         VocabulariesOfQuestionResult result = new VocabulariesOfQuestionResult(
-                 learningPathNodeCommand.id(),
-                 learningPathNodeCommand.vocabulary_question_id(),
-                 vocabularyDetailResultList
-         );
+        VocabulariesOfQuestionResult result = new VocabulariesOfQuestionResult(
+                learningPathNodeCommand.id(),
+                learningPathNodeCommand.vocabulary_question_id(),
+                vocabularyDetailResultList
+        );
         return result;
     }
 }

@@ -1,20 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="100%" height="100%">
-  <defs>
-    <clipPath id="shield-clip">
-      <path d="M 37 20 L 83 20 C 95 20, 95 20, 95 32 L 95 65 C 95 95, 25 95, 25 65 L 25 32 C 25 20, 25 20, 37 20 Z" />
-    </clipPath>
-    <linearGradient id="silver-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#E8F1F6" />
-      <stop offset="100%" stop-color="#B1CAD9" />
-    </linearGradient>
-  </defs>
+    <defs>
+        <clipPath id="shield-clip">
+            <path d="M 37 20 L 83 20 C 95 20, 95 20, 95 32 L 95 65 C 95 95, 25 95, 25 65 L 25 32 C 25 20, 25 20, 37 20 Z"/>
+        </clipPath>
+        <linearGradient id="silver-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#E8F1F6"/>
+            <stop offset="100%" stop-color="#B1CAD9"/>
+        </linearGradient>
+    </defs>
 
-  <!-- 3D Base -->
-  <path d="M 37 20 L 83 20 C 95 20, 95 20, 95 32 L 95 65 C 95 95, 25 95, 25 65 L 25 32 C 25 20, 25 20, 37 20 Z" fill="#9BB2C4" transform="translate(0, 8)" />
+    <!-- 3D Base -->
+    <path d="M 37 20 L 83 20 C 95 20, 95 20, 95 32 L 95 65 C 95 95, 25 95, 25 65 L 25 32 C 25 20, 25 20, 37 20 Z"
+          fill="#9BB2C4" transform="translate(0, 8)"/>
 
-  <!-- Front Face and Highlight -->
-  <g>
-    <path d="M 37 20 L 83 20 C 95 20, 95 20, 95 32 L 95 65 C 95 95, 25 95, 25 65 L 25 32 C 25 20, 25 20, 37 20 Z" fill="url(#silver-grad)" />
-    <path d="M 0 0 L 62 0 L 42 120 L 0 120 Z" fill="#FFFFFF" opacity="0.20" clip-path="url(#shield-clip)" />
-  </g>
+    <!-- Front Face and Highlight -->
+    <g>
+        <path d="M 37 20 L 83 20 C 95 20, 95 20, 95 32 L 95 65 C 95 95, 25 95, 25 65 L 25 32 C 25 20, 25 20, 37 20 Z"
+              fill="url(#silver-grad)"/>
+        <path d="M 0 0 L 62 0 L 42 120 L 0 120 Z" fill="#FFFFFF" opacity="0.20" clip-path="url(#shield-clip)"/>
+    </g>
 </svg>

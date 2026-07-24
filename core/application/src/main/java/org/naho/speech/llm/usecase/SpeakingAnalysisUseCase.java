@@ -33,12 +33,12 @@ import org.naho.speech.azure.port.out.AzureSpeechServicePort;
 import org.naho.speech.llm.command.SpeakingAnalysisCommand;
 import org.naho.speech.llm.command.SpeakingHistoryFilterCommand;
 import org.naho.speech.llm.port.in.SpeakingAnalysisInputPort;
+import org.naho.pagination.PageData;
 import org.naho.speech.llm.port.out.AiAnalysisPort;
 import org.naho.speech.llm.port.out.AnswerHistoryRepositoryPort;
 import org.naho.speech.llm.result.SpeakingAnalysisResult;
 import org.naho.speech.llm.result.SpeakingHistoryDetailResult;
 import org.naho.speech.llm.result.SpeakingHistoryListItemResult;
-import org.naho.speech.llm.result.SpeakingHistoryListResult;
 import org.naho.speech.model.AnswerHistory;
 import org.naho.speech.model.ContentAssessment;
 import org.naho.speech.model.SpeechAssessment;
@@ -427,7 +427,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
 
         org.naho.file.model.File audioFile = fileRepositoryPort.findById(uploadResult.id());
         String audioUrl = audioFile != null ? audioFile.getObjectKey() : null;
-        
+
         return new SpeakingAnalysisResult(answerHistory.getId(), overallScore, audioUrl);
     }
 
@@ -638,7 +638,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     }
 
     @Override
-    public SpeakingHistoryListResult getUserHistoryList(SpeakingHistoryFilterCommand command) {
+    public org.naho.pagination.PageData<SpeakingHistoryListItemResult> getUserHistoryList(SpeakingHistoryFilterCommand command) {
         return answerHistoryRepositoryPort.findUserAnswerHistories(command);
     }
 
