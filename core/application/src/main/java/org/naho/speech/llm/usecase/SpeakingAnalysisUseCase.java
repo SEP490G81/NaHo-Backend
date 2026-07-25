@@ -63,6 +63,7 @@ import java.util.Map;
 
 public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
 
+    public static final String RECORDS_FORDER_NAME = "recordings";
     private final UserRepositoryPort userRepositoryPort;
     private final SpeakingQuestionRepositoryPort speakingQuestionRepositoryPort;
     private final FileStorageInputPort fileStorageInputPort;
@@ -116,8 +117,6 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         this.completeSpeakingQuestionInputPort = completeSpeakingQuestionInputPort;
         this.userLearningProgressRepositoryPort = userLearningProgressRepositoryPort;
     }
-
-    public static final String RECORDS_FORDER_NAME = "recordings";
 
     @Override
     public SpeakingAnalysisResult analyzeSpeaking(SpeakingAnalysisCommand command) {

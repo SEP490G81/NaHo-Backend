@@ -9,5 +9,6 @@ public final class PaymentDetailMessageKey {
     public static final String PAYMENT_INVALID_STATE = "payment.invalid.state";
     public static final String PAYMENT_DUPLICATE_TXN = "payment.duplicate.txn";
 
-    private PaymentDetailMessageKey() {}
+    private PaymentDetailMessageKey() {
+    }
 }

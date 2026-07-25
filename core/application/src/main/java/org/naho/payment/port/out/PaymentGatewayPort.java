@@ -8,23 +8,23 @@ import java.time.Instant;
 import java.util.Map;
 
 public interface PaymentGatewayPort {
-        PaymentProvider supportedProvider();
+    PaymentProvider supportedProvider();
 
-        PaymentInitializationResult initialize(
-                        PaymentOrder paymentOrder,
-                        PaymentCustomerContext customerContext);
+    PaymentInitializationResult initialize(
+            PaymentOrder paymentOrder,
+            PaymentCustomerContext customerContext);
 
-        boolean verifySignature(Map<String, String> fields, String secureHash);
+    boolean verifySignature(Map<String, String> fields, String secureHash);
 
-        record PaymentInitializationResult(
-                        URI paymentUrl,
-                        Instant expiresTime,
-                        Map<String, String> metadata) {
-        }
+    record PaymentInitializationResult(
+            URI paymentUrl,
+            Instant expiresTime,
+            Map<String, String> metadata) {
+    }
 
-        record PaymentCustomerContext(
-                        Long userId,
-                        String clientIp,
-                        String locale) {
-        }
+    record PaymentCustomerContext(
+            Long userId,
+            String clientIp,
+            String locale) {
+    }
 }

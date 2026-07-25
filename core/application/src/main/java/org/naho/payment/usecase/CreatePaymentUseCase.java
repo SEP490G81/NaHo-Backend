@@ -3,7 +3,10 @@ package org.naho.payment.usecase;
 import org.naho.payment.command.CreatePaymentCommand;
 import org.naho.payment.model.PaymentOrder;
 import org.naho.payment.port.in.CreatePaymentInputPort;
-import org.naho.payment.port.out.*;
+import org.naho.payment.port.out.PaymentGatewayPort;
+import org.naho.payment.port.out.PaymentGatewayResolver;
+import org.naho.payment.port.out.PaymentOrderCodeGenerator;
+import org.naho.payment.port.out.PaymentOrderRepositoryPort;
 import org.naho.payment.result.CreatePaymentResult;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.subscription.exception.SubscriptionErrorCode;
@@ -61,13 +64,13 @@ public class CreatePaymentUseCase implements CreatePaymentInputPort {
         subscriptionRepositoryPort.findActiveByUserId(command.userId(), now).flatMap
                 (activeSub -> planRepositoryPort.findById(activeSub.getSubscriptionPlanId())).ifPresent
                 (activePlan -> {
-            if (activePlan.getTier()
-                    .isHigherOrEqualThan(plan.getTier())) {
-                throw new ApplicationException(
-                        SubscriptionErrorCode.ALREADY_ACTIVE_HIGHER_OR_EQUAL_PLAN,
-                        "subscription.plan.already_active_or_higher");
-            }
-        });
+                    if (activePlan.getTier()
+                            .isHigherOrEqualThan(plan.getTier())) {
+                        throw new ApplicationException(
+                                SubscriptionErrorCode.ALREADY_ACTIVE_HIGHER_OR_EQUAL_PLAN,
+                                "subscription.plan.already_active_or_higher");
+                    }
+                });
 
         String orderCode = orderCodeGenerator.generate();
 

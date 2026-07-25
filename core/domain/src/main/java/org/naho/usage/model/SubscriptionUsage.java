@@ -6,7 +6,6 @@ import org.naho.subscription.model.UsageQuota;
 import org.naho.usage.exception.UsageDomainErrorCode;
 
 import java.time.Instant;
-import java.util.Objects;
 
 public class SubscriptionUsage {
     private final Long id;
@@ -102,17 +101,49 @@ public class SubscriptionUsage {
     }
 
     // Getters
-    public Long getId() { return id; }
-    public Long getSubscriptionId() { return subscriptionId; }
-    public Long getUserId() { return userId; }
-    public Instant getPeriodStart() { return periodStart; }
-    public Instant getPeriodEnd() { return periodEnd; }
-    public int getAssessmentAttemptsUsed() { return assessmentAttemptsUsed; }
-    public long getAssessmentAudioSecondsUsed() { return assessmentAudioSecondsUsed; }
-    public long getConversationSecondsUsed() { return conversationSecondsUsed; }
-    public int getConversationSessionsUsed() { return conversationSessionsUsed; }
-    public int getConversationTurnsUsed() { return conversationTurnsUsed; }
-    public long getVersion() { return version; }
+    public Long getId() {
+        return id;
+    }
+
+    public Long getSubscriptionId() {
+        return subscriptionId;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public Instant getPeriodStart() {
+        return periodStart;
+    }
+
+    public Instant getPeriodEnd() {
+        return periodEnd;
+    }
+
+    public int getAssessmentAttemptsUsed() {
+        return assessmentAttemptsUsed;
+    }
+
+    public long getAssessmentAudioSecondsUsed() {
+        return assessmentAudioSecondsUsed;
+    }
+
+    public long getConversationSecondsUsed() {
+        return conversationSecondsUsed;
+    }
+
+    public int getConversationSessionsUsed() {
+        return conversationSessionsUsed;
+    }
+
+    public int getConversationTurnsUsed() {
+        return conversationTurnsUsed;
+    }
+
+    public long getVersion() {
+        return version;
+    }
 
     public static final class Builder {
         private Long id;
@@ -127,19 +158,63 @@ public class SubscriptionUsage {
         private int conversationTurnsUsed;
         private long version;
 
-        private Builder() {}
+        private Builder() {
+        }
 
-        public Builder id(Long id) { this.id = id; return this; }
-        public Builder subscriptionId(Long subscriptionId) { this.subscriptionId = subscriptionId; return this; }
-        public Builder userId(Long userId) { this.userId = userId; return this; }
-        public Builder periodStart(Instant periodStart) { this.periodStart = periodStart; return this; }
-        public Builder periodEnd(Instant periodEnd) { this.periodEnd = periodEnd; return this; }
-        public Builder assessmentAttemptsUsed(int assessmentAttemptsUsed) { this.assessmentAttemptsUsed = assessmentAttemptsUsed; return this; }
-        public Builder assessmentAudioSecondsUsed(long assessmentAudioSecondsUsed) { this.assessmentAudioSecondsUsed = assessmentAudioSecondsUsed; return this; }
-        public Builder conversationSecondsUsed(long conversationSecondsUsed) { this.conversationSecondsUsed = conversationSecondsUsed; return this; }
-        public Builder conversationSessionsUsed(int conversationSessionsUsed) { this.conversationSessionsUsed = conversationSessionsUsed; return this; }
-        public Builder conversationTurnsUsed(int conversationTurnsUsed) { this.conversationTurnsUsed = conversationTurnsUsed; return this; }
-        public Builder version(long version) { this.version = version; return this; }
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder subscriptionId(Long subscriptionId) {
+            this.subscriptionId = subscriptionId;
+            return this;
+        }
+
+        public Builder userId(Long userId) {
+            this.userId = userId;
+            return this;
+        }
+
+        public Builder periodStart(Instant periodStart) {
+            this.periodStart = periodStart;
+            return this;
+        }
+
+        public Builder periodEnd(Instant periodEnd) {
+            this.periodEnd = periodEnd;
+            return this;
+        }
+
+        public Builder assessmentAttemptsUsed(int assessmentAttemptsUsed) {
+            this.assessmentAttemptsUsed = assessmentAttemptsUsed;
+            return this;
+        }
+
+        public Builder assessmentAudioSecondsUsed(long assessmentAudioSecondsUsed) {
+            this.assessmentAudioSecondsUsed = assessmentAudioSecondsUsed;
+            return this;
+        }
+
+        public Builder conversationSecondsUsed(long conversationSecondsUsed) {
+            this.conversationSecondsUsed = conversationSecondsUsed;
+            return this;
+        }
+
+        public Builder conversationSessionsUsed(int conversationSessionsUsed) {
+            this.conversationSessionsUsed = conversationSessionsUsed;
+            return this;
+        }
+
+        public Builder conversationTurnsUsed(int conversationTurnsUsed) {
+            this.conversationTurnsUsed = conversationTurnsUsed;
+            return this;
+        }
+
+        public Builder version(long version) {
+            this.version = version;
+            return this;
+        }
 
         public SubscriptionUsage build() {
             if (subscriptionId == null) {

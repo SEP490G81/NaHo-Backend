@@ -17,6 +17,7 @@ public interface SpeakingSessionInputPort {
     ChatResult sendMessage(SendMessageWithSessionCommand command);
 
     void sendMessageStream(SendMessageWithSessionCommand command, Consumer<String> onToken);
+
     StartConversationResult startConversationWithAISession(StartSpeakingConversationWithAICommand startSpeakingConversationWithAICommand);
 
     /**

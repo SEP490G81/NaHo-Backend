@@ -47,6 +47,13 @@ public class LearningPathNodeRepositoryAdapter implements LearningPathNodeReposi
     }
 
     @Override
+    public Optional<LearningPathNode> findByVocabularyQuestionId(Long vocabularyQuestionId) {
+        return learningPathNodeJpaRepository
+                .findByVocabularyQuestion_Id(vocabularyQuestionId)
+                .map(learningPathNodeEntityMapper::entityToDomain);
+    }
+
+    @Override
     public Optional<LearningPathNode> findBySpeakingQuestionId(Long speakingQuestionId) {
         return learningPathNodeJpaRepository
                 .findBySpeakingQuestion_Id(speakingQuestionId)

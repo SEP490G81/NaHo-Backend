@@ -72,7 +72,7 @@ public class RegisterUseCase implements RegisterInputPort {
 
         // init user learning progress
         crudUserLearningProgressInputPort.initUserLearningProgress(savedUser.getId());
-        
+
         return new RegisterResult(
                 savedUser.getId() != null ? savedUser.getId().toString() : "",
                 savedUser.getUsername().getValue(),

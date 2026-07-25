@@ -9,7 +9,6 @@ import org.naho.file.model.File;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.repository.FileJpaRepository;
 import org.naho.i18n.message.file.FileDetailMessageKey;
-import org.naho.question.entity.SpeakingQuestionEntity;
 import org.naho.shared.exception.InfrastructureException;
 import org.naho.social.entity.CommentEntity;
 import org.naho.social.report.entity.ReportEntity;

@@ -33,7 +33,7 @@ public class TopicConfig {
 
     @Bean
     public GetTopicDetailInputPort getTopicDetailInputPort(TopicRepositoryAdapter topicRepositoryAdapter,
-            LessonRepositoryAdapter lessonRepositoryAdapter) {
+                                                           LessonRepositoryAdapter lessonRepositoryAdapter) {
         return new GetTopicDetailUseCase(topicRepositoryAdapter, lessonRepositoryAdapter);
     }
 
@@ -44,8 +44,8 @@ public class TopicConfig {
 
     @Bean
     public DeleteTopicInputPort deleteTopicInputPort(TopicRepositoryAdapter topicRepositoryAdapter,
-            SpeakingQuestionRepositoryPort questionRepositoryPort,
-            TransactionPort transactionPort) {
+                                                     SpeakingQuestionRepositoryPort questionRepositoryPort,
+                                                     TransactionPort transactionPort) {
         return new DeleteTopicUseCase(topicRepositoryAdapter, questionRepositoryPort, transactionPort);
     }
 }

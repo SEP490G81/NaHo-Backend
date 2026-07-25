@@ -1,8 +1,8 @@
 package org.naho.subscription.model;
 
 import org.naho.i18n.message.subscription.SubscriptionDetailMessageKey;
-import org.naho.subscription.exception.SubscriptionDomainErrorCode;
 import org.naho.shared.exception.DomainException;
+import org.naho.subscription.exception.SubscriptionDomainErrorCode;
 
 public record UsageQuota(
         int monthlyAssessmentLimit,

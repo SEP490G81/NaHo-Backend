@@ -15,11 +15,11 @@ public class PaymentOrder {
     private final Long userId;
     private final Long subscriptionPlanId;
     private final Money amount;
+    private final Instant createdTime; // Thời gian tạo hóa đơn
+    private final Instant expiresTime; // Thời gian hết hạn thanh toán
     private PaymentProvider provider;
     private PaymentStatus status;
     private String providerTransactionId;
-    private final Instant createdTime; // Thời gian tạo hóa đơn
-    private final Instant expiresTime; // Thời gian hết hạn thanh toán
     private Instant paidTime; // Thời gian xác nhận đã thanh toán thành công
     private Instant modifiedTime;// Thời gian cập nhật hóa đơn
 

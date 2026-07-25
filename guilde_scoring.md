@@ -411,10 +411,23 @@ Người học N3/B1 có thể:
 {
   "rubric_name": "JLPT_N3_Speaking_Rubric",
   "criterion": "grammar | vocabulary | fluency | pronunciation | content",
-  "score": 1 | 2 | 3 | 4 | 5,
+  "score": 1
+  |
+  2
+  |
+  3
+  |
+  4
+  |
+  5,
   "cefr_level": "B1",
   "jlpt_level": "N3",
-  "source_references": ["JLPT_N3_spec", "CEFR_B1", "Shin_Kanzen_Master_N3", "OPI_interview"],
+  "source_references": [
+    "JLPT_N3_spec",
+    "CEFR_B1",
+    "Shin_Kanzen_Master_N3",
+    "OPI_interview"
+  ],
   "language": "vi",
   "document_type": "rubric"
 }

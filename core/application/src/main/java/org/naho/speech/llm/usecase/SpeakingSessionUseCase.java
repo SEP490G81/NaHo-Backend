@@ -1,7 +1,11 @@
 package org.naho.speech.llm.usecase;
 
+import org.naho.i18n.message.persona.PersonaDetailMessageKey;
+import org.naho.persona.exception.PersonaErrorCode;
 import org.naho.persona.model.Persona;
 import org.naho.persona.port.out.PersonaRepositoryPort;
+import org.naho.shared.exception.ApplicationException;
+import org.naho.speech.azure.port.out.TextToSpeechServicePort;
 import org.naho.speech.llm.command.SendAudioMessageCommand;
 import org.naho.speech.llm.command.SendMessageWithSessionCommand;
 import org.naho.speech.llm.command.StartSpeakingConversationWithAICommand;
@@ -11,12 +15,6 @@ import org.naho.speech.llm.port.out.AiChatPort;
 import org.naho.speech.llm.port.out.SessionStorePort;
 import org.naho.speech.llm.port.out.SpeechToTextPort;
 import org.naho.speech.llm.result.*;
-import org.naho.persona.port.out.PersonaRepositoryPort;
-import org.naho.persona.model.Persona;
-import org.naho.shared.exception.ApplicationException;
-import org.naho.persona.exception.PersonaErrorCode;
-import org.naho.i18n.message.persona.PersonaDetailMessageKey;
-import org.naho.speech.azure.port.out.TextToSpeechServicePort;
 
 import java.util.Base64;
 import java.util.List;

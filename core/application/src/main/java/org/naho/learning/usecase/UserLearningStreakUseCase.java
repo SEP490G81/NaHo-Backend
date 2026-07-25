@@ -11,7 +11,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 
 public class UserLearningStreakUseCase implements UserLearningStreakInputPort {
-    
+
     @Override
     public UserLearningProgress updateUserLearningStreak(UpdateUserStreakCommand command) {
         if (command.userId() == null) {

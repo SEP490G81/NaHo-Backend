@@ -7,10 +7,10 @@ import java.net.URI;
 import java.time.Instant;
 
 public record CreatePaymentResult(
-                Long paymentOrderId,
-                String orderCode,
-                Money amount,
-                PaymentStatus status,
-                URI paymentUrl,
-                Instant expiresTime) {
+        Long paymentOrderId,
+        String orderCode,
+        Money amount,
+        PaymentStatus status,
+        URI paymentUrl,
+        Instant expiresTime) {
 }

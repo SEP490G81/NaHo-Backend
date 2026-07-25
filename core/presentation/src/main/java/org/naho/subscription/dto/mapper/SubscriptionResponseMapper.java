@@ -12,6 +12,8 @@ import java.util.List;
 public interface SubscriptionResponseMapper {
 
     SubscriptionPlanResponse planResultToResponse(SubscriptionPlanResult result);
+
     List<SubscriptionPlanResponse> listPlanResultToResponse(List<SubscriptionPlanResult> results);
+
     UserSubscriptionResponse userSubResultToResponse(UserSubscriptionResult result);
 }
