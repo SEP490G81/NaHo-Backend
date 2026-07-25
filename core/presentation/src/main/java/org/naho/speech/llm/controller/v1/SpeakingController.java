@@ -2,6 +2,7 @@ package org.naho.speech.llm.controller.v1;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.naho.i18n.message.speech.SpeechDetailMessageKey;
 import org.naho.speech.llm.command.SendAudioMessageCommand;
 import org.naho.speech.llm.command.SendMessageWithSessionCommand;
 import org.naho.speech.llm.command.StartSpeakingConversationWithAICommand;
@@ -70,7 +71,7 @@ public class SpeakingController {
     // ─── Topics ─────────────────────────────────────────────────
 
     @GetMapping(value = "/topics", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiResponseMessage(message = "Get suggested topics successfully!")
+    @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_TOPICS_GET_SUCCESS)
     public ResponseEntity<SuggestedTopicsResponse> getTopics() {
         SuggestedTopicsResult result = suggestedTopicsInputPort.getSuggestedTopics();
         return ResponseEntity.ok(suggestedTopicsResponseMapper.resultToResponse(result));
@@ -83,7 +84,7 @@ public class SpeakingController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    @ApiResponseMessage(message = "Topic session started successfully!")
+    @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_TOPIC_SESSION_START_SUCCESS)
     public ResponseEntity<StartTopicResponse> startTopicSession(
             @Valid @RequestBody StartTopicRequest request
     ) {
@@ -96,7 +97,7 @@ public class SpeakingController {
             value = "/session/{personaId}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    @ApiResponseMessage(message = "Conversation started successfully!")
+    @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_CONVERSATION_START_SUCCESS)
     public ResponseEntity<StartConversationResponse> startConversationWithAISession(
             @PathVariable("personaId") int personaId
     ) {
@@ -112,7 +113,7 @@ public class SpeakingController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    @ApiResponseMessage(message = "Message sent successfully!")
+    @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_MESSAGE_SEND_SUCCESS)
     public ResponseEntity<ChatResponse> sendMessage(
             @PathVariable("sessionId") String sessionId,
             @Valid @RequestBody ChatSessionMessageRequest request
@@ -163,7 +164,7 @@ public class SpeakingController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    @ApiResponseMessage(message = "Audio message processed successfully!")
+    @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_AUDIO_MESSAGE_PROCESS_SUCCESS)
     public ResponseEntity<AudioChatResponse> sendAudioMessage(
             @PathVariable("sessionId") String sessionId,
             @RequestPart("file") MultipartFile file,
@@ -181,7 +182,7 @@ public class SpeakingController {
             consumes = {MediaType.APPLICATION_JSON_VALUE, "application/json;charset=UTF-8"},
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    @ApiResponseMessage(message = "Session ended and scored successfully!")
+    @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_SESSION_END_SUCCESS)
     public ResponseEntity<ScoringResponse> endSession(
             @PathVariable("sessionId") String sessionId,
             @RequestBody(required = false) EndSessionRequest req

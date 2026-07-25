@@ -27,13 +27,13 @@ public class TopicConfig {
     @Bean
     public ListTopicInputPort listTopicUseCasePort(
             TopicListRepositoryAdapter topicListRepositoryAdapter,
-            TopicResultMapper topicResultMapper
-    ) {
+            TopicResultMapper topicResultMapper) {
         return new ListTopicUseCase(topicListRepositoryAdapter, topicResultMapper);
     }
 
     @Bean
-    public GetTopicDetailInputPort getTopicDetailInputPort(TopicRepositoryAdapter topicRepositoryAdapter, LessonRepositoryAdapter lessonRepositoryAdapter) {
+    public GetTopicDetailInputPort getTopicDetailInputPort(TopicRepositoryAdapter topicRepositoryAdapter,
+            LessonRepositoryAdapter lessonRepositoryAdapter) {
         return new GetTopicDetailUseCase(topicRepositoryAdapter, lessonRepositoryAdapter);
     }
 
@@ -44,8 +44,8 @@ public class TopicConfig {
 
     @Bean
     public DeleteTopicInputPort deleteTopicInputPort(TopicRepositoryAdapter topicRepositoryAdapter,
-                                                     SpeakingQuestionRepositoryPort questionRepositoryPort,
-                                                     TransactionPort transactionPort) {
+            SpeakingQuestionRepositoryPort questionRepositoryPort,
+            TransactionPort transactionPort) {
         return new DeleteTopicUseCase(topicRepositoryAdapter, questionRepositoryPort, transactionPort);
     }
 }

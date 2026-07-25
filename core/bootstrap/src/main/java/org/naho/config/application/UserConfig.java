@@ -1,6 +1,7 @@
 package org.naho.config.application;
 
 import org.naho.file.port.in.CrudFileInputPort;
+import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.user.mapper.OAuthProviderResultMapper;
 import org.naho.user.mapper.RoleResultMapper;
@@ -34,48 +35,40 @@ public class UserConfig {
     public UserResultMapper userResultMapper(
             CrudRoleInputPort crudRoleInputPort,
             CrudOAuthProviderInputPort crudOAuthProviderInputPort,
-            CrudFileInputPort crudFileInputPort
-    ) {
+            CrudFileInputPort crudFileInputPort) {
         return new UserResultMapper(
                 crudRoleInputPort,
                 crudOAuthProviderInputPort,
-                crudFileInputPort
-        );
+                crudFileInputPort);
     }
 
     @Bean
     public CrudUserInputPort crudUserInputPort(
             UserRepositoryPort userRepositoryPort,
             UserResultMapper userResultMapper,
-            RoleRepositoryPort roleRepositoryPort
-    ) {
+            RoleRepositoryPort roleRepositoryPort) {
         return new CrudUserUseCase(
                 userRepositoryPort,
                 userResultMapper,
-                roleRepositoryPort
-        );
+                roleRepositoryPort);
     }
 
     @Bean
     public CrudRoleInputPort crudRoleInputPort(
             RoleRepositoryPort roleRepositoryPort,
-            RoleResultMapper roleResultMapper
-    ) {
+            RoleResultMapper roleResultMapper) {
         return new CrudRoleUseCase(
                 roleRepositoryPort,
-                roleResultMapper
-        );
+                roleResultMapper);
     }
 
     @Bean
     public CrudOAuthProviderInputPort crudOAuthProviderInputPort(
             OAuthProviderRepositoryPort oAuthProviderRepositoryPort,
-            OAuthProviderResultMapper oAuthProviderResultMapper
-    ) {
+            OAuthProviderResultMapper oAuthProviderResultMapper) {
         return new CrudOAuthProviderUseCase(
                 oAuthProviderRepositoryPort,
-                oAuthProviderResultMapper
-        );
+                oAuthProviderResultMapper);
     }
 
     @Bean
@@ -87,7 +80,8 @@ public class UserConfig {
             RoleRepositoryPort roleRepositoryPort,
             TransactionPort transactionPort,
             UserSessionServicePort userSessionServicePort,
-            UserSessionEventPublisherPort userSessionEventPublisherPort
+            UserSessionEventPublisherPort userSessionEventPublisherPort,
+            CrudUserLearningProgressInputPort crudUserLearningProgressInputPort
     ) {
         return new AuthUseCase(
                 userRepositoryPort,
@@ -97,7 +91,8 @@ public class UserConfig {
                 roleRepositoryPort,
                 transactionPort,
                 userSessionServicePort,
-                userSessionEventPublisherPort
+                userSessionEventPublisherPort,
+                crudUserLearningProgressInputPort
         );
     }
 
@@ -105,27 +100,30 @@ public class UserConfig {
     public RegisterInputPort registerInputPort(
             UserRepositoryPort userRepository,
             EncoderPort encoderPort,
-            RoleRepositoryPort roleRepository
+            RoleRepositoryPort roleRepository,
+            CrudUserLearningProgressInputPort crudUserLearningProgressInputPort
     ) {
-        return new RegisterUseCase(userRepository, encoderPort, roleRepository);
+        return new RegisterUseCase(
+                userRepository,
+                encoderPort,
+                roleRepository,
+                crudUserLearningProgressInputPort
+        );
     }
 
     @Bean
     public GetUserInputPort getUserInputPort(
             UserRepositoryPort userRepositoryPort,
-            UserResultMapper userResultMapper
-    ) {
+            UserResultMapper userResultMapper) {
         return new GetUserUseCase(userRepositoryPort, userResultMapper);
     }
 
     @Bean
     public UpdateUserInputPort updateUserInputPort(
             UserRepositoryPort userRepositoryPort,
-            UserResultMapper userResultMapper
-    ) {
+            UserResultMapper userResultMapper) {
         return new UpdateUserUseCase(
                 userRepositoryPort,
-                userResultMapper
-        );
+                userResultMapper);
     }
 }

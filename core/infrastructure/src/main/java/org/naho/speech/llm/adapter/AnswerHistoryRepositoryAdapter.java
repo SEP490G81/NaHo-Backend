@@ -25,17 +25,18 @@ import org.naho.speech.llm.port.out.AnswerHistoryRepositoryPort;
 import org.naho.speech.llm.result.SpeakingHistoryListItemResult;
 import org.naho.pagination.PageData;
 import org.naho.pagination.PageMeta;
-import org.naho.point.constant.CloudFrontProperties;
 import org.naho.speech.model.AnswerHistory;
 import org.naho.speech.model.ContentAssessment;
 import org.naho.speech.model.SpeechAssessment;
 import org.naho.speech.model.WordAssessment;
 import org.naho.user.entity.UserEntity;
 import org.naho.user.repository.UserJpaRepository;
+import org.naho.question.specification.AnswerHistorySpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -200,17 +201,31 @@ public class AnswerHistoryRepositoryAdapter implements AnswerHistoryRepositoryPo
     }
 
     @Override
-    public org.naho.pagination.PageData<SpeakingHistoryListItemResult> findUserAnswerHistories(SpeakingHistoryFilterCommand command) {
+    public PageData<SpeakingHistoryListItemResult> findUserAnswerHistories(SpeakingHistoryFilterCommand command) {
         Long userId = command != null ? command.userId() : null;
         Long questionId = command != null ? command.speakingQuestionId() : null;
         Long topicId = command != null ? command.topicId() : null;
         String search = command != null ? command.search() : null;
 
-        int pageNumber = (command != null && command.page() > 0) ? command.page() - 1 : 0;
-        int pageSize = (command != null && command.size() > 0) ? command.size() : 10;
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "createdTime"));
+        int pageNumber = command != null && command.page() != null && command.page() >= 0 ? command.page() : 0;
+        int pageSize = command != null && command.size() != null && command.size() > 0 ? command.size() : 10;
+        Sort.Direction direction = (command != null && command.sortDirection() != null)
+                ? Sort.Direction.valueOf(command.sortDirection().name())
+                : Sort.Direction.DESC;
+        String sortCol = (command != null && command.sortColumn() != null)
+                ? command.sortColumn().getColumnName()
+                : "createdTime";
 
-        Page<AnswerHistoryEntity> entityPage = answerHistoryJpaRepository.findByUserIdAndFilters(userId, questionId, topicId, search, pageable);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(direction, sortCol));
+
+        Specification<AnswerHistoryEntity> specification = Specification.allOf(
+                AnswerHistorySpecification.hasUserId(userId),
+                AnswerHistorySpecification.hasSpeakingQuestionId(questionId),
+                AnswerHistorySpecification.hasTopicId(topicId),
+                AnswerHistorySpecification.searchByTitle(search)
+        );
+
+        Page<AnswerHistoryEntity> entityPage = answerHistoryJpaRepository.findAll(specification, pageable);
 
         List<SpeakingHistoryListItemResult> items = entityPage.getContent().stream().map(entity -> {
             SpeakingQuestionEntity sq = entity.getSpeakingQuestion();
@@ -263,8 +278,8 @@ public class AnswerHistoryRepositoryAdapter implements AnswerHistoryRepositoryPo
             );
         }).toList();
 
-        return org.naho.pagination.PageData.<SpeakingHistoryListItemResult>builder()
-                .pageMeta(org.naho.pagination.PageMeta.builder()
+        return PageData.<SpeakingHistoryListItemResult>builder()
+                .pageMeta(PageMeta.builder()
                         .currentPage(entityPage.getNumber())
                         .pageSize(entityPage.getSize())
                         .totalPages(entityPage.getTotalPages())

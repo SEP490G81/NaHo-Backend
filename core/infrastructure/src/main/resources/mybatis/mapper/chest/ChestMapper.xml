@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.naho.chest.mybatis.ChestQueryMapper">
+    <resultMap id="ChestEntityResultMap" type="org.naho.chest.entity.ChestEntity">
+        <id property="id" column="id"/>
+        <result property="chestType" column="chest_type"/>
+        <result property="description" column="description"/>
+        <result property="minPoint" column="min_point"/>
+        <result property="maxPoint" column="max_point"/>
+    </resultMap>
+
+    <select id="findByDailyRewardId" resultMap="ChestEntityResultMap">
+        select c.id,
+               c.chest_type,
+               c.description,
+               c.min_point,
+               c.max_point
+        from chests c
+                 join daily_rewards dr on c.id = dr.chest_id
+        where dr.id = #{dailyRewardId}
+    </select>
+</mapper>

@@ -1,53 +1,48 @@
 package org.naho.question.usecase;
 
-import org.naho.i18n.message.learning.LearningPathNodeDetailMessageKey;
-import org.naho.i18n.message.learning.UserLearningProgressDetailMessageKey;
+import org.naho.learning.command.UpdateFarthestAvailableNodeCommand;
 import org.naho.learning.command.UpdateUserStreakCommand;
-import org.naho.learning.exception.LearningPathNodeErrorCode;
-import org.naho.learning.exception.UserLearningProgressErrorCode;
 import org.naho.learning.model.LearningPathNode;
 import org.naho.learning.model.UserLearningProgress;
 import org.naho.learning.model.UserNodeProgress;
+import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
 import org.naho.learning.port.in.UserLearningStreakInputPort;
-import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
 import org.naho.learning.port.out.UserNodeProgressRepositoryPort;
 import org.naho.learning.type.NodeStatus;
-import org.naho.learning.usecase.UserLearningStreakUseCase;
 import org.naho.point.command.PointHistoryCommand;
 import org.naho.point.port.in.CrudPointHistoryInputPort;
 import org.naho.point.type.PointTransactionType;
 import org.naho.question.command.CompleteSpeakingQuestionCommand;
 import org.naho.question.port.in.CompleteSpeakingQuestionInputPort;
-import org.naho.shared.exception.ApplicationException;
+import org.naho.shared.constant.SystemZoneId;
 import org.naho.shared.port.out.TransactionPort;
 
 import java.time.Instant;
-import java.time.ZoneId;
 
 public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestionInputPort {
 
-    private final LearningPathNodeRepositoryPort learningPathNodeRepositoryPort;
     private final UserNodeProgressRepositoryPort userNodeProgressRepositoryPort;
     private final UserLearningProgressRepositoryPort userLearningProgressRepositoryPort;
     private final CrudPointHistoryInputPort crudPointHistoryInputPort;
     private final TransactionPort transactionPort;
     private final UserLearningStreakInputPort userLearningStreakInputPort;
+    private final CrudUserLearningProgressInputPort crudUserLearningProgressInputPort;
 
     public CompleteSpeakingQuestionUseCase(
-            LearningPathNodeRepositoryPort learningPathNodeRepositoryPort,
             UserNodeProgressRepositoryPort userNodeProgressRepositoryPort,
             UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
             CrudPointHistoryInputPort crudPointHistoryInputPort,
             TransactionPort transactionPort,
-            UserLearningStreakInputPort userLearningStreakInputPort
+            UserLearningStreakInputPort userLearningStreakInputPort,
+            CrudUserLearningProgressInputPort crudUserLearningProgressInputPort
     ) {
-        this.learningPathNodeRepositoryPort = learningPathNodeRepositoryPort;
         this.userNodeProgressRepositoryPort = userNodeProgressRepositoryPort;
         this.userLearningProgressRepositoryPort = userLearningProgressRepositoryPort;
         this.crudPointHistoryInputPort = crudPointHistoryInputPort;
         this.transactionPort = transactionPort;
         this.userLearningStreakInputPort = userLearningStreakInputPort;
+        this.crudUserLearningProgressInputPort = crudUserLearningProgressInputPort;
     }
 
     @Override
@@ -58,21 +53,10 @@ public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestion
     public void doCompleteSpeakingQuestion(CompleteSpeakingQuestionCommand command) {
         Instant now = Instant.now();
 
-        LearningPathNode speakingQuestionLearningPathNode = learningPathNodeRepositoryPort
-                .findBySpeakingQuestionId(command.speakingQuestionId())
-                .orElseThrow(() -> new ApplicationException(
-                        LearningPathNodeErrorCode.LEARNING_PATH_NODE_NOT_FOUND,
-                        LearningPathNodeDetailMessageKey.LEARNING_PATH_NODE_ID_NOT_FOUND,
-                        command.speakingQuestionId()
-                ));
+        LearningPathNode speakingQuestionLearningPathNode =
+                command.speakingQuestionLearningPathNode();
 
-        UserLearningProgress progress = userLearningProgressRepositoryPort
-                .findByUserId(command.userId())
-                .orElseThrow(() -> new ApplicationException(
-                        UserLearningProgressErrorCode.USER_LEARNING_PROGRESS_NOT_FOUND,
-                        UserLearningProgressDetailMessageKey.USER_LEARNING_PROGRESS_NOT_FOUND_BY_USER_ID,
-                        command.userId()
-                ));
+        UserLearningProgress progress = command.userLearningProgress();
 
         UserNodeProgress currentUserNodeProgress = userNodeProgressRepositoryPort
                 .findByLearningPathNodeIdAndUserId(
@@ -80,7 +64,6 @@ public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestion
                         command.userId()
                 )
                 .orElse(null);
-
 
         Double point = null;
 
@@ -118,26 +101,15 @@ public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestion
             userNodeProgressRepositoryPort.save(currentUserNodeProgress);
         }
 
-        // nếu node này xa hơn node xa nhất hiện tại mà người dùng đã học thì cập nhật
-        Long currentFarthestAvailableNodeId = progress.getFarthestAvailableNodeId();
-        if (currentFarthestAvailableNodeId == null) {
-            progress.setFarthestAvailableNodeId(speakingQuestionLearningPathNode.getId());
-            progress.setFarthestAvailableNodeGlobalOrderIndex(speakingQuestionLearningPathNode.getGlobalOrderIndex());
-        } else {
-            LearningPathNode currentFarthestAvailableNode = learningPathNodeRepositoryPort
-                    .findById(currentFarthestAvailableNodeId)
-                    .orElseThrow(() -> new ApplicationException(
-                            LearningPathNodeErrorCode.LEARNING_PATH_NODE_NOT_FOUND,
-                            LearningPathNodeDetailMessageKey.LEARNING_PATH_NODE_ID_NOT_FOUND,
-                            currentFarthestAvailableNodeId
-                    ));
-            if (currentFarthestAvailableNode.getGlobalOrderIndex() <
-                    speakingQuestionLearningPathNode.getGlobalOrderIndex()) {
-                progress.setFarthestAvailableNodeId(speakingQuestionLearningPathNode.getId());
-                progress.setFarthestAvailableNodeGlobalOrderIndex(speakingQuestionLearningPathNode.getGlobalOrderIndex());
-            }
-        }
+        // cập nhật node xa nhất mà người dùng có thể học sau khi học xong node này
+        progress = crudUserLearningProgressInputPort.updateFarthestAvailableNodeWhenCompletedANode(
+                new UpdateFarthestAvailableNodeCommand(
+                        progress,
+                        speakingQuestionLearningPathNode
+                )
+        );
 
+        // update node cuối cùng mà người dùng học
         progress.setLastLearningNodeId(speakingQuestionLearningPathNode.getId());
         progress.setLastLearningNodeGlobalOrderIndex(speakingQuestionLearningPathNode.getGlobalOrderIndex());
 
@@ -147,13 +119,13 @@ public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestion
                         .userLearningProgress(progress)
                         .userId(command.userId())
                         .now(now)
-                        .zoneId(ZoneId.of(UserLearningStreakUseCase.HO_CHI_MINH_ZONE_ID))
+                        .zoneId(SystemZoneId.HO_CHI_MINH_ZONE_ID)
                         .build()
         );
 
         userLearningProgressRepositoryPort.save(progress);
 
-        // nếu có sự thay đổi điểm thì tạo lịch sử điểm
+        // nếu có sự thay đổi điểm thì tạo lịch sử nhận điểm
         if (point != null) {
             PointHistoryCommand pointHistoryCommand = PointHistoryCommand.builder()
                     .userId(command.userId())

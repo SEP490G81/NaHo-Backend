@@ -4,6 +4,24 @@ public final class SpeechDetailMessageKey {
     // Success
     public static final String SPEECH_PRONUNCIATION_ASSESSMENT_SUCCESSFULLY =
             "speech.pronunciation.assessment.successfully";
+    public static final String SPEAKING_HISTORY_GET_ALL_SUCCESS =
+            "speaking.history.get.all.success";
+    public static final String SPEAKING_HISTORY_GET_DETAIL_SUCCESS =
+            "speaking.history.get.detail.success";
+    public static final String SPEAKING_ANALYSIS_SUCCESS =
+            "speaking.analysis.success";
+    public static final String SPEAKING_TOPICS_GET_SUCCESS =
+            "speaking.topics.get.success";
+    public static final String SPEAKING_TOPIC_SESSION_START_SUCCESS =
+            "speaking.topic.session.start.success";
+    public static final String SPEAKING_CONVERSATION_START_SUCCESS =
+            "speaking.conversation.start.success";
+    public static final String SPEAKING_MESSAGE_SEND_SUCCESS =
+            "speaking.message.send.success";
+    public static final String SPEAKING_AUDIO_MESSAGE_PROCESS_SUCCESS =
+            "speaking.audio.message.process.success";
+    public static final String SPEAKING_SESSION_END_SUCCESS =
+            "speaking.session.end.success";
     // Audio / STT input
     public static final String SPEECH_AUDIO_FILE_EMPTY =
             "speech.audio.file.empty";

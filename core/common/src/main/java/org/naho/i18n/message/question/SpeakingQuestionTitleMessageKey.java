@@ -11,6 +11,8 @@ public final class SpeakingQuestionTitleMessageKey {
             "speaking_question.update.failed.title";
     public static final String SPEAKING_QUESTION_DELETE_FAILED_TITLE =
             "speaking_question.delete.failed.title";
+    public static final String SPEAKING_QUESTION_LOCKED_TITLE =
+            "speaking_question.locked.title";
 
     private SpeakingQuestionTitleMessageKey() {
     }

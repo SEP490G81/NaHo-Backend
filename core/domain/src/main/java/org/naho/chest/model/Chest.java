@@ -1,21 +1,26 @@
 package org.naho.chest.model;
 
 import org.naho.chest.exception.ChestDomainErrorCode;
+import org.naho.chest.type.ChestType;
 import org.naho.i18n.message.chest.ChestDetailMessageKey;
 import org.naho.shared.exception.DomainException;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Chest {
 
     private final Long id;
-    private String title;
+    private ChestType chestType;
     private String description;
-    private Double point;
+    private Integer minPoint;
+    private Integer maxPoint;
 
     private Chest(Builder builder) {
         this.id = builder.id;
-        this.title = builder.title;
+        this.chestType = builder.chestType;
         this.description = builder.description;
-        this.point = builder.point;
+        this.minPoint = builder.minPoint;
+        this.maxPoint = builder.maxPoint;
     }
 
     public static Builder builder() {
@@ -26,12 +31,12 @@ public class Chest {
         return id;
     }
 
-    public String getTitle() {
-        return title;
+    public ChestType getChestType() {
+        return chestType;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setChestType(ChestType chestType) {
+        this.chestType = chestType;
     }
 
     public String getDescription() {
@@ -42,20 +47,33 @@ public class Chest {
         this.description = description;
     }
 
-    public Double getPoint() {
-        return point;
+    public Integer getMinPoint() {
+        return minPoint;
     }
 
-    public void setPoint(Double point) {
-        this.point = point;
+    public void setMinPoint(Integer minPoint) {
+        this.minPoint = minPoint;
+    }
+
+    public Integer getMaxPoint() {
+        return maxPoint;
+    }
+
+    public void setMaxPoint(Integer maxPoint) {
+        this.maxPoint = maxPoint;
+    }
+
+    public int getRandomPoint() {
+        return ThreadLocalRandom.current().nextInt(minPoint, maxPoint + 1);
     }
 
     public static final class Builder {
 
         private Long id;
-        private String title;
+        private ChestType chestType;
         private String description;
-        private Double point;
+        private Integer minPoint;
+        private Integer maxPoint;
 
         private Builder() {
         }
@@ -65,8 +83,8 @@ public class Chest {
             return this;
         }
 
-        public Builder title(String title) {
-            this.title = title;
+        public Builder chestType(ChestType chestType) {
+            this.chestType = chestType;
             return this;
         }
 
@@ -75,20 +93,25 @@ public class Chest {
             return this;
         }
 
-        public Builder point(Double point) {
-            this.point = point;
+        public Builder minPoint(Integer minPoint) {
+            this.minPoint = minPoint;
+            return this;
+        }
+
+        public Builder maxPoint(Integer maxPoint) {
+            this.maxPoint = maxPoint;
             return this;
         }
 
         public Chest build() {
-            if (title == null || title.isBlank()) {
+            if (chestType == null) {
                 throw new DomainException(
-                        ChestDomainErrorCode.CHEST_TITLE_EMPTY,
-                        ChestDetailMessageKey.CHEST_TITLE_EMPTY
+                        ChestDomainErrorCode.CHEST_TYPE_EMPTY,
+                        ChestDetailMessageKey.CHEST_TYPE_EMPTY
                 );
             }
 
-            if (point == null || point <= 0) {
+            if (minPoint == null || minPoint < 0 || maxPoint == null || maxPoint < minPoint) {
                 throw new DomainException(
                         ChestDomainErrorCode.CHEST_POINT_INVALID,
                         ChestDetailMessageKey.CHEST_POINT_INVALID

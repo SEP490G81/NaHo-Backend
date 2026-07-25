@@ -22,14 +22,14 @@ public class SpeechConfig {
     }
 
     @Bean
-    public AssessSpeechUseCase assessSpeechUseCase(AzureSpeechServicePort azureSpeechServicePort, PronunciationAssessmentMapper pronunciationAssessmentMapper) {
+    public AssessSpeechUseCase assessSpeechUseCase(AzureSpeechServicePort azureSpeechServicePort,
+            PronunciationAssessmentMapper pronunciationAssessmentMapper) {
         return new AssessSpeechUseCase(azureSpeechServicePort, pronunciationAssessmentMapper);
     }
 
     @Bean
     public TextToSpeechUseCase textToSpeechUseCase(
-            TextToSpeechServicePort textToSpeechServicePort
-    ) {
+            TextToSpeechServicePort textToSpeechServicePort) {
         return new TextToSpeechUseCase(textToSpeechServicePort);
     }
 }

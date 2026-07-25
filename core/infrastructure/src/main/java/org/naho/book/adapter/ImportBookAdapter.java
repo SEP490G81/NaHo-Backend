@@ -265,7 +265,8 @@ public class ImportBookAdapter implements ImportBookPort {
                                     .orElseThrow(() -> new InfrastructureException(
                                             ChestErrorCode.CHEST_NOT_FOUND,
                                             ChestDetailMessageKey.CHEST_NOT_FOUND,
-                                            chestId));
+                                            chestId
+                                    ));
 
                             learningPathNodeEntity.setChest(chestEntity);
                         }
