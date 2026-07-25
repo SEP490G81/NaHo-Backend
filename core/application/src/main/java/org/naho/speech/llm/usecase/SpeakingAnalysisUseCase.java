@@ -12,14 +12,21 @@ import org.naho.book.port.out.BookRepositoryPort;
 import org.naho.book.port.out.LessonRepositoryPort;
 import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.book.port.out.TopicRepositoryPort;
-import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.file.command.FileUploadCommand;
 import org.naho.file.port.in.FileStorageInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.result.FileResult;
 import org.naho.furigana.port.out.FuriganaGenerationPort;
+import org.naho.i18n.message.learning.LearningPathNodeDetailMessageKey;
+import org.naho.i18n.message.learning.UserLearningProgressDetailMessageKey;
 import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
 import org.naho.i18n.message.user.UserDetailMessageKey;
+import org.naho.learning.exception.LearningPathNodeErrorCode;
+import org.naho.learning.exception.UserLearningProgressErrorCode;
+import org.naho.learning.model.LearningPathNode;
+import org.naho.learning.model.UserLearningProgress;
+import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
+import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
 import org.naho.question.command.CompleteSpeakingQuestionCommand;
 import org.naho.question.exception.SpeakingQuestionErrorCode;
 import org.naho.question.model.Grammar;
@@ -37,7 +44,6 @@ import org.naho.speech.llm.port.out.AiAnalysisPort;
 import org.naho.speech.llm.port.out.AnswerHistoryRepositoryPort;
 import org.naho.speech.llm.result.SpeakingAnalysisResult;
 import org.naho.speech.llm.result.SpeakingHistoryDetailResult;
-import org.naho.speech.llm.result.SpeakingHistoryListItemResult;
 import org.naho.speech.llm.result.SpeakingHistoryListResult;
 import org.naho.speech.model.AnswerHistory;
 import org.naho.speech.model.ContentAssessment;
@@ -72,6 +78,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     private final FuriganaGenerationPort furiganaGenerationPort;
     private final TransactionPort transactionPort;
     private final CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort;
+    private final UserLearningProgressRepositoryPort userLearningProgressRepositoryPort;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public SpeakingAnalysisUseCase(
@@ -89,7 +96,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             AiAnalysisPort aiAnalysisPort,
             FuriganaGenerationPort furiganaGenerationPort,
             TransactionPort transactionPort,
-            CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort
+            CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort,
+            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort
     ) {
         this.userRepositoryPort = userRepositoryPort;
         this.speakingQuestionRepositoryPort = speakingQuestionRepositoryPort;
@@ -106,6 +114,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         this.furiganaGenerationPort = furiganaGenerationPort;
         this.transactionPort = transactionPort;
         this.completeSpeakingQuestionInputPort = completeSpeakingQuestionInputPort;
+        this.userLearningProgressRepositoryPort = userLearningProgressRepositoryPort;
     }
 
     public static final String RECORDS_FORDER_NAME = "recordings";
@@ -116,6 +125,31 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     }
 
     private SpeakingAnalysisResult doAnalyzeSpeaking(SpeakingAnalysisCommand command) {
+        LearningPathNode speakingQuestionLearningPathNode = learningPathNodeRepositoryPort
+                .findBySpeakingQuestionId(command.speakingQuestionId())
+                .orElseThrow(() -> new ApplicationException(
+                        LearningPathNodeErrorCode.LEARNING_PATH_NODE_NOT_FOUND,
+                        LearningPathNodeDetailMessageKey.LEARNING_PATH_NODE_ID_NOT_FOUND,
+                        command.speakingQuestionId()
+                ));
+
+        UserLearningProgress progress = userLearningProgressRepositoryPort
+                .findByUserId(command.userId())
+                .orElseThrow(() -> new ApplicationException(
+                        UserLearningProgressErrorCode.USER_LEARNING_PROGRESS_NOT_FOUND,
+                        UserLearningProgressDetailMessageKey.USER_LEARNING_PROGRESS_NOT_FOUND_BY_USER_ID,
+                        command.userId()
+                ));
+
+        // nếu node xa nhất người dùng có thể học còn nhỏ hơn node đang định học
+        if (progress.getFarthestAvailableNodeGlobalOrderIndex()
+                < speakingQuestionLearningPathNode.getGlobalOrderIndex()) {
+            throw new ApplicationException(
+                    SpeakingQuestionErrorCode.SPEAKING_QUESTION_LOCKED,
+                    SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_LOCKED
+            );
+        }
+
         User user = userRepositoryPort.findById(command.userId())
                 .orElseThrow(() -> new ApplicationException(
                         UserErrorCode.USER_NOT_FOUND,
@@ -419,7 +453,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
 
         completeSpeakingQuestionInputPort.completeSpeakingQuestion(
                 CompleteSpeakingQuestionCommand.builder()
-                        .speakingQuestionId(speakingQuestion.getId())
+                        .userLearningProgress(progress)
+                        .speakingQuestionLearningPathNode(speakingQuestionLearningPathNode)
                         .userId(command.userId())
                         .overallScore(overallScore)
                         .build()
@@ -427,7 +462,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
 
         org.naho.file.model.File audioFile = fileRepositoryPort.findById(uploadResult.id());
         String audioUrl = audioFile != null ? audioFile.getObjectKey() : null;
-        
+
         return new SpeakingAnalysisResult(answerHistory.getId(), overallScore, audioUrl);
     }
 

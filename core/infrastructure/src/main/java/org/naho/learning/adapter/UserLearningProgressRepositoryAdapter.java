@@ -12,6 +12,7 @@ import org.naho.user.entity.UserEntity;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.repository.UserJpaRepository;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -24,6 +25,7 @@ public class UserLearningProgressRepositoryAdapter implements UserLearningProgre
     private final UserLearningProgressEntityMapper userLearningProgressEntityMapper;
 
     @Override
+    @Transactional
     public UserLearningProgress createNew(UserLearningProgress userLearningProgress, Long userId) {
         UserLearningProgressEntity userLearningProgressEntity =
                 userLearningProgressEntityMapper.domainToEntity(userLearningProgress);
@@ -61,5 +63,10 @@ public class UserLearningProgressRepositoryAdapter implements UserLearningProgre
         UserLearningProgressEntity savedEntity =
                 userLearningProgressJpaRepository.save(userLearningProgressEntity);
         return userLearningProgressEntityMapper.entityToDomain(savedEntity);
+    }
+
+    @Override
+    public boolean existsByUserId(Long userId) {
+        return userLearningProgressJpaRepository.existsByUser_Id(userId);
     }
 }

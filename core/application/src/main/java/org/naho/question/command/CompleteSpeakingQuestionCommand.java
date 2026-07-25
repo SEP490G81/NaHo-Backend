@@ -1,7 +1,11 @@
 package org.naho.question.command;
 
+import org.naho.learning.model.LearningPathNode;
+import org.naho.learning.model.UserLearningProgress;
+
 public record CompleteSpeakingQuestionCommand(
-        Long speakingQuestionId,
+        UserLearningProgress userLearningProgress,
+        LearningPathNode speakingQuestionLearningPathNode,
         Long userId,
         Double overallScore
 ) {
@@ -11,12 +15,18 @@ public record CompleteSpeakingQuestionCommand(
     }
 
     public static class Builder {
-        private Long speakingQuestionId;
+        private UserLearningProgress userLearningProgress;
+        private LearningPathNode speakingQuestionLearningPathNode;
         private Long userId;
         private Double overallScore;
 
-        public Builder speakingQuestionId(Long speakingQuestionId) {
-            this.speakingQuestionId = speakingQuestionId;
+        public Builder userLearningProgress(UserLearningProgress userLearningProgress) {
+            this.userLearningProgress = userLearningProgress;
+            return this;
+        }
+
+        public Builder speakingQuestionLearningPathNode(LearningPathNode speakingQuestionLearningPathNode) {
+            this.speakingQuestionLearningPathNode = speakingQuestionLearningPathNode;
             return this;
         }
 
@@ -32,7 +42,8 @@ public record CompleteSpeakingQuestionCommand(
 
         public CompleteSpeakingQuestionCommand build() {
             return new CompleteSpeakingQuestionCommand(
-                    speakingQuestionId,
+                    userLearningProgress,
+                    speakingQuestionLearningPathNode,
                     userId,
                     overallScore
             );

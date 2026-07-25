@@ -15,8 +15,12 @@ public final class DailyRewardDetailMessageKey {
             "daily.reward.get.current.month.success";
     public static final String DAILY_REWARD_CREATE_CURRENT_MONTH_SUCCESS =
             "daily.reward.create.current.month.success";
+    public static final String DAILY_REWARD_EARN_SUCCESS =
+            "daily.reward.earn.success";
     public static final String DAILY_REWARD_ALREADY_EXISTS =
             "daily.reward.already.exists";
+    public static final String DAILY_REWARD_NOT_FOR_TODAY =
+            "daily.reward.not.for.today";
 
     private DailyRewardDetailMessageKey() {
     }

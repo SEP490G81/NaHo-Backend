@@ -1,6 +1,7 @@
 package org.naho.user.usecase;
 
 import org.naho.i18n.message.user.UserDetailMessageKey;
+import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.user.command.RegisterCommand;
 import org.naho.user.exception.UserErrorCode;
@@ -20,15 +21,18 @@ public class RegisterUseCase implements RegisterInputPort {
     private final UserRepositoryPort userRepository;
     private final RoleRepositoryPort roleRepository;
     private final EncoderPort encoderPort;
+    private final CrudUserLearningProgressInputPort crudUserLearningProgressInputPort;
 
     public RegisterUseCase(
             UserRepositoryPort userRepository,
             EncoderPort encoderPort,
-            RoleRepositoryPort roleRepository
+            RoleRepositoryPort roleRepository,
+            CrudUserLearningProgressInputPort crudUserLearningProgressInputPort
     ) {
         this.userRepository = userRepository;
         this.encoderPort = encoderPort;
         this.roleRepository = roleRepository;
+        this.crudUserLearningProgressInputPort = crudUserLearningProgressInputPort;
     }
 
     @Override
@@ -66,6 +70,9 @@ public class RegisterUseCase implements RegisterInputPort {
 
         User savedUser = userRepository.createNew(newUser, null);
 
+        // init user learning progress
+        crudUserLearningProgressInputPort.initUserLearningProgress(savedUser.getId());
+        
         return new RegisterResult(
                 savedUser.getId() != null ? savedUser.getId().toString() : "",
                 savedUser.getUsername().getValue(),

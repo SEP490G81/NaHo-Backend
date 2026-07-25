@@ -6,6 +6,7 @@ public final class ChestDetailMessageKey {
     public static final String CHEST_NOT_FOUND = "chest.not.found";
     public static final String CHEST_OPEN_SUCCESS = "chest.open.success";
     public static final String CHEST_ALREADY_OPENED = "chest.already.opened";
+    public static final String CHEST_LOCKED = "chest.locked";
 
     private ChestDetailMessageKey() {
     }

@@ -5,6 +5,8 @@ import org.naho.daily.valueobject.RewardYearMonth;
 import org.naho.i18n.message.daily.DailyRewardDetailMessageKey;
 import org.naho.shared.exception.DomainException;
 
+import java.time.LocalDate;
+
 public class DailyReward {
 
     private final Long id;
@@ -37,6 +39,10 @@ public class DailyReward {
 
     public Integer getDayOfMonth() {
         return dayOfMonth;
+    }
+
+    public LocalDate getLocalDate() {
+        return rewardYearMonth.toYearMonth().atDay(dayOfMonth);
     }
 
     public void setChestId(Long chestId) {

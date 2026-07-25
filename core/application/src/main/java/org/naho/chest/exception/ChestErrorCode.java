@@ -5,7 +5,8 @@ import org.naho.shared.exception.ErrorCode;
 
 public enum ChestErrorCode implements ErrorCode {
     CHEST_NOT_FOUND("CHEST_A001", ChestTitleMessageKey.CHEST_NOT_FOUND_TITLE, 404),
-    CHEST_ALREADY_OPENED("CHEST_A002", ChestTitleMessageKey.CHEST_OPEN_FAILED_TITLE, 400);
+    CHEST_ALREADY_OPENED("CHEST_A002", ChestTitleMessageKey.CHEST_OPEN_FAILED_TITLE, 400),
+    CHEST_LOCKED("CHEST_A003", ChestTitleMessageKey.CHEST_OPEN_FAILED_TITLE, 400);
 
     private final String code;
     private final String titleKey;

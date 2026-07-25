@@ -1,5 +1,6 @@
 package org.naho.learning.exception;
 
+import org.naho.i18n.message.learning.UserLearningProgressTitleMessageKey;
 import org.naho.shared.exception.ErrorCode;
 
 public enum UserLearningProgressErrorCode implements ErrorCode {
@@ -7,6 +8,16 @@ public enum UserLearningProgressErrorCode implements ErrorCode {
             "USER_LEARNING_PROGRESS_A001",
             "user_learning_progress.not_found.title",
             404
+    ),
+    USER_LEARNING_PROGRESS_ALREADY_EXISTS(
+            "USER_LEARNING_PROGRESS_A002",
+            UserLearningProgressTitleMessageKey.USER_LEARNING_PROGRESS_CREATION_FAILED_TITLE,
+            400
+    ),
+    USER_LEARNING_PROGRESS_INVALID(
+            "USER_LEARNING_PROGRESS_A003",
+            UserLearningProgressTitleMessageKey.USER_LEARNING_PROGRESS_CREATION_FAILED_TITLE,
+            400
     );
 
     private final String code;

@@ -388,6 +388,7 @@ CREATE TABLE user_daily_attendances
     created_time    datetime(6)           NOT NULL,
     modified_time   datetime(6)           NULL,
     attendance_date date                  NOT NULL,
+    earned_point    INT                   NOT NULL,
     user_id         BIGINT                NOT NULL,
     daily_reward_id BIGINT                NOT NULL,
     CONSTRAINT pk_user_daily_attendances PRIMARY KEY (id)

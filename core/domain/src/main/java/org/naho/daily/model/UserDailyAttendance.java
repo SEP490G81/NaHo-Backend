@@ -13,12 +13,14 @@ public class UserDailyAttendance {
     private final Long dailyRewardId;
 
     private final LocalDate attendanceDate;
+    private final Integer earnedPoint;
 
     private UserDailyAttendance(Builder builder) {
         this.id = builder.id;
         this.userId = builder.userId;
         this.dailyRewardId = builder.dailyRewardId;
         this.attendanceDate = builder.attendanceDate;
+        this.earnedPoint = builder.earnedPoint;
     }
 
     public Long getId() {
@@ -37,6 +39,10 @@ public class UserDailyAttendance {
         return attendanceDate;
     }
 
+    public Integer getEarnedPoint() {
+        return earnedPoint;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -47,6 +53,7 @@ public class UserDailyAttendance {
         private Long userId;
         private Long dailyRewardId;
         private LocalDate attendanceDate;
+        private Integer earnedPoint;
 
         private Builder() {
         }
@@ -68,6 +75,11 @@ public class UserDailyAttendance {
 
         public Builder attendanceDate(LocalDate attendanceDate) {
             this.attendanceDate = attendanceDate;
+            return this;
+        }
+
+        public Builder earnedPoint(Integer earnedPoint) {
+            this.earnedPoint = earnedPoint;
             return this;
         }
 
