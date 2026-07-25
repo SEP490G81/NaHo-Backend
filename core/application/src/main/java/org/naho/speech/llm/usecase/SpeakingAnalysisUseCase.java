@@ -1,6 +1,5 @@
 package org.naho.speech.llm.usecase;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -12,7 +11,6 @@ import org.naho.book.port.out.BookRepositoryPort;
 import org.naho.book.port.out.LessonRepositoryPort;
 import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.book.port.out.TopicRepositoryPort;
-import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.file.command.FileUploadCommand;
 import org.naho.file.port.in.FileStorageInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
@@ -28,6 +26,7 @@ import org.naho.learning.model.LearningPathNode;
 import org.naho.learning.model.UserLearningProgress;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
+import org.naho.pagination.PageData;
 import org.naho.question.command.CompleteSpeakingQuestionCommand;
 import org.naho.question.exception.SpeakingQuestionErrorCode;
 import org.naho.question.model.Grammar;
@@ -41,7 +40,6 @@ import org.naho.speech.azure.port.out.AzureSpeechServicePort;
 import org.naho.speech.llm.command.SpeakingAnalysisCommand;
 import org.naho.speech.llm.command.SpeakingHistoryFilterCommand;
 import org.naho.speech.llm.port.in.SpeakingAnalysisInputPort;
-import org.naho.pagination.PageData;
 import org.naho.speech.llm.port.out.AiAnalysisPort;
 import org.naho.speech.llm.port.out.AnswerHistoryRepositoryPort;
 import org.naho.speech.llm.result.SpeakingAnalysisResult;
@@ -63,10 +61,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.naho.pagination.PageData;
-
 public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
 
+    public static final String RECORDS_FORDER_NAME = "recordings";
     private final UserRepositoryPort userRepositoryPort;
     private final SpeakingQuestionRepositoryPort speakingQuestionRepositoryPort;
     private final FileStorageInputPort fileStorageInputPort;
@@ -120,8 +117,6 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         this.completeSpeakingQuestionInputPort = completeSpeakingQuestionInputPort;
         this.userLearningProgressRepositoryPort = userLearningProgressRepositoryPort;
     }
-
-    public static final String RECORDS_FORDER_NAME = "recordings";
 
     @Override
     public SpeakingAnalysisResult analyzeSpeaking(SpeakingAnalysisCommand command) {

@@ -56,12 +56,15 @@ public class SpeakingAnalysisController {
         return ResponseEntity.status(HttpStatus.CREATED).body(speakingAnalysisMapper.toResponse(result));
     }
 
-    @PostMapping(value = "/histories", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/speaking-histories", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_HISTORY_GET_ALL_SUCCESS)
     public ResponseEntity<PageData<SpeakingHistoryListItemResponse>> getUserHistoryList(
             @AuthenticationPrincipal AccessTokenPayload payload,
-            @RequestBody SpeakingHistoryQueryRequest request
+            @RequestBody(required = false) SpeakingHistoryQueryRequest request
     ) {
+        if (request == null) {
+            request = new SpeakingHistoryQueryRequest();
+        }
         SpeakingHistoryFilterCommand command = speakingAnalysisMapper.requestToCommand(request, payload.userId());
 
         PageData<SpeakingHistoryListItemResult> result = speakingAnalysisInputPort.getUserHistoryList(command);
@@ -78,7 +81,7 @@ public class SpeakingAnalysisController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping(value = "/histories/{historyId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/speaking-histories/{historyId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_HISTORY_GET_DETAIL_SUCCESS)
     public ResponseEntity<SpeakingHistoryDetailResponse> getSpeakingHistoryDetail(
             @PathVariable("historyId") Long historyId
