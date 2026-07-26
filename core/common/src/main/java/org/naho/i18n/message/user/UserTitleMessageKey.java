@@ -23,12 +23,13 @@ public final class UserTitleMessageKey {
             "user.already.exists.title";
     public static final String USER_ROLE_NOT_VALID_TITLE =
             "user.role.not.valid.title";
-    public static final String USER_PERSIST_FAILED_TITLE =
-            "user.persist.failed.title";
-    public static final String USER_INVALID_REFRESH_TOKEN_TITLE =
-            "user.invalid.refresh.token.title";
-    public static final String USER_GOOGLE_ID_TOKEN_NOT_VALID_TITLE =
-            "user.google.id.token.not.valid.title";
+    public static final String USER_PERSIST_FAILED_TITLE = "user.persist.failed.title";
+    public static final String USER_INVALID_REFRESH_TOKEN_TITLE = "user.invalid.refresh.token.title";
+    public static final String USER_GOOGLE_ID_TOKEN_NOT_VALID_TITLE = "user.google.id.token.not.valid.title";
+    public static final String USER_EMAIL_UNVERIFIED_TITLE = "user.email.unverified.title";
+    public static final String USER_INVALID_OTP_TITLE = "user.invalid.otp.title";
+    public static final String USER_OTP_COOLDOWN_TITLE = "user.otp.cooldown.title";
+    public static final String USER_OTP_ATTEMPTS_EXCEEDED_TITLE = "user.otp.attempts.exceeded.title";
     public static final String USER_OAUTH_PROVIDER_NOT_VALID_TITLE =
             "user.oauth.provider.not.valid.title";
 

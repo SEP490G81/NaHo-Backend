@@ -5,6 +5,7 @@ import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.i18n.message.user.UserTitleMessageKey;
 import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
 import org.naho.shared.exception.ApplicationException;
+import org.naho.shared.port.out.EmailPort;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.user.command.CredentialsLoginCommand;
 import org.naho.user.command.ForceLogoutCommand;
@@ -39,6 +40,8 @@ public class AuthUseCase implements AuthInputPort {
     private final UserSessionServicePort userSessionServicePort;
     private final UserSessionEventPublisherPort userSessionEventPublisherPort;
     private final CrudUserLearningProgressInputPort crudUserLearningProgressInputPort;
+    private final OtpPort otpPort;
+    private final EmailPort emailPort;
 
     public AuthUseCase(
             UserRepositoryPort userRepositoryPort,
@@ -49,7 +52,9 @@ public class AuthUseCase implements AuthInputPort {
             TransactionPort transactionPort,
             UserSessionServicePort userSessionServicePort,
             UserSessionEventPublisherPort userSessionEventPublisherPort,
-            CrudUserLearningProgressInputPort crudUserLearningProgressInputPort
+            CrudUserLearningProgressInputPort crudUserLearningProgressInputPort,
+            OtpPort otpPort,
+            EmailPort emailPort
     ) {
         this.userRepositoryPort = userRepositoryPort;
         this.encoderPort = encoderPort;
@@ -60,6 +65,8 @@ public class AuthUseCase implements AuthInputPort {
         this.userSessionServicePort = userSessionServicePort;
         this.userSessionEventPublisherPort = userSessionEventPublisherPort;
         this.crudUserLearningProgressInputPort = crudUserLearningProgressInputPort;
+        this.otpPort = otpPort;
+        this.emailPort = emailPort;
     }
 
     @Override
@@ -98,6 +105,18 @@ public class AuthUseCase implements AuthInputPort {
             throw new ApplicationException(
                     UserErrorCode.USER_LOGIN_FAILED,
                     UserDetailMessageKey.USER_ACCOUNT_NOT_ACTIVE);
+        }
+
+        if (!user.isEmailVerified()) {
+            String email = user.getEmail().getValue();
+            if (!otpPort.hasValidOtp(email)) {
+                String otp = otpPort.generateOtp();
+                otpPort.saveOtp(email, otp);
+                emailPort.sendOtpEmail(email, otp);
+            }
+            throw new ApplicationException(
+                    UserErrorCode.USER_EMAIL_UNVERIFIED,
+                    UserDetailMessageKey.USER_EMAIL_UNVERIFIED_DETAIL);
         }
 
         userSessionServicePort.revokeAllSessionsByUserId(
@@ -176,6 +195,7 @@ public class AuthUseCase implements AuthInputPort {
                         .email(Email.of(command.getEmail()))
                         .fullName(command.getFullName())
                         .status(UserStatus.ACTIVE)
+                        .isEmailVerified(true)
                         .roleIds(List.of(learnerRole.getId()))
                         .build();
 

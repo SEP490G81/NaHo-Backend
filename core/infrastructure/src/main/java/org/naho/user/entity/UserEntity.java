@@ -42,6 +42,10 @@ public class UserEntity extends BaseEntity {
     @Column(name = "full_name")
     String fullName;
 
+    @Column(name = "is_email_verified", nullable = false)
+    @Builder.Default
+    boolean isEmailVerified = false;
+
     @Column(length = 10)
     @Enumerated(EnumType.STRING)
     Gender gender;

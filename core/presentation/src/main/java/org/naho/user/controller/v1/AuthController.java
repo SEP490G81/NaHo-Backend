@@ -1,17 +1,26 @@
 package org.naho.user.controller.v1;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.user.command.CredentialsLoginCommand;
 import org.naho.user.command.LogoutCommand;
+import org.naho.user.command.ResendOtpCommand;
+import org.naho.user.command.VerifyEmailCommand;
 import org.naho.user.constant.TokenType;
 import org.naho.user.dto.mapper.LoginRequestMapper;
+import org.naho.user.dto.mapper.ResendOtpRequestMapper;
+import org.naho.user.dto.mapper.VerifyEmailRequestMapper;
 import org.naho.user.dto.request.CredentialsLoginRequest;
+import org.naho.user.dto.request.ResendOtpRequest;
+import org.naho.user.dto.request.VerifyEmailRequest;
 import org.naho.user.helper.CookieFactory;
 import org.naho.user.helper.LoginRequestResolver;
 import org.naho.user.port.in.AuthInputPort;
+import org.naho.user.port.in.ResendOtpInputPort;
+import org.naho.user.port.in.VerifyEmailInputPort;
 import org.naho.user.result.AccessTokenPayload;
 import org.naho.user.result.LoginResult;
 import org.springframework.http.HttpHeaders;
@@ -28,6 +37,10 @@ public class AuthController {
     private final LoginRequestMapper loginRequestMapper;
     private final CookieFactory cookieFactory;
     private final LoginRequestResolver loginRequestResolver;
+    private final VerifyEmailInputPort verifyEmailInputPort;
+    private final ResendOtpInputPort resendOtpInputPort;
+    private final VerifyEmailRequestMapper verifyEmailRequestMapper;
+    private final ResendOtpRequestMapper resendOtpRequestMapper;
 
     @ApiResponseMessage(message = UserDetailMessageKey.USER_LOGIN_SUCCESSFULLY)
     @PostMapping("/login")
@@ -115,4 +128,33 @@ public class AuthController {
                 .build();
     }
 
+    @ApiResponseMessage(message = UserDetailMessageKey.USER_EMAIL_VERIFIED_SUCCESSFULLY)
+    @PostMapping("/verify-email")
+    public ResponseEntity<Void> verifyEmail(
+            @Valid @RequestBody VerifyEmailRequest request
+    ) {
+        VerifyEmailCommand command = verifyEmailRequestMapper.toCommand(request);
+        LoginResult result = verifyEmailInputPort.verifyEmail(command);
+
+        ResponseCookie accessTokenCookie =
+                cookieFactory.createCookieForJWTToken(result.accessToken());
+        ResponseCookie refreshTokenCookie =
+                cookieFactory.createCookieForJWTToken(result.refreshToken());
+
+        return ResponseEntity
+                .ok()
+                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                .build();
+    }
+
+    @ApiResponseMessage(message = UserDetailMessageKey.USER_OTP_RESENT_SUCCESSFULLY)
+    @PostMapping("/resend-otp")
+    public ResponseEntity<Void> resendOtp(
+            @Valid @RequestBody ResendOtpRequest request
+    ) {
+        ResendOtpCommand command = resendOtpRequestMapper.toCommand(request);
+        resendOtpInputPort.resendOtp(command);
+        return ResponseEntity.ok().build();
+    }
 }

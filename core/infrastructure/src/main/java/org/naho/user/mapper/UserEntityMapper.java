@@ -22,6 +22,7 @@ public interface UserEntityMapper {
     @Mapping(target = "userSessionIds", ignore = true)
     @Mapping(target = "oAuthProviderIds", source = "OAuthProviders", qualifiedByName = "getOAuthProviderIds")
     @Mapping(target = "avatarFileId", source = "avatar.id")
+    @Mapping(target = "isEmailVerified", source = "emailVerified")
     User entityToDomain(UserEntity entity);
 
     @Mapping(target = "roles", source = "roleIds")
@@ -37,6 +38,7 @@ public interface UserEntityMapper {
     @Mapping(target = "oAuthProviders", ignore = true)
     @Mapping(target = "avatar", ignore = true)
     @Mapping(target = "userDailyAttendances", ignore = true)
+    @Mapping(target = "isEmailVerified", source = "emailVerified")
     UserEntity domainToEntity(User user);
 
     @Named("getOAuthProviderIds")
