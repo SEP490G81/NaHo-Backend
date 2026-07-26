@@ -73,6 +73,13 @@ public final class UserDetailMessageKey {
             "user.oauth.provider.provider.name.null";
     public static final String USER_OAUTH_PROVIDER_AVATAR_URL_BLANK =
             "user.oauth.provider.avatar.url.blank";
+    public static final String USER_EMAIL_UNVERIFIED_DETAIL = "user.email.unverified.detail";
+    public static final String USER_INVALID_OTP_DETAIL = "user.invalid.otp.detail";
+    public static final String USER_OTP_COOLDOWN_DETAIL = "user.otp.cooldown.detail";
+    public static final String USER_OTP_ATTEMPTS_EXCEEDED_DETAIL = "user.otp.attempts.exceeded.detail";
+    public static final String USER_EMAIL_ALREADY_VERIFIED = "user.email.already.verified";
+    public static final String USER_EMAIL_VERIFIED_SUCCESSFULLY = "user.email.verified.successfully";
+    public static final String USER_OTP_RESENT_SUCCESSFULLY = "user.otp.resent.successfully";
 
     private UserDetailMessageKey() {
     }

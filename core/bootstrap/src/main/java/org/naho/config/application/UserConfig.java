@@ -2,6 +2,7 @@ package org.naho.config.application;
 
 import org.naho.file.port.in.CrudFileInputPort;
 import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
+import org.naho.shared.port.out.EmailPort;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.user.mapper.OAuthProviderResultMapper;
 import org.naho.user.mapper.RoleResultMapper;
@@ -81,7 +82,9 @@ public class UserConfig {
             TransactionPort transactionPort,
             UserSessionServicePort userSessionServicePort,
             UserSessionEventPublisherPort userSessionEventPublisherPort,
-            CrudUserLearningProgressInputPort crudUserLearningProgressInputPort
+            CrudUserLearningProgressInputPort crudUserLearningProgressInputPort,
+            OtpPort otpPort,
+            EmailPort emailPort
     ) {
         return new AuthUseCase(
                 userRepositoryPort,
@@ -92,7 +95,9 @@ public class UserConfig {
                 transactionPort,
                 userSessionServicePort,
                 userSessionEventPublisherPort,
-                crudUserLearningProgressInputPort
+                crudUserLearningProgressInputPort,
+                otpPort,
+                emailPort
         );
     }
 
@@ -101,13 +106,17 @@ public class UserConfig {
             UserRepositoryPort userRepository,
             EncoderPort encoderPort,
             RoleRepositoryPort roleRepository,
-            CrudUserLearningProgressInputPort crudUserLearningProgressInputPort
+            CrudUserLearningProgressInputPort crudUserLearningProgressInputPort,
+            OtpPort otpPort,
+            EmailPort emailPort
     ) {
         return new RegisterUseCase(
                 userRepository,
                 encoderPort,
                 roleRepository,
-                crudUserLearningProgressInputPort
+                crudUserLearningProgressInputPort,
+                otpPort,
+                emailPort
         );
     }
 
@@ -125,5 +134,37 @@ public class UserConfig {
         return new UpdateUserUseCase(
                 userRepositoryPort,
                 userResultMapper);
+    }
+
+    @Bean
+    public VerifyEmailInputPort verifyEmailInputPort(
+            UserRepositoryPort userRepositoryPort,
+            OtpPort otpPort,
+            TransactionPort transactionPort,
+            TokenServicePort tokenServicePort,
+            EncoderPort encoderPort,
+            UserSessionRepositoryPort userSessionRepositoryPort,
+            UserSessionServicePort userSessionServicePort,
+            UserSessionEventPublisherPort userSessionEventPublisherPort) {
+        return new VerifyEmailUseCase(
+                userRepositoryPort,
+                otpPort,
+                transactionPort,
+                tokenServicePort,
+                encoderPort,
+                userSessionRepositoryPort,
+                userSessionServicePort,
+                userSessionEventPublisherPort);
+    }
+
+    @Bean
+    public ResendOtpInputPort resendOtpInputPort(
+            UserRepositoryPort userRepositoryPort,
+            OtpPort otpPort,
+            EmailPort emailPort) {
+        return new ResendOtpUseCase(
+                userRepositoryPort,
+                otpPort,
+                emailPort);
     }
 }

@@ -3,12 +3,14 @@ package org.naho.user.usecase;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
 import org.naho.shared.exception.ApplicationException;
+import org.naho.shared.port.out.EmailPort;
 import org.naho.user.command.RegisterCommand;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.model.Role;
 import org.naho.user.model.User;
 import org.naho.user.port.in.RegisterInputPort;
 import org.naho.user.port.out.EncoderPort;
+import org.naho.user.port.out.OtpPort;
 import org.naho.user.port.out.RoleRepositoryPort;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.naho.user.result.RegisterResult;
@@ -22,17 +24,23 @@ public class RegisterUseCase implements RegisterInputPort {
     private final RoleRepositoryPort roleRepository;
     private final EncoderPort encoderPort;
     private final CrudUserLearningProgressInputPort crudUserLearningProgressInputPort;
+    private final OtpPort otpPort;
+    private final EmailPort emailPort;
 
     public RegisterUseCase(
             UserRepositoryPort userRepository,
             EncoderPort encoderPort,
             RoleRepositoryPort roleRepository,
-            CrudUserLearningProgressInputPort crudUserLearningProgressInputPort
+            CrudUserLearningProgressInputPort crudUserLearningProgressInputPort,
+            OtpPort otpPort,
+            EmailPort emailPort
     ) {
         this.userRepository = userRepository;
         this.encoderPort = encoderPort;
         this.roleRepository = roleRepository;
         this.crudUserLearningProgressInputPort = crudUserLearningProgressInputPort;
+        this.otpPort = otpPort;
+        this.emailPort = emailPort;
     }
 
     @Override
@@ -73,9 +81,15 @@ public class RegisterUseCase implements RegisterInputPort {
         // init user learning progress
         crudUserLearningProgressInputPort.initUserLearningProgress(savedUser.getId());
 
+        // Send OTP
+        String email = savedUser.getEmail().getValue();
+        String otp = otpPort.generateOtp();
+        otpPort.saveOtp(email, otp);
+        emailPort.sendOtpEmail(email, otp);
+
         return new RegisterResult(
                 savedUser.getId() != null ? savedUser.getId().toString() : "",
                 savedUser.getUsername().getValue(),
-                savedUser.getEmail().getValue());
+                email);
     }
 }

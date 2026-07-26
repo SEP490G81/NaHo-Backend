@@ -25,8 +25,8 @@ public class User {
     private Gender gender;
     private Dob dob;
     private JLPTLevel jlptLevel;
-
     private UserStatus status;
+    private boolean isEmailVerified;
 
     private User(Builder builder) {
         this.id = builder.id;
@@ -43,6 +43,7 @@ public class User {
         this.dob = builder.dob;
         this.jlptLevel = builder.jlptLevel;
         this.status = builder.status;
+        this.isEmailVerified = builder.isEmailVerified;
     }
 
     public static User registerNewUser(String rawUsername, String hashPassword, String rawEmail, List<Long> roleIds) {
@@ -51,6 +52,7 @@ public class User {
                 .email(Email.of(rawEmail))
                 .hashPassword(hashPassword)
                 .status(UserStatus.ACTIVE)
+                .isEmailVerified(false)
                 .roleIds(roleIds)
                 .build();
     }
@@ -61,6 +63,14 @@ public class User {
 
     public boolean isActive() {
         return status == UserStatus.ACTIVE;
+    }
+
+    public boolean isEmailVerified() {
+        return isEmailVerified;
+    }
+
+    public void verifyEmail() {
+        this.isEmailVerified = true;
     }
 
     public Builder toBuilder() {
@@ -183,6 +193,7 @@ public class User {
         private JLPTLevel jlptLevel;
 
         private UserStatus status;
+        private boolean isEmailVerified;
 
         private Builder() {
         }
@@ -254,6 +265,11 @@ public class User {
 
         public Builder status(UserStatus status) {
             this.status = status;
+            return this;
+        }
+
+        public Builder isEmailVerified(boolean isEmailVerified) {
+            this.isEmailVerified = isEmailVerified;
             return this;
         }
 
