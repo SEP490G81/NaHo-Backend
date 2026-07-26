@@ -1,8 +1,10 @@
-package org.naho.social.model;
+package org.naho.social.comment.model;
 
 import org.naho.i18n.message.social.CommentDetailMessageKey;
 import org.naho.shared.exception.DomainException;
-import org.naho.social.exception.CommentDomainErrorCode;
+import org.naho.social.comment.exception.CommentDomainErrorCode;
+
+import java.time.Instant;
 
 public class Comment {
 
@@ -11,6 +13,8 @@ public class Comment {
     private final Long questionId;
     private final Long parentId;
     private final String content;
+    private final Instant createdTime;
+    private final Instant modifiedTime;
 
     private Comment(Builder builder) {
         this.id = builder.id;
@@ -18,6 +22,8 @@ public class Comment {
         this.questionId = builder.questionId;
         this.parentId = builder.parentId;
         this.content = builder.content;
+        this.createdTime = builder.createdTime;
+        this.modifiedTime = builder.modifiedTime;
     }
 
     public static Builder builder() {
@@ -44,6 +50,14 @@ public class Comment {
         return content;
     }
 
+    public Instant getCreatedTime() {
+        return createdTime;
+    }
+
+    public Instant getModifiedTime() {
+        return modifiedTime;
+    }
+
     public static class Builder {
 
         private Long id;
@@ -51,6 +65,8 @@ public class Comment {
         private Long questionId;
         private Long parentId;
         private String content;
+        private Instant createdTime;
+        private Instant modifiedTime;
 
         public Builder id(Long id) {
             this.id = id;
@@ -74,6 +90,16 @@ public class Comment {
 
         public Builder content(String content) {
             this.content = content;
+            return this;
+        }
+
+        public Builder createdTime(Instant createdTime) {
+            this.createdTime = createdTime;
+            return this;
+        }
+
+        public Builder modifiedTime(Instant modifiedTime) {
+            this.modifiedTime = modifiedTime;
             return this;
         }
 

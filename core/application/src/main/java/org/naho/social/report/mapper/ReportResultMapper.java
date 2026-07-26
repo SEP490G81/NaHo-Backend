@@ -1,6 +1,6 @@
 package org.naho.social.report.mapper;
 
-import org.naho.social.model.Report;
+import org.naho.social.report.model.Report;
 import org.naho.social.report.result.ReportResult;
 
 public class ReportResultMapper {

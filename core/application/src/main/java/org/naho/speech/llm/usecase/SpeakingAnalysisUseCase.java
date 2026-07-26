@@ -1,6 +1,5 @@
 package org.naho.speech.llm.usecase;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -27,6 +26,7 @@ import org.naho.learning.model.LearningPathNode;
 import org.naho.learning.model.UserLearningProgress;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
+import org.naho.pagination.PageData;
 import org.naho.question.command.CompleteSpeakingQuestionCommand;
 import org.naho.question.exception.SpeakingQuestionErrorCode;
 import org.naho.question.model.Grammar;
@@ -44,7 +44,7 @@ import org.naho.speech.llm.port.out.AiAnalysisPort;
 import org.naho.speech.llm.port.out.AnswerHistoryRepositoryPort;
 import org.naho.speech.llm.result.SpeakingAnalysisResult;
 import org.naho.speech.llm.result.SpeakingHistoryDetailResult;
-import org.naho.speech.llm.result.SpeakingHistoryListResult;
+import org.naho.speech.llm.result.SpeakingHistoryListItemResult;
 import org.naho.speech.model.AnswerHistory;
 import org.naho.speech.model.ContentAssessment;
 import org.naho.speech.model.SpeechAssessment;
@@ -672,15 +672,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     }
 
     @Override
-    public SpeakingHistoryListResult getUserHistoryList(SpeakingHistoryFilterCommand command) {
+    public PageData<SpeakingHistoryListItemResult> getUserHistoryList(SpeakingHistoryFilterCommand command) {
         return answerHistoryRepositoryPort.findUserAnswerHistories(command);
-    }
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    private record FeedbackResponse(Scores scores) {
-    }
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    private record Scores(Double vocabulary, Double grammar, Double naturalness) {
     }
 }

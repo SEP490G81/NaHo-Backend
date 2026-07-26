@@ -25,6 +25,7 @@ public class UserLearningProgressInitializer implements ApplicationRunner {
         if (userLearningProgressRepositoryPort.existsByUserId(ADMIN_USER_ID)) {
             log.info("UserLearningProgress Data existed!");
         } else {
+            log.info("Initializing UserLearningProgress Data...");
             crudUserLearningProgressInputPort.initUserLearningProgress(ADMIN_USER_ID);
             log.info("UserLearningProgress Data initialized!");
         }
