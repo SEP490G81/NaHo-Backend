@@ -2,6 +2,7 @@ package org.naho.persona.controller.v1;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.naho.i18n.message.persona.PersonaDetailMessageKey;
 import org.naho.persona.command.CreatePersonaCommand;
 import org.naho.persona.command.UpdatePersonaCommand;
 import org.naho.persona.dto.mapper.PersonaResponseMapper;
@@ -9,7 +10,6 @@ import org.naho.persona.dto.request.CreatePersonaRequest;
 import org.naho.persona.dto.request.UpdatePersonaRequest;
 import org.naho.persona.dto.response.PersonaResponse;
 import org.naho.persona.exception.PersonaErrorCode;
-import org.naho.i18n.message.persona.PersonaDetailMessageKey;
 import org.naho.persona.model.Persona;
 import org.naho.persona.port.in.CreatePersonaInputPort;
 import org.naho.persona.port.in.GetPersonaInputPort;

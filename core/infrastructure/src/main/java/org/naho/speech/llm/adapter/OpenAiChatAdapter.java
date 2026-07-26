@@ -2,11 +2,11 @@ package org.naho.speech.llm.adapter;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.naho.i18n.message.llm.LlmDetailMessageKey;
 import org.naho.shared.exception.InfrastructureException;
 import org.naho.speech.llm.constant.OpenAiConfigProperties;
 import org.naho.speech.llm.exception.LlmApplicationError;
 import org.naho.speech.llm.port.out.AiChatPort;
-import org.naho.i18n.message.llm.LlmDetailMessageKey;
 
 import java.net.URI;
 import java.net.http.HttpClient;

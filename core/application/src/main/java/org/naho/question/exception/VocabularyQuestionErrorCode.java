@@ -4,7 +4,8 @@ import org.naho.i18n.message.question.VocabularyQuestionTitleMessageKey;
 import org.naho.shared.exception.ErrorCode;
 
 public enum VocabularyQuestionErrorCode implements ErrorCode {
-    VOCABULARY_QUESTION_NOT_FOUND("VOCABULARY_QUESTION_A001", VocabularyQuestionTitleMessageKey.VOCABULARY_QUESTION_NOT_FOUND_TITLE, 404);
+    VOCABULARY_QUESTION_NOT_FOUND("VOCABULARY_QUESTION_A001", VocabularyQuestionTitleMessageKey.VOCABULARY_QUESTION_NOT_FOUND_TITLE, 404),
+    VOCABULARY_QUESTION_LOCKED("VOCABULARY_QUESTION_A002", VocabularyQuestionTitleMessageKey.VOCABULARY_QUESTION_LOCKED_TITLE, 400);
 
     private final String code;
     private final String titleKey;

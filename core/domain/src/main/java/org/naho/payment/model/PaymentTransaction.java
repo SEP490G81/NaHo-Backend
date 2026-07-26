@@ -7,7 +7,6 @@ import org.naho.shared.exception.DomainException;
 
 import java.time.Instant;
 import java.util.Map;
-import java.util.Objects;
 
 public class PaymentTransaction {
     private final Long id;

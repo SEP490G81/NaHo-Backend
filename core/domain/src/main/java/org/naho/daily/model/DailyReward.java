@@ -33,6 +33,10 @@ public class DailyReward {
         return chestId;
     }
 
+    public void setChestId(Long chestId) {
+        this.chestId = chestId;
+    }
+
     public RewardYearMonth getRewardYearMonth() {
         return rewardYearMonth;
     }
@@ -43,10 +47,6 @@ public class DailyReward {
 
     public LocalDate getLocalDate() {
         return rewardYearMonth.toYearMonth().atDay(dayOfMonth);
-    }
-
-    public void setChestId(Long chestId) {
-        this.chestId = chestId;
     }
 
     public static final class Builder {

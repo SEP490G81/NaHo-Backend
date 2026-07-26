@@ -6,7 +6,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.question.entity.SpeakingQuestionEntity;
 import org.naho.shared.persistence.BaseEntity;
-import org.naho.social.type.ReactionType;
+import org.naho.social.reaction.type.ReactionType;
 import org.naho.user.entity.UserEntity;
 
 @SuperBuilder

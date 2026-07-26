@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import org.naho.social.type.ReportType;
+import org.naho.social.reaction.type.ReportType;
 
 @Getter
 @Setter

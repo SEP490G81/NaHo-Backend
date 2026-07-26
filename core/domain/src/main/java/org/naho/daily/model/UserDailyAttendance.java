@@ -23,6 +23,10 @@ public class UserDailyAttendance {
         this.earnedPoint = builder.earnedPoint;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public Long getId() {
         return id;
     }
@@ -41,10 +45,6 @@ public class UserDailyAttendance {
 
     public Integer getEarnedPoint() {
         return earnedPoint;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     public static final class Builder {

@@ -3,7 +3,7 @@ package org.naho.social.model;
 import org.naho.i18n.message.social.ReportDetailMessageKey;
 import org.naho.shared.exception.DomainException;
 import org.naho.social.exception.ReportDomainErrorCode;
-import org.naho.social.type.ReportType;
+import org.naho.social.reaction.type.ReportType;
 
 public class Report {
 

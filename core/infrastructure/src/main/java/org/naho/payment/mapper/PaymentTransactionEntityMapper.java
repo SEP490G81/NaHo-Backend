@@ -56,7 +56,8 @@ public interface PaymentTransactionEntityMapper {
     default Map<String, String> jsonToMap(String json) {
         if (json == null || json.isBlank()) return Map.of();
         try {
-            return OBJECT_MAPPER.readValue(json, new TypeReference<Map<String, String>>() {});
+            return OBJECT_MAPPER.readValue(json, new TypeReference<Map<String, String>>() {
+            });
         } catch (JsonProcessingException e) {
             return Map.of();
         }

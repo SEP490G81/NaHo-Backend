@@ -24,9 +24,9 @@ public class ConfirmPaymentUseCase implements ConfirmPaymentInputPort {
     private final UserSubscriptionRepositoryPort subscriptionRepositoryPort;
 
     public ConfirmPaymentUseCase(PaymentOrderRepositoryPort orderRepositoryPort,
-            PaymentTransactionRepositoryPort transactionRepositoryPort,
-            SubscriptionPlanRepositoryPort planRepositoryPort,
-            UserSubscriptionRepositoryPort subscriptionRepositoryPort) {
+                                 PaymentTransactionRepositoryPort transactionRepositoryPort,
+                                 SubscriptionPlanRepositoryPort planRepositoryPort,
+                                 UserSubscriptionRepositoryPort subscriptionRepositoryPort) {
         this.orderRepositoryPort = orderRepositoryPort;
         this.transactionRepositoryPort = transactionRepositoryPort;
         this.planRepositoryPort = planRepositoryPort;
@@ -69,7 +69,7 @@ public class ConfirmPaymentUseCase implements ConfirmPaymentInputPort {
                 order.expire(now); // Chuyển trạng thái chuẩn sang EXPIRED nếu đã quá 5 phút
             } else {
                 order.markFailed(now); // Chuyển sang FAILED nếu thất bại trong thời hạn 5 phút (ví dụ: sai OTP, tài
-                                       // khoản không đủ tiền)
+                // khoản không đủ tiền)
             }
             orderRepositoryPort.save(order);
             return ConfirmPaymentResult.failed(order.getOrderCode());

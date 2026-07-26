@@ -2,11 +2,11 @@ package org.naho.social.report.adapter;
 
 
 import org.naho.social.model.Report;
+import org.naho.social.reaction.type.ReportType;
 import org.naho.social.report.entity.ReportEntity;
 import org.naho.social.report.mapper.ReportEntityMapper;
 import org.naho.social.report.port.out.ReportRepositoryPort;
 import org.naho.social.report.repository.ReportJpaRepository;
-import org.naho.social.type.ReportType;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

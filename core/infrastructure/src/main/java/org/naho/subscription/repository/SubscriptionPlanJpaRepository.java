@@ -11,5 +11,6 @@ import java.util.Optional;
 @Repository
 public interface SubscriptionPlanJpaRepository extends BaseJpaRepository<SubscriptionPlanEntity> {
     Optional<SubscriptionPlanEntity> findByCodeAndStatus(String code, PlanStatus status);
+
     List<SubscriptionPlanEntity> findAllByStatus(PlanStatus status);
 }

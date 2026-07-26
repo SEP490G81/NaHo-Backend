@@ -1,4 +1,4 @@
-package org.naho.social.model;
+package org.naho.social.reaction.model;
 
 import org.naho.i18n.message.social.CommentDetailMessageKey;
 import org.naho.shared.exception.DomainException;

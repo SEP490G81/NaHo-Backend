@@ -1,9 +1,9 @@
-package org.naho.social.model;
+package org.naho.social.reaction.model;
 
 import org.naho.i18n.message.social.ReactionDetailMessageKey;
 import org.naho.shared.exception.DomainException;
 import org.naho.social.exception.ReactionDomainErrorCode;
-import org.naho.social.type.ReactionType;
+import org.naho.social.reaction.type.ReactionType;
 
 public class Reaction {
 

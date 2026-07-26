@@ -9,6 +9,8 @@ public final class VocabularyQuestionTitleMessageKey {
             "vocabulary.export.not_found.title";
     public static final String VOCABULARY_NOT_FOUND_TITLE =
             "vocabulary.not_found.title";
+    public static final String VOCABULARY_QUESTION_LOCKED_TITLE =
+            "vocabulary_question.locked.title";
 
     private VocabularyQuestionTitleMessageKey() {
     }

@@ -1,13 +1,13 @@
 package org.naho.question.usecase;
 
+import org.naho.i18n.message.question.VocabularyQuestionDetailMessageKey;
 import org.naho.question.command.LearningPathNodeCommand;
-import org.naho.vocabulary.model.Vocabulary;
 import org.naho.question.port.in.SearchVocabulariesOfQuestionInputPort;
-import org.naho.vocabulary.port.out.VocabularyPort;
 import org.naho.question.result.VocabulariesOfQuestionResult;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.vocabulary.exception.VocabularyErrorCode;
-import org.naho.i18n.message.question.VocabularyQuestionDetailMessageKey;
+import org.naho.vocabulary.model.Vocabulary;
+import org.naho.vocabulary.port.out.VocabularyPort;
 
 import java.util.List;
 

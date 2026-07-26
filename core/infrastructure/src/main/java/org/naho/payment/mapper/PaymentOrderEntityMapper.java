@@ -21,8 +21,7 @@ public interface PaymentOrderEntityMapper {
         }
         org.naho.payment.model.Money amount = new org.naho.payment.model.Money(
                 entity.getAmountAmount(),
-                java.util.Currency.getInstance(entity.getAmountCurrency())
-        );
+                java.util.Currency.getInstance(entity.getAmountCurrency()));
         return PaymentOrder.builder()
                 .id(entity.getId())
                 .orderCode(entity.getOrderCode())
@@ -31,6 +30,7 @@ public interface PaymentOrderEntityMapper {
                 .amount(amount)
                 .provider(entity.getProvider())
                 .status(entity.getStatus())
+                .paymentUrl(entity.getPaymentUrl())
                 .providerTransactionId(entity.getProviderTransactionId())
                 .createdTime(entity.getCreatedTime() != null ? entity.getCreatedTime() : java.time.Instant.now())
                 .expiresTime(entity.getExpiresTime())

@@ -6,9 +6,9 @@
     <select id="findByProviderUserIdAndProviderName" resultType="org.naho.user.entity.UserEntity">
         select u.*
         from users u
-                 join o_auth_providers o on u.id = o.user_id
+        join o_auth_providers o on u.id = o.user_id
         where o.provider_user_id = #{providerUserId}
-          and o.provider_name = #{providerName}
+        and o.provider_name = #{providerName}
     </select>
 
     <resultMap id="LeaderboardUserResultMap" type="org.naho.user.result.LeaderboardUserResult">

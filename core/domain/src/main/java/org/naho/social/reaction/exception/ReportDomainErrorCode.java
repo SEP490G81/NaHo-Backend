@@ -1,4 +1,4 @@
-package org.naho.social.exception;
+package org.naho.social.reaction.exception;
 
 import org.naho.i18n.message.social.ReportTitleMessageKey;
 import org.naho.shared.exception.ErrorCode;

@@ -23,7 +23,7 @@ public class UserDailyAttendanceEntity extends BaseEntity {
 
     @Column(name = "earned_point", nullable = false)
     Integer earnedPoint;
-    
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     UserEntity user;

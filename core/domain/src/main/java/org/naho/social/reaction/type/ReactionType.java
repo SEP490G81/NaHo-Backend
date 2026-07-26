@@ -1,4 +1,4 @@
-package org.naho.social.type;
+package org.naho.social.reaction.type;
 
 public enum ReactionType {
     LIKE,

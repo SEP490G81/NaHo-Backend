@@ -1,23 +1,22 @@
 package org.naho.subscription.model;
 
 import org.naho.i18n.message.subscription.SubscriptionDetailMessageKey;
+import org.naho.shared.exception.DomainException;
 import org.naho.subscription.exception.SubscriptionDomainErrorCode;
 import org.naho.subscription.type.SubscriptionStatus;
-import org.naho.shared.exception.DomainException;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Objects;
 
 public class UserSubscription { //Đăng ký gói của học viên
     private final Long id;
     private final Long userId;
     private final Long subscriptionPlanId;
     private final Long paymentOrderId;
-    private SubscriptionStatus status;
     private final Instant startTime;
     private final Instant endTime;
     private final Instant createdTime;
+    private SubscriptionStatus status;
     private Instant modifiedTime;
 
     private UserSubscription(Builder builder) {
@@ -64,6 +63,11 @@ public class UserSubscription { //Đăng ký gói của học viên
             status = SubscriptionStatus.EXPIRED;
             modifiedTime = now;
         }
+    }
+
+    public void cancel(Instant now) {
+        this.status = SubscriptionStatus.CANCELLED;
+        this.modifiedTime = now;
     }
 
     // Getters
