@@ -1,15 +1,15 @@
 package org.naho.question.repository;
 
 import org.naho.question.entity.AnswerHistoryEntity;
+import org.naho.shared.persistence.BaseJpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface AnswerHistoryJpaRepository extends JpaRepository<AnswerHistoryEntity, Long> {
+public interface AnswerHistoryJpaRepository extends BaseJpaRepository<AnswerHistoryEntity> {
 
     @Query("""
                 SELECT ah FROM AnswerHistoryEntity ah

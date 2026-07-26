@@ -1,4 +1,4 @@
-package org.naho.social.exception;
+package org.naho.social.reaction.exception;
 
 import org.naho.i18n.message.social.ReactionTitleMessageKey;
 import org.naho.shared.exception.ErrorCode;
@@ -12,11 +12,6 @@ public enum ReactionDomainErrorCode implements ErrorCode {
     REACTION_COMMENT_ID_NOT_VALID(
             "REACTION_002",
             ReactionTitleMessageKey.REACTION_COMMENT_ID_NOT_VALID_TITLE,
-            400
-    ),
-    REACTION_QUESTION_ID_NOT_VALID(
-            "REACTION_004",
-            ReactionTitleMessageKey.REACTION_QUESTION_ID_NOT_VALID_TITLE,
             400
     ),
     REACTION_TYPE_NOT_VALID(

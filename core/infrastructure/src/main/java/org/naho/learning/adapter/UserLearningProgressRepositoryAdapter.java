@@ -20,53 +20,52 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserLearningProgressRepositoryAdapter implements UserLearningProgressRepositoryPort {
 
-    private final UserLearningProgressJpaRepository userLearningProgressJpaRepository;
-    private final UserJpaRepository userJpaRepository;
-    private final UserLearningProgressEntityMapper userLearningProgressEntityMapper;
+        private final UserLearningProgressJpaRepository userLearningProgressJpaRepository;
+        private final UserJpaRepository userJpaRepository;
+        private final UserLearningProgressEntityMapper userLearningProgressEntityMapper;
 
-    @Override
-    @Transactional
-    public UserLearningProgress createNew(UserLearningProgress userLearningProgress, Long userId) {
-        UserLearningProgressEntity userLearningProgressEntity =
-                userLearningProgressEntityMapper.domainToEntity(userLearningProgress);
+        @Override
+        @Transactional
+        public UserLearningProgress createNew(UserLearningProgress userLearningProgress, Long userId) {
+                UserLearningProgressEntity userLearningProgressEntity = userLearningProgressEntityMapper
+                                .domainToEntity(userLearningProgress);
 
-        UserEntity user = userJpaRepository.findById(userId)
-                .orElseThrow(() -> new InfrastructureException(
-                        UserErrorCode.USER_NOT_FOUND,
-                        UserDetailMessageKey.USER_ID_NOT_FOUND,
-                        userId
-                ));
+                UserEntity user = userJpaRepository.findById(userId)
+                                .orElseThrow(() -> new InfrastructureException(
+                                                UserErrorCode.USER_NOT_FOUND,
+                                                UserDetailMessageKey.USER_ID_NOT_FOUND,
+                                                userId));
 
-        userLearningProgressEntity.setUser(user);
+                userLearningProgressEntity.setUser(user);
 
-        UserLearningProgressEntity savedUserLearningProgressEntity =
-                userLearningProgressJpaRepository.save(userLearningProgressEntity);
+                UserLearningProgressEntity savedUserLearningProgressEntity = userLearningProgressJpaRepository
+                                .save(userLearningProgressEntity);
 
-        user.setUserLearningProgress(savedUserLearningProgressEntity);
-        userJpaRepository.save(user);
+                user.setUserLearningProgress(savedUserLearningProgressEntity);
+                userJpaRepository.save(user);
 
-        return userLearningProgressEntityMapper.entityToDomain(savedUserLearningProgressEntity);
-    }
+                return userLearningProgressEntityMapper.entityToDomain(savedUserLearningProgressEntity);
+        }
 
-    @Override
-    public Optional<UserLearningProgress> findByUserId(Long userId) {
-        return userLearningProgressJpaRepository
-                .findByUserId(userId)
-                .map(userLearningProgressEntityMapper::entityToDomain);
-    }
+        @Override
+        public Optional<UserLearningProgress> findByUserId(Long userId) {
+                return userLearningProgressJpaRepository
+                                .findByUser_Id(userId)
+                                .map(userLearningProgressEntityMapper::entityToDomain);
+        }
 
-    @Override
-    public UserLearningProgress save(UserLearningProgress userLearningProgress) {
-        UserLearningProgressEntity userLearningProgressEntity =
-                userLearningProgressEntityMapper.domainToEntity(userLearningProgress);
+        @Override
+        public UserLearningProgress save(UserLearningProgress userLearningProgress) {
+                UserLearningProgressEntity userLearningProgressEntity = userLearningProgressEntityMapper
+                                .domainToEntity(userLearningProgress);
 
-        UserLearningProgressEntity savedEntity =
-                userLearningProgressJpaRepository.save(userLearningProgressEntity);
-        return userLearningProgressEntityMapper.entityToDomain(savedEntity);
-    }
+                UserLearningProgressEntity savedEntity = userLearningProgressJpaRepository
+                                .save(userLearningProgressEntity);
+                return userLearningProgressEntityMapper.entityToDomain(savedEntity);
+        }
 
-    @Override
-    public boolean existsByUserId(Long userId) {
-        return userLearningProgressJpaRepository.existsByUser_Id(userId);
-    }
+        @Override
+        public boolean existsByUserId(Long userId) {
+                return userLearningProgressJpaRepository.existsByUser_Id(userId);
+        }
 }

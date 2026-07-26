@@ -56,10 +56,10 @@ public class SpeakingQuestion {
     }
 
     public void update(String title,
-                       String description,
-                       String titleMarkup,
-                       String descriptionMarkup,
-                       Long speakingQuestionAudioFileId) {
+            String description,
+            String titleMarkup,
+            String descriptionMarkup,
+            Long speakingQuestionAudioFileId) {
         validateTitle(title);
         validateDescription(description);
 

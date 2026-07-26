@@ -51,7 +51,7 @@ public class UserLearningProgress {
                 0.0
         );
     }
-
+    
     public static Builder builder() {
         return new Builder();
     }

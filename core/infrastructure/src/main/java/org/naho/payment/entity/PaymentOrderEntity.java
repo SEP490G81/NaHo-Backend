@@ -46,6 +46,9 @@ public class PaymentOrderEntity extends BaseEntity {
     @Column(nullable = false)
     PaymentStatus status;
 
+    @Column(name = "payment_url", columnDefinition = "TEXT")
+    String paymentUrl;
+
     @Column(name = "provider_transaction_id")
     String providerTransactionId;
 

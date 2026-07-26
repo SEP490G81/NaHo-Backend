@@ -1,6 +1,7 @@
 package org.naho.social.report.result;
 
-import org.naho.social.type.ReportType;
+
+import org.naho.social.report.type.ReportType;
 
 public record ReportResult(
         Long id,

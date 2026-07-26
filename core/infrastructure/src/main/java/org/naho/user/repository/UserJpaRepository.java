@@ -1,10 +1,12 @@
 package org.naho.user.repository;
 
+import jakarta.persistence.LockModeType;
 import org.naho.shared.persistence.BaseJpaRepository;
 import org.naho.user.entity.UserEntity;
 import org.naho.user.type.JLPTLevel;
 import org.naho.user.type.RoleName;
 import org.naho.user.type.UserStatus;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -21,6 +23,10 @@ public interface UserJpaRepository extends BaseJpaRepository<UserEntity> {
     boolean existsByUsername(String username);
 
     boolean existsByEmail(String email);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT u FROM UserEntity u WHERE u.id = :userId")
+    Optional<UserEntity> findByIdForUpdate(@Param("userId") Long userId);
 
     @Query("SELECT DISTINCT u FROM UserEntity u " +
             "LEFT JOIN u.roles r " +

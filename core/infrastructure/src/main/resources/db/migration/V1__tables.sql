@@ -184,6 +184,19 @@ CREATE TABLE objectives
     CONSTRAINT pk_objectives PRIMARY KEY (id)
 );
 
+CREATE TABLE payment_idempotencies
+(
+    id                     BIGINT AUTO_INCREMENT NOT NULL,
+    created_time           datetime(6)           NOT NULL,
+    modified_time          datetime(6)           NULL,
+    user_id                BIGINT                NOT NULL,
+    idempotency_key        VARCHAR(100)          NOT NULL,
+    request_hash           VARCHAR(64)           NOT NULL,
+    payment_order_id       BIGINT                NOT NULL,
+    retention_expires_time datetime(6)           NOT NULL,
+    CONSTRAINT pk_payment_idempotencies PRIMARY KEY (id)
+);
+
 CREATE TABLE payment_orders
 (
     id                      BIGINT AUTO_INCREMENT NOT NULL,
@@ -196,6 +209,7 @@ CREATE TABLE payment_orders
     amount_currency         VARCHAR(255)          NOT NULL,
     provider                VARCHAR(255)          NOT NULL,
     status                  VARCHAR(255)          NOT NULL,
+    payment_url             TEXT                  NULL,
     provider_transaction_id VARCHAR(255)          NULL,
     expires_time            datetime              NOT NULL,
     paid_time               datetime              NULL,
@@ -576,6 +590,9 @@ ALTER TABLE users
 
 ALTER TABLE users
     ADD CONSTRAINT uc_users_username UNIQUE (username);
+
+ALTER TABLE payment_idempotencies
+    ADD CONSTRAINT uk_payment_idempotency_user_key UNIQUE (user_id, idempotency_key);
 
 ALTER TABLE answer_histories
     ADD CONSTRAINT FK_ANSWER_HISTORIES_ON_AUDIO_FILE FOREIGN KEY (audio_file_id) REFERENCES files (id);

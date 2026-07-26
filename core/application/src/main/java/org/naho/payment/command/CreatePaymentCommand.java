@@ -7,5 +7,6 @@ public record CreatePaymentCommand(
         String planCode,
         PaymentProvider provider,
         String clientIp,
-        String locale) {
+        String locale,
+        String idempotencyKey) {
 }

@@ -1,5 +1,6 @@
 INSERT IGNORE INTO vocabulary_questions (id, created_time, modified_time)
 VALUES (1, NOW(), NULL),
+       (1, NOW(), NULL),
        (2, NOW(), NULL),
        (3, NOW(), NULL),
        (4, NOW(), NULL),

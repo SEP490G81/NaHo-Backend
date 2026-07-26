@@ -34,4 +34,6 @@ public interface UserRepositoryPort {
     List<LeaderboardUserResult> findTop10OrderByTotalPointInLeague(Long leagueId);
 
     Optional<LeaderboardUserResult> findTopOfUserByUserId(Long userId);
+
+    void lockById(Long userId);
 }

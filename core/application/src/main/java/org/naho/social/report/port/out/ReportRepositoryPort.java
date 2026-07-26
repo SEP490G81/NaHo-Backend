@@ -1,7 +1,7 @@
 package org.naho.social.report.port.out;
 
-import org.naho.social.model.Report;
-import org.naho.social.type.ReportType;
+import org.naho.social.report.model.Report;
+import org.naho.social.report.type.ReportType;
 
 import java.util.List;
 import java.util.Optional;

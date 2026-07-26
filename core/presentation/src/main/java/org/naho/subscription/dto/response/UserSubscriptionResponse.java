@@ -21,4 +21,5 @@ public class UserSubscriptionResponse {
     private Instant endTime;
     private Instant createdTime;
     private Instant modifiedTime;
+    private SubscriptionPlanResponse plan;
 }

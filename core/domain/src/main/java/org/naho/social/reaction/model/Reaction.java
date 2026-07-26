@@ -1,9 +1,11 @@
-package org.naho.social.model;
+package org.naho.social.reaction.model;
 
 import org.naho.i18n.message.social.ReactionDetailMessageKey;
 import org.naho.shared.exception.DomainException;
-import org.naho.social.exception.ReactionDomainErrorCode;
-import org.naho.social.type.ReactionType;
+import org.naho.social.reaction.exception.ReactionDomainErrorCode;
+import org.naho.social.reaction.type.ReactionType;
+
+import java.time.Instant;
 
 public class Reaction {
 
@@ -11,7 +13,9 @@ public class Reaction {
     private final Long userId;
     private final Long commentId;
     private final Long questionId;
-    private final ReactionType reactionType;
+    private final Instant createdTime;
+    private final Instant modifiedTime;
+    private ReactionType reactionType;
 
     private Reaction(Builder builder) {
         this.id = builder.id;
@@ -19,10 +23,23 @@ public class Reaction {
         this.commentId = builder.commentId;
         this.questionId = builder.questionId;
         this.reactionType = builder.reactionType;
+        this.createdTime = builder.createdTime;
+        this.modifiedTime = builder.modifiedTime;
     }
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public Builder toBuilder() {
+        return new Builder()
+                .id(this.id)
+                .userId(this.userId)
+                .commentId(this.commentId)
+                .questionId(this.questionId)
+                .reactionType(this.reactionType)
+                .createdTime(this.createdTime)
+                .modifiedTime(this.modifiedTime);
     }
 
     public Long getId() {
@@ -45,6 +62,14 @@ public class Reaction {
         return reactionType;
     }
 
+    public Instant getCreatedTime() {
+        return createdTime;
+    }
+
+    public Instant getModifiedTime() {
+        return modifiedTime;
+    }
+
     public static class Builder {
 
         private Long id;
@@ -52,6 +77,8 @@ public class Reaction {
         private Long commentId;
         private Long questionId;
         private ReactionType reactionType;
+        private Instant createdTime;
+        private Instant modifiedTime;
 
         public Builder id(Long id) {
             this.id = id;
@@ -75,6 +102,16 @@ public class Reaction {
 
         public Builder reactionType(ReactionType reactionType) {
             this.reactionType = reactionType;
+            return this;
+        }
+
+        public Builder createdTime(Instant createdTime) {
+            this.createdTime = createdTime;
+            return this;
+        }
+
+        public Builder modifiedTime(Instant modifiedTime) {
+            this.modifiedTime = modifiedTime;
             return this;
         }
 
