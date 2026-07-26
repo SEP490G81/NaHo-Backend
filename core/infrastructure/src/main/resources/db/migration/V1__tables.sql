@@ -193,7 +193,7 @@ CREATE TABLE payment_orders
     user_id                 BIGINT       NOT NULL,
     subscription_plan_id    BIGINT       NOT NULL,
     amount_amount           DECIMAL      NOT NULL,
-    payment_url             TEXT         NOT NULL,
+    payment_url             TEXT         NULL,
     amount_currency         VARCHAR(255) NOT NULL,
     provider                VARCHAR(255) NOT NULL,
     status                  VARCHAR(255) NOT NULL,
