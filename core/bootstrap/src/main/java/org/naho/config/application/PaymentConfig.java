@@ -77,7 +77,33 @@ public class PaymentConfig {
             PlatformTransactionManager transactionManager) {
         GetPaymentUseCase target = new GetPaymentUseCase(orderRepositoryPort);
         TransactionTemplate template = new TransactionTemplate(transactionManager);
-        return orderCode -> template.execute(status -> target.getPaymentByOrderCode(orderCode));
+        return new GetPaymentInputPort() {
+            @Override
+            public org.naho.payment.result.PaymentOrderResult getPaymentByOrderCode(String orderCode) {
+                return template.execute(status -> target.getPaymentByOrderCode(orderCode));
+            }
+
+            @Override
+            public java.util.List<org.naho.payment.result.PaymentOrderResult> getPaymentsByUserId(Long userId) {
+                return template.execute(status -> target.getPaymentsByUserId(userId));
+            }
+        };
+    }
+
+    @Bean
+    public org.naho.payment.port.in.AdminUpgradeSubscriptionInputPort adminUpgradeSubscriptionInputPort(
+            org.naho.user.port.out.RoleRepositoryPort roleRepositoryPort,
+            UserRepositoryPort userRepositoryPort,
+            SubscriptionPlanRepositoryPort planRepositoryPort,
+            UserSubscriptionRepositoryPort subscriptionRepositoryPort,
+            PlatformTransactionManager transactionManager) {
+        org.naho.payment.usecase.AdminUpgradeSubscriptionUseCase target = new org.naho.payment.usecase.AdminUpgradeSubscriptionUseCase(
+                roleRepositoryPort,
+                userRepositoryPort,
+                planRepositoryPort,
+                subscriptionRepositoryPort);
+        TransactionTemplate template = new TransactionTemplate(transactionManager);
+        return command -> template.execute(status -> target.upgradeSubscription(command));
     }
 
     @Bean
@@ -107,3 +133,4 @@ public class PaymentConfig {
         return userId -> template.execute(status -> target.getActiveSubscription(userId));
     }
 }
+

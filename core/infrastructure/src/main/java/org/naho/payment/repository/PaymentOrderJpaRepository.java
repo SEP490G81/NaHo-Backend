@@ -24,6 +24,9 @@ public interface PaymentOrderJpaRepository extends BaseJpaRepository<PaymentOrde
 
     boolean existsByOrderCode(String orderCode);
 
+    List<PaymentOrderEntity> findByUserIdOrderByCreatedTimeDesc(Long userId);
+
+
     @Query("""
                 SELECT po
                 FROM PaymentOrderEntity po

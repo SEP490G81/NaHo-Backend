@@ -193,6 +193,7 @@ CREATE TABLE payment_orders
     user_id                 BIGINT       NOT NULL,
     subscription_plan_id    BIGINT       NOT NULL,
     amount_amount           DECIMAL      NOT NULL,
+    payment_url             TEXT         NOT NULL,
     amount_currency         VARCHAR(255) NOT NULL,
     provider                VARCHAR(255) NOT NULL,
     status                  VARCHAR(255) NOT NULL,
@@ -402,10 +403,10 @@ CREATE TABLE user_daily_attendances
     id              BIGINT AUTO_INCREMENT NOT NULL,
     created_time    datetime(6)           NOT NULL,
     modified_time   datetime(6)           NULL,
-    attendance_date date                  NOT NULL,
-    earned_point    INT                   NOT NULL,
-    user_id         BIGINT                NOT NULL,
-    daily_reward_id BIGINT                NOT NULL,
+    attendance_date date   NOT NULL,
+    earned_point    INT    NOT NULL,
+    user_id         BIGINT NOT NULL,
+    daily_reward_id BIGINT NOT NULL,
     CONSTRAINT pk_user_daily_attendances PRIMARY KEY (id)
 );
 

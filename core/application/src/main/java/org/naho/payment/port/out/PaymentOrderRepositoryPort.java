@@ -3,6 +3,7 @@ package org.naho.payment.port.out;
 import org.naho.payment.model.PaymentOrder;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 public interface PaymentOrderRepositoryPort {
@@ -18,5 +19,8 @@ public interface PaymentOrderRepositoryPort {
 
     Optional<PaymentOrder> findPendingByUserId(Long userId);
 
+    List<PaymentOrder> findAllByUserId(Long userId);
+
     void expirePendingBefore(Instant now);
 }
+

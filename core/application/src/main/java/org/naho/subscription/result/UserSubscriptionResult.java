@@ -13,5 +13,6 @@ public record UserSubscriptionResult(
         Instant startTime,
         Instant endTime,
         Instant createdTime,
-        Instant modifiedTime) {
+        Instant modifiedTime,
+        SubscriptionPlanResult planResult) {
 }

@@ -66,6 +66,15 @@ public class PaymentOrderRepositoryAdapter implements PaymentOrderRepositoryPort
     }
 
     @Override
+    public List<PaymentOrder> findAllByUserId(Long userId) {
+        return orderJpaRepository.findByUserIdOrderByCreatedTimeDesc(userId)
+                .stream()
+                .map(orderEntityMapper::entityToDomain)
+                .toList();
+    }
+
+
+    @Override
     public void expirePendingBefore(Instant now) {
         orderJpaRepository.expirePendingBefore(now);
     }

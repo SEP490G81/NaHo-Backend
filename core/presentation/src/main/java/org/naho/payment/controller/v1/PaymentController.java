@@ -1,17 +1,24 @@
 package org.naho.payment.controller.v1;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+
+import org.naho.i18n.message.payment.PaymentDetailMessageKey;
+import org.naho.payment.command.AdminUpgradeSubscriptionCommand;
 import org.naho.payment.command.CancelPaymentCommand;
 import org.naho.payment.command.ConfirmPaymentCommand;
 import org.naho.payment.command.CreatePaymentCommand;
 import org.naho.payment.dto.mapper.PaymentResponseMapper;
+import org.naho.payment.dto.request.AdminUpgradeSubscriptionRequest;
 import org.naho.payment.dto.request.CreatePaymentRequest;
 import org.naho.payment.dto.response.CancelPaymentResponse;
 import org.naho.payment.dto.response.CreatePaymentResponse;
 import org.naho.payment.dto.response.PaymentOrderResponse;
 import org.naho.payment.dto.response.VnPayIpnResponse;
 import org.naho.payment.helper.VnPayCallbackHelper;
+import org.naho.payment.port.in.AdminUpgradeSubscriptionInputPort;
 import org.naho.payment.port.in.CancelPaymentInputPort;
 import org.naho.payment.port.in.ConfirmPaymentInputPort;
 import org.naho.payment.port.in.CreatePaymentInputPort;
@@ -22,6 +29,9 @@ import org.naho.payment.result.CreatePaymentResult;
 import org.naho.payment.result.PaymentOrderResult;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.shared.exception.ApplicationException;
+import org.naho.subscription.dto.mapper.SubscriptionResponseMapper;
+import org.naho.subscription.dto.response.UserSubscriptionResponse;
+import org.naho.subscription.result.UserSubscriptionResult;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -30,6 +40,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -44,8 +55,37 @@ public class PaymentController {
     private final ConfirmPaymentInputPort confirmPaymentInputPort;
     private final GetPaymentInputPort getPaymentInputPort;
     private final CancelPaymentInputPort cancelPaymentInputPort;
+    private final AdminUpgradeSubscriptionInputPort adminUpgradeSubscriptionInputPort;
     private final PaymentResponseMapper responseMapper;
+    private final SubscriptionResponseMapper subscriptionResponseMapper;
     private final VnPayCallbackHelper vnPayCallbackHelper;
+
+    @GetMapping("/my-orders")
+    @ApiResponseMessage(message = PaymentDetailMessageKey.PAYMENT_ORDER_GET_ALL_SUCCESS)
+    public ResponseEntity<List<PaymentOrderResponse>> getMyPaymentOrders(
+            @AuthenticationPrincipal AccessTokenPayload payload) {
+        List<PaymentOrderResult> results = getPaymentInputPort.getPaymentsByUserId(payload.userId());
+        List<PaymentOrderResponse> response = results.stream()
+                .map(responseMapper::resultToOrderResponse)
+                .toList();
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/admin/upgrade-subscription")
+    @ApiResponseMessage(message = PaymentDetailMessageKey.PAYMENT_SUBSCRIPTION_UPGRADE_SUCCESS)
+    public ResponseEntity<UserSubscriptionResponse> upgradeUserSubscription(
+            @AuthenticationPrincipal AccessTokenPayload payload,
+            @RequestBody @Valid AdminUpgradeSubscriptionRequest request) {
+        AdminUpgradeSubscriptionCommand command = new AdminUpgradeSubscriptionCommand(
+                payload.userId(),
+                request.getUserId(),
+                request.getPlanCode(),
+                request.getDurationDays()
+        );
+        UserSubscriptionResult result = adminUpgradeSubscriptionInputPort.upgradeSubscription(command);
+        UserSubscriptionResponse response = subscriptionResponseMapper.userSubResultToResponse(result);
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping("/create")
     @ApiResponseMessage(message = "payment.order.creation_success")
@@ -135,3 +175,4 @@ public class PaymentController {
         return ResponseEntity.ok(response);
     }
 }
+

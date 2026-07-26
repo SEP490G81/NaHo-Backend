@@ -31,6 +31,25 @@ public class GetPaymentUseCase implements GetPaymentInputPort {
             orderRepositoryPort.save(order);
         }
 
+        return mapToResult(order);
+    }
+
+    @Override
+    public java.util.List<PaymentOrderResult> getPaymentsByUserId(Long userId) {
+        java.util.List<PaymentOrder> orders = orderRepositoryPort.findAllByUserId(userId);
+        Instant now = Instant.now();
+        java.util.List<PaymentOrderResult> results = new java.util.ArrayList<>();
+        for (PaymentOrder order : orders) {
+            if (order.getStatus() == PaymentStatus.PENDING && order.isExpiredAt(now)) {
+                order.expire(now);
+                orderRepositoryPort.save(order);
+            }
+            results.add(mapToResult(order));
+        }
+        return results;
+    }
+
+    private PaymentOrderResult mapToResult(PaymentOrder order) {
         return new PaymentOrderResult(
                 order.getId(),
                 order.getOrderCode(),
@@ -46,3 +65,4 @@ public class GetPaymentUseCase implements GetPaymentInputPort {
                 order.getModifiedTime());
     }
 }
+
