@@ -96,6 +96,7 @@ app:
     hash-secret: ${VNPAY_SECRET_KEY}
     payment-url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
     return-url: https://groggily-override-wrongly.ngrok-free.dev/api/v1/payments/vnpay-return
+    timeout: 5
 
   static-resources:
     base-location: ${STATIC_RESOURCES_BASE_LOCATION}

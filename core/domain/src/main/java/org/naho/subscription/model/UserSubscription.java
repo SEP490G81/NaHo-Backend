@@ -65,6 +65,11 @@ public class UserSubscription { //Đăng ký gói của học viên
         }
     }
 
+    public void cancel(Instant now) {
+        this.status = SubscriptionStatus.CANCELLED;
+        this.modifiedTime = now;
+    }
+
     // Getters
     public Long getId() {
         return id;

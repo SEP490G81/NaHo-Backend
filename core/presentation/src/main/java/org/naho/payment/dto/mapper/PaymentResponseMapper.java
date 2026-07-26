@@ -12,7 +12,8 @@ public interface PaymentResponseMapper {
 
     @Mapping(target = "amount", source = "amount.amount")
     @Mapping(target = "currency", expression = "java(result.amount().currency().getCurrencyCode())")
-    @Mapping(target = "paymentUrl", expression = "java(result.paymentUrl().toString())")
+    @Mapping(target = "paymentUrl", expression = "java(result.paymentUrl() != null ? result.paymentUrl().toString() : null)")
+    @Mapping(target = "reuseReason", expression = "java(result.reuseReason() != null ? result.reuseReason().name() : null)")
     CreatePaymentResponse resultToCreateResponse(CreatePaymentResult result);
 
     @Mapping(target = "amount", source = "amount.amount")

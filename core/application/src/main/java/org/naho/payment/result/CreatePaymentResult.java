@@ -1,6 +1,7 @@
 package org.naho.payment.result;
 
 import org.naho.payment.model.Money;
+import org.naho.payment.type.PaymentReuseReason;
 import org.naho.payment.type.PaymentStatus;
 
 import java.net.URI;
@@ -12,5 +13,7 @@ public record CreatePaymentResult(
         Money amount,
         PaymentStatus status,
         URI paymentUrl,
-        Instant expiresTime) {
+        Instant expiresTime,
+        boolean reused,
+        PaymentReuseReason reuseReason) {
 }
