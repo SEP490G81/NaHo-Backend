@@ -19,5 +19,6 @@ public final class SubscriptionDetailMessageKey {
     public static final String PLAN_FREE_NOT_PURCHASABLE = "subscription.plan.free_not_purchasable";
     public static final String PLAN_ALREADY_ACTIVE_OR_HIGHER = "subscription.plan.already_active_or_higher";
 
-    private SubscriptionDetailMessageKey() {}
+    private SubscriptionDetailMessageKey() {
+    }
 }

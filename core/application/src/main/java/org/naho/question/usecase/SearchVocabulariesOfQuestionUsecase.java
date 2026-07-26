@@ -1,13 +1,13 @@
 package org.naho.question.usecase;
 
+import org.naho.i18n.message.question.VocabularyQuestionDetailMessageKey;
 import org.naho.question.command.LearningPathNodeCommand;
-import org.naho.vocabulary.model.Vocabulary;
 import org.naho.question.port.in.SearchVocabulariesOfQuestionInputPort;
-import org.naho.vocabulary.port.out.VocabularyPort;
 import org.naho.question.result.VocabulariesOfQuestionResult;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.vocabulary.exception.VocabularyErrorCode;
-import org.naho.i18n.message.question.VocabularyQuestionDetailMessageKey;
+import org.naho.vocabulary.model.Vocabulary;
+import org.naho.vocabulary.port.out.VocabularyPort;
 
 import java.util.List;
 
@@ -22,14 +22,14 @@ public class SearchVocabulariesOfQuestionUsecase implements SearchVocabulariesOf
 
     @Override
     public VocabulariesOfQuestionResult getVocabularyListOfQuestion(LearningPathNodeCommand learningPathNodeCommand) {
-         List<Vocabulary> listVocabulary =  vocabularyPort.findVocabularyList(learningPathNodeCommand.vocabulary_question_id());
-         if(listVocabulary.isEmpty()){
-              throw new ApplicationException(
-                      VocabularyErrorCode.VOCABULARY_NOT_FOUND,
-                      VocabularyQuestionDetailMessageKey.VOCABULARY_NOT_FOUND,
-                      learningPathNodeCommand.vocabulary_question_id()
-              );
-         }
+        List<Vocabulary> listVocabulary = vocabularyPort.findVocabularyList(learningPathNodeCommand.vocabulary_question_id());
+        if (listVocabulary.isEmpty()) {
+            throw new ApplicationException(
+                    VocabularyErrorCode.VOCABULARY_NOT_FOUND,
+                    VocabularyQuestionDetailMessageKey.VOCABULARY_NOT_FOUND,
+                    learningPathNodeCommand.vocabulary_question_id()
+            );
+        }
         List<VocabulariesOfQuestionResult.VocabularyDetailResult> vocabularyDetailResultList = listVocabulary.stream().map(
                 vocab -> new VocabulariesOfQuestionResult.VocabularyDetailResult(
                         vocab.getId(),
@@ -39,11 +39,11 @@ public class SearchVocabulariesOfQuestionUsecase implements SearchVocabulariesOf
                         vocab.getEnglishMeaningText()
                 )
         ).toList();
-         VocabulariesOfQuestionResult result = new VocabulariesOfQuestionResult(
-                 learningPathNodeCommand.id(),
-                 learningPathNodeCommand.vocabulary_question_id(),
-                 vocabularyDetailResultList
-         );
+        VocabulariesOfQuestionResult result = new VocabulariesOfQuestionResult(
+                learningPathNodeCommand.id(),
+                learningPathNodeCommand.vocabulary_question_id(),
+                vocabularyDetailResultList
+        );
         return result;
     }
 }

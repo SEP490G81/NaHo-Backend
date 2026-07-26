@@ -8,7 +8,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
-import java.util.Optional;
 
 @Repository
 public interface UserSubscriptionJpaRepository extends BaseJpaRepository<UserSubscriptionEntity> {

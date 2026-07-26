@@ -1,7 +1,6 @@
 package org.naho.subscription.adapter;
 
 import lombok.RequiredArgsConstructor;
-import org.naho.subscription.entity.SubscriptionPlanEntity;
 import org.naho.subscription.mapper.SubscriptionPlanEntityMapper;
 import org.naho.subscription.model.SubscriptionPlan;
 import org.naho.subscription.port.out.SubscriptionPlanRepositoryPort;

@@ -20,4 +20,6 @@ public class CreatePaymentResponse {
     private String status;
     private String paymentUrl;
     private Instant expiresTime;
+    private boolean reused;
+    private String reuseReason;
 }

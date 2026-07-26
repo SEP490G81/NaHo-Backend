@@ -1,7 +1,5 @@
 package org.naho.question.result;
 
-import org.naho.vocabulary.model.Vocabulary;
-
 import java.util.List;
 
 public record VocabulariesOfQuestionResult(

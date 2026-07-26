@@ -1,13 +1,12 @@
 package org.naho.subscription.model;
 
 import org.naho.i18n.message.subscription.SubscriptionDetailMessageKey;
+import org.naho.shared.exception.DomainException;
 import org.naho.subscription.exception.SubscriptionDomainErrorCode;
 import org.naho.subscription.type.SubscriptionStatus;
-import org.naho.shared.exception.DomainException;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Objects;
 
 public class UserSubscription { //Đăng ký gói của học viên
     private final Long id;

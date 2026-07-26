@@ -68,8 +68,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         UserEntity userEntity = userEntityMapper.domainToEntity(user);
 
         if (oAuthProvider != null) {
-            OAuthProviderEntity oAuthProviderEntity =
-                    oAuthProviderEntityMapper.domainToEntity(oAuthProvider);
+            OAuthProviderEntity oAuthProviderEntity = oAuthProviderEntityMapper.domainToEntity(oAuthProvider);
             oAuthProviderEntity.setUser(userEntity);
             userEntity.getOAuthProviders().add(oAuthProviderEntity);
         }
@@ -83,8 +82,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         UserEntity userEntity = userEntityMapper.domainToEntity(user);
 
         if (oAuthProvider != null) {
-            OAuthProviderEntity oAuthProviderEntity =
-                    oAuthProviderEntityMapper.domainToEntity(oAuthProvider);
+            OAuthProviderEntity oAuthProviderEntity = oAuthProviderEntityMapper.domainToEntity(oAuthProvider);
             oAuthProviderEntity.setUser(userEntity);
             userEntity.getOAuthProviders().add(oAuthProviderEntity);
         }
@@ -153,5 +151,10 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         return userJpaRepository.findAll().stream()
                 .map(userEntityMapper::entityToDomain)
                 .toList();
+    }
+
+    @Override
+    public void lockById(Long userId) {
+        userJpaRepository.findByIdForUpdate(userId);
     }
 }

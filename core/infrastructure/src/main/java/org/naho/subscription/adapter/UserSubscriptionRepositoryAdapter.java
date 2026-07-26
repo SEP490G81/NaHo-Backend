@@ -28,7 +28,7 @@ public class UserSubscriptionRepositoryAdapter implements UserSubscriptionReposi
     @Override
     public UserSubscription save(UserSubscription subscription) {
         UserSubscriptionEntity entity = subscriptionEntityMapper.domainToEntity(subscription);
-        
+
         SubscriptionPlanEntity planEntity = planJpaRepository.getReferenceById(subscription.getSubscriptionPlanId());
         entity.setSubscriptionPlan(planEntity);
 

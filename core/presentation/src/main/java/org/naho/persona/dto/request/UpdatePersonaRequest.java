@@ -8,4 +8,5 @@ public record UpdatePersonaRequest(
         @NotBlank String prompt,
         Long avatarFileId,
         @NotNull Long suggestedConversationStyleId
-) {}
+) {
+}

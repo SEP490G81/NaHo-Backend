@@ -8,6 +8,11 @@ public final class PaymentDetailMessageKey {
     public static final String PAYMENT_EXPIRATION_INVALID = "payment.expiration.invalid";
     public static final String PAYMENT_INVALID_STATE = "payment.invalid.state";
     public static final String PAYMENT_DUPLICATE_TXN = "payment.duplicate.txn";
+    public static final String PAYMENT_IDEMPOTENCY_KEY_INVALID = "payment.idempotency_key.invalid";
+    public static final String PAYMENT_IDEMPOTENCY_KEY_REUSED = "payment.idempotency_key.reused";
+    public static final String PAYMENT_ACTIVE_ORDER_EXISTS = "payment.active_order_exists";
+    public static final String PAYMENT_ORDER_NOT_FOUND = "payment.order.not_found";
 
-    private PaymentDetailMessageKey() {}
+    private PaymentDetailMessageKey() {
+    }
 }

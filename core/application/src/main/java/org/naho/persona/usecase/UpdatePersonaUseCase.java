@@ -1,12 +1,12 @@
 package org.naho.persona.usecase;
 
+import org.naho.i18n.message.persona.PersonaDetailMessageKey;
 import org.naho.persona.command.UpdatePersonaCommand;
+import org.naho.persona.exception.PersonaErrorCode;
 import org.naho.persona.model.Persona;
 import org.naho.persona.port.in.UpdatePersonaInputPort;
 import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.naho.shared.exception.ApplicationException;
-import org.naho.persona.exception.PersonaErrorCode;
-import org.naho.i18n.message.persona.PersonaDetailMessageKey;
 
 public class UpdatePersonaUseCase implements UpdatePersonaInputPort {
 

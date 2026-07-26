@@ -10,6 +10,8 @@ import org.naho.subscription.entity.SubscriptionPlanEntity;
 import org.naho.subscription.repository.SubscriptionPlanJpaRepository;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -52,5 +54,19 @@ public class PaymentOrderRepositoryAdapter implements PaymentOrderRepositoryPort
     @Override
     public boolean existsByOrderCode(String orderCode) {
         return orderJpaRepository.existsByOrderCode(orderCode);
+    }
+
+    @Override
+    public Optional<PaymentOrder> findPendingByUserId(Long userId) {
+        List<PaymentOrderEntity> list = orderJpaRepository.findAllPendingByUserId(userId);
+        if (list.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(orderEntityMapper.entityToDomain(list.get(0)));
+    }
+
+    @Override
+    public void expirePendingBefore(Instant now) {
+        orderJpaRepository.expirePendingBefore(now);
     }
 }

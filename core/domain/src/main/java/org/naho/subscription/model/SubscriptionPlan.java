@@ -2,13 +2,12 @@ package org.naho.subscription.model;
 
 import org.naho.i18n.message.subscription.SubscriptionDetailMessageKey;
 import org.naho.payment.model.Money;
+import org.naho.shared.exception.DomainException;
 import org.naho.subscription.exception.SubscriptionDomainErrorCode;
 import org.naho.subscription.type.PlanStatus;
 import org.naho.subscription.type.PlanTier;
-import org.naho.shared.exception.DomainException;
 
 import java.time.Instant;
-import java.util.Objects;
 
 public class SubscriptionPlan {
     private final Long id;

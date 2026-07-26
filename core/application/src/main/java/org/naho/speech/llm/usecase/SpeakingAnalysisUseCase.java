@@ -12,7 +12,6 @@ import org.naho.book.port.out.BookRepositoryPort;
 import org.naho.book.port.out.LessonRepositoryPort;
 import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.book.port.out.TopicRepositoryPort;
-import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.file.command.FileUploadCommand;
 import org.naho.file.port.in.FileStorageInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
@@ -20,6 +19,7 @@ import org.naho.file.result.FileResult;
 import org.naho.furigana.port.out.FuriganaGenerationPort;
 import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
 import org.naho.i18n.message.user.UserDetailMessageKey;
+import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.question.command.CompleteSpeakingQuestionCommand;
 import org.naho.question.exception.SpeakingQuestionErrorCode;
 import org.naho.question.model.Grammar;
@@ -37,7 +37,6 @@ import org.naho.speech.llm.port.out.AiAnalysisPort;
 import org.naho.speech.llm.port.out.AnswerHistoryRepositoryPort;
 import org.naho.speech.llm.result.SpeakingAnalysisResult;
 import org.naho.speech.llm.result.SpeakingHistoryDetailResult;
-import org.naho.speech.llm.result.SpeakingHistoryListItemResult;
 import org.naho.speech.llm.result.SpeakingHistoryListResult;
 import org.naho.speech.model.AnswerHistory;
 import org.naho.speech.model.ContentAssessment;
@@ -427,7 +426,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
 
         org.naho.file.model.File audioFile = fileRepositoryPort.findById(uploadResult.id());
         String audioUrl = audioFile != null ? audioFile.getObjectKey() : null;
-        
+
         return new SpeakingAnalysisResult(answerHistory.getId(), overallScore, audioUrl);
     }
 

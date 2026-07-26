@@ -17,6 +17,7 @@ public class PaymentOrder {
     private final Money amount;
     private PaymentProvider provider;
     private PaymentStatus status;
+    private String paymentUrl;
     private String providerTransactionId;
     private final Instant createdTime; // Thời gian tạo hóa đơn
     private final Instant expiresTime; // Thời gian hết hạn thanh toán
@@ -31,6 +32,7 @@ public class PaymentOrder {
         this.amount = builder.amount;
         this.provider = builder.provider;
         this.status = builder.status;
+        this.paymentUrl = builder.paymentUrl;
         this.providerTransactionId = builder.providerTransactionId;
         this.createdTime = builder.createdTime;
         this.expiresTime = builder.expiresTime;
@@ -71,10 +73,11 @@ public class PaymentOrder {
         this.modifiedTime = now;
     }
 
-    public void markProcessing(Instant now) {
-        ensurePending();
-        ensureNotExpired(now);
-        this.status = PaymentStatus.PROCESSING;
+    public void assignPaymentUrl(String paymentUrl, Instant now) {
+        if (paymentUrl == null || paymentUrl.isBlank()) {
+            throw new IllegalArgumentException("Payment URL must not be blank");
+        }
+        this.paymentUrl = paymentUrl;
         this.modifiedTime = now;
     }
 
@@ -83,7 +86,7 @@ public class PaymentOrder {
             return;
         }
 
-        if (status != PaymentStatus.PENDING && status != PaymentStatus.PROCESSING) {
+        if (status != PaymentStatus.PENDING) {
             throw new DomainException(
                     PaymentDomainErrorCode.PAYMENT_INVALID_STATE,
                     PaymentDetailMessageKey.PAYMENT_INVALID_STATE);
@@ -182,6 +185,10 @@ public class PaymentOrder {
         return status;
     }
 
+    public String getPaymentUrl() {
+        return paymentUrl;
+    }
+
     public String getProviderTransactionId() {
         return providerTransactionId;
     }
@@ -210,6 +217,7 @@ public class PaymentOrder {
         private Money amount;
         private PaymentProvider provider;
         private PaymentStatus status;
+        private String paymentUrl;
         private String providerTransactionId;
         private Instant createdTime;
         private Instant expiresTime;
@@ -251,6 +259,11 @@ public class PaymentOrder {
 
         public Builder status(PaymentStatus status) {
             this.status = status;
+            return this;
+        }
+
+        public Builder paymentUrl(String paymentUrl) {
+            this.paymentUrl = paymentUrl;
             return this;
         }
 
@@ -300,7 +313,7 @@ public class PaymentOrder {
                 createdTime = Instant.now();
             }
             if (expiresTime == null || !expiresTime.isAfter(createdTime)) {
-                expiresTime = createdTime.plus(java.time.Duration.ofMinutes(5));
+                expiresTime = createdTime.plus(java.time.Duration.ofMinutes(15));
             }
             if (provider == null) {
                 provider = PaymentProvider.UNASSIGNED;
