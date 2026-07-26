@@ -22,15 +22,18 @@ public class ConfirmPaymentUseCase implements ConfirmPaymentInputPort {
     private final PaymentTransactionRepositoryPort transactionRepositoryPort;
     private final SubscriptionPlanRepositoryPort planRepositoryPort;
     private final UserSubscriptionRepositoryPort subscriptionRepositoryPort;
+    private final org.naho.shared.port.out.EventPublisherPort eventPublisherPort;
 
     public ConfirmPaymentUseCase(PaymentOrderRepositoryPort orderRepositoryPort,
                                  PaymentTransactionRepositoryPort transactionRepositoryPort,
                                  SubscriptionPlanRepositoryPort planRepositoryPort,
-                                 UserSubscriptionRepositoryPort subscriptionRepositoryPort) {
+                                 UserSubscriptionRepositoryPort subscriptionRepositoryPort,
+                                 org.naho.shared.port.out.EventPublisherPort eventPublisherPort) {
         this.orderRepositoryPort = orderRepositoryPort;
         this.transactionRepositoryPort = transactionRepositoryPort;
         this.planRepositoryPort = planRepositoryPort;
         this.subscriptionRepositoryPort = subscriptionRepositoryPort;
+        this.eventPublisherPort = eventPublisherPort;
     }
 
     @Override
@@ -93,6 +96,12 @@ public class ConfirmPaymentUseCase implements ConfirmPaymentInputPort {
                     plan.getDurationDays(),
                     now);
             subscriptionRepositoryPort.save(subscription);
+
+            // Publish Event Nâng cấp gói
+            eventPublisherPort.publish(new org.naho.user.event.UserPlanUpgradedEvent(
+                    order.getUserId(),
+                    plan.getCode()
+            ));
         }
 
         orderRepositoryPort.save(order);
