@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.chest.type.ChestType;
+import org.naho.daily.entity.DailyMissionEntity;
 import org.naho.daily.entity.DailyRewardEntity;
 import org.naho.learning.entity.LearningPathNodeEntity;
 import org.naho.shared.persistence.BaseEntity;
@@ -41,4 +42,8 @@ public class ChestEntity extends BaseEntity {
     @Builder.Default
     @OneToMany(mappedBy = "chest")
     List<DailyRewardEntity> dailyRewards = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "chest")
+    List<DailyMissionEntity> dailyMissions = new ArrayList<>();
 }
