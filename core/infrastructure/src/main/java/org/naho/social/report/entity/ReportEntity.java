@@ -8,7 +8,7 @@ import org.naho.file.entity.FileEntity;
 import org.naho.question.entity.SpeakingQuestionEntity;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.social.entity.CommentEntity;
-import org.naho.social.reaction.type.ReportType;
+import org.naho.social.report.type.ReportType;
 import org.naho.user.entity.UserEntity;
 
 import java.util.List;

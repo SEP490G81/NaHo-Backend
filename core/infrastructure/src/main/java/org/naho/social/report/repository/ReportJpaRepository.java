@@ -1,6 +1,6 @@
 package org.naho.social.report.repository;
 
-import org.naho.social.reaction.type.ReportType;
+import org.naho.social.report.type.ReportType;
 import org.naho.social.report.entity.ReportEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
