@@ -8,7 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface UserLearningProgressJpaRepository extends BaseJpaRepository<UserLearningProgressEntity> {
-    Optional<UserLearningProgressEntity> findByUserId(Long userId);
+    Optional<UserLearningProgressEntity> findByUser_Id(Long userId);
 
     boolean existsByUser_Id(Long userId);
 }
