@@ -13,10 +13,10 @@ public class UserSubscription { //Đăng ký gói của học viên
     private final Long userId;
     private final Long subscriptionPlanId;
     private final Long paymentOrderId;
-    private SubscriptionStatus status;
     private final Instant startTime;
     private final Instant endTime;
     private final Instant createdTime;
+    private SubscriptionStatus status;
     private Instant modifiedTime;
 
     private UserSubscription(Builder builder) {

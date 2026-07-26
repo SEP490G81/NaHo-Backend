@@ -137,7 +137,8 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
     @Override
     public Optional<LeaderboardUserResult> findTopOfUserByUserId(Long userId) {
-        return userQueryMapper.findTopOfUserByUserId(userId);
+        Optional<LeaderboardUserResult> leaderboardUserResult = userQueryMapper.findTopOfUserByUserId(userId);
+        return leaderboardUserResult;
     }
 
     @Override

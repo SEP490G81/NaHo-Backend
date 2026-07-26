@@ -53,6 +53,10 @@ public class RewardYearMonth {
         return new RewardYearMonth(value.format(YEAR_MONTH_FORMATTER));
     }
 
+    public YearMonth toYearMonth() {
+        return YearMonth.parse(value, YEAR_MONTH_FORMATTER);
+    }
+
     public String getValue() {
         return value;
     }

@@ -2,8 +2,11 @@ package org.naho.chest.controller.v1;
 
 import lombok.RequiredArgsConstructor;
 import org.naho.chest.command.OpenChestCommand;
+import org.naho.chest.dto.mapper.ChestResponseMapper;
 import org.naho.chest.dto.request.OpenChestRequest;
+import org.naho.chest.dto.response.OpenChestResponse;
 import org.naho.chest.port.in.OpenChestInputPort;
+import org.naho.chest.result.OpenChestResult;
 import org.naho.i18n.message.chest.ChestDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.user.result.AccessTokenPayload;
@@ -21,18 +24,22 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChestController {
 
     private final OpenChestInputPort openChestInputPort;
+    private final ChestResponseMapper chestResponseMapper;
 
     @ApiResponseMessage(message = ChestDetailMessageKey.CHEST_OPEN_SUCCESS)
     @PostMapping("/open")
-    public ResponseEntity<Void> openChest(
+    public ResponseEntity<OpenChestResponse> openChest(
             @RequestBody OpenChestRequest openChestRequest,
             @AuthenticationPrincipal AccessTokenPayload payload
     ) {
         OpenChestCommand command = new OpenChestCommand(
-                openChestRequest.chestId(),
+                openChestRequest.learningPathNodeId(),
                 payload.userId()
         );
-        openChestInputPort.openChest(command);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+
+        OpenChestResult result = openChestInputPort.openChest(command);
+        OpenChestResponse response = chestResponseMapper.resultToResponse(result);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

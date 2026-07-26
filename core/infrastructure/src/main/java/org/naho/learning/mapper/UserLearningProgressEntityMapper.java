@@ -41,7 +41,7 @@ public abstract class UserLearningProgressEntityMapper {
         if (farthestAvailableNodeId == null) {
             return null;
         }
-        return learningPathNodeJpaRepository.getReferenceById(farthestAvailableNodeId);
+        return learningPathNodeJpaRepository.findById(farthestAvailableNodeId).orElse(null);
     }
 
     @Named("getLastLearningNodeById")
@@ -49,6 +49,6 @@ public abstract class UserLearningProgressEntityMapper {
         if (lastLearningNodeId == null) {
             return null;
         }
-        return learningPathNodeJpaRepository.getReferenceById(lastLearningNodeId);
+        return learningPathNodeJpaRepository.findById(lastLearningNodeId).orElse(null);
     }
 }

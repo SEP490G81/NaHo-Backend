@@ -35,22 +35,24 @@ public class LearningConfig {
     }
 
     @Bean
-    public UserLearningProgressResultMapper userLearningProgressResultMapper() {
-        return new UserLearningProgressResultMapper();
+    public UserLearningProgressResultMapper userLearningProgressResultMapper(
+            UserRepositoryPort userRepositoryPort
+    ) {
+        return new UserLearningProgressResultMapper(
+                userRepositoryPort
+        );
     }
 
     @Bean
     public CrudUserLearningProgressInputPort crudUserLearningProgressInputPort(
             UserLearningProgressRepositoryAdapter userLearningProgressRepositoryAdapter,
             LearningPathNodeRepositoryAdapter learningPathNodeRepositoryAdapter,
-            UserLearningProgressResultMapper userLearningProgressResultMapper,
-            UserRepositoryPort userRepositoryPort
+            UserLearningProgressResultMapper userLearningProgressResultMapper
     ) {
         return new CrudUserLearningProgressUseCase(
                 userLearningProgressRepositoryAdapter,
                 learningPathNodeRepositoryAdapter,
-                userLearningProgressResultMapper,
-                userRepositoryPort
+                userLearningProgressResultMapper
         );
     }
 

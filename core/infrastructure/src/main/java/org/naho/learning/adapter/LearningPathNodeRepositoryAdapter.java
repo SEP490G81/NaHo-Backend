@@ -5,6 +5,7 @@ import org.naho.learning.mapper.LearningPathNodeEntityMapper;
 import org.naho.learning.model.LearningPathNode;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.learning.repository.LearningPathNodeJpaRepository;
+import org.naho.learning.type.NodeType;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -46,9 +47,30 @@ public class LearningPathNodeRepositoryAdapter implements LearningPathNodeReposi
     }
 
     @Override
+    public Optional<LearningPathNode> findByVocabularyQuestionId(Long vocabularyQuestionId) {
+        return learningPathNodeJpaRepository
+                .findByVocabularyQuestion_Id(vocabularyQuestionId)
+                .map(learningPathNodeEntityMapper::entityToDomain);
+    }
+
+    @Override
     public Optional<LearningPathNode> findBySpeakingQuestionId(Long speakingQuestionId) {
         return learningPathNodeJpaRepository
                 .findBySpeakingQuestion_Id(speakingQuestionId)
+                .map(learningPathNodeEntityMapper::entityToDomain);
+    }
+
+    @Override
+    public Optional<LearningPathNode> findByIdAndNodeType(Long id, NodeType nodeType) {
+        return learningPathNodeJpaRepository
+                .findByIdAndNodeType(id, nodeType)
+                .map(learningPathNodeEntityMapper::entityToDomain);
+    }
+
+    @Override
+    public Optional<LearningPathNode> findTopByGlobalOrderIndexGreaterThanOrderByGlobalOrderIndex(Double globalOrderIndex) {
+        return learningPathNodeJpaRepository
+                .findTopByGlobalOrderIndexGreaterThanOrderByGlobalOrderIndex(globalOrderIndex)
                 .map(learningPathNodeEntityMapper::entityToDomain);
     }
 }

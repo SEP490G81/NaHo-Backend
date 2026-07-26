@@ -18,6 +18,10 @@ public class FileUploadCommand {
         this.size = builder.size;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public String getFolderName() {
         return folderName;
     }
@@ -40,10 +44,6 @@ public class FileUploadCommand {
 
     public Long getSize() {
         return size;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     public static final class Builder {

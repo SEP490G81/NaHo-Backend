@@ -1,6 +1,7 @@
 package org.naho.config.application;
 
 import org.naho.file.port.in.CrudFileInputPort;
+import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.user.mapper.OAuthProviderResultMapper;
 import org.naho.user.mapper.RoleResultMapper;
@@ -79,7 +80,9 @@ public class UserConfig {
             RoleRepositoryPort roleRepositoryPort,
             TransactionPort transactionPort,
             UserSessionServicePort userSessionServicePort,
-            UserSessionEventPublisherPort userSessionEventPublisherPort) {
+            UserSessionEventPublisherPort userSessionEventPublisherPort,
+            CrudUserLearningProgressInputPort crudUserLearningProgressInputPort
+    ) {
         return new AuthUseCase(
                 userRepositoryPort,
                 encoderPort,
@@ -88,15 +91,24 @@ public class UserConfig {
                 roleRepositoryPort,
                 transactionPort,
                 userSessionServicePort,
-                userSessionEventPublisherPort);
+                userSessionEventPublisherPort,
+                crudUserLearningProgressInputPort
+        );
     }
 
     @Bean
     public RegisterInputPort registerInputPort(
             UserRepositoryPort userRepository,
             EncoderPort encoderPort,
-            RoleRepositoryPort roleRepository) {
-        return new RegisterUseCase(userRepository, encoderPort, roleRepository);
+            RoleRepositoryPort roleRepository,
+            CrudUserLearningProgressInputPort crudUserLearningProgressInputPort
+    ) {
+        return new RegisterUseCase(
+                userRepository,
+                encoderPort,
+                roleRepository,
+                crudUserLearningProgressInputPort
+        );
     }
 
     @Bean

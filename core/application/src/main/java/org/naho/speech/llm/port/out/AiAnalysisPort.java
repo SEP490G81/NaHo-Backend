@@ -1,6 +1,8 @@
 package org.naho.speech.llm.port.out;
 
 public interface AiAnalysisPort {
+    String analyzeSpeaking(Context context);
+
     record Context(
             String curriculum,
             String level,
@@ -19,7 +21,5 @@ public interface AiAnalysisPort {
             String studentTranscript
     ) {
     }
-
-    String analyzeSpeaking(Context context);
 }
 

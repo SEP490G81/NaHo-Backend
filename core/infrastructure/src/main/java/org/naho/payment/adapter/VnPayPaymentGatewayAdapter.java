@@ -33,6 +33,27 @@ public class VnPayPaymentGatewayAdapter implements PaymentGatewayPort {
     @Value("${app.vnpay.return-url}")
     private String returnUrl;
 
+    public static String hmacSHA512(final String key, final String data) {
+        try {
+            if (key == null || data == null) {
+                return null;
+            }
+            final Mac hmac512 = Mac.getInstance("HmacSHA512");
+            byte[] hmacKeyBytes = key.getBytes(StandardCharsets.UTF_8);
+            final SecretKeySpec secretKey = new SecretKeySpec(hmacKeyBytes, "HmacSHA512");
+            hmac512.init(secretKey);
+            byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
+            byte[] result = hmac512.doFinal(dataBytes);
+            StringBuilder sb = new StringBuilder(2 * result.length);
+            for (byte b : result) {
+                sb.append(String.format("%02x", b & 0xff));
+            }
+            return sb.toString();
+        } catch (Exception ex) {
+            return "";
+        }
+    }
+
     @Override
     public PaymentProvider supportedProvider() {
         return PaymentProvider.VNPAY;
@@ -150,26 +171,5 @@ public class VnPayPaymentGatewayAdapter implements PaymentGatewayPort {
         }
 
         return value.strip();
-    }
-
-    public static String hmacSHA512(final String key, final String data) {
-        try {
-            if (key == null || data == null) {
-                return null;
-            }
-            final Mac hmac512 = Mac.getInstance("HmacSHA512");
-            byte[] hmacKeyBytes = key.getBytes(StandardCharsets.UTF_8);
-            final SecretKeySpec secretKey = new SecretKeySpec(hmacKeyBytes, "HmacSHA512");
-            hmac512.init(secretKey);
-            byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
-            byte[] result = hmac512.doFinal(dataBytes);
-            StringBuilder sb = new StringBuilder(2 * result.length);
-            for (byte b : result) {
-                sb.append(String.format("%02x", b & 0xff));
-            }
-            return sb.toString();
-        } catch (Exception ex) {
-            return "";
-        }
     }
 }

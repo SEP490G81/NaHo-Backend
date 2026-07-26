@@ -8,6 +8,7 @@ import org.naho.file.port.in.FileStorageInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.furigana.port.out.FuriganaGenerationPort;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
+import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
 import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.naho.question.port.in.CompleteSpeakingQuestionInputPort;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
@@ -114,7 +115,8 @@ public class ChatConfig {
             AiAnalysisPort aiAnalysisPort,
             FuriganaGenerationPort furiganaGenerationPort,
             TransactionPort transactionPort,
-            CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort
+            CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort,
+            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort
     ) {
         return new SpeakingAnalysisUseCase(
                 userRepositoryPort,
@@ -131,7 +133,8 @@ public class ChatConfig {
                 aiAnalysisPort,
                 furiganaGenerationPort,
                 transactionPort,
-                completeSpeakingQuestionInputPort
+                completeSpeakingQuestionInputPort,
+                userLearningProgressRepositoryPort
         );
     }
 }

@@ -197,7 +197,6 @@ CREATE TABLE payment_orders
     provider                VARCHAR(255) NOT NULL,
     status                  VARCHAR(255) NOT NULL,
     provider_transaction_id VARCHAR(255) NULL,
-    payment_url             TEXT NULL,
     expires_time            datetime(6)           NOT NULL,
     paid_time               datetime(6)           NULL,
     pending_user_id         BIGINT GENERATED ALWAYS AS (CASE WHEN status = 'PENDING' THEN user_id ELSE NULL END) STORED,
@@ -209,10 +208,10 @@ CREATE TABLE payment_idempotencies
     id                     BIGINT AUTO_INCREMENT NOT NULL,
     created_time           datetime(6)           NOT NULL,
     modified_time          datetime(6)           NULL,
-    user_id                BIGINT                NOT NULL,
-    idempotency_key        VARCHAR(100)          NOT NULL,
-    request_hash           VARCHAR(64)           NOT NULL,
-    payment_order_id       BIGINT                NOT NULL,
+    user_id                BIGINT       NOT NULL,
+    idempotency_key        VARCHAR(100) NOT NULL,
+    request_hash           VARCHAR(64)  NOT NULL,
+    payment_order_id       BIGINT       NOT NULL,
     retention_expires_time datetime(6)           NOT NULL,
     CONSTRAINT pk_payment_idempotencies PRIMARY KEY (id),
     CONSTRAINT uk_payment_idempotency_user_key UNIQUE (user_id, idempotency_key)
@@ -403,9 +402,10 @@ CREATE TABLE user_daily_attendances
     id              BIGINT AUTO_INCREMENT NOT NULL,
     created_time    datetime(6)           NOT NULL,
     modified_time   datetime(6)           NULL,
-    attendance_date date   NOT NULL,
-    user_id         BIGINT NOT NULL,
-    daily_reward_id BIGINT NOT NULL,
+    attendance_date date                  NOT NULL,
+    earned_point    INT                   NOT NULL,
+    user_id         BIGINT                NOT NULL,
+    daily_reward_id BIGINT                NOT NULL,
     CONSTRAINT pk_user_daily_attendances PRIMARY KEY (id)
 );
 

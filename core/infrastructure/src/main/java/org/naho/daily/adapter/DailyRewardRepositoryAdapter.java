@@ -9,6 +9,7 @@ import org.naho.daily.repository.DailyRewardJpaRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -44,5 +45,12 @@ public class DailyRewardRepositoryAdapter implements DailyRewardRepositoryPort {
         return savedDailyRewardEntityList.stream()
                 .map(dailyEntityMapper::entityToDomain)
                 .toList();
+    }
+
+    @Override
+    public Optional<DailyReward> findById(Long id) {
+        return dailyRewardJpaRepository
+                .findById(id)
+                .map(dailyEntityMapper::entityToDomain);
     }
 }

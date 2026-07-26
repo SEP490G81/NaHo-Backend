@@ -3,6 +3,7 @@ package org.naho.chest.adapter;
 import lombok.RequiredArgsConstructor;
 import org.naho.chest.mapper.ChestEntityMapper;
 import org.naho.chest.model.Chest;
+import org.naho.chest.mybatis.ChestQueryMapper;
 import org.naho.chest.port.out.ChestRepositoryPort;
 import org.naho.chest.repository.ChestJpaRepository;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ public class ChestRepositoryAdapter implements ChestRepositoryPort {
 
     private final ChestJpaRepository chestJpaRepository;
     private final ChestEntityMapper chestEntityMapper;
+    private final ChestQueryMapper chestQueryMapper;
 
     @Override
     public Optional<Chest> findById(Long id) {
@@ -30,5 +32,12 @@ public class ChestRepositoryAdapter implements ChestRepositoryPort {
         return chestJpaRepository.findAllByIdIn(ids).stream()
                 .map(chestEntityMapper::entityToDomain)
                 .toList();
+    }
+
+    @Override
+    public Optional<Chest> findByDailyRewardId(Long dailyRewardId) {
+        return chestQueryMapper
+                .findByDailyRewardId(dailyRewardId)
+                .map(chestEntityMapper::entityToDomain);
     }
 }

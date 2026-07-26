@@ -12,6 +12,7 @@ import java.time.Instant;
 public class SubscriptionPlan {
     private final Long id;
     private final String code;
+    private final Instant createdTime;
     private String name;
     private String description;
     private PlanTier tier;
@@ -22,7 +23,6 @@ public class SubscriptionPlan {
     private boolean progressAnalyticsEnabled;
     private boolean sampleAnswerEnabled;
     private PlanStatus status;
-    private final Instant createdTime;
     private Instant modifiedTime;
 
     private SubscriptionPlan(Builder builder) {

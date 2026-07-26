@@ -2,17 +2,19 @@ package org.naho.question.controller.v1;
 
 import lombok.RequiredArgsConstructor;
 import org.naho.i18n.message.question.VocabularyQuestionDetailMessageKey;
+import org.naho.question.command.CompleteVocabularyQuestionCommand;
 import org.naho.question.command.LearningPathNodeCommand;
 import org.naho.question.dto.mapper.VocabularyQuestionResponseMapper;
+import org.naho.question.dto.request.CompleteVocabularyQuestionRequest;
 import org.naho.question.dto.response.VocabulariesOfQuestionResponse;
+import org.naho.question.port.in.CompleteVocabularyQuestionInputPort;
 import org.naho.question.port.in.SearchVocabulariesOfQuestionInputPort;
 import org.naho.question.result.VocabulariesOfQuestionResult;
 import org.naho.shared.annotation.ApiResponseMessage;
+import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/vocabulary-questions")
@@ -21,6 +23,7 @@ public class VocabularyQuestionController {
 
     private final SearchVocabulariesOfQuestionInputPort searchVocabulariesOfQuestionInputPort;
     private final VocabularyQuestionResponseMapper vocabularyQuestionResponseMapper;
+    private final CompleteVocabularyQuestionInputPort completeVocabularyQuestionInputPort;
 
     @GetMapping
     @ApiResponseMessage(message = VocabularyQuestionDetailMessageKey.VOCABULARY_QUESTION_GET_SUCCESS)
@@ -40,5 +43,21 @@ public class VocabularyQuestionController {
         VocabulariesOfQuestionResult result = searchVocabulariesOfQuestionInputPort.getVocabularyListOfQuestion(command);
         VocabulariesOfQuestionResponse response = vocabularyQuestionResponseMapper.toResponse(result);
         return ResponseEntity.ok(response);
+    }
+
+    @ApiResponseMessage(message = VocabularyQuestionDetailMessageKey.VOCABULARY_QUESTION_COMPLETE_SUCCESS)
+    @PostMapping("/completion")
+    public ResponseEntity<Void> completeVocabularyQuestion(
+            @AuthenticationPrincipal AccessTokenPayload payload,
+            @RequestBody CompleteVocabularyQuestionRequest request
+    ) {
+        CompleteVocabularyQuestionCommand command = new CompleteVocabularyQuestionCommand(
+                request.vocabularyQuestionId(),
+                payload.userId()
+        );
+
+        completeVocabularyQuestionInputPort.completeVocabularyQuestion(command);
+
+        return ResponseEntity.ok().build();
     }
 }

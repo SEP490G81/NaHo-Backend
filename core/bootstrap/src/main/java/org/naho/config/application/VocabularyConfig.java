@@ -1,7 +1,15 @@
 package org.naho.config.application;
 
+import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
+import org.naho.learning.port.in.UserLearningStreakInputPort;
+import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
+import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
+import org.naho.learning.port.out.UserNodeProgressRepositoryPort;
+import org.naho.point.port.in.CrudPointHistoryInputPort;
+import org.naho.question.port.in.CompleteVocabularyQuestionInputPort;
 import org.naho.question.port.in.SearchVocabulariesOfQuestionInputPort;
 import org.naho.question.port.out.VocabulariesQuestionPort;
+import org.naho.question.usecase.CompleteVocabularyQuestionUseCase;
 import org.naho.question.usecase.SearchVocabulariesOfQuestionUsecase;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.vocabulary.port.in.ExportVocabularyInputPort;
@@ -51,6 +59,27 @@ public class VocabularyConfig {
             ExcelWriterPort excelWriterPort
     ) {
         return new ExportVocabularyUseCase(vocabularyPort, vocabulariesQuestionPort, excelWriterPort);
+    }
+
+    @Bean
+    public CompleteVocabularyQuestionInputPort completeVocabularyQuestionInputPort(
+            UserNodeProgressRepositoryPort userNodeProgressRepositoryPort,
+            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
+            CrudPointHistoryInputPort crudPointHistoryInputPort,
+            TransactionPort transactionPort,
+            UserLearningStreakInputPort userLearningStreakInputPort,
+            CrudUserLearningProgressInputPort crudUserLearningProgressInputPort,
+            LearningPathNodeRepositoryPort learningPathNodeRepositoryPort
+    ) {
+        return new CompleteVocabularyQuestionUseCase(
+                userNodeProgressRepositoryPort,
+                userLearningProgressRepositoryPort,
+                crudPointHistoryInputPort,
+                transactionPort,
+                userLearningStreakInputPort,
+                crudUserLearningProgressInputPort,
+                learningPathNodeRepositoryPort
+        );
     }
 }
 
