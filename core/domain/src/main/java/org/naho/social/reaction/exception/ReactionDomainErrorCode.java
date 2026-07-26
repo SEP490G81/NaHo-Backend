@@ -14,11 +14,6 @@ public enum ReactionDomainErrorCode implements ErrorCode {
             ReactionTitleMessageKey.REACTION_COMMENT_ID_NOT_VALID_TITLE,
             400
     ),
-    REACTION_QUESTION_ID_NOT_VALID(
-            "REACTION_004",
-            ReactionTitleMessageKey.REACTION_QUESTION_ID_NOT_VALID_TITLE,
-            400
-    ),
     REACTION_TYPE_NOT_VALID(
             "REACTION_003",
             ReactionTitleMessageKey.REACTION_TYPE_NOT_VALID_TITLE,
