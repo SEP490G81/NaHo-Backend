@@ -42,3 +42,4 @@ public class ChestEntity extends BaseEntity {
     @OneToMany(mappedBy = "chest")
     List<DailyRewardEntity> dailyRewards = new ArrayList<>();
 }
+

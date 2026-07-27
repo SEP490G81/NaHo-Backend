@@ -1,5 +1,6 @@
 package org.naho.config.application;
 
+import org.naho.daily.port.in.CrudDailyMissionInputPort;
 import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
 import org.naho.learning.port.in.UserLearningStreakInputPort;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
@@ -60,7 +61,8 @@ public class SpeakingQuestionConfig {
             CrudPointHistoryInputPort crudPointHistoryInputPort,
             TransactionPort transactionPort,
             UserLearningStreakInputPort userLearningStreakInputPort,
-            CrudUserLearningProgressInputPort crudUserLearningProgressInputPort
+            CrudUserLearningProgressInputPort crudUserLearningProgressInputPort,
+            CrudDailyMissionInputPort crudDailyMissionInputPort
     ) {
         return new CompleteSpeakingQuestionUseCase(
                 userNodeProgressRepositoryPort,
@@ -68,7 +70,8 @@ public class SpeakingQuestionConfig {
                 crudPointHistoryInputPort,
                 transactionPort,
                 userLearningStreakInputPort,
-                crudUserLearningProgressInputPort
+                crudUserLearningProgressInputPort,
+                crudDailyMissionInputPort
         );
     }
 }

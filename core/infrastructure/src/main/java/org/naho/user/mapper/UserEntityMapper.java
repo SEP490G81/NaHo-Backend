@@ -50,6 +50,7 @@ public abstract class UserEntityMapper {
     @Mapping(target = "avatar", ignore = true)
     @Mapping(target = "userDailyAttendances", ignore = true)
     @Mapping(target = "isEmailVerified", source = "emailVerified")
+    @Mapping(target = "userDailyMissions", ignore = true)
     public abstract UserEntity domainToEntity(User user);
 
     @Named("getUserLearningProgressEntityByUserId")
