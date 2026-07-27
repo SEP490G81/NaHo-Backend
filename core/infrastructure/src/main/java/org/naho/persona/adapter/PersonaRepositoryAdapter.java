@@ -43,12 +43,24 @@ public class PersonaRepositoryAdapter implements PersonaRepositoryPort {
     }
 
     private Persona entityToDomain(PersonaEntity entity) {
+        org.naho.persona.model.ConversationStyle conversationStyle = null;
+        if (entity.getSuggestedConversationStyle() != null) {
+            conversationStyle = org.naho.persona.model.ConversationStyle.builder()
+                    .id(entity.getSuggestedConversationStyle().getId())
+                    .description(entity.getSuggestedConversationStyle().getDescription())
+                    .prompt(entity.getSuggestedConversationStyle().getPrompt())
+                    .formalityLevel(entity.getSuggestedConversationStyle().getFormalityLevel())
+                    .marugotoLevel(entity.getSuggestedConversationStyle().getMarugotoLevel())
+                    .build();
+        }
+
         return Persona.builder()
                 .id(entity.getId())
                 .name(entity.getName())
                 .prompt(entity.getPrompt())
                 .avatarFileId(entity.getAvatarFile() != null ? entity.getAvatarFile().getId() : null)
                 .suggestedConversationStyleId(entity.getSuggestedConversationStyle() != null ? entity.getSuggestedConversationStyle().getId() : null)
+                .conversationStyle(conversationStyle)
                 .build();
     }
 

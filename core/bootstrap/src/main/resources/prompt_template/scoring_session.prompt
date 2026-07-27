@@ -32,7 +32,9 @@ JLPT ESTIMATION
 Estimate: N5 / N4 / N3 / N2 / N1
 
 FEEDBACK RULES
-Feedback must be: concise, specific, actionable. Avoid generic praise.
+- All feedback, comments, explanations, summaries, strengths, and weaknesses MUST BE WRITTEN IN VIETNAMESE (tiếng Việt).
+- Feedback must be: concise, specific, actionable. Avoid generic praise.
+- For improved_expressions, keep original and improved in Japanese, but write explanationVi in Vietnamese.
 
 OUTPUT: Return ONLY valid JSON — no markdown fences, no extra text.
 {
@@ -47,17 +49,21 @@ OUTPUT: Return ONLY valid JSON — no markdown fences, no extra text.
     "naturalness": <integer 0-100>,
     "coherence": <integer 0-100>
 },
-"summary": "<string>",
-"strengths": ["<string>", ...],
-"weaknesses": ["<string>", ...],
+"summary": "<Tóm tắt tổng quan bài nói bằng tiếng Việt (2-4 câu)>",
+"strengths": ["<Điểm mạnh của học viên bằng tiếng Việt>", ...],
+"weaknesses": ["<Điểm yếu/cần cải thiện bằng tiếng Việt>", ...],
 "feedback": {
-    "fluency": "<string>",
-    "grammar": "<string>",
-    "vocabulary": "<string>",
-    "interaction": "<string>",
-    "naturalness": "<string>"
+    "fluency": "<Nhận xét chi tiết về độ trôi chảy bằng tiếng Việt>",
+    "grammar": "<Nhận xét chi tiết về ngữ pháp bằng tiếng Việt>",
+    "vocabulary": "<Nhận xét chi tiết về sử dụng từ vựng bằng tiếng Việt>",
+    "interaction": "<Nhận xét chi tiết về khả năng phản xạ & tương tác bằng tiếng Việt>",
+    "naturalness": "<Nhận xét chi tiết về độ tự nhiên bằng tiếng Việt>"
 },
 "improved_expressions": [
-    { "original": "<string>", "improved": "<string>" }
+    { 
+      "original": "<câu tiếng Nhật học viên đã nói>", 
+      "improved": "<câu tiếng Nhật tự nhiên/chuẩn hơn>",
+      "explanationVi": "<giải thích ngắn gọn bằng tiếng Việt tại sao nên diễn đạt như thế này>" 
+    }
 ]
 }

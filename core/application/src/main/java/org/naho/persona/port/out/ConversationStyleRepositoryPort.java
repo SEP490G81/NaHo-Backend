@@ -6,4 +6,6 @@ import java.util.Optional;
 
 public interface ConversationStyleRepositoryPort {
     Optional<ConversationStyle> findById(Long id);
+
+    ConversationStyle save(ConversationStyle conversationStyle);
 }

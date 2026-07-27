@@ -126,8 +126,24 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         sessionStorePort.initSession(sessionId);
         sessionStorePort.setTopic(sessionId, "Conversation with " + persona.getName());
 
-        String customInstruction = FREE_INSTRUCTION + "\n- Your persona prompt: " + persona.getPrompt();
-        String prompt = SYSTEM_PROMPT_TEMPLATE.formatted(customInstruction);
+        StringBuilder customInstruction = new StringBuilder(FREE_INSTRUCTION);
+        customInstruction.append("\n- Your persona role & prompt: ").append(persona.getPrompt());
+        if (persona.getConversationStyle() != null) {
+            if (persona.getConversationStyle().getDescription() != null) {
+                customInstruction.append("\n- Conversation style description: ").append(persona.getConversationStyle().getDescription());
+            }
+            if (persona.getConversationStyle().getPrompt() != null) {
+                customInstruction.append("\n- Conversation style prompt: ").append(persona.getConversationStyle().getPrompt());
+            }
+            if (persona.getConversationStyle().getFormalityLevel() != null) {
+                customInstruction.append("\n- Formality level (Keigo/Style): ").append(persona.getConversationStyle().getFormalityLevel().name());
+            }
+            if (persona.getConversationStyle().getMarugotoLevel() != null) {
+                customInstruction.append("\n- Marugoto course level: ").append(persona.getConversationStyle().getMarugotoLevel().name());
+            }
+        }
+
+        String prompt = SYSTEM_PROMPT_TEMPLATE.formatted(customInstruction.toString());
         sessionStorePort.addMessage(sessionId, "system", prompt);
         sessionStorePort.addMessage(sessionId, "user", "こんにちは、話しましょう！");
 

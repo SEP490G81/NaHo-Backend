@@ -21,12 +21,32 @@ public class ConversationStyleRepositoryAdapter implements ConversationStyleRepo
                 .map(this::entityToDomain);
     }
 
+    @Override
+    public ConversationStyle save(ConversationStyle conversationStyle) {
+        ConversationStyleEntity entity = domainToEntity(conversationStyle);
+        ConversationStyleEntity saved = conversationStyleJpaRepository.save(entity);
+        return entityToDomain(saved);
+    }
+
+    private ConversationStyleEntity domainToEntity(ConversationStyle domain) {
+        ConversationStyleEntity.ConversationStyleEntityBuilder<?, ?> builder = ConversationStyleEntity.builder()
+                .description(domain.getDescription())
+                .prompt(domain.getPrompt())
+                .formalityLevel(domain.getFormalityLevel())
+                .marugotoLevel(domain.getMarugotoLevel());
+        if (domain.getId() != null) {
+            builder.id(domain.getId());
+        }
+        return builder.build();
+    }
+
     private ConversationStyle entityToDomain(ConversationStyleEntity entity) {
         return ConversationStyle.builder()
                 .id(entity.getId())
                 .description(entity.getDescription())
                 .prompt(entity.getPrompt())
                 .formalityLevel(entity.getFormalityLevel())
+                .marugotoLevel(entity.getMarugotoLevel())
                 .build();
     }
 }

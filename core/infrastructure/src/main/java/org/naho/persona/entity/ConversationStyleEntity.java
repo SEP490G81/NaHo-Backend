@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.persona.type.FormalityLevel;
+import org.naho.persona.type.MarugotoLevel;
 import org.naho.shared.persistence.BaseEntity;
 
 import java.util.List;
@@ -27,6 +28,10 @@ public class ConversationStyleEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     FormalityLevel formalityLevel;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "marugoto_level")
+    MarugotoLevel marugotoLevel;
 
     @OneToMany(mappedBy = "suggestedConversationStyle")
     List<PersonaEntity> personas;
