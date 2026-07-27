@@ -99,7 +99,7 @@ public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestion
             if (differentScore > 0) {
                 currentUserNodeProgress.setBestScore(command.overallScore());
                 point = progress.addPoint(differentScore);
-                pointTransactionType = PointTransactionType.RETAKE;
+                pointTransactionType = PointTransactionType.LEARNING_PATH_NODE_RETAKE;
             }
 
             currentUserNodeProgress.setCurrentScore(command.overallScore());
