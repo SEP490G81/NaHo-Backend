@@ -4,13 +4,8 @@ import org.naho.i18n.message.daily.DailyMissionTitleMessageKey;
 import org.naho.shared.exception.ErrorCode;
 
 public enum DailyMissionDomainErrorCode implements ErrorCode {
-    DAILY_MISSION_CHEST_ID_REQUIRED(
+    DAILY_MISSION_POINT_REQUIRED(
             "DAILY_MISSION_001",
-            DailyMissionTitleMessageKey.DAILY_MISSION_CREATION_FAILED_TITLE,
-            400
-    ),
-    DAILY_MISSION_TITLE_REQUIRED(
-            "DAILY_MISSION_002",
             DailyMissionTitleMessageKey.DAILY_MISSION_CREATION_FAILED_TITLE,
             400
     ),

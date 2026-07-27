@@ -23,6 +23,11 @@ public enum UserDailyMissionDomainErrorCode implements ErrorCode {
             "USER_DAILY_MISSION_004",
             UserDailyMissionTitleMessageKey.USER_DAILY_MISSION_NOT_FOUND_TITLE,
             404
+    ),
+    USER_DAILY_MISSION_ALREADY_COMPLETED(
+            "USER_DAILY_MISSION_005",
+            UserDailyMissionTitleMessageKey.USER_DAILY_MISSION_FAILED_TITLE,
+            400
     );
 
     private final String code;

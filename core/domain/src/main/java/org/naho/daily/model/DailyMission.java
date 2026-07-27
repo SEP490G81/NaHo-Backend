@@ -10,18 +10,13 @@ import java.time.LocalDate;
 public class DailyMission {
 
     private final Long id;
-    private final Long chestId;
-    private final String title;
-
-    private String description;
+    private Double point;
     private LocalDate missionDate;
     private MissionType missionType;
 
     private DailyMission(Builder builder) {
         this.id = builder.id;
-        this.chestId = builder.chestId;
-        this.title = builder.title;
-        this.description = builder.description;
+        this.point = builder.point;
         this.missionDate = builder.missionDate;
         this.missionType = builder.missionType;
     }
@@ -30,16 +25,8 @@ public class DailyMission {
         return id;
     }
 
-    public Long getChestId() {
-        return chestId;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getDescription() {
-        return description;
+    public Double getPoint() {
+        return point;
     }
 
     public LocalDate getMissionDate() {
@@ -50,8 +37,8 @@ public class DailyMission {
         return missionType;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setPoint(Double point) {
+        this.point = point;
     }
 
     public void setMissionDate(LocalDate missionDate) {
@@ -69,9 +56,7 @@ public class DailyMission {
     public static class Builder {
 
         private Long id;
-        private Long chestId;
-        private String title;
-        private String description;
+        private Double point;
         private LocalDate missionDate;
         private MissionType missionType;
 
@@ -80,18 +65,8 @@ public class DailyMission {
             return this;
         }
 
-        public Builder chestId(Long chestId) {
-            this.chestId = chestId;
-            return this;
-        }
-
-        public Builder title(String title) {
-            this.title = title;
-            return this;
-        }
-
-        public Builder description(String description) {
-            this.description = description;
+        public Builder point(Double point) {
+            this.point = point;
             return this;
         }
 
@@ -106,17 +81,10 @@ public class DailyMission {
         }
 
         public DailyMission build() {
-            if (chestId == null) {
+            if (point == null) {
                 throw new DomainException(
-                        DailyMissionDomainErrorCode.DAILY_MISSION_CHEST_ID_REQUIRED,
-                        DailyMissionDetailMessageKey.DAILY_MISSION_CHEST_ID_REQUIRED
-                );
-            }
-
-            if (title == null || title.isBlank()) {
-                throw new DomainException(
-                        DailyMissionDomainErrorCode.DAILY_MISSION_TITLE_REQUIRED,
-                        DailyMissionDetailMessageKey.DAILY_MISSION_TITLE_REQUIRED
+                        DailyMissionDomainErrorCode.DAILY_MISSION_POINT_REQUIRED,
+                        DailyMissionDetailMessageKey.DAILY_MISSION_POINT_REQUIRED
                 );
             }
 
@@ -138,3 +106,5 @@ public class DailyMission {
         }
     }
 }
+
+

@@ -4,4 +4,5 @@ import org.naho.daily.entity.UserDailyMissionEntity;
 import org.naho.shared.persistence.BaseJpaRepository;
 
 public interface UserDailyMissionJpaRepository extends BaseJpaRepository<UserDailyMissionEntity> {
+    boolean existsByUser_IdAndDailyMission_Id(Long userId, Long dailyMissionId);
 }
