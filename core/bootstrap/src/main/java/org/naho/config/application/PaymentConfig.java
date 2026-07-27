@@ -61,14 +61,12 @@ public class PaymentConfig {
             PaymentTransactionRepositoryPort transactionRepositoryPort,
             SubscriptionPlanRepositoryPort planRepositoryPort,
             UserSubscriptionRepositoryPort subscriptionRepositoryPort,
-            org.naho.shared.port.out.EventPublisherPort eventPublisherPort,
             PlatformTransactionManager transactionManager) {
         ConfirmPaymentUseCase target = new ConfirmPaymentUseCase(
                 orderRepositoryPort,
                 transactionRepositoryPort,
                 planRepositoryPort,
-                subscriptionRepositoryPort,
-                eventPublisherPort);
+                subscriptionRepositoryPort);
         TransactionTemplate template = new TransactionTemplate(transactionManager);
         return command -> template.execute(status -> target.confirmPayment(command));
     }
@@ -98,14 +96,12 @@ public class PaymentConfig {
             UserRepositoryPort userRepositoryPort,
             SubscriptionPlanRepositoryPort planRepositoryPort,
             UserSubscriptionRepositoryPort subscriptionRepositoryPort,
-            org.naho.shared.port.out.EventPublisherPort eventPublisherPort,
             PlatformTransactionManager transactionManager) {
         org.naho.payment.usecase.AdminUpgradeSubscriptionUseCase target = new org.naho.payment.usecase.AdminUpgradeSubscriptionUseCase(
                 roleRepositoryPort,
                 userRepositoryPort,
                 planRepositoryPort,
-                subscriptionRepositoryPort,
-                eventPublisherPort);
+                subscriptionRepositoryPort);
         TransactionTemplate template = new TransactionTemplate(transactionManager);
         return command -> template.execute(status -> target.upgradeSubscription(command));
     }

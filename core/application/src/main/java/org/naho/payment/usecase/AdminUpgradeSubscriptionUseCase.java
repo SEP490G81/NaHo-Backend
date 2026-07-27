@@ -28,28 +28,24 @@ public class AdminUpgradeSubscriptionUseCase implements AdminUpgradeSubscription
     private final SubscriptionPlanRepositoryPort planRepositoryPort;
     private final UserSubscriptionRepositoryPort subscriptionRepositoryPort;
     private final SubscriptionPlanResultMapper planResultMapper;
-    private final org.naho.shared.port.out.EventPublisherPort eventPublisherPort;
 
     public AdminUpgradeSubscriptionUseCase(RoleRepositoryPort roleRepositoryPort,
                                             UserRepositoryPort userRepositoryPort,
                                             SubscriptionPlanRepositoryPort planRepositoryPort,
                                             UserSubscriptionRepositoryPort subscriptionRepositoryPort,
-                                            SubscriptionPlanResultMapper planResultMapper,
-                                            org.naho.shared.port.out.EventPublisherPort eventPublisherPort) {
+                                            SubscriptionPlanResultMapper planResultMapper) {
         this.roleRepositoryPort = roleRepositoryPort;
         this.userRepositoryPort = userRepositoryPort;
         this.planRepositoryPort = planRepositoryPort;
         this.subscriptionRepositoryPort = subscriptionRepositoryPort;
         this.planResultMapper = planResultMapper;
-        this.eventPublisherPort = eventPublisherPort;
     }
 
     public AdminUpgradeSubscriptionUseCase(RoleRepositoryPort roleRepositoryPort,
                                             UserRepositoryPort userRepositoryPort,
                                             SubscriptionPlanRepositoryPort planRepositoryPort,
-                                            UserSubscriptionRepositoryPort subscriptionRepositoryPort,
-                                            org.naho.shared.port.out.EventPublisherPort eventPublisherPort) {
-        this(roleRepositoryPort, userRepositoryPort, planRepositoryPort, subscriptionRepositoryPort, new SubscriptionPlanResultMapper(), eventPublisherPort);
+                                            UserSubscriptionRepositoryPort subscriptionRepositoryPort) {
+        this(roleRepositoryPort, userRepositoryPort, planRepositoryPort, subscriptionRepositoryPort, new SubscriptionPlanResultMapper());
     }
 
     @Override
@@ -122,14 +118,6 @@ public class AdminUpgradeSubscriptionUseCase implements AdminUpgradeSubscription
 
         UserSubscription savedSubscription = subscriptionRepositoryPort.save(newSubscription);
         SubscriptionPlanResult planResult = planResultMapper.mapToPlanResult(targetPlan);
-        
-        // Publish Event Nâng cấp gói bởi Admin
-        if (eventPublisherPort != null) {
-            eventPublisherPort.publish(new org.naho.user.event.UserPlanUpgradedEvent(
-                    command.targetUserId(),
-                    targetPlan.getCode()
-            ));
-        }
 
         return new UserSubscriptionResult(
                 savedSubscription.getId(),
