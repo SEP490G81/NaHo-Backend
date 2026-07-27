@@ -46,4 +46,32 @@ public class SmtpEmailAdapter implements EmailPort {
                     "Lỗi gửi email xác nhận. Vui lòng thử lại sau.", e);
         }
     }
+
+    @Async
+    @Override
+    public void sendEmail(String toEmail, String subject, String templateName, java.util.Map<String, Object> variables) {
+        try {
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+            Context context = new Context();
+            if (variables != null) {
+                variables.forEach(context::setVariable);
+            }
+
+            String htmlContent = templateEngine.process(templateName, context);
+
+            helper.setTo(toEmail);
+            helper.setSubject(subject);
+            helper.setText(htmlContent, true);
+
+            javaMailSender.send(mimeMessage);
+            log.info("Sent email to {} with subject '{}'", toEmail, subject);
+        } catch (MessagingException e) {
+            log.error("Failed to send email to {}", toEmail, e);
+            throw new InfrastructureException(
+                    org.naho.shared.exception.CommonErrorCode.COMMON_INTERNAL_SERVER_ERROR,
+                    "Lỗi gửi email. Vui lòng thử lại sau.", e);
+        }
+    }
 }

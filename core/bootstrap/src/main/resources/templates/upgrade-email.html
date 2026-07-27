@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Chúc mừng nâng cấp gói - NaHo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background-color: #28a745;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            padding: 30px;
+            line-height: 1.6;
+        }
+        .plan-box {
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #f8fff9;
+            border: 2px solid #28a745;
+            display: inline-block;
+            border-radius: 8px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #28a745;
+            text-align: center;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .footer {
+            background-color: #f1f1f1;
+            padding: 15px;
+            text-align: center;
+            font-size: 14px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Chúc mừng nâng cấp thành công</h1>
+    </div>
+    <div class="content">
+        <p>Chào <strong th:text="${fullName}">Bạn</strong>,</p>
+        <p>Cảm ơn bạn đã tin tưởng và đồng hành cùng NaHo. Tài khoản của bạn đã được nâng cấp thành công lên gói:</p>
+        <div class="plan-box" th:text="${newPlanName}">Premium Plan</div>
+        <p>Bây giờ bạn đã có thể trải nghiệm toàn bộ các tính năng cao cấp của gói này. Chúc bạn có những giờ học tập hiệu quả cùng NaHo!</p>
+        <p>Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với bộ phận hỗ trợ của chúng tôi.</p>
+    </div>
+    <div class="footer">
+        &copy; 2026 NaHo App. All rights reserved.
+    </div>
+</div>
+</body>
+</html>
