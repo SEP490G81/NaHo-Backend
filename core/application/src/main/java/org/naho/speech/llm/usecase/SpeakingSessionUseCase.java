@@ -1,5 +1,7 @@
 package org.naho.speech.llm.usecase;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.naho.i18n.message.persona.PersonaDetailMessageKey;
 import org.naho.persona.exception.PersonaErrorCode;
 import org.naho.persona.model.Persona;
@@ -23,16 +25,28 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
     private static final String SYSTEM_PROMPT_TEMPLATE = """
             You are a friendly and patient Japanese conversation partner for language learners.
             Your role:
-            - Always respond ONLY in Japanese (日本語のみ).
             - Match the learner's level: if they use simple Japanese, respond simply.
-            - If the learner makes mistakes, gently continue the conversation naturally \
-            (do NOT correct grammar explicitly during the conversation).
             - Keep your responses concise (2-4 sentences max) to encourage the learner to speak more.
             - Ask follow-up questions to keep the conversation going.
-            %s""";
+            %s
+            
+            IMPORTANT OUTPUT FORMAT REQUIREMENT:
+            You MUST always respond with ONLY a valid, raw JSON object (no markdown formatting, no code blocks like ```json).
+            The JSON object MUST contain the following 5 string fields:
+            {
+              "reply": "Your conversation response ONLY in Japanese (日本語のみ), matching persona & level",
+              "replyTranslation": "Dịch nghĩa tiếng Việt câu trả lời 'reply' của bạn",
+              "grammarExplanation": "Giải thích cấu trúc ngữ pháp hoặc từ vựng chính trong câu 'reply' của bạn bằng tiếng Việt",
+              "correctedUserText": "Câu tiếng Nhật đã được sửa lỗi ngữ pháp/từ vựng/kính ngữ cho lượt vừa rồi của học viên (nếu câu của học viên đã đúng hoàn toàn thì giữ nguyên hoặc đưa ra cách diễn đạt tự nhiên hơn)",
+              "correctionExplanation": "Giải thích chi tiết lỗi sai và lý do sửa/cải thiện bằng tiếng Việt (nếu câu của học viên không có lỗi thì ghi 'Câu của bạn đã chính xác và tự nhiên!')"
+            }
+            """;
 
     private static final String TOPIC_INSTRUCTION =
             "- The conversation topic is: 「%s」. Stay on this topic.\n"
@@ -60,6 +74,39 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         this.textToSpeechServicePort = textToSpeechServicePort;
     }
 
+    private record ParsedAiReply(
+            String reply,
+            String replyTranslation,
+            String grammarExplanation,
+            String correctedUserText,
+            String correctionExplanation
+    ) {}
+
+    private ParsedAiReply parseAiResponse(String rawResponse) {
+        if (rawResponse == null || rawResponse.isBlank()) {
+            return new ParsedAiReply("", "", "", "", "");
+        }
+        try {
+            String cleaned = rawResponse.trim();
+            if (cleaned.startsWith("```")) {
+                int firstNewline = cleaned.indexOf("\n");
+                int lastBacktick = cleaned.lastIndexOf("```");
+                if (firstNewline != -1 && lastBacktick > firstNewline) {
+                    cleaned = cleaned.substring(firstNewline + 1, lastBacktick).trim();
+                }
+            }
+            JsonNode root = OBJECT_MAPPER.readTree(cleaned);
+            String reply = root.path("reply").asText(rawResponse);
+            String replyTranslation = root.path("replyTranslation").asText("");
+            String grammarExplanation = root.path("grammarExplanation").asText("");
+            String correctedUserText = root.path("correctedUserText").asText("");
+            String correctionExplanation = root.path("correctionExplanation").asText("");
+            return new ParsedAiReply(reply, replyTranslation, grammarExplanation, correctedUserText, correctionExplanation);
+        } catch (Exception e) {
+            System.out.println("[SpeakingSessionUseCase] Fallback raw text parsing: " + e.getMessage());
+            return new ParsedAiReply(rawResponse, "", "", "", "");
+        }
+    }
 
     @Override
     public SpeakingTopicResult startTopicSession(StartSpeakingTopicCommand command) {
@@ -67,18 +114,32 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         String topic = command.topic();
         sessionStorePort.initSession(sessionId);
         sessionStorePort.setTopic(sessionId, topic);
+        sessionStorePort.setVoiceName(sessionId, "ja-JP-NanamiNeural");
+
         String prompt = SYSTEM_PROMPT_TEMPLATE.formatted(TOPIC_INSTRUCTION.formatted(topic));
         sessionStorePort.addMessage(sessionId, "system", prompt);
         sessionStorePort.addMessage(sessionId, "user", "こんにちは、話しましょう！");
+
         List<Map<String, String>> messages = sessionStorePort.getConversationHistory(sessionId);
-        String aiGreeting = aiChatPort.chatWithContext(messages);
-        sessionStorePort.addMessage(sessionId, "assistant", aiGreeting);
+        String rawReply = aiChatPort.chatWithContext(messages);
+        ParsedAiReply parsed = parseAiResponse(rawReply);
+
+        sessionStorePort.addMessage(sessionId, "assistant", parsed.reply());
         sessionStorePort.appendTranscript(sessionId,
-                "[Turn]\nUser: こんにちは、話しましょう！\nAssistant: " + aiGreeting + "\n"
+                "[Turn]\nUser: こんにちは、話しましょう！\nAssistant: " + parsed.reply() + "\n"
         );
-        System.out.println("[SpeakingSession] Topic session started: " + sessionId
-                + " | Topic: " + topic);
-        return new SpeakingTopicResult(sessionId, topic, aiGreeting);
+
+        String audioBase64 = toAudioBase64(sessionId, parsed.reply());
+        System.out.println("[SpeakingSession] Topic session started: " + sessionId + " | Topic: " + topic);
+
+        return new SpeakingTopicResult(
+                sessionId,
+                topic,
+                parsed.reply(),
+                audioBase64,
+                parsed.replyTranslation(),
+                parsed.grammarExplanation()
+        );
     }
 
     @Override
@@ -86,13 +147,26 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         String sessionId = command.sessionId();
         String userMessage = command.userMessage();
         sessionStorePort.addMessage(sessionId, "user", userMessage);
+
         List<Map<String, String>> messages = sessionStorePort.getConversationHistory(sessionId);
-        String reply = aiChatPort.chatWithContext(messages);
-        sessionStorePort.addMessage(sessionId, "assistant", reply);
+        String rawReply = aiChatPort.chatWithContext(messages);
+        ParsedAiReply parsed = parseAiResponse(rawReply);
+
+        sessionStorePort.addMessage(sessionId, "assistant", parsed.reply());
         sessionStorePort.appendTranscript(sessionId,
-                "[Turn]\nUser: " + userMessage + "\nAssistant: " + reply + "\n"
+                "[Turn]\nUser: " + userMessage + "\nAssistant: " + parsed.reply() + "\n"
         );
-        return new ChatResult(reply);
+
+        String aiAudio = toAudioBase64(sessionId, parsed.reply());
+
+        return new ChatResult(
+                parsed.reply(),
+                parsed.replyTranslation(),
+                parsed.grammarExplanation(),
+                parsed.correctedUserText(),
+                parsed.correctionExplanation(),
+                aiAudio
+        );
     }
 
     @Override
@@ -100,17 +174,20 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         String sessionId = command.sessionId();
         String userMessage = command.userMessage();
         sessionStorePort.addMessage(sessionId, "user", userMessage);
+
         List<Map<String, String>> messages = sessionStorePort.getConversationHistory(sessionId);
         StringBuilder fullReply = new StringBuilder();
         aiChatPort.chatStreamWithContext(messages, token -> {
-                    fullReply.append(token);
-                    onToken.accept(token);
-                }
-        );
-        String reply = fullReply.toString();
-        sessionStorePort.addMessage(sessionId, "assistant", reply);
+            fullReply.append(token);
+            onToken.accept(token);
+        });
+
+        String rawReply = fullReply.toString();
+        ParsedAiReply parsed = parseAiResponse(rawReply);
+
+        sessionStorePort.addMessage(sessionId, "assistant", parsed.reply());
         sessionStorePort.appendTranscript(sessionId,
-                "[Turn]\nUser: " + userMessage + "\nAssistant: " + reply + "\n");
+                "[Turn]\nUser: " + userMessage + "\nAssistant: " + parsed.reply() + "\n");
     }
 
     @Override
@@ -125,6 +202,28 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
 
         sessionStorePort.initSession(sessionId);
         sessionStorePort.setTopic(sessionId, "Conversation with " + persona.getName());
+        sessionStorePort.setVoiceName(sessionId, "ja-JP-NanamiNeural");
+
+        StringBuilder personaCtx = new StringBuilder();
+        personaCtx.append("Persona name: ").append(persona.getName()).append("\n");
+        if (persona.getPrompt() != null) {
+            personaCtx.append("Persona role: ").append(persona.getPrompt()).append("\n");
+        }
+        if (persona.getConversationStyle() != null) {
+            if (persona.getConversationStyle().getDescription() != null) {
+                personaCtx.append("Style description: ").append(persona.getConversationStyle().getDescription()).append("\n");
+            }
+            if (persona.getConversationStyle().getPrompt() != null) {
+                personaCtx.append("Style instructions: ").append(persona.getConversationStyle().getPrompt()).append("\n");
+            }
+            if (persona.getConversationStyle().getFormalityLevel() != null) {
+                personaCtx.append("formalityLevel: ").append(persona.getConversationStyle().getFormalityLevel().name()).append("\n");
+            }
+            if (persona.getConversationStyle().getMarugotoLevel() != null) {
+                personaCtx.append("marugotoLevel: ").append(persona.getConversationStyle().getMarugotoLevel().name()).append("\n");
+            }
+        }
+        sessionStorePort.setPersonaContext(sessionId, personaCtx.toString());
 
         StringBuilder customInstruction = new StringBuilder(FREE_INSTRUCTION);
         customInstruction.append("\n- Your persona role & prompt: ").append(persona.getPrompt());
@@ -148,57 +247,70 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         sessionStorePort.addMessage(sessionId, "user", "こんにちは、話しましょう！");
 
         List<Map<String, String>> messages = sessionStorePort.getConversationHistory(sessionId);
-        String aiGreeting = aiChatPort.chatWithContext(messages);
-        sessionStorePort.addMessage(sessionId, "assistant", aiGreeting);
+        String rawReply = aiChatPort.chatWithContext(messages);
+        ParsedAiReply parsed = parseAiResponse(rawReply);
+
+        sessionStorePort.addMessage(sessionId, "assistant", parsed.reply());
         sessionStorePort.appendTranscript(sessionId,
-                "[Turn]\nUser: こんにちは、話しましょう！\nAssistant: " + aiGreeting + "\n"
+                "[Turn]\nUser: こんにちは、話しましょう！\nAssistant: " + parsed.reply() + "\n"
         );
 
-        byte[] audioBytes = textToSpeechServicePort.textToSpeech(aiGreeting, "ja-JP-NanamiNeural", "ja-JP").audioData();
-        String audioBase64 = Base64.getEncoder().encodeToString(audioBytes);
+        String audioBase64 = toAudioBase64(sessionId, parsed.reply());
 
-        return new StartConversationResult(sessionId, audioBase64, aiGreeting);
+        return new StartConversationResult(
+                sessionId,
+                audioBase64,
+                parsed.reply(),
+                parsed.replyTranslation(),
+                parsed.grammarExplanation()
+        );
     }
 
-    /**
-     * Luồng hoàn chỉnh cho audio message:
-     * 1. Gọi SpeechToTextPort → Azure STT + Pronunciation Assessment → transcript + scores
-     * 2. Thêm user message (transcript) vào conversation history
-     * 3. Gọi AiChatPort → AI reply dựa trên context
-     * 4. Lưu assistant reply + append transcript
-     * 5. Trả về AudioChatResult (transcript + AI reply + pronunciation scores)
-     */
     @Override
     public AudioChatResult sendAudioMessage(SendAudioMessageCommand command) {
         String sessionId = command.sessionId();
 
-        // 1. Speech-to-Text + Pronunciation Assessment
         SpeechToTextResult sttResult = speechToTextPort.transcribeAndAssess(
                 command.audioBytes(), command.referenceText());
 
         String transcribedText = sttResult.transcribedText();
         System.out.println("[SpeakingSession] STT result: " + transcribedText);
 
-        // 2. Thêm user message vào conversation history
         sessionStorePort.addMessage(sessionId, "user", transcribedText);
 
-        // 3. Gọi AI reply
         List<Map<String, String>> messages = sessionStorePort.getConversationHistory(sessionId);
-        String aiReply = aiChatPort.chatWithContext(messages);
+        String rawReply = aiChatPort.chatWithContext(messages);
+        ParsedAiReply parsed = parseAiResponse(rawReply);
 
-        // 4. Lưu assistant reply
-        sessionStorePort.addMessage(sessionId, "assistant", aiReply);
+        sessionStorePort.addMessage(sessionId, "assistant", parsed.reply());
         sessionStorePort.appendTranscript(sessionId,
-                "[Turn]\nUser: " + transcribedText + "\nAssistant: " + aiReply + "\n");
+                "[Turn]\nUser: " + transcribedText + "\nAssistant: " + parsed.reply() + "\n");
 
-        // 5. Trả về kết quả tổng hợp
+        String aiAudio = toAudioBase64(sessionId, parsed.reply());
+
         return new AudioChatResult(
                 transcribedText,
-                aiReply,
+                parsed.reply(),
+                parsed.replyTranslation(),
+                parsed.grammarExplanation(),
+                parsed.correctedUserText(),
+                parsed.correctionExplanation(),
+                aiAudio,
                 sttResult.accuracyScore(),
                 sttResult.fluencyScore(),
                 sttResult.completenessScore(),
                 sttResult.pronunciationScore()
         );
+    }
+
+    private String toAudioBase64(String sessionId, String text) {
+        try {
+            String voiceName = sessionStorePort.getVoiceName(sessionId);
+            byte[] audioBytes = textToSpeechServicePort.textToSpeech(text, voiceName, "ja-JP").audioData();
+            return Base64.getEncoder().encodeToString(audioBytes);
+        } catch (Exception e) {
+            System.out.println("[SpeakingSession] TTS failed for session " + sessionId + ": " + e.getMessage());
+            return null;
+        }
     }
 }

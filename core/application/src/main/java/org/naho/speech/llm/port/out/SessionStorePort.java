@@ -24,5 +24,14 @@ public interface SessionStorePort {
 
     String getFullTranscript(String sessionId);
 
+    // Persona / Conversation Style context for scoring
+    void setPersonaContext(String sessionId, String personaContext);
+
+    String getPersonaContext(String sessionId);
+
+    // Voice name for TTS replies
+    void setVoiceName(String sessionId, String voiceName);
+
+    String getVoiceName(String sessionId);
 
 }

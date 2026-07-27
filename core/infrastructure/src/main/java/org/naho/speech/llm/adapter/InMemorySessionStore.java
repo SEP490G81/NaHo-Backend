@@ -13,6 +13,8 @@ public class InMemorySessionStore implements SessionStorePort {
     private final ConcurrentHashMap<String, StringBuilder> transcripts = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, String> topics = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, List<Map<String, String>>> histories = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, String> personaContexts = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, String> voiceNames = new ConcurrentHashMap<>();
 
     @Override
     public void initSession(String sessionId) {
@@ -27,6 +29,8 @@ public class InMemorySessionStore implements SessionStorePort {
         transcripts.remove(sessionId);
         topics.remove(sessionId);
         histories.remove(sessionId);
+        personaContexts.remove(sessionId);
+        voiceNames.remove(sessionId);
         System.out.println("[SessionStore] Session cleared: " + sessionId
                 + " | Remaining sessions: " + transcripts.size());
     }
@@ -70,5 +74,29 @@ public class InMemorySessionStore implements SessionStorePort {
     public String getFullTranscript(String sessionId) {
         StringBuilder sb = transcripts.get(sessionId);
         return (sb != null) ? sb.toString() : "";
+    }
+
+    @Override
+    public void setPersonaContext(String sessionId, String personaContext) {
+        if (personaContext != null) {
+            personaContexts.put(sessionId, personaContext);
+        }
+    }
+
+    @Override
+    public String getPersonaContext(String sessionId) {
+        return personaContexts.getOrDefault(sessionId, "");
+    }
+
+    @Override
+    public void setVoiceName(String sessionId, String voiceName) {
+        if (voiceName != null) {
+            voiceNames.put(sessionId, voiceName);
+        }
+    }
+
+    @Override
+    public String getVoiceName(String sessionId) {
+        return voiceNames.getOrDefault(sessionId, "ja-JP-NanamiNeural");
     }
 }

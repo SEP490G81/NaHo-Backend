@@ -40,10 +40,11 @@ public class OpenAiScoringAdapter implements AiScoringPort {
                                String topic,
                                String fullTranscript,
                                String speechMetadata,
-                               String asrConfidence) {
+                               String asrConfidence,
+                               String personaContext) {
         System.out.println("[OpenAiScoringAdapter] Calling model: " + properties.getScoringModel());
 
-        String userContent = buildUserContent(topic, fullTranscript, speechMetadata, asrConfidence);
+        String userContent = buildUserContent(topic, fullTranscript, speechMetadata, asrConfidence, personaContext);
         String requestBody = buildScoringRequestBody(userContent);
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -86,12 +87,15 @@ public class OpenAiScoringAdapter implements AiScoringPort {
     private String buildUserContent(String topic,
                                     String conversation,
                                     String speechMetadata,
-                                    String asrConfidence) {
+                                    String asrConfidence,
+                                    String personaContext) {
         String safeTopic = (topic != null && !topic.isBlank()) ? topic : "General conversation";
         String safeMeta = (speechMetadata != null && !speechMetadata.isBlank()) ? speechMetadata : "N/A";
         String safeAsr = (asrConfidence != null && !asrConfidence.isBlank()) ? asrConfidence : "N/A";
+        String safePersona = (personaContext != null && !personaContext.isBlank()) ? personaContext : "(No persona context — general evaluation)";
 
-        return "Topic: " + safeTopic + "\n\n"
+        return "Persona Context:\n" + safePersona + "\n"
+                + "Topic: " + safeTopic + "\n\n"
                 + "Conversation:\n" + conversation + "\n\n"
                 + "Speech Metadata: " + safeMeta + "\n\n"
                 + "ASR Confidence: " + safeAsr;

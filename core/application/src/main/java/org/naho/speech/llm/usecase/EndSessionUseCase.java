@@ -17,8 +17,10 @@ public class EndSessionUseCase implements EndSessionInputPort {
     @Override
     public ScoringResult endSession(String sessionId, String topic, String speechMetaData, String arsConfidence) {
         String fullTranscript = sessionStorePort.getFullTranscript(sessionId);
+        String personaContext = sessionStorePort.getPersonaContext(sessionId);
         System.out.println("    Transcript length: " + fullTranscript.length() + " chars");
-        ScoringResult result = aiScoringPort.score(sessionId, topic, fullTranscript, speechMetaData, arsConfidence);
+        System.out.println("    Persona context: " + (personaContext.isBlank() ? "(none)" : personaContext.substring(0, Math.min(80, personaContext.length()))));
+        ScoringResult result = aiScoringPort.score(sessionId, topic, fullTranscript, speechMetaData, arsConfidence, personaContext);
         System.out.println("    overallScore: " + result.overallScore() + "/100");
         System.out.println("    jlptEstimate: " + result.jlptEstimate());
 
