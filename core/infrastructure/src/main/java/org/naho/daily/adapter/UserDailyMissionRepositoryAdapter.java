@@ -8,6 +8,8 @@ import org.naho.daily.port.out.UserDailyMissionRepositoryPort;
 import org.naho.daily.repository.UserDailyMissionJpaRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class UserDailyMissionRepositoryAdapter implements UserDailyMissionRepositoryPort {
@@ -25,5 +27,13 @@ public class UserDailyMissionRepositoryAdapter implements UserDailyMissionReposi
         UserDailyMissionEntity entity = userDailyMissionEntityMapper.domainToEntity(userDailyMission);
         UserDailyMissionEntity savedEntity = userDailyMissionJpaRepository.save(entity);
         return userDailyMissionEntityMapper.entityToDomain(savedEntity);
+    }
+
+    @Override
+    public List<UserDailyMission> findAllByUserId(Long userId) {
+        return userDailyMissionJpaRepository
+                .findAllByUser_Id(userId)
+                .stream().map(userDailyMissionEntityMapper::entityToDomain)
+                .toList();
     }
 }

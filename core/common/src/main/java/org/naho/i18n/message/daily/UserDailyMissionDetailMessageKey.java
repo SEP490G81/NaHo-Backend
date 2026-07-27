@@ -11,6 +11,8 @@ public final class UserDailyMissionDetailMessageKey {
             "user.daily.mission.not.found";
     public static final String USER_DAILY_MISSION_ALREADY_COMPLETED =
             "user.daily.mission.already.completed";
+    public static final String USER_DAILY_MISSION_GET_ALL_SUCCESS =
+            "user.daily.mission.get.all.success";
 
     private UserDailyMissionDetailMessageKey() {
     }
