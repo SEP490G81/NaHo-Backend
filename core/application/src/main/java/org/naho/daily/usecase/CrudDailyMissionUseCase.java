@@ -2,7 +2,6 @@ package org.naho.daily.usecase;
 
 import org.naho.daily.command.CompleteMissionCommand;
 import org.naho.daily.exception.DailyMissionDomainErrorCode;
-import org.naho.daily.exception.UserDailyMissionDomainErrorCode;
 import org.naho.daily.mapper.DailyMissionResultMapper;
 import org.naho.daily.model.DailyMission;
 import org.naho.daily.model.UserDailyMission;
@@ -12,7 +11,6 @@ import org.naho.daily.port.out.UserDailyMissionRepositoryPort;
 import org.naho.daily.result.DailyMissionResult;
 import org.naho.daily.type.MissionType;
 import org.naho.i18n.message.daily.DailyMissionDetailMessageKey;
-import org.naho.i18n.message.daily.UserDailyMissionDetailMessageKey;
 import org.naho.i18n.message.learning.UserLearningProgressDetailMessageKey;
 import org.naho.learning.exception.UserLearningProgressErrorCode;
 import org.naho.learning.model.UserLearningProgress;
@@ -67,7 +65,7 @@ public class CrudDailyMissionUseCase implements CrudDailyMissionInputPort {
 
             DailyMission completeANode = DailyMission.builder()
                     .missionDate(today)
-                    .missionType(MissionType.COMPLETE_A_NODE)
+                    .missionType(MissionType.COMPLETE_SPEAKING_QUESTION_NODE)
                     .point(DEFAULT_POINT)
                     .build();
 
@@ -95,10 +93,7 @@ public class CrudDailyMissionUseCase implements CrudDailyMissionInputPort {
                 command.userId(),
                 dailyMission.getId()
         )) {
-            throw new ApplicationException(
-                    UserDailyMissionDomainErrorCode.USER_DAILY_MISSION_ALREADY_COMPLETED,
-                    UserDailyMissionDetailMessageKey.USER_DAILY_MISSION_ALREADY_COMPLETED
-            );
+            return;
         }
 
         UserDailyMission userDailyMission = UserDailyMission.builder()

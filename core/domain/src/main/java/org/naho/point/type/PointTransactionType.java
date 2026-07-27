@@ -8,6 +8,7 @@ public enum PointTransactionType {
     BOOK_COMPLETION,
     DAILY_LOGIN_REWARD,
     DAILY_MISSION_REWARD,
+    RETAKE,
     STREAK_BONUS,
     ACHIEVEMENT_REWARD,
     PENALTY
