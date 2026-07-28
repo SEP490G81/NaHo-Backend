@@ -1,23 +1,30 @@
 package org.naho.daily.model;
 
 import org.naho.daily.exception.UserDailyMissionDomainErrorCode;
+import org.naho.daily.type.MissionStatus;
 import org.naho.i18n.message.daily.UserDailyMissionDetailMessageKey;
 import org.naho.shared.exception.DomainException;
 
-import java.time.Instant;
+import java.time.LocalDate;
 
 public class UserDailyMission {
 
     private Long id;
     private Long userId;
     private Long dailyMissionId;
-    private Instant completedAt;
+    private MissionStatus status;
+    private LocalDate startedDate;
+    private LocalDate completedDate;
+    private LocalDate earnedDate;
 
     private UserDailyMission(Builder builder) {
         this.id = builder.id;
         this.userId = builder.userId;
         this.dailyMissionId = builder.dailyMissionId;
-        this.completedAt = builder.completedAt;
+        this.status = builder.status;
+        this.startedDate = builder.startedDate;
+        this.completedDate = builder.completedDate;
+        this.earnedDate = builder.earnedDate;
     }
 
     public Long getId() {
@@ -32,8 +39,20 @@ public class UserDailyMission {
         return dailyMissionId;
     }
 
-    public Instant getCompletedAt() {
-        return completedAt;
+    public MissionStatus getStatus() {
+        return status;
+    }
+
+    public LocalDate getStartedDate() {
+        return startedDate;
+    }
+
+    public LocalDate getCompletedDate() {
+        return completedDate;
+    }
+
+    public LocalDate getEarnedDate() {
+        return earnedDate;
     }
 
     public void setId(Long id) {
@@ -48,8 +67,20 @@ public class UserDailyMission {
         this.dailyMissionId = dailyMissionId;
     }
 
-    public void setCompletedAt(Instant completedAt) {
-        this.completedAt = completedAt;
+    public void setStatus(MissionStatus status) {
+        this.status = status;
+    }
+
+    public void setStartedDate(LocalDate startedDate) {
+        this.startedDate = startedDate;
+    }
+
+    public void setCompletedDate(LocalDate completedDate) {
+        this.completedDate = completedDate;
+    }
+
+    public void setEarnedDate(LocalDate earnedDate) {
+        this.earnedDate = earnedDate;
     }
 
     public static Builder builder() {
@@ -61,7 +92,10 @@ public class UserDailyMission {
         private Long id;
         private Long userId;
         private Long dailyMissionId;
-        private Instant completedAt;
+        private MissionStatus status;
+        private LocalDate startedDate;
+        private LocalDate completedDate;
+        private LocalDate earnedDate;
 
         public Builder id(Long id) {
             this.id = id;
@@ -78,8 +112,23 @@ public class UserDailyMission {
             return this;
         }
 
-        public Builder completedAt(Instant completedAt) {
-            this.completedAt = completedAt;
+        public Builder status(MissionStatus status) {
+            this.status = status;
+            return this;
+        }
+
+        public Builder startedDate(LocalDate startedDate) {
+            this.startedDate = startedDate;
+            return this;
+        }
+
+        public Builder completedDate(LocalDate completedDate) {
+            this.completedDate = completedDate;
+            return this;
+        }
+
+        public Builder earnedDate(LocalDate earnedDate) {
+            this.earnedDate = earnedDate;
             return this;
         }
 
@@ -95,13 +144,6 @@ public class UserDailyMission {
                 throw new DomainException(
                         UserDailyMissionDomainErrorCode.USER_DAILY_MISSION_DAILY_MISSION_ID_REQUIRED,
                         UserDailyMissionDetailMessageKey.USER_DAILY_MISSION_DAILY_MISSION_ID_REQUIRED
-                );
-            }
-
-            if (completedAt == null) {
-                throw new DomainException(
-                        UserDailyMissionDomainErrorCode.USER_DAILY_MISSION_COMPLETED_AT_REQUIRED,
-                        UserDailyMissionDetailMessageKey.USER_DAILY_MISSION_COMPLETED_AT_REQUIRED
                 );
             }
 

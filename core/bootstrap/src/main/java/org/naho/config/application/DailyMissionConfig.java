@@ -23,37 +23,35 @@ public class DailyMissionConfig {
     }
 
     @Bean
-    public UserDailyMissionResultMapper userDailyMissionResultMapper() {
-        return new UserDailyMissionResultMapper();
+    public UserDailyMissionResultMapper userDailyMissionResultMapper(
+            CrudDailyMissionInputPort crudDailyMissionInputPort,
+            DailyMissionResultMapper dailyMissionResultMapper) {
+        return new UserDailyMissionResultMapper(crudDailyMissionInputPort, dailyMissionResultMapper);
     }
 
     @Bean
     public CrudDailyMissionInputPort crudDailyMissionInputPort(
             DailyMissionRepositoryPort dailyMissionRepositoryPort,
-            UserDailyMissionRepositoryPort userDailyMissionRepositoryPort,
-            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
-            CrudPointHistoryInputPort crudPointHistoryInputPort,
-            DailyMissionResultMapper dailyMissionResultMapper,
-            TransactionPort transactionPort
-    ) {
+            DailyMissionResultMapper dailyMissionResultMapper) {
         return new CrudDailyMissionUseCase(
                 dailyMissionRepositoryPort,
-                userDailyMissionRepositoryPort,
-                userLearningProgressRepositoryPort,
-                crudPointHistoryInputPort,
-                dailyMissionResultMapper,
-                transactionPort
-        );
+                dailyMissionResultMapper);
     }
 
     @Bean
     public CrudUserDailyMissionInputPort crudUserDailyMissionInputPort(
             UserDailyMissionRepositoryPort userDailyMissionRepositoryPort,
-            UserDailyMissionResultMapper userDailyMissionResultMapper
-    ) {
+            UserDailyMissionResultMapper userDailyMissionResultMapper,
+            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
+            DailyMissionRepositoryPort dailyMissionRepositoryPort,
+            CrudPointHistoryInputPort crudPointHistoryInputPort,
+            TransactionPort transactionPort) {
         return new CrudUserDailyMissionUseCase(
                 userDailyMissionRepositoryPort,
-                userDailyMissionResultMapper
-        );
+                userDailyMissionResultMapper,
+                userLearningProgressRepositoryPort,
+                dailyMissionRepositoryPort,
+                crudPointHistoryInputPort,
+                transactionPort);
     }
 }

@@ -1,11 +1,16 @@
 package org.naho.daily.result;
 
-import java.time.Instant;
+import org.naho.daily.type.MissionStatus;
+
+import java.time.LocalDate;
 
 public record UserDailyMissionResult(
         Long id,
         Long userId,
-        Long dailyMissionId,
-        Instant completedAt
+        DailyMissionResult dailyMission,
+        MissionStatus status,
+        LocalDate startedDate,
+        LocalDate completedDate,
+        LocalDate earnedDate
 ) {
 }

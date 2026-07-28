@@ -78,7 +78,8 @@ CREATE TABLE daily_missions
     id            BIGINT AUTO_INCREMENT NOT NULL,
     created_time  datetime(6)           NOT NULL,
     modified_time datetime(6)           NULL,
-    mission_date  date                  NOT NULL,
+    title         VARCHAR(255)          NOT NULL,
+    description   VARCHAR(255)          NULL,
     mission_type  VARCHAR(255)          NOT NULL,
     point         DOUBLE                NOT NULL,
     CONSTRAINT pk_daily_missions PRIMARY KEY (id)
@@ -424,7 +425,10 @@ CREATE TABLE user_daily_missions
     id               BIGINT AUTO_INCREMENT NOT NULL,
     created_time     datetime(6)           NOT NULL,
     modified_time    datetime(6)           NULL,
-    completed_at     datetime(6)           NOT NULL,
+    status           VARCHAR(255)          NULL,
+    started_date     date                  NULL,
+    completed_date   date                  NULL,
+    earned_date      date                  NULL,
     daily_mission_id BIGINT                NOT NULL,
     user_id          BIGINT                NOT NULL,
     CONSTRAINT pk_user_daily_missions PRIMARY KEY (id)

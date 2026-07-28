@@ -1,7 +1,7 @@
 package org.naho.question.usecase;
 
-import org.naho.daily.command.CompleteMissionCommand;
-import org.naho.daily.port.in.CrudDailyMissionInputPort;
+import org.naho.daily.command.CompleteDailyMissionCommand;
+import org.naho.daily.port.in.CrudUserDailyMissionInputPort;
 import org.naho.daily.type.MissionType;
 import org.naho.learning.command.UpdateFarthestAvailableNodeCommand;
 import org.naho.learning.command.UpdateUserStreakCommand;
@@ -31,7 +31,7 @@ public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestion
     private final TransactionPort transactionPort;
     private final UserLearningStreakInputPort userLearningStreakInputPort;
     private final CrudUserLearningProgressInputPort crudUserLearningProgressInputPort;
-    private final CrudDailyMissionInputPort crudDailyMissionInputPort;
+    private final CrudUserDailyMissionInputPort crudUserDailyMissionInputPort;
 
     public CompleteSpeakingQuestionUseCase(
             UserNodeProgressRepositoryPort userNodeProgressRepositoryPort,
@@ -40,7 +40,7 @@ public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestion
             TransactionPort transactionPort,
             UserLearningStreakInputPort userLearningStreakInputPort,
             CrudUserLearningProgressInputPort crudUserLearningProgressInputPort,
-            CrudDailyMissionInputPort crudDailyMissionInputPort
+            CrudUserDailyMissionInputPort crudUserDailyMissionInputPort
     ) {
         this.userNodeProgressRepositoryPort = userNodeProgressRepositoryPort;
         this.userLearningProgressRepositoryPort = userLearningProgressRepositoryPort;
@@ -48,7 +48,7 @@ public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestion
         this.transactionPort = transactionPort;
         this.userLearningStreakInputPort = userLearningStreakInputPort;
         this.crudUserLearningProgressInputPort = crudUserLearningProgressInputPort;
-        this.crudDailyMissionInputPort = crudDailyMissionInputPort;
+        this.crudUserDailyMissionInputPort = crudUserDailyMissionInputPort;
     }
 
     @Override
@@ -59,16 +59,14 @@ public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestion
     public void doCompleteSpeakingQuestion(CompleteSpeakingQuestionCommand command) {
         Instant now = Instant.now();
 
-        LearningPathNode speakingQuestionLearningPathNode =
-                command.speakingQuestionLearningPathNode();
+        LearningPathNode speakingQuestionLearningPathNode = command.speakingQuestionLearningPathNode();
 
         UserLearningProgress progress = command.userLearningProgress();
 
         UserNodeProgress currentUserNodeProgress = userNodeProgressRepositoryPort
                 .findByLearningPathNodeIdAndUserId(
                         speakingQuestionLearningPathNode.getId(),
-                        command.userId()
-                )
+                        command.userId())
                 .orElse(null);
 
         Double point = null;
@@ -113,9 +111,7 @@ public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestion
         progress = crudUserLearningProgressInputPort.updateFarthestAvailableNodeWhenCompletedANode(
                 new UpdateFarthestAvailableNodeCommand(
                         progress,
-                        speakingQuestionLearningPathNode
-                )
-        );
+                        speakingQuestionLearningPathNode));
 
         // update node cuối cùng mà người dùng học
         progress.setLastLearningNodeId(speakingQuestionLearningPathNode.getId());
@@ -128,8 +124,7 @@ public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestion
                         .userId(command.userId())
                         .now(now)
                         .zoneId(SystemZoneId.HO_CHI_MINH_ZONE_ID)
-                        .build()
-        );
+                        .build());
 
         userLearningProgressRepositoryPort.save(progress);
 
@@ -145,9 +140,9 @@ public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestion
             crudPointHistoryInputPort.createPointHistory(pointHistoryCommand);
         }
 
-        crudDailyMissionInputPort.completeMission(new CompleteMissionCommand(
-                MissionType.COMPLETE_SPEAKING_QUESTION_NODE,
-                command.userId()
+        crudUserDailyMissionInputPort.completeMission(new CompleteDailyMissionCommand(
+                command.userId(),
+                MissionType.COMPLETE_SPEAKING_QUESTION_NODE
         ));
     }
 }

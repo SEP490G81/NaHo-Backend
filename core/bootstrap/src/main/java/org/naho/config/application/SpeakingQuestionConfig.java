@@ -1,6 +1,6 @@
 package org.naho.config.application;
 
-import org.naho.daily.port.in.CrudDailyMissionInputPort;
+import org.naho.daily.port.in.CrudUserDailyMissionInputPort;
 import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
 import org.naho.learning.port.in.UserLearningStreakInputPort;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
@@ -21,36 +21,41 @@ public class SpeakingQuestionConfig {
 
     @Bean
     public SuggestCustomSpeakingQuestionUseCase suggestCustomSpeakingQuestionUseCase(
-            AiChatPort aiChatPort
-    ) {
+            AiChatPort aiChatPort) {
         return new SuggestCustomSpeakingQuestionUseCase(aiChatPort);
     }
 
     @Bean
-    public CreateSpeakingQuestionInputPort createSpeakingQuestionInputPort(SpeakingQuestionRepositoryAdapter speakingQuestionRepositoryAdapter) {
+    public CreateSpeakingQuestionInputPort createSpeakingQuestionInputPort(
+            SpeakingQuestionRepositoryAdapter speakingQuestionRepositoryAdapter) {
         return new CreateSpeakingQuestionUseCase(speakingQuestionRepositoryAdapter);
     }
 
     @Bean
-    public UpdateSpeakingQuestionInputPort updateSpeakingQuestionInputPort(SpeakingQuestionRepositoryAdapter speakingQuestionRepositoryAdapter) {
+    public UpdateSpeakingQuestionInputPort updateSpeakingQuestionInputPort(
+            SpeakingQuestionRepositoryAdapter speakingQuestionRepositoryAdapter) {
         return new UpdateSpeakingQuestionUseCase(speakingQuestionRepositoryAdapter);
     }
 
     @Bean
-    public DeleteSpeakingQuestionInputPort deleteSpeakingQuestionInputPort(SpeakingQuestionRepositoryAdapter speakingQuestionRepositoryAdapter,
-                                                                           TransactionPort transactionPort) {
+    public DeleteSpeakingQuestionInputPort deleteSpeakingQuestionInputPort(
+            SpeakingQuestionRepositoryAdapter speakingQuestionRepositoryAdapter,
+            TransactionPort transactionPort) {
         return new DeleteSpeakingQuestionUseCase(speakingQuestionRepositoryAdapter, transactionPort);
     }
 
     @Bean
-    public ChangeSpeakingQuestionStatusInputPort changeSpeakingQuestionStatusInputPort(SpeakingQuestionRepositoryAdapter speakingQuestionRepositoryAdapter,
-                                                                                       EventPublisherPort eventPublisherPort,
-                                                                                       TransactionPort transactionPort) {
-        return new ChangeSpeakingQuestionStatusUseCase(speakingQuestionRepositoryAdapter, eventPublisherPort, transactionPort);
+    public ChangeSpeakingQuestionStatusInputPort changeSpeakingQuestionStatusInputPort(
+            SpeakingQuestionRepositoryAdapter speakingQuestionRepositoryAdapter,
+            EventPublisherPort eventPublisherPort,
+            TransactionPort transactionPort) {
+        return new ChangeSpeakingQuestionStatusUseCase(speakingQuestionRepositoryAdapter, eventPublisherPort,
+                transactionPort);
     }
 
     @Bean
-    public SearchSpeakingQuestionsInputPort searchSpeakingQuestionsInputPort(SpeakingQuestionListRepositoryAdapter speakingQuestionListRepositoryAdapter) {
+    public SearchSpeakingQuestionsInputPort searchSpeakingQuestionsInputPort(
+            SpeakingQuestionListRepositoryAdapter speakingQuestionListRepositoryAdapter) {
         return new SearchSpeakingQuestionsUseCase(speakingQuestionListRepositoryAdapter);
     }
 
@@ -62,8 +67,7 @@ public class SpeakingQuestionConfig {
             TransactionPort transactionPort,
             UserLearningStreakInputPort userLearningStreakInputPort,
             CrudUserLearningProgressInputPort crudUserLearningProgressInputPort,
-            CrudDailyMissionInputPort crudDailyMissionInputPort
-    ) {
+            CrudUserDailyMissionInputPort crudUserDailyMissionInputPort) {
         return new CompleteSpeakingQuestionUseCase(
                 userNodeProgressRepositoryPort,
                 userLearningProgressRepositoryPort,
@@ -71,7 +75,6 @@ public class SpeakingQuestionConfig {
                 transactionPort,
                 userLearningStreakInputPort,
                 crudUserLearningProgressInputPort,
-                crudDailyMissionInputPort
-        );
+                crudUserDailyMissionInputPort);
     }
 }
