@@ -1,6 +1,7 @@
 package org.naho.daily.model;
 
 import org.naho.daily.exception.UserDailyMissionDomainErrorCode;
+import org.naho.daily.type.MissionStatus;
 import org.naho.i18n.message.daily.UserDailyMissionDetailMessageKey;
 import org.naho.shared.exception.DomainException;
 
@@ -11,13 +12,17 @@ public class UserDailyMission {
     private Long id;
     private Long userId;
     private Long dailyMissionId;
+    private MissionStatus status;
     private Instant completedAt;
+    private Instant earnedAt;
 
     private UserDailyMission(Builder builder) {
         this.id = builder.id;
         this.userId = builder.userId;
         this.dailyMissionId = builder.dailyMissionId;
+        this.status = builder.status;
         this.completedAt = builder.completedAt;
+        this.earnedAt = builder.earnedAt;
     }
 
     public Long getId() {
@@ -32,8 +37,16 @@ public class UserDailyMission {
         return dailyMissionId;
     }
 
+    public MissionStatus getStatus() {
+        return status;
+    }
+
     public Instant getCompletedAt() {
         return completedAt;
+    }
+
+    public Instant getEarnedAt() {
+        return earnedAt;
     }
 
     public void setId(Long id) {
@@ -48,8 +61,16 @@ public class UserDailyMission {
         this.dailyMissionId = dailyMissionId;
     }
 
+    public void setStatus(MissionStatus status) {
+        this.status = status;
+    }
+
     public void setCompletedAt(Instant completedAt) {
         this.completedAt = completedAt;
+    }
+
+    public void setEarnedAt(Instant earnedAt) {
+        this.earnedAt = earnedAt;
     }
 
     public static Builder builder() {
@@ -61,7 +82,9 @@ public class UserDailyMission {
         private Long id;
         private Long userId;
         private Long dailyMissionId;
+        private MissionStatus status;
         private Instant completedAt;
+        private Instant earnedAt;
 
         public Builder id(Long id) {
             this.id = id;
@@ -78,8 +101,18 @@ public class UserDailyMission {
             return this;
         }
 
+        public Builder status(MissionStatus status) {
+            this.status = status;
+            return this;
+        }
+
         public Builder completedAt(Instant completedAt) {
             this.completedAt = completedAt;
+            return this;
+        }
+
+        public Builder earnedAt(Instant earnedAt) {
+            this.earnedAt = earnedAt;
             return this;
         }
 

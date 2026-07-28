@@ -9,6 +9,7 @@ import org.naho.daily.port.in.CrudDailyMissionInputPort;
 import org.naho.daily.port.out.DailyMissionRepositoryPort;
 import org.naho.daily.port.out.UserDailyMissionRepositoryPort;
 import org.naho.daily.result.DailyMissionResult;
+import org.naho.daily.type.MissionStatus;
 import org.naho.daily.type.MissionType;
 import org.naho.i18n.message.daily.DailyMissionDetailMessageKey;
 import org.naho.i18n.message.learning.UserLearningProgressDetailMessageKey;
@@ -99,6 +100,7 @@ public class CrudDailyMissionUseCase implements CrudDailyMissionInputPort {
         UserDailyMission userDailyMission = UserDailyMission.builder()
                 .userId(command.userId())
                 .dailyMissionId(dailyMission.getId())
+                .status(MissionStatus.COMPLETED)
                 .completedAt(Instant.now())
                 .build();
 

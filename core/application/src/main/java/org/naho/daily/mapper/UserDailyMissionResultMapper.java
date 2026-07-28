@@ -9,7 +9,9 @@ public class UserDailyMissionResultMapper {
                 domain.getId(),
                 domain.getUserId(),
                 domain.getDailyMissionId(),
-                domain.getCompletedAt()
+                domain.getStatus(),
+                domain.getCompletedAt(),
+                domain.getEarnedAt()
         );
     }
 }
