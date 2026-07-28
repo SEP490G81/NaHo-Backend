@@ -6,9 +6,7 @@ import org.naho.daily.mapper.UserDailyMissionEntityMapper;
 import org.naho.daily.model.UserDailyMission;
 import org.naho.daily.port.out.UserDailyMissionRepositoryPort;
 import org.naho.daily.repository.UserDailyMissionJpaRepository;
-import org.naho.daily.type.MissionStatus;
 import org.naho.daily.type.MissionType;
-import org.naho.shared.exception.InfrastructureException;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -68,7 +66,7 @@ public class UserDailyMissionRepositoryAdapter implements UserDailyMissionReposi
 
     @Override
     public Optional<UserDailyMission> findByUserIdAndDailyMissionMissionTypeAndStartedDate(Long userId,
-            MissionType missionType, LocalDate startedDate) {
+                                                                                           MissionType missionType, LocalDate startedDate) {
         if (userId == null || missionType == null || startedDate == null) {
             return Optional.empty();
         }
