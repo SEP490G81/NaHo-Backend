@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.daily.entity.UserDailyAttendanceEntity;
+import org.naho.daily.entity.UserDailyMissionEntity;
 import org.naho.file.entity.FileEntity;
 import org.naho.learning.entity.UserLearningProgressEntity;
 import org.naho.learning.entity.UserNodeProgressEntity;
@@ -95,4 +96,7 @@ public class UserEntity extends BaseEntity {
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "avatar_file_id")
     FileEntity avatar;
+
+    @OneToMany(mappedBy = "user")
+    List<UserDailyMissionEntity> userDailyMissions;
 }

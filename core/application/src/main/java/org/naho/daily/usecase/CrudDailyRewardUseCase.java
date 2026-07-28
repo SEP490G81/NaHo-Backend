@@ -182,7 +182,7 @@ public class CrudDailyRewardUseCase implements CrudDailyRewardInputPort {
         crudPointHistoryInputPort.createPointHistory(PointHistoryCommand.builder()
                 .userId(command.userId())
                 .point(earnedPoint)
-                .transactionType(PointTransactionType.DAILY_REWARD)
+                .transactionType(PointTransactionType.DAILY_LOGIN_REWARD)
                 .build());
 
         // save the daily reward attendance
