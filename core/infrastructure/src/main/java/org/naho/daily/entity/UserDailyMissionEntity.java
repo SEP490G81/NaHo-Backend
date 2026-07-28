@@ -8,7 +8,7 @@ import org.naho.daily.type.MissionStatus;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.user.entity.UserEntity;
 
-import java.time.Instant;
+import java.time.LocalDate;
 
 @SuperBuilder
 @Getter
@@ -23,11 +23,14 @@ public class UserDailyMissionEntity extends BaseEntity {
     @Column(name = "status")
     MissionStatus status;
 
-    @Column(name = "completed_at", nullable = false)
-    Instant completedAt;
+    @Column(name = "started_date")
+    LocalDate startedDate;
 
-    @Column(name = "earned_at")
-    Instant earnedAt;
+    @Column(name = "completed_date")
+    LocalDate completedDate;
+
+    @Column(name = "earned_date")
+    LocalDate earnedDate;
 
     @ManyToOne
     @JoinColumn(name = "daily_mission_id", nullable = false)

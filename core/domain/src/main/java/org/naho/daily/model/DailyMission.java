@@ -5,19 +5,19 @@ import org.naho.daily.type.MissionType;
 import org.naho.i18n.message.daily.DailyMissionDetailMessageKey;
 import org.naho.shared.exception.DomainException;
 
-import java.time.LocalDate;
-
 public class DailyMission {
 
     private final Long id;
+    private String title;
+    private String description;
     private Double point;
-    private LocalDate missionDate;
     private MissionType missionType;
 
     private DailyMission(Builder builder) {
         this.id = builder.id;
+        this.title = builder.title;
+        this.description = builder.description;
         this.point = builder.point;
-        this.missionDate = builder.missionDate;
         this.missionType = builder.missionType;
     }
 
@@ -25,24 +25,32 @@ public class DailyMission {
         return id;
     }
 
-    public Double getPoint() {
-        return point;
+    public String getTitle() {
+        return title;
     }
 
-    public LocalDate getMissionDate() {
-        return missionDate;
+    public String getDescription() {
+        return description;
+    }
+
+    public Double getPoint() {
+        return point;
     }
 
     public MissionType getMissionType() {
         return missionType;
     }
 
-    public void setPoint(Double point) {
-        this.point = point;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public void setMissionDate(LocalDate missionDate) {
-        this.missionDate = missionDate;
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setPoint(Double point) {
+        this.point = point;
     }
 
     public void setMissionType(MissionType missionType) {
@@ -56,8 +64,9 @@ public class DailyMission {
     public static class Builder {
 
         private Long id;
+        private String title;
+        private String description;
         private Double point;
-        private LocalDate missionDate;
         private MissionType missionType;
 
         public Builder id(Long id) {
@@ -65,13 +74,18 @@ public class DailyMission {
             return this;
         }
 
-        public Builder point(Double point) {
-            this.point = point;
+        public Builder title(String title) {
+            this.title = title;
             return this;
         }
 
-        public Builder missionDate(LocalDate missionDate) {
-            this.missionDate = missionDate;
+        public Builder description(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public Builder point(Double point) {
+            this.point = point;
             return this;
         }
 
@@ -88,13 +102,6 @@ public class DailyMission {
                 );
             }
 
-            if (missionDate == null) {
-                throw new DomainException(
-                        DailyMissionDomainErrorCode.DAILY_MISSION_DATE_REQUIRED,
-                        DailyMissionDetailMessageKey.DAILY_MISSION_DATE_REQUIRED
-                );
-            }
-
             if (missionType == null) {
                 throw new DomainException(
                         DailyMissionDomainErrorCode.DAILY_MISSION_TYPE_REQUIRED,
@@ -106,5 +113,3 @@ public class DailyMission {
         }
     }
 }
-
-

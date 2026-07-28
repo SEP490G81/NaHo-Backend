@@ -7,7 +7,6 @@ import lombok.experimental.SuperBuilder;
 import org.naho.daily.type.MissionType;
 import org.naho.shared.persistence.BaseEntity;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @SuperBuilder
@@ -19,8 +18,11 @@ import java.util.List;
 @Table(name = "daily_missions")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DailyMissionEntity extends BaseEntity {
-    @Column(name = "mission_date", nullable = false)
-    LocalDate missionDate;
+    @Column(name = "title", nullable = false)
+    String title;
+
+    @Column(name = "description")
+    String description;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "mission_type", nullable = false)
@@ -32,4 +34,3 @@ public class DailyMissionEntity extends BaseEntity {
     @OneToMany(mappedBy = "dailyMission")
     List<UserDailyMissionEntity> userDailyMissions;
 }
-

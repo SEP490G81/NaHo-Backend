@@ -6,6 +6,5 @@ import org.naho.daily.result.DailyMissionResult;
 
 @Mapper(componentModel = "spring")
 public interface DailyMissionResponseMapper {
-
     DailyMissionResponse resultToResponse(DailyMissionResult result);
 }
