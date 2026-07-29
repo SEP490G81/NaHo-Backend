@@ -2,14 +2,14 @@ package org.naho.social.report.usecase;
 
 import org.naho.i18n.message.social.ReportDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
-import org.naho.social.report.model.Report;
-import org.naho.social.report.type.ReportType;
 import org.naho.social.report.command.GetReportCommand;
 import org.naho.social.report.exception.ReportErrorCode;
 import org.naho.social.report.mapper.ReportResultMapper;
+import org.naho.social.report.model.Report;
 import org.naho.social.report.port.in.GetReportInputPort;
 import org.naho.social.report.port.out.ReportRepositoryPort;
 import org.naho.social.report.result.ReportResult;
+import org.naho.social.report.type.ReportType;
 
 import java.util.List;
 

@@ -3,8 +3,6 @@ package org.naho.payment.controller.v1;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
-
 import org.naho.i18n.message.payment.PaymentDetailMessageKey;
 import org.naho.payment.command.AdminUpgradeSubscriptionCommand;
 import org.naho.payment.command.CancelPaymentCommand;
@@ -18,11 +16,7 @@ import org.naho.payment.dto.response.CreatePaymentResponse;
 import org.naho.payment.dto.response.PaymentOrderResponse;
 import org.naho.payment.dto.response.VnPayIpnResponse;
 import org.naho.payment.helper.VnPayCallbackHelper;
-import org.naho.payment.port.in.AdminUpgradeSubscriptionInputPort;
-import org.naho.payment.port.in.CancelPaymentInputPort;
-import org.naho.payment.port.in.ConfirmPaymentInputPort;
-import org.naho.payment.port.in.CreatePaymentInputPort;
-import org.naho.payment.port.in.GetPaymentInputPort;
+import org.naho.payment.port.in.*;
 import org.naho.payment.result.CancelPaymentResult;
 import org.naho.payment.result.ConfirmPaymentResult;
 import org.naho.payment.result.CreatePaymentResult;
@@ -48,9 +42,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PaymentController {
 
-    @Value("${app.frontend-url:http://localhost:3636}")
-    private String frontendUrl;
-
     private final CreatePaymentInputPort createPaymentInputPort;
     private final ConfirmPaymentInputPort confirmPaymentInputPort;
     private final GetPaymentInputPort getPaymentInputPort;
@@ -59,6 +50,8 @@ public class PaymentController {
     private final PaymentResponseMapper responseMapper;
     private final SubscriptionResponseMapper subscriptionResponseMapper;
     private final VnPayCallbackHelper vnPayCallbackHelper;
+    @Value("${app.frontend-url:http://localhost:3636}")
+    private String frontendUrl;
 
     @GetMapping("/my-orders")
     @ApiResponseMessage(message = PaymentDetailMessageKey.PAYMENT_ORDER_GET_ALL_SUCCESS)

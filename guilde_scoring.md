@@ -25,13 +25,13 @@ Rubric này được tổng hợp từ bốn nguồn tham chiếu:
 
 ## Tổng quan cấu trúc rubric
 
-| Tiêu chí          | Trọng số (gợi ý) | Thang điểm |
-|-------------------|------------------|------------|
-| Grammar（文法）       | 25%              | 1–5        |
-| Vocabulary（語彙）    | 20%              | 1–5        |
-| Fluency（流暢さ）      | 20%              | 1–5        |
-| Pronunciation（発音） | 15%              | 1–5        |
-| Content（内容・談話能力）  | 20%              | 1–5        |
+| Tiêu chí                  | Trọng số (gợi ý) | Thang điểm |
+|---------------------------|------------------|------------|
+| Grammar（文法）           | 25%              | 1–5        |
+| Vocabulary（語彙）        | 20%              | 1–5        |
+| Fluency（流暢さ）         | 20%              | 1–5        |
+| Pronunciation（発音）     | 15%              | 1–5        |
+| Content（内容・談話能力） | 20%              | 1–5        |
 
 **Điểm tổng (có trọng số):** Tối đa 5.0 điểm  
 **Quy đổi năng lực:**
