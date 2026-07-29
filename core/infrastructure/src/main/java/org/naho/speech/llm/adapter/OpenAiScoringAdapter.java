@@ -194,8 +194,21 @@ public class OpenAiScoringAdapter implements AiScoringPort {
                 for (JsonNode node : improvedNode) {
                     String original = node.path("original").asText("");
                     String improved = node.path("improved").asText("");
-                    improvedExpressions.add(new ScoringResult.ImprovedExpression(original, improved));
+                    String explanationVi = node.path("explanationVi").asText(null);
+                    improvedExpressions.add(new ScoringResult.ImprovedExpression(original, improved, explanationVi));
                 }
+            }
+
+            // Parse studyRecommendation (new field)
+            ScoringResult.StudyRecommendation studyRecommendation = null;
+            JsonNode studyNode = root.path("studyRecommendation");
+            if (!studyNode.isMissingNode() && studyNode.isObject()) {
+                studyRecommendation = new ScoringResult.StudyRecommendation(
+                        studyNode.path("focusArea").asText(null),
+                        studyNode.path("reason").asText(null),
+                        studyNode.path("suggestedPractice").asText(null),
+                        studyNode.path("encouragement").asText(null)
+                );
             }
 
             return new ScoringResult(
@@ -213,7 +226,8 @@ public class OpenAiScoringAdapter implements AiScoringPort {
                     strengths,
                     weaknesses,
                     feedback,
-                    improvedExpressions
+                    improvedExpressions,
+                    studyRecommendation
             );
         } catch (Exception e) {
             throw new InfrastructureException(

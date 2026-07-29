@@ -11,6 +11,14 @@ All evaluation must be **anchored to the specific lesson context** provided belo
 5. If understandable but unnatural, suggest a natural alternative with Vietnamese explanation.
 6. All feedback, comments, and explanations MUST be written in **Vietnamese**.
 7. Return ONLY valid raw JSON — no markdown fences, no extra text.
+8. EMPTY / TOO SHORT: If the transcript is empty, blank, only whitespace, or fewer than 3 meaningful Japanese words:
+   → Set grammar=0, vocabulary=0, contentRelevance=0, naturalness=0, languageScore=0.
+   → Set summaryVi to: "Học viên chưa trả lời hoặc câu trả lời quá ngắn. Vui lòng thử lại và nói ít nhất 1–2 câu đầy đủ."
+   → Do NOT generate fake improved expressions.
+9. FULL ENGLISH / NO JAPANESE: If the entire transcript is in English with no Japanese content:
+   → grammar=0, vocabulary=0, naturalness=0, contentRelevance≤10.
+   → Note in summaryVi that the answer must be in Japanese.
+
 
 # CURRICULUM CONTEXT
 Curriculum: %s
