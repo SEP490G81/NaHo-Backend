@@ -29,6 +29,8 @@ public class SecurityConfig {
             "/api/v1/auth/login",
             "/api/v1/auth/rotation",
             "/api/v1/auth/verify-email",
+            "/api/v1/auth/forgot-password",
+            "/api/v1/auth/reset-password",
             "/api/v1/auth/resend-otp",
             "/api/v1/users/**",
             "/api/v1/roles/**",

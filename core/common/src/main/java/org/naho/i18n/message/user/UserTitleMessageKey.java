@@ -33,6 +33,10 @@ public final class UserTitleMessageKey {
     public static final String USER_OAUTH_PROVIDER_NOT_VALID_TITLE =
             "user.oauth.provider.not.valid.title";
 
+    public static final String USER_PASSWORD_NOT_MATCH_TITLE = "user.password.not.match.title";
+    public static final String USER_PASSWORD_SAME_AS_OLD_TITLE = "user.password.same.as.old.title";
+    public static final String USER_SOCIAL_LOGIN_CANNOT_RESET_PASSWORD_TITLE = "user.social.login.cannot.reset.password.title";
+
     private UserTitleMessageKey() {
     }
 }
