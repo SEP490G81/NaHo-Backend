@@ -71,6 +71,9 @@ dependencies {
     // Redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.apache.commons:commons-pool2:2.13.1")
+    
+    // Apache tika
+    implementation("org.apache.tika:tika-core:3.3.1")
 
     // other
     testImplementation("org.testcontainers:mysql:1.21.4")

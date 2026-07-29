@@ -17,7 +17,7 @@ public class User {
     private final List<Long> oAuthProviderIds;
 
     private final Long userLearningProgressId;
-    private final Username username;
+    private Username username;
     private final Email email;
     private Long avatarFileId;
     private String hashPassword;
@@ -120,6 +120,10 @@ public class User {
 
     public Username getUsername() {
         return username;
+    }
+
+    public void setUsername(Username username) {
+        this.username = username;
     }
 
     public Email getEmail() {

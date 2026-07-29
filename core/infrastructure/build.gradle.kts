@@ -72,6 +72,9 @@ dependencies {
     // Apache POI for Excel
     implementation("org.apache.poi:poi-ooxml:5.2.3")
 
+    // Apache tika
+    implementation("org.apache.tika:tika-core:3.3.1")
+
     // other
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
