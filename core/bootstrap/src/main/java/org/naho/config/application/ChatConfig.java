@@ -76,17 +76,26 @@ public class ChatConfig {
             SessionStorePort sessionStorePort,
             SpeechToTextPort speechToTextPort,
             PersonaRepositoryPort personaRepositoryPort,
-            TextToSpeechServicePort textToSpeechServicePort
+            TextToSpeechServicePort textToSpeechServicePort,
+            SpeakingSessionRepositoryPort speakingSessionRepositoryPort
     ) {
-        return new SpeakingSessionUseCase(aiChatPort, sessionStorePort, speechToTextPort, personaRepositoryPort, textToSpeechServicePort);
+        return new SpeakingSessionUseCase(
+                aiChatPort,
+                sessionStorePort,
+                speechToTextPort,
+                personaRepositoryPort,
+                textToSpeechServicePort,
+                speakingSessionRepositoryPort
+        );
     }
 
     @Bean
     public EndSessionInputPort endSessionInputPort(
             SessionStorePort sessionStorePort,
-            AiScoringPort aiScoringPort
+            AiScoringPort aiScoringPort,
+            SpeakingSessionRepositoryPort speakingSessionRepositoryPort
     ) {
-        return new EndSessionUseCase(sessionStorePort, aiScoringPort);
+        return new EndSessionUseCase(sessionStorePort, aiScoringPort, speakingSessionRepositoryPort);
     }
 
     @Bean

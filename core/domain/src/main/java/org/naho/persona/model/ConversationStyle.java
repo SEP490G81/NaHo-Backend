@@ -3,6 +3,7 @@ package org.naho.persona.model;
 import org.naho.i18n.message.persona.ConversationStyleDetailMessageKey;
 import org.naho.persona.exception.ConversationStyleDomainErrorCode;
 import org.naho.persona.type.FormalityLevel;
+import org.naho.persona.type.MarugotoLevel;
 import org.naho.shared.exception.DomainException;
 
 public class ConversationStyle {
@@ -11,12 +12,14 @@ public class ConversationStyle {
     private final String description;
     private final String prompt;
     private final FormalityLevel formalityLevel;
+    private final MarugotoLevel marugotoLevel;
 
     private ConversationStyle(Builder builder) {
         this.id = builder.id;
         this.description = builder.description;
         this.prompt = builder.prompt;
         this.formalityLevel = builder.formalityLevel;
+        this.marugotoLevel = builder.marugotoLevel;
     }
 
     public static Builder builder() {
@@ -39,12 +42,17 @@ public class ConversationStyle {
         return formalityLevel;
     }
 
+    public MarugotoLevel getMarugotoLevel() {
+        return marugotoLevel;
+    }
+
     public static class Builder {
 
         private Long id;
         private String description;
         private String prompt;
         private FormalityLevel formalityLevel;
+        private MarugotoLevel marugotoLevel;
 
         public Builder id(Long id) {
             this.id = id;
@@ -63,6 +71,11 @@ public class ConversationStyle {
 
         public Builder formalityLevel(FormalityLevel formalityLevel) {
             this.formalityLevel = formalityLevel;
+            return this;
+        }
+
+        public Builder marugotoLevel(MarugotoLevel marugotoLevel) {
+            this.marugotoLevel = marugotoLevel;
             return this;
         }
 

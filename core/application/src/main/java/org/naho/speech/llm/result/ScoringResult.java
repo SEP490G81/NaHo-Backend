@@ -18,11 +18,19 @@ public record ScoringResult(
         List<String> strengths,
         List<String> weaknesses,
         Map<String, String> feedback,
-        List<ImprovedExpression> improvedExpressions
+        List<ImprovedExpression> improvedExpressions,
+        StudyRecommendation studyRecommendation
 ) {
-    public record ImprovedExpression(String original, String improved) {
+    public record ImprovedExpression(String original, String improved, String explanationVi) {
     }
 
+    public record StudyRecommendation(
+            String focusArea,
+            String reason,
+            String suggestedPractice,
+            String encouragement
+    ) {
+    }
 }
 
 

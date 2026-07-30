@@ -5,6 +5,7 @@ public record UpdatePersonaCommand(
         String name,
         String prompt,
         Long avatarFileId,
-        Long suggestedConversationStyleId
+        Long suggestedConversationStyleId,
+        UpdateConversationStyleCommand conversationStyleCommand
 ) {
 }

@@ -4,6 +4,7 @@ public record CreatePersonaCommand(
         String name,
         String prompt,
         Long avatarFileId,
-        Long suggestedConversationStyleId
+        Long suggestedConversationStyleId,
+        CreateConversationStyleCommand conversationStyleCommand
 ) {
 }
