@@ -8,6 +8,7 @@ public interface AiScoringPort {
             String topic,
             String fullTranscript,
             String speechMetadata,
-            String asrConfidence
+            String asrConfidence,
+            String personaContext
     );
 }

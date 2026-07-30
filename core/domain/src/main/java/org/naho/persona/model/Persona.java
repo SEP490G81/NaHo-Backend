@@ -9,6 +9,7 @@ public class Persona {
     private final Long id;
     private final Long avatarFileId;
     private final Long suggestedConversationStyleId;
+    private final ConversationStyle conversationStyle;
     private final String name;
     private final String prompt;
 
@@ -16,6 +17,7 @@ public class Persona {
         this.id = builder.id;
         this.avatarFileId = builder.avatarFileId;
         this.suggestedConversationStyleId = builder.suggestedConversationStyleId;
+        this.conversationStyle = builder.conversationStyle;
         this.name = builder.name;
         this.prompt = builder.prompt;
     }
@@ -36,6 +38,10 @@ public class Persona {
         return suggestedConversationStyleId;
     }
 
+    public ConversationStyle getConversationStyle() {
+        return conversationStyle;
+    }
+
     public String getName() {
         return name;
     }
@@ -49,6 +55,7 @@ public class Persona {
         private Long id;
         private Long avatarFileId;
         private Long suggestedConversationStyleId;
+        private ConversationStyle conversationStyle;
         private String name;
         private String prompt;
 
@@ -64,6 +71,11 @@ public class Persona {
 
         public Builder suggestedConversationStyleId(Long suggestedConversationStyleId) {
             this.suggestedConversationStyleId = suggestedConversationStyleId;
+            return this;
+        }
+
+        public Builder conversationStyle(ConversationStyle conversationStyle) {
+            this.conversationStyle = conversationStyle;
             return this;
         }
 

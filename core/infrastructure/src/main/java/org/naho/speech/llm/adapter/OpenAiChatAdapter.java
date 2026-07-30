@@ -151,7 +151,7 @@ public class OpenAiChatAdapter implements AiChatPort {
             String streamField = stream ? ",\"stream\":true" : "";
 
             return String.format(
-                    "{\"model\":\"%s\",\"messages\":%s,\"max_tokens\":%d,\"temperature\":%.1f%s}",
+                    "{\"model\":\"%s\",\"messages\":%s,\"max_tokens\":%d,\"temperature\":%.1f,\"response_format\":{\"type\":\"json_object\"}%s}",
                     properties.getChatModel(),
                     messagesJson,
                     properties.getMaxTokens(),
@@ -180,7 +180,8 @@ public class OpenAiChatAdapter implements AiChatPort {
                     }
                   ],
                   "max_tokens": %d,
-                  "temperature": %.1f%s
+                  "temperature": %.1f,
+                  "response_format": { "type": "json_object" }%s
                 }
                 """.formatted(
                 properties.getChatModel(),

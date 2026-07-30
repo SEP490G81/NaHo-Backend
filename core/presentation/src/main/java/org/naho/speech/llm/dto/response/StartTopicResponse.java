@@ -1,11 +1,11 @@
 package org.naho.speech.llm.dto.response;
 
-/**
- * HTTP Response DTO: Kết quả bắt đầu topic session.
- */
 public record StartTopicResponse(
         String sessionId,
         String topic,
-        String aiGreeting
+        String aiGreeting,
+        String audioBase64,
+        String aiGreetingTranslation,
+        String grammarExplanation
 ) {
 }

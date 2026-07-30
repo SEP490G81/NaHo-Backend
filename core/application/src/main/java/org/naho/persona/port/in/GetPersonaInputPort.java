@@ -1,5 +1,6 @@
 package org.naho.persona.port.in;
 
+import org.naho.persona.model.ConversationStyle;
 import org.naho.persona.model.Persona;
 
 import java.util.List;
@@ -9,4 +10,6 @@ public interface GetPersonaInputPort {
     List<Persona> getAllPersonas();
 
     Optional<Persona> getPersonaById(Long id);
+
+    Optional<ConversationStyle> getConversationStyleByPersonaId(Long id);
 }
