@@ -4,8 +4,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.naho.question.entity.SpeakingQuestionEntity;
 import org.naho.social.entity.CommentEntity;
-import org.naho.social.report.model.Report;
 import org.naho.social.report.entity.ReportEntity;
+import org.naho.social.report.model.Report;
 import org.naho.user.entity.UserEntity;
 
 @Mapper(componentModel = "spring")

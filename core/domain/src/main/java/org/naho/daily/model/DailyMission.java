@@ -21,6 +21,10 @@ public class DailyMission {
         this.missionType = builder.missionType;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public Long getId() {
         return id;
     }
@@ -29,36 +33,32 @@ public class DailyMission {
         return title;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public Double getPoint() {
-        return point;
-    }
-
-    public MissionType getMissionType() {
-        return missionType;
-    }
-
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
     }
 
+    public Double getPoint() {
+        return point;
+    }
+
     public void setPoint(Double point) {
         this.point = point;
     }
 
-    public void setMissionType(MissionType missionType) {
-        this.missionType = missionType;
+    public MissionType getMissionType() {
+        return missionType;
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public void setMissionType(MissionType missionType) {
+        this.missionType = missionType;
     }
 
     public static class Builder {

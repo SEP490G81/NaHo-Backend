@@ -12,12 +12,14 @@ import org.naho.daily.result.DailyRewardResult;
 import org.naho.daily.result.UserDailyAttendanceResult;
 import org.naho.i18n.message.daily.DailyRewardDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
+import org.naho.shared.constant.SystemZoneId;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.YearMonth;
 import java.util.List;
 
 @RestController
@@ -43,7 +45,11 @@ public class DailyRewardController {
     @ApiResponseMessage(message = DailyRewardDetailMessageKey.DAILY_REWARD_CREATE_CURRENT_MONTH_SUCCESS)
     @PostMapping("/current-month")
     public ResponseEntity<List<DailyRewardResponse>> createCurrentMonthDailyRewards() {
-        List<DailyRewardResult> results = crudDailyRewardInputPort.createCurrentMonthDailyRewards();
+        YearMonth yearMonth = YearMonth.now(SystemZoneId.HO_CHI_MINH_ZONE_ID);
+
+        List<DailyRewardResult> results = crudDailyRewardInputPort
+                .createMonthlyDailyRewards(yearMonth);
+
         List<DailyRewardResponse> responses = results.stream()
                 .map(dailyRewardResponseMapper::resultToResponse)
                 .toList();

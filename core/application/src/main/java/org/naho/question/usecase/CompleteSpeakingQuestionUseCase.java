@@ -140,6 +140,7 @@ public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestion
             crudPointHistoryInputPort.createPointHistory(pointHistoryCommand);
         }
 
+        // hoàn thành nhiệm vụ làm 1 node
         crudUserDailyMissionInputPort.completeMission(new CompleteDailyMissionCommand(
                 command.userId(),
                 MissionType.COMPLETE_SPEAKING_QUESTION_NODE
