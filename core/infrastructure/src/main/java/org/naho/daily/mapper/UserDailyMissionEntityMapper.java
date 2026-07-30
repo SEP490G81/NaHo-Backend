@@ -24,7 +24,6 @@ public abstract class UserDailyMissionEntityMapper {
     @Mapping(target = "dailyMissionId", source = "dailyMission.id")
     public abstract UserDailyMission entityToDomain(UserDailyMissionEntity entity);
 
-
     @Mapping(
             target = "user",
             source = "userId",

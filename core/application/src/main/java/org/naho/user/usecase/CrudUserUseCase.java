@@ -15,12 +15,13 @@ import org.naho.user.port.in.CrudUserInputPort;
 import org.naho.user.port.out.RoleRepositoryPort;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.naho.user.result.UserResult;
+import org.naho.user.type.Gender;
+import org.naho.user.valueobject.Dob;
 import org.naho.user.valueobject.Username;
 
+import java.time.LocalDate;
+
 public class CrudUserUseCase implements CrudUserInputPort {
-
-    private static final String AVATAR_FILE_FOLDER = "avatars";
-
     private final UserRepositoryPort userRepositoryPort;
     private final FileValidatorPort fileValidatorPort;
     private final CrudFileInputPort crudFileInputPort;
@@ -64,6 +65,13 @@ public class CrudUserUseCase implements CrudUserInputPort {
 
     @Override
     public UserResult updateUserInfo(UpdateUserInfoCommand command) {
+        if (command.id() == null) {
+            throw new ApplicationException(
+                    UserErrorCode.USER_NOT_FOUND,
+                    UserDetailMessageKey.USER_ID_NULL
+            );
+        }
+        
         User user = userRepositoryPort.findById(command.id())
                 .orElseThrow(() -> new ApplicationException(
                         UserErrorCode.USER_NOT_FOUND,
@@ -73,25 +81,39 @@ public class CrudUserUseCase implements CrudUserInputPort {
 
         String commandUsername = command.username();
         if (commandUsername != null && !commandUsername.isBlank()) {
+            String currentUsername = user.getUsername() != null ? user.getUsername().getValue() : null;
+            if (!commandUsername.equals(currentUsername) && userRepositoryPort.existsByUsername(commandUsername)) {
+                throw new ApplicationException(
+                        UserErrorCode.USER_ALREADY_EXISTS,
+                        UserDetailMessageKey.USER_USERNAME_ALREADY_EXISTS,
+                        commandUsername
+                );
+            }
             user.setUsername(Username.of(commandUsername));
         }
 
         FileUploadCommand commandAvatarFile = command.avatarFile();
         if (commandAvatarFile != null) {
-            String contentType = fileValidatorPort.validateImageFile(commandAvatarFile.getInputStream());
-
-            FileResult fileResult = fileStorageInputPort.uploadFile(
-                    FileUploadCommand.builder()
-                            .folderName(AVATAR_FILE_FOLDER)
-                            .originalName(commandAvatarFile.getOriginalName())
-                            .contentType(contentType)
-                            .size(commandAvatarFile.getSize())
-                            .build()
-            );
-
+            FileResult fileResult = fileStorageInputPort.uploadFile(commandAvatarFile);
             user.setAvatarFileId(fileResult.id());
         }
-        
-        return null;
+
+        String commandFullName = command.fullName();
+        if (commandFullName != null && !commandFullName.isBlank()) {
+            user.setFullName(commandFullName);
+        }
+
+        Gender commandGender = command.gender();
+        if (commandGender != null) {
+            user.setGender(commandGender);
+        }
+
+        LocalDate commandDob = command.dob();
+        if (commandDob != null) {
+            user.setDob(Dob.of(commandDob));
+        }
+
+        User savedUser = userRepositoryPort.save(user);
+        return userResultMapper.domainToResult(savedUser);
     }
 }

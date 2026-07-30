@@ -64,15 +64,8 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
-    public User save(User user, OAuthProvider oAuthProvider) {
+    public User save(User user) {
         UserEntity userEntity = userEntityMapper.domainToEntity(user);
-
-        if (oAuthProvider != null) {
-            OAuthProviderEntity oAuthProviderEntity = oAuthProviderEntityMapper.domainToEntity(oAuthProvider);
-            oAuthProviderEntity.setUser(userEntity);
-            userEntity.getOAuthProviders().add(oAuthProviderEntity);
-        }
-
         UserEntity savedEntity = userJpaRepository.save(userEntity);
         return userEntityMapper.entityToDomain(savedEntity);
     }

@@ -21,7 +21,7 @@ public interface UserRepositoryPort {
 
     boolean existsByEmail(String email);
 
-    User save(User user, OAuthProvider oAuthProvider);
+    User save(User user);
 
     User createNew(User user, OAuthProvider oAuthProvider);
 

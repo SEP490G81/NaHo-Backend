@@ -75,7 +75,7 @@ public class UserEntity extends BaseEntity {
     List<OAuthProviderEntity> oAuthProviders = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
-    List<SpeakingQuestionEntity> questions;
+    List<SpeakingQuestionEntity> speakingQuestions;
 
     @OneToMany(mappedBy = "user")
     List<ReportEntity> reports;

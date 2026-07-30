@@ -31,286 +31,273 @@ import java.time.Instant;
 import java.util.List;
 
 public class AuthUseCase implements AuthInputPort {
-    private final UserRepositoryPort userRepositoryPort;
-    private final EncoderPort encoderPort;
-    private final TokenServicePort tokenServicePort;
-    private final UserSessionRepositoryPort userSessionRepositoryPort;
-    private final RoleRepositoryPort roleRepositoryPort;
-    private final TransactionPort transactionPort;
-    private final UserSessionServicePort userSessionServicePort;
-    private final UserSessionEventPublisherPort userSessionEventPublisherPort;
-    private final CrudUserLearningProgressInputPort crudUserLearningProgressInputPort;
-    private final OtpPort otpPort;
-    private final EmailPort emailPort;
+        private final UserRepositoryPort userRepositoryPort;
+        private final EncoderPort encoderPort;
+        private final TokenServicePort tokenServicePort;
+        private final UserSessionRepositoryPort userSessionRepositoryPort;
+        private final RoleRepositoryPort roleRepositoryPort;
+        private final TransactionPort transactionPort;
+        private final UserSessionServicePort userSessionServicePort;
+        private final UserSessionEventPublisherPort userSessionEventPublisherPort;
+        private final CrudUserLearningProgressInputPort crudUserLearningProgressInputPort;
+        private final OtpPort otpPort;
+        private final EmailPort emailPort;
 
-    public AuthUseCase(
-            UserRepositoryPort userRepositoryPort,
-            EncoderPort encoderPort,
-            TokenServicePort tokenServicePort,
-            UserSessionRepositoryPort userSessionRepositoryPort,
-            RoleRepositoryPort roleRepositoryPort,
-            TransactionPort transactionPort,
-            UserSessionServicePort userSessionServicePort,
-            UserSessionEventPublisherPort userSessionEventPublisherPort,
-            CrudUserLearningProgressInputPort crudUserLearningProgressInputPort,
-            OtpPort otpPort,
-            EmailPort emailPort
-    ) {
-        this.userRepositoryPort = userRepositoryPort;
-        this.encoderPort = encoderPort;
-        this.tokenServicePort = tokenServicePort;
-        this.userSessionRepositoryPort = userSessionRepositoryPort;
-        this.roleRepositoryPort = roleRepositoryPort;
-        this.transactionPort = transactionPort;
-        this.userSessionServicePort = userSessionServicePort;
-        this.userSessionEventPublisherPort = userSessionEventPublisherPort;
-        this.crudUserLearningProgressInputPort = crudUserLearningProgressInputPort;
-        this.otpPort = otpPort;
-        this.emailPort = emailPort;
-    }
-
-    @Override
-    public void logoutAllSessions(Long userId) {
-        if (userId == null) {
-            throw new ApplicationException(
-                    UserErrorCode.USER_UNAUTHORIZED,
-                    UserDetailMessageKey.USER_UNAUTHORIZED
-            );
-        }
-        userSessionRepositoryPort.revokeAllActiveSessionsByUserId(
-                userId,
-                Instant.now(),
-                SessionRevokedReason.USER_LOGOUT_ALL
-        );
-    }
-
-    @Override
-    public LoginResult credentialsLogin(CredentialsLoginCommand command) {
-        return transactionPort.execute(() -> doCredentialsLogin(command));
-    }
-
-    private LoginResult doCredentialsLogin(CredentialsLoginCommand command) {
-        User user = userRepositoryPort.findByUsernameOrEmail(command.usernameOrEmail())
-                .orElseThrow(() -> new ApplicationException(
-                        UserErrorCode.USER_LOGIN_FAILED,
-                        UserDetailMessageKey.USER_WRONG_LOGIN_INFO));
-
-        if (!encoderPort.matches(command.rawPassword(), user.getHashPassword())) {
-            throw new ApplicationException(
-                    UserErrorCode.USER_LOGIN_FAILED,
-                    UserDetailMessageKey.USER_WRONG_LOGIN_INFO);
+        public AuthUseCase(
+                        UserRepositoryPort userRepositoryPort,
+                        EncoderPort encoderPort,
+                        TokenServicePort tokenServicePort,
+                        UserSessionRepositoryPort userSessionRepositoryPort,
+                        RoleRepositoryPort roleRepositoryPort,
+                        TransactionPort transactionPort,
+                        UserSessionServicePort userSessionServicePort,
+                        UserSessionEventPublisherPort userSessionEventPublisherPort,
+                        CrudUserLearningProgressInputPort crudUserLearningProgressInputPort,
+                        OtpPort otpPort,
+                        EmailPort emailPort) {
+                this.userRepositoryPort = userRepositoryPort;
+                this.encoderPort = encoderPort;
+                this.tokenServicePort = tokenServicePort;
+                this.userSessionRepositoryPort = userSessionRepositoryPort;
+                this.roleRepositoryPort = roleRepositoryPort;
+                this.transactionPort = transactionPort;
+                this.userSessionServicePort = userSessionServicePort;
+                this.userSessionEventPublisherPort = userSessionEventPublisherPort;
+                this.crudUserLearningProgressInputPort = crudUserLearningProgressInputPort;
+                this.otpPort = otpPort;
+                this.emailPort = emailPort;
         }
 
-        if (!user.isActive()) {
-            throw new ApplicationException(
-                    UserErrorCode.USER_LOGIN_FAILED,
-                    UserDetailMessageKey.USER_ACCOUNT_NOT_ACTIVE);
+        @Override
+        public void logoutAllSessions(Long userId) {
+                if (userId == null) {
+                        throw new ApplicationException(
+                                        UserErrorCode.USER_UNAUTHORIZED,
+                                        UserDetailMessageKey.USER_UNAUTHORIZED);
+                }
+                userSessionRepositoryPort.revokeAllActiveSessionsByUserId(
+                                userId,
+                                Instant.now(),
+                                SessionRevokedReason.USER_LOGOUT_ALL);
         }
 
-        if (!user.isEmailVerified()) {
-            String email = user.getEmail().getValue();
-            if (!otpPort.hasValidOtp(email)) {
-                String otp = otpPort.generateOtp();
-                otpPort.saveOtp(email, otp);
-                emailPort.sendOtpEmail(email, otp);
-            }
-            throw new ApplicationException(
-                    UserErrorCode.USER_EMAIL_UNVERIFIED,
-                    UserDetailMessageKey.USER_EMAIL_UNVERIFIED_DETAIL);
+        @Override
+        public LoginResult credentialsLogin(CredentialsLoginCommand command) {
+                return transactionPort.execute(() -> doCredentialsLogin(command));
         }
 
-        userSessionServicePort.revokeAllSessionsByUserId(
-                user.getId(),
-                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
-        );
+        private LoginResult doCredentialsLogin(CredentialsLoginCommand command) {
+                User user = userRepositoryPort.findByUsernameOrEmail(command.usernameOrEmail())
+                                .orElseThrow(() -> new ApplicationException(
+                                                UserErrorCode.USER_LOGIN_FAILED,
+                                                UserDetailMessageKey.USER_WRONG_LOGIN_INFO));
 
-        Instant now = Instant.now();
+                if (!encoderPort.matches(command.rawPassword(), user.getHashPassword())) {
+                        throw new ApplicationException(
+                                        UserErrorCode.USER_LOGIN_FAILED,
+                                        UserDetailMessageKey.USER_WRONG_LOGIN_INFO);
+                }
 
-        TokenResult refreshToken = tokenServicePort.generateRefreshToken(now);
+                if (!user.isActive()) {
+                        throw new ApplicationException(
+                                        UserErrorCode.USER_LOGIN_FAILED,
+                                        UserDetailMessageKey.USER_ACCOUNT_NOT_ACTIVE);
+                }
 
-        String hashRefreshToken = encoderPort.hashRefreshToken(refreshToken.value());
+                if (!user.isEmailVerified()) {
+                        String email = user.getEmail().getValue();
+                        if (!otpPort.hasValidOtp(email)) {
+                                String otp = otpPort.generateOtp();
+                                otpPort.saveOtp(email, otp);
+                                emailPort.sendOtpEmail(email, otp);
+                        }
+                        throw new ApplicationException(
+                                        UserErrorCode.USER_EMAIL_UNVERIFIED,
+                                        UserDetailMessageKey.USER_EMAIL_UNVERIFIED_DETAIL);
+                }
 
-        UserSession userSession = UserSession.builder()
-                .userId(user.getId())
-                .hashRefreshToken(hashRefreshToken)
-                .deviceId(command.deviceId())
-                .userAgent(command.userAgent())
-                .ipAddress(command.ipAddress())
-                .issuedAt(now)
-                .refreshTokenExpiresAt(refreshToken.expiresAt())
-                .accessTokenExpiresAt(tokenServicePort.getAccessTokenExpiry(now))
-                .lastUsedAt(now)
-                .build();
+                userSessionServicePort.revokeAllSessionsByUserId(
+                                user.getId(),
+                                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE);
 
-        UserSession savedUserSession = userSessionRepositoryPort.save(userSession);
+                Instant now = Instant.now();
 
-        TokenResult accessToken = tokenServicePort.generateAccessToken(savedUserSession);
+                TokenResult refreshToken = tokenServicePort.generateRefreshToken(now);
 
-        userSessionEventPublisherPort.publishForceLogoutEvent(new ForceLogoutCommand(
-                savedUserSession.getUserId(),
-                savedUserSession.getId(),
-                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
-        ));
+                String hashRefreshToken = encoderPort.hashRefreshToken(refreshToken.value());
 
-        return new LoginResult(
-                accessToken,
-                refreshToken
-        );
-    }
+                UserSession userSession = UserSession.builder()
+                                .userId(user.getId())
+                                .hashRefreshToken(hashRefreshToken)
+                                .deviceId(command.deviceId())
+                                .userAgent(command.userAgent())
+                                .ipAddress(command.ipAddress())
+                                .issuedAt(now)
+                                .refreshTokenExpiresAt(refreshToken.expiresAt())
+                                .accessTokenExpiresAt(tokenServicePort.getAccessTokenExpiry(now))
+                                .lastUsedAt(now)
+                                .build();
 
+                UserSession savedUserSession = userSessionRepositoryPort.save(userSession);
 
-    @Override
-    public LoginResult googleLogin(GoogleLoginCommand command) {
-        return transactionPort.execute(() -> doGoogleLogin(command));
-    }
+                TokenResult accessToken = tokenServicePort.generateAccessToken(savedUserSession);
 
-    private LoginResult doGoogleLogin(GoogleLoginCommand command) {
-        // Google provider id
-        String providerUserId = command.getSub();
+                userSessionEventPublisherPort.publishForceLogoutEvent(new ForceLogoutCommand(
+                                savedUserSession.getUserId(),
+                                savedUserSession.getId(),
+                                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE));
 
-        User currentUser = userRepositoryPort
-                .findByProviderUserIdAndProviderName(providerUserId, OAuthProviderName.GOOGLE)
-                .orElse(null);
-
-        if (currentUser == null) {
-            OAuthProvider oAuthProvider = OAuthProvider.builder()
-                    .providerUserId(providerUserId)
-                    .providerName(OAuthProviderName.GOOGLE)
-                    .avatarUrl(command.getPictureUrl())
-                    .build();
-
-            User emailUser = userRepositoryPort.findByEmail(command.getEmail())
-                    .orElse(null);
-
-            // if user is not found by Google providerUserId and email, create new
-            if (emailUser == null) {
-                Role learnerRole = roleRepositoryPort.findByName(RoleName.LEARNER)
-                        .orElseThrow(() -> new ApplicationException(
-                                RoleErrorCode.ROLE_NOT_FOUND,
-                                RoleDetailMessageKey.ROLE_ROLE_NAME_NOT_FOUND,
-                                RoleName.LEARNER.name()
-                        ));
-
-                User newUser = User.builder()
-                        .email(Email.of(command.getEmail()))
-                        .fullName(command.getFullName())
-                        .status(UserStatus.ACTIVE)
-                        .isEmailVerified(true)
-                        .roleIds(List.of(learnerRole.getId()))
-                        .build();
-
-                currentUser = userRepositoryPort.createNew(newUser, oAuthProvider);
-
-                // init user learning progress
-                crudUserLearningProgressInputPort.initUserLearningProgress(currentUser.getId());
-            } else {
-                // if user is found by email, update OAuthProvider (link to Google)
-                currentUser = userRepositoryPort.save(emailUser, oAuthProvider);
-            }
+                return new LoginResult(
+                                accessToken,
+                                refreshToken);
         }
 
-        if (!currentUser.isActive()) {
-            throw new ApplicationException(
-                    UserErrorCode.USER_LOGIN_FAILED,
-                    UserDetailMessageKey.USER_ACCOUNT_NOT_ACTIVE);
+        @Override
+        public LoginResult googleLogin(GoogleLoginCommand command) {
+                return transactionPort.execute(() -> doGoogleLogin(command));
         }
 
-        userSessionServicePort.revokeAllSessionsByUserId(
-                currentUser.getId(),
-                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
-        );
+        private LoginResult doGoogleLogin(GoogleLoginCommand command) {
+                // Google provider id
+                String providerUserId = command.getSub();
 
-        Instant now = Instant.now();
+                User currentUser = userRepositoryPort
+                                .findByProviderUserIdAndProviderName(providerUserId, OAuthProviderName.GOOGLE)
+                                .orElse(null);
 
-        TokenResult refreshToken = tokenServicePort.generateRefreshToken(now);
+                if (currentUser == null) {
+                        OAuthProvider oAuthProvider = OAuthProvider.builder()
+                                        .providerUserId(providerUserId)
+                                        .providerName(OAuthProviderName.GOOGLE)
+                                        .avatarUrl(command.getPictureUrl())
+                                        .build();
 
-        String hashRefreshToken = encoderPort.hashRefreshToken(refreshToken.value());
+                        User emailUser = userRepositoryPort.findByEmail(command.getEmail())
+                                        .orElse(null);
 
-        UserSession userSession = UserSession.builder()
-                .userId(currentUser.getId())
-                .hashRefreshToken(hashRefreshToken)
-                .deviceId(command.getDeviceId())
-                .userAgent(command.getUserAgent())
-                .ipAddress(command.getIpAddress())
-                .issuedAt(now)
-                .refreshTokenExpiresAt(refreshToken.expiresAt())
-                .accessTokenExpiresAt(tokenServicePort.getAccessTokenExpiry(now))
-                .lastUsedAt(now)
-                .build();
+                        // if user is not found by Google providerUserId and email, create new
+                        if (emailUser == null) {
+                                Role learnerRole = roleRepositoryPort.findByName(RoleName.LEARNER)
+                                                .orElseThrow(() -> new ApplicationException(
+                                                                RoleErrorCode.ROLE_NOT_FOUND,
+                                                                RoleDetailMessageKey.ROLE_ROLE_NAME_NOT_FOUND,
+                                                                RoleName.LEARNER.name()));
 
-        UserSession savedUserSession = userSessionRepositoryPort.save(userSession);
+                                User newUser = User.builder()
+                                                .email(Email.of(command.getEmail()))
+                                                .fullName(command.getFullName())
+                                                .status(UserStatus.ACTIVE)
+                                                .isEmailVerified(true)
+                                                .roleIds(List.of(learnerRole.getId()))
+                                                .build();
 
-        TokenResult accessToken = tokenServicePort.generateAccessToken(savedUserSession);
+                                currentUser = userRepositoryPort.createNew(newUser, oAuthProvider);
 
-        userSessionEventPublisherPort.publishForceLogoutEvent(new ForceLogoutCommand(
-                savedUserSession.getUserId(),
-                savedUserSession.getId(),
-                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
-        ));
+                                // init user learning progress
+                                crudUserLearningProgressInputPort.initUserLearningProgress(currentUser.getId());
+                        } else {
+                                // if user is found by email, update OAuthProvider (link to Google)
+                                currentUser = userRepositoryPort.createNew(emailUser, oAuthProvider);
+                        }
+                }
 
-        return new LoginResult(
-                accessToken,
-                refreshToken
-        );
-    }
+                if (!currentUser.isActive()) {
+                        throw new ApplicationException(
+                                        UserErrorCode.USER_LOGIN_FAILED,
+                                        UserDetailMessageKey.USER_ACCOUNT_NOT_ACTIVE);
+                }
 
-    @Override
-    public void logout(LogoutCommand command) {
-        if (command == null || command.userId() == null || command.userSessionId() == null) {
-            throw new ApplicationException(
-                    UserErrorCode.USER_UNAUTHORIZED,
-                    UserTitleMessageKey.USER_UNAUTHORIZED_TITLE);
+                userSessionServicePort.revokeAllSessionsByUserId(
+                                currentUser.getId(),
+                                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE);
+
+                Instant now = Instant.now();
+
+                TokenResult refreshToken = tokenServicePort.generateRefreshToken(now);
+
+                String hashRefreshToken = encoderPort.hashRefreshToken(refreshToken.value());
+
+                UserSession userSession = UserSession.builder()
+                                .userId(currentUser.getId())
+                                .hashRefreshToken(hashRefreshToken)
+                                .deviceId(command.getDeviceId())
+                                .userAgent(command.getUserAgent())
+                                .ipAddress(command.getIpAddress())
+                                .issuedAt(now)
+                                .refreshTokenExpiresAt(refreshToken.expiresAt())
+                                .accessTokenExpiresAt(tokenServicePort.getAccessTokenExpiry(now))
+                                .lastUsedAt(now)
+                                .build();
+
+                UserSession savedUserSession = userSessionRepositoryPort.save(userSession);
+
+                TokenResult accessToken = tokenServicePort.generateAccessToken(savedUserSession);
+
+                userSessionEventPublisherPort.publishForceLogoutEvent(new ForceLogoutCommand(
+                                savedUserSession.getUserId(),
+                                savedUserSession.getId(),
+                                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE));
+
+                return new LoginResult(
+                                accessToken,
+                                refreshToken);
         }
-        userSessionRepositoryPort.revokeActiveSessionsByUserIdAndUserSessionId(
-                command.userId(),
-                command.userSessionId(),
-                Instant.now(),
-                SessionRevokedReason.USER_LOGOUT
-        );
-    }
 
-    @Override
-    public LoginResult rotateToken(String refreshToken) {
-        String hashRefreshToken = encoderPort.hashRefreshToken(refreshToken);
-        UserSession userSession = userSessionRepositoryPort.findByHashRefreshToken(hashRefreshToken);
-        Instant now = Instant.now();
+        @Override
+        public void logout(LogoutCommand command) {
+                if (command == null || command.userId() == null || command.userSessionId() == null) {
+                        throw new ApplicationException(
+                                        UserErrorCode.USER_UNAUTHORIZED,
+                                        UserTitleMessageKey.USER_UNAUTHORIZED_TITLE);
+                }
+                userSessionRepositoryPort.revokeActiveSessionsByUserIdAndUserSessionId(
+                                command.userId(),
+                                command.userSessionId(),
+                                Instant.now(),
+                                SessionRevokedReason.USER_LOGOUT);
+        }
 
-        userSessionRepositoryPort.verifyUserSession(userSession, now);
+        @Override
+        public LoginResult rotateToken(String refreshToken) {
+                String hashRefreshToken = encoderPort.hashRefreshToken(refreshToken);
+                UserSession userSession = userSessionRepositoryPort.findByHashRefreshToken(hashRefreshToken);
+                Instant now = Instant.now();
 
-        return transactionPort.execute(() -> doRotateToken(userSession, now));
-    }
+                userSessionRepositoryPort.verifyUserSession(userSession, now);
 
-    private LoginResult doRotateToken(UserSession userSession, Instant now) {
-        // revoke old refresh token
-        userSession.setRevokedReason(SessionRevokedReason.ROTATED);
-        userSession.setRevokedAt(now);
-        userSession.setLastUsedAt(now);
-        userSessionRepositoryPort.save(userSession);
+                return transactionPort.execute(() -> doRotateToken(userSession, now));
+        }
 
-        // generate new refresh token and new user session
-        TokenResult newRefreshToken = tokenServicePort.generateRefreshToken(now);
+        private LoginResult doRotateToken(UserSession userSession, Instant now) {
+                // revoke old refresh token
+                userSession.setRevokedReason(SessionRevokedReason.ROTATED);
+                userSession.setRevokedAt(now);
+                userSession.setLastUsedAt(now);
+                userSessionRepositoryPort.save(userSession);
 
-        String newHashRefreshToken = encoderPort.hashRefreshToken(newRefreshToken.value());
+                // generate new refresh token and new user session
+                TokenResult newRefreshToken = tokenServicePort.generateRefreshToken(now);
 
-        UserSession newUserSession = UserSession.builder()
-                .userId(userSession.getUserId())
-                .hashRefreshToken(newHashRefreshToken)
-                .deviceId(userSession.getDeviceId())
-                .userAgent(userSession.getUserAgent())
-                .ipAddress(userSession.getIpAddress())
-                .issuedAt(now)
-                .refreshTokenExpiresAt(newRefreshToken.expiresAt())
-                .accessTokenExpiresAt(tokenServicePort.getAccessTokenExpiry(now))
-                .lastUsedAt(now)
-                .build();
+                String newHashRefreshToken = encoderPort.hashRefreshToken(newRefreshToken.value());
 
-        UserSession savedUserSession = userSessionRepositoryPort.save(newUserSession);
+                UserSession newUserSession = UserSession.builder()
+                                .userId(userSession.getUserId())
+                                .hashRefreshToken(newHashRefreshToken)
+                                .deviceId(userSession.getDeviceId())
+                                .userAgent(userSession.getUserAgent())
+                                .ipAddress(userSession.getIpAddress())
+                                .issuedAt(now)
+                                .refreshTokenExpiresAt(newRefreshToken.expiresAt())
+                                .accessTokenExpiresAt(tokenServicePort.getAccessTokenExpiry(now))
+                                .lastUsedAt(now)
+                                .build();
 
-        TokenResult newAccessToken = tokenServicePort.generateAccessToken(savedUserSession);
+                UserSession savedUserSession = userSessionRepositoryPort.save(newUserSession);
 
-        return new LoginResult(
-                newAccessToken,
-                newRefreshToken
-        );
-    }
+                TokenResult newAccessToken = tokenServicePort.generateAccessToken(savedUserSession);
+
+                return new LoginResult(
+                                newAccessToken,
+                                newRefreshToken);
+        }
 }

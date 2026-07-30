@@ -2,6 +2,7 @@ package org.naho.daily.model;
 
 import org.naho.daily.exception.UserDailyAttendanceDomainErrorCode;
 import org.naho.i18n.message.daily.UserDailyAttendanceDetailMessageKey;
+import org.naho.shared.constant.SystemZoneId;
 import org.naho.shared.exception.DomainException;
 
 import java.time.LocalDate;
@@ -105,7 +106,7 @@ public class UserDailyAttendance {
                 );
             }
 
-            if (attendanceDate.isAfter(LocalDate.now())) {
+            if (attendanceDate.isAfter(LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID))) {
                 throw new DomainException(
                         UserDailyAttendanceDomainErrorCode.USER_DAILY_ATTENDANCE_DATE_FUTURE,
                         UserDailyAttendanceDetailMessageKey.USER_DAILY_ATTENDANCE_DATE_FUTURE

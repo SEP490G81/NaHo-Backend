@@ -2,12 +2,16 @@ package org.naho.social.comment.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.naho.question.entity.SpeakingQuestionEntity;
+import org.naho.question.mapper.SpeakingQuestionIdMapper;
 import org.naho.social.comment.model.Comment;
 import org.naho.social.entity.CommentEntity;
-import org.naho.user.entity.UserEntity;
+import org.naho.user.mapper.UserIdMapper;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {
+        UserIdMapper.class,
+        SpeakingQuestionIdMapper.class,
+        CommentIdMapper.class
+})
 public interface CommentEntityMapper {
 
     @Mapping(target = "userId", source = "user.id")
@@ -25,31 +29,4 @@ public interface CommentEntityMapper {
     @Mapping(target = "createdTime", ignore = true)
     @Mapping(target = "modifiedTime", ignore = true)
     CommentEntity domainToEntity(Comment domain);
-
-    default UserEntity mapUserIdToUserEntity(Long userId) {
-        if (userId == null) {
-            return null;
-        }
-        UserEntity entity = new UserEntity();
-        entity.setId(userId);
-        return entity;
-    }
-
-    default SpeakingQuestionEntity mapQuestionIdToQuestionEntity(Long questionId) {
-        if (questionId == null) {
-            return null;
-        }
-        SpeakingQuestionEntity entity = new SpeakingQuestionEntity();
-        entity.setId(questionId);
-        return entity;
-    }
-
-    default CommentEntity mapParentIdToCommentEntity(Long parentId) {
-        if (parentId == null) {
-            return null;
-        }
-        CommentEntity entity = new CommentEntity();
-        entity.setId(parentId);
-        return entity;
-    }
 }
