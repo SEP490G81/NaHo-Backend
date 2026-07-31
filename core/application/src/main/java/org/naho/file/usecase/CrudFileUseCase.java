@@ -1,5 +1,6 @@
 package org.naho.file.usecase;
 
+import org.naho.file.command.SaveFileCommand;
 import org.naho.file.exception.FileErrorCode;
 import org.naho.file.mapper.FileResultMapper;
 import org.naho.file.model.File;
@@ -9,7 +10,9 @@ import org.naho.file.result.FileResult;
 import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 public class CrudFileUseCase implements CrudFileInputPort {
 
@@ -54,5 +57,31 @@ public class CrudFileUseCase implements CrudFileInputPort {
                 .stream()
                 .map(fileResultMapper::domainToResult)
                 .toList();
+    }
+
+    @Override
+    public FileResult save(SaveFileCommand command) {
+        if (command.folderName() == null || command.folderName().isBlank()) {
+            throw new ApplicationException(
+                    FileErrorCode.FILE_NOT_VALID,
+                    FileDetailMessageKey.FILE_FOLDER_NAME_EMPTY
+            );
+        }
+
+        String objectKey = command.folderName() +
+                "/" +
+                UUID.randomUUID() +
+                "_" +
+                Instant.now().toEpochMilli();
+
+        File file = File.builder()
+                .objectKey(objectKey)
+                .originalName(command.originalName())
+                .contentType(command.contentType())
+                .size(command.size())
+                .build();
+
+        File savedFile = fileRepositoryPort.save(file);
+        return fileResultMapper.domainToResult(savedFile);
     }
 }

@@ -11,7 +11,7 @@ import org.naho.book.port.out.BookRepositoryPort;
 import org.naho.book.port.out.LessonRepositoryPort;
 import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.book.port.out.TopicRepositoryPort;
-import org.naho.file.command.FileUploadCommand;
+import org.naho.file.command.UploadFileCommand;
 import org.naho.file.port.in.FileStorageInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.result.FileResult;
@@ -162,7 +162,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 ));
 
         // Upload file
-        FileUploadCommand uploadCommand = FileUploadCommand.builder()
+        
+        UploadFileCommand uploadCommand = UploadFileCommand.builder()
                 .folderName(RECORDS_FORDER_NAME)
                 .originalName(command.originalFilename() != null ?
                         command.originalFilename() :

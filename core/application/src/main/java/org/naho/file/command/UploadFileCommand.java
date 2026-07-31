@@ -2,17 +2,15 @@ package org.naho.file.command;
 
 import java.io.InputStream;
 
-public class FileUploadCommand {
+public class UploadFileCommand {
 
-    private String folderName;
-    private String originalName;
+    private String objectKey;
     private InputStream inputStream;
     private String contentType;
     private Long size;
 
-    private FileUploadCommand(Builder builder) {
-        this.folderName = builder.folderName;
-        this.originalName = builder.originalName;
+    private UploadFileCommand(Builder builder) {
+        this.objectKey = builder.objectKey;
         this.inputStream = builder.inputStream;
         this.contentType = builder.contentType;
         this.size = builder.size;
@@ -22,33 +20,40 @@ public class FileUploadCommand {
         return new Builder();
     }
 
-    public String getFolderName() {
-        return folderName;
+    public String getObjectKey() {
+        return objectKey;
     }
 
-    public String getOriginalName() {
-        return originalName;
-    }
-
-    public void setOriginalName(String originalName) {
-        this.originalName = originalName;
+    public void setObjectKey(String objectKey) {
+        this.objectKey = objectKey;
     }
 
     public InputStream getInputStream() {
         return inputStream;
     }
 
+    public void setInputStream(InputStream inputStream) {
+        this.inputStream = inputStream;
+    }
+
     public String getContentType() {
         return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
     }
 
     public Long getSize() {
         return size;
     }
 
+    public void setSize(Long size) {
+        this.size = size;
+    }
+
     public static final class Builder {
-        private String folderName;
-        private String originalName;
+        private String objectKey;
         private InputStream inputStream;
         private String contentType;
         private Long size;
@@ -56,13 +61,8 @@ public class FileUploadCommand {
         private Builder() {
         }
 
-        public Builder folderName(String folderName) {
-            this.folderName = folderName;
-            return this;
-        }
-
-        public Builder originalName(String originalName) {
-            this.originalName = originalName;
+        public Builder objectKey(String objectKey) {
+            this.objectKey = objectKey;
             return this;
         }
 
@@ -81,8 +81,8 @@ public class FileUploadCommand {
             return this;
         }
 
-        public FileUploadCommand build() {
-            return new FileUploadCommand(this);
+        public UploadFileCommand build() {
+            return new UploadFileCommand(this);
         }
     }
 }

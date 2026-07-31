@@ -50,6 +50,6 @@ public class FileEntity extends BaseEntity {
     @OneToOne(mappedBy = "iconFile")
     LeagueEntity league;
 
-    @OneToOne(mappedBy = "avatar")
+    @OneToOne(mappedBy = "avatarFile")
     UserEntity user;
 }

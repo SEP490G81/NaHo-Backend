@@ -1,6 +1,6 @@
 package org.naho.user.command;
 
-import org.naho.file.command.FileUploadCommand;
+import org.naho.file.command.UploadFileCommand;
 import org.naho.user.type.Gender;
 
 import java.time.LocalDate;
@@ -8,7 +8,7 @@ import java.time.LocalDate;
 public record UpdateUserInfoCommand(
         Long id,
         String username,
-        FileUploadCommand avatarFile,
+        UploadFileCommand avatarFile,
         String fullName,
         Gender gender,
         LocalDate dob
@@ -21,7 +21,7 @@ public record UpdateUserInfoCommand(
     public static final class Builder {
         private Long id;
         private String username;
-        private FileUploadCommand avatarFile;
+        private UploadFileCommand avatarFile;
         private String fullName;
         private Gender gender;
         private LocalDate dob;
@@ -36,7 +36,7 @@ public record UpdateUserInfoCommand(
             return this;
         }
 
-        public Builder avatarFile(FileUploadCommand avatarFile) {
+        public Builder avatarFile(UploadFileCommand avatarFile) {
             this.avatarFile = avatarFile;
             return this;
         }

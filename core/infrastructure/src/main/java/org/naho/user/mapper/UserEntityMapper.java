@@ -37,7 +37,7 @@ public interface UserEntityMapper {
     @Mapping(target = "userNodeProgressIds", source = "userNodeProgresses")
     @Mapping(target = "userDailyAttendanceIds", source = "userDailyAttendances")
     @Mapping(target = "userDailyMissionIds", source = "userDailyMissions")
-    @Mapping(target = "avatarFileId", source = "avatar.id")
+    @Mapping(target = "avatarFileId", source = "avatarFile.id")
     @Mapping(target = "userLearningProgressId", source = "userLearningProgress.id")
     @Mapping(target = "isEmailVerified", source = "emailVerified")
     User entityToDomain(UserEntity entity);
@@ -51,7 +51,7 @@ public interface UserEntityMapper {
     @Mapping(target = "pointHistories", source = "pointHistoryIds")
     @Mapping(target = "userNodeProgresses", source = "userNodeProgressIds")
     @Mapping(target = "oAuthProviders", source = "OAuthProviderIds")
-    @Mapping(target = "avatar", source = "avatarFileId")
+    @Mapping(target = "avatarFile", source = "avatarFileId")
     @Mapping(target = "userDailyAttendances", source = "userDailyAttendanceIds")
     @Mapping(target = "userDailyMissions", source = "userDailyMissionIds")
     @Mapping(target = "isEmailVerified", source = "emailVerified")

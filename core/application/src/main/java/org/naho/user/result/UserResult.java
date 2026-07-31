@@ -11,11 +11,9 @@ import java.util.List;
 public record UserResult(
         Long id,
         List<RoleResult> roles,
-        List<Long> userSessionIds,
         List<OAuthProviderResult> oAuthProviders,
-
+        FileResult avatarFile,
         Long userLearningProgressId,
-        FileResult avatar,
 
         String username,
         String email,
@@ -23,7 +21,6 @@ public record UserResult(
         Gender gender,
         LocalDate dob,
         JLPTLevel jlptLevel,
-
         UserStatus status
 ) {
 
@@ -35,11 +32,10 @@ public record UserResult(
 
         private Long id;
         private List<RoleResult> roles;
-        private List<Long> userSessionIds;
         private List<OAuthProviderResult> oAuthProviders;
 
         private Long userLearningProgressId;
-        private FileResult avatar;
+        private FileResult avatarFile;
 
         private String username;
         private String email;
@@ -63,11 +59,6 @@ public record UserResult(
             return this;
         }
 
-        public Builder userSessionIds(List<Long> userSessionIds) {
-            this.userSessionIds = userSessionIds;
-            return this;
-        }
-
         public Builder oAuthProviders(List<OAuthProviderResult> oAuthProviders) {
             this.oAuthProviders = oAuthProviders;
             return this;
@@ -78,8 +69,8 @@ public record UserResult(
             return this;
         }
 
-        public Builder avatar(FileResult avatar) {
-            this.avatar = avatar;
+        public Builder avatarFile(FileResult avatarFile) {
+            this.avatarFile = avatarFile;
             return this;
         }
 
@@ -122,10 +113,9 @@ public record UserResult(
             return new UserResult(
                     id,
                     roles,
-                    userSessionIds,
                     oAuthProviders,
+                    avatarFile,
                     userLearningProgressId,
-                    avatar,
                     username,
                     email,
                     fullName,

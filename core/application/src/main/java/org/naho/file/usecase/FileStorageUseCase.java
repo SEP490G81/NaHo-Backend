@@ -1,18 +1,13 @@
 package org.naho.file.usecase;
 
-import org.naho.file.command.FileUploadCommand;
+import org.naho.file.command.UploadFileCommand;
 import org.naho.file.exception.FileErrorCode;
 import org.naho.file.mapper.FileResultMapper;
-import org.naho.file.model.File;
 import org.naho.file.port.in.FileStorageInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileStorageServicePort;
-import org.naho.file.result.FileResult;
 import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
-
-import java.time.Instant;
-import java.util.UUID;
 
 public class FileStorageUseCase implements FileStorageInputPort {
     private final FileStorageServicePort fileStorageServicePort;
@@ -30,7 +25,7 @@ public class FileStorageUseCase implements FileStorageInputPort {
     }
 
     @Override
-    public FileResult uploadFile(FileUploadCommand command) {
+    public void uploadFile(UploadFileCommand command) {
         if (command == null || command.getInputStream() == null) {
             throw new ApplicationException(
                     FileErrorCode.FILE_NOT_VALID,
@@ -38,32 +33,19 @@ public class FileStorageUseCase implements FileStorageInputPort {
             );
         }
 
-        if (command.getFolderName() == null || command.getFolderName().isBlank()) {
+        if (command.getObjectKey() == null || command.getObjectKey().isBlank()) {
             throw new ApplicationException(
                     FileErrorCode.FILE_NOT_VALID,
-                    FileDetailMessageKey.FILE_FOLDER_NAME_EMPTY
+                    FileDetailMessageKey.FILE_OBJECT_KEY_EMPTY
             );
         }
 
-        String objectKey = command.getFolderName() + "/" + UUID.randomUUID() + "-" + Instant.now().toEpochMilli();
-
-        File file = File.builder()
-                .objectKey(objectKey)
-                .originalName(command.getOriginalName())
-                .contentType(command.getContentType())
-                .size(command.getSize())
-                .build();
-
-        File savedFile = fileRepositoryPort.save(file);
-
         fileStorageServicePort.uploadFile(
-                objectKey,
+                command.getObjectKey(),
                 command.getInputStream(),
                 command.getContentType(),
                 command.getSize()
         );
-
-        return fileResultMapper.domainToResult(savedFile);
     }
 
     @Override

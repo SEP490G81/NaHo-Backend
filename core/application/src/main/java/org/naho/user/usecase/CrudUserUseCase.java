@@ -1,6 +1,6 @@
 package org.naho.user.usecase;
 
-import org.naho.file.command.FileUploadCommand;
+import org.naho.file.command.UploadFileCommand;
 import org.naho.file.port.in.CrudFileInputPort;
 import org.naho.file.port.in.FileStorageInputPort;
 import org.naho.file.port.out.FileValidatorPort;
@@ -71,7 +71,7 @@ public class CrudUserUseCase implements CrudUserInputPort {
                     UserDetailMessageKey.USER_ID_NULL
             );
         }
-        
+
         User user = userRepositoryPort.findById(command.id())
                 .orElseThrow(() -> new ApplicationException(
                         UserErrorCode.USER_NOT_FOUND,
@@ -79,9 +79,15 @@ public class CrudUserUseCase implements CrudUserInputPort {
                         command.id()
                 ));
 
+        // tên người dùng muốn đổi sang
         String commandUsername = command.username();
+
         if (commandUsername != null && !commandUsername.isBlank()) {
+            // tên người dùng hiện tại
             String currentUsername = user.getUsername() != null ? user.getUsername().getValue() : null;
+
+            // nếu tên người dùng muốn đổi sang khác tên hiện tại
+            // và đã tồn tại trong db thì ném ra lỗi
             if (!commandUsername.equals(currentUsername) && userRepositoryPort.existsByUsername(commandUsername)) {
                 throw new ApplicationException(
                         UserErrorCode.USER_ALREADY_EXISTS,
@@ -92,7 +98,7 @@ public class CrudUserUseCase implements CrudUserInputPort {
             user.setUsername(Username.of(commandUsername));
         }
 
-        FileUploadCommand commandAvatarFile = command.avatarFile();
+        UploadFileCommand commandAvatarFile = command.avatarFile();
         if (commandAvatarFile != null) {
             FileResult fileResult = fileStorageInputPort.uploadFile(commandAvatarFile);
             user.setAvatarFileId(fileResult.id());

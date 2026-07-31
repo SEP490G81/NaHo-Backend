@@ -11,6 +11,7 @@ public final class FileDetailMessageKey {
     public static final String FILE_EMPTY = "file.empty";
     public static final String FILE_FOLDER_NAME_EMPTY = "file.folder.name.empty";
     public static final String FILE_ORIGINAL_NAME_EMPTY = "file.original.name.empty";
+    public static final String FILE_OBJECT_KEY_EMPTY = "file.object.key.empty";
     public static final String FILE_NOT_VALID = "file.not.valid";
     public static final String FILE_DELETE_FAILED = "file.delete.failed";
     public static final String FILE_DELETE_SUCCESSFULLY = "file.delete.successfully";

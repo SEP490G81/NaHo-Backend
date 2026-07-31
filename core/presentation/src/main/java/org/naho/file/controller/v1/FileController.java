@@ -1,7 +1,7 @@
 package org.naho.file.controller.v1;
 
 import lombok.RequiredArgsConstructor;
-import org.naho.file.command.FileUploadCommand;
+import org.naho.file.command.UploadFileCommand;
 import org.naho.file.dto.mapper.FileRequestMapper;
 import org.naho.file.dto.mapper.FileResponseMapper;
 import org.naho.file.dto.response.FileResponse;
@@ -28,7 +28,7 @@ public class FileController {
             @RequestPart("file") MultipartFile file,
             @RequestPart("folder-name") String folderName
     ) {
-        FileUploadCommand command =
+        UploadFileCommand command =
                 fileRequestMapper.multipartFileAndFolderNameToCommand(file, folderName);
 
         FileResult result = fileStorageInputPort.uploadFile(command);

@@ -95,7 +95,7 @@ public class UserEntity extends BaseEntity {
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "avatar_file_id")
-    FileEntity avatar;
+    FileEntity avatarFile;
 
     @OneToMany(mappedBy = "user")
     List<UserDailyMissionEntity> userDailyMissions;

@@ -1,7 +1,7 @@
 package org.naho.user.controller.v1;
 
 import lombok.RequiredArgsConstructor;
-import org.naho.file.command.FileUploadCommand;
+import org.naho.file.command.UploadFileCommand;
 import org.naho.file.port.out.FileValidatorPort;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.i18n.message.user.UserTitleMessageKey;
@@ -106,10 +106,13 @@ public class UserController {
             @RequestPart(value = "avatarFile", required = false) MultipartFile avatarFile
     ) {
         try {
-            FileUploadCommand avatarFileUploadCommand = null;
+            UploadFileCommand avatarUploadFileCommand = null;
             if (avatarFile != null && !avatarFile.isEmpty()) {
-                String contentType = fileValidatorPort.validateImageFile(avatarFile.getInputStream());
-                avatarFileUploadCommand = FileUploadCommand.builder()
+                // check định dạng của file có phải là ảnh không?
+                String contentType = fileValidatorPort
+                        .validateImageFile(avatarFile.getInputStream());
+
+                avatarUploadFileCommand = UploadFileCommand.builder()
                         .folderName(AVATAR_FILE_FOLDER)
                         .originalName(avatarFile.getOriginalFilename())
                         .inputStream(avatarFile.getInputStream())
@@ -121,7 +124,7 @@ public class UserController {
             UpdateUserInfoCommand command = UpdateUserInfoCommand.builder()
                     .id(payload.userId())
                     .username(request.username())
-                    .avatarFile(avatarFileUploadCommand)
+                    .avatarFile(avatarUploadFileCommand)
                     .fullName(request.fullName())
                     .gender(request.gender())
                     .dob(request.dob())
