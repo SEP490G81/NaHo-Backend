@@ -14,4 +14,8 @@ public interface SpeakingSessionJpaRepository extends JpaRepository<SpeakingSess
     Page<SpeakingSessionEntity> findByUserId(Long userId, Pageable pageable);
 
     Optional<SpeakingSessionEntity> findBySessionCodeAndUserId(String sessionCode, Long userId);
+
+    Optional<SpeakingSessionEntity> findFirstByUserIdAndStatusOrderByStartedAtDesc(Long userId, String status);
+
+    Optional<SpeakingSessionEntity> findFirstByUserIdAndPersonaIdAndStatusOrderByStartedAtDesc(Long userId, Long personaId, String status);
 }

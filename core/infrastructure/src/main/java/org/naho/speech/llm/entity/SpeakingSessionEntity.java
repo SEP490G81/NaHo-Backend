@@ -31,9 +31,6 @@ public class SpeakingSessionEntity extends BaseEntity {
     @Column(name = "topic", length = 500)
     String topic;
 
-    @Column(name = "session_type", nullable = false, length = 30)
-    String sessionType;
-
     @Column(name = "marugoto_level", length = 30)
     String marugotoLevel;
 

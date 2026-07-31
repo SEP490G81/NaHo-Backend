@@ -12,6 +12,7 @@ import org.naho.speech.llm.entity.SpeakingSessionEntity;
 import org.naho.speech.llm.port.out.SpeakingSessionRepositoryPort;
 import org.naho.speech.llm.repository.SpeakingSessionAssessmentJpaRepository;
 import org.naho.speech.llm.repository.SpeakingSessionJpaRepository;
+import org.naho.speech.llm.result.ActiveSpeakingSessionResult;
 import org.naho.speech.llm.result.ScoringResult;
 import org.naho.speech.llm.result.SpeakingSessionDetailResult;
 import org.naho.speech.llm.result.SpeakingSessionListItemResult;
@@ -31,12 +32,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.naho.speech.llm.entity.SpeakingSessionMessageEntity;
+import org.naho.speech.llm.repository.SpeakingSessionAssessmentJpaRepository;
+import org.naho.speech.llm.repository.SpeakingSessionJpaRepository;
+import org.naho.speech.llm.repository.SpeakingSessionMessageJpaRepository;
+
 @Component
 @RequiredArgsConstructor
 public class SpeakingSessionRepositoryAdapter implements SpeakingSessionRepositoryPort {
 
     private final SpeakingSessionJpaRepository sessionJpaRepository;
     private final SpeakingSessionAssessmentJpaRepository assessmentJpaRepository;
+    private final SpeakingSessionMessageJpaRepository messageJpaRepository;
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Override
@@ -46,7 +53,6 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
             Long userId,
             Long personaId,
             String topic,
-            String sessionType,
             String marugotoLevel,
             String formalityLevel,
             String fullTranscript,
@@ -55,22 +61,27 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
             Instant startedAt,
             ScoringResult scoringResult
     ) {
-        // 1. Lưu speaking_sessions
-        SpeakingSessionEntity sessionEntity = SpeakingSessionEntity.builder()
-                .sessionCode(sessionCode)
-                .userId(userId)
-                .personaId(personaId)
-                .topic(topic)
-                .sessionType(sessionType)
-                .marugotoLevel(marugotoLevel)
-                .formalityLevel(formalityLevel)
-                .fullTranscript(fullTranscript)
-                .totalTurns(totalTurns)
-                .asrConfidence(asrConfidence)
-                .status("COMPLETED")
-                .startedAt(startedAt != null ? startedAt : Instant.now())
-                .endedAt(Instant.now())
-                .build();
+        // 1. Lưu/Cập nhật speaking_sessions thành COMPLETED
+        SpeakingSessionEntity sessionEntity = sessionJpaRepository.findBySessionCode(sessionCode)
+                .orElseGet(() -> SpeakingSessionEntity.builder().sessionCode(sessionCode).build());
+
+        sessionEntity.setUserId(userId);
+        sessionEntity.setPersonaId(personaId);
+        sessionEntity.setTopic(topic);
+        sessionEntity.setMarugotoLevel(marugotoLevel);
+        sessionEntity.setFormalityLevel(formalityLevel);
+        sessionEntity.setFullTranscript(fullTranscript);
+        sessionEntity.setTotalTurns(totalTurns);
+        sessionEntity.setAsrConfidence(asrConfidence);
+        sessionEntity.setStatus("COMPLETED");
+        if (sessionEntity.getStartedAt() == null) {
+            sessionEntity.setStartedAt(startedAt != null ? startedAt : Instant.now());
+        }
+        Instant endedAt = Instant.now();
+        sessionEntity.setEndedAt(endedAt);
+        if (sessionEntity.getStartedAt() != null) {
+            sessionEntity.setDurationSeconds((int) java.time.Duration.between(sessionEntity.getStartedAt(), endedAt).getSeconds());
+        }
         SpeakingSessionEntity savedSession = sessionJpaRepository.save(sessionEntity);
 
         // 2. Lưu speaking_session_assessments
@@ -136,7 +147,6 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
     public PageData<SpeakingSessionListItemResult> findUserSessions(SpeakingSessionFilterCommand command) {
         Long userId = command != null ? command.userId() : null;
         Long personaId = command != null ? command.personaId() : null;
-        String sessionType = command != null ? command.sessionType() : null;
         String search = command != null ? command.search() : null;
 
         int pageNumber = command != null && command.page() != null && command.page() >= 0 ? command.page() : 0;
@@ -154,7 +164,6 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
         Specification<SpeakingSessionEntity> specification = Specification.allOf(
                 SpeakingSessionSpecification.hasUserId(userId),
                 SpeakingSessionSpecification.hasPersonaId(personaId),
-                SpeakingSessionSpecification.hasSessionType(sessionType),
                 SpeakingSessionSpecification.searchByTopic(search)
         );
 
@@ -173,7 +182,6 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
             return new SpeakingSessionListItemResult(
                     session.getId(),
                     session.getSessionCode(),
-                    session.getSessionType(),
                     session.getTopic(),
                     session.getPersonaId(),
                     session.getMarugotoLevel(),
@@ -270,7 +278,6 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
             return new SpeakingSessionDetailResult(
                     session.getId(),
                     session.getSessionCode(),
-                    session.getSessionType(),
                     session.getTopic(),
                     session.getPersonaId(),
                     session.getMarugotoLevel(),
@@ -316,5 +323,119 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
         } catch (Exception e) {
             return List.of();
         }
+    }
+
+    @Override
+    @Transactional
+    public void createInProgressSession(
+            String sessionCode,
+            Long userId,
+            Long personaId,
+            String topic,
+            String marugotoLevel,
+            String formalityLevel
+    ) {
+        if (userId == null) return;
+        SpeakingSessionEntity sessionEntity = SpeakingSessionEntity.builder()
+                .sessionCode(sessionCode)
+                .userId(userId)
+                .personaId(personaId)
+                .topic(topic)
+                .marugotoLevel(marugotoLevel)
+                .formalityLevel(formalityLevel)
+                .totalTurns(0)
+                .status("IN_PROGRESS")
+                .startedAt(Instant.now())
+                .build();
+        sessionJpaRepository.save(sessionEntity);
+    }
+
+    @Override
+    @Transactional
+    public void saveSessionMessage(
+            String sessionCode,
+            int turnIndex,
+            String senderType,
+            String content,
+            String correctedText,
+            String correctionExplanation,
+            String grammarNote,
+            String hintForLearner,
+            Double pronunciationScore
+    ) {
+        Optional<SpeakingSessionEntity> sessionOpt = sessionJpaRepository.findBySessionCode(sessionCode);
+        if (sessionOpt.isEmpty()) return;
+
+        SpeakingSessionEntity session = sessionOpt.get();
+        SpeakingSessionMessageEntity messageEntity = SpeakingSessionMessageEntity.builder()
+                .session(session)
+                .turnIndex(turnIndex)
+                .senderType(senderType)
+                .content(content)
+                .correctedText(correctedText)
+                .correctionExplanation(correctionExplanation)
+                .grammarNote(grammarNote)
+                .hintForLearner(hintForLearner)
+                .pronunciationScore(pronunciationScore)
+                .build();
+        messageJpaRepository.save(messageEntity);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<ActiveSpeakingSessionResult> findActiveSession(Long userId, Long personaId) {
+        if (userId == null) return Optional.empty();
+        Optional<SpeakingSessionEntity> sessionOpt;
+        if (personaId != null && personaId > 0) {
+            sessionOpt = sessionJpaRepository.findFirstByUserIdAndPersonaIdAndStatusOrderByStartedAtDesc(userId, personaId, "IN_PROGRESS");
+        } else {
+            sessionOpt = sessionJpaRepository.findFirstByUserIdAndStatusOrderByStartedAtDesc(userId, "IN_PROGRESS");
+        }
+        return sessionOpt.map(this::toActiveSessionResult);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<ActiveSpeakingSessionResult> findActiveSessionByCode(String sessionCode, Long userId) {
+        if (sessionCode == null || sessionCode.isBlank()) return Optional.empty();
+        Optional<SpeakingSessionEntity> sessionOpt = sessionJpaRepository.findBySessionCodeAndUserId(sessionCode, userId);
+        return sessionOpt.map(this::toActiveSessionResult);
+    }
+
+    private ActiveSpeakingSessionResult toActiveSessionResult(SpeakingSessionEntity session) {
+        List<SpeakingSessionMessageEntity> messageEntities = messageJpaRepository.findBySessionIdOrderByTurnIndex(session.getId());
+        List<ActiveSpeakingSessionResult.SessionMessageItem> messages = messageEntities.stream().map(m ->
+                new ActiveSpeakingSessionResult.SessionMessageItem(
+                        m.getTurnIndex(),
+                        m.getSenderType(),
+                        m.getContent(),
+                        m.getCorrectedText(),
+                        m.getCorrectionExplanation(),
+                        m.getGrammarNote(),
+                        m.getHintForLearner()
+                )
+        ).toList();
+
+        return new ActiveSpeakingSessionResult(
+                session.getId(),
+                session.getSessionCode(),
+                session.getPersonaId(),
+                session.getTopic(),
+                session.getMarugotoLevel(),
+                session.getFormalityLevel(),
+                session.getTotalTurns(),
+                session.getStartedAt(),
+                messages
+        );
+    }
+
+    @Override
+    @Transactional
+    public void updateSessionTurnAndTranscript(String sessionCode, int totalTurns, String fullTranscript) {
+        sessionJpaRepository.findBySessionCode(sessionCode).ifPresent(session -> {
+            session.setTotalTurns(totalTurns);
+            session.setFullTranscript(fullTranscript);
+            sessionJpaRepository.save(session);
+        });
     }
 }

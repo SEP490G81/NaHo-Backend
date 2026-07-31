@@ -19,6 +19,5 @@ public class SpeakingSessionQueryRequest {
     SpeakingHistorySortColumn sortColumn = SpeakingHistorySortColumn.CREATED_TIME;
     SortDirection sortDirection = SortDirection.DESC;
     Long personaId;
-    String sessionType;
     String search;
 }

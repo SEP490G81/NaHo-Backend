@@ -1,4 +1,4 @@
-﻿-- V13: AI Speaking 1-1 Session Persistence Tables
+-- V13: AI Speaking 1-1 Session Persistence Tables
 
 CREATE TABLE speaking_sessions
 (
@@ -9,7 +9,6 @@ CREATE TABLE speaking_sessions
     user_id          BIGINT                NOT NULL,
     persona_id       BIGINT                NULL,
     topic            VARCHAR(500)          NULL,
-    session_type     VARCHAR(30)           NOT NULL,
     marugoto_level   VARCHAR(30)           NULL,
     formality_level  VARCHAR(20)           NULL,
     duration_seconds INT                   NULL,

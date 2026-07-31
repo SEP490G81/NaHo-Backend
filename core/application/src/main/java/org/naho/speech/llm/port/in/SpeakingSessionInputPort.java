@@ -5,14 +5,11 @@ import org.naho.speech.llm.command.SendAudioMessageCommand;
 import org.naho.speech.llm.command.SendMessageWithSessionCommand;
 import org.naho.speech.llm.command.SpeakingSessionFilterCommand;
 import org.naho.speech.llm.command.StartSpeakingConversationWithAICommand;
-import org.naho.speech.llm.command.StartSpeakingTopicCommand;
 import org.naho.speech.llm.result.*;
 
 import java.util.function.Consumer;
 
 public interface SpeakingSessionInputPort {
-    SpeakingTopicResult startTopicSession(StartSpeakingTopicCommand command);
-
     ChatResult sendMessage(SendMessageWithSessionCommand command);
 
     void sendMessageStream(SendMessageWithSessionCommand command, Consumer<String> onToken);
@@ -33,4 +30,14 @@ public interface SpeakingSessionInputPort {
      * Lấy chi tiết kết quả và toàn bộ nhận xét AI của một buổi nói AI 1-1 theo sessionCode.
      */
     SpeakingSessionDetailResult getSessionHistoryDetail(String sessionCode, Long userId);
+
+    /**
+     * Lấy thông tin phiên nói chuyện đang ở trạng thái IN_PROGRESS của người dùng.
+     */
+    ActiveSpeakingSessionResult getActiveSession(Long userId, Integer personaId);
+
+    /**
+     * Khôi phục phiên nói chuyện dở dang từ CSDL/Memory để người dùng tiếp tục hội thoại.
+     */
+    StartConversationResult resumeSession(String sessionCode, Long userId);
 }

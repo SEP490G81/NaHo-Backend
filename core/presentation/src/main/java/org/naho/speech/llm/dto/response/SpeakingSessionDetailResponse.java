@@ -9,7 +9,6 @@ import java.util.Map;
 public record SpeakingSessionDetailResponse(
         Long id,
         String sessionCode,
-        String sessionType,
         String topic,
         Long personaId,
         String marugotoLevel,

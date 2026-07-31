@@ -15,7 +15,6 @@ import org.naho.speech.llm.command.SendAudioMessageCommand;
 import org.naho.speech.llm.command.SendMessageWithSessionCommand;
 import org.naho.speech.llm.command.SpeakingSessionFilterCommand;
 import org.naho.speech.llm.command.StartSpeakingConversationWithAICommand;
-import org.naho.speech.llm.command.StartSpeakingTopicCommand;
 import org.naho.speech.llm.port.in.SpeakingSessionInputPort;
 import org.naho.speech.llm.port.out.AiChatPort;
 import org.naho.speech.llm.port.out.SessionStorePort;
@@ -69,13 +68,9 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             }
             """;
 
-    private static final String TOPIC_INSTRUCTION =
-            "- The conversation topic is: 「%s」. Stay on this topic.\n"
-                    + "- Start with a warm greeting related to this topic.";
-
-    private static final String FREE_INSTRUCTION =
-            "- This is a free conversation. The learner can talk about any topic.\n"
-                    + "- Start by greeting the learner and asking what they'd like to talk about.";
+    private static final String PERSONA_INSTRUCTION =
+            "- You are roleplaying as the specified persona. Adapt your tone, formality, and personality accordingly.\n"
+                    + "- Start by greeting the learner in character and inviting them to converse.";
 
     private final AiChatPort aiChatPort;
     private final SessionStorePort sessionStorePort;
@@ -138,41 +133,6 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         }
     }
 
-    @Override
-    public SpeakingTopicResult startTopicSession(StartSpeakingTopicCommand command) {
-        String sessionId = UUID.randomUUID().toString();
-        String topic = command.topic();
-        sessionStorePort.initSession(sessionId);
-        sessionStorePort.setTopic(sessionId, topic);
-        sessionStorePort.setVoiceName(sessionId, "ja-JP-NanamiNeural");
-        sessionStorePort.setSessionType(sessionId, "TOPIC");
-
-        String prompt = SYSTEM_PROMPT_TEMPLATE.formatted(TOPIC_INSTRUCTION.formatted(topic));
-        sessionStorePort.addMessage(sessionId, "system", prompt);
-        sessionStorePort.addMessage(sessionId, "user", "こんにちは、話しましょう！");
-
-        List<Map<String, String>> messages = sessionStorePort.getConversationHistory(sessionId);
-        String rawReply = aiChatPort.chatWithContext(messages);
-        ParsedAiReply parsed = parseAiResponse(rawReply);
-
-        sessionStorePort.addMessage(sessionId, "assistant", parsed.reply());
-        sessionStorePort.appendTranscript(sessionId,
-                "[Turn]\nUser: こんにちは、話しましょう！\nAssistant: " + parsed.reply() + "\n"
-        );
-        sessionStorePort.incrementTurnCount(sessionId);
-
-        String audioBase64 = toAudioBase64(sessionId, parsed.reply());
-        System.out.println("[SpeakingSession] Topic session started: " + sessionId + " | Topic: " + topic);
-
-        return new SpeakingTopicResult(
-                sessionId,
-                topic,
-                parsed.reply(),
-                audioBase64,
-                parsed.replyTranslation(),
-                parsed.grammarNote()
-        );
-    }
 
     @Override
     public ChatResult sendMessage(SendMessageWithSessionCommand command) {
@@ -188,7 +148,16 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         sessionStorePort.appendTranscript(sessionId,
                 "[Turn]\nUser: " + userMessage + "\nAssistant: " + parsed.reply() + "\n"
         );
-        sessionStorePort.incrementTurnCount(sessionId);
+        int currentTurn = sessionStorePort.incrementTurnCount(sessionId);
+
+        // Real-time persistence to DB for session resume
+        try {
+            speakingSessionRepositoryPort.saveSessionMessage(sessionId, currentTurn, "user", userMessage, parsed.correctedUserText(), parsed.correctionExplanation(), null, parsed.hintForLearner(), null);
+            speakingSessionRepositoryPort.saveSessionMessage(sessionId, currentTurn, "assistant", parsed.reply(), null, null, parsed.grammarNote(), null, null);
+            speakingSessionRepositoryPort.updateSessionTurnAndTranscript(sessionId, currentTurn, sessionStorePort.getFullTranscript(sessionId));
+        } catch (Exception e) {
+            System.err.println("[SpeakingSessionUseCase] Failed to persist turn message to DB: " + e.getMessage());
+        }
 
         String aiAudio = toAudioBase64(sessionId, parsed.reply());
 
@@ -269,7 +238,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         }
         sessionStorePort.setPersonaContext(sessionId, personaCtx.toString());
 
-        StringBuilder customInstruction = new StringBuilder(FREE_INSTRUCTION);
+        StringBuilder customInstruction = new StringBuilder(PERSONA_INSTRUCTION);
         customInstruction.append("\n- Your persona role & prompt: ").append(persona.getPrompt());
         if (persona.getConversationStyle() != null) {
             if (persona.getConversationStyle().getDescription() != null) {
@@ -287,7 +256,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         }
 
         // Store session metadata for DB persistence
-        sessionStorePort.setSessionType(sessionId, "PERSONA");
+        sessionStorePort.setUserId(sessionId, startSpeakingConversationWithAICommand.userId());
         sessionStorePort.setPersonaId(sessionId, (long) startSpeakingConversationWithAICommand.personaId());
         if (effectiveMarugoto != null) {
             sessionStorePort.setMarugotoLevel(sessionId, effectiveMarugoto.name());
@@ -309,6 +278,21 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                 "[Turn]\nUser: こんにちは、話しましょう！\nAssistant: " + parsed.reply() + "\n"
         );
         sessionStorePort.incrementTurnCount(sessionId);
+
+        // Create IN_PROGRESS session in DB
+        try {
+            speakingSessionRepositoryPort.createInProgressSession(
+                    sessionId,
+                    startSpeakingConversationWithAICommand.userId(),
+                    (long) startSpeakingConversationWithAICommand.personaId(),
+                    "Conversation with " + persona.getName(),
+                    effectiveMarugoto != null ? effectiveMarugoto.name() : null,
+                    effectiveFormality != null ? effectiveFormality.name() : null
+            );
+            speakingSessionRepositoryPort.saveSessionMessage(sessionId, 0, "assistant", parsed.reply(), null, null, parsed.grammarNote(), null, null);
+        } catch (Exception e) {
+            System.err.println("[SpeakingSessionUseCase] Failed to create IN_PROGRESS session in DB: " + e.getMessage());
+        }
 
         String audioBase64 = toAudioBase64(sessionId, parsed.reply());
 
@@ -340,7 +324,16 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         sessionStorePort.addMessage(sessionId, "assistant", parsed.reply());
         sessionStorePort.appendTranscript(sessionId,
                 "[Turn]\nUser: " + transcribedText + "\nAssistant: " + parsed.reply() + "\n");
-        sessionStorePort.incrementTurnCount(sessionId);
+        int currentTurn = sessionStorePort.incrementTurnCount(sessionId);
+
+        // Real-time persistence to DB for session resume
+        try {
+            speakingSessionRepositoryPort.saveSessionMessage(sessionId, currentTurn, "user", transcribedText, parsed.correctedUserText(), parsed.correctionExplanation(), null, parsed.hintForLearner(), sttResult.pronunciationScore());
+            speakingSessionRepositoryPort.saveSessionMessage(sessionId, currentTurn, "assistant", parsed.reply(), null, null, parsed.grammarNote(), null, null);
+            speakingSessionRepositoryPort.updateSessionTurnAndTranscript(sessionId, currentTurn, sessionStorePort.getFullTranscript(sessionId));
+        } catch (Exception e) {
+            System.err.println("[SpeakingSessionUseCase] Failed to persist audio message to DB: " + e.getMessage());
+        }
 
         String aiAudio = toAudioBase64(sessionId, parsed.reply());
 
@@ -371,6 +364,91 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                         PersonaErrorCode.PERSONA_NOT_FOUND,
                         "Không tìm thấy thông tin buổi nói chuyện hoặc không có quyền truy cập."
                 ));
+    }
+
+    @Override
+    public ActiveSpeakingSessionResult getActiveSession(Long userId, Integer personaId) {
+        if (userId == null) return null;
+        Long pId = (personaId != null && personaId > 0) ? personaId.longValue() : null;
+        return speakingSessionRepositoryPort.findActiveSession(userId, pId).orElse(null);
+    }
+
+    @Override
+    public StartConversationResult resumeSession(String sessionCode, Long userId) {
+        if (sessionCode == null || sessionCode.isBlank()) {
+            throw new ApplicationException(PersonaErrorCode.PERSONA_NOT_FOUND, "Mã phiên nói chuyện không hợp lệ.");
+        }
+
+        // 1. Nếu session đang còn trong memory
+        if (sessionStorePort.hasSession(sessionCode)) {
+            List<Map<String, String>> history = sessionStorePort.getConversationHistory(sessionCode);
+            String lastAssistantReply = "";
+            for (int i = history.size() - 1; i >= 0; i--) {
+                if ("assistant".equals(history.get(i).get("role"))) {
+                    lastAssistantReply = history.get(i).get("content");
+                    break;
+                }
+            }
+            ParsedAiReply parsed = parseAiResponse(lastAssistantReply);
+            String audioBase64 = toAudioBase64(sessionCode, parsed.reply());
+            return new StartConversationResult(
+                    sessionCode,
+                    audioBase64,
+                    parsed.reply(),
+                    parsed.replyTranslation(),
+                    parsed.grammarNote()
+            );
+        }
+
+        // 2. Khôi phục từ DB nếu session bị mất trong memory
+        ActiveSpeakingSessionResult activeSession = speakingSessionRepositoryPort.findActiveSessionByCode(sessionCode, userId)
+                .orElseThrow(() -> new ApplicationException(
+                        PersonaErrorCode.PERSONA_NOT_FOUND,
+                        "Không tìm thấy phiên nói chuyện dở dang để tiếp tục."
+                ));
+
+        List<Map<String, String>> historyMessages = new java.util.ArrayList<>();
+        String lastAssistantReply = "";
+
+        if (activeSession.messages() != null) {
+            for (var msg : activeSession.messages()) {
+                historyMessages.add(Map.of("role", msg.senderType(), "content", msg.content()));
+                if ("assistant".equals(msg.senderType())) {
+                    lastAssistantReply = msg.content();
+                }
+            }
+        }
+
+        StringBuilder fullTranscript = new StringBuilder();
+        if (activeSession.messages() != null) {
+            for (var msg : activeSession.messages()) {
+                fullTranscript.append("[Turn]\n").append(msg.senderType()).append(": ").append(msg.content()).append("\n");
+            }
+        }
+
+        sessionStorePort.restoreSession(
+                sessionCode,
+                userId,
+                activeSession.personaId(),
+                activeSession.topic(),
+                activeSession.marugotoLevel(),
+                activeSession.formalityLevel(),
+                fullTranscript.toString(),
+                activeSession.totalTurns(),
+                activeSession.startedAt(),
+                historyMessages
+        );
+
+        ParsedAiReply parsed = parseAiResponse(lastAssistantReply);
+        String audioBase64 = toAudioBase64(sessionCode, parsed.reply());
+
+        return new StartConversationResult(
+                sessionCode,
+                audioBase64,
+                parsed.reply(),
+                parsed.replyTranslation(),
+                parsed.grammarNote()
+        );
     }
 
 

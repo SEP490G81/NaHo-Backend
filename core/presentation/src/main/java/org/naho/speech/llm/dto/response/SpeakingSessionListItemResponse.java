@@ -5,7 +5,6 @@ import java.time.Instant;
 public record SpeakingSessionListItemResponse(
         Long id,
         String sessionCode,
-        String sessionType,
         String topic,
         Long personaId,
         String marugotoLevel,
