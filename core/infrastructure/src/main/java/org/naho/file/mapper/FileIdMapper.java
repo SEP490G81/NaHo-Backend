@@ -1,20 +1,24 @@
 package org.naho.file.mapper;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.mapstruct.Mapper;
 import org.naho.file.entity.FileEntity;
 
 @Mapper(componentModel = "spring")
-public interface FileIdMapper {
-    default FileEntity idToEntity(Long id) {
+public abstract class FileIdMapper {
+
+    @PersistenceContext
+    protected EntityManager entityManager;
+
+    public FileEntity idToEntity(Long id) {
         if (id == null) {
             return null;
         }
-        FileEntity entity = new FileEntity();
-        entity.setId(id);
-        return entity;
+        return entityManager.getReference(FileEntity.class, id);
     }
 
-    default Long entityToId(FileEntity entity) {
+    public Long entityToId(FileEntity entity) {
         return entity == null ? null : entity.getId();
     }
 }

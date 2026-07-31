@@ -1,20 +1,24 @@
 package org.naho.daily.mapper;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.mapstruct.Mapper;
 import org.naho.daily.entity.UserDailyMissionEntity;
 
 @Mapper(componentModel = "spring")
-public interface UserDailyMissionIdMapper {
-    default UserDailyMissionEntity idToEntity(Long id) {
+public abstract class UserDailyMissionIdMapper {
+
+    @PersistenceContext
+    protected EntityManager entityManager;
+
+    public UserDailyMissionEntity idToEntity(Long id) {
         if (id == null) {
             return null;
         }
-        UserDailyMissionEntity entity = new UserDailyMissionEntity();
-        entity.setId(id);
-        return entity;
+        return entityManager.getReference(UserDailyMissionEntity.class, id);
     }
 
-    default Long entityToId(UserDailyMissionEntity entity) {
+    public Long entityToId(UserDailyMissionEntity entity) {
         return entity == null ? null : entity.getId();
     }
 }

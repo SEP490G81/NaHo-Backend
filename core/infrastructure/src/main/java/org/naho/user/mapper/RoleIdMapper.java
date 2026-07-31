@@ -1,20 +1,24 @@
 package org.naho.user.mapper;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.mapstruct.Mapper;
 import org.naho.user.entity.RoleEntity;
 
 @Mapper(componentModel = "spring")
-public interface RoleIdMapper {
-    default RoleEntity idToEntity(Long id) {
+public abstract class RoleIdMapper {
+
+    @PersistenceContext
+    protected EntityManager entityManager;
+
+    public RoleEntity idToEntity(Long id) {
         if (id == null) {
             return null;
         }
-        RoleEntity entity = new RoleEntity();
-        entity.setId(id);
-        return entity;
+        return entityManager.getReference(RoleEntity.class, id);
     }
 
-    default Long entityToId(RoleEntity entity) {
+    public Long entityToId(RoleEntity entity) {
         return entity == null ? null : entity.getId();
     }
 }

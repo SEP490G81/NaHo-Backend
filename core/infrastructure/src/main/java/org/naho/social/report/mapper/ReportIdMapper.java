@@ -1,20 +1,24 @@
 package org.naho.social.report.mapper;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.mapstruct.Mapper;
 import org.naho.social.report.entity.ReportEntity;
 
 @Mapper(componentModel = "spring")
-public interface ReportIdMapper {
-    default ReportEntity idToEntity(Long id) {
+public abstract class ReportIdMapper {
+
+    @PersistenceContext
+    protected EntityManager entityManager;
+
+    public ReportEntity idToEntity(Long id) {
         if (id == null) {
             return null;
         }
-        ReportEntity entity = new ReportEntity();
-        entity.setId(id);
-        return entity;
+        return entityManager.getReference(ReportEntity.class, id);
     }
 
-    default Long entityToId(ReportEntity entity) {
+    public Long entityToId(ReportEntity entity) {
         return entity == null ? null : entity.getId();
     }
 }
