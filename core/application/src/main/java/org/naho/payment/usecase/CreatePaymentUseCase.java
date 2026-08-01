@@ -191,7 +191,7 @@ public class CreatePaymentUseCase implements CreatePaymentInputPort {
     }
 
     private String createRequestHash(CreatePaymentCommand command) {
-        String raw = command.userId() + "|" + command.planCode() + "|" + command.provider().name();
+        String raw = command.userId() + "|" + command.planCode().name() + "|" + command.provider().name();
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(raw.getBytes(StandardCharsets.UTF_8));

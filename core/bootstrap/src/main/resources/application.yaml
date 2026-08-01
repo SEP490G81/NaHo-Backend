@@ -98,5 +98,8 @@ app:
     return-url: https://groggily-override-wrongly.ngrok-free.dev/api/v1/payments/vnpay-return
     timeout: 5
 
-  static-resources:
-    base-location: ${STATIC_RESOURCES_BASE_LOCATION}
+  static-resource:
+    base-location: ${STATIC_RESOURCE_BASE_LOCATION}
+    avatars: avatars
+    books: books
+    recordings: recordings

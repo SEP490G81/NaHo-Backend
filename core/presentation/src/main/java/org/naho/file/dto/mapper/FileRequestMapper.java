@@ -14,8 +14,8 @@ public interface FileRequestMapper {
         if (file == null || file.isEmpty()) return null;
         try {
             return UploadFileCommand.builder()
-                    .folderName(folderName)
-                    .originalName(file.getOriginalFilename())
+//                    .folderName(folderName)
+//                    .originalName(file.getOriginalFilename())
                     .inputStream(file.getInputStream())
                     .contentType(file.getContentType())
                     .size(file.getSize())

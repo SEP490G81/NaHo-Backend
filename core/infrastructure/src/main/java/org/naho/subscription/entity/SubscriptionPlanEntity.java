@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.shared.persistence.BaseEntity;
+import org.naho.subscription.type.PlanCode;
 import org.naho.subscription.type.PlanStatus;
 import org.naho.subscription.type.PlanTier;
 
@@ -19,9 +20,9 @@ import java.math.BigDecimal;
 @Table(name = "subscription_plans")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SubscriptionPlanEntity extends BaseEntity {
-
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, unique = true)
-    String code;
+    PlanCode code;
 
     @Column(nullable = false)
     String name;
@@ -68,6 +69,12 @@ public class SubscriptionPlanEntity extends BaseEntity {
 
     @Column(name = "sample_answer_enabled", nullable = false)
     Boolean sampleAnswerEnabled;
+
+    @Column(name = "max_answer_time_seconds", nullable = false)
+    Double maxAnswerTimeSeconds;
+
+    @Column(name = "save_answer_history_enabled", nullable = false)
+    Boolean saveAnswerHistoryEnabled;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

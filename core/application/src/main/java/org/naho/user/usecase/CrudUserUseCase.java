@@ -1,10 +1,8 @@
 package org.naho.user.usecase;
 
-import org.naho.file.command.UploadFileCommand;
 import org.naho.file.port.in.CrudFileInputPort;
 import org.naho.file.port.in.FileStorageInputPort;
 import org.naho.file.port.out.FileValidatorPort;
-import org.naho.file.result.FileResult;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.user.command.UpdateUserInfoCommand;
@@ -98,11 +96,11 @@ public class CrudUserUseCase implements CrudUserInputPort {
             user.setUsername(Username.of(commandUsername));
         }
 
-        UploadFileCommand commandAvatarFile = command.avatarFile();
-        if (commandAvatarFile != null) {
-            FileResult fileResult = fileStorageInputPort.uploadFile(commandAvatarFile);
-            user.setAvatarFileId(fileResult.id());
-        }
+//        UploadFileCommand commandAvatarFile = command.avatarFile();
+//        if (commandAvatarFile != null) {
+//            FileResult fileResult = fileStorageInputPort.uploadFile(commandAvatarFile);
+//            user.setAvatarFileId(fileResult.id());
+//        }
 
         String commandFullName = command.fullName();
         if (commandFullName != null && !commandFullName.isBlank()) {

@@ -26,6 +26,7 @@ import org.naho.speech.llm.usecase.EndSessionUseCase;
 import org.naho.speech.llm.usecase.SpeakingAnalysisUseCase;
 import org.naho.speech.llm.usecase.SpeakingSessionUseCase;
 import org.naho.speech.llm.usecase.SuggestedTopicsUseCase;
+import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -125,7 +126,8 @@ public class ChatConfig {
             FuriganaGenerationPort furiganaGenerationPort,
             TransactionPort transactionPort,
             CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort,
-            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort
+            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
+            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort
     ) {
         return new SpeakingAnalysisUseCase(
                 userRepositoryPort,
@@ -143,7 +145,8 @@ public class ChatConfig {
                 furiganaGenerationPort,
                 transactionPort,
                 completeSpeakingQuestionInputPort,
-                userLearningProgressRepositoryPort
+                userLearningProgressRepositoryPort,
+                getActiveSubscriptionInputPort
         );
     }
 }

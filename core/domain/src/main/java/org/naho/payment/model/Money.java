@@ -13,11 +13,10 @@ import java.util.Objects;
 //Khóa an toàn dữ liệu tài chính (Money): Sử dụng kiểu dữ liệu BigDecimal
 // có cấu hình làm tròn HALF_UP cho số tiền để loại bỏ hoàn toàn các lỗi
 // sai lệch số thập phân trong các phép so sánh số dư.
-
-
 public record Money(
         BigDecimal amount,
-        Currency currency) {
+        Currency currency
+) {
     public Money {
         Objects.requireNonNull(amount);
         Objects.requireNonNull(currency);

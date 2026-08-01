@@ -8,4 +8,5 @@ public record SpeakingAnalysisCommand(
         String originalFilename,
         Integer durationSec
 ) {
+
 }

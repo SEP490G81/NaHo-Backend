@@ -1,8 +1,8 @@
 package org.naho.file.command;
 
-public record SaveFileCommand(
+public record SaveFileToDbCommand(
         String folderName,
-        String originalName,
+        String originalFileName,
         String contentType,
         Long size
 ) {

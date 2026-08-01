@@ -7,6 +7,7 @@ import lombok.experimental.SuperBuilder;
 import org.naho.payment.entity.PaymentOrderEntity;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.subscription.type.SubscriptionStatus;
+import org.naho.user.entity.UserEntity;
 
 import java.time.Instant;
 
@@ -20,8 +21,9 @@ import java.time.Instant;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserSubscriptionEntity extends BaseEntity {
 
-    @Column(name = "user_id", nullable = false)
-    Long userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subscription_plan_id", nullable = false)

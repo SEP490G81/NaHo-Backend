@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.naho.subscription.type.PlanCode;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 
 @Getter
 @Setter
@@ -14,23 +14,23 @@ import java.time.Instant;
 @AllArgsConstructor
 public class SubscriptionPlanResponse {
     private Long id;
-    private String code;
+    private PlanCode code;
     private String name;
     private String description;
     private String tier;
     private BigDecimal priceAmount;
     private String priceCurrency;
-    private int durationDays;
+    private Integer durationDays;
     private int monthlyAssessmentLimit;
     private long monthlyAssessmentAudioSeconds;
     private int maxAssessmentAudioSeconds;
     private long monthlyConversationSeconds;
     private int maxConversationSessionSeconds;
     private int maxConversationTurnsPerSession;
-    private boolean fullCurriculumAccess;
-    private boolean progressAnalyticsEnabled;
-    private boolean sampleAnswerEnabled;
+    private Boolean fullCurriculumAccess;
+    private Boolean progressAnalyticsEnabled;
+    private Boolean sampleAnswerEnabled;
+    private Double maxAnswerTimeSeconds;
+    private Boolean saveAnswerHistoryEnabled;
     private String status;
-    private Instant createdTime;
-    private Instant modifiedTime;
 }

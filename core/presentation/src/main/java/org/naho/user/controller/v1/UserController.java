@@ -113,8 +113,8 @@ public class UserController {
                         .validateImageFile(avatarFile.getInputStream());
 
                 avatarUploadFileCommand = UploadFileCommand.builder()
-                        .folderName(AVATAR_FILE_FOLDER)
-                        .originalName(avatarFile.getOriginalFilename())
+//                        .folderName(AVATAR_FILE_FOLDER)
+//                        .originalName(avatarFile.getOriginalFilename())
                         .inputStream(avatarFile.getInputStream())
                         .contentType(contentType)
                         .size(avatarFile.getSize())

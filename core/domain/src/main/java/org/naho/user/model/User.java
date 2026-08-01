@@ -21,6 +21,7 @@ public class User {
     private final List<Long> userNodeProgressIds;
     private final List<Long> userDailyAttendanceIds;
     private final List<Long> userDailyMissionIds;
+    private final List<Long> userSubscriptionIds;
     private Long avatarFileId;
     private final Long userLearningProgressId;
 
@@ -45,6 +46,7 @@ public class User {
         this.userNodeProgressIds = builder.userNodeProgressIds;
         this.userDailyAttendanceIds = builder.userDailyAttendanceIds;
         this.userDailyMissionIds = builder.userDailyMissionIds;
+        this.userSubscriptionIds = builder.userSubscriptionIds;
         this.userLearningProgressId = builder.userLearningProgressId;
         this.avatarFileId = builder.avatarFileId;
         this.username = builder.username;
@@ -97,6 +99,7 @@ public class User {
                 .userNodeProgressIds(userNodeProgressIds)
                 .userDailyAttendanceIds(userDailyAttendanceIds)
                 .userDailyMissionIds(userDailyMissionIds)
+                .userSubscriptionIds(userSubscriptionIds)
                 .userLearningProgressId(userLearningProgressId)
                 .avatarFileId(avatarFileId)
                 .username(username)
@@ -147,6 +150,10 @@ public class User {
 
     public List<Long> getUserDailyMissionIds() {
         return userDailyMissionIds;
+    }
+
+    public List<Long> getUserSubscriptionIds() {
+        return userSubscriptionIds;
     }
 
     public Long getUserLearningProgressId() {
@@ -233,6 +240,7 @@ public class User {
         private List<Long> userNodeProgressIds;
         private List<Long> userDailyAttendanceIds;
         private List<Long> userDailyMissionIds;
+        private List<Long> userSubscriptionIds;
 
         private Long userLearningProgressId;
         private Long avatarFileId;
@@ -298,6 +306,11 @@ public class User {
 
         public Builder userDailyMissionIds(List<Long> userDailyMissionIds) {
             this.userDailyMissionIds = userDailyMissionIds;
+            return this;
+        }
+
+        public Builder userSubscriptionIds(List<Long> userSubscriptionIds) {
+            this.userSubscriptionIds = userSubscriptionIds;
             return this;
         }
 

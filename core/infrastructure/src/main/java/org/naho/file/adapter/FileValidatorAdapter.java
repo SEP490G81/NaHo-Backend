@@ -9,6 +9,10 @@ import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.shared.exception.InfrastructureException;
 import org.springframework.stereotype.Component;
 
+import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
@@ -16,7 +20,6 @@ import java.util.Set;
 @Component
 @RequiredArgsConstructor
 public class FileValidatorAdapter implements FileValidatorPort {
-
     private final Tika tika;
 
     @Override
@@ -35,9 +38,52 @@ public class FileValidatorAdapter implements FileValidatorPort {
                         detectedMimeType
                 );
             }
-            
+
             return detectedMimeType;
         } catch (IOException e) {
+            throw new InfrastructureException(
+                    FileErrorCode.FILE_NOT_VALID,
+                    FileDetailMessageKey.FILE_NOT_VALID,
+                    e.getMessage()
+            );
+        }
+    }
+
+    @Override
+    public void validateWavFileAndDuration(InputStream inputStream, Double maxDuration) {
+        try {
+            AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(inputStream);
+
+            if (fileFormat.getType() != AudioFileFormat.Type.WAVE) {
+                throw new InfrastructureException(
+                        FileErrorCode.FILE_NOT_VALID,
+                        FileDetailMessageKey.FILE_NOT_VALID,
+                        fileFormat.getType()
+                );
+            }
+
+            AudioFormat format = fileFormat.getFormat();
+
+            long frameLength = fileFormat.getFrameLength();
+
+            if (frameLength == AudioSystem.NOT_SPECIFIED) {
+                throw new InfrastructureException(
+                        FileErrorCode.FILE_NOT_VALID,
+                        FileDetailMessageKey.FILE_AUDIO_DURATION_UNSPECIFIED
+                );
+            }
+
+            double durationSeconds = frameLength / format.getFrameRate();
+            if (durationSeconds > maxDuration) {
+                throw new InfrastructureException(
+                        FileErrorCode.FILE_NOT_VALID,
+                        FileDetailMessageKey.FILE_AUDIO_DURATION_EXCEEDED,
+                        durationSeconds,
+                        maxDuration
+                );
+            }
+
+        } catch (UnsupportedAudioFileException | IOException e) {
             throw new InfrastructureException(
                     FileErrorCode.FILE_NOT_VALID,
                     FileDetailMessageKey.FILE_NOT_VALID,

@@ -11,10 +11,8 @@ import org.naho.book.port.out.BookRepositoryPort;
 import org.naho.book.port.out.LessonRepositoryPort;
 import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.book.port.out.TopicRepositoryPort;
-import org.naho.file.command.UploadFileCommand;
 import org.naho.file.port.in.FileStorageInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
-import org.naho.file.result.FileResult;
 import org.naho.furigana.port.out.FuriganaGenerationPort;
 import org.naho.i18n.message.learning.LearningPathNodeDetailMessageKey;
 import org.naho.i18n.message.learning.UserLearningProgressDetailMessageKey;
@@ -50,11 +48,13 @@ import org.naho.speech.model.ContentAssessment;
 import org.naho.speech.model.SpeechAssessment;
 import org.naho.speech.model.WordAssessment;
 import org.naho.speech.type.SpeechAssessmentErrorType;
+import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
+import org.naho.subscription.result.SubscriptionPlanResult;
+import org.naho.subscription.type.PlanCode;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.model.User;
 import org.naho.user.port.out.UserRepositoryPort;
 
-import java.io.ByteArrayInputStream;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -80,6 +80,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     private final TransactionPort transactionPort;
     private final CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort;
     private final UserLearningProgressRepositoryPort userLearningProgressRepositoryPort;
+    private final GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public SpeakingAnalysisUseCase(
@@ -98,7 +99,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             FuriganaGenerationPort furiganaGenerationPort,
             TransactionPort transactionPort,
             CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort,
-            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort
+            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
+            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort
     ) {
         this.userRepositoryPort = userRepositoryPort;
         this.speakingQuestionRepositoryPort = speakingQuestionRepositoryPort;
@@ -116,6 +118,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         this.transactionPort = transactionPort;
         this.completeSpeakingQuestionInputPort = completeSpeakingQuestionInputPort;
         this.userLearningProgressRepositoryPort = userLearningProgressRepositoryPort;
+        this.getActiveSubscriptionInputPort = getActiveSubscriptionInputPort;
     }
 
     @Override
@@ -161,29 +164,36 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                         SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_NOT_FOUND
                 ));
 
-        // Upload file
-        
-        UploadFileCommand uploadCommand = UploadFileCommand.builder()
-                .folderName(RECORDS_FORDER_NAME)
-                .originalName(command.originalFilename() != null ?
-                        command.originalFilename() :
-                        "recording.wav"
-                )
-                .inputStream(new ByteArrayInputStream(command.audioBytes()))
-                .contentType(command.contentType())
-                .size((long) command.audioBytes().length)
-                .build();
+        // Get User Current Subscription plan
+        SubscriptionPlanResult subscriptionPlan = getActiveSubscriptionInputPort
+                .getUserActiveSubscriptionPlan(user.getId());
 
-        FileResult uploadResult = fileStorageInputPort.uploadFile(uploadCommand);
+        if (!subscriptionPlan.code().equals(PlanCode.FREE)) {
+//        // Upload file
+//
+//        UploadFileCommand uploadCommand = UploadFileCommand.builder()
+//                .folderName(RECORDS_FORDER_NAME)
+//                .originalName(command.originalFilename() != null ?
+//                        command.originalFilename() :
+//                        "recording.wav"
+//                )
+//                .inputStream(new ByteArrayInputStream(command.audioBytes()))
+//                .contentType(command.contentType())
+//                .size((long) command.audioBytes().length)
+//                .build();
+//
+//        FileResult uploadResult = fileStorageInputPort.uploadFile(uploadCommand);
 
-        // Save answer history
-        AnswerHistory answerHistory = AnswerHistory.builder()
-                .userId(user.getId())
-                .speakingQuestionId(speakingQuestion.getId())
-                .audioFileId(uploadResult.id())
-                .build();
+            // Save answer history
+            AnswerHistory answerHistory = AnswerHistory.builder()
+                    .userId(user.getId())
+                    .speakingQuestionId(speakingQuestion.getId())
+//                .audioFileId(uploadResult.id())
+                    .build();
 
-        answerHistory = answerHistoryRepositoryPort.saveAnswerHistory(answerHistory);
+            answerHistory = answerHistoryRepositoryPort.saveAnswerHistory(answerHistory);
+        }
+
 
         // Speech Assessment
         SpeechAssessmentCommand speechAssessmentCommand = new SpeechAssessmentCommand(command.audioBytes(), null);
@@ -195,7 +205,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 .fluencyScore(azureAssessment.getFluencyScore())
                 .completenessScore(azureAssessment.getCompletenessScore())
                 .pronunciationScore(azureAssessment.getPronunciationScore())
-                .answerHistoryId(answerHistory.getId())
+//                .answerHistoryId(answerHistory.getId())
                 .build();
 
         speechAssessment = answerHistoryRepositoryPort.saveSpeechAssessment(speechAssessment);
@@ -447,7 +457,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 .grammarScore(grammarScore)
                 .aiFeedback(rawLlmFeedback)
                 .translationText("")
-                .answerHistoryId(answerHistory.getId())
+//                .answerHistoryId(answerHistory.getId())
                 .build();
         answerHistoryRepositoryPort.saveContentAssessment(contentAssessment);
 
@@ -460,10 +470,11 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                         .build()
         );
 
-        org.naho.file.model.File audioFile = fileRepositoryPort.findById(uploadResult.id());
-        String audioUrl = audioFile != null ? audioFile.getObjectKey() : null;
+//        org.naho.file.model.File audioFile = fileRepositoryPort.findById(uploadResult.id());
+//        String audioUrl = audioFile != null ? audioFile.getObjectKey() : null;
 
-        return new SpeakingAnalysisResult(answerHistory.getId(), overallScore, audioUrl);
+//        return new SpeakingAnalysisResult(answerHistory.getId(), overallScore, audioUrl);
+        return null;
     }
 
     @Override

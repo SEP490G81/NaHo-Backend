@@ -21,11 +21,14 @@ import org.naho.user.entity.UserEntity;
 @Table(name = "files")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FileEntity extends BaseEntity {
+    @Column(name = "local_storage_path", length = 2048)
+    String localStoragePath;
+
     @Column(name = "object_key", nullable = false, length = 2048)
     String objectKey;
 
     @Column(name = "original_name", nullable = false)
-    String originalName;
+    String originalFileName;
 
     @Column(name = "content_type", nullable = false, length = 100)
     String contentType;

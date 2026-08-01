@@ -6,10 +6,8 @@ import org.naho.file.dto.mapper.FileRequestMapper;
 import org.naho.file.dto.mapper.FileResponseMapper;
 import org.naho.file.dto.response.FileResponse;
 import org.naho.file.port.in.FileStorageInputPort;
-import org.naho.file.result.FileResult;
 import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,14 +29,16 @@ public class FileController {
         UploadFileCommand command =
                 fileRequestMapper.multipartFileAndFolderNameToCommand(file, folderName);
 
-        FileResult result = fileStorageInputPort.uploadFile(command);
-        FileResponse response = fileResponseMapper.resultToResponse(result);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+//        FileResult result = fileStorageInputPort.uploadFile(command);
+//        FileResponse response = fileResponseMapper.resultToResponse(result);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return null;
     }
 
     @ApiResponseMessage(message = FileDetailMessageKey.FILE_DELETE_SUCCESSFULLY)
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteFileById(@PathVariable("id") Long fileId) {
-        return ResponseEntity.ok(fileStorageInputPort.deleteFileById(fileId));
+    @DeleteMapping
+    public ResponseEntity<Void> deleteFileInCloud(@RequestParam("objectKey") String objectKey) {
+        fileStorageInputPort.deleteFileInCloud(objectKey);
+        return ResponseEntity.ok().build();
     }
 }

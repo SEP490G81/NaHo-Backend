@@ -3,10 +3,10 @@ package org.naho.initializer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.naho.book.exception.BookErrorCode;
+import org.naho.file.constant.StaticResourceProperties;
 import org.naho.shared.exception.BootstrapException;
 import org.naho.vocabulary.port.in.ImportVocabularyPort;
 import org.naho.vocabulary.repository.VocabularyJpaRepository;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
@@ -25,9 +25,7 @@ public class VocabularyInitializer implements ApplicationRunner {
     private final VocabularyJpaRepository vocabularyJpaRepository;
     private final ResourceLoader resourceLoader;
     private final ImportVocabularyPort importVocabularyPort;
-
-    @Value("${app.static-resources.base-location}")
-    private String staticResourcesBaseLocation;
+    private final StaticResourceProperties staticResourceProperties;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -35,7 +33,9 @@ public class VocabularyInitializer implements ApplicationRunner {
             log.info("Vocabulary Data existed!");
         } else {
             try (InputStream inputStream = resourceLoader
-                    .getResource(staticResourcesBaseLocation + "books/vocabulary_data.xlsx")
+                    .getResource(staticResourceProperties.getBaseLocation() +
+                            staticResourceProperties.getBooks() +
+                            "/vocabulary_data.xlsx")
                     .getInputStream()) {
 
                 log.info("Initializing Vocabulary Data...");

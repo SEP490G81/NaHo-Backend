@@ -4,26 +4,25 @@ import org.naho.i18n.message.subscription.SubscriptionDetailMessageKey;
 import org.naho.payment.model.Money;
 import org.naho.shared.exception.DomainException;
 import org.naho.subscription.exception.SubscriptionDomainErrorCode;
+import org.naho.subscription.type.PlanCode;
 import org.naho.subscription.type.PlanStatus;
 import org.naho.subscription.type.PlanTier;
 
-import java.time.Instant;
-
 public class SubscriptionPlan {
     private final Long id;
-    private final String code;
-    private final Instant createdTime;
+    private final PlanCode code;
     private String name;
     private String description;
     private PlanTier tier;
     private Money price;
-    private int durationDays;
+    private Integer durationDays;
     private UsageQuota quota;
-    private boolean fullCurriculumAccess;
-    private boolean progressAnalyticsEnabled;
-    private boolean sampleAnswerEnabled;
+    private Boolean fullCurriculumAccess;
+    private Boolean progressAnalyticsEnabled;
+    private Boolean sampleAnswerEnabled;
+    private Double maxAnswerTimeSeconds;
+    private Boolean saveAnswerHistoryEnabled;
     private PlanStatus status;
-    private Instant modifiedTime;
 
     private SubscriptionPlan(Builder builder) {
         this.id = builder.id;
@@ -37,9 +36,9 @@ public class SubscriptionPlan {
         this.fullCurriculumAccess = builder.fullCurriculumAccess;
         this.progressAnalyticsEnabled = builder.progressAnalyticsEnabled;
         this.sampleAnswerEnabled = builder.sampleAnswerEnabled;
+        this.maxAnswerTimeSeconds = builder.maxAnswerTimeSeconds;
+        this.saveAnswerHistoryEnabled = builder.saveAnswerHistoryEnabled;
         this.status = builder.status;
-        this.createdTime = builder.createdTime;
-        this.modifiedTime = builder.modifiedTime;
     }
 
     public static Builder builder() {
@@ -47,17 +46,18 @@ public class SubscriptionPlan {
     }
 
     public static SubscriptionPlan create(
-            String code,
+            PlanCode code,
             String name,
             String description,
             PlanTier tier,
             Money price,
-            int durationDays,
+            Integer durationDays,
             UsageQuota quota,
-            boolean fullCurriculumAccess,
-            boolean progressAnalyticsEnabled,
-            boolean sampleAnswerEnabled,
-            Instant now) {
+            Boolean fullCurriculumAccess,
+            Boolean progressAnalyticsEnabled,
+            Boolean sampleAnswerEnabled,
+            Double maxAnswerTimeSeconds,
+            Boolean saveAnswerHistoryEnabled) {
         return builder()
                 .code(code)
                 .name(name)
@@ -69,8 +69,9 @@ public class SubscriptionPlan {
                 .fullCurriculumAccess(fullCurriculumAccess)
                 .progressAnalyticsEnabled(progressAnalyticsEnabled)
                 .sampleAnswerEnabled(sampleAnswerEnabled)
+                .maxAnswerTimeSeconds(maxAnswerTimeSeconds)
+                .saveAnswerHistoryEnabled(saveAnswerHistoryEnabled)
                 .status(PlanStatus.ACTIVE)
-                .createdTime(now)
                 .build();
     }
 
@@ -87,7 +88,7 @@ public class SubscriptionPlan {
         return id;
     }
 
-    public String getCode() {
+    public PlanCode getCode() {
         return code;
     }
 
@@ -107,7 +108,7 @@ public class SubscriptionPlan {
         return price;
     }
 
-    public int getDurationDays() {
+    public Integer getDurationDays() {
         return durationDays;
     }
 
@@ -115,45 +116,45 @@ public class SubscriptionPlan {
         return quota;
     }
 
-    public boolean isFullCurriculumAccess() {
+    public Boolean isFullCurriculumAccess() {
         return fullCurriculumAccess;
     }
 
-    public boolean isProgressAnalyticsEnabled() {
+    public Boolean isProgressAnalyticsEnabled() {
         return progressAnalyticsEnabled;
     }
 
-    public boolean isSampleAnswerEnabled() {
+    public Boolean isSampleAnswerEnabled() {
         return sampleAnswerEnabled;
+    }
+
+    public Double getMaxAnswerTimeSeconds() {
+        return maxAnswerTimeSeconds;
+    }
+
+    public Boolean isSaveAnswerHistoryEnabled() {
+        return saveAnswerHistoryEnabled;
     }
 
     public PlanStatus getStatus() {
         return status;
     }
 
-    public Instant getCreatedTime() {
-        return createdTime;
-    }
-
-    public Instant getModifiedTime() {
-        return modifiedTime;
-    }
-
     public static final class Builder {
         private Long id;
-        private String code;
+        private PlanCode code;
         private String name;
         private String description;
         private PlanTier tier;
         private Money price;
-        private int durationDays;
+        private Integer durationDays;
         private UsageQuota quota;
-        private boolean fullCurriculumAccess;
-        private boolean progressAnalyticsEnabled;
-        private boolean sampleAnswerEnabled;
+        private Boolean fullCurriculumAccess;
+        private Boolean progressAnalyticsEnabled;
+        private Boolean sampleAnswerEnabled;
+        private Double maxAnswerTimeSeconds;
+        private Boolean saveAnswerHistoryEnabled;
         private PlanStatus status;
-        private Instant createdTime;
-        private Instant modifiedTime;
 
         private Builder() {
         }
@@ -163,7 +164,7 @@ public class SubscriptionPlan {
             return this;
         }
 
-        public Builder code(String code) {
+        public Builder code(PlanCode code) {
             this.code = code;
             return this;
         }
@@ -188,7 +189,7 @@ public class SubscriptionPlan {
             return this;
         }
 
-        public Builder durationDays(int durationDays) {
+        public Builder durationDays(Integer durationDays) {
             this.durationDays = durationDays;
             return this;
         }
@@ -198,18 +199,28 @@ public class SubscriptionPlan {
             return this;
         }
 
-        public Builder fullCurriculumAccess(boolean fullCurriculumAccess) {
+        public Builder fullCurriculumAccess(Boolean fullCurriculumAccess) {
             this.fullCurriculumAccess = fullCurriculumAccess;
             return this;
         }
 
-        public Builder progressAnalyticsEnabled(boolean progressAnalyticsEnabled) {
+        public Builder progressAnalyticsEnabled(Boolean progressAnalyticsEnabled) {
             this.progressAnalyticsEnabled = progressAnalyticsEnabled;
             return this;
         }
 
-        public Builder sampleAnswerEnabled(boolean sampleAnswerEnabled) {
+        public Builder sampleAnswerEnabled(Boolean sampleAnswerEnabled) {
             this.sampleAnswerEnabled = sampleAnswerEnabled;
+            return this;
+        }
+
+        public Builder maxAnswerTimeSeconds(Double maxAnswerTimeSeconds) {
+            this.maxAnswerTimeSeconds = maxAnswerTimeSeconds;
+            return this;
+        }
+
+        public Builder saveAnswerHistoryEnabled(Boolean saveAnswerHistoryEnabled) {
+            this.saveAnswerHistoryEnabled = saveAnswerHistoryEnabled;
             return this;
         }
 
@@ -218,18 +229,8 @@ public class SubscriptionPlan {
             return this;
         }
 
-        public Builder createdTime(Instant createdTime) {
-            this.createdTime = createdTime;
-            return this;
-        }
-
-        public Builder modifiedTime(Instant modifiedTime) {
-            this.modifiedTime = modifiedTime;
-            return this;
-        }
-
         public SubscriptionPlan build() {
-            if (code == null || code.isBlank()) {
+            if (code == null) {
                 throw new DomainException(SubscriptionDomainErrorCode.PLAN_CODE_EMPTY,
                         SubscriptionDetailMessageKey.PLAN_CODE_EMPTY);
             }
@@ -241,7 +242,7 @@ public class SubscriptionPlan {
                 throw new DomainException(SubscriptionDomainErrorCode.PLAN_PRICE_EMPTY,
                         SubscriptionDetailMessageKey.PLAN_PRICE_EMPTY);
             }
-            if (durationDays <= 0) {
+            if (durationDays == null || durationDays <= 0) {
                 throw new DomainException(SubscriptionDomainErrorCode.PLAN_DURATION_INVALID,
                         SubscriptionDetailMessageKey.PLAN_DURATION_INVALID);
             }
@@ -255,9 +256,6 @@ public class SubscriptionPlan {
             }
             if (status == null) {
                 status = PlanStatus.ACTIVE;
-            }
-            if (createdTime == null) {
-                createdTime = Instant.now();
             }
             return new SubscriptionPlan(this);
         }

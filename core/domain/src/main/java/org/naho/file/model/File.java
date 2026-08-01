@@ -9,8 +9,10 @@ public class File {
     private final Long id;
     private final Long commentId;
     private final Long reportId;
+
+    private final String localStoragePath;
     private final String objectKey;
-    private final String originalName;
+    private final String originalFileName;
     private final String contentType;
     private final Long size;
 
@@ -18,8 +20,9 @@ public class File {
         this.id = builder.id;
         this.commentId = builder.commentId;
         this.reportId = builder.reportId;
+        this.localStoragePath = builder.localStoragePath;
         this.objectKey = builder.objectKey;
-        this.originalName = builder.originalName;
+        this.originalFileName = builder.originalFileName;
         this.contentType = builder.contentType;
         this.size = builder.size;
     }
@@ -40,12 +43,16 @@ public class File {
         return reportId;
     }
 
+    public String getLocalStoragePath() {
+        return localStoragePath;
+    }
+
     public String getObjectKey() {
         return objectKey;
     }
 
-    public String getOriginalName() {
-        return originalName;
+    public String getOriginalFileName() {
+        return originalFileName;
     }
 
     public String getContentType() {
@@ -61,8 +68,9 @@ public class File {
         private Long id;
         private Long commentId;
         private Long reportId;
+        private String localStoragePath;
         private String objectKey;
-        private String originalName;
+        private String originalFileName;
         private String contentType;
         private Long size;
 
@@ -81,13 +89,18 @@ public class File {
             return this;
         }
 
+        public Builder localStoragePath(String localStoragePath) {
+            this.localStoragePath = localStoragePath;
+            return this;
+        }
+
         public Builder objectKey(String objectKey) {
             this.objectKey = objectKey;
             return this;
         }
 
-        public Builder originalName(String originalName) {
-            this.originalName = originalName;
+        public Builder originalFileName(String originalFileName) {
+            this.originalFileName = originalFileName;
             return this;
         }
 
@@ -108,7 +121,7 @@ public class File {
                         FileDetailMessageKey.FILE_EMPTY);
             }
 
-            if (originalName == null || originalName.isBlank()) {
+            if (originalFileName == null || originalFileName.isBlank()) {
                 throw new DomainException(
                         FileDomainErrorCode.FILE_ORIGINAL_NAME_EMPTY,
                         FileDetailMessageKey.FILE_ORIGINAL_NAME_EMPTY);

@@ -13,6 +13,7 @@ import org.naho.point.entity.PointHistoryEntity;
 import org.naho.question.entity.SpeakingQuestionEntity;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.social.report.entity.ReportEntity;
+import org.naho.subscription.entity.UserSubscriptionEntity;
 import org.naho.user.type.Gender;
 import org.naho.user.type.JLPTLevel;
 import org.naho.user.type.UserStatus;
@@ -99,4 +100,7 @@ public class UserEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "user")
     List<UserDailyMissionEntity> userDailyMissions;
+
+    @OneToMany(mappedBy = "user")
+    List<UserSubscriptionEntity> userSubscriptions;
 }
