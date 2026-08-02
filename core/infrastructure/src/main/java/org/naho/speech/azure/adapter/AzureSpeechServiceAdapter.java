@@ -76,7 +76,7 @@ public class AzureSpeechServiceAdapter implements AzureSpeechServicePort {
              * Validate thời lượng audio.
              * Ví dụ: không cho vượt quá 120 giây.
              */
-            azureSpeechServiceHelper.validateAudioDuration(durationSeconds);
+//            azureSpeechServiceHelper.validateAudioDuration(durationSeconds);
 
             /*
              * Tính timeout động theo duration.

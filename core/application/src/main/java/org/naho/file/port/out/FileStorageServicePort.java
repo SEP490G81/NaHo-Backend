@@ -1,12 +1,16 @@
 package org.naho.file.port.out;
 
-import java.io.InputStream;
+import org.naho.file.model.File;
+import org.naho.file.model.StoredFile;
 
 public interface FileStorageServicePort {
-    void uploadFile(String objectKey,
-                    InputStream inputStream,
-                    String contentType,
-                    Long size);
+    void uploadFileToCloud(StoredFile file, boolean isPublic);
 
-    void deleteFileByObjectKey(String objectKey);
+    void deleteFileInCloud(String objectKey, boolean isPublic);
+
+    StoredFile saveFileToLocal(Object file);
+
+    void deleteFileInLocal(String localStoragePath);
+
+    String generatePresignedUrl(File file);
 }

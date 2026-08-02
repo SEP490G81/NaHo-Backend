@@ -18,6 +18,36 @@ public enum FileDomainErrorCode implements ErrorCode {
             "FILE_003",
             FileTitleMessageKey.FILE_NOT_VALID_TITLE,
             400
+    ),
+    FILE_UPLOAD_STATUS_EMPTY(
+            "FILE_004",
+            FileTitleMessageKey.FILE_NOT_VALID_TITLE,
+            400
+    ),
+    FILE_OPERATION_TYPE_EMPTY(
+            "FILE_005",
+            FileTitleMessageKey.FILE_NOT_VALID_TITLE,
+            400
+    ),
+    FILE_OPERATION_STATUS_EMPTY(
+            "FILE_006",
+            FileTitleMessageKey.FILE_NOT_VALID_TITLE,
+            400
+    ),
+    FILE_RETRY_COUNT_EMPTY(
+            "FILE_007",
+            FileTitleMessageKey.FILE_NOT_VALID_TITLE,
+            400
+    ),
+    FILE_LOCAL_STORAGE_PATH_EMPTY(
+            "FILE_008",
+            FileTitleMessageKey.FILE_NOT_VALID_TITLE,
+            400
+    ),
+    FILE_ID_NULL(
+            "FILE_009",
+            FileTitleMessageKey.FILE_NOT_VALID_TITLE,
+            400
     );
 
     private final String code;

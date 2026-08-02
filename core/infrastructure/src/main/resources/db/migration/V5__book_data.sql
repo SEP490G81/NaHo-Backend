@@ -1,12 +1,26 @@
 -- Book cover image data
-INSERT INTO files (id, created_time, modified_time, object_key, original_name, content_type, size, comment_id,
-                   report_id)
-VALUES (11, NOW(), NULL, 'books/A1.jpeg', 'A1.jpeg', 'image/jpeg', 197300, NULL, NULL),
-       (12, NOW(), NULL, 'books/A2.jpeg', 'A2.jpeg', 'image/jpeg', 252500, NULL, NULL),
-       (13, NOW(), NULL, 'books/A2-2.jpeg', 'A2-2.jpeg', 'image/jpeg', 214700, NULL, NULL),
-       (14, NOW(), NULL, 'books/A2B1.jpeg', 'A2B1.jpeg', 'image/jpeg', 238200, NULL, NULL),
-       (15, NOW(), NULL, 'books/B1.jpeg', 'B1.jpeg', 'image/jpeg', 128800, NULL, NULL),
-       (16, NOW(), NULL, 'books/B1-2.jpeg', 'B1-2.jpeg', 'image/jpeg', 128200, NULL, NULL);
+INSERT INTO files (id,
+                   created_time,
+                   object_key,
+                   bucket_name,
+                   original_name,
+                   content_type,
+                   size)
+VALUES (11, NOW(), 'books/A1.jpeg', 'naho-public-bucket', 'A1.jpeg', 'image/jpeg', 197300),
+       (12, NOW(), 'books/A2.jpeg', 'naho-public-bucket', 'A2.jpeg', 'image/jpeg', 252500),
+       (13, NOW(), 'books/A2-2.jpeg', 'naho-public-bucket', 'A2-2.jpeg', 'image/jpeg', 214700),
+       (14, NOW(), 'books/A2B1.jpeg', 'naho-public-bucket', 'A2B1.jpeg', 'image/jpeg', 238200),
+       (15, NOW(), 'books/B1.jpeg', 'naho-public-bucket', 'B1.jpeg', 'image/jpeg', 128800),
+       (16, NOW(), 'books/B1-2.jpeg', 'naho-public-bucket', 'B1-2.jpeg', 'image/jpeg', 128200);
+
+-- Insert file operations for book cover images
+INSERT INTO file_operations (created_time, file_id, operation_type, operation_status, retry_count)
+VALUES (NOW(), 11, 'UPLOAD', 'COMPLETED', 0),
+       (NOW(), 12, 'UPLOAD', 'COMPLETED', 0),
+       (NOW(), 13, 'UPLOAD', 'COMPLETED', 0),
+       (NOW(), 14, 'UPLOAD', 'COMPLETED', 0),
+       (NOW(), 15, 'UPLOAD', 'COMPLETED', 0),
+       (NOW(), 16, 'UPLOAD', 'COMPLETED', 0);
 
 -- Book data
 INSERT INTO books (id,

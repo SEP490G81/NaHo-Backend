@@ -47,6 +47,10 @@ public class ContentAssessment {
         return translationText;
     }
 
+    public void setAnswerHistoryId(Long answerHistoryId) {
+        this.answerHistoryId = answerHistoryId;
+    }
+
     // Builder
     public static class Builder {
         private Long id;

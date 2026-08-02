@@ -9,8 +9,10 @@ public class File {
     private final Long id;
     private final Long commentId;
     private final Long reportId;
+
     private final String objectKey;
-    private final String originalName;
+    private final String bucketName;
+    private final String originalFileName;
     private final String contentType;
     private final Long size;
 
@@ -19,7 +21,8 @@ public class File {
         this.commentId = builder.commentId;
         this.reportId = builder.reportId;
         this.objectKey = builder.objectKey;
-        this.originalName = builder.originalName;
+        this.bucketName = builder.bucketName;
+        this.originalFileName = builder.originalFileName;
         this.contentType = builder.contentType;
         this.size = builder.size;
     }
@@ -44,8 +47,12 @@ public class File {
         return objectKey;
     }
 
-    public String getOriginalName() {
-        return originalName;
+    public String getBucketName() {
+        return bucketName;
+    }
+
+    public String getOriginalFileName() {
+        return originalFileName;
     }
 
     public String getContentType() {
@@ -62,7 +69,8 @@ public class File {
         private Long commentId;
         private Long reportId;
         private String objectKey;
-        private String originalName;
+        private String bucketName;
+        private String originalFileName;
         private String contentType;
         private Long size;
 
@@ -86,8 +94,13 @@ public class File {
             return this;
         }
 
-        public Builder originalName(String originalName) {
-            this.originalName = originalName;
+        public Builder bucketName(String bucketName) {
+            this.bucketName = bucketName;
+            return this;
+        }
+
+        public Builder originalFileName(String originalFileName) {
+            this.originalFileName = originalFileName;
             return this;
         }
 
@@ -108,7 +121,7 @@ public class File {
                         FileDetailMessageKey.FILE_EMPTY);
             }
 
-            if (originalName == null || originalName.isBlank()) {
+            if (originalFileName == null || originalFileName.isBlank()) {
                 throw new DomainException(
                         FileDomainErrorCode.FILE_ORIGINAL_NAME_EMPTY,
                         FileDetailMessageKey.FILE_ORIGINAL_NAME_EMPTY);

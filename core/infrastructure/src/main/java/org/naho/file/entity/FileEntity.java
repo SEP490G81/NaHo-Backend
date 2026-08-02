@@ -12,6 +12,8 @@ import org.naho.social.entity.CommentEntity;
 import org.naho.social.report.entity.ReportEntity;
 import org.naho.user.entity.UserEntity;
 
+import java.util.List;
+
 @SuperBuilder
 @Getter
 @Setter
@@ -21,11 +23,14 @@ import org.naho.user.entity.UserEntity;
 @Table(name = "files")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FileEntity extends BaseEntity {
-    @Column(name = "object_key", nullable = false, length = 2048)
+    @Column(name = "object_key", nullable = false, unique = true, length = 500)
     String objectKey;
 
+    @Column(name = "bucket_name")
+    String bucketName;
+
     @Column(name = "original_name", nullable = false)
-    String originalName;
+    String originalFileName;
 
     @Column(name = "content_type", nullable = false, length = 100)
     String contentType;
@@ -50,6 +55,9 @@ public class FileEntity extends BaseEntity {
     @OneToOne(mappedBy = "iconFile")
     LeagueEntity league;
 
-    @OneToOne(mappedBy = "avatar")
+    @OneToOne(mappedBy = "avatarFile")
     UserEntity user;
+
+    @OneToOne(mappedBy = "file", cascade = CascadeType.ALL, orphanRemoval = true)
+    FileOperationEntity fileOperation;
 }

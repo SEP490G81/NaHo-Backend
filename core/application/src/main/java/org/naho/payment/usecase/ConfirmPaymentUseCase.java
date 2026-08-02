@@ -100,7 +100,7 @@ public class ConfirmPaymentUseCase implements ConfirmPaymentInputPort {
             // Publish Event Nâng cấp gói
             eventPublisherPort.publish(new org.naho.user.event.UserPlanUpgradedEvent(
                     order.getUserId(),
-                    plan.getCode()
+                    plan.getCode().name()
             ));
         }
 

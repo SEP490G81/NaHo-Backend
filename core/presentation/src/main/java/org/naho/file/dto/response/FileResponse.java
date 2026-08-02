@@ -2,9 +2,10 @@ package org.naho.file.dto.response;
 
 public record FileResponse(
         Long id,
-        String objectKey,
-        String originalName,
+        String accessUrl,
+        String originalFileName,
         String contentType,
-        Long size
+        Long size,
+        FileOperationResponse fileOperation
 ) {
 }

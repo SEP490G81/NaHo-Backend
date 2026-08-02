@@ -59,6 +59,8 @@ public final class UserDetailMessageKey {
             "user.rotate.token.successfully";
     public static final String USER_GET_SUCCESSFULLY =
             "user.get.successfully";
+    public static final String USER_UPDATE_INFO_SUCCESSFULLY =
+            "user.update.info.successfully";
     public static final String USER_LOGOUT_ALL_SUCCESSFULLY =
             "user.logout.all.successfully";
     public static final String USER_GOOGLE_ID_TOKEN_NOT_VALID =

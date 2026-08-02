@@ -2,8 +2,10 @@ package org.naho.subscription.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.naho.payment.model.Money;
 import org.naho.subscription.entity.SubscriptionPlanEntity;
 import org.naho.subscription.model.SubscriptionPlan;
+import org.naho.subscription.model.UsageQuota;
 
 @Mapper(componentModel = "spring")
 public interface SubscriptionPlanEntityMapper {
@@ -24,11 +26,11 @@ public interface SubscriptionPlanEntityMapper {
         if (entity == null) {
             return null;
         }
-        org.naho.payment.model.Money price = new org.naho.payment.model.Money(
+        Money price = new Money(
                 entity.getPriceAmount(),
                 java.util.Currency.getInstance(entity.getPriceCurrency())
         );
-        org.naho.subscription.model.UsageQuota quota = new org.naho.subscription.model.UsageQuota(
+        UsageQuota quota = new UsageQuota(
                 entity.getMonthlyAssessmentLimit(),
                 entity.getMonthlyAssessmentAudioSeconds(),
                 entity.getMaxAssessmentAudioSeconds(),
@@ -48,9 +50,9 @@ public interface SubscriptionPlanEntityMapper {
                 .fullCurriculumAccess(entity.getFullCurriculumAccess())
                 .progressAnalyticsEnabled(entity.getProgressAnalyticsEnabled())
                 .sampleAnswerEnabled(entity.getSampleAnswerEnabled())
+                .maxAnswerTimeSeconds(entity.getMaxAnswerTimeSeconds())
+                .saveAnswerHistoryEnabled(entity.getSaveAnswerHistoryEnabled())
                 .status(entity.getStatus())
-                .createdTime(entity.getCreatedTime())
-                .modifiedTime(entity.getModifiedTime())
                 .build();
     }
 }

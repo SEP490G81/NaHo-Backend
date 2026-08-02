@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.naho.book.exception.BookErrorCode;
 import org.naho.book.port.in.ImportBookInputPort;
 import org.naho.book.repository.TopicJpaRepository;
+import org.naho.file.constant.StaticResourceProperties;
 import org.naho.shared.exception.BootstrapException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
@@ -25,9 +25,7 @@ public class BookDataInitializer implements ApplicationRunner {
     private final ResourceLoader resourceLoader;
     private final ImportBookInputPort importBookInputPort;
     private final TopicJpaRepository topicJpaRepository;
-
-    @Value("${app.static-resources.base-location}")
-    private String staticResourcesBaseLocation;
+    private final StaticResourceProperties staticResourceProperties;
 
     @Override
     public void run(ApplicationArguments args) {
@@ -35,7 +33,9 @@ public class BookDataInitializer implements ApplicationRunner {
             log.info("Book Data existed!");
         } else {
             try (InputStream inputStream = resourceLoader
-                    .getResource(staticResourcesBaseLocation + "books/book_data.xlsx")
+                    .getResource(staticResourceProperties.getLocalRoot() +
+                            staticResourceProperties.getBooks() +
+                            "/book_data.xlsx")
                     .getInputStream()) {
 
                 log.info("Initializing Book Data...");

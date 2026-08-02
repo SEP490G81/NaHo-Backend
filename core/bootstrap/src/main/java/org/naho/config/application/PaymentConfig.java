@@ -9,6 +9,8 @@ import org.naho.payment.usecase.CancelPaymentUseCase;
 import org.naho.payment.usecase.ConfirmPaymentUseCase;
 import org.naho.payment.usecase.CreatePaymentUseCase;
 import org.naho.payment.usecase.GetPaymentUseCase;
+import org.naho.subscription.mapper.SubscriptionPlanResultMapper;
+import org.naho.subscription.mapper.UserSubscriptionResultMapper;
 import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
 import org.naho.subscription.port.in.ListActivePlansInputPort;
 import org.naho.subscription.port.out.SubscriptionPlanRepositoryPort;
@@ -127,14 +129,28 @@ public class PaymentConfig {
     }
 
     @Bean
+    public SubscriptionPlanResultMapper subscriptionPlanResultMapper() {
+        return new SubscriptionPlanResultMapper();
+    }
+
+    @Bean
+    public UserSubscriptionResultMapper userSubscriptionResultMapper() {
+        return new UserSubscriptionResultMapper();
+    }
+
+    @Bean
     public GetActiveSubscriptionInputPort getActiveSubscriptionInputPort(
-            UserSubscriptionRepositoryPort subscriptionRepositoryPort,
-            SubscriptionPlanRepositoryPort planRepositoryPort,
-            PlatformTransactionManager transactionManager) {
-        GetActiveSubscriptionUseCase target = new GetActiveSubscriptionUseCase(subscriptionRepositoryPort,
-                planRepositoryPort);
-        TransactionTemplate template = new TransactionTemplate(transactionManager);
-        return userId -> template.execute(status -> target.getActiveSubscription(userId));
+            UserSubscriptionRepositoryPort userSubscriptionRepositoryPort,
+            SubscriptionPlanRepositoryPort subscriptionPlanRepositoryPort,
+            SubscriptionPlanResultMapper subscriptionPlanResultMapper,
+            UserSubscriptionResultMapper userSubscriptionResultMapper
+    ) {
+        return new GetActiveSubscriptionUseCase(
+                userSubscriptionRepositoryPort,
+                subscriptionPlanRepositoryPort,
+                subscriptionPlanResultMapper,
+                userSubscriptionResultMapper
+        );
     }
 }
 

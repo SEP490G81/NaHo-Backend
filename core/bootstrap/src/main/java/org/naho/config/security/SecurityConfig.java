@@ -38,7 +38,7 @@ public class SecurityConfig {
             "/api/v1/lessons/**",
             "/api/v1/payments/vnpay-ipn",
             "/api/v1/payments/vnpay-return",
-            "/ws/**"
+            "/ws/**",
     };
 
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
