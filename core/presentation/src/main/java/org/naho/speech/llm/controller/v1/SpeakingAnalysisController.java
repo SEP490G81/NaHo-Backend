@@ -71,7 +71,6 @@ public class SpeakingAnalysisController {
                         audioBytes,
                         subscriptionPlan.maxAnswerTimeSeconds()
                 );
-
                 // Step 1: Lưu file vào local
                 storedFile = fileStorageServicePort.saveFileToLocal(file);
             }
