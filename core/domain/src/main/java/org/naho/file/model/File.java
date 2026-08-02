@@ -11,6 +11,7 @@ public class File {
     private final Long reportId;
 
     private final String objectKey;
+    private final String bucketName;
     private final String originalFileName;
     private final String contentType;
     private final Long size;
@@ -20,6 +21,7 @@ public class File {
         this.commentId = builder.commentId;
         this.reportId = builder.reportId;
         this.objectKey = builder.objectKey;
+        this.bucketName = builder.bucketName;
         this.originalFileName = builder.originalFileName;
         this.contentType = builder.contentType;
         this.size = builder.size;
@@ -45,6 +47,10 @@ public class File {
         return objectKey;
     }
 
+    public String getBucketName() {
+        return bucketName;
+    }
+
     public String getOriginalFileName() {
         return originalFileName;
     }
@@ -63,6 +69,7 @@ public class File {
         private Long commentId;
         private Long reportId;
         private String objectKey;
+        private String bucketName;
         private String originalFileName;
         private String contentType;
         private Long size;
@@ -84,6 +91,11 @@ public class File {
 
         public Builder objectKey(String objectKey) {
             this.objectKey = objectKey;
+            return this;
+        }
+
+        public Builder bucketName(String bucketName) {
+            this.bucketName = bucketName;
             return this;
         }
 

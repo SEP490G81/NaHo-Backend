@@ -1,14 +1,12 @@
 package org.naho.file.result;
 
-import java.util.List;
-
 public record FileResult(
         Long id,
         String accessUrl,
         String originalFileName,
         String contentType,
         Long size,
-        List<FileOperationResult> fileOperations
+        FileOperationResult fileOperation
 ) {
 
     public static Builder builder() {
@@ -21,7 +19,7 @@ public record FileResult(
         private String originalFileName;
         private String contentType;
         private Long size;
-        private List<FileOperationResult> fileOperations;
+        private FileOperationResult fileOperation;
 
         private Builder() {
         }
@@ -51,8 +49,8 @@ public record FileResult(
             return this;
         }
 
-        public Builder fileOperations(List<FileOperationResult> fileOperations) {
-            this.fileOperations = fileOperations;
+        public Builder fileOperation(FileOperationResult fileOperation) {
+            this.fileOperation = fileOperation;
             return this;
         }
 
@@ -63,7 +61,7 @@ public record FileResult(
                     originalFileName,
                     contentType,
                     size,
-                    fileOperations
+                    fileOperation
             );
         }
     }

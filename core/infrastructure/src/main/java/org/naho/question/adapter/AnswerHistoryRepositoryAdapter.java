@@ -1,4 +1,4 @@
-package org.naho.speech.llm.adapter;
+package org.naho.question.adapter;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,6 +14,7 @@ import org.naho.pagination.PageMeta;
 import org.naho.question.entity.AnswerHistoryEntity;
 import org.naho.question.entity.SpeakingQuestionEntity;
 import org.naho.question.mapper.AnswerHistoryEntityMapper;
+import org.naho.question.port.out.AnswerHistoryRepositoryPort;
 import org.naho.question.repository.AnswerHistoryJpaRepository;
 import org.naho.question.repository.SpeakingQuestionJpaRepository;
 import org.naho.question.specification.AnswerHistorySpecification;
@@ -24,7 +25,6 @@ import org.naho.speech.azure.repository.ContentAssessmentJpaRepository;
 import org.naho.speech.azure.repository.SpeechAssessmentJpaRepository;
 import org.naho.speech.azure.repository.WordAssessmentJpaRepository;
 import org.naho.speech.llm.command.SpeakingHistoryFilterCommand;
-import org.naho.speech.llm.port.out.AnswerHistoryRepositoryPort;
 import org.naho.speech.llm.result.SpeakingHistoryListItemResult;
 import org.naho.speech.model.AnswerHistory;
 import org.naho.speech.model.ContentAssessment;
@@ -138,14 +138,10 @@ public class AnswerHistoryRepositoryAdapter implements AnswerHistoryRepositoryPo
     }
 
     @Override
-    public Optional<AnswerHistory> findAnswerHistoryById(Long id) {
-        return answerHistoryJpaRepository.findById(id).map(entity -> AnswerHistory.builder()
-                .id(entity.getId())
-                .userId(entity.getUser().getId())
-                .speakingQuestionId(entity.getSpeakingQuestion().getId())
-                .audioFileId(entity.getAudioFile().getId())
-                .createdTime(entity.getCreatedTime())
-                .build());
+    public Optional<AnswerHistory> findById(Long id) {
+        return answerHistoryJpaRepository
+                .findById(id)
+                .map(answerHistoryEntityMapper::entityToDomain);
     }
 
     @Override

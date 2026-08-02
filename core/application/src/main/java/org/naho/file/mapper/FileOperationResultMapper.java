@@ -10,11 +10,8 @@ public class FileOperationResultMapper {
         }
 
         return FileOperationResult.builder()
-                .id(domain.getId())
-                .fileId(domain.getFileId())
                 .operationType(domain.getOperationType())
                 .operationStatus(domain.getOperationStatus())
-                .retryCount(domain.getRetryCount())
                 .build();
     }
 }

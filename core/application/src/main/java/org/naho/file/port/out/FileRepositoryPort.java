@@ -1,6 +1,7 @@
 package org.naho.file.port.out;
 
 import org.naho.file.model.File;
+import org.naho.file.model.StoredFile;
 
 import java.util.List;
 
@@ -11,7 +12,9 @@ public interface FileRepositoryPort {
 
     List<File> findAllByBookIds(List<Long> ids);
 
-    File createNew(File file);
+    File createNew(File file, boolean isPublic);
 
     File findByObjectKey(String objectKey);
+
+    File saveFileToDbForUpload(StoredFile storedFile, boolean isPublic);
 }

@@ -3,7 +3,6 @@ package org.naho.file.usecase;
 import org.naho.file.command.UpdateOperationStatusCommand;
 import org.naho.file.exception.FileErrorCode;
 import org.naho.file.model.File;
-import org.naho.file.model.FileOperation;
 import org.naho.file.model.StoredFile;
 import org.naho.file.port.in.CrudFileInputPort;
 import org.naho.file.port.out.FileOperationRepositoryPort;
@@ -75,7 +74,7 @@ public class CrudFileUseCase implements CrudFileInputPort {
     }
 
     @Override
-    public void uploadFileToCloud(StoredFile storedFile) {
+    public void uploadFileToCloud(StoredFile storedFile, boolean isPublic) {
         if (storedFile == null) {
             throw new ApplicationException(
                     FileErrorCode.FILE_NOT_VALID,
@@ -85,7 +84,7 @@ public class CrudFileUseCase implements CrudFileInputPort {
 
         // Step 4: Thử upload file lên S3
         try {
-            fileStorageServicePort.uploadFileToCloud(storedFile);
+            fileStorageServicePort.uploadFileToCloud(storedFile, isPublic);
 
             // nếu thành công => xóa file đang lưu trong local storage
             fileStorageServicePort.deleteFileInLocal(storedFile.absoluteLocalStoragePath());
@@ -99,42 +98,13 @@ public class CrudFileUseCase implements CrudFileInputPort {
                             .build()
             );
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    @Override
-    public FileResult saveFileToDbForUpload(StoredFile storedFile) {
-        return transactionPort.execute(() -> doSaveFileToDbForUpload(storedFile));
-    }
-
-    private FileResult doSaveFileToDbForUpload(StoredFile storedFile) {
-        if (storedFile == null) {
-            throw new ApplicationException(
-                    FileErrorCode.FILE_NOT_VALID,
-                    FileDetailMessageKey.FILE_NOT_VALID
+            fileOperationRepositoryPort.updateOperationStatusByObjectKeyAndOperationType(
+                    UpdateOperationStatusCommand.builder()
+                            .objectKey(storedFile.objectKey())
+                            .operationType(OperationType.UPLOAD)
+                            .toOperationStatus(OperationStatus.FAILED)
+                            .build()
             );
         }
-
-        // Step 2: Lưu file vào db (FileEntity)
-        File domain = File.builder()
-                .objectKey(storedFile.objectKey())
-                .originalFileName(storedFile.originalFileName())
-                .contentType(storedFile.contentType())
-                .size(storedFile.size())
-                .build();
-
-        File savedFile = fileRepositoryPort.createNew(domain);
-
-        // Step 3: Lưu file operation vào db (FileOperationEntity)
-        FileOperation fileOperation = FileOperation.builder()
-                .fileId(savedFile.getId())
-                .operationType(OperationType.UPLOAD)
-                .operationStatus(OperationStatus.PENDING)
-                .retryCount(0)
-                .build();
-
-        fileOperationRepositoryPort.save(fileOperation);
-        return fileResultMapperPort.domainToResult(savedFile);
     }
 }

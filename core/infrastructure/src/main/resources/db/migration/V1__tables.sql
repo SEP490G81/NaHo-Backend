@@ -115,6 +115,7 @@ CREATE TABLE files
     created_time  datetime(6)           NOT NULL,
     modified_time datetime(6)           NULL,
     object_key    VARCHAR(500)          NOT NULL,
+    bucket_name   VARCHAR(255)          NULL,
     original_name VARCHAR(255)          NOT NULL,
     content_type  VARCHAR(100)          NOT NULL,
     size          BIGINT                NOT NULL,

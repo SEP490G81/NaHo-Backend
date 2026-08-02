@@ -5,13 +5,14 @@ import org.naho.book.port.out.LessonRepositoryPort;
 import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.book.port.out.TopicRepositoryPort;
 import org.naho.file.port.in.AsyncUploadFileInputPort;
-import org.naho.file.port.in.CrudFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
+import org.naho.file.port.out.FileResultMapperPort;
 import org.naho.furigana.port.out.FuriganaGenerationPort;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
 import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.naho.question.port.in.CompleteSpeakingQuestionInputPort;
+import org.naho.question.port.out.AnswerHistoryRepositoryPort;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.shared.port.out.AfterCommitPort;
 import org.naho.shared.port.out.TransactionPort;
@@ -127,7 +128,7 @@ public class ChatConfig {
             TransactionPort transactionPort,
             CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort,
             UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
-            CrudFileInputPort crudFileInputPort,
+            FileResultMapperPort fileResultMapperPort,
             AfterCommitPort afterCommitPort,
             AsyncUploadFileInputPort asyncUploadFileInputPort
     ) {
@@ -147,7 +148,7 @@ public class ChatConfig {
                 transactionPort,
                 completeSpeakingQuestionInputPort,
                 userLearningProgressRepositoryPort,
-                crudFileInputPort,
+                fileResultMapperPort,
                 afterCommitPort,
                 asyncUploadFileInputPort
         );

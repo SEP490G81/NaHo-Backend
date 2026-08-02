@@ -19,6 +19,6 @@ public interface FileEntityMapper {
     @Mapping(target = "report", ignore = true)
     @Mapping(target = "league", ignore = true)
     @Mapping(target = "user", ignore = true)
-    @Mapping(target = "fileOperations", ignore = true)
+    @Mapping(target = "fileOperation", ignore = true)
     FileEntity domainToEntity(File domain);
 }

@@ -6,19 +6,33 @@ ALTER TABLE leagues
 INSERT INTO files (id,
                    created_time,
                    object_key,
+                   bucket_name,
                    original_name,
                    content_type,
                    size)
-VALUES (1, NOW(), 'leagues/bronze.svg', 'bronze.svg', 'image/svg+xml', 974),
-       (2, NOW(), 'leagues/silver.svg', 'silver.svg', 'image/svg+xml', 974),
-       (3, NOW(), 'leagues/gold.svg', 'gold.svg', 'image/svg+xml', 970),
-       (4, NOW(), 'leagues/sapphire.svg', 'sapphire.svg', 'image/svg+xml', 1268),
-       (5, NOW(), 'leagues/ruby.svg', 'ruby.svg', 'image/svg+xml', 1260),
-       (6, NOW(), 'leagues/emerald.svg', 'emerald.svg', 'image/svg+xml', 1266),
-       (7, NOW(), 'leagues/amethyst.svg', 'amethyst.svg', 'image/svg+xml', 1442),
-       (8, NOW(), 'leagues/pearl.svg', 'pearl.svg', 'image/svg+xml', 1436),
-       (9, NOW(), 'leagues/obsidian.svg', 'obsidian.svg', 'image/svg+xml', 1442),
-       (10, NOW(), 'leagues/diamond.svg', 'diamond.svg', 'image/svg+xml', 1164);
+VALUES (1, NOW(), 'leagues/bronze.svg', 'naho-public-bucket', 'bronze.svg', 'image/svg+xml', 974),
+       (2, NOW(), 'leagues/silver.svg', 'naho-public-bucket', 'silver.svg', 'image/svg+xml', 974),
+       (3, NOW(), 'leagues/gold.svg', 'naho-public-bucket', 'gold.svg', 'image/svg+xml', 970),
+       (4, NOW(), 'leagues/sapphire.svg', 'naho-public-bucket', 'sapphire.svg', 'image/svg+xml', 1268),
+       (5, NOW(), 'leagues/ruby.svg', 'naho-public-bucket', 'ruby.svg', 'image/svg+xml', 1260),
+       (6, NOW(), 'leagues/emerald.svg', 'naho-public-bucket', 'emerald.svg', 'image/svg+xml', 1266),
+       (7, NOW(), 'leagues/amethyst.svg', 'naho-public-bucket', 'amethyst.svg', 'image/svg+xml', 1442),
+       (8, NOW(), 'leagues/pearl.svg', 'naho-public-bucket', 'pearl.svg', 'image/svg+xml', 1436),
+       (9, NOW(), 'leagues/obsidian.svg', 'naho-public-bucket', 'obsidian.svg', 'image/svg+xml', 1442),
+       (10, NOW(), 'leagues/diamond.svg', 'naho-public-bucket', 'diamond.svg', 'image/svg+xml', 1164);
+
+-- Insert file operations for league SVG files
+INSERT INTO file_operations (created_time, file_id, operation_type, operation_status, retry_count)
+VALUES (NOW(), 1, 'UPLOAD', 'COMPLETED', 0),
+       (NOW(), 2, 'UPLOAD', 'COMPLETED', 0),
+       (NOW(), 3, 'UPLOAD', 'COMPLETED', 0),
+       (NOW(), 4, 'UPLOAD', 'COMPLETED', 0),
+       (NOW(), 5, 'UPLOAD', 'COMPLETED', 0),
+       (NOW(), 6, 'UPLOAD', 'COMPLETED', 0),
+       (NOW(), 7, 'UPLOAD', 'COMPLETED', 0),
+       (NOW(), 8, 'UPLOAD', 'COMPLETED', 0),
+       (NOW(), 9, 'UPLOAD', 'COMPLETED', 0),
+       (NOW(), 10, 'UPLOAD', 'COMPLETED', 0);
 
 -- Insert league levels into leagues table
 INSERT INTO leagues (id, created_time, modified_time, name, description, min_point, max_point, icon_file_id)

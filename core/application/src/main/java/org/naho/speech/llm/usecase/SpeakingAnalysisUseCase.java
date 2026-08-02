@@ -11,11 +11,11 @@ import org.naho.book.port.out.BookRepositoryPort;
 import org.naho.book.port.out.LessonRepositoryPort;
 import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.book.port.out.TopicRepositoryPort;
+import org.naho.file.model.File;
 import org.naho.file.model.StoredFile;
 import org.naho.file.port.in.AsyncUploadFileInputPort;
-import org.naho.file.port.in.CrudFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
-import org.naho.file.result.FileResult;
+import org.naho.file.port.out.FileResultMapperPort;
 import org.naho.furigana.port.out.FuriganaGenerationPort;
 import org.naho.i18n.message.learning.LearningPathNodeDetailMessageKey;
 import org.naho.i18n.message.learning.UserLearningProgressDetailMessageKey;
@@ -33,6 +33,7 @@ import org.naho.question.exception.SpeakingQuestionErrorCode;
 import org.naho.question.model.Grammar;
 import org.naho.question.model.SpeakingQuestion;
 import org.naho.question.port.in.CompleteSpeakingQuestionInputPort;
+import org.naho.question.port.out.AnswerHistoryRepositoryPort;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.AfterCommitPort;
@@ -43,7 +44,6 @@ import org.naho.speech.llm.command.SpeakingAnalysisCommand;
 import org.naho.speech.llm.command.SpeakingHistoryFilterCommand;
 import org.naho.speech.llm.port.in.SpeakingAnalysisInputPort;
 import org.naho.speech.llm.port.out.AiAnalysisPort;
-import org.naho.speech.llm.port.out.AnswerHistoryRepositoryPort;
 import org.naho.speech.llm.result.SpeakingAnalysisResult;
 import org.naho.speech.llm.result.SpeakingHistoryDetailResult;
 import org.naho.speech.llm.result.SpeakingHistoryListItemResult;
@@ -79,7 +79,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     private final TransactionPort transactionPort;
     private final CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort;
     private final UserLearningProgressRepositoryPort userLearningProgressRepositoryPort;
-    private final CrudFileInputPort crudFileInputPort;
+    private final FileResultMapperPort fileResultMapperPort;
     private final AfterCommitPort afterCommitPort;
     private final AsyncUploadFileInputPort asyncUploadFileInputPort;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -100,7 +100,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             TransactionPort transactionPort,
             CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort,
             UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
-            CrudFileInputPort crudFileInputPort,
+            FileResultMapperPort fileResultMapperPort,
             AfterCommitPort afterCommitPort,
             AsyncUploadFileInputPort asyncUploadFileInputPort
     ) {
@@ -119,7 +119,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         this.transactionPort = transactionPort;
         this.completeSpeakingQuestionInputPort = completeSpeakingQuestionInputPort;
         this.userLearningProgressRepositoryPort = userLearningProgressRepositoryPort;
-        this.crudFileInputPort = crudFileInputPort;
+        this.fileResultMapperPort = fileResultMapperPort;
         this.afterCommitPort = afterCommitPort;
         this.asyncUploadFileInputPort = asyncUploadFileInputPort;
     }
@@ -167,26 +167,27 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                         SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_NOT_FOUND
                 ));
 
-        FileResult audioFileResult = null;
+        File audioFile = null;
 
         // nếu đã lưu file trong local
         // (tức là đăng kí gói không phải FREE)
         // thì mới lưu lại file nói chuyện của người dùng
         StoredFile storedFile = command.storedFile();
         if (storedFile != null) {
-            audioFileResult = crudFileInputPort.saveFileToDbForUpload(storedFile);
+            audioFile = fileRepositoryPort.saveFileToDbForUpload(storedFile, false);
         }
 
-        AnswerHistory answerHistory = answerHistoryRepositoryPort.saveAnswerHistory(
-                AnswerHistory.builder()
-                        .userId(user.getId())
-                        .speakingQuestionId(speakingQuestion.getId())
-                        .build()
-        );
+        AnswerHistory answerHistory = AnswerHistory.builder()
+                .userId(user.getId())
+                .speakingQuestionId(speakingQuestion.getId())
+                .build();
 
-        if (audioFileResult != null) {
-            answerHistory.setAudioFileId(audioFileResult.id());
+        if (audioFile != null) {
+            answerHistory.setAudioFileId(audioFile.getId());
         }
+
+        AnswerHistory savedAnswerHistory = answerHistoryRepositoryPort
+                .saveAnswerHistory(answerHistory);
 
         // Speech Assessment
         SpeechAssessmentCommand speechAssessmentCommand = new SpeechAssessmentCommand(
@@ -202,7 +203,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 .fluencyScore(azureAssessment.getFluencyScore())
                 .completenessScore(azureAssessment.getCompletenessScore())
                 .pronunciationScore(azureAssessment.getPronunciationScore())
-                .answerHistoryId(answerHistory.getId())
+                .answerHistoryId(savedAnswerHistory.getId())
                 .build();
 
         speechAssessment = answerHistoryRepositoryPort.saveSpeechAssessment(speechAssessment);
@@ -454,7 +455,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 .grammarScore(grammarScore)
                 .aiFeedback(rawLlmFeedback)
                 .translationText("")
-                .answerHistoryId(answerHistory.getId())
+                .answerHistoryId(savedAnswerHistory.getId())
                 .build();
 
         answerHistoryRepositoryPort.saveContentAssessment(contentAssessment);
@@ -470,17 +471,18 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
 
         SpeakingAnalysisResult result = SpeakingAnalysisResult.builder()
                 .overallScore(overallScore)
-                .answerHistoryId(answerHistory.getId())
+                .answerHistoryId(savedAnswerHistory.getId())
                 .build();
 
-        if (audioFileResult != null) {
-            result.setAudioFile(audioFileResult);
+        if (audioFile != null) {
+            result.setAudioFile(fileResultMapperPort.domainToResult(audioFile));
         }
 
-        // nếu đăng kí acc vip thì mới đẩy file lên cloud
         if (storedFile != null) {
             // khi nào commit thành công thì mới thực hiện việc upload lên cloud
-            afterCommitPort.execute(() -> asyncUploadFileInputPort.uploadFileToCloud(storedFile));
+            afterCommitPort.execute(() -> asyncUploadFileInputPort.uploadFileToCloud(
+                    storedFile, false
+            ));
         }
 
         return result;
@@ -490,7 +492,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     public SpeakingHistoryDetailResult getHistoryDetail(Long historyId) {
         System.out.println("[SpeakingAnalysis] Loading history detail for id: " + historyId);
 
-        AnswerHistory history = answerHistoryRepositoryPort.findAnswerHistoryById(historyId)
+        AnswerHistory history = answerHistoryRepositoryPort.findById(historyId)
                 .orElseThrow(() -> new ApplicationException(
                         SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
                         SpeakingQuestionDetailMessageKey.ANSWER_HISTORY_NOT_FOUND,

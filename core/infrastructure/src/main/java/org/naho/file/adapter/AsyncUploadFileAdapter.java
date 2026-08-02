@@ -14,7 +14,7 @@ public class AsyncUploadFileAdapter implements AsyncUploadFileInputPort {
 
     @Async("uploadFileToCloudExecutor")
     @Override
-    public void uploadFileToCloud(StoredFile file) {
-        crudFileInputPort.uploadFileToCloud(file);
+    public void uploadFileToCloud(StoredFile file, boolean isPublic) {
+        crudFileInputPort.uploadFileToCloud(file, isPublic);
     }
 }

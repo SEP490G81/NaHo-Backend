@@ -27,7 +27,7 @@ public class CrudFileOperationUseCase implements CrudFileOperationInputPort {
     }
 
     @Override
-    public Set<FileOperationResult> findAllByFileId(Long fileId) {
+    public FileOperationResult findByFileId(Long fileId) {
         if (fileId == null) {
             throw new ApplicationException(
                     FileErrorCode.FILE_NOT_VALID,
@@ -35,10 +35,9 @@ public class CrudFileOperationUseCase implements CrudFileOperationInputPort {
             );
         }
 
-        return fileOperationRepositoryPort.findAllByFileId(fileId)
-                .stream()
+        return fileOperationRepositoryPort.findByFileId(fileId)
                 .map(fileOperationResultMapper::domainToResult)
-                .collect(Collectors.toSet());
+                .orElse(null);
     }
 
     @Override

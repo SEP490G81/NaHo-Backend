@@ -17,7 +17,7 @@ public interface FileOperationRepositoryPort {
 
     FileOperation updateOperationStatus(FileOperation fileOperation, OperationStatus operationStatus);
 
-    Set<FileOperation> findAllByFileId(Long fileId);
+    Optional<FileOperation> findByFileId(Long fileId);
 
     Optional<FileOperation> findByFileIdAndOperationType(Long fileId, OperationType operationType);
 }

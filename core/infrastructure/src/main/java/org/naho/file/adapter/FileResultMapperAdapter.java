@@ -2,23 +2,25 @@ package org.naho.file.adapter;
 
 import lombok.RequiredArgsConstructor;
 import org.naho.file.constant.CloudFrontProperties;
-import org.naho.file.constant.StaticResourceProperties;
+import org.naho.file.constant.S3Properties;
 import org.naho.file.model.File;
 import org.naho.file.port.in.CrudFileOperationInputPort;
 import org.naho.file.port.out.FileResultMapperPort;
 import org.naho.file.result.FileOperationResult;
 import org.naho.file.result.FileResult;
-import org.naho.file.type.OperationStatus;
-import org.naho.file.type.OperationType;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class FileResultMapperAdapter implements FileResultMapperPort {
 
-    private final StaticResourceProperties staticResourceProperties;
-    private final CloudFrontProperties cloudFrontProperties;
     private final CrudFileOperationInputPort crudFileOperationInputPort;
+    private final CloudFrontProperties cloudFrontProperties;
+    private final S3Properties s3Properties;
+
+    @Value("${app.nextjs-server-files-api}")
+    private String nextjsServerApi;
 
     @Override
     public FileResult domainToResult(File domain) {
@@ -26,12 +28,15 @@ public class FileResultMapperAdapter implements FileResultMapperPort {
             return null;
         }
 
-        FileOperationResult uploadOperation = crudFileOperationInputPort
-                .findByFileIdAndOperationType(domain.getId(), OperationType.UPLOAD);
+        FileOperationResult fileOperation =
+                crudFileOperationInputPort.findByFileId(domain.getId());
 
-        String accessUrl = uploadOperation.operationStatus().equals(OperationStatus.COMPLETED) ?
-                cloudFrontProperties.getDomain() + domain.getObjectKey() :
-                staticResourceProperties.getBackendFilesBaseUrl() + domain.getObjectKey();
+        String accessUrl;
+        if (s3Properties.getPublicBucketName().equals(domain.getBucketName())) {
+            accessUrl = cloudFrontProperties.getDomain() + domain.getObjectKey();
+        } else {
+            accessUrl = nextjsServerApi + domain.getId();
+        }
 
         return FileResult.builder()
                 .id(domain.getId())
@@ -39,6 +44,7 @@ public class FileResultMapperAdapter implements FileResultMapperPort {
                 .originalFileName(domain.getOriginalFileName())
                 .contentType(domain.getContentType())
                 .size(domain.getSize())
+                .fileOperation(fileOperation)
                 .build();
     }
 }

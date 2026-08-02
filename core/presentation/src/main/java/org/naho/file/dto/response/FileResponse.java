@@ -5,6 +5,7 @@ public record FileResponse(
         String accessUrl,
         String originalFileName,
         String contentType,
-        Long size
+        Long size,
+        FileOperationResponse fileOperation
 ) {
 }

@@ -115,10 +115,9 @@ public class FileOperationRepositoryAdapter implements FileOperationRepositoryPo
     }
 
     @Override
-    public Set<FileOperation> findAllByFileId(Long fileId) {
-        return fileOperationJpaRepository.findAllByFile_Id(fileId)
-                .stream().map(fileOperationEntityMapper::entityToDomain)
-                .collect(Collectors.toSet());
+    public Optional<FileOperation> findByFileId(Long fileId) {
+        return fileOperationJpaRepository.findByFile_Id(fileId)
+                .map(fileOperationEntityMapper::entityToDomain);
     }
 
     @Override

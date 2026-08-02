@@ -5,8 +5,11 @@ import org.naho.file.constant.S3Metadata;
 import org.naho.file.constant.S3Properties;
 import org.naho.file.constant.StaticResourceProperties;
 import org.naho.file.exception.FileErrorCode;
+import org.naho.file.model.File;
 import org.naho.file.model.StoredFile;
 import org.naho.file.port.out.FileHelperPort;
+import org.naho.file.port.out.FileOperationRepositoryPort;
+import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.shared.exception.InfrastructureException;
@@ -16,6 +19,8 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -30,57 +35,65 @@ import java.util.UUID;
 public class FileStorageServiceAdapter implements FileStorageServicePort {
 
     private final S3Client s3Client;
+    private final S3Presigner s3Presigner;
     private final S3Properties s3Properties;
     private final StaticResourceProperties staticResourceProperties;
     private final FileHelperPort fileHelperPort;
+    private final FileRepositoryPort fileRepositoryPort;
+    private final FileOperationRepositoryPort fileOperationRepositoryPort;
 
     @Override
-    public void uploadFileToCloud(StoredFile file) throws S3Exception {
+    public void uploadFileToCloud(StoredFile file, boolean isPublic) throws S3Exception {
         Path path = Path.of(file.absoluteLocalStoragePath());
         if (!Files.exists(path)) {
             throw new InfrastructureException(
                     FileErrorCode.FILE_NOT_FOUND,
                     FileDetailMessageKey.FILE_NOT_FOUND,
-                    file.absoluteLocalStoragePath()
-            );
+                    file.absoluteLocalStoragePath());
         }
 
+        String bucketName = isPublic ?
+                s3Properties.getPublicBucketName() :
+                s3Properties.getPrivateBucketName();
+
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                .bucket(s3Properties.getBucketName())
+                .bucket(bucketName)
                 .key(file.objectKey())
                 .contentType(file.contentType())
                 .metadata(Map.of(
                         S3Metadata.ORIGINAL_FILE_NAME, file.originalFileName(),
-                        S3Metadata.CHECKSUM, file.checksum()
-                ))
+                        S3Metadata.CHECKSUM, file.checksum()))
                 .build();
 
         s3Client.putObject(putObjectRequest, RequestBody.fromFile(path));
     }
 
-//    @Override
-//    public void deleteFileInCloud(String objectKey) {
-//        try {
-//            s3Client.deleteObject(request -> request
-//                    .bucket(s3Properties.getBucketName())
-//                    .key(objectKey)
-//            );
-//        } catch (S3Exception e) {
-//            throw new InfrastructureException(
-//                    FileErrorCode.FILE_DELETE_FAILED,
-//                    FileDetailMessageKey.FILE_DELETE_FAILED,
-//                    e.getMessage()
-//            );
-//        }
-//    }
+    @Override
+    public void deleteFileInCloud(String objectKey, boolean isPublic) {
+        String bucketName = isPublic ?
+                s3Properties.getPublicBucketName() :
+                s3Properties.getPrivateBucketName();
+
+        try {
+            s3Client.deleteObject(request -> request
+                    .bucket(bucketName)
+                    .key(objectKey)
+            );
+        } catch (S3Exception e) {
+            throw new InfrastructureException(
+                    FileErrorCode.FILE_DELETE_FAILED,
+                    FileDetailMessageKey.FILE_DELETE_FAILED,
+                    e.getMessage()
+            );
+        }
+    }
 
     @Override
     public StoredFile saveFileToLocal(Object file) {
         if (!(file instanceof MultipartFile multipartFile)) {
             throw new InfrastructureException(
                     FileErrorCode.FILE_NOT_VALID,
-                    FileDetailMessageKey.FILE_NOT_VALID
-            );
+                    FileDetailMessageKey.FILE_NOT_VALID);
         }
 
         try {
@@ -100,11 +113,10 @@ public class FileStorageServiceAdapter implements FileStorageServicePort {
 
             String checksum = fileHelperPort.calculateChecksum(destination);
 
-            String relativePath = staticResourceProperties.getRecordings() + "/" + fileName;
+            String objectKey = staticResourceProperties.getRecordings() + "/" + fileName;
 
             return StoredFile.builder()
-                    .objectKey(relativePath)
-                    .relativeLocalStoragePath(relativePath)
+                    .objectKey(objectKey)
                     .absoluteLocalStoragePath(destination.toAbsolutePath().toString())
                     .originalFileName(originalFileName)
                     .contentType(multipartFile.getContentType())
@@ -116,8 +128,7 @@ public class FileStorageServiceAdapter implements FileStorageServicePort {
             throw new InfrastructureException(
                     FileErrorCode.FILE_UPLOAD_FAILED,
                     FileDetailMessageKey.FILE_UPLOAD_FAILED,
-                    e.getMessage()
-            );
+                    e.getMessage());
         }
     }
 
@@ -126,8 +137,7 @@ public class FileStorageServiceAdapter implements FileStorageServicePort {
         if (localStoragePath == null || localStoragePath.isEmpty()) {
             throw new InfrastructureException(
                     FileErrorCode.FILE_NOT_VALID,
-                    FileDetailMessageKey.FILE_LOCAL_STORAGE_PATH_EMPTY
-            );
+                    FileDetailMessageKey.FILE_LOCAL_STORAGE_PATH_EMPTY);
         }
 
         Path path = Path.of(localStoragePath);
@@ -137,6 +147,26 @@ public class FileStorageServiceAdapter implements FileStorageServicePort {
             throw new InfrastructureException(
                     FileErrorCode.FILE_DELETE_FAILED,
                     FileDetailMessageKey.FILE_DELETE_FAILED,
+                    e.getMessage());
+        }
+    }
+
+    @Override
+    public String generatePresignedUrl(File file) {
+        try {
+            GetObjectPresignRequest getObjectPresignRequest = GetObjectPresignRequest.builder()
+                    .signatureDuration(s3Properties.getSignatureDuration())
+                    .getObjectRequest(request -> request
+                            .bucket(file.getBucketName())
+                            .key(file.getObjectKey()))
+                    .build();
+
+            return s3Presigner.presignGetObject(getObjectPresignRequest).url().toString();
+
+        } catch (Exception e) {
+            throw new InfrastructureException(
+                    FileErrorCode.FILE_GENERATE_PRESIGNED_URL_FAILED,
+                    FileDetailMessageKey.FILE_GENERATE_PRESIGNED_URL_FAILED,
                     e.getMessage()
             );
         }

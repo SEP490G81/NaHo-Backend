@@ -43,12 +43,12 @@ public class SpeakingAnalysisController {
     private final FileValidatorPort fileValidatorPort;
     private final GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
 
+    @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_ANALYSIS_SUCCESS)
     @PostMapping(
             value = "/analysis",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_ANALYSIS_SUCCESS)
     public ResponseEntity<SpeakingAnalysisResponse> uploadAudioAndAnalyzeSpeaking(
             @RequestPart("file") MultipartFile file,
             @RequestParam("speakingQuestionId") Long speakingQuestionId,

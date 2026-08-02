@@ -26,6 +26,9 @@ public class FileEntity extends BaseEntity {
     @Column(name = "object_key", nullable = false, unique = true, length = 500)
     String objectKey;
 
+    @Column(name = "bucket_name")
+    String bucketName;
+
     @Column(name = "original_name", nullable = false)
     String originalFileName;
 
@@ -55,6 +58,6 @@ public class FileEntity extends BaseEntity {
     @OneToOne(mappedBy = "avatarFile")
     UserEntity user;
 
-    @OneToMany(mappedBy = "file", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<FileOperationEntity> fileOperations;
+    @OneToOne(mappedBy = "file", cascade = CascadeType.ALL, orphanRemoval = true)
+    FileOperationEntity fileOperation;
 }

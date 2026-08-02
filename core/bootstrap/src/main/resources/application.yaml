@@ -71,6 +71,7 @@ mybatis:
 
 app:
   frontend-url: ${FRONTEND_URL}
+  nextjs-server-files-api: ${NEXTJS_SERVER_FILES_API}
   jwt:
     secret: ${JWT_SECRET}
     access-token-expiration: 5m
@@ -88,8 +89,10 @@ app:
     region: japaneast
     language: ja-JP
   s3:
-    bucket-name: naho-bucket
+    public-bucket-name: naho-public-bucket
+    private-bucket-name: naho-private-bucket
     region: ap-southeast-1
+    signatureDuration: 5m
 
   vnpay:
     tmn-code: AS09APAU

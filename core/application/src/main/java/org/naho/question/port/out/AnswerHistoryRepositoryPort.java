@@ -1,4 +1,4 @@
-package org.naho.speech.llm.port.out;
+package org.naho.question.port.out;
 
 import org.naho.pagination.PageData;
 import org.naho.speech.llm.command.SpeakingHistoryFilterCommand;
@@ -20,7 +20,7 @@ public interface AnswerHistoryRepositoryPort {
 
     List<WordAssessment> saveAllWordAssessment(List<WordAssessment> wordAssessmentList);
 
-    Optional<AnswerHistory> findAnswerHistoryById(Long id);
+    Optional<AnswerHistory> findById(Long id);
 
     Optional<SpeechAssessment> findSpeechAssessmentByAnswerHistoryId(Long answerHistoryId);
 

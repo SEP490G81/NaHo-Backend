@@ -1,6 +1,7 @@
 package org.naho.speech.llm.dto.mapper;
 
 import org.mapstruct.Mapper;
+import org.naho.file.dto.mapper.FileResponseMapper;
 import org.naho.shared.constant.SortDirection;
 import org.naho.speech.llm.command.SpeakingHistoryFilterCommand;
 import org.naho.speech.llm.constant.SpeakingHistorySortColumn;
@@ -15,11 +16,13 @@ import org.naho.speech.llm.result.SpeakingHistoryListItemResult;
 
 import java.time.format.DateTimeFormatter;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses =
+        {FileResponseMapper.class}
+)
 public abstract class SpeakingAnalysisResponseMapper {
 
     private static final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ISO_INSTANT;
-    
+
     public abstract SpeakingAnalysisResponse resultToResponse(SpeakingAnalysisResult result);
 
     public SpeakingHistoryFilterCommand requestToCommand(SpeakingHistoryQueryRequest request, Long userId) {

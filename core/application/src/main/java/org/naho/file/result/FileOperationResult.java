@@ -4,11 +4,8 @@ import org.naho.file.type.OperationStatus;
 import org.naho.file.type.OperationType;
 
 public record FileOperationResult(
-        Long id,
-        Long fileId,
         OperationType operationType,
-        OperationStatus operationStatus,
-        Integer retryCount
+        OperationStatus operationStatus
 ) {
 
     public static Builder builder() {
@@ -16,21 +13,8 @@ public record FileOperationResult(
     }
 
     public static final class Builder {
-        private Long id;
-        private Long fileId;
         private OperationType operationType;
         private OperationStatus operationStatus;
-        private Integer retryCount;
-
-        public Builder id(Long id) {
-            this.id = id;
-            return this;
-        }
-
-        public Builder fileId(Long fileId) {
-            this.fileId = fileId;
-            return this;
-        }
 
         public Builder operationType(OperationType operationType) {
             this.operationType = operationType;
@@ -42,18 +26,10 @@ public record FileOperationResult(
             return this;
         }
 
-        public Builder retryCount(Integer retryCount) {
-            this.retryCount = retryCount;
-            return this;
-        }
-
         public FileOperationResult build() {
             return new FileOperationResult(
-                    id,
-                    fileId,
                     operationType,
-                    operationStatus,
-                    retryCount
+                    operationStatus
             );
         }
     }

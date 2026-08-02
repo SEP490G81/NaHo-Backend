@@ -17,8 +17,8 @@ import org.naho.shared.persistence.BaseEntity;
 @Table(name = "file_operations")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FileOperationEntity extends BaseEntity {
-    @ManyToOne
-    @JoinColumn(name = "file_id", nullable = false)
+    @OneToOne
+    @JoinColumn(name = "file_id", nullable = false, unique = true)
     FileEntity file;
 
     @Enumerated(EnumType.STRING)
