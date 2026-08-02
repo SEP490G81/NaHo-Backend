@@ -1,5 +1,6 @@
 package org.naho.file.usecase;
 
+import org.naho.file.command.UpdateOperationStatusCommand;
 import org.naho.file.exception.FileErrorCode;
 import org.naho.file.model.File;
 import org.naho.file.model.FileOperation;
@@ -74,11 +75,40 @@ public class CrudFileUseCase implements CrudFileInputPort {
     }
 
     @Override
-    public FileResult uploadFileToCloud(StoredFile storedFile) {
-        return transactionPort.execute(() -> doUploadFileToCloud(storedFile));
+    public void uploadFileToCloud(StoredFile storedFile) {
+        if (storedFile == null) {
+            throw new ApplicationException(
+                    FileErrorCode.FILE_NOT_VALID,
+                    FileDetailMessageKey.FILE_NOT_VALID
+            );
+        }
+
+        // Step 4: Thử upload file lên S3
+        try {
+            fileStorageServicePort.uploadFileToCloud(storedFile);
+
+            // nếu thành công => xóa file đang lưu trong local storage
+            fileStorageServicePort.deleteFileInLocal(storedFile.absoluteLocalStoragePath());
+
+            // nếu thành công => cập nhật trạng thái của file operation thành completed
+            fileOperationRepositoryPort.updateOperationStatusByObjectKeyAndOperationType(
+                    UpdateOperationStatusCommand.builder()
+                            .objectKey(storedFile.objectKey())
+                            .operationType(OperationType.UPLOAD)
+                            .toOperationStatus(OperationStatus.COMPLETED)
+                            .build()
+            );
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
-    private FileResult doUploadFileToCloud(StoredFile storedFile) {
+    @Override
+    public FileResult saveFileToDbForUpload(StoredFile storedFile) {
+        return transactionPort.execute(() -> doSaveFileToDbForUpload(storedFile));
+    }
+
+    private FileResult doSaveFileToDbForUpload(StoredFile storedFile) {
         if (storedFile == null) {
             throw new ApplicationException(
                     FileErrorCode.FILE_NOT_VALID,
@@ -88,7 +118,6 @@ public class CrudFileUseCase implements CrudFileInputPort {
 
         // Step 2: Lưu file vào db (FileEntity)
         File domain = File.builder()
-                .localStoragePath(storedFile.relativeLocalStoragePath())
                 .objectKey(storedFile.objectKey())
                 .originalFileName(storedFile.originalFileName())
                 .contentType(storedFile.contentType())
@@ -105,29 +134,7 @@ public class CrudFileUseCase implements CrudFileInputPort {
                 .retryCount(0)
                 .build();
 
-        FileOperation savedFileOperation = fileOperationRepositoryPort.save(fileOperation);
-
-        // Step 4: Thử upload file lên S3
-        try {
-            fileStorageServicePort.uploadFileToCloud(storedFile);
-
-            // nếu thành công => xóa file đang lưu trong local storage
-            fileStorageServicePort.deleteFileInLocal(storedFile.absoluteLocalStoragePath());
-
-            // nếu thành công => cập nhật trạng thái của file operation thành completed
-            fileOperationRepositoryPort.updateOperationStatus(
-                    savedFileOperation,
-                    OperationStatus.COMPLETED
-            );
-        } catch (Exception e) {
-            // xử lí khi upload s3 bị lỗi
-            System.out.println(e.getMessage());
-//            throw new ApplicationException(
-//                    FileErrorCode.FILE_UPLOAD_FAILED,
-//                    FileDetailMessageKey.FILE_UPLOAD_FAILED
-//            );
-        }
-
+        fileOperationRepositoryPort.save(fileOperation);
         return fileResultMapperPort.domainToResult(savedFile);
     }
 }

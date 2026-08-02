@@ -9,10 +9,15 @@ import org.naho.file.model.FileOperation;
 import org.naho.file.port.out.FileOperationRepositoryPort;
 import org.naho.file.repository.FileOperationJpaRepository;
 import org.naho.file.type.OperationStatus;
+import org.naho.file.type.OperationType;
 import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.i18n.message.file.FileOperationDetailMessageKey;
 import org.naho.shared.exception.InfrastructureException;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -107,5 +112,19 @@ public class FileOperationRepositoryAdapter implements FileOperationRepositoryPo
 
         FileOperationEntity savedEntity = fileOperationJpaRepository.save(entity);
         return fileOperationEntityMapper.entityToDomain(savedEntity);
+    }
+
+    @Override
+    public Set<FileOperation> findAllByFileId(Long fileId) {
+        return fileOperationJpaRepository.findAllByFile_Id(fileId)
+                .stream().map(fileOperationEntityMapper::entityToDomain)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Optional<FileOperation> findByFileIdAndOperationType(Long fileId, OperationType operationType) {
+        return fileOperationJpaRepository
+                .findByFile_IdAndOperationType(fileId, operationType)
+                .map(fileOperationEntityMapper::entityToDomain);
     }
 }

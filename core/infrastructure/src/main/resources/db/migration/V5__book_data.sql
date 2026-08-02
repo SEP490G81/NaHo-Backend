@@ -2,16 +2,15 @@
 INSERT INTO files (id,
                    created_time,
                    object_key,
-                   local_storage_path,
                    original_name,
                    content_type,
                    size)
-VALUES (11, NOW(), 'books/A1.jpeg', 'books/A1.jpeg', 'A1.jpeg', 'image/jpeg', 197300),
-       (12, NOW(), 'books/A2.jpeg', 'books/A2.jpeg', 'A2.jpeg', 'image/jpeg', 252500),
-       (13, NOW(), 'books/A2-2.jpeg', 'books/A2-2.jpeg', 'A2-2.jpeg', 'image/jpeg', 214700),
-       (14, NOW(), 'books/A2B1.jpeg', 'books/A2B1.jpeg', 'A2B1.jpeg', 'image/jpeg', 238200),
-       (15, NOW(), 'books/B1.jpeg', 'books/B1.jpeg', 'B1.jpeg', 'image/jpeg', 128800),
-       (16, NOW(), 'books/B1-2.jpeg', 'books/B1-2.jpeg', 'B1-2.jpeg', 'image/jpeg', 128200);
+VALUES (11, NOW(), 'books/A1.jpeg', 'A1.jpeg', 'image/jpeg', 197300),
+       (12, NOW(), 'books/A2.jpeg', 'A2.jpeg', 'image/jpeg', 252500),
+       (13, NOW(), 'books/A2-2.jpeg', 'A2-2.jpeg', 'image/jpeg', 214700),
+       (14, NOW(), 'books/A2B1.jpeg', 'A2B1.jpeg', 'image/jpeg', 238200),
+       (15, NOW(), 'books/B1.jpeg', 'B1.jpeg', 'image/jpeg', 128800),
+       (16, NOW(), 'books/B1-2.jpeg', 'B1-2.jpeg', 'image/jpeg', 128200);
 
 -- Book data
 INSERT INTO books (id,

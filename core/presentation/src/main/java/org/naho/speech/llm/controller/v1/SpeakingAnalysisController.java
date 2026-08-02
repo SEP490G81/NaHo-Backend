@@ -65,11 +65,14 @@ public class SpeakingAnalysisController {
 
             // nếu đang dùng gói FREE thì không lưu file
             if (!subscriptionPlan.code().equals(PlanCode.FREE)) {
+                // validate xem có phải file .wav không?
+                // và validate xem thời lượng có hợp lệ không?
                 fileValidatorPort.validateWavFileAndDuration(
                         audioBytes,
                         subscriptionPlan.maxAnswerTimeSeconds()
                 );
 
+                // Step 1: Lưu file vào local
                 storedFile = fileStorageServicePort.saveFileToLocal(file);
             }
 

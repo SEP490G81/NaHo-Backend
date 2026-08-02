@@ -23,9 +23,6 @@ import java.util.List;
 @Table(name = "files")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FileEntity extends BaseEntity {
-    @Column(name = "local_storage_path", nullable = false, unique = true, length = 500)
-    String localStoragePath;
-
     @Column(name = "object_key", nullable = false, unique = true, length = 500)
     String objectKey;
 
@@ -59,5 +56,5 @@ public class FileEntity extends BaseEntity {
     UserEntity user;
 
     @OneToMany(mappedBy = "file", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<FileOperationEntity> fileStorageOperations;
+    List<FileOperationEntity> fileOperations;
 }

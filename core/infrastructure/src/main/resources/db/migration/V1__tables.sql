@@ -111,16 +111,15 @@ CREATE TABLE file_operations
 
 CREATE TABLE files
 (
-    id                 BIGINT AUTO_INCREMENT NOT NULL,
-    created_time       datetime(6)           NOT NULL,
-    modified_time      datetime(6)           NULL,
-    local_storage_path VARCHAR(500)          NOT NULL,
-    object_key         VARCHAR(500)          NOT NULL,
-    original_name      VARCHAR(255)          NOT NULL,
-    content_type       VARCHAR(100)          NOT NULL,
-    size               BIGINT                NOT NULL,
-    comment_id         BIGINT                NULL,
-    report_id          BIGINT                NULL,
+    id            BIGINT AUTO_INCREMENT NOT NULL,
+    created_time  datetime(6)           NOT NULL,
+    modified_time datetime(6)           NULL,
+    object_key    VARCHAR(500)          NOT NULL,
+    original_name VARCHAR(255)          NOT NULL,
+    content_type  VARCHAR(100)          NOT NULL,
+    size          BIGINT                NOT NULL,
+    comment_id    BIGINT                NULL,
+    report_id     BIGINT                NULL,
     CONSTRAINT pk_files PRIMARY KEY (id)
 );
 
@@ -664,9 +663,6 @@ ALTER TABLE books
 
 ALTER TABLE content_assessments
     ADD CONSTRAINT uc_content_assessments_answer_history UNIQUE (answer_history_id);
-
-ALTER TABLE files
-    ADD CONSTRAINT uc_files_local_storage_path UNIQUE (local_storage_path);
 
 ALTER TABLE files
     ADD CONSTRAINT uc_files_object_key UNIQUE (object_key);

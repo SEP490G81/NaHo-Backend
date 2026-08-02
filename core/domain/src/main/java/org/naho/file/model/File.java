@@ -10,7 +10,6 @@ public class File {
     private final Long commentId;
     private final Long reportId;
 
-    private final String localStoragePath;
     private final String objectKey;
     private final String originalFileName;
     private final String contentType;
@@ -20,7 +19,6 @@ public class File {
         this.id = builder.id;
         this.commentId = builder.commentId;
         this.reportId = builder.reportId;
-        this.localStoragePath = builder.localStoragePath;
         this.objectKey = builder.objectKey;
         this.originalFileName = builder.originalFileName;
         this.contentType = builder.contentType;
@@ -41,10 +39,6 @@ public class File {
 
     public Long getReportId() {
         return reportId;
-    }
-
-    public String getLocalStoragePath() {
-        return localStoragePath;
     }
 
     public String getObjectKey() {
@@ -68,7 +62,6 @@ public class File {
         private Long id;
         private Long commentId;
         private Long reportId;
-        private String localStoragePath;
         private String objectKey;
         private String originalFileName;
         private String contentType;
@@ -86,11 +79,6 @@ public class File {
 
         public Builder reportId(Long reportId) {
             this.reportId = reportId;
-            return this;
-        }
-
-        public Builder localStoragePath(String localStoragePath) {
-            this.localStoragePath = localStoragePath;
             return this;
         }
 

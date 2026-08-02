@@ -4,6 +4,7 @@ import org.naho.book.port.out.BookRepositoryPort;
 import org.naho.book.port.out.LessonRepositoryPort;
 import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.book.port.out.TopicRepositoryPort;
+import org.naho.file.port.in.AsyncUploadFileInputPort;
 import org.naho.file.port.in.CrudFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.furigana.port.out.FuriganaGenerationPort;
@@ -12,6 +13,7 @@ import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
 import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.naho.question.port.in.CompleteSpeakingQuestionInputPort;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
+import org.naho.shared.port.out.AfterCommitPort;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
 import org.naho.speech.azure.port.out.TextToSpeechServicePort;
@@ -26,7 +28,6 @@ import org.naho.speech.llm.usecase.EndSessionUseCase;
 import org.naho.speech.llm.usecase.SpeakingAnalysisUseCase;
 import org.naho.speech.llm.usecase.SpeakingSessionUseCase;
 import org.naho.speech.llm.usecase.SuggestedTopicsUseCase;
-import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -113,21 +114,22 @@ public class ChatConfig {
     public SpeakingAnalysisInputPort speakingAnalysisInputPort(
             UserRepositoryPort userRepositoryPort,
             SpeakingQuestionRepositoryPort questionRepositoryPort,
+            FileRepositoryPort fileRepositoryPort,
+            AnswerHistoryRepositoryPort answerHistoryRepositoryPort,
+            AzureSpeechServicePort azureSpeechServicePort,
             TopicRepositoryPort topicRepositoryPort,
             LessonRepositoryPort lessonRepositoryPort,
             ObjectiveRepositoryPort objectiveRepositoryPort,
             BookRepositoryPort bookRepositoryPort,
             LearningPathNodeRepositoryPort learningPathNodeRepositoryPort,
-            FileRepositoryPort fileRepositoryPort,
-            AnswerHistoryRepositoryPort answerHistoryRepositoryPort,
-            AzureSpeechServicePort azureSpeechServicePort,
             AiAnalysisPort aiAnalysisPort,
             FuriganaGenerationPort furiganaGenerationPort,
             TransactionPort transactionPort,
             CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort,
             UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
-            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort,
-            CrudFileInputPort crudFileInputPort
+            CrudFileInputPort crudFileInputPort,
+            AfterCommitPort afterCommitPort,
+            AsyncUploadFileInputPort asyncUploadFileInputPort
     ) {
         return new SpeakingAnalysisUseCase(
                 userRepositoryPort,
@@ -145,8 +147,9 @@ public class ChatConfig {
                 transactionPort,
                 completeSpeakingQuestionInputPort,
                 userLearningProgressRepositoryPort,
-                getActiveSubscriptionInputPort,
-                crudFileInputPort
+                crudFileInputPort,
+                afterCommitPort,
+                asyncUploadFileInputPort
         );
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class StaticResourceProperties {
     String localRoot;
     String localPath;
+    String backendFilesBaseUrl;
     String avatars;
     String books;
     String recordings;

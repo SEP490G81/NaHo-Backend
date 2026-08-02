@@ -12,5 +12,7 @@ public interface CrudFileInputPort {
 
     List<FileResult> findAllByBookIds(List<Long> ids);
 
-    FileResult uploadFileToCloud(StoredFile storedFile);
+    void uploadFileToCloud(StoredFile storedFile);
+
+    FileResult saveFileToDbForUpload(StoredFile storedFile);
 }

@@ -1,12 +1,14 @@
 package org.naho.file.result;
 
+import java.util.List;
+
 public record FileResult(
         Long id,
-        String localStoragePath,
-        String objectKey,
+        String accessUrl,
         String originalFileName,
         String contentType,
-        Long size
+        Long size,
+        List<FileOperationResult> fileOperations
 ) {
 
     public static Builder builder() {
@@ -15,11 +17,11 @@ public record FileResult(
 
     public static final class Builder {
         private Long id;
-        private String localStoragePath;
-        private String objectKey;
+        private String accessUrl;
         private String originalFileName;
         private String contentType;
         private Long size;
+        private List<FileOperationResult> fileOperations;
 
         private Builder() {
         }
@@ -29,13 +31,8 @@ public record FileResult(
             return this;
         }
 
-        public Builder localStoragePath(String localStoragePath) {
-            this.localStoragePath = localStoragePath;
-            return this;
-        }
-
-        public Builder objectKey(String objectKey) {
-            this.objectKey = objectKey;
+        public Builder accessUrl(String accessUrl) {
+            this.accessUrl = accessUrl;
             return this;
         }
 
@@ -54,14 +51,19 @@ public record FileResult(
             return this;
         }
 
+        public Builder fileOperations(List<FileOperationResult> fileOperations) {
+            this.fileOperations = fileOperations;
+            return this;
+        }
+
         public FileResult build() {
             return new FileResult(
                     id,
-                    localStoragePath,
-                    objectKey,
+                    accessUrl,
                     originalFileName,
                     contentType,
-                    size
+                    size,
+                    fileOperations
             );
         }
     }
