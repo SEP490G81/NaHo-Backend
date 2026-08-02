@@ -87,6 +87,11 @@ public final class UserDetailMessageKey {
     public static final String USER_PASSWORD_NOT_MATCH_DETAIL = "user.password.not.match.detail";
     public static final String USER_PASSWORD_SAME_AS_OLD_DETAIL = "user.password.same.as.old.detail";
 
+    public static final String USER_CHANGE_PASSWORD_SUCCESSFULLY = "user.change.password.successfully";
+    public static final String USER_OLD_PASSWORD_NOT_MATCH_DETAIL = "user.old.password.not.match.detail";
+    public static final String USER_INVALID_RESET_TOKEN_DETAIL = "user.invalid.reset.token.detail";
+    public static final String USER_OTP_VERIFIED_SUCCESSFULLY = "user.otp.verified.successfully";
+
     private UserDetailMessageKey() {
     }
 }

@@ -69,8 +69,27 @@ public class RedisPasswordResetOtpAdapter implements PasswordResetOtpPort {
         return val != null ? Integer.parseInt(val) : 0;
     }
 
-    @Override
     public void clearFailedAttempts(String email) {
         stringRedisTemplate.delete(ATTEMPTS_PREFIX + email);
+    }
+
+    @Override
+    public void saveResetToken(String email, String token) {
+        stringRedisTemplate.opsForValue().set(
+                "forgot_password_token:" + email,
+                token,
+                Duration.ofMinutes(15)
+        );
+    }
+
+    @Override
+    public boolean verifyResetToken(String email, String token) {
+        String savedToken = stringRedisTemplate.opsForValue().get("forgot_password_token:" + email);
+        return savedToken != null && savedToken.equals(token);
+    }
+
+    @Override
+    public void removeResetToken(String email) {
+        stringRedisTemplate.delete("forgot_password_token:" + email);
     }
 }

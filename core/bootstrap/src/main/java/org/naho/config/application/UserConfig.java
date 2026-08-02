@@ -189,4 +189,22 @@ public class UserConfig {
                 passwordResetOtpPort,
                 encoderPort);
     }
+
+    @Bean
+    public VerifyForgotPasswordOtpInputPort verifyForgotPasswordOtpInputPort(
+            UserRepositoryPort userRepositoryPort,
+            PasswordResetOtpPort passwordResetOtpPort) {
+        return new VerifyForgotPasswordOtpUseCase(
+                userRepositoryPort,
+                passwordResetOtpPort);
+    }
+
+    @Bean
+    public ChangePasswordInputPort changePasswordInputPort(
+            UserRepositoryPort userRepositoryPort,
+            EncoderPort encoderPort) {
+        return new ChangePasswordUseCase(
+                userRepositoryPort,
+                encoderPort);
+    }
 }

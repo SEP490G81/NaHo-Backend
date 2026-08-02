@@ -37,6 +37,9 @@ public final class UserTitleMessageKey {
     public static final String USER_PASSWORD_SAME_AS_OLD_TITLE = "user.password.same.as.old.title";
     public static final String USER_SOCIAL_LOGIN_CANNOT_RESET_PASSWORD_TITLE = "user.social.login.cannot.reset.password.title";
 
+    public static final String USER_OLD_PASSWORD_NOT_MATCH_TITLE = "user.old.password.not.match.title";
+    public static final String USER_INVALID_RESET_TOKEN_TITLE = "user.invalid.reset.token.title";
+
     private UserTitleMessageKey() {
     }
 }

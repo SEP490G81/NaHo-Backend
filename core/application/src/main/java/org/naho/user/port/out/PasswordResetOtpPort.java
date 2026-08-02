@@ -18,4 +18,10 @@ public interface PasswordResetOtpPort {
     int getFailedAttempts(String email);
 
     void clearFailedAttempts(String email);
+
+    void saveResetToken(String email, String token);
+
+    boolean verifyResetToken(String email, String token);
+
+    void removeResetToken(String email);
 }
