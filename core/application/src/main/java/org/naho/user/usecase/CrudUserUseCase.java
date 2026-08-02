@@ -1,7 +1,6 @@
 package org.naho.user.usecase;
 
 import org.naho.file.port.in.CrudFileInputPort;
-import org.naho.file.port.in.FileStorageInputPort;
 import org.naho.file.port.out.FileValidatorPort;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
@@ -23,7 +22,6 @@ public class CrudUserUseCase implements CrudUserInputPort {
     private final UserRepositoryPort userRepositoryPort;
     private final FileValidatorPort fileValidatorPort;
     private final CrudFileInputPort crudFileInputPort;
-    private final FileStorageInputPort fileStorageInputPort;
     private final UserResultMapper userResultMapper;
     private final RoleRepositoryPort roleRepositoryPort;
 
@@ -31,14 +29,12 @@ public class CrudUserUseCase implements CrudUserInputPort {
             UserRepositoryPort userRepositoryPort,
             FileValidatorPort fileValidatorPort,
             CrudFileInputPort crudFileInputPort,
-            FileStorageInputPort fileStorageInputPort,
             UserResultMapper userResultMapper,
             RoleRepositoryPort roleRepositoryPort
     ) {
         this.userRepositoryPort = userRepositoryPort;
         this.fileValidatorPort = fileValidatorPort;
         this.crudFileInputPort = crudFileInputPort;
-        this.fileStorageInputPort = fileStorageInputPort;
         this.userResultMapper = userResultMapper;
         this.roleRepositoryPort = roleRepositoryPort;
     }

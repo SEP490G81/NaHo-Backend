@@ -2,7 +2,8 @@ package org.naho.file.model;
 
 public record StoredFile(
         String objectKey,
-        String localStoragePath,
+        String relativeLocalStoragePath,
+        String absoluteLocalStoragePath,
         String originalFileName,
         String contentType,
         Long size,
@@ -15,7 +16,8 @@ public record StoredFile(
 
     public static class Builder {
         private String objectKey;
-        private String localStoragePath;
+        private String relativeLocalStoragePath;
+        private String absoluteLocalStoragePath;
         private String originalFileName;
         private String contentType;
         private Long size;
@@ -26,8 +28,13 @@ public record StoredFile(
             return this;
         }
 
-        public Builder localStoragePath(String localStoragePath) {
-            this.localStoragePath = localStoragePath;
+        public Builder relativeLocalStoragePath(String relativeLocalStoragePath) {
+            this.relativeLocalStoragePath = relativeLocalStoragePath;
+            return this;
+        }
+
+        public Builder absoluteLocalStoragePath(String absoluteLocalStoragePath) {
+            this.absoluteLocalStoragePath = absoluteLocalStoragePath;
             return this;
         }
 
@@ -54,7 +61,8 @@ public record StoredFile(
         public StoredFile build() {
             return new StoredFile(
                     objectKey,
-                    localStoragePath,
+                    relativeLocalStoragePath,
+                    absoluteLocalStoragePath,
                     originalFileName,
                     contentType,
                     size,

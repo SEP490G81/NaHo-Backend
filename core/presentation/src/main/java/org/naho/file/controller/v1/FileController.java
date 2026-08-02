@@ -5,7 +5,6 @@ import org.naho.file.command.UploadFileCommand;
 import org.naho.file.dto.mapper.FileRequestMapper;
 import org.naho.file.dto.mapper.FileResponseMapper;
 import org.naho.file.dto.response.FileResponse;
-import org.naho.file.port.in.FileStorageInputPort;
 import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/v1/files")
 @RequiredArgsConstructor
 public class FileController {
-    private final FileStorageInputPort fileStorageInputPort;
     private final FileRequestMapper fileRequestMapper;
     private final FileResponseMapper fileResponseMapper;
 
@@ -38,7 +36,6 @@ public class FileController {
     @ApiResponseMessage(message = FileDetailMessageKey.FILE_DELETE_SUCCESSFULLY)
     @DeleteMapping
     public ResponseEntity<Void> deleteFileInCloud(@RequestParam("objectKey") String objectKey) {
-        fileStorageInputPort.deleteFileInCloud(objectKey);
         return ResponseEntity.ok().build();
     }
 }

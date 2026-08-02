@@ -41,6 +41,10 @@ public class AnswerHistory {
         return createdTime;
     }
 
+    public void setAudioFileId(Long audioFileId) {
+        this.audioFileId = audioFileId;
+    }
+
     public static class Builder {
         private Long id;
         private Long userId;

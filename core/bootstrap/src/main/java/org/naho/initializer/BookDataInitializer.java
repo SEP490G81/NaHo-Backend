@@ -33,7 +33,7 @@ public class BookDataInitializer implements ApplicationRunner {
             log.info("Book Data existed!");
         } else {
             try (InputStream inputStream = resourceLoader
-                    .getResource(staticResourceProperties.getBaseLocation() +
+                    .getResource(staticResourceProperties.getLocalRoot() +
                             staticResourceProperties.getBooks() +
                             "/book_data.xlsx")
                     .getInputStream()) {

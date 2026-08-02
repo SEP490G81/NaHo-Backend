@@ -75,6 +75,9 @@ dependencies {
     // Apache tika
     implementation("org.apache.tika:tika-core:3.3.1")
 
+    // FFmpeg
+    implementation("net.bramp.ffmpeg:ffmpeg:0.9.2")
+
     // other
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")

@@ -5,7 +5,7 @@ CREATE TABLE answer_histories
     modified_time        datetime(6)           NULL,
     user_id              BIGINT                NOT NULL,
     speaking_question_id BIGINT                NOT NULL,
-    audio_file_id        BIGINT                NOT NULL,
+    audio_file_id        BIGINT                NULL,
     CONSTRAINT pk_answer_histories PRIMARY KEY (id)
 );
 
@@ -97,17 +97,30 @@ CREATE TABLE daily_rewards
     CONSTRAINT pk_daily_rewards PRIMARY KEY (id)
 );
 
+CREATE TABLE file_operations
+(
+    id               BIGINT AUTO_INCREMENT NOT NULL,
+    created_time     datetime(6)           NOT NULL,
+    modified_time    datetime(6)           NULL,
+    file_id          BIGINT                NOT NULL,
+    operation_type   VARCHAR(255)          NOT NULL,
+    operation_status VARCHAR(255)          NOT NULL,
+    retry_count      INT                   NOT NULL,
+    CONSTRAINT pk_file_operations PRIMARY KEY (id)
+);
+
 CREATE TABLE files
 (
-    id            BIGINT AUTO_INCREMENT NOT NULL,
-    created_time  datetime(6)           NOT NULL,
-    modified_time datetime(6)           NULL,
-    object_key    VARCHAR(2048)         NOT NULL,
-    original_name VARCHAR(255)          NOT NULL,
-    content_type  VARCHAR(100)          NOT NULL,
-    size          BIGINT                NOT NULL,
-    comment_id    BIGINT                NULL,
-    report_id     BIGINT                NULL,
+    id                 BIGINT AUTO_INCREMENT NOT NULL,
+    created_time       datetime(6)           NOT NULL,
+    modified_time      datetime(6)           NULL,
+    local_storage_path VARCHAR(500)          NOT NULL,
+    object_key         VARCHAR(500)          NOT NULL,
+    original_name      VARCHAR(255)          NOT NULL,
+    content_type       VARCHAR(100)          NOT NULL,
+    size               BIGINT                NOT NULL,
+    comment_id         BIGINT                NULL,
+    report_id          BIGINT                NULL,
     CONSTRAINT pk_files PRIMARY KEY (id)
 );
 
@@ -652,6 +665,12 @@ ALTER TABLE books
 ALTER TABLE content_assessments
     ADD CONSTRAINT uc_content_assessments_answer_history UNIQUE (answer_history_id);
 
+ALTER TABLE files
+    ADD CONSTRAINT uc_files_local_storage_path UNIQUE (local_storage_path);
+
+ALTER TABLE files
+    ADD CONSTRAINT uc_files_object_key UNIQUE (object_key);
+
 ALTER TABLE leagues
     ADD CONSTRAINT uc_leagues_icon_file UNIQUE (icon_file_id);
 
@@ -744,6 +763,9 @@ ALTER TABLE files
 
 ALTER TABLE files
     ADD CONSTRAINT FK_FILES_ON_REPORT FOREIGN KEY (report_id) REFERENCES reports (id);
+
+ALTER TABLE file_operations
+    ADD CONSTRAINT FK_FILE_OPERATIONS_ON_FILE FOREIGN KEY (file_id) REFERENCES files (id);
 
 ALTER TABLE leagues
     ADD CONSTRAINT FK_LEAGUES_ON_ICON_FILE FOREIGN KEY (icon_file_id) REFERENCES files (id);

@@ -61,6 +61,10 @@ public class SpeechAssessment {
         return words;
     }
 
+    public void setAnswerHistoryId(Long answerHistoryId) {
+        this.answerHistoryId = answerHistoryId;
+    }
+
     // Builder
     public static class Builder {
         private Long id;

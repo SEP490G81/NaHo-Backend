@@ -1,8 +1,10 @@
 package org.naho.speech.llm.dto.response;
 
+import org.naho.file.result.FileResult;
+
 public record SpeakingAnalysisResponse(
-        Long historyId,
-        Double score,
-        String audioUrl
+        Long answerHistoryId,
+        Double overallScore,
+        FileResult audioFile
 ) {
 }

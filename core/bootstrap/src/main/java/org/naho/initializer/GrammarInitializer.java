@@ -33,7 +33,7 @@ public class GrammarInitializer implements ApplicationRunner {
             log.info("Grammar Data existed!");
         } else {
             try (InputStream inputStream = resourceLoader
-                    .getResource(staticResourceProperties.getBaseLocation() +
+                    .getResource(staticResourceProperties.getLocalRoot() +
                             staticResourceProperties.getBooks() +
                             "/grammar_data.xlsx")
                     .getInputStream()) {

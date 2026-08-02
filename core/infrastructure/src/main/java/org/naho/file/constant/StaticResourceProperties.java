@@ -8,8 +8,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 @ConfigurationProperties(prefix = "app.static-resource")
 public class StaticResourceProperties {
-    String baseLocation;
+    String localRoot;
+    String localPath;
     String avatars;
     String books;
     String recordings;
+    String temp;
 }

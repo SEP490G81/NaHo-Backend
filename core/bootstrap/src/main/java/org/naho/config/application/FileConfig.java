@@ -1,42 +1,31 @@
 package org.naho.config.application;
 
-import org.naho.file.mapper.FileResultMapper;
 import org.naho.file.port.in.CrudFileInputPort;
+import org.naho.file.port.out.FileOperationRepositoryPort;
 import org.naho.file.port.out.FileRepositoryPort;
+import org.naho.file.port.out.FileResultMapperPort;
 import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.file.usecase.CrudFileUseCase;
-import org.naho.file.usecase.FileStorageUseCase;
+import org.naho.shared.port.out.TransactionPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class FileConfig {
     @Bean
-    public FileResultMapper fileResultMapper() {
-        return new FileResultMapper();
-    }
-
-    @Bean
-    public FileStorageUseCase fileStorageUseCase(
-            FileStorageServicePort fileStorageServicePort,
-            FileRepositoryPort fileRepositoryPort,
-            FileResultMapper fileResultMapper
-    ) {
-        return new FileStorageUseCase(
-                fileStorageServicePort,
-                fileRepositoryPort,
-                fileResultMapper
-        );
-    }
-
-    @Bean
     public CrudFileInputPort crudFileInputPort(
             FileRepositoryPort fileRepositoryPort,
-            FileResultMapper fileResultMapper
+            FileOperationRepositoryPort fileOperationRepositoryPort,
+            FileStorageServicePort fileStorageServicePort,
+            FileResultMapperPort fileResultMapperPort,
+            TransactionPort transactionPort
     ) {
         return new CrudFileUseCase(
                 fileRepositoryPort,
-                fileResultMapper
+                fileOperationRepositoryPort,
+                fileStorageServicePort,
+                fileResultMapperPort,
+                transactionPort
         );
     }
 }

@@ -33,7 +33,7 @@ public class VocabularyInitializer implements ApplicationRunner {
             log.info("Vocabulary Data existed!");
         } else {
             try (InputStream inputStream = resourceLoader
-                    .getResource(staticResourceProperties.getBaseLocation() +
+                    .getResource(staticResourceProperties.getLocalRoot() +
                             staticResourceProperties.getBooks() +
                             "/vocabulary_data.xlsx")
                     .getInputStream()) {

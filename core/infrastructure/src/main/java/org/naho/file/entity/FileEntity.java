@@ -12,6 +12,8 @@ import org.naho.social.entity.CommentEntity;
 import org.naho.social.report.entity.ReportEntity;
 import org.naho.user.entity.UserEntity;
 
+import java.util.List;
+
 @SuperBuilder
 @Getter
 @Setter
@@ -21,10 +23,10 @@ import org.naho.user.entity.UserEntity;
 @Table(name = "files")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FileEntity extends BaseEntity {
-    @Column(name = "local_storage_path", length = 2048)
+    @Column(name = "local_storage_path", nullable = false, unique = true, length = 500)
     String localStoragePath;
 
-    @Column(name = "object_key", nullable = false, length = 2048)
+    @Column(name = "object_key", nullable = false, unique = true, length = 500)
     String objectKey;
 
     @Column(name = "original_name", nullable = false)
@@ -55,4 +57,7 @@ public class FileEntity extends BaseEntity {
 
     @OneToOne(mappedBy = "avatarFile")
     UserEntity user;
+
+    @OneToMany(mappedBy = "file", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<FileOperationEntity> fileStorageOperations;
 }

@@ -1,7 +1,6 @@
 package org.naho.config.application;
 
 import org.naho.file.port.in.CrudFileInputPort;
-import org.naho.file.port.in.FileStorageInputPort;
 import org.naho.file.port.out.FileValidatorPort;
 import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
 import org.naho.shared.port.out.EmailPort;
@@ -50,7 +49,6 @@ public class UserConfig {
             UserRepositoryPort userRepositoryPort,
             FileValidatorPort fileValidatorPort,
             CrudFileInputPort crudFileInputPort,
-            FileStorageInputPort fileStorageInputPort,
             UserResultMapper userResultMapper,
             RoleRepositoryPort roleRepositoryPort
     ) {
@@ -58,7 +56,6 @@ public class UserConfig {
                 userRepositoryPort,
                 fileValidatorPort,
                 crudFileInputPort,
-                fileStorageInputPort,
                 userResultMapper,
                 roleRepositoryPort
         );

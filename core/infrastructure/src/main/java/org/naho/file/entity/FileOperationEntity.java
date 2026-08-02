@@ -14,14 +14,12 @@ import org.naho.shared.persistence.BaseEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "file_storage_operations")
+@Table(name = "file_operations")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class FileStorageOperationEntity extends BaseEntity {
-    @Column(name = "object_key", length = 2048)
-    String objectKey;
-
-    @Column(name = "file_id")
-    Long fileId;
+public class FileOperationEntity extends BaseEntity {
+    @ManyToOne
+    @JoinColumn(name = "file_id", nullable = false)
+    FileEntity file;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "operation_type", nullable = false)

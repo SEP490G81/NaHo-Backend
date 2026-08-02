@@ -6,20 +6,18 @@ import org.naho.file.type.OperationType;
 import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.shared.exception.DomainException;
 
-public class FileStorageOperation {
+public class FileOperation {
 
     private final Long id;
     private final Long fileId;
-    private final String objectKey;
 
     private OperationType operationType;
     private OperationStatus operationStatus;
     private Integer retryCount;
 
-    private FileStorageOperation(Builder builder) {
+    private FileOperation(Builder builder) {
         this.id = builder.id;
         this.fileId = builder.fileId;
-        this.objectKey = builder.objectKey;
         this.operationType = builder.operationType;
         this.operationStatus = builder.operationStatus;
         this.retryCount = builder.retryCount;
@@ -33,7 +31,6 @@ public class FileStorageOperation {
 
         private Long id;
         private Long fileId;
-        private String objectKey;
         private OperationType operationType;
         private OperationStatus operationStatus;
         private Integer retryCount = 0;
@@ -48,11 +45,6 @@ public class FileStorageOperation {
 
         public Builder fileId(Long fileId) {
             this.fileId = fileId;
-            return this;
-        }
-
-        public Builder objectKey(String objectKey) {
-            this.objectKey = objectKey;
             return this;
         }
 
@@ -71,7 +63,7 @@ public class FileStorageOperation {
             return this;
         }
 
-        public FileStorageOperation build() {
+        public FileOperation build() {
             if (operationType == null) {
                 throw new DomainException(
                         FileDomainErrorCode.FILE_OPERATION_TYPE_EMPTY,
@@ -90,24 +82,15 @@ public class FileStorageOperation {
                         FileDetailMessageKey.FILE_RETRY_COUNT_EMPTY);
             }
 
-            if (operationType.equals(OperationType.UPLOAD) && fileId == null) {
+            if (fileId == null) {
                 throw new DomainException(
                         FileDomainErrorCode.FILE_ID_NULL,
                         FileDetailMessageKey.FILE_ID_NULL);
             }
 
-            if (operationType.equals(OperationType.DELETE) &&
-                    (objectKey == null || objectKey.isBlank())) {
-                throw new DomainException(
-                        FileDomainErrorCode.FILE_OBJECT_KEY_EMPTY,
-                        FileDetailMessageKey.FILE_OBJECT_KEY_EMPTY);
-            }
-
-            return new FileStorageOperation(this);
+            return new FileOperation(this);
         }
     }
-
-    // Getters...
 
     public Long getId() {
         return id;
@@ -115,10 +98,6 @@ public class FileStorageOperation {
 
     public Long getFileId() {
         return fileId;
-    }
-
-    public String getObjectKey() {
-        return objectKey;
     }
 
     public OperationType getOperationType() {
@@ -132,8 +111,6 @@ public class FileStorageOperation {
     public Integer getRetryCount() {
         return retryCount;
     }
-
-    // State update methods
 
     public void markCompleted() {
         this.operationStatus = OperationStatus.COMPLETED;

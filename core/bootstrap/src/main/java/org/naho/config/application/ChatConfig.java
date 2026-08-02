@@ -4,7 +4,7 @@ import org.naho.book.port.out.BookRepositoryPort;
 import org.naho.book.port.out.LessonRepositoryPort;
 import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.book.port.out.TopicRepositoryPort;
-import org.naho.file.port.in.FileStorageInputPort;
+import org.naho.file.port.in.CrudFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.furigana.port.out.FuriganaGenerationPort;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
@@ -118,7 +118,6 @@ public class ChatConfig {
             ObjectiveRepositoryPort objectiveRepositoryPort,
             BookRepositoryPort bookRepositoryPort,
             LearningPathNodeRepositoryPort learningPathNodeRepositoryPort,
-            FileStorageInputPort fileStorageInputPort,
             FileRepositoryPort fileRepositoryPort,
             AnswerHistoryRepositoryPort answerHistoryRepositoryPort,
             AzureSpeechServicePort azureSpeechServicePort,
@@ -127,12 +126,12 @@ public class ChatConfig {
             TransactionPort transactionPort,
             CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort,
             UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
-            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort
+            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort,
+            CrudFileInputPort crudFileInputPort
     ) {
         return new SpeakingAnalysisUseCase(
                 userRepositoryPort,
                 questionRepositoryPort,
-                fileStorageInputPort,
                 fileRepositoryPort,
                 answerHistoryRepositoryPort,
                 azureSpeechServicePort,
@@ -146,7 +145,8 @@ public class ChatConfig {
                 transactionPort,
                 completeSpeakingQuestionInputPort,
                 userLearningProgressRepositoryPort,
-                getActiveSubscriptionInputPort
+                getActiveSubscriptionInputPort,
+                crudFileInputPort
         );
     }
 }

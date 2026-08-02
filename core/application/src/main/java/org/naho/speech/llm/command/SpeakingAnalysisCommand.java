@@ -1,12 +1,59 @@
 package org.naho.speech.llm.command;
 
+import org.naho.file.model.StoredFile;
+
 public record SpeakingAnalysisCommand(
         Long userId,
         Long speakingQuestionId,
-        byte[] audioBytes,
-        String contentType,
-        String originalFilename,
-        Integer durationSec
+        Integer durationSec,
+        StoredFile storedFile,
+        byte[] audioBytes
 ) {
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static final class Builder {
+        private Long userId;
+        private Long speakingQuestionId;
+        private Integer durationSec;
+        private StoredFile storedFile;
+        private byte[] audioBytes;
+
+        public Builder userId(Long userId) {
+            this.userId = userId;
+            return this;
+        }
+
+        public Builder speakingQuestionId(Long speakingQuestionId) {
+            this.speakingQuestionId = speakingQuestionId;
+            return this;
+        }
+
+        public Builder durationSec(Integer durationSec) {
+            this.durationSec = durationSec;
+            return this;
+        }
+
+        public Builder storedFile(StoredFile storedFile) {
+            this.storedFile = storedFile;
+            return this;
+        }
+
+        public Builder audioBytes(byte[] audioBytes) {
+            this.audioBytes = audioBytes;
+            return this;
+        }
+
+        public SpeakingAnalysisCommand build() {
+            return new SpeakingAnalysisCommand(
+                    userId,
+                    speakingQuestionId,
+                    durationSec,
+                    storedFile,
+                    audioBytes
+            );
+        }
+    }
 }

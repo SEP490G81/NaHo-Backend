@@ -6,14 +6,14 @@ import lombok.RequiredArgsConstructor;
 import org.naho.book.entity.LessonEntity;
 import org.naho.book.entity.ObjectiveEntity;
 import org.naho.book.entity.TopicEntity;
-import org.naho.file.entity.FileEntity;
+import org.naho.file.constant.CloudFrontProperties;
 import org.naho.file.repository.FileJpaRepository;
 import org.naho.learning.entity.LearningPathNodeEntity;
 import org.naho.pagination.PageData;
 import org.naho.pagination.PageMeta;
-import org.naho.point.constant.CloudFrontProperties;
 import org.naho.question.entity.AnswerHistoryEntity;
 import org.naho.question.entity.SpeakingQuestionEntity;
+import org.naho.question.mapper.AnswerHistoryEntityMapper;
 import org.naho.question.repository.AnswerHistoryJpaRepository;
 import org.naho.question.repository.SpeakingQuestionJpaRepository;
 import org.naho.question.specification.AnswerHistorySpecification;
@@ -30,7 +30,6 @@ import org.naho.speech.model.AnswerHistory;
 import org.naho.speech.model.ContentAssessment;
 import org.naho.speech.model.SpeechAssessment;
 import org.naho.speech.model.WordAssessment;
-import org.naho.user.entity.UserEntity;
 import org.naho.user.repository.UserJpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -55,29 +54,14 @@ public class AnswerHistoryRepositoryAdapter implements AnswerHistoryRepositoryPo
     private final SpeakingQuestionJpaRepository questionJpaRepository;
     private final FileJpaRepository fileJpaRepository;
     private final CloudFrontProperties cloudFrontProperties;
+    private final AnswerHistoryEntityMapper answerHistoryEntityMapper;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public AnswerHistory saveAnswerHistory(AnswerHistory domain) {
-        UserEntity user = userJpaRepository.getReferenceById(domain.getUserId());
-        SpeakingQuestionEntity question = questionJpaRepository.getReferenceById(domain.getSpeakingQuestionId());
-        FileEntity file = fileJpaRepository.getReferenceById(domain.getAudioFileId());
-
-        AnswerHistoryEntity entity = AnswerHistoryEntity.builder()
-                .id(domain.getId())
-                .user(user)
-                .speakingQuestion(question)
-                .audioFile(file)
-                .build();
-
-        AnswerHistoryEntity saved = answerHistoryJpaRepository.save(entity);
-        return AnswerHistory.builder()
-                .id(saved.getId())
-                .userId(saved.getUser().getId())
-                .speakingQuestionId(saved.getSpeakingQuestion().getId())
-                .audioFileId(saved.getAudioFile().getId())
-                .createdTime(saved.getCreatedTime())
-                .build();
+        AnswerHistoryEntity entity = answerHistoryEntityMapper.domainToEntity(domain);
+        AnswerHistoryEntity savedEntity = answerHistoryJpaRepository.save(entity);
+        return answerHistoryEntityMapper.entityToDomain(savedEntity);
     }
 
     @Override
