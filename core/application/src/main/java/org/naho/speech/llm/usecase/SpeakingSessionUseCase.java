@@ -11,18 +11,13 @@ import org.naho.persona.type.FormalityLevel;
 import org.naho.persona.type.MarugotoLevel;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.speech.azure.port.out.TextToSpeechServicePort;
-import org.naho.speech.llm.command.SendAudioMessageCommand;
-import org.naho.speech.llm.command.SendMessageWithSessionCommand;
-import org.naho.speech.llm.command.SpeakingSessionFilterCommand;
-import org.naho.speech.llm.command.StartSpeakingConversationWithAICommand;
-import org.naho.speech.llm.command.StartSpeakingTopicCommand;
+import org.naho.speech.llm.command.*;
 import org.naho.speech.llm.port.in.SpeakingSessionInputPort;
 import org.naho.speech.llm.port.out.AiChatPort;
 import org.naho.speech.llm.port.out.SessionStorePort;
 import org.naho.speech.llm.port.out.SpeakingSessionRepositoryPort;
 import org.naho.speech.llm.port.out.SpeechToTextPort;
 import org.naho.speech.llm.result.*;
-
 
 import java.util.Base64;
 import java.util.List;
@@ -37,7 +32,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     private static final String SYSTEM_PROMPT_TEMPLATE = """
             You are a Japanese conversation partner on the NaHo language learning platform.
             %s
-
+            
             ## CONVERSATION BEHAVIOR RULES
             1. **Language**: The "reply" field MUST be in Japanese ONLY. No English or Vietnamese in "reply".
             2. **Length calibration**:
@@ -56,7 +51,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             5. **Topic steering**: Gently redirect off-topic responses. Stay on session topic.
             6. **If no grammar errors found**: correctionExplanation = "Câu của bạn đã rất tự nhiên và chính xác!"
             7. **Naturalness over perfection**: Prefer warm, natural Japanese over formal textbook phrases.
-
+            
             ## OUTPUT FORMAT (MANDATORY)
             Respond ONLY with a valid raw JSON object. No markdown, no code fences. All 6 fields required:
             {
@@ -97,16 +92,6 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         this.textToSpeechServicePort = textToSpeechServicePort;
         this.speakingSessionRepositoryPort = speakingSessionRepositoryPort;
     }
-
-
-    private record ParsedAiReply(
-            String reply,
-            String replyTranslation,
-            String grammarNote,
-            String correctedUserText,
-            String correctionExplanation,
-            String hintForLearner
-    ) {}
 
     private ParsedAiReply parseAiResponse(String rawResponse) {
         if (rawResponse == null || rawResponse.isBlank()) {
@@ -373,7 +358,6 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                 ));
     }
 
-
     private String toAudioBase64(String sessionId, String text) {
         try {
             String voiceName = sessionStorePort.getVoiceName(sessionId);
@@ -383,5 +367,15 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             System.out.println("[SpeakingSession] TTS failed for session " + sessionId + ": " + e.getMessage());
             return null;
         }
+    }
+
+    private record ParsedAiReply(
+            String reply,
+            String replyTranslation,
+            String grammarNote,
+            String correctedUserText,
+            String correctionExplanation,
+            String hintForLearner
+    ) {
     }
 }

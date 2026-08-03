@@ -27,6 +27,38 @@ public class FileOperation {
         return new Builder();
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public Long getFileId() {
+        return fileId;
+    }
+
+    public OperationType getOperationType() {
+        return operationType;
+    }
+
+    public OperationStatus getOperationStatus() {
+        return operationStatus;
+    }
+
+    public Integer getRetryCount() {
+        return retryCount;
+    }
+
+    public void markCompleted() {
+        this.operationStatus = OperationStatus.COMPLETED;
+    }
+
+    public void markFailed() {
+        this.operationStatus = OperationStatus.FAILED;
+    }
+
+    public void increaseRetryCount() {
+        this.retryCount++;
+    }
+
     public static final class Builder {
 
         private Long id;
@@ -90,37 +122,5 @@ public class FileOperation {
 
             return new FileOperation(this);
         }
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getFileId() {
-        return fileId;
-    }
-
-    public OperationType getOperationType() {
-        return operationType;
-    }
-
-    public OperationStatus getOperationStatus() {
-        return operationStatus;
-    }
-
-    public Integer getRetryCount() {
-        return retryCount;
-    }
-
-    public void markCompleted() {
-        this.operationStatus = OperationStatus.COMPLETED;
-    }
-
-    public void markFailed() {
-        this.operationStatus = OperationStatus.FAILED;
-    }
-
-    public void increaseRetryCount() {
-        this.retryCount++;
     }
 }

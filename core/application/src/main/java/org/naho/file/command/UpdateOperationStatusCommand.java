@@ -3,15 +3,80 @@ package org.naho.file.command;
 import org.naho.file.type.OperationStatus;
 import org.naho.file.type.OperationType;
 
-public record UpdateOperationStatusCommand(
-        Long fileOperationId,
-        String objectKey,
-        OperationType operationType,
-        OperationStatus toOperationStatus
-) {
+public class UpdateOperationStatusCommand {
+
+    private Long fileOperationId;
+    private String objectKey;
+    private OperationType operationType;
+    private OperationStatus toOperationStatus;
+
+    public UpdateOperationStatusCommand() {
+    }
+
+    public UpdateOperationStatusCommand(Long fileOperationId, String objectKey, OperationType operationType, OperationStatus toOperationStatus) {
+        this.fileOperationId = fileOperationId;
+        this.objectKey = objectKey;
+        this.operationType = operationType;
+        this.toOperationStatus = toOperationStatus;
+    }
+
+    private UpdateOperationStatusCommand(Builder builder) {
+        this.fileOperationId = builder.fileOperationId;
+        this.objectKey = builder.objectKey;
+        this.operationType = builder.operationType;
+        this.toOperationStatus = builder.toOperationStatus;
+    }
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public Long getFileOperationId() {
+        return fileOperationId;
+    }
+
+    public void setFileOperationId(Long fileOperationId) {
+        this.fileOperationId = fileOperationId;
+    }
+
+    public String getObjectKey() {
+        return objectKey;
+    }
+
+    public void setObjectKey(String objectKey) {
+        this.objectKey = objectKey;
+    }
+
+    public OperationType getOperationType() {
+        return operationType;
+    }
+
+    public void setOperationType(OperationType operationType) {
+        this.operationType = operationType;
+    }
+
+    public OperationStatus getToOperationStatus() {
+        return toOperationStatus;
+    }
+
+    public void setToOperationStatus(OperationStatus toOperationStatus) {
+        this.toOperationStatus = toOperationStatus;
+    }
+
+    public Long fileOperationId() {
+        return fileOperationId;
+    }
+
+    public String objectKey() {
+        return objectKey;
+    }
+
+    public OperationType operationType() {
+        return operationType;
+    }
+
+    public OperationStatus toOperationStatus() {
+        return toOperationStatus;
     }
 
     public static final class Builder {
@@ -44,12 +109,7 @@ public record UpdateOperationStatusCommand(
         }
 
         public UpdateOperationStatusCommand build() {
-            return new UpdateOperationStatusCommand(
-                    fileOperationId,
-                    objectKey,
-                    operationType,
-                    toOperationStatus
-            );
+            return new UpdateOperationStatusCommand(this);
         }
     }
 }

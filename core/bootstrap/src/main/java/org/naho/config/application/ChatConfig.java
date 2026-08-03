@@ -4,7 +4,7 @@ import org.naho.book.port.out.BookRepositoryPort;
 import org.naho.book.port.out.LessonRepositoryPort;
 import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.book.port.out.TopicRepositoryPort;
-import org.naho.file.port.in.AsyncUploadFileInputPort;
+import org.naho.file.port.in.CrudFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileResultMapperPort;
 import org.naho.furigana.port.out.FuriganaGenerationPort;
@@ -14,7 +14,6 @@ import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.naho.question.port.in.CompleteSpeakingQuestionInputPort;
 import org.naho.question.port.out.AnswerHistoryRepositoryPort;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
-import org.naho.shared.port.out.AfterCommitPort;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
 import org.naho.speech.azure.port.out.TextToSpeechServicePort;
@@ -129,8 +128,7 @@ public class ChatConfig {
             CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort,
             UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
             FileResultMapperPort fileResultMapperPort,
-            AfterCommitPort afterCommitPort,
-            AsyncUploadFileInputPort asyncUploadFileInputPort
+            CrudFileInputPort crudFileInputPort
     ) {
         return new SpeakingAnalysisUseCase(
                 userRepositoryPort,
@@ -149,8 +147,7 @@ public class ChatConfig {
                 completeSpeakingQuestionInputPort,
                 userLearningProgressRepositoryPort,
                 fileResultMapperPort,
-                afterCommitPort,
-                asyncUploadFileInputPort
+                crudFileInputPort
         );
     }
 }

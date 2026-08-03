@@ -95,7 +95,7 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
                 s3Properties.getPrivateBucketName();
 
         entity.setBucketName(bucketName);
-        
+
         FileEntity savedEntity = fileJpaRepository.save(entity);
         return fileEntityMapper.entityToDomain(savedEntity);
     }

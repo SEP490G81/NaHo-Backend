@@ -2,13 +2,16 @@ package org.naho.file.usecase;
 
 import org.naho.file.command.UpdateOperationStatusCommand;
 import org.naho.file.exception.FileErrorCode;
+import org.naho.file.mapper.FileOperationResultMapper;
 import org.naho.file.model.File;
+import org.naho.file.model.FileOperation;
 import org.naho.file.model.StoredFile;
 import org.naho.file.port.in.CrudFileInputPort;
 import org.naho.file.port.out.FileOperationRepositoryPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileResultMapperPort;
 import org.naho.file.port.out.FileStorageServicePort;
+import org.naho.file.result.FileOperationResult;
 import org.naho.file.result.FileResult;
 import org.naho.file.type.OperationStatus;
 import org.naho.file.type.OperationType;
@@ -24,6 +27,7 @@ public class CrudFileUseCase implements CrudFileInputPort {
     private final FileOperationRepositoryPort fileOperationRepositoryPort;
     private final FileStorageServicePort fileStorageServicePort;
     private final FileResultMapperPort fileResultMapperPort;
+    private final FileOperationResultMapper fileOperationResultMapper;
     private final TransactionPort transactionPort;
 
     public CrudFileUseCase(
@@ -31,12 +35,14 @@ public class CrudFileUseCase implements CrudFileInputPort {
             FileOperationRepositoryPort fileOperationRepositoryPort,
             FileStorageServicePort fileStorageServicePort,
             FileResultMapperPort fileResultMapperPort,
+            FileOperationResultMapper fileOperationResultMapper,
             TransactionPort transactionPort
     ) {
         this.fileRepositoryPort = fileRepositoryPort;
         this.fileOperationRepositoryPort = fileOperationRepositoryPort;
         this.fileStorageServicePort = fileStorageServicePort;
         this.fileResultMapperPort = fileResultMapperPort;
+        this.fileOperationResultMapper = fileOperationResultMapper;
         this.transactionPort = transactionPort;
     }
 
@@ -74,7 +80,7 @@ public class CrudFileUseCase implements CrudFileInputPort {
     }
 
     @Override
-    public void uploadFileToCloud(StoredFile storedFile, boolean isPublic) {
+    public FileOperationResult uploadFileToCloud(StoredFile storedFile, boolean isPublic) {
         if (storedFile == null) {
             throw new ApplicationException(
                     FileErrorCode.FILE_NOT_VALID,
@@ -82,6 +88,12 @@ public class CrudFileUseCase implements CrudFileInputPort {
             );
         }
 
+        UpdateOperationStatusCommand command = UpdateOperationStatusCommand.builder()
+                .objectKey(storedFile.objectKey())
+                .operationType(OperationType.UPLOAD)
+                .build();
+
+        FileOperation fileOperation;
         // Step 4: Thử upload file lên S3
         try {
             fileStorageServicePort.uploadFileToCloud(storedFile, isPublic);
@@ -90,21 +102,15 @@ public class CrudFileUseCase implements CrudFileInputPort {
             fileStorageServicePort.deleteFileInLocal(storedFile.absoluteLocalStoragePath());
 
             // nếu thành công => cập nhật trạng thái của file operation thành completed
-            fileOperationRepositoryPort.updateOperationStatusByObjectKeyAndOperationType(
-                    UpdateOperationStatusCommand.builder()
-                            .objectKey(storedFile.objectKey())
-                            .operationType(OperationType.UPLOAD)
-                            .toOperationStatus(OperationStatus.COMPLETED)
-                            .build()
-            );
+            command.setToOperationStatus(OperationStatus.COMPLETED);
+            fileOperation = fileOperationRepositoryPort
+                    .updateOperationStatusByObjectKeyAndOperationType(command);
         } catch (Exception e) {
-            fileOperationRepositoryPort.updateOperationStatusByObjectKeyAndOperationType(
-                    UpdateOperationStatusCommand.builder()
-                            .objectKey(storedFile.objectKey())
-                            .operationType(OperationType.UPLOAD)
-                            .toOperationStatus(OperationStatus.FAILED)
-                            .build()
-            );
+            // nếu thất bại => cập nhật trạng thái của file thành thất bại
+            command.setToOperationStatus(OperationStatus.FAILED);
+            fileOperation = fileOperationRepositoryPort
+                    .updateOperationStatusByObjectKeyAndOperationType(command);
         }
+        return fileOperationResultMapper.domainToResult(fileOperation);
     }
 }

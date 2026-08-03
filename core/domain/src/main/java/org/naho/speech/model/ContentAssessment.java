@@ -31,6 +31,10 @@ public class ContentAssessment {
         return answerHistoryId;
     }
 
+    public void setAnswerHistoryId(Long answerHistoryId) {
+        this.answerHistoryId = answerHistoryId;
+    }
+
     public Double getVocabularyScore() {
         return vocabularyScore;
     }
@@ -45,10 +49,6 @@ public class ContentAssessment {
 
     public String getTranslationText() {
         return translationText;
-    }
-
-    public void setAnswerHistoryId(Long answerHistoryId) {
-        this.answerHistoryId = answerHistoryId;
     }
 
     // Builder

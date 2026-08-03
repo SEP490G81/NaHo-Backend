@@ -13,9 +13,10 @@ import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.book.port.out.TopicRepositoryPort;
 import org.naho.file.model.File;
 import org.naho.file.model.StoredFile;
-import org.naho.file.port.in.AsyncUploadFileInputPort;
+import org.naho.file.port.in.CrudFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileResultMapperPort;
+import org.naho.file.result.FileOperationResult;
 import org.naho.furigana.port.out.FuriganaGenerationPort;
 import org.naho.i18n.message.learning.LearningPathNodeDetailMessageKey;
 import org.naho.i18n.message.learning.UserLearningProgressDetailMessageKey;
@@ -36,7 +37,6 @@ import org.naho.question.port.in.CompleteSpeakingQuestionInputPort;
 import org.naho.question.port.out.AnswerHistoryRepositoryPort;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.shared.exception.ApplicationException;
-import org.naho.shared.port.out.AfterCommitPort;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
@@ -80,8 +80,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     private final CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort;
     private final UserLearningProgressRepositoryPort userLearningProgressRepositoryPort;
     private final FileResultMapperPort fileResultMapperPort;
-    private final AfterCommitPort afterCommitPort;
-    private final AsyncUploadFileInputPort asyncUploadFileInputPort;
+    private final CrudFileInputPort crudFileInputPort;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public SpeakingAnalysisUseCase(
@@ -101,8 +100,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort,
             UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
             FileResultMapperPort fileResultMapperPort,
-            AfterCommitPort afterCommitPort,
-            AsyncUploadFileInputPort asyncUploadFileInputPort
+            CrudFileInputPort crudFileInputPort
     ) {
         this.userRepositoryPort = userRepositoryPort;
         this.speakingQuestionRepositoryPort = speakingQuestionRepositoryPort;
@@ -120,13 +118,20 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         this.completeSpeakingQuestionInputPort = completeSpeakingQuestionInputPort;
         this.userLearningProgressRepositoryPort = userLearningProgressRepositoryPort;
         this.fileResultMapperPort = fileResultMapperPort;
-        this.afterCommitPort = afterCommitPort;
-        this.asyncUploadFileInputPort = asyncUploadFileInputPort;
+        this.crudFileInputPort = crudFileInputPort;
     }
 
     @Override
     public SpeakingAnalysisResult analyzeSpeaking(SpeakingAnalysisCommand command) {
-        return transactionPort.execute(() -> doAnalyzeSpeaking(command));
+        SpeakingAnalysisResult result = transactionPort.execute(() -> doAnalyzeSpeaking(command));
+
+        StoredFile storedFile = command.storedFile();
+        if (storedFile != null) {
+            FileOperationResult fileOperation = crudFileInputPort.uploadFileToCloud(storedFile, false);
+            result.getAudioFile().setFileOperation(fileOperation);
+        }
+
+        return result;
     }
 
     private SpeakingAnalysisResult doAnalyzeSpeaking(SpeakingAnalysisCommand command) {
@@ -476,13 +481,6 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
 
         if (audioFile != null) {
             result.setAudioFile(fileResultMapperPort.domainToResult(audioFile));
-        }
-
-        if (storedFile != null) {
-            // khi nào commit thành công thì mới thực hiện việc upload lên cloud
-            afterCommitPort.execute(() -> asyncUploadFileInputPort.uploadFileToCloud(
-                    storedFile, false
-            ));
         }
 
         return result;

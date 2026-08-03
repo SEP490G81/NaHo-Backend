@@ -21,6 +21,7 @@ public class FileConfig {
             FileOperationRepositoryPort fileOperationRepositoryPort,
             FileStorageServicePort fileStorageServicePort,
             FileResultMapperPort fileResultMapperPort,
+            FileOperationResultMapper fileOperationResultMapper,
             TransactionPort transactionPort
     ) {
         return new CrudFileUseCase(
@@ -28,6 +29,7 @@ public class FileConfig {
                 fileOperationRepositoryPort,
                 fileStorageServicePort,
                 fileResultMapperPort,
+                fileOperationResultMapper,
                 transactionPort
         );
     }

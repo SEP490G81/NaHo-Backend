@@ -5,7 +5,6 @@ import org.naho.file.type.OperationType;
 import org.naho.shared.persistence.BaseJpaRepository;
 
 import java.util.Optional;
-import java.util.Set;
 
 public interface FileOperationJpaRepository extends BaseJpaRepository<FileOperationEntity> {
     Optional<FileOperationEntity> findByFile_ObjectKeyAndOperationType(String fileObjectKey, OperationType operationType);

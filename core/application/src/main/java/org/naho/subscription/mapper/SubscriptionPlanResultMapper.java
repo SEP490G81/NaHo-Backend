@@ -9,7 +9,7 @@ public class SubscriptionPlanResultMapper {
         if (plan == null) {
             return null;
         }
-        
+
         return new SubscriptionPlanResult(
                 plan.getId(),
                 plan.getCode(),

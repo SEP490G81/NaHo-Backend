@@ -1,11 +1,7 @@
 package org.naho.speech.llm.port.in;
 
 import org.naho.pagination.PageData;
-import org.naho.speech.llm.command.SendAudioMessageCommand;
-import org.naho.speech.llm.command.SendMessageWithSessionCommand;
-import org.naho.speech.llm.command.SpeakingSessionFilterCommand;
-import org.naho.speech.llm.command.StartSpeakingConversationWithAICommand;
-import org.naho.speech.llm.command.StartSpeakingTopicCommand;
+import org.naho.speech.llm.command.*;
 import org.naho.speech.llm.result.*;
 
 import java.util.function.Consumer;

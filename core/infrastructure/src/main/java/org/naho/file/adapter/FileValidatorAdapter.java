@@ -23,21 +23,19 @@ import java.util.Set;
 @Component
 @RequiredArgsConstructor
 public class FileValidatorAdapter implements FileValidatorPort {
-    private final Tika tika;
-    private final FFprobe ffprobe;
-    private final StaticResourceProperties staticResourceProperties;
-
     private static final Set<String> ALLOWED_IMAGE_MIME_TYPES = Set.of(
             FileContentType.IMAGE_PNG,
             FileContentType.IMAGE_JPEG,
             FileContentType.IMAGE_WEBP
     );
-
     private static final Set<String> ALLOWED_WAV_MIME_TYPES = Set.of(
             FileContentType.AUDIO_WAV,
             FileContentType.AUDIO_X_WAV,
             FileContentType.AUDIO_VND_WAVE
     );
+    private final Tika tika;
+    private final FFprobe ffprobe;
+    private final StaticResourceProperties staticResourceProperties;
 
     @Override
     public String validateImageFile(InputStream inputStream) {

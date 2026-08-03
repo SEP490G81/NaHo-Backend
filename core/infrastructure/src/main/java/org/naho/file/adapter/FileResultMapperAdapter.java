@@ -6,7 +6,6 @@ import org.naho.file.constant.S3Properties;
 import org.naho.file.model.File;
 import org.naho.file.port.in.CrudFileOperationInputPort;
 import org.naho.file.port.out.FileResultMapperPort;
-import org.naho.file.result.FileOperationResult;
 import org.naho.file.result.FileResult;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -27,9 +26,9 @@ public class FileResultMapperAdapter implements FileResultMapperPort {
         if (domain == null) {
             return null;
         }
-
-        FileOperationResult fileOperation =
-                crudFileOperationInputPort.findByFileId(domain.getId());
+//
+//        FileOperationResult fileOperation =
+//                crudFileOperationInputPort.findByFileId(domain.getId());
 
         String accessUrl;
         if (s3Properties.getPublicBucketName().equals(domain.getBucketName())) {
@@ -44,7 +43,7 @@ public class FileResultMapperAdapter implements FileResultMapperPort {
                 .originalFileName(domain.getOriginalFileName())
                 .contentType(domain.getContentType())
                 .size(domain.getSize())
-                .fileOperation(fileOperation)
+//                .fileOperation(fileOperation)
                 .build();
     }
 }

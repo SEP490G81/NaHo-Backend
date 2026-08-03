@@ -1,6 +1,7 @@
 package org.naho.file.port.in;
 
 import org.naho.file.model.StoredFile;
+import org.naho.file.result.FileOperationResult;
 import org.naho.file.result.FileResult;
 
 import java.util.List;
@@ -12,5 +13,5 @@ public interface CrudFileInputPort {
 
     List<FileResult> findAllByBookIds(List<Long> ids);
 
-    void uploadFileToCloud(StoredFile storedFile, boolean isPublic);
+    FileOperationResult uploadFileToCloud(StoredFile storedFile, boolean isPublic);
 }
