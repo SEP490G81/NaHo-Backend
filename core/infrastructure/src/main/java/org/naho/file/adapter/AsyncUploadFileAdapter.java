@@ -1,6 +1,7 @@
 package org.naho.file.adapter;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.file.command.UploadFileToCloudCommand;
 import org.naho.file.model.StoredFile;
 import org.naho.file.port.in.AsyncUploadFileInputPort;
 import org.naho.file.port.in.CrudFileInputPort;
@@ -15,6 +16,12 @@ public class AsyncUploadFileAdapter implements AsyncUploadFileInputPort {
     @Async("uploadFileToCloudExecutor")
     @Override
     public void uploadFileToCloud(StoredFile file, boolean isPublic) {
-        crudFileInputPort.uploadFileToCloud(file, isPublic);
+        crudFileInputPort.uploadFileToCloud(
+                UploadFileToCloudCommand.builder()
+                        .storedFile(file)
+                        .isPublic(isPublic)
+                        .isRetry(false)
+                        .build()
+        );
     }
 }

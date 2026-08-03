@@ -1,7 +1,9 @@
 package org.naho.file.port.out;
 
+import org.naho.file.command.UpdateOperationStatusCommand;
 import org.naho.file.model.File;
 import org.naho.file.model.StoredFile;
+import org.naho.file.type.OperationStatus;
 
 import java.util.List;
 
@@ -17,4 +19,8 @@ public interface FileRepositoryPort {
     File findByObjectKey(String objectKey);
 
     File saveFileToDbForUpload(StoredFile storedFile, boolean isPublic);
+
+    File updateOperationByObjectKeyAndOperationType(UpdateOperationStatusCommand command);
+
+    File updateOperationStatus(File file, OperationStatus operationStatus);
 }

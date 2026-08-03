@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.naho.file.constant.CloudFrontProperties;
 import org.naho.file.constant.S3Properties;
 import org.naho.file.model.File;
-import org.naho.file.port.in.CrudFileOperationInputPort;
 import org.naho.file.port.out.FileResultMapperPort;
 import org.naho.file.result.FileResult;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class FileResultMapperAdapter implements FileResultMapperPort {
 
-    private final CrudFileOperationInputPort crudFileOperationInputPort;
     private final CloudFrontProperties cloudFrontProperties;
     private final S3Properties s3Properties;
 
@@ -26,9 +24,6 @@ public class FileResultMapperAdapter implements FileResultMapperPort {
         if (domain == null) {
             return null;
         }
-//
-//        FileOperationResult fileOperation =
-//                crudFileOperationInputPort.findByFileId(domain.getId());
 
         String accessUrl;
         if (s3Properties.getPublicBucketName().equals(domain.getBucketName())) {
@@ -43,7 +38,10 @@ public class FileResultMapperAdapter implements FileResultMapperPort {
                 .originalFileName(domain.getOriginalFileName())
                 .contentType(domain.getContentType())
                 .size(domain.getSize())
-//                .fileOperation(fileOperation)
+                .checksum(domain.getChecksum())
+                .operationType(domain.getOperationType())
+                .operationStatus(domain.getOperationStatus())
+                .retryCount(domain.getRetryCount())
                 .build();
     }
 }

@@ -8,6 +8,7 @@ public final class FileDetailMessageKey {
             "file.upload.failed";
     public static final String FILE_UPLOAD_SUCCESSFULLY =
             "file.upload.successfully";
+    public static final String FILE_NOT_UPLOADED = "file.not.uploaded";
     public static final String FILE_EMPTY = "file.empty";
     public static final String FILE_FOLDER_NAME_EMPTY = "file.folder.name.empty";
     public static final String FILE_ORIGINAL_NAME_EMPTY = "file.original.name.empty";

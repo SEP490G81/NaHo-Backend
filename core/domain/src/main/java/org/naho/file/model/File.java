@@ -1,6 +1,8 @@
 package org.naho.file.model;
 
 import org.naho.file.exception.FileDomainErrorCode;
+import org.naho.file.type.OperationStatus;
+import org.naho.file.type.OperationType;
 import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.shared.exception.DomainException;
 
@@ -15,6 +17,11 @@ public class File {
     private final String originalFileName;
     private final String contentType;
     private final Long size;
+    private final String checksum;
+
+    private OperationType operationType;
+    private OperationStatus operationStatus;
+    private Integer retryCount;
 
     private File(Builder builder) {
         this.id = builder.id;
@@ -25,6 +32,10 @@ public class File {
         this.originalFileName = builder.originalFileName;
         this.contentType = builder.contentType;
         this.size = builder.size;
+        this.checksum = builder.checksum;
+        this.operationType = builder.operationType;
+        this.operationStatus = builder.operationStatus;
+        this.retryCount = builder.retryCount != null ? builder.retryCount : 0;
     }
 
     public static Builder builder() {
@@ -63,6 +74,41 @@ public class File {
         return size;
     }
 
+    public String getChecksum() {
+        return checksum;
+    }
+
+    public OperationType getOperationType() {
+        return operationType;
+    }
+
+    public OperationStatus getOperationStatus() {
+        return operationStatus;
+    }
+
+    public Integer getRetryCount() {
+        return retryCount;
+    }
+
+    public void markCompleted() {
+        this.operationStatus = OperationStatus.COMPLETED;
+    }
+
+    public void markFailed() {
+        this.operationStatus = OperationStatus.FAILED;
+    }
+
+    public void markBlocked() {
+        this.operationStatus = OperationStatus.BLOCKED;
+    }
+
+    public void incrementRetryCount() {
+        if (this.retryCount == null) {
+            this.retryCount = 0;
+        }
+        this.retryCount++;
+    }
+
     public static class Builder {
 
         private Long id;
@@ -73,6 +119,10 @@ public class File {
         private String originalFileName;
         private String contentType;
         private Long size;
+        private String checksum;
+        private OperationType operationType;
+        private OperationStatus operationStatus;
+        private Integer retryCount;
 
         public Builder id(Long id) {
             this.id = id;
@@ -111,6 +161,26 @@ public class File {
 
         public Builder size(Long size) {
             this.size = size;
+            return this;
+        }
+
+        public Builder checksum(String checksum) {
+            this.checksum = checksum;
+            return this;
+        }
+
+        public Builder operationType(OperationType operationType) {
+            this.operationType = operationType;
+            return this;
+        }
+
+        public Builder operationStatus(OperationStatus operationStatus) {
+            this.operationStatus = operationStatus;
+            return this;
+        }
+
+        public Builder retryCount(Integer retryCount) {
+            this.retryCount = retryCount;
             return this;
         }
 

@@ -8,9 +8,12 @@ import org.naho.file.exception.FileErrorCode;
 import org.naho.file.model.File;
 import org.naho.file.model.StoredFile;
 import org.naho.file.port.out.FileHelperPort;
-import org.naho.file.port.out.FileOperationRepositoryPort;
 import org.naho.file.port.out.FileRepositoryPort;
+import org.naho.file.port.out.FileResultMapperPort;
 import org.naho.file.port.out.FileStorageServicePort;
+import org.naho.file.repository.FileJpaRepository;
+import org.naho.file.result.FileResult;
+import org.naho.file.type.OperationStatus;
 import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.shared.exception.InfrastructureException;
 import org.springframework.stereotype.Service;
@@ -40,16 +43,22 @@ public class FileStorageServiceAdapter implements FileStorageServicePort {
     private final StaticResourceProperties staticResourceProperties;
     private final FileHelperPort fileHelperPort;
     private final FileRepositoryPort fileRepositoryPort;
-    private final FileOperationRepositoryPort fileOperationRepositoryPort;
+    private final FileResultMapperPort fileResultMapperPort;
+    private final FileJpaRepository fileJpaRepository;
 
     @Override
     public void uploadFileToCloud(StoredFile file, boolean isPublic) throws S3Exception {
-        Path path = Path.of(file.absoluteLocalStoragePath());
+        String absolutePath = staticResourceProperties.getLocalPath()
+                + staticResourceProperties.getRecordings() + "/"
+                + file.objectKey();
+
+        Path path = Path.of(absolutePath);
         if (!Files.exists(path)) {
             throw new InfrastructureException(
                     FileErrorCode.FILE_NOT_FOUND,
                     FileDetailMessageKey.FILE_NOT_FOUND,
-                    file.absoluteLocalStoragePath());
+                    absolutePath
+            );
         }
 
         String bucketName = isPublic ?
@@ -117,7 +126,6 @@ public class FileStorageServiceAdapter implements FileStorageServicePort {
 
             return StoredFile.builder()
                     .objectKey(objectKey)
-                    .absoluteLocalStoragePath(destination.toAbsolutePath().toString())
                     .originalFileName(originalFileName)
                     .contentType(multipartFile.getContentType())
                     .size(multipartFile.getSize())
@@ -133,14 +141,19 @@ public class FileStorageServiceAdapter implements FileStorageServicePort {
     }
 
     @Override
-    public void deleteFileInLocal(String localStoragePath) {
-        if (localStoragePath == null || localStoragePath.isEmpty()) {
+    public void deleteFileInLocal(String objectKey) {
+        if (objectKey == null || objectKey.isEmpty()) {
             throw new InfrastructureException(
                     FileErrorCode.FILE_NOT_VALID,
-                    FileDetailMessageKey.FILE_LOCAL_STORAGE_PATH_EMPTY);
+                    FileDetailMessageKey.FILE_LOCAL_STORAGE_PATH_EMPTY
+            );
         }
 
-        Path path = Path.of(localStoragePath);
+        String absolutePath = staticResourceProperties.getLocalPath()
+                + staticResourceProperties.getRecordings() + "/"
+                + objectKey;
+
+        Path path = Path.of(absolutePath);
         try {
             Files.deleteIfExists(path);
         } catch (IOException e) {
@@ -170,5 +183,27 @@ public class FileStorageServiceAdapter implements FileStorageServicePort {
                     e.getMessage()
             );
         }
+    }
+
+    @Override
+    public FileResult retryUploadFileToCloud(Long id, boolean isPublic) {
+        File file = fileRepositoryPort.findById(id);
+
+        StoredFile storedFile = StoredFile.builder()
+                .objectKey(file.getObjectKey())
+                .originalFileName(file.getOriginalFileName())
+                .contentType(file.getContentType())
+                .size(file.getSize())
+                .checksum(file.getChecksum())
+                .build();
+
+        try {
+            this.uploadFileToCloud(storedFile, isPublic);
+            file = fileRepositoryPort.updateOperationStatus(file, OperationStatus.COMPLETED);
+        } catch (Exception e) {
+            file = fileRepositoryPort.updateOperationStatus(file, OperationStatus.FAILED);
+        }
+
+        return fileResultMapperPort.domainToResult(file);
     }
 }

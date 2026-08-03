@@ -9,15 +9,25 @@ public class UpdateOperationStatusCommand {
     private String objectKey;
     private OperationType operationType;
     private OperationStatus toOperationStatus;
+    private boolean isRetry;
 
     public UpdateOperationStatusCommand() {
     }
 
-    public UpdateOperationStatusCommand(Long fileOperationId, String objectKey, OperationType operationType, OperationStatus toOperationStatus) {
+    public UpdateOperationStatusCommand(
+            Long fileOperationId, String objectKey, OperationType operationType,
+            OperationStatus toOperationStatus, boolean isRetry
+    ) {
         this.fileOperationId = fileOperationId;
         this.objectKey = objectKey;
         this.operationType = operationType;
         this.toOperationStatus = toOperationStatus;
+        this.isRetry = isRetry;
+    }
+
+    public UpdateOperationStatusCommand(Long fileOperationId, String objectKey, OperationType operationType,
+                                        OperationStatus toOperationStatus) {
+        this(fileOperationId, objectKey, operationType, toOperationStatus, false);
     }
 
     private UpdateOperationStatusCommand(Builder builder) {
@@ -25,6 +35,7 @@ public class UpdateOperationStatusCommand {
         this.objectKey = builder.objectKey;
         this.operationType = builder.operationType;
         this.toOperationStatus = builder.toOperationStatus;
+        this.isRetry = builder.isRetry;
     }
 
     public static Builder builder() {
@@ -63,6 +74,14 @@ public class UpdateOperationStatusCommand {
         this.toOperationStatus = toOperationStatus;
     }
 
+    public boolean isRetry() {
+        return isRetry;
+    }
+
+    public void setRetry(boolean retry) {
+        isRetry = retry;
+    }
+
     public Long fileOperationId() {
         return fileOperationId;
     }
@@ -84,6 +103,7 @@ public class UpdateOperationStatusCommand {
         private String objectKey;
         private OperationType operationType;
         private OperationStatus toOperationStatus;
+        private boolean isRetry;
 
         private Builder() {
         }
@@ -105,6 +125,11 @@ public class UpdateOperationStatusCommand {
 
         public Builder toOperationStatus(OperationStatus toOperationStatus) {
             this.toOperationStatus = toOperationStatus;
+            return this;
+        }
+
+        public Builder isRetry(boolean isRetry) {
+            this.isRetry = isRetry;
             return this;
         }
 
