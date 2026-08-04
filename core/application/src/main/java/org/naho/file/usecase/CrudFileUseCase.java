@@ -1,7 +1,7 @@
 package org.naho.file.usecase;
 
-import org.naho.file.command.UpdateOperationStatusCommand;
 import org.naho.file.command.UploadFileToCloudCommand;
+import org.naho.file.constant.FileProperties;
 import org.naho.file.exception.FileErrorCode;
 import org.naho.file.model.File;
 import org.naho.file.model.StoredFile;
@@ -10,8 +10,6 @@ import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileResultMapperPort;
 import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.file.result.FileResult;
-import org.naho.file.type.OperationStatus;
-import org.naho.file.type.OperationType;
 import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
 
@@ -76,28 +74,29 @@ public class CrudFileUseCase implements CrudFileInputPort {
             );
         }
 
-        UpdateOperationStatusCommand updateOperationStatusCommand =
-                UpdateOperationStatusCommand
-                        .builder()
-                        .objectKey(storedFile.objectKey())
-                        .operationType(OperationType.UPLOAD)
-                        .build();
+        File file = fileRepositoryPort.findByObjectKey(storedFile.objectKey());
 
-        File file;
+        if (file.getRetryCount() != null && file.getRetryCount() >= FileProperties.MAX_RETRY_COUNT) {
+            throw new ApplicationException(
+                    FileErrorCode.FILE_UPLOAD_FAILED,
+                    FileDetailMessageKey.FILE_RETRY_EXCEEDED,
+                    FileProperties.MAX_RETRY_COUNT
+            );
+        }
+
         try {
             fileStorageServicePort.uploadFileToCloud(storedFile, command.isPublic());
             fileStorageServicePort.deleteFileInLocal(storedFile.objectKey());
 
-            updateOperationStatusCommand.setToOperationStatus(OperationStatus.COMPLETED);
-            file = fileRepositoryPort.updateOperationByObjectKeyAndOperationType(
-                    updateOperationStatusCommand
-            );
+            file.markCompleted();
         } catch (Exception e) {
-            updateOperationStatusCommand.setToOperationStatus(OperationStatus.FAILED);
-            file = fileRepositoryPort.updateOperationByObjectKeyAndOperationType(
-                    updateOperationStatusCommand
-            );
+            file.markFailed();
         }
-        return fileResultMapperPort.domainToResult(file);
+
+        file.incrementRetryCount();
+
+        File savedFile = fileRepositoryPort.save(file);
+
+        return fileResultMapperPort.domainToResult(savedFile);
     }
 }

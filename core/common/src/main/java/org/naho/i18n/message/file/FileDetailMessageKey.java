@@ -22,6 +22,7 @@ public final class FileDetailMessageKey {
     public static final String FILE_NOT_VALID = "file.not.valid";
     public static final String FILE_AUDIO_DURATION_UNSPECIFIED = "file.audio.duration.unspecified";
     public static final String FILE_AUDIO_DURATION_EXCEEDED = "file.audio.duration.exceeded";
+    public static final String FILE_RETRY_EXCEEDED = "file.retry.exceeded";
     public static final String FILE_DELETE_FAILED = "file.delete.failed";
     public static final String FILE_DELETE_SUCCESSFULLY = "file.delete.successfully";
     public static final String FILE_GENERATE_PRESIGNED_URL_FAILED = "file.generate_presigned_url.failed";

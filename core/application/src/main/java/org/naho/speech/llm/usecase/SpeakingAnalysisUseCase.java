@@ -180,7 +180,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         // thì mới lưu lại file nói chuyện của người dùng
         StoredFile storedFile = command.storedFile();
         if (storedFile != null) {
-            audioFile = fileRepositoryPort.saveFileToDbForUpload(storedFile, false);
+            audioFile = fileRepositoryPort.createNewForUpload(storedFile, false);
         }
 
         AnswerHistory answerHistory = AnswerHistory.builder()

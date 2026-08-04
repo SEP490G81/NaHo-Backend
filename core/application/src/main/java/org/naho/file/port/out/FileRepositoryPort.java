@@ -14,13 +14,13 @@ public interface FileRepositoryPort {
 
     List<File> findAllByBookIds(List<Long> ids);
 
-    File createNew(File file, boolean isPublic);
-
     File findByObjectKey(String objectKey);
 
-    File saveFileToDbForUpload(StoredFile storedFile, boolean isPublic);
+    File createNewForUpload(StoredFile storedFile, boolean isPublic);
 
     File updateOperationByObjectKeyAndOperationType(UpdateOperationStatusCommand command);
 
     File updateOperationStatus(File file, OperationStatus operationStatus);
+
+    File save(File file);
 }

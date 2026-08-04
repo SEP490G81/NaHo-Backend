@@ -85,21 +85,7 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
     }
 
     @Override
-    public File createNew(File file, boolean isPublic) {
-        FileEntity entity = fileEntityMapper.domainToEntity(file);
-
-        String bucketName = isPublic ?
-                s3Properties.getPublicBucketName() :
-                s3Properties.getPrivateBucketName();
-
-        entity.setBucketName(bucketName);
-
-        FileEntity savedEntity = fileJpaRepository.save(entity);
-        return fileEntityMapper.entityToDomain(savedEntity);
-    }
-
-    @Override
-    public File saveFileToDbForUpload(StoredFile storedFile, boolean isPublic) {
+    public File createNewForUpload(StoredFile storedFile, boolean isPublic) {
         if (storedFile == null) {
             throw new InfrastructureException(
                     FileErrorCode.FILE_NOT_VALID,
@@ -175,6 +161,31 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
         entity.setOperationStatus(operationStatus);
 
         FileEntity savedEntity = fileJpaRepository.save(entity);
+        return fileEntityMapper.entityToDomain(savedEntity);
+    }
+
+    @Override
+    public File save(File file) {
+        FileEntity entity = fileJpaRepository.findById(file.getId())
+                .orElseThrow(() -> new InfrastructureException(
+                        FileErrorCode.FILE_NOT_FOUND,
+                        FileDetailMessageKey.FILE_NOT_FOUND,
+                        file.getId()
+                ));
+
+        entity.setObjectKey(file.getObjectKey());
+        entity.setBucketName(file.getBucketName());
+        entity.setOriginalFileName(file.getOriginalFileName());
+        entity.setContentType(file.getContentType());
+        entity.setSize(file.getSize());
+        entity.setChecksum(file.getChecksum());
+
+        entity.setOperationType(file.getOperationType());
+        entity.setOperationStatus(file.getOperationStatus());
+        entity.setRetryCount(file.getRetryCount());
+
+        FileEntity savedEntity = fileJpaRepository.save(entity);
+
         return fileEntityMapper.entityToDomain(savedEntity);
     }
 }
