@@ -17,6 +17,8 @@ import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.shared.exception.InfrastructureException;
 import org.springframework.stereotype.Component;
 
+import org.naho.social.report.repository.ReportJpaRepository;
+
 import java.util.List;
 
 @Component
@@ -25,6 +27,7 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
 
     private final FileJpaRepository fileJpaRepository;
     private final FileOperationJpaRepository fileOperationJpaRepository;
+    private final ReportJpaRepository reportJpaRepository;
     private final FileEntityMapper fileEntityMapper;
     private final S3Properties s3Properties;
 
@@ -134,5 +137,57 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
         fileOperationJpaRepository.save(fileOperationEntity);
 
         return fileEntityMapper.entityToDomain(savedEntity);
+    }
+
+    @Override
+    public File saveReportFileToDbForUpload(StoredFile storedFile, Long reportId, boolean isPublic) {
+        if (storedFile == null) {
+            throw new InfrastructureException(
+                    FileErrorCode.FILE_NOT_VALID,
+                    FileDetailMessageKey.FILE_NOT_VALID
+            );
+        }
+
+        File domain = File.builder()
+                .objectKey(storedFile.objectKey())
+                .originalFileName(storedFile.originalFileName())
+                .contentType(storedFile.contentType())
+                .size(storedFile.size())
+                .reportId(reportId)
+                .build();
+
+        FileEntity entity = fileEntityMapper.domainToEntity(domain);
+        String bucketName = isPublic ?
+                s3Properties.getPublicBucketName() :
+                s3Properties.getPrivateBucketName();
+        entity.setBucketName(bucketName);
+
+        if (reportId != null) {
+            reportJpaRepository.findById(reportId).ifPresent(entity::setReport);
+        }
+
+        FileEntity savedEntity = fileJpaRepository.save(entity);
+
+        FileOperationEntity fileOperationEntity = FileOperationEntity.builder()
+                .file(savedEntity)
+                .operationType(OperationType.UPLOAD)
+                .operationStatus(OperationStatus.PENDING)
+                .retryCount(0)
+                .build();
+
+        fileOperationJpaRepository.save(fileOperationEntity);
+
+        return fileEntityMapper.entityToDomain(savedEntity);
+    }
+
+    @Override
+    public List<File> findAllByReportId(Long reportId) {
+        if (reportId == null) {
+            return List.of();
+        }
+        List<FileEntity> entities = fileJpaRepository.findAllByReport_Id(reportId);
+        return entities.stream()
+                .map(fileEntityMapper::entityToDomain)
+                .toList();
     }
 }

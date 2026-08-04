@@ -17,4 +17,8 @@ public interface FileRepositoryPort {
     File findByObjectKey(String objectKey);
 
     File saveFileToDbForUpload(StoredFile storedFile, boolean isPublic);
+
+    File saveReportFileToDbForUpload(StoredFile storedFile, Long reportId, boolean isPublic);
+
+    List<File> findAllByReportId(Long reportId);
 }

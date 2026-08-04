@@ -8,6 +8,7 @@ public final class ReportDetailMessageKey {
     public static final String REPORT_QUESTION_ID_BLANK = "report.question.id.blank";
     public static final String REPORT_COMMENT_ID_BLANK = "report.comment.id.blank";
     public static final String REPORT_ID_NOT_FOUND = "report.id.not.found";
+    public static final String REPORT_CREATE_SUCCESS = "report.create.success";
 
     private ReportDetailMessageKey() {
     }

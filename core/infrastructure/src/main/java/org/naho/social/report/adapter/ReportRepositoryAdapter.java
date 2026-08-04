@@ -37,4 +37,11 @@ public class ReportRepositoryAdapter implements ReportRepositoryPort {
                 .map(reportEntityMapper::entityToDomain)
                 .toList();
     }
+
+    @Override
+    public Report save(Report report) {
+        ReportEntity entity = reportEntityMapper.domainToEntity(report);
+        ReportEntity savedEntity = reportJpaRepository.save(entity);
+        return reportEntityMapper.entityToDomain(savedEntity);
+    }
 }

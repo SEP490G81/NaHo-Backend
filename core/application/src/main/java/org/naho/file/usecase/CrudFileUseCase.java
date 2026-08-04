@@ -31,8 +31,7 @@ public class CrudFileUseCase implements CrudFileInputPort {
             FileOperationRepositoryPort fileOperationRepositoryPort,
             FileStorageServicePort fileStorageServicePort,
             FileResultMapperPort fileResultMapperPort,
-            TransactionPort transactionPort
-    ) {
+            TransactionPort transactionPort) {
         this.fileRepositoryPort = fileRepositoryPort;
         this.fileOperationRepositoryPort = fileOperationRepositoryPort;
         this.fileStorageServicePort = fileStorageServicePort;
@@ -45,8 +44,7 @@ public class CrudFileUseCase implements CrudFileInputPort {
         if (id == null) {
             throw new ApplicationException(
                     FileErrorCode.FILE_NOT_VALID,
-                    FileDetailMessageKey.FILE_ID_NULL
-            );
+                    FileDetailMessageKey.FILE_ID_NULL);
         }
 
         File file = fileRepositoryPort.findById(id);
@@ -55,7 +53,8 @@ public class CrudFileUseCase implements CrudFileInputPort {
 
     @Override
     public List<FileResult> findAllByLeagueIds(List<Long> leagueIds) {
-        if (leagueIds == null || leagueIds.isEmpty()) return List.of();
+        if (leagueIds == null || leagueIds.isEmpty())
+            return List.of();
         List<File> files = fileRepositoryPort.findAllByLeagueIds(leagueIds);
         return files
                 .stream()
@@ -65,7 +64,8 @@ public class CrudFileUseCase implements CrudFileInputPort {
 
     @Override
     public List<FileResult> findAllByBookIds(List<Long> ids) {
-        if (ids == null || ids.isEmpty()) return List.of();
+        if (ids == null || ids.isEmpty())
+            return List.of();
         List<File> files = fileRepositoryPort.findAllByBookIds(ids);
         return files
                 .stream()
@@ -78,8 +78,7 @@ public class CrudFileUseCase implements CrudFileInputPort {
         if (storedFile == null) {
             throw new ApplicationException(
                     FileErrorCode.FILE_NOT_VALID,
-                    FileDetailMessageKey.FILE_NOT_VALID
-            );
+                    FileDetailMessageKey.FILE_NOT_VALID);
         }
 
         // Step 4: Thử upload file lên S3
@@ -95,16 +94,15 @@ public class CrudFileUseCase implements CrudFileInputPort {
                             .objectKey(storedFile.objectKey())
                             .operationType(OperationType.UPLOAD)
                             .toOperationStatus(OperationStatus.COMPLETED)
-                            .build()
-            );
+                            .build());
         } catch (Exception e) {
+            e.printStackTrace();
             fileOperationRepositoryPort.updateOperationStatusByObjectKeyAndOperationType(
                     UpdateOperationStatusCommand.builder()
                             .objectKey(storedFile.objectKey())
                             .operationType(OperationType.UPLOAD)
                             .toOperationStatus(OperationStatus.FAILED)
-                            .build()
-            );
+                            .build());
         }
     }
 }

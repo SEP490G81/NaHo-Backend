@@ -10,4 +10,6 @@ public interface ReportRepositoryPort {
     Optional<Report> findById(Long id);
 
     List<Report> findByReportTypeIn(List<ReportType> reportTypes);
+
+    Report save(Report report);
 }

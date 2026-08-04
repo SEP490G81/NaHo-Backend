@@ -11,4 +11,6 @@ public interface FileJpaRepository extends BaseJpaRepository<FileEntity> {
     List<FileEntity> findAllByLeague_IdIn(Collection<Long> leagueIds);
 
     Optional<FileEntity> findByObjectKey(String objectKey);
+
+    List<FileEntity> findAllByReport_Id(Long reportId);
 }

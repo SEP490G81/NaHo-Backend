@@ -1,7 +1,10 @@
 package org.naho.social.report.result;
 
 
+import org.naho.file.result.FileResult;
 import org.naho.social.report.type.ReportType;
+
+import java.util.List;
 
 public record ReportResult(
         Long id,
@@ -11,6 +14,7 @@ public record ReportResult(
         ReportType reportType,
         Boolean isResolved,
         Long questionId,
-        Long commentId
+        Long commentId,
+        List<FileResult> files
 ) {
 }

@@ -20,8 +20,7 @@ public class CrudFileOperationUseCase implements CrudFileOperationInputPort {
 
     public CrudFileOperationUseCase(
             FileOperationRepositoryPort fileOperationRepositoryPort,
-            FileOperationResultMapper fileOperationResultMapper
-    ) {
+            FileOperationResultMapper fileOperationResultMapper) {
         this.fileOperationRepositoryPort = fileOperationRepositoryPort;
         this.fileOperationResultMapper = fileOperationResultMapper;
     }
@@ -31,8 +30,7 @@ public class CrudFileOperationUseCase implements CrudFileOperationInputPort {
         if (fileId == null) {
             throw new ApplicationException(
                     FileErrorCode.FILE_NOT_VALID,
-                    FileDetailMessageKey.FILE_ID_NULL
-            );
+                    FileDetailMessageKey.FILE_ID_NULL);
         }
 
         return fileOperationRepositoryPort.findByFileId(fileId)
@@ -45,15 +43,13 @@ public class CrudFileOperationUseCase implements CrudFileOperationInputPort {
         if (fileId == null) {
             throw new ApplicationException(
                     FileOperationErrorCode.FILE_OPERATION_NOT_VALID,
-                    FileDetailMessageKey.FILE_ID_NULL
-            );
+                    FileDetailMessageKey.FILE_ID_NULL);
         }
 
         if (operationType == null) {
             throw new ApplicationException(
                     FileOperationErrorCode.FILE_OPERATION_NOT_VALID,
-                    FileDetailMessageKey.FILE_OPERATION_TYPE_EMPTY
-            );
+                    FileDetailMessageKey.FILE_OPERATION_TYPE_EMPTY);
         }
 
         return fileOperationRepositoryPort
@@ -61,7 +57,6 @@ public class CrudFileOperationUseCase implements CrudFileOperationInputPort {
                 .map(fileOperationResultMapper::domainToResult)
                 .orElseThrow(() -> new ApplicationException(
                         FileOperationErrorCode.FILE_OPERATION_NOT_FOUND,
-                        FileOperationDetailMessageKey.FILE_OPERATION_NOT_FOUND
-                ));
+                        FileOperationDetailMessageKey.FILE_OPERATION_NOT_FOUND));
     }
 }

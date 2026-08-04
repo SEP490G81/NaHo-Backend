@@ -1,17 +1,30 @@
 package org.naho.social.report.controller.v1;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.naho.file.port.out.FileValidatorPort;
+import org.naho.i18n.message.social.ReportDetailMessageKey;
+import org.naho.shared.annotation.ApiResponseMessage;
+import org.naho.shared.exception.PresentationException;
+import org.naho.social.report.command.CreateReportCommand;
 import org.naho.social.report.command.GetReportCommand;
+import org.naho.social.report.dto.mapper.ReportRequestMapper;
 import org.naho.social.report.dto.mapper.ReportResponseMapper;
+import org.naho.social.report.dto.request.CreateReportRequest;
 import org.naho.social.report.dto.response.ReportResponse;
+import org.naho.social.report.exception.ReportErrorCode;
+import org.naho.social.report.port.in.CreateReportInputPort;
 import org.naho.social.report.port.in.GetReportInputPort;
 import org.naho.social.report.result.ReportResult;
+import org.naho.user.result.AccessTokenPayload;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -20,7 +33,42 @@ import java.util.List;
 public class ReportController {
 
     private final GetReportInputPort getReportInputPort;
+    private final CreateReportInputPort createReportInputPort;
     private final ReportResponseMapper reportResponseMapper;
+    private final ReportRequestMapper reportRequestMapper;
+    private final FileValidatorPort fileValidatorPort;
+
+    @PostMapping(value = { "", "/" }, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ApiResponseMessage(message = ReportDetailMessageKey.REPORT_CREATE_SUCCESS)
+    public ResponseEntity<ReportResponse> createReport(
+            @Valid @ModelAttribute CreateReportRequest request,
+            @RequestParam(value = "files", required = false) List<MultipartFile> files,
+            @AuthenticationPrincipal AccessTokenPayload payload) {
+        Long userId = payload != null ? payload.userId() : null;
+
+        List<MultipartFile> uploadFiles = (files != null && !files.isEmpty())
+                ? files
+                : request.getFiles();
+
+        if (uploadFiles != null) {
+            for (MultipartFile file : uploadFiles) {
+                if (file != null && !file.isEmpty()) {
+                    try {
+                        fileValidatorPort.validateImageFile(file.getInputStream());
+                    } catch (IOException e) {
+                        throw new PresentationException(
+                                ReportErrorCode.REPORT_NOT_FOUND,
+                                ReportDetailMessageKey.REPORT_TITLE_BLANK,
+                                e.getMessage());
+                    }
+                }
+            }
+        }
+
+        CreateReportCommand command = reportRequestMapper.requestToCommand(request, userId, uploadFiles);
+        ReportResult result = createReportInputPort.createReport(command);
+        return ResponseEntity.status(HttpStatus.CREATED).body(reportResponseMapper.resultToResponse(result));
+    }
 
     @GetMapping("/admin")
     public ResponseEntity<List<ReportResponse>> getReportsByAdmin() {

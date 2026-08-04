@@ -1,11 +1,13 @@
 package org.naho.social.report.model;
 
+import org.naho.file.model.File;
 import org.naho.i18n.message.social.ReportDetailMessageKey;
 import org.naho.shared.exception.DomainException;
 import org.naho.social.report.exception.ReportDomainErrorCode;
 import org.naho.social.report.type.ReportType;
 
 import java.time.Instant;
+import java.util.List;
 
 public class Report {
 
@@ -19,6 +21,7 @@ public class Report {
     private final boolean isResolved;
     private final Instant createdTime;
     private final Instant modifiedTime;
+    private final List<File> files;
 
     private Report(Builder builder) {
         this.id = builder.id;
@@ -31,6 +34,7 @@ public class Report {
         this.isResolved = builder.isResolved;
         this.createdTime = builder.createdTime;
         this.modifiedTime = builder.modifiedTime;
+        this.files = builder.files != null ? builder.files : List.of();
     }
 
     public static Builder builder() {
@@ -77,6 +81,10 @@ public class Report {
         return modifiedTime;
     }
 
+    public List<File> getFiles() {
+        return files;
+    }
+
     public static class Builder {
 
         private Long id;
@@ -89,6 +97,7 @@ public class Report {
         private boolean isResolved;
         private Instant createdTime;
         private Instant modifiedTime;
+        private List<File> files;
 
         public Builder id(Long id) {
             this.id = id;
@@ -137,6 +146,11 @@ public class Report {
 
         public Builder modifiedTime(Instant modifiedTime) {
             this.modifiedTime = modifiedTime;
+            return this;
+        }
+
+        public Builder files(List<File> files) {
+            this.files = files;
             return this;
         }
 
