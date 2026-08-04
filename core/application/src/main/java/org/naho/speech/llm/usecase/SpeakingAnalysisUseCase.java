@@ -11,13 +11,12 @@ import org.naho.book.port.out.BookRepositoryPort;
 import org.naho.book.port.out.LessonRepositoryPort;
 import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.book.port.out.TopicRepositoryPort;
-import org.naho.file.command.UploadFileToCloudCommand;
 import org.naho.file.model.File;
-import org.naho.file.model.StoredFile;
-import org.naho.file.port.in.CrudFileInputPort;
+import org.naho.file.port.in.UploadFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileResultMapperPort;
 import org.naho.file.result.FileResult;
+import org.naho.file.result.StoredFile;
 import org.naho.furigana.port.out.FuriganaGenerationPort;
 import org.naho.i18n.message.learning.LearningPathNodeDetailMessageKey;
 import org.naho.i18n.message.learning.UserLearningProgressDetailMessageKey;
@@ -81,7 +80,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     private final CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort;
     private final UserLearningProgressRepositoryPort userLearningProgressRepositoryPort;
     private final FileResultMapperPort fileResultMapperPort;
-    private final CrudFileInputPort crudFileInputPort;
+    private final UploadFileInputPort uploadFileInputPort;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public SpeakingAnalysisUseCase(
@@ -101,7 +100,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort,
             UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
             FileResultMapperPort fileResultMapperPort,
-            CrudFileInputPort crudFileInputPort) {
+            UploadFileInputPort uploadFileInputPort) {
         this.userRepositoryPort = userRepositoryPort;
         this.speakingQuestionRepositoryPort = speakingQuestionRepositoryPort;
         this.fileRepositoryPort = fileRepositoryPort;
@@ -118,7 +117,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         this.completeSpeakingQuestionInputPort = completeSpeakingQuestionInputPort;
         this.userLearningProgressRepositoryPort = userLearningProgressRepositoryPort;
         this.fileResultMapperPort = fileResultMapperPort;
-        this.crudFileInputPort = crudFileInputPort;
+        this.uploadFileInputPort = uploadFileInputPort;
     }
 
     @Override
@@ -127,13 +126,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
 
         StoredFile storedFile = command.storedFile();
         if (storedFile != null) {
-            FileResult uploadedFile = crudFileInputPort.uploadFileToCloud(
-                    UploadFileToCloudCommand.builder()
-                            .storedFile(storedFile)
-                            .isPublic(false)
-                            .isRetry(false)
-                            .build()
-            );
+            FileResult uploadedFile = uploadFileInputPort.uploadFileToCloud(storedFile);
             result.setAudioFile(uploadedFile);
         }
 
@@ -256,8 +249,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         if (objective != null) {
             canDoObjectiveVal = (objective.getJapaneseDescription() != null
                     && !objective.getJapaneseDescription().isBlank())
-                            ? objective.getJapaneseDescription()
-                            : objective.getJapaneseName();
+                    ? objective.getJapaneseDescription()
+                    : objective.getJapaneseName();
         } else {
             canDoObjectiveVal = "N/A";
         }
@@ -308,8 +301,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         String questionTitleVal = speakingQuestion.getTitle() != null ? speakingQuestion.getTitle() : "N/A";
         String questionDescriptionVal = speakingQuestion.getDescription() != null
                 && !speakingQuestion.getDescription().isBlank()
-                        ? speakingQuestion.getDescription()
-                        : questionTitleVal;
+                ? speakingQuestion.getDescription()
+                : questionTitleVal;
 
         double accuracy = azureAssessment.getAccuracyScore() != null ? azureAssessment.getAccuracyScore() : 0.0;
         double fluency = azureAssessment.getFluencyScore() != null ? azureAssessment.getFluencyScore() : 0.0;

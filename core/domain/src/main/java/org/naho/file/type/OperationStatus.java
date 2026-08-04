@@ -1,5 +1,5 @@
 package org.naho.file.type;
 
 public enum OperationStatus {
-    COMPLETED, PENDING, FAILED, BLOCKED
+    COMPLETED, PROCESSING, FAILED, RETRY_LIMIT_EXCEEDED
 }

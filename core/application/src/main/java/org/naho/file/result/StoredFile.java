@@ -1,7 +1,8 @@
-package org.naho.file.model;
+package org.naho.file.result;
 
 public record StoredFile(
         String objectKey,
+        String bucketName,
         String originalFileName,
         String contentType,
         Long size,
@@ -14,6 +15,7 @@ public record StoredFile(
 
     public static class Builder {
         private String objectKey;
+        private String bucketName;
         private String originalFileName;
         private String contentType;
         private Long size;
@@ -21,6 +23,11 @@ public record StoredFile(
 
         public Builder objectKey(String objectKey) {
             this.objectKey = objectKey;
+            return this;
+        }
+
+        public Builder bucketName(String bucketName) {
+            this.bucketName = bucketName;
             return this;
         }
 
@@ -47,6 +54,7 @@ public record StoredFile(
         public StoredFile build() {
             return new StoredFile(
                     objectKey,
+                    bucketName,
                     originalFileName,
                     contentType,
                     size,

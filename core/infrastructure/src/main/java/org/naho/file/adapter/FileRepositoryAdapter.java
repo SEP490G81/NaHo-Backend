@@ -2,20 +2,23 @@ package org.naho.file.adapter;
 
 import lombok.RequiredArgsConstructor;
 import org.naho.file.command.UpdateOperationStatusCommand;
+import org.naho.file.constant.FileProperties;
 import org.naho.file.constant.S3Properties;
 import org.naho.file.entity.FileEntity;
 import org.naho.file.exception.FileErrorCode;
 import org.naho.file.mapper.FileEntityMapper;
 import org.naho.file.model.File;
-import org.naho.file.model.StoredFile;
+import org.naho.file.mybatis.FileQueryMapper;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.repository.FileJpaRepository;
+import org.naho.file.result.StoredFile;
 import org.naho.file.type.OperationStatus;
 import org.naho.file.type.OperationType;
 import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.shared.exception.InfrastructureException;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.List;
 
 @Component
@@ -24,6 +27,7 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
 
     private final FileJpaRepository fileJpaRepository;
     private final FileEntityMapper fileEntityMapper;
+    private final FileQueryMapper fileQueryMapper;
     private final S3Properties s3Properties;
 
     @Override
@@ -100,8 +104,9 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
                 .size(storedFile.size())
                 .checksum(storedFile.checksum())
                 .operationType(OperationType.UPLOAD)
-                .operationStatus(OperationStatus.PENDING)
+                .operationStatus(OperationStatus.PROCESSING)
                 .retryCount(0)
+                .nextRetryAt(null)
                 .build();
 
         FileEntity entity = fileEntityMapper.domainToEntity(domain);
@@ -166,7 +171,7 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
 
     @Override
     public File save(File file) {
-        FileEntity entity = fileJpaRepository.findById(file.getId())
+        FileEntity entity = fileJpaRepository.findByObjectKey(file.getObjectKey())
                 .orElseThrow(() -> new InfrastructureException(
                         FileErrorCode.FILE_NOT_FOUND,
                         FileDetailMessageKey.FILE_NOT_FOUND,
@@ -184,8 +189,22 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
         entity.setOperationStatus(file.getOperationStatus());
         entity.setRetryCount(file.getRetryCount());
 
+        entity.setNextRetryAt(file.getNextRetryAt() != null ?
+                file.getNextRetryAt().getValue() : null);
+
         FileEntity savedEntity = fileJpaRepository.save(entity);
 
         return fileEntityMapper.entityToDomain(savedEntity);
+    }
+
+    @Override
+    public List<File> findAllForSchedulerRetryUpload(Instant now, OperationType operationType, OperationStatus operationStatus) {
+        return fileQueryMapper.findAllForSchedulerRetryUpload(
+                        now,
+                        operationType,
+                        operationStatus,
+                        FileProperties.MAX_RETRY_COUNT
+                ).stream().map(fileEntityMapper::entityToDomain)
+                .toList();
     }
 }

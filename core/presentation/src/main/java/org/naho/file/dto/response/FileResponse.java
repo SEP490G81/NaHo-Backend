@@ -3,6 +3,8 @@ package org.naho.file.dto.response;
 import org.naho.file.type.OperationStatus;
 import org.naho.file.type.OperationType;
 
+import java.time.Instant;
+
 public record FileResponse(
         Long id,
         String accessUrl,
@@ -12,6 +14,7 @@ public record FileResponse(
         String checksum,
         OperationType operationType,
         OperationStatus operationStatus,
-        Integer retryCount
+        Integer retryCount,
+        Instant nextRetryAt
 ) {
 }

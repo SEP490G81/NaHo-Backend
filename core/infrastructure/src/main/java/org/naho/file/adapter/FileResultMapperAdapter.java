@@ -42,6 +42,7 @@ public class FileResultMapperAdapter implements FileResultMapperPort {
                 .operationType(domain.getOperationType())
                 .operationStatus(domain.getOperationStatus())
                 .retryCount(domain.getRetryCount())
+                .nextRetryAt(domain.getNextRetryAt() != null ? domain.getNextRetryAt().getValue() : null)
                 .build();
     }
 }

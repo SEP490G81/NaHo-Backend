@@ -110,7 +110,8 @@ CREATE TABLE files
     checksum         VARCHAR(255)          NULL,
     operation_type   VARCHAR(50)           NULL,
     operation_status VARCHAR(50)           NULL,
-    retry_count      INT                   NULL,
+    retry_count      INT                   NOT NULL,
+    next_retry_at    datetime(6)           NULL,
     comment_id       BIGINT                NULL,
     report_id        BIGINT                NULL,
     CONSTRAINT pk_files PRIMARY KEY (id)

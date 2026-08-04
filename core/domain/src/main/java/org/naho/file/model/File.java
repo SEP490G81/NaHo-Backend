@@ -3,6 +3,7 @@ package org.naho.file.model;
 import org.naho.file.exception.FileDomainErrorCode;
 import org.naho.file.type.OperationStatus;
 import org.naho.file.type.OperationType;
+import org.naho.file.valueobject.NextRetryAt;
 import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.shared.exception.DomainException;
 
@@ -21,7 +22,9 @@ public class File {
 
     private OperationType operationType;
     private OperationStatus operationStatus;
+
     private Integer retryCount;
+    private NextRetryAt nextRetryAt;
 
     private File(Builder builder) {
         this.id = builder.id;
@@ -36,6 +39,7 @@ public class File {
         this.operationType = builder.operationType;
         this.operationStatus = builder.operationStatus;
         this.retryCount = builder.retryCount != null ? builder.retryCount : 0;
+        this.nextRetryAt = builder.nextRetryAt;
     }
 
     public static Builder builder() {
@@ -90,27 +94,34 @@ public class File {
         return retryCount;
     }
 
+    public NextRetryAt getNextRetryAt() {
+        return nextRetryAt;
+    }
+
+    public void setNextRetryAt(NextRetryAt nextRetryAt) {
+        this.nextRetryAt = nextRetryAt;
+    }
+
     public void markCompleted() {
         this.operationStatus = OperationStatus.COMPLETED;
+        this.nextRetryAt = null;
     }
 
     public void markFailed() {
         this.operationStatus = OperationStatus.FAILED;
     }
 
-    public void markBlocked() {
-        this.operationStatus = OperationStatus.BLOCKED;
+    public void markRetryLimitExceeded() {
+        this.operationStatus = OperationStatus.RETRY_LIMIT_EXCEEDED;
+        this.nextRetryAt = null;
     }
 
-    public void incrementRetryCount() {
-        if (this.retryCount == null) {
-            this.retryCount = 0;
-        }
-        this.retryCount++;
+    public int incrementRetryCount() {
+        this.retryCount += 1;
+        return this.retryCount;
     }
 
     public static class Builder {
-
         private Long id;
         private Long commentId;
         private Long reportId;
@@ -123,6 +134,7 @@ public class File {
         private OperationType operationType;
         private OperationStatus operationStatus;
         private Integer retryCount;
+        private NextRetryAt nextRetryAt;
 
         public Builder id(Long id) {
             this.id = id;
@@ -184,6 +196,11 @@ public class File {
             return this;
         }
 
+        public Builder nextRetryAt(NextRetryAt nextRetryAt) {
+            this.nextRetryAt = nextRetryAt;
+            return this;
+        }
+
         public File build() {
             if (objectKey == null || objectKey.isBlank()) {
                 throw new DomainException(
@@ -201,6 +218,10 @@ public class File {
                 throw new DomainException(
                         FileDomainErrorCode.FILE_SIZE_INVALID,
                         FileDetailMessageKey.FILE_EMPTY);
+            }
+
+            if (retryCount == null) {
+                retryCount = 0;
             }
 
             return new File(this);

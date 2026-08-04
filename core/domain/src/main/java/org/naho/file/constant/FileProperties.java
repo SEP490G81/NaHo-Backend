@@ -4,5 +4,5 @@ public final class FileProperties {
     private FileProperties() {
     }
 
-    public static final int MAX_RETRY_COUNT = 3;
+    public static final int MAX_RETRY_COUNT = 10;
 }

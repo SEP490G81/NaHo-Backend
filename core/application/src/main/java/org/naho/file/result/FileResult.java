@@ -3,6 +3,8 @@ package org.naho.file.result;
 import org.naho.file.type.OperationStatus;
 import org.naho.file.type.OperationType;
 
+import java.time.Instant;
+
 public class FileResult {
 
     private Long id;
@@ -14,11 +16,12 @@ public class FileResult {
     private OperationType operationType;
     private OperationStatus operationStatus;
     private Integer retryCount;
+    private Instant nextRetryAt;
 
     public FileResult() {
     }
 
-    public FileResult(Long id, String accessUrl, String originalFileName, String contentType, Long size, String checksum, OperationType operationType, OperationStatus operationStatus, Integer retryCount) {
+    public FileResult(Long id, String accessUrl, String originalFileName, String contentType, Long size, String checksum, OperationType operationType, OperationStatus operationStatus, Integer retryCount, Instant nextRetryAt) {
         this.id = id;
         this.accessUrl = accessUrl;
         this.originalFileName = originalFileName;
@@ -28,6 +31,7 @@ public class FileResult {
         this.operationType = operationType;
         this.operationStatus = operationStatus;
         this.retryCount = retryCount;
+        this.nextRetryAt = nextRetryAt;
     }
 
     private FileResult(Builder builder) {
@@ -40,6 +44,7 @@ public class FileResult {
         this.operationType = builder.operationType;
         this.operationStatus = builder.operationStatus;
         this.retryCount = builder.retryCount;
+        this.nextRetryAt = builder.nextRetryAt;
     }
 
     public static Builder builder() {
@@ -118,6 +123,14 @@ public class FileResult {
         this.retryCount = retryCount;
     }
 
+    public Instant getNextRetryAt() {
+        return nextRetryAt;
+    }
+
+    public void setNextRetryAt(Instant nextRetryAt) {
+        this.nextRetryAt = nextRetryAt;
+    }
+
     public Long id() {
         return id;
     }
@@ -154,6 +167,10 @@ public class FileResult {
         return retryCount;
     }
 
+    public Instant nextRetryAt() {
+        return nextRetryAt;
+    }
+
     public static final class Builder {
         private Long id;
         private String accessUrl;
@@ -164,6 +181,7 @@ public class FileResult {
         private OperationType operationType;
         private OperationStatus operationStatus;
         private Integer retryCount;
+        private Instant nextRetryAt;
 
         private Builder() {
         }
@@ -210,6 +228,11 @@ public class FileResult {
 
         public Builder retryCount(Integer retryCount) {
             this.retryCount = retryCount;
+            return this;
+        }
+
+        public Builder nextRetryAt(Instant nextRetryAt) {
+            this.nextRetryAt = nextRetryAt;
             return this;
         }
 

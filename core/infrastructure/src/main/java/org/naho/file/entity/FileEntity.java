@@ -14,6 +14,8 @@ import org.naho.social.entity.CommentEntity;
 import org.naho.social.report.entity.ReportEntity;
 import org.naho.user.entity.UserEntity;
 
+import java.time.Instant;
+
 @SuperBuilder
 @Getter
 @Setter
@@ -49,8 +51,11 @@ public class FileEntity extends BaseEntity {
     @Column(name = "operation_status", length = 50)
     OperationStatus operationStatus;
 
-    @Column(name = "retry_count")
+    @Column(name = "retry_count", nullable = false)
     Integer retryCount;
+
+    @Column(name = "next_retry_at")
+    Instant nextRetryAt;
 
     @OneToOne(mappedBy = "avatarFile")
     PersonaEntity persona;
