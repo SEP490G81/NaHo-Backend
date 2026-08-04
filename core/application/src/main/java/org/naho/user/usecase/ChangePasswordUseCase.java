@@ -8,6 +8,7 @@ import org.naho.user.model.User;
 import org.naho.user.port.in.ChangePasswordInputPort;
 import org.naho.user.port.out.EncoderPort;
 import org.naho.user.port.out.UserRepositoryPort;
+import org.naho.user.valueobject.Password;
 
 import java.util.Optional;
 
@@ -66,7 +67,8 @@ public class ChangePasswordUseCase implements ChangePasswordInputPort {
             );
         }
 
-        String encodedPassword = encoderPort.hashPassword(command.newPassword());
+        Password newPassword = Password.of(command.newPassword());
+        String encodedPassword = encoderPort.hashPassword(newPassword.getValue());
         user.setHashPassword(encodedPassword);
 
         userRepository.save(user, null);

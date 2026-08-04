@@ -9,6 +9,7 @@ import org.naho.user.port.in.ResetPasswordInputPort;
 import org.naho.user.port.out.EncoderPort;
 import org.naho.user.port.out.PasswordResetOtpPort;
 import org.naho.user.port.out.UserRepositoryPort;
+import org.naho.user.valueobject.Password;
 
 import java.util.Optional;
 
@@ -67,7 +68,8 @@ public class ResetPasswordUseCase implements ResetPasswordInputPort {
             );
         }
 
-        String encodedPassword = encoderPort.hashPassword(newPassword);
+        Password newValidPassword = Password.of(newPassword);
+        String encodedPassword = encoderPort.hashPassword(newValidPassword.getValue());
         user.setHashPassword(encodedPassword);
 
         if (!user.isEmailVerified()) {

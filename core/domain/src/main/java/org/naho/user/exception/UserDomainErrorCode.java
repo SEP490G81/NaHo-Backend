@@ -33,6 +33,12 @@ public enum UserDomainErrorCode implements ErrorCode {
             "USER_005",
             UserTitleMessageKey.USER_OAUTH_PROVIDER_NOT_VALID_TITLE,
             400
+    ),
+
+    USER_PASSWORD_NOT_VALID(
+            "USER_006",
+            UserTitleMessageKey.USER_PASSWORD_NOT_VALID_TITLE,
+            400
     );
 
     private final String code;

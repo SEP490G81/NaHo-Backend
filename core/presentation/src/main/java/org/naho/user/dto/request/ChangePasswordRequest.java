@@ -1,7 +1,6 @@
 package org.naho.user.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,10 +11,8 @@ public class ChangePasswordRequest {
     private String oldPassword;
 
     @NotBlank
-    @Size(min = 6)
     private String newPassword;
 
     @NotBlank
-    @Size(min = 6)
     private String confirmPassword;
 }

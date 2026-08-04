@@ -40,6 +40,8 @@ public final class UserTitleMessageKey {
     public static final String USER_OLD_PASSWORD_NOT_MATCH_TITLE = "user.old.password.not.match.title";
     public static final String USER_INVALID_RESET_TOKEN_TITLE = "user.invalid.reset.token.title";
 
+    public static final String USER_PASSWORD_NOT_VALID_TITLE = "user.password.not.valid.title";
+
     private UserTitleMessageKey() {
     }
 }

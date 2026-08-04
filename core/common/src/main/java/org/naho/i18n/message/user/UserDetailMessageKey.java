@@ -92,6 +92,9 @@ public final class UserDetailMessageKey {
     public static final String USER_INVALID_RESET_TOKEN_DETAIL = "user.invalid.reset.token.detail";
     public static final String USER_OTP_VERIFIED_SUCCESSFULLY = "user.otp.verified.successfully";
 
+    public static final String USER_PASSWORD_REQUIRED = "user.password.required";
+    public static final String USER_PASSWORD_INVALID_FORMAT = "user.password.invalid.format";
+
     private UserDetailMessageKey() {
     }
 }
