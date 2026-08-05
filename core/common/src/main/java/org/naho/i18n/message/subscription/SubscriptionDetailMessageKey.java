@@ -21,6 +21,9 @@ public final class SubscriptionDetailMessageKey {
     public static final String SUBSCRIPTION_USER_GET_ACTIVE_SUCCESS = "subscription.user.get_active_success";
     public static final String SUBSCRIPTION_PLANS_GET_LIST_SUCCESS = "subscription.plans.get_list_success";
 
+    public static final String SUBSCRIPTION_USER_GET_ACTIVE_SUCCESS = "subscription.user.get_active_success";
+    public static final String SUBSCRIPTION_PLANS_GET_LIST_SUCCESS = "subscription.plans.get_list_success";
+
     private SubscriptionDetailMessageKey() {
     }
 }

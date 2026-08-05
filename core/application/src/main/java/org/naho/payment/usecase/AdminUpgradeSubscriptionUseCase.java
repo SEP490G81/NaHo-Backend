@@ -22,6 +22,8 @@ import org.naho.user.port.out.RoleRepositoryPort;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.naho.user.type.RoleName;
 
+import org.naho.shared.port.out.TransactionPort;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +37,7 @@ public class AdminUpgradeSubscriptionUseCase implements AdminUpgradeSubscription
     private final SubscriptionPlanResultMapper planResultMapper;
     private final UserSubscriptionResultMapper userSubscriptionResultMapper;
     private final org.naho.shared.port.out.EventPublisherPort eventPublisherPort;
+    private final TransactionPort transactionPort;
 
     public AdminUpgradeSubscriptionUseCase(RoleRepositoryPort roleRepositoryPort,
                                            UserRepositoryPort userRepositoryPort,
@@ -42,7 +45,8 @@ public class AdminUpgradeSubscriptionUseCase implements AdminUpgradeSubscription
                                            UserSubscriptionRepositoryPort subscriptionRepositoryPort,
                                            SubscriptionPlanResultMapper planResultMapper,
                                            UserSubscriptionResultMapper userSubscriptionResultMapper,
-                                           org.naho.shared.port.out.EventPublisherPort eventPublisherPort) {
+                                           org.naho.shared.port.out.EventPublisherPort eventPublisherPort,
+                                           TransactionPort transactionPort) {
         this.roleRepositoryPort = roleRepositoryPort;
         this.userRepositoryPort = userRepositoryPort;
         this.planRepositoryPort = planRepositoryPort;
@@ -50,6 +54,7 @@ public class AdminUpgradeSubscriptionUseCase implements AdminUpgradeSubscription
         this.planResultMapper = planResultMapper;
         this.userSubscriptionResultMapper = userSubscriptionResultMapper;
         this.eventPublisherPort = eventPublisherPort;
+        this.transactionPort = transactionPort;
     }
 
     public AdminUpgradeSubscriptionUseCase(RoleRepositoryPort roleRepositoryPort,
@@ -57,20 +62,26 @@ public class AdminUpgradeSubscriptionUseCase implements AdminUpgradeSubscription
                                            SubscriptionPlanRepositoryPort planRepositoryPort,
                                            UserSubscriptionRepositoryPort subscriptionRepositoryPort,
                                            SubscriptionPlanResultMapper planResultMapper,
-                                           org.naho.shared.port.out.EventPublisherPort eventPublisherPort) {
-        this(roleRepositoryPort, userRepositoryPort, planRepositoryPort, subscriptionRepositoryPort, planResultMapper, new UserSubscriptionResultMapper(), eventPublisherPort);
+                                           org.naho.shared.port.out.EventPublisherPort eventPublisherPort,
+                                           TransactionPort transactionPort) {
+        this(roleRepositoryPort, userRepositoryPort, planRepositoryPort, subscriptionRepositoryPort, planResultMapper, new UserSubscriptionResultMapper(), eventPublisherPort, transactionPort);
     }
 
     public AdminUpgradeSubscriptionUseCase(RoleRepositoryPort roleRepositoryPort,
                                            UserRepositoryPort userRepositoryPort,
                                            SubscriptionPlanRepositoryPort planRepositoryPort,
                                            UserSubscriptionRepositoryPort subscriptionRepositoryPort,
-                                           org.naho.shared.port.out.EventPublisherPort eventPublisherPort) {
-        this(roleRepositoryPort, userRepositoryPort, planRepositoryPort, subscriptionRepositoryPort, new SubscriptionPlanResultMapper(), new UserSubscriptionResultMapper(), eventPublisherPort);
+                                           org.naho.shared.port.out.EventPublisherPort eventPublisherPort,
+                                           TransactionPort transactionPort) {
+        this(roleRepositoryPort, userRepositoryPort, planRepositoryPort, subscriptionRepositoryPort, new SubscriptionPlanResultMapper(), new UserSubscriptionResultMapper(), eventPublisherPort, transactionPort);
     }
 
     @Override
     public UserSubscriptionResult upgradeSubscription(AdminUpgradeSubscriptionCommand command) {
+        return transactionPort.execute(() -> doUpgradeSubscription(command));
+    }
+
+    private UserSubscriptionResult doUpgradeSubscription(AdminUpgradeSubscriptionCommand command) {
         Instant now = Instant.now();
 
         // 1. Verify Admin Role

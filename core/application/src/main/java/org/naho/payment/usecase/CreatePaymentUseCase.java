@@ -18,6 +18,8 @@ import org.naho.subscription.port.out.UserSubscriptionRepositoryPort;
 import org.naho.subscription.type.PlanTier;
 import org.naho.user.port.out.UserRepositoryPort;
 
+import org.naho.shared.port.out.TransactionPort;
+
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -35,15 +37,17 @@ public class CreatePaymentUseCase implements CreatePaymentInputPort {
     private final UserRepositoryPort userRepositoryPort;
     private final PaymentIdempotencyRepositoryPort idempotencyRepositoryPort;
     private final int timeoutMinutes;
+    private final TransactionPort transactionPort;
 
     public CreatePaymentUseCase(SubscriptionPlanRepositoryPort planRepositoryPort,
-            PaymentOrderRepositoryPort paymentOrderRepositoryPort,
-            UserSubscriptionRepositoryPort subscriptionRepositoryPort,
-            PaymentGatewayResolver gatewayResolver,
-            PaymentOrderCodeGenerator orderCodeGenerator,
-            UserRepositoryPort userRepositoryPort,
-            PaymentIdempotencyRepositoryPort idempotencyRepositoryPort,
-            int timeoutMinutes) {
+                                PaymentOrderRepositoryPort paymentOrderRepositoryPort,
+                                UserSubscriptionRepositoryPort subscriptionRepositoryPort,
+                                PaymentGatewayResolver gatewayResolver,
+                                PaymentOrderCodeGenerator orderCodeGenerator,
+                                UserRepositoryPort userRepositoryPort,
+                                PaymentIdempotencyRepositoryPort idempotencyRepositoryPort,
+                                int timeoutMinutes,
+                                TransactionPort transactionPort) {
         this.planRepositoryPort = planRepositoryPort;
         this.paymentOrderRepositoryPort = paymentOrderRepositoryPort;
         this.subscriptionRepositoryPort = subscriptionRepositoryPort;
@@ -52,10 +56,15 @@ public class CreatePaymentUseCase implements CreatePaymentInputPort {
         this.userRepositoryPort = userRepositoryPort;
         this.idempotencyRepositoryPort = idempotencyRepositoryPort;
         this.timeoutMinutes = timeoutMinutes > 0 ? timeoutMinutes : 5;
+        this.transactionPort = transactionPort;
     }
 
     @Override
     public CreatePaymentResult createPayment(CreatePaymentCommand command) {
+        return transactionPort.execute(() -> doCreatePayment(command));
+    }
+
+    private CreatePaymentResult doCreatePayment(CreatePaymentCommand command) {
         Instant now = Instant.now();
 
         validateIdempotencyKey(command.idempotencyKey());
