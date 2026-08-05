@@ -98,6 +98,13 @@ public class ConfirmPaymentUseCase implements ConfirmPaymentInputPort {
                         "subscription.plan.not_found"));
 
         if (!subscriptionRepositoryPort.existsByPaymentOrderId(order.getId())) {
+            // Hủy gói active cũ (nếu có) trước khi kích hoạt gói mới
+            subscriptionRepositoryPort.findActiveByUserId(order.getUserId(), now)
+                    .ifPresent(previousSub -> {
+                        previousSub.cancel(now);
+                        subscriptionRepositoryPort.save(previousSub);
+                    });
+
             UserSubscription subscription = UserSubscription.activate(
                     order.getUserId(),
                     plan.getId(),
