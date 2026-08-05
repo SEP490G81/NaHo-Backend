@@ -13,5 +13,5 @@ public interface ReportRepositoryPort {
 
     Report save(Report report);
 
-    List<Report> findByUserId(Long userId);
+    List<Report> findAllByUserId(Long userId);
 }

@@ -6,7 +6,6 @@ import org.naho.shared.exception.DomainException;
 import org.naho.social.report.exception.ReportDomainErrorCode;
 import org.naho.social.report.type.ReportType;
 
-import java.time.Instant;
 import java.util.List;
 
 public class Report {
@@ -19,9 +18,7 @@ public class Report {
     private final String description;
     private final ReportType reportType;
     private final boolean isResolved;
-    private final Instant createdTime;
-    private final Instant modifiedTime;
-    private final List<File> files;
+    private List<File> files;
 
     private Report(Builder builder) {
         this.id = builder.id;
@@ -32,8 +29,6 @@ public class Report {
         this.description = builder.description;
         this.reportType = builder.reportType;
         this.isResolved = builder.isResolved;
-        this.createdTime = builder.createdTime;
-        this.modifiedTime = builder.modifiedTime;
         this.files = builder.files != null ? builder.files : List.of();
     }
 
@@ -73,16 +68,12 @@ public class Report {
         return isResolved;
     }
 
-    public Instant getCreatedTime() {
-        return createdTime;
-    }
-
-    public Instant getModifiedTime() {
-        return modifiedTime;
-    }
-
     public List<File> getFiles() {
         return files;
+    }
+
+    public void setFiles(List<File> files) {
+        this.files = files;
     }
 
     public Report updateStatus(boolean isResolved) {
@@ -95,8 +86,6 @@ public class Report {
                 .description(this.description)
                 .reportType(this.reportType)
                 .isResolved(isResolved)
-                .createdTime(this.createdTime)
-                .modifiedTime(Instant.now())
                 .files(this.files)
                 .build();
     }
@@ -111,8 +100,6 @@ public class Report {
         private String description;
         private ReportType reportType;
         private boolean isResolved;
-        private Instant createdTime;
-        private Instant modifiedTime;
         private List<File> files;
 
         public Builder id(Long id) {
@@ -152,16 +139,6 @@ public class Report {
 
         public Builder isResolved(boolean isResolved) {
             this.isResolved = isResolved;
-            return this;
-        }
-
-        public Builder createdTime(Instant createdTime) {
-            this.createdTime = createdTime;
-            return this;
-        }
-
-        public Builder modifiedTime(Instant modifiedTime) {
-            this.modifiedTime = modifiedTime;
             return this;
         }
 

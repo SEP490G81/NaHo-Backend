@@ -1,10 +1,11 @@
 package org.naho.config.application;
 
-import org.naho.file.port.in.CrudFileInputPort;
+import org.naho.file.port.in.UploadFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileResultMapperPort;
 import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.shared.port.out.EmailPort;
+import org.naho.shared.port.out.TransactionPort;
 import org.naho.social.report.mapper.ReportResultMapper;
 import org.naho.social.report.port.in.CreateReportInputPort;
 import org.naho.social.report.port.in.GetListReportByUserInputPort;
@@ -55,15 +56,18 @@ public class ReportConfig {
             ReportRepositoryPort reportRepositoryPort,
             FileStorageServicePort fileStorageServicePort,
             FileRepositoryPort fileRepositoryPort,
-            CrudFileInputPort crudFileInputPort,
-            ReportResultMapper reportResultMapper
+            ReportResultMapper reportResultMapper,
+            UploadFileInputPort uploadFileInputPort,
+            TransactionPort transactionPort
     ) {
         return new CreateReportUseCase(
                 reportRepositoryPort,
                 fileStorageServicePort,
                 fileRepositoryPort,
-                crudFileInputPort,
-                reportResultMapper
+                reportResultMapper,
+                uploadFileInputPort,
+                transactionPort
         );
     }
 }
+

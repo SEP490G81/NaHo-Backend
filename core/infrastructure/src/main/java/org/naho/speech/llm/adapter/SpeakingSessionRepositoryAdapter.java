@@ -31,9 +31,9 @@ import java.util.*;
 @RequiredArgsConstructor
 public class SpeakingSessionRepositoryAdapter implements SpeakingSessionRepositoryPort {
 
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private final SpeakingSessionJpaRepository sessionJpaRepository;
     private final SpeakingSessionAssessmentJpaRepository assessmentJpaRepository;
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Override
     @Transactional

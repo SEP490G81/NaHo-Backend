@@ -1,23 +1,23 @@
 package org.naho.file.adapter;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.file.constant.FileProperties;
 import org.naho.file.constant.S3Properties;
 import org.naho.file.entity.FileEntity;
-import org.naho.file.entity.FileOperationEntity;
 import org.naho.file.exception.FileErrorCode;
 import org.naho.file.mapper.FileEntityMapper;
 import org.naho.file.model.File;
-import org.naho.file.model.StoredFile;
+import org.naho.file.mybatis.FileQueryMapper;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.repository.FileJpaRepository;
-import org.naho.file.repository.FileOperationJpaRepository;
+import org.naho.file.result.StoredFile;
 import org.naho.file.type.OperationStatus;
 import org.naho.file.type.OperationType;
 import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.shared.exception.InfrastructureException;
-import org.naho.social.report.repository.ReportJpaRepository;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.List;
 
 @Component
@@ -25,9 +25,8 @@ import java.util.List;
 public class FileRepositoryAdapter implements FileRepositoryPort {
 
     private final FileJpaRepository fileJpaRepository;
-    private final FileOperationJpaRepository fileOperationJpaRepository;
-    private final ReportJpaRepository reportJpaRepository;
     private final FileEntityMapper fileEntityMapper;
+    private final FileQueryMapper fileQueryMapper;
     private final S3Properties s3Properties;
 
     @Override
@@ -89,21 +88,7 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
     }
 
     @Override
-    public File createNew(File file, boolean isPublic) {
-        FileEntity entity = fileEntityMapper.domainToEntity(file);
-
-        String bucketName = isPublic ?
-                s3Properties.getPublicBucketName() :
-                s3Properties.getPrivateBucketName();
-
-        entity.setBucketName(bucketName);
-
-        FileEntity savedEntity = fileJpaRepository.save(entity);
-        return fileEntityMapper.entityToDomain(savedEntity);
-    }
-
-    @Override
-    public File saveFileToDbForUpload(StoredFile storedFile, boolean isPublic) {
+    public File createNewForUpload(StoredFile storedFile, boolean isPublic) {
         if (storedFile == null) {
             throw new InfrastructureException(
                     FileErrorCode.FILE_NOT_VALID,
@@ -112,71 +97,74 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
         }
 
         File domain = File.builder()
+                .commentId(storedFile.commentId())
+                .reportId(storedFile.reportId())
                 .objectKey(storedFile.objectKey())
                 .originalFileName(storedFile.originalFileName())
                 .contentType(storedFile.contentType())
                 .size(storedFile.size())
+                .checksum(storedFile.checksum())
+                .operationType(OperationType.UPLOAD)
+                .operationStatus(OperationStatus.PROCESSING)
+                .retryCount(0)
+                .nextRetryAt(null)
                 .build();
 
         FileEntity entity = fileEntityMapper.domainToEntity(domain);
+
         String bucketName = isPublic ?
                 s3Properties.getPublicBucketName() :
                 s3Properties.getPrivateBucketName();
+
         entity.setBucketName(bucketName);
 
         FileEntity savedEntity = fileJpaRepository.save(entity);
-
-        FileOperationEntity fileOperationEntity = FileOperationEntity.builder()
-                .file(savedEntity)
-                .operationType(OperationType.UPLOAD)
-                .operationStatus(OperationStatus.PENDING)
-                .retryCount(0)
-                .build();
-
-        fileOperationJpaRepository.save(fileOperationEntity);
 
         return fileEntityMapper.entityToDomain(savedEntity);
     }
 
     @Override
-    public File saveReportFileToDbForUpload(StoredFile storedFile, Long reportId, boolean isPublic) {
-        if (storedFile == null) {
-            throw new InfrastructureException(
-                    FileErrorCode.FILE_NOT_VALID,
-                    FileDetailMessageKey.FILE_NOT_VALID
-            );
-        }
+    public File save(File file) {
+        FileEntity entity = fileJpaRepository.findByObjectKey(file.getObjectKey())
+                .orElseThrow(() -> new InfrastructureException(
+                        FileErrorCode.FILE_NOT_FOUND,
+                        FileDetailMessageKey.FILE_NOT_FOUND,
+                        file.getId()
+                ));
 
-        File domain = File.builder()
-                .objectKey(storedFile.objectKey())
-                .originalFileName(storedFile.originalFileName())
-                .contentType(storedFile.contentType())
-                .size(storedFile.size())
-                .reportId(reportId)
-                .build();
+        entity.setObjectKey(file.getObjectKey());
+        entity.setBucketName(file.getBucketName());
+        entity.setOriginalFileName(file.getOriginalFileName());
+        entity.setContentType(file.getContentType());
+        entity.setSize(file.getSize());
+        entity.setChecksum(file.getChecksum());
 
-        FileEntity entity = fileEntityMapper.domainToEntity(domain);
-        String bucketName = isPublic ?
-                s3Properties.getPublicBucketName() :
-                s3Properties.getPrivateBucketName();
-        entity.setBucketName(bucketName);
+        entity.setOperationType(file.getOperationType());
+        entity.setOperationStatus(file.getOperationStatus());
+        entity.setRetryCount(file.getRetryCount());
 
-        if (reportId != null) {
-            reportJpaRepository.findById(reportId).ifPresent(entity::setReport);
-        }
+        entity.setNextRetryAt(file.getNextRetryAt() != null ?
+                file.getNextRetryAt().getValue() : null);
 
         FileEntity savedEntity = fileJpaRepository.save(entity);
 
-        FileOperationEntity fileOperationEntity = FileOperationEntity.builder()
-                .file(savedEntity)
-                .operationType(OperationType.UPLOAD)
-                .operationStatus(OperationStatus.PENDING)
-                .retryCount(0)
-                .build();
-
-        fileOperationJpaRepository.save(fileOperationEntity);
-
         return fileEntityMapper.entityToDomain(savedEntity);
+    }
+
+    @Override
+    public List<File> findAllForSchedulerRetryUpload(Instant now, OperationType operationType, OperationStatus operationStatus) {
+        return fileQueryMapper.findAllForSchedulerRetryUpload(
+                        now,
+                        operationType,
+                        operationStatus,
+                        FileProperties.MAX_RETRY_COUNT
+                ).stream().map(fileEntityMapper::entityToDomain)
+                .toList();
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        fileJpaRepository.deleteById(id);
     }
 
     @Override

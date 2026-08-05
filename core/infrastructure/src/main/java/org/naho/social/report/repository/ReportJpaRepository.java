@@ -20,5 +20,7 @@ public interface ReportJpaRepository extends JpaRepository<ReportEntity, Long> {
 
     @EntityGraph(attributePaths = {"files"})
     List<ReportEntity> findByUserId(Long userId);
+
+    List<ReportEntity> findAllByUser_Id(Long userId);
 }
 

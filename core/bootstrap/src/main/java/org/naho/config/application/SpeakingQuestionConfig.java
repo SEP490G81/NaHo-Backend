@@ -1,7 +1,6 @@
 package org.naho.config.application;
 
 import org.naho.daily.port.in.CrudUserDailyMissionInputPort;
-import org.naho.file.port.out.FileOperationRepositoryPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
@@ -27,13 +26,11 @@ public class SpeakingQuestionConfig {
     public CrudAnswerHistoryInputPort crudAnswerHistoryInputPort(
             AnswerHistoryRepositoryPort answerHistoryRepositoryPort,
             FileRepositoryPort fileRepositoryPort,
-            FileOperationRepositoryPort fileOperationRepositoryPort,
             FileStorageServicePort fileStorageServicePort
     ) {
         return new CrudAnswerHistoryUseCase(
                 answerHistoryRepositoryPort,
                 fileRepositoryPort,
-                fileOperationRepositoryPort,
                 fileStorageServicePort
         );
     }

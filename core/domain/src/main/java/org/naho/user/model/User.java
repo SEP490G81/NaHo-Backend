@@ -22,11 +22,10 @@ public class User {
     private final List<Long> userDailyAttendanceIds;
     private final List<Long> userDailyMissionIds;
     private final List<Long> userSubscriptionIds;
-    private Long avatarFileId;
     private final Long userLearningProgressId;
-
-    private Username username;
     private final Email email;
+    private Long avatarFileId;
+    private Username username;
     private String hashPassword;
     private String fullName;
     private Gender gender;

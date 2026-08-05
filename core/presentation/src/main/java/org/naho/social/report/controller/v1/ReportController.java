@@ -2,20 +2,23 @@ package org.naho.social.report.controller.v1;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.naho.file.constant.FileFolderConstant;
+import org.naho.file.exception.FileErrorCode;
+import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.file.port.out.FileValidatorPort;
+import org.naho.file.result.StoredFile;
+import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.i18n.message.social.ReportDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.shared.exception.PresentationException;
 import org.naho.social.report.command.CreateReportCommand;
 import org.naho.social.report.command.GetReportCommand;
-import org.naho.social.report.command.GetReportsByUserCommand;
 import org.naho.social.report.command.UpdateReportStatusCommand;
 import org.naho.social.report.dto.mapper.ReportRequestMapper;
 import org.naho.social.report.dto.mapper.ReportResponseMapper;
 import org.naho.social.report.dto.request.CreateReportRequest;
 import org.naho.social.report.dto.request.UpdateReportStatusRequest;
 import org.naho.social.report.dto.response.ReportResponse;
-import org.naho.social.report.exception.ReportErrorCode;
 import org.naho.social.report.port.in.CreateReportInputPort;
 import org.naho.social.report.port.in.GetListReportByUserInputPort;
 import org.naho.social.report.port.in.GetReportInputPort;
@@ -30,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -44,35 +48,44 @@ public class ReportController {
     private final ReportResponseMapper reportResponseMapper;
     private final ReportRequestMapper reportRequestMapper;
     private final FileValidatorPort fileValidatorPort;
+    private final FileStorageServicePort fileStorageServicePort;
 
-    @PostMapping(value = {"", "/"}, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiResponseMessage(message = ReportDetailMessageKey.REPORT_CREATE_SUCCESS)
     public ResponseEntity<ReportResponse> createReport(
             @Valid @ModelAttribute CreateReportRequest request,
             @RequestParam(value = "files", required = false) List<MultipartFile> files,
             @AuthenticationPrincipal AccessTokenPayload payload) {
-        Long userId = payload != null ? payload.userId() : null;
+        if (files == null || files.isEmpty()) {
+            throw new PresentationException(
+                    FileErrorCode.FILE_NOT_VALID,
+                    FileDetailMessageKey.FILE_NOT_VALID
+            );
+        }
 
-        List<MultipartFile> uploadFiles = (files != null && !files.isEmpty())
-                ? files
-                : request.getFiles();
+        List<StoredFile> storedFiles = new ArrayList<>();
+        for (MultipartFile file : files) {
+            if (file == null || file.isEmpty()) {
+                throw new PresentationException(
+                        FileErrorCode.FILE_NOT_VALID,
+                        FileDetailMessageKey.FILE_EMPTY
+                );
+            }
 
-        if (uploadFiles != null) {
-            for (MultipartFile file : uploadFiles) {
-                if (file != null && !file.isEmpty()) {
-                    try {
-                        fileValidatorPort.validateImageFile(file.getInputStream());
-                    } catch (IOException e) {
-                        throw new PresentationException(
-                                ReportErrorCode.REPORT_NOT_FOUND,
-                                ReportDetailMessageKey.REPORT_TITLE_BLANK,
-                                e.getMessage());
-                    }
-                }
+            try {
+                fileValidatorPort.validateImageFile(file.getBytes());
+                StoredFile storedFile = fileStorageServicePort.saveFileToLocal(file, FileFolderConstant.REPORTS, false);
+                storedFiles.add(storedFile);
+            } catch (IOException e) {
+                throw new PresentationException(
+                        FileErrorCode.FILE_UPLOAD_FAILED,
+                        FileDetailMessageKey.FILE_UPLOAD_FAILED,
+                        e.getMessage()
+                );
             }
         }
 
-        CreateReportCommand command = reportRequestMapper.requestToCommand(request, userId, uploadFiles);
+        CreateReportCommand command = reportRequestMapper.requestToCommand(request, payload.userId(), storedFiles);
         ReportResult result = createReportInputPort.createReport(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(reportResponseMapper.resultToResponse(result));
     }
@@ -98,12 +111,13 @@ public class ReportController {
     @GetMapping("/user")
     @ApiResponseMessage(message = ReportDetailMessageKey.REPORT_GET_LIST_USER_SUCCESS)
     public ResponseEntity<List<ReportResponse>> getReportsByUser(
-            @AuthenticationPrincipal AccessTokenPayload payload) {
-        Long userId = payload != null ? payload.userId() : null;
-        List<ReportResult> results = getListReportByUserInputPort.getReportsByUser(new GetReportsByUserCommand(userId));
-        return ResponseEntity.ok(results.stream()
-                .map(reportResponseMapper::resultToResponse)
-                .toList());
+            @AuthenticationPrincipal AccessTokenPayload payload
+    ) {
+        List<ReportResult> results = getListReportByUserInputPort.getReportsByUser(payload.userId());
+
+        List<ReportResponse> responses = results.stream().map(reportResponseMapper::resultToResponse).toList();
+        
+        return ResponseEntity.ok(responses);
     }
 
     @PatchMapping("/{id}/status")

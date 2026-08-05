@@ -46,11 +46,8 @@ public class ReportRepositoryAdapter implements ReportRepositoryPort {
     }
 
     @Override
-    public List<Report> findByUserId(Long userId) {
-        if (userId == null) {
-            return List.of();
-        }
-        List<ReportEntity> entities = reportJpaRepository.findByUserId(userId);
+    public List<Report> findAllByUserId(Long userId) {
+        List<ReportEntity> entities = reportJpaRepository.findAllByUser_Id(userId);
         return entities.stream()
                 .map(reportEntityMapper::entityToDomain)
                 .toList();

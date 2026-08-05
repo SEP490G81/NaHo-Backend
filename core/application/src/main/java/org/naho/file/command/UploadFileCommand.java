@@ -3,14 +3,26 @@ package org.naho.file.command;
 import java.io.InputStream;
 
 public class UploadFileCommand {
-
-    private String objectKey;
+    private String folderName;
+    private String originalName;
     private InputStream inputStream;
     private String contentType;
     private Long size;
 
+    public UploadFileCommand() {
+    }
+
+    public UploadFileCommand(String folderName, String originalName, InputStream inputStream, String contentType, Long size) {
+        this.folderName = folderName;
+        this.originalName = originalName;
+        this.inputStream = inputStream;
+        this.contentType = contentType;
+        this.size = size;
+    }
+
     private UploadFileCommand(Builder builder) {
-        this.objectKey = builder.objectKey;
+        this.folderName = builder.folderName;
+        this.originalName = builder.originalName;
         this.inputStream = builder.inputStream;
         this.contentType = builder.contentType;
         this.size = builder.size;
@@ -20,40 +32,29 @@ public class UploadFileCommand {
         return new Builder();
     }
 
-    public String getObjectKey() {
-        return objectKey;
+    public String getFolderName() {
+        return folderName;
     }
 
-    public void setObjectKey(String objectKey) {
-        this.objectKey = objectKey;
+    public String getOriginalName() {
+        return originalName;
     }
 
     public InputStream getInputStream() {
         return inputStream;
     }
 
-    public void setInputStream(InputStream inputStream) {
-        this.inputStream = inputStream;
-    }
-
     public String getContentType() {
         return contentType;
-    }
-
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
     }
 
     public Long getSize() {
         return size;
     }
 
-    public void setSize(Long size) {
-        this.size = size;
-    }
-
     public static final class Builder {
-        private String objectKey;
+        private String folderName;
+        private String originalName;
         private InputStream inputStream;
         private String contentType;
         private Long size;
@@ -61,8 +62,13 @@ public class UploadFileCommand {
         private Builder() {
         }
 
-        public Builder objectKey(String objectKey) {
-            this.objectKey = objectKey;
+        public Builder folderName(String folderName) {
+            this.folderName = folderName;
+            return this;
+        }
+
+        public Builder originalName(String originalName) {
+            this.originalName = originalName;
             return this;
         }
 
