@@ -1,6 +1,7 @@
 package org.naho.user.controller.v1;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.file.constant.FileFolderConstant;
 import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.file.port.out.FileValidatorPort;
 import org.naho.i18n.message.user.UserDetailMessageKey;
@@ -34,7 +35,7 @@ import java.util.List;
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 public class UserController {
-    public static final String AVATAR_FILE_FOLDER = "avatars";
+    public static final String AVATAR_FILE_FOLDER = FileFolderConstant.AVATARS;
 
     private final GetUserInputPort getUserInputPort;
     private final UpdateUserInputPort updateUserInputPort;

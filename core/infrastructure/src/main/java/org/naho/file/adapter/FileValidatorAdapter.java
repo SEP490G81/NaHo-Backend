@@ -6,6 +6,7 @@ import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import org.apache.tika.Tika;
 import org.naho.file.constant.FileContentType;
+import org.naho.file.constant.FileFolderConstant;
 import org.naho.file.constant.StaticResourceProperties;
 import org.naho.file.exception.FileErrorCode;
 import org.naho.file.port.out.FileValidatorPort;
@@ -14,7 +15,6 @@ import org.naho.shared.exception.InfrastructureException;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
@@ -38,23 +38,14 @@ public class FileValidatorAdapter implements FileValidatorPort {
     private final StaticResourceProperties staticResourceProperties;
 
     @Override
-    public String validateImageFile(InputStream inputStream) {
-        try {
-            String detectedMimeType = tika.detect(inputStream);
-            if (!ALLOWED_IMAGE_MIME_TYPES.contains(detectedMimeType)) {
-                throw new InfrastructureException(
-                        FileErrorCode.FILE_NOT_VALID,
-                        FileDetailMessageKey.FILE_NOT_VALID,
-                        detectedMimeType
-                );
-            }
+    public void validateImageFile(byte[] fileBytes) {
+        String detectedMimeType = tika.detect(fileBytes);
 
-            return detectedMimeType;
-        } catch (IOException e) {
+        if (!ALLOWED_IMAGE_MIME_TYPES.contains(detectedMimeType)) {
             throw new InfrastructureException(
                     FileErrorCode.FILE_NOT_VALID,
                     FileDetailMessageKey.FILE_NOT_VALID,
-                    e.getMessage()
+                    detectedMimeType
             );
         }
     }
@@ -83,7 +74,7 @@ public class FileValidatorAdapter implements FileValidatorPort {
 
             Path tempDirectory = Path.of(
                     staticResourceProperties.getLocalPath(),
-                    staticResourceProperties.getTemp()
+                    FileFolderConstant.TEMP
             );
 
             Files.createDirectories(tempDirectory);

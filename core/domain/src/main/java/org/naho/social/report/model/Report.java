@@ -1,11 +1,12 @@
 package org.naho.social.report.model;
 
+import org.naho.file.model.File;
 import org.naho.i18n.message.social.ReportDetailMessageKey;
 import org.naho.shared.exception.DomainException;
 import org.naho.social.report.exception.ReportDomainErrorCode;
 import org.naho.social.report.type.ReportType;
 
-import java.time.Instant;
+import java.util.List;
 
 public class Report {
 
@@ -17,8 +18,7 @@ public class Report {
     private final String description;
     private final ReportType reportType;
     private final boolean isResolved;
-    private final Instant createdTime;
-    private final Instant modifiedTime;
+    private List<File> files;
 
     private Report(Builder builder) {
         this.id = builder.id;
@@ -29,8 +29,7 @@ public class Report {
         this.description = builder.description;
         this.reportType = builder.reportType;
         this.isResolved = builder.isResolved;
-        this.createdTime = builder.createdTime;
-        this.modifiedTime = builder.modifiedTime;
+        this.files = builder.files != null ? builder.files : List.of();
     }
 
     public static Builder builder() {
@@ -69,12 +68,26 @@ public class Report {
         return isResolved;
     }
 
-    public Instant getCreatedTime() {
-        return createdTime;
+    public List<File> getFiles() {
+        return files;
     }
 
-    public Instant getModifiedTime() {
-        return modifiedTime;
+    public void setFiles(List<File> files) {
+        this.files = files;
+    }
+
+    public Report updateStatus(boolean isResolved) {
+        return builder()
+                .id(this.id)
+                .userId(this.userId)
+                .questionId(this.questionId)
+                .commentId(this.commentId)
+                .title(this.title)
+                .description(this.description)
+                .reportType(this.reportType)
+                .isResolved(isResolved)
+                .files(this.files)
+                .build();
     }
 
     public static class Builder {
@@ -87,8 +100,7 @@ public class Report {
         private String description;
         private ReportType reportType;
         private boolean isResolved;
-        private Instant createdTime;
-        private Instant modifiedTime;
+        private List<File> files;
 
         public Builder id(Long id) {
             this.id = id;
@@ -130,13 +142,8 @@ public class Report {
             return this;
         }
 
-        public Builder createdTime(Instant createdTime) {
-            this.createdTime = createdTime;
-            return this;
-        }
-
-        public Builder modifiedTime(Instant modifiedTime) {
-            this.modifiedTime = modifiedTime;
+        public Builder files(List<File> files) {
+            this.files = files;
             return this;
         }
 

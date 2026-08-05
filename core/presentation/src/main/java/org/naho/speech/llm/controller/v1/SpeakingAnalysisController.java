@@ -1,6 +1,7 @@
 package org.naho.speech.llm.controller.v1;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.file.constant.FileFolderConstant;
 import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.file.port.out.FileValidatorPort;
 import org.naho.file.result.StoredFile;
@@ -72,7 +73,7 @@ public class SpeakingAnalysisController {
                         subscriptionPlan.maxAnswerTimeSeconds()
                 );
                 // Step 1: Lưu file vào local
-                storedFile = fileStorageServicePort.saveFileToLocal(file, false);
+                storedFile = fileStorageServicePort.saveFileToLocal(file, FileFolderConstant.RECORDINGS, false);
             }
 
             SpeakingAnalysisCommand command = SpeakingAnalysisCommand.builder()

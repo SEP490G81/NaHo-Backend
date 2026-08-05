@@ -11,8 +11,4 @@ public class StaticResourceProperties {
     String localRoot;
     String localPath;
     String backendFilesBaseUrl;
-    String avatars;
-    String books;
-    String recordings;
-    String temp;
 }

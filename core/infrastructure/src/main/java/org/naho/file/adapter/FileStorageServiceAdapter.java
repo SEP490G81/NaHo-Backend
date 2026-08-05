@@ -90,7 +90,7 @@ public class FileStorageServiceAdapter implements FileStorageServicePort {
     }
 
     @Override
-    public StoredFile saveFileToLocal(Object file, boolean isPublic) {
+    public StoredFile saveFileToLocal(Object file, String folder, boolean isPublic) {
         if (!(file instanceof MultipartFile multipartFile)) {
             throw new InfrastructureException(
                     FileErrorCode.FILE_NOT_VALID,
@@ -105,7 +105,7 @@ public class FileStorageServiceAdapter implements FileStorageServicePort {
 
             Path storageDirectory = Paths.get(
                     staticResourceProperties.getLocalPath(),
-                    staticResourceProperties.getRecordings()
+                    folder
             );
 
             Files.createDirectories(storageDirectory);
@@ -116,7 +116,7 @@ public class FileStorageServiceAdapter implements FileStorageServicePort {
 
             String checksum = fileHelperPort.calculateChecksum(destination);
 
-            String objectKey = staticResourceProperties.getRecordings() + "/" + fileName;
+            String objectKey = folder + "/" + fileName;
 
             String bucketName = isPublic ?
                     s3Properties.getPublicBucketName() :
@@ -212,5 +212,10 @@ public class FileStorageServiceAdapter implements FileStorageServicePort {
                     e.getMessage()
             );
         }
+    }
+
+    @Override
+    public StoredFile saveReportFileToLocal(Object fileObj) {
+        return null;
     }
 }

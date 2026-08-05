@@ -1,7 +1,6 @@
 package org.naho.file.adapter;
 
 import lombok.RequiredArgsConstructor;
-import org.naho.file.command.UpdateOperationStatusCommand;
 import org.naho.file.constant.FileProperties;
 import org.naho.file.constant.S3Properties;
 import org.naho.file.entity.FileEntity;
@@ -98,6 +97,8 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
         }
 
         File domain = File.builder()
+                .commentId(storedFile.commentId())
+                .reportId(storedFile.reportId())
                 .objectKey(storedFile.objectKey())
                 .originalFileName(storedFile.originalFileName())
                 .contentType(storedFile.contentType())
@@ -119,53 +120,6 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
 
         FileEntity savedEntity = fileJpaRepository.save(entity);
 
-        return fileEntityMapper.entityToDomain(savedEntity);
-    }
-
-    @Override
-    public File updateOperationByObjectKeyAndOperationType(UpdateOperationStatusCommand command) {
-        if (command == null || command.getObjectKey() == null || command.getObjectKey().isBlank()) {
-            throw new InfrastructureException(
-                    FileErrorCode.FILE_NOT_VALID,
-                    FileDetailMessageKey.FILE_OBJECT_KEY_EMPTY
-            );
-        }
-
-        FileEntity entity = fileJpaRepository
-                .findByObjectKeyAndOperationType(command.getObjectKey(), command.getOperationType())
-                .orElseGet(() -> fileJpaRepository.findByObjectKey(command.getObjectKey())
-                        .orElseThrow(() -> new InfrastructureException(
-                                FileErrorCode.FILE_NOT_FOUND,
-                                FileDetailMessageKey.FILE_NOT_FOUND,
-                                command.getObjectKey()
-                        )));
-
-        entity.setOperationStatus(command.getToOperationStatus());
-
-        FileEntity savedEntity = fileJpaRepository.save(entity);
-        return fileEntityMapper.entityToDomain(savedEntity);
-    }
-
-    @Override
-    public File updateOperationStatus(File file, OperationStatus operationStatus) {
-        if (file == null || file.getId() == null) {
-            throw new InfrastructureException(
-                    FileErrorCode.FILE_NOT_VALID,
-                    FileDetailMessageKey.FILE_ID_NULL
-            );
-        }
-
-        FileEntity entity = fileJpaRepository
-                .findById(file.getId())
-                .orElseThrow(() -> new InfrastructureException(
-                        FileErrorCode.FILE_NOT_FOUND,
-                        FileDetailMessageKey.FILE_NOT_FOUND,
-                        file.getId()
-                ));
-
-        entity.setOperationStatus(operationStatus);
-
-        FileEntity savedEntity = fileJpaRepository.save(entity);
         return fileEntityMapper.entityToDomain(savedEntity);
     }
 
@@ -211,5 +165,16 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
     @Override
     public void deleteById(Long id) {
         fileJpaRepository.deleteById(id);
+    }
+
+    @Override
+    public List<File> findAllByReportId(Long reportId) {
+        if (reportId == null) {
+            return List.of();
+        }
+        List<FileEntity> entities = fileJpaRepository.findAllByReport_Id(reportId);
+        return entities.stream()
+                .map(fileEntityMapper::entityToDomain)
+                .toList();
     }
 }

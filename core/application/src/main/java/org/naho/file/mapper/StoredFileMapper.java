@@ -10,6 +10,8 @@ public class StoredFileMapper {
         }
 
         return StoredFile.builder()
+                .commentId(file.getCommentId())
+                .reportId(file.getReportId())
                 .objectKey(file.getObjectKey())
                 .bucketName(file.getBucketName())
                 .originalFileName(file.getOriginalFileName())
@@ -25,6 +27,8 @@ public class StoredFileMapper {
         }
 
         return File.builder()
+                .commentId(storedFile.commentId())
+                .reportId(storedFile.reportId())
                 .objectKey(storedFile.objectKey())
                 .bucketName(storedFile.bucketName())
                 .originalFileName(storedFile.originalFileName())

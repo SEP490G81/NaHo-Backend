@@ -19,4 +19,6 @@ public interface FileJpaRepository extends BaseJpaRepository<FileEntity> {
     Optional<FileEntity> findByIdAndOperationType(Long id, OperationType operationType);
 
     List<FileEntity> findTop20AllByOperationStatusAndOperationTypeAndRetryCountLessThanOrderByCreatedTime(OperationStatus operationStatus, OperationType operationType, Integer retryCount);
+
+    List<FileEntity> findAllByReport_Id(Long reportId);
 }

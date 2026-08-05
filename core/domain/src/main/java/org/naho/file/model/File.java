@@ -12,6 +12,10 @@ public class File {
     private final Long id;
     private final Long commentId;
     private final Long reportId;
+    private final Long userId;
+    private final Long personaId;
+    private final Long leagueId;
+    private final Long speakingQuestionId;
 
     private final String objectKey;
     private final String bucketName;
@@ -30,6 +34,10 @@ public class File {
         this.id = builder.id;
         this.commentId = builder.commentId;
         this.reportId = builder.reportId;
+        this.userId = builder.userId;
+        this.personaId = builder.personaId;
+        this.leagueId = builder.leagueId;
+        this.speakingQuestionId = builder.speakingQuestionId;
         this.objectKey = builder.objectKey;
         this.bucketName = builder.bucketName;
         this.originalFileName = builder.originalFileName;
@@ -56,6 +64,22 @@ public class File {
 
     public Long getReportId() {
         return reportId;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public Long getPersonaId() {
+        return personaId;
+    }
+
+    public Long getLeagueId() {
+        return leagueId;
+    }
+
+    public Long getSpeakingQuestionId() {
+        return speakingQuestionId;
     }
 
     public String getObjectKey() {
@@ -125,6 +149,10 @@ public class File {
         private Long id;
         private Long commentId;
         private Long reportId;
+        private Long userId;
+        private Long personaId;
+        private Long leagueId;
+        private Long speakingQuestionId;
         private String objectKey;
         private String bucketName;
         private String originalFileName;
@@ -148,6 +176,26 @@ public class File {
 
         public Builder reportId(Long reportId) {
             this.reportId = reportId;
+            return this;
+        }
+
+        public Builder userId(Long userId) {
+            this.userId = userId;
+            return this;
+        }
+
+        public Builder personaId(Long personaId) {
+            this.personaId = personaId;
+            return this;
+        }
+
+        public Builder leagueId(Long leagueId) {
+            this.leagueId = leagueId;
+            return this;
+        }
+
+        public Builder speakingQuestionId(Long speakingQuestionId) {
+            this.speakingQuestionId = speakingQuestionId;
             return this;
         }
 

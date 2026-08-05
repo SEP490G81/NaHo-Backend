@@ -7,7 +7,7 @@ import org.naho.file.result.StoredFile;
 public interface FileStorageServicePort {
     void uploadFileToCloud(StoredFile file);
 
-    StoredFile saveFileToLocal(Object file, boolean isPublic);
+    StoredFile saveFileToLocal(Object file, String folder, boolean isPublic);
 
     void deleteFileInLocal(String objectKey);
 
@@ -16,4 +16,6 @@ public interface FileStorageServicePort {
     DownloadedFile downloadFileFromCloud(File file);
 
     void deleteFileInCloud(File file);
+
+    StoredFile saveReportFileToLocal(Object fileObj);
 }

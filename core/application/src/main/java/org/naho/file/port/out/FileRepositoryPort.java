@@ -1,6 +1,5 @@
 package org.naho.file.port.out;
 
-import org.naho.file.command.UpdateOperationStatusCommand;
 import org.naho.file.model.File;
 import org.naho.file.result.StoredFile;
 import org.naho.file.type.OperationStatus;
@@ -20,10 +19,6 @@ public interface FileRepositoryPort {
 
     File createNewForUpload(StoredFile storedFile, boolean isPublic);
 
-    File updateOperationByObjectKeyAndOperationType(UpdateOperationStatusCommand command);
-
-    File updateOperationStatus(File file, OperationStatus operationStatus);
-
     File save(File file);
 
     List<File> findAllForSchedulerRetryUpload(
@@ -33,4 +28,6 @@ public interface FileRepositoryPort {
     );
 
     void deleteById(Long id);
+
+    List<File> findAllByReportId(Long reportId);
 }
