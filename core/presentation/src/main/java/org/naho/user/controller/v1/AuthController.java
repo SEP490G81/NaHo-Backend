@@ -5,22 +5,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
-import org.naho.user.command.CredentialsLoginCommand;
-import org.naho.user.command.LogoutCommand;
-import org.naho.user.command.ResendOtpCommand;
-import org.naho.user.command.VerifyEmailCommand;
+import org.naho.user.command.*;
 import org.naho.user.constant.TokenType;
-import org.naho.user.dto.mapper.LoginRequestMapper;
-import org.naho.user.dto.mapper.ResendOtpRequestMapper;
-import org.naho.user.dto.mapper.VerifyEmailRequestMapper;
-import org.naho.user.dto.request.CredentialsLoginRequest;
-import org.naho.user.dto.request.ResendOtpRequest;
-import org.naho.user.dto.request.VerifyEmailRequest;
+import org.naho.user.dto.mapper.*;
+import org.naho.user.dto.request.*;
 import org.naho.user.helper.CookieFactory;
 import org.naho.user.helper.LoginRequestResolver;
-import org.naho.user.port.in.AuthInputPort;
-import org.naho.user.port.in.ResendOtpInputPort;
-import org.naho.user.port.in.VerifyEmailInputPort;
+import org.naho.user.port.in.*;
 import org.naho.user.result.AccessTokenPayload;
 import org.naho.user.result.LoginResult;
 import org.springframework.http.HttpHeaders;
@@ -41,6 +32,14 @@ public class AuthController {
     private final ResendOtpInputPort resendOtpInputPort;
     private final VerifyEmailRequestMapper verifyEmailRequestMapper;
     private final ResendOtpRequestMapper resendOtpRequestMapper;
+    private final ForgotPasswordInputPort forgotPasswordInputPort;
+    private final ResetPasswordInputPort resetPasswordInputPort;
+    private final ForgotPasswordRequestMapper forgotPasswordRequestMapper;
+    private final ResetPasswordRequestMapper resetPasswordRequestMapper;
+    private final VerifyForgotPasswordOtpInputPort verifyForgotPasswordOtpInputPort;
+    private final VerifyForgotPasswordOtpRequestMapper verifyForgotPasswordOtpRequestMapper;
+    private final ChangePasswordInputPort changePasswordInputPort;
+    private final ChangePasswordRequestMapper changePasswordRequestMapper;
 
     @ApiResponseMessage(message = UserDetailMessageKey.USER_LOGIN_SUCCESSFULLY)
     @PostMapping("/login")
@@ -155,6 +154,47 @@ public class AuthController {
     ) {
         ResendOtpCommand command = resendOtpRequestMapper.toCommand(request);
         resendOtpInputPort.resendOtp(command);
+        return ResponseEntity.ok().build();
+    }
+
+    @ApiResponseMessage(message = UserDetailMessageKey.USER_FORGOT_PASSWORD_EMAIL_SENT)
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Void> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest request
+    ) {
+        ForgotPasswordCommand command = forgotPasswordRequestMapper.requestToCommand(request);
+        forgotPasswordInputPort.forgotPassword(command);
+        return ResponseEntity.ok().build();
+    }
+
+    @ApiResponseMessage(message = UserDetailMessageKey.USER_OTP_VERIFIED_SUCCESSFULLY)
+    @PostMapping("/forgot-password-otp")
+    public ResponseEntity<java.util.Map<String, String>> verifyForgotPasswordOtp(
+            @Valid @RequestBody VerifyForgotPasswordOtpRequest request
+    ) {
+        VerifyForgotPasswordOtpCommand command = verifyForgotPasswordOtpRequestMapper.toCommand(request);
+        String resetToken = verifyForgotPasswordOtpInputPort.verifyOtp(command);
+        return ResponseEntity.ok(java.util.Map.of("resetToken", resetToken));
+    }
+
+    @ApiResponseMessage(message = UserDetailMessageKey.USER_PASSWORD_RESET_SUCCESSFULLY)
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest request
+    ) {
+        ResetPasswordCommand command = resetPasswordRequestMapper.toCommand(request);
+        resetPasswordInputPort.resetPassword(command);
+        return ResponseEntity.ok().build();
+    }
+
+    @ApiResponseMessage(message = UserDetailMessageKey.USER_CHANGE_PASSWORD_SUCCESSFULLY)
+    @PostMapping("/change-password")
+    public ResponseEntity<Void> changePassword(
+            @AuthenticationPrincipal AccessTokenPayload payload,
+            @Valid @RequestBody ChangePasswordRequest request
+    ) {
+        ChangePasswordCommand command = changePasswordRequestMapper.toCommand(payload.userId(), request);
+        changePasswordInputPort.changePassword(command);
         return ResponseEntity.ok().build();
     }
 }

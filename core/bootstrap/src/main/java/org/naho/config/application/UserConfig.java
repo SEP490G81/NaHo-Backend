@@ -174,4 +174,44 @@ public class UserConfig {
                 otpPort,
                 emailPort);
     }
+
+    @Bean
+    public ForgotPasswordInputPort forgotPasswordInputPort(
+            UserRepositoryPort userRepositoryPort,
+            PasswordResetOtpPort passwordResetOtpPort,
+            EmailPort emailPort) {
+        return new ForgotPasswordUseCase(
+                userRepositoryPort,
+                passwordResetOtpPort,
+                emailPort);
+    }
+
+    @Bean
+    public ResetPasswordInputPort resetPasswordInputPort(
+            UserRepositoryPort userRepositoryPort,
+            PasswordResetOtpPort passwordResetOtpPort,
+            EncoderPort encoderPort) {
+        return new ResetPasswordUseCase(
+                userRepositoryPort,
+                passwordResetOtpPort,
+                encoderPort);
+    }
+
+    @Bean
+    public VerifyForgotPasswordOtpInputPort verifyForgotPasswordOtpInputPort(
+            UserRepositoryPort userRepositoryPort,
+            PasswordResetOtpPort passwordResetOtpPort) {
+        return new VerifyForgotPasswordOtpUseCase(
+                userRepositoryPort,
+                passwordResetOtpPort);
+    }
+
+    @Bean
+    public ChangePasswordInputPort changePasswordInputPort(
+            UserRepositoryPort userRepositoryPort,
+            EncoderPort encoderPort) {
+        return new ChangePasswordUseCase(
+                userRepositoryPort,
+                encoderPort);
+    }
 }

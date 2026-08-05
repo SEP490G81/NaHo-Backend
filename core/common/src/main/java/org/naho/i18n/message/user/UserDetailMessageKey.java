@@ -83,6 +83,20 @@ public final class UserDetailMessageKey {
     public static final String USER_EMAIL_VERIFIED_SUCCESSFULLY = "user.email.verified.successfully";
     public static final String USER_OTP_RESENT_SUCCESSFULLY = "user.otp.resent.successfully";
 
+    public static final String USER_PASSWORD_RESET_SUCCESSFULLY = "user.password.reset.successfully";
+    public static final String USER_FORGOT_PASSWORD_EMAIL_SENT = "user.forgot.password.email.sent";
+    public static final String USER_SOCIAL_LOGIN_CANNOT_RESET_PASSWORD = "user.social.login.cannot.reset.password";
+    public static final String USER_PASSWORD_NOT_MATCH_DETAIL = "user.password.not.match.detail";
+    public static final String USER_PASSWORD_SAME_AS_OLD_DETAIL = "user.password.same.as.old.detail";
+
+    public static final String USER_CHANGE_PASSWORD_SUCCESSFULLY = "user.change.password.successfully";
+    public static final String USER_OLD_PASSWORD_NOT_MATCH_DETAIL = "user.old.password.not.match.detail";
+    public static final String USER_INVALID_RESET_TOKEN_DETAIL = "user.invalid.reset.token.detail";
+    public static final String USER_OTP_VERIFIED_SUCCESSFULLY = "user.otp.verified.successfully";
+
+    public static final String USER_PASSWORD_REQUIRED = "user.password.required";
+    public static final String USER_PASSWORD_INVALID_FORMAT = "user.password.invalid.format";
+
     private UserDetailMessageKey() {
     }
 }
