@@ -78,6 +78,7 @@ public class ReportController {
     }
 
     @GetMapping("/admin")
+    @ApiResponseMessage(message = ReportDetailMessageKey.REPORT_GET_LIST_ADMIN_SUCCESS)
     public ResponseEntity<List<ReportResponse>> getReportsByAdmin() {
         List<ReportResult> results = getReportInputPort.getReportsByAdmin();
         return ResponseEntity.ok(results.stream()
@@ -86,6 +87,7 @@ public class ReportController {
     }
 
     @GetMapping("/content-manager")
+    @ApiResponseMessage(message = ReportDetailMessageKey.REPORT_GET_LIST_CONTENT_MANAGER_SUCCESS)
     public ResponseEntity<List<ReportResponse>> getReportsByContentManager() {
         List<ReportResult> results = getReportInputPort.getReportsByContentManager();
         return ResponseEntity.ok(results.stream()
@@ -115,6 +117,7 @@ public class ReportController {
     }
 
     @GetMapping("/{id}")
+    @ApiResponseMessage(message = ReportDetailMessageKey.REPORT_GET_DETAIL_SUCCESS)
     public ResponseEntity<ReportResponse> getReport(@PathVariable("id") Long id) {
         ReportResult result = getReportInputPort.getReport(new GetReportCommand(id));
         return ResponseEntity.ok(reportResponseMapper.resultToResponse(result));
