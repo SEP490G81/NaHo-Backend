@@ -1,5 +1,8 @@
 package org.naho.payment.usecase;
 
+import org.naho.i18n.message.payment.PaymentDetailMessageKey;
+import org.naho.i18n.message.subscription.SubscriptionDetailMessageKey;
+import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.payment.command.AdminUpgradeSubscriptionCommand;
 import org.naho.payment.exception.PaymentErrorCode;
 import org.naho.payment.port.in.AdminUpgradeSubscriptionInputPort;
@@ -84,16 +87,16 @@ public class AdminUpgradeSubscriptionUseCase implements AdminUpgradeSubscription
         // 1. Verify Admin Role
         List<String> adminRoles = roleRepositoryPort.findRoleNamesByUserId(command.adminUserId());
         if (adminRoles == null || !adminRoles.contains(RoleName.ADMIN.name())) {
-            throw new ApplicationException(UserErrorCode.USER_ACCESS_DENIED, "user.access_denied");
+            throw new ApplicationException(UserErrorCode.USER_ACCESS_DENIED, UserDetailMessageKey.USER_ACCESS_DENIED);
         }
 
         // 2. Verify Target User Exists
         userRepositoryPort.findById(command.targetUserId())
-                .orElseThrow(() -> new ApplicationException(UserErrorCode.USER_NOT_FOUND, "user.not_found"));
+                .orElseThrow(() -> new ApplicationException(UserErrorCode.USER_NOT_FOUND, UserDetailMessageKey.USER_NOT_FOUND));
 
         // 3. Verify Target Plan Exists and is Active
         SubscriptionPlan targetPlan = planRepositoryPort.findActiveByCode(command.planCode())
-                .orElseThrow(() -> new ApplicationException(PaymentErrorCode.PLAN_NOT_FOUND, "subscription.plan.not_found"));
+                .orElseThrow(() -> new ApplicationException(PaymentErrorCode.PLAN_NOT_FOUND, SubscriptionDetailMessageKey.PLAN_NOT_FOUND));
 
         // 4. Get Current Active Subscription or Fallback to FREE plan info
         Optional<UserSubscription> currentActiveSubOpt = subscriptionRepositoryPort.findActiveByUserId(command.targetUserId(), now);
@@ -115,13 +118,13 @@ public class AdminUpgradeSubscriptionUseCase implements AdminUpgradeSubscription
             if (currentTier == PlanTier.PREMIUM) {
                 throw new ApplicationException(
                         PaymentErrorCode.MAXIMUM_SUBSCRIPTION_TIER_REACHED,
-                        "payment.subscription.max_tier_reached");
+                        PaymentDetailMessageKey.PAYMENT_SUBSCRIPTION_MAX_TIER_REACHED);
             }
 
             if (targetTier.getLevel() <= currentTier.getLevel()) {
                 throw new ApplicationException(
                         PaymentErrorCode.CANNOT_UPGRADE_SAME_OR_LOWER_TIER,
-                        "payment.subscription.same_or_lower_tier");
+                        PaymentDetailMessageKey.PAYMENT_SUBSCRIPTION_SAME_OR_LOWER_TIER);
             }
         }
 

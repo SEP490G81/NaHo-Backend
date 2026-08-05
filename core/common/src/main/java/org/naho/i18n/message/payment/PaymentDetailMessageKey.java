@@ -12,6 +12,7 @@ public final class PaymentDetailMessageKey {
     public static final String PAYMENT_IDEMPOTENCY_KEY_REUSED = "payment.idempotency_key.reused";
     public static final String PAYMENT_ACTIVE_ORDER_EXISTS = "payment.active_order_exists";
     public static final String PAYMENT_ORDER_NOT_FOUND = "payment.order.not_found";
+    public static final String PAYMENT_ORDER_NOT_BELONG_TO_USER = "payment.order.not_belong_to_user";
     public static final String PAYMENT_ORDER_GET_ALL_SUCCESS = "payment.order.get_all_success";
     public static final String PAYMENT_SUBSCRIPTION_SAME_OR_LOWER_TIER = "payment.subscription.same_or_lower_tier";
     public static final String PAYMENT_SUBSCRIPTION_MAX_TIER_REACHED = "payment.subscription.max_tier_reached";
