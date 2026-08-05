@@ -4,6 +4,7 @@ import org.naho.file.port.in.CrudFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileResultMapperPort;
 import org.naho.file.port.out.FileStorageServicePort;
+import org.naho.shared.port.out.EmailPort;
 import org.naho.social.report.mapper.ReportResultMapper;
 import org.naho.social.report.port.in.CreateReportInputPort;
 import org.naho.social.report.port.in.GetListReportByUserInputPort;
@@ -14,6 +15,7 @@ import org.naho.social.report.usecase.CreateReportUseCase;
 import org.naho.social.report.usecase.GetListReportByUserUseCase;
 import org.naho.social.report.usecase.GetReportUseCase;
 import org.naho.social.report.usecase.UpdateReportStatusUseCase;
+import org.naho.user.port.out.UserRepositoryPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -38,10 +40,15 @@ public class ReportConfig {
     }
 
     @Bean
-    public UpdateReportStatusInputPort updateReportStatusInputPort(ReportRepositoryPort reportRepositoryPort,
-                                                                   ReportResultMapper reportResultMapper) {
-        return new UpdateReportStatusUseCase(reportRepositoryPort, reportResultMapper);
+    public UpdateReportStatusInputPort updateReportStatusInputPort(
+            ReportRepositoryPort reportRepositoryPort,
+            ReportResultMapper reportResultMapper,
+            UserRepositoryPort userRepositoryPort,
+            EmailPort emailPort
+    ) {
+        return new UpdateReportStatusUseCase(reportRepositoryPort, reportResultMapper, userRepositoryPort, emailPort);
     }
+
 
     @Bean
     public CreateReportInputPort createReportInputPort(

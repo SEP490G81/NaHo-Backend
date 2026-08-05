@@ -29,6 +29,6 @@ public interface ReportEntityMapper {
     @Mapping(target = "createdTime", ignore = true)
     @Mapping(target = "modifiedTime", ignore = true)
     @Mapping(target = "isResolved", source = "resolved")
-    @Mapping(target = "files", ignore = true)
+    @Mapping(target = "files", source = "files")
     ReportEntity domainToEntity(Report report);
 }
