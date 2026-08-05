@@ -7,6 +7,8 @@ public record CreateSpeakingQuestionRequest(
         String titleMarkup,
 
         @NotBlank(message = "Description is required")
-        String descriptionMarkup
+        String descriptionMarkup,
+
+        String sampleAnswer
 ) {
 }

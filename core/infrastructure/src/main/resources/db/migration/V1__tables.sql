@@ -352,6 +352,7 @@ CREATE TABLE speaking_questions
     title_markup                    VARCHAR(255)          NOT NULL,
     `description`                   TEXT                  NULL,
     description_markup              TEXT                  NULL,
+    sample_answer                   TEXT                  NULL,
     status                          VARCHAR(50)           NULL,
     speaking_question_audio_file_id BIGINT                NULL,
     user_id                         BIGINT                NULL,

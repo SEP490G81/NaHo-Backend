@@ -13,6 +13,7 @@
         q.title_markup as titleMarkup,
         q.description as description,
         q.description_markup as descriptionMarkup,
+        q.sample_answer as sampleAnswer,
         q.status as status
     </sql>
 

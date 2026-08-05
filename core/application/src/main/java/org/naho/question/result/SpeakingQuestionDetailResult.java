@@ -13,6 +13,7 @@ public record SpeakingQuestionDetailResult(
         String titleMarkup,
         String description,
         String descriptionMarkup,
+        String sampleAnswer,
         QuestionStatus status,
         List<VocabularyDetailResult> vocabularies,
         List<GrammarDetailResult> grammars

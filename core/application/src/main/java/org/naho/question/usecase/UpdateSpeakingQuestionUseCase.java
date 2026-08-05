@@ -55,6 +55,7 @@ public class UpdateSpeakingQuestionUseCase implements UpdateSpeakingQuestionInpu
                 rawDescription,
                 command.titleMarkup(),
                 command.descriptionMarkup(),
+                command.sampleAnswer(),
                 null // Audio is null for now
         );
 
@@ -68,6 +69,7 @@ public class UpdateSpeakingQuestionUseCase implements UpdateSpeakingQuestionInpu
                 updatedSpeakingQuestion.getTitleMarkup(),
                 updatedSpeakingQuestion.getDescription(),
                 updatedSpeakingQuestion.getDescriptionMarkup(),
+                updatedSpeakingQuestion.getSampleAnswer(),
                 updatedSpeakingQuestion.getStatus()
         );
     }
