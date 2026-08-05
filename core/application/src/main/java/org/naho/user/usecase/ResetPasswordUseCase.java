@@ -76,7 +76,7 @@ public class ResetPasswordUseCase implements ResetPasswordInputPort {
             user.verifyEmail();
         }
 
-        userRepository.save(user, null);
+        userRepository.save(user);
 
         passwordResetOtpPort.removeResetToken(email);
     }

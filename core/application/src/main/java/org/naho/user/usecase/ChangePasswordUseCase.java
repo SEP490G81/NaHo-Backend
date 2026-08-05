@@ -71,6 +71,6 @@ public class ChangePasswordUseCase implements ChangePasswordInputPort {
         String encodedPassword = encoderPort.hashPassword(newPassword.getValue());
         user.setHashPassword(encodedPassword);
 
-        userRepository.save(user, null);
+        userRepository.save(user);
     }
 }
