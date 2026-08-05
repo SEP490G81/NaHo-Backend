@@ -86,8 +86,7 @@ public class SpeakingAnalysisController {
 
             SpeakingAnalysisResult result = speakingAnalysisInputPort.analyzeSpeaking(command);
 
-            SpeakingAnalysisResponse response = speakingAnalysisResponseMapper
-                    .resultToResponse(result);
+            SpeakingAnalysisResponse response = speakingAnalysisResponseMapper.resultToResponse(result);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
 

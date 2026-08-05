@@ -3,12 +3,9 @@ package org.naho.question.adapter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.naho.book.entity.LessonEntity;
-import org.naho.book.entity.ObjectiveEntity;
-import org.naho.book.entity.TopicEntity;
 import org.naho.file.constant.CloudFrontProperties;
+import org.naho.file.entity.FileEntity;
 import org.naho.file.repository.FileJpaRepository;
-import org.naho.learning.entity.LearningPathNodeEntity;
 import org.naho.pagination.PageData;
 import org.naho.pagination.PageMeta;
 import org.naho.question.entity.AnswerHistoryEntity;
@@ -30,6 +27,7 @@ import org.naho.speech.model.AnswerHistory;
 import org.naho.speech.model.ContentAssessment;
 import org.naho.speech.model.SpeechAssessment;
 import org.naho.speech.model.WordAssessment;
+import org.naho.user.entity.UserEntity;
 import org.naho.user.repository.UserJpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -59,125 +57,54 @@ public class AnswerHistoryRepositoryAdapter implements AnswerHistoryRepositoryPo
 
     @Override
     public AnswerHistory saveAnswerHistory(AnswerHistory domain) {
-        AnswerHistoryEntity entity = answerHistoryEntityMapper.domainToEntity(domain);
-        AnswerHistoryEntity savedEntity = answerHistoryJpaRepository.save(entity);
-        return answerHistoryEntityMapper.entityToDomain(savedEntity);
+        UserEntity user = userJpaRepository.getReferenceById(domain.getUserId());
+        SpeakingQuestionEntity question = questionJpaRepository.getReferenceById(domain.getSpeakingQuestionId());
+        FileEntity file = fileJpaRepository.getReferenceById(domain.getAudioFileId());
+
+        AnswerHistoryEntity entity = answerHistoryEntityMapper.toEntity(domain, user, question, file);
+        AnswerHistoryEntity saved = answerHistoryJpaRepository.save(entity);
+        return answerHistoryEntityMapper.toDomain(saved);
     }
 
     @Override
     public SpeechAssessment saveSpeechAssessment(SpeechAssessment domain) {
         AnswerHistoryEntity answerHistory = answerHistoryJpaRepository.getReferenceById(domain.getAnswerHistoryId());
 
-        SpeechAssessmentEntity entity = SpeechAssessmentEntity.builder()
-                .id(domain.getId())
-                .transcriptText(domain.getTranscriptText())
-                .accuracyScore(domain.getAccuracyScore())
-                .fluencyScore(domain.getFluencyScore())
-                .completenessScore(domain.getCompletenessScore())
-                .pronunciationScore(domain.getPronunciationScore())
-                .answerHistory(answerHistory)
-                .build();
-
+        SpeechAssessmentEntity entity = answerHistoryEntityMapper.toEntity(domain, answerHistory);
         SpeechAssessmentEntity saved = speechAssessmentJpaRepository.save(entity);
-        return SpeechAssessment.builder()
-                .id(saved.getId())
-                .transcriptText(saved.getTranscriptText())
-                .accuracyScore(saved.getAccuracyScore())
-                .fluencyScore(saved.getFluencyScore())
-                .completenessScore(saved.getCompletenessScore())
-                .pronunciationScore(saved.getPronunciationScore())
-                .answerHistoryId(saved.getAnswerHistory().getId())
-                .build();
+        return answerHistoryEntityMapper.toDomain(saved);
     }
 
     @Override
     public ContentAssessment saveContentAssessment(ContentAssessment domain) {
         AnswerHistoryEntity answerHistory = answerHistoryJpaRepository.getReferenceById(domain.getAnswerHistoryId());
 
-        ContentAssessmentEntity entity = ContentAssessmentEntity.builder()
-                .id(domain.getId())
-                .vocabularyScore(domain.getVocabularyScore())
-                .grammarScore(domain.getGrammarScore())
-                .aiFeedback(domain.getAiFeedback())
-                .translationText(domain.getTranslationText())
-                .answerHistory(answerHistory)
-                .build();
-
+        ContentAssessmentEntity entity = answerHistoryEntityMapper.toEntity(domain, answerHistory);
         ContentAssessmentEntity saved = contentAssessmentJpaRepository.save(entity);
-        return ContentAssessment.builder()
-                .id(saved.getId())
-                .vocabularyScore(saved.getVocabularyScore())
-                .grammarScore(saved.getGrammarScore())
-                .aiFeedback(saved.getAiFeedback())
-                .translationText(saved.getTranslationText())
-                .answerHistoryId(saved.getAnswerHistory().getId())
-                .build();
+        return answerHistoryEntityMapper.toDomain(saved);
     }
 
     @Override
     public List<WordAssessment> saveAllWordAssessment(List<WordAssessment> domains) {
         List<WordAssessmentEntity> entities = domains.stream().map(domain -> {
             SpeechAssessmentEntity sa = speechAssessmentJpaRepository.getReferenceById(domain.getSpeechAssessmentId());
-            WordAssessmentEntity entity = WordAssessmentEntity.builder()
-                    .word(domain.getWord())
-                    .accuracyScore(domain.getAccuracyScore())
-                    .errorType(domain.getErrorType())
-                    .speechAssessment(sa)
-                    .build();
-            return entity;
+            return answerHistoryEntityMapper.toEntity(domain, sa);
         }).toList();
 
         List<WordAssessmentEntity> saved = wordAssessmentJpaRepository.saveAll(entities);
-        return saved.stream().map(e -> WordAssessment.builder()
-                .id(e.getId())
-                .word(e.getWord())
-                .accuracyScore(e.getAccuracyScore())
-                .errorType(e.getErrorType())
-                .speechAssessmentId(e.getSpeechAssessment().getId())
-                .build()).toList();
-    }
-
-    @Override
-    public Optional<AnswerHistory> findById(Long id) {
-        return answerHistoryJpaRepository
-                .findById(id)
-                .map(answerHistoryEntityMapper::entityToDomain);
+        return answerHistoryEntityMapper.toWordAssessmentDomainList(saved);
     }
 
     @Override
     public Optional<SpeechAssessment> findSpeechAssessmentByAnswerHistoryId(Long answerHistoryId) {
-        return speechAssessmentJpaRepository.findByAnswerHistoryId(answerHistoryId).map(entity -> {
-            List<WordAssessment> words = entity.getWords() != null ? entity.getWords().stream().map(w -> WordAssessment.builder()
-                    .id(w.getId())
-                    .word(w.getWord())
-                    .accuracyScore(w.getAccuracyScore())
-                    .errorType(w.getErrorType())
-                    .speechAssessmentId(w.getSpeechAssessment().getId())
-                    .build()).toList() : List.of();
-
-            return SpeechAssessment.builder()
-                    .id(entity.getId())
-                    .transcriptText(entity.getTranscriptText())
-                    .accuracyScore(entity.getAccuracyScore())
-                    .fluencyScore(entity.getFluencyScore())
-                    .completenessScore(entity.getCompletenessScore())
-                    .pronunciationScore(entity.getPronunciationScore())
-                    .answerHistoryId(entity.getAnswerHistory().getId())
-                    .words(words)
-                    .build();
-        });
+        return speechAssessmentJpaRepository.findByAnswerHistoryId(answerHistoryId)
+                .map(answerHistoryEntityMapper::toDomain);
     }
 
     @Override
     public Optional<ContentAssessment> findContentAssessmentByAnswerHistoryId(Long answerHistoryId) {
-        return contentAssessmentJpaRepository.findByAnswerHistoryId(answerHistoryId).map(entity -> ContentAssessment.builder()
-                .id(entity.getId())
-                .vocabularyScore(entity.getVocabularyScore())
-                .grammarScore(entity.getGrammarScore())
-                .aiFeedback(entity.getAiFeedback())
-                .translationText(entity.getTranslationText())
-                .answerHistoryId(entity.getAnswerHistory().getId())
-                .build());
+        return contentAssessmentJpaRepository.findByAnswerHistoryId(answerHistoryId)
+                .map(answerHistoryEntityMapper::toDomain);
     }
 
     @Override
@@ -208,24 +135,6 @@ public class AnswerHistoryRepositoryAdapter implements AnswerHistoryRepositoryPo
         Page<AnswerHistoryEntity> entityPage = answerHistoryJpaRepository.findAll(specification, pageable);
 
         List<SpeakingHistoryListItemResult> items = entityPage.getContent().stream().map(entity -> {
-            SpeakingQuestionEntity sq = entity.getSpeakingQuestion();
-            Long sqId = sq != null ? sq.getId() : null;
-            String sqTitle = sq != null ? sq.getTitle() : null;
-
-            LearningPathNodeEntity lpn = sq != null ? sq.getLearningPathNode() : null;
-            ObjectiveEntity obj = lpn != null ? lpn.getObjective() : null;
-            LessonEntity les = obj != null ? obj.getLesson() : null;
-
-            Long lpnId = lpn != null ? lpn.getId() : null;
-
-            TopicEntity t = les != null ? les.getTopic() : null;
-
-            Long tId = t != null ? t.getId() : null;
-            String tName = t != null ? t.getJapaneseName() : null;
-
-            org.naho.book.entity.BookEntity book = t != null ? t.getBook() : null;
-            Long bookId = book != null ? book.getId() : null;
-
             String audioUrl = null;
             if (entity.getAudioFile() != null && entity.getAudioFile().getObjectKey() != null) {
                 audioUrl = cloudFrontProperties.getDomain() + entity.getAudioFile().getObjectKey();
@@ -243,19 +152,7 @@ public class AnswerHistoryRepositoryAdapter implements AnswerHistoryRepositoryPo
                 }
             }
 
-            return new SpeakingHistoryListItemResult(
-                    entity.getId(),
-                    sqId,
-                    sqTitle,
-                    tId,
-                    tName,
-                    lpnId,
-                    bookId,
-                    score,
-                    durationSec,
-                    audioUrl,
-                    entity.getCreatedTime()
-            );
+            return answerHistoryEntityMapper.toListItemResult(entity, score, durationSec, audioUrl);
         }).toList();
 
         return PageData.<SpeakingHistoryListItemResult>builder()
@@ -269,5 +166,12 @@ public class AnswerHistoryRepositoryAdapter implements AnswerHistoryRepositoryPo
                         .build())
                 .data(items)
                 .build();
+    }
+
+    @Override
+    public Optional<AnswerHistory> findById(Long id) {
+        return answerHistoryJpaRepository
+                .findById(id)
+                .map(answerHistoryEntityMapper::toDomain);
     }
 }

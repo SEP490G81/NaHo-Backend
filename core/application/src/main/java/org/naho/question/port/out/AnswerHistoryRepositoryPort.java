@@ -20,11 +20,11 @@ public interface AnswerHistoryRepositoryPort {
 
     List<WordAssessment> saveAllWordAssessment(List<WordAssessment> wordAssessmentList);
 
-    Optional<AnswerHistory> findById(Long id);
-
     Optional<SpeechAssessment> findSpeechAssessmentByAnswerHistoryId(Long answerHistoryId);
 
     Optional<ContentAssessment> findContentAssessmentByAnswerHistoryId(Long answerHistoryId);
 
     PageData<SpeakingHistoryListItemResult> findUserAnswerHistories(SpeakingHistoryFilterCommand command);
+
+    Optional<AnswerHistory> findById(Long id);
 }

@@ -108,8 +108,3 @@ app:
     local-root: ${LOCAL_ROOT}
     local-path: ${LOCAL_PATH}
     backend-files-base-url: ${BACKEND_FILES_BASE_URL}
-    avatars: avatars
-    books: books
-    recordings: recordings
-    reports: reports
-    temp: temp

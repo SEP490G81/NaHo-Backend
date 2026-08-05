@@ -26,15 +26,6 @@ public final class SpeakingSessionSpecification {
         };
     }
 
-    public static Specification<SpeakingSessionEntity> hasSessionType(String sessionType) {
-        return (root, query, criteriaBuilder) -> {
-            if (sessionType == null || sessionType.isBlank()) {
-                return criteriaBuilder.conjunction();
-            }
-            return criteriaBuilder.equal(root.get("sessionType"), sessionType);
-        };
-    }
-
     public static Specification<SpeakingSessionEntity> searchByTopic(String search) {
         return (root, query, criteriaBuilder) -> {
             if (search == null || search.isBlank()) {

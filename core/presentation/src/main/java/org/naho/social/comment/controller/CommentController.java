@@ -20,12 +20,11 @@ import org.naho.social.comment.result.CommentResonseResult;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/comments")
@@ -35,24 +34,63 @@ public class CommentController {
     private final CommentCrudInputPort commentCrudInputPort;
     private final CommentCommandMapper commentCommandMapper;
     private final CommentResponseMapper commentResponseMapper;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @GetMapping
     @ApiResponseMessage(message = CommentDetailMessageKey.COMMENT_GET_LIST_SUCCESS)
     public ResponseEntity<CommentListResponseResult> getComments(
             @RequestParam("speakingQuestionId") Long speakingQuestionId,
-            @AuthenticationPrincipal AccessTokenPayload payload) {
+            @AuthenticationPrincipal AccessTokenPayload payload
+    ) {
         Long currentUserId = payload != null ? payload.userId() : null;
         CommentReadCommand command = new CommentReadCommand(speakingQuestionId);
         CommentListResponseResult result = commentCrudInputPort.getListCommentOfQuestion(command, currentUserId);
         return ResponseEntity.ok(result);
     }
 
+    @PostMapping
+    public ResponseEntity<CommentResponse> createCommentRest(
+            @Valid @RequestBody CreateCommentRequest createCommentRequest,
+            @AuthenticationPrincipal AccessTokenPayload payload
+    ) {
+        Long userId = payload != null ? payload.userId() : createCommentRequest.userId();
+        CommentCreateCommand createCommand = commentCommandMapper.requestToCommand(createCommentRequest, userId);
+        CommentResonseResult commentResonseResult = commentCrudInputPort.createComment(createCommand);
+        CommentResponse response = commentResponseMapper.resultToResponse(commentResonseResult);
+        messagingTemplate.convertAndSend("/topic/comments", response);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping
+    public ResponseEntity<CommentResponse> updateCommentRest(
+            @Valid @RequestBody UpdateCommentRequest updateCommentRequest,
+            @AuthenticationPrincipal AccessTokenPayload payload) {
+        Long userId = payload != null ? payload.userId() : updateCommentRequest.userId();
+        CommentUpdateCommand command = commentCommandMapper.requestToUpdateCommand(updateCommentRequest, userId);
+        CommentResonseResult commentResonseResult = commentCrudInputPort.updateComment(command);
+        CommentResponse response = commentResponseMapper.resultToResponse(commentResonseResult);
+        messagingTemplate.convertAndSend("/topic/comments", response);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<CommentResponse> deleteCommentRest(
+            @Valid @RequestBody DeleteCommandRequest deleteCommandRequest,
+            @AuthenticationPrincipal AccessTokenPayload payload) {
+        Long userId = payload != null ? payload.userId() : null;
+        CommentDeleteCommand command = commentCommandMapper.requestToDeleteCommand(deleteCommandRequest, userId);
+        CommentResonseResult commentResonseResult = commentCrudInputPort.deleteComment(command);
+        CommentResponse response = commentResponseMapper.resultToResponse(commentResonseResult);
+        messagingTemplate.convertAndSend("/topic/comments", response);
+        return ResponseEntity.ok(response);
+    }
+
     @MessageMapping("/comments/create")
     @SendTo("/topic/comments")
     public CommentResponse createComment(
-            @Valid CreateCommentRequest createCommentRequest,
+            @Valid @Payload CreateCommentRequest createCommentRequest,
             @AuthenticationPrincipal AccessTokenPayload payload) {
-        Long userId = payload != null ? payload.userId() : null;
+        Long userId = payload != null ? payload.userId() : createCommentRequest.userId();
         CommentCreateCommand createCommand = commentCommandMapper.requestToCommand(createCommentRequest, userId);
         CommentResonseResult commentResonseResult = commentCrudInputPort.createComment(createCommand);
         return commentResponseMapper.resultToResponse(commentResonseResult);
@@ -61,9 +99,9 @@ public class CommentController {
     @MessageMapping("/comments/update")
     @SendTo("/topic/comments")
     public CommentResponse fixComment(
-            @Valid UpdateCommentRequest updateCommentRequest,
+            @Valid @Payload UpdateCommentRequest updateCommentRequest,
             @AuthenticationPrincipal AccessTokenPayload payload) {
-        Long userId = payload != null ? payload.userId() : null;
+        Long userId = payload != null ? payload.userId() : updateCommentRequest.userId();
         CommentUpdateCommand command = commentCommandMapper.requestToUpdateCommand(updateCommentRequest, userId);
         CommentResonseResult commentResonseResult = commentCrudInputPort.updateComment(command);
         return commentResponseMapper.resultToResponse(commentResonseResult);
@@ -72,7 +110,7 @@ public class CommentController {
     @MessageMapping("/comments/delete")
     @SendTo("/topic/comments")
     public CommentResponse deleteComment(
-            @Valid DeleteCommandRequest deleteCommandRequest,
+            @Valid @Payload DeleteCommandRequest deleteCommandRequest,
             @AuthenticationPrincipal AccessTokenPayload payload) {
         Long userId = payload != null ? payload.userId() : null;
         CommentDeleteCommand command = commentCommandMapper.requestToDeleteCommand(deleteCommandRequest, userId);

@@ -36,14 +36,14 @@ public class PersonaController {
     private final PersonaResponseMapper personaResponseMapper;
 
     @GetMapping
-    @ApiResponseMessage(message = PersonaDetailMessageKey.PERSONA_GET_ALL_SUCCESS)
+    @ApiResponseMessage(message = "Get all personas successfully!")
     public ResponseEntity<List<PersonaResponse>> getAllPersonas() {
         List<Persona> personas = getPersonaInputPort.getAllPersonas();
         return ResponseEntity.ok(personaResponseMapper.toResponseList(personas));
     }
 
     @GetMapping("/{personaId}")
-    @ApiResponseMessage(message = PersonaDetailMessageKey.PERSONA_GET_SUCCESS)
+    @ApiResponseMessage(message = "Get persona successfully!")
     public ResponseEntity<PersonaResponse> getPersonaById(
             @PathVariable("personaId") Long personaId
     ) {
@@ -57,7 +57,7 @@ public class PersonaController {
     }
 
     @GetMapping("/{personaId}/conversation-style")
-    @ApiResponseMessage(message = PersonaDetailMessageKey.PERSONA_GET_CONVERSATION_STYLE_SUCCESS)
+    @ApiResponseMessage(message = "Get conversation style of persona successfully!")
     public ResponseEntity<ConversationStyleResponse> getConversationStyleByPersonaId(
             @PathVariable("personaId") Long personaId
     ) {
@@ -71,7 +71,7 @@ public class PersonaController {
     }
 
     @PostMapping
-    @ApiResponseMessage(message = PersonaDetailMessageKey.PERSONA_CREATE_SUCCESS)
+    @ApiResponseMessage(message = "Create persona successfully!")
     public ResponseEntity<PersonaResponse> createPersona(
             @Valid @RequestBody CreatePersonaRequest request
     ) {
@@ -97,7 +97,7 @@ public class PersonaController {
     }
 
     @PutMapping("/{personaId}")
-    @ApiResponseMessage(message = PersonaDetailMessageKey.PERSONA_UPDATE_SUCCESS)
+    @ApiResponseMessage(message = "Update persona successfully!")
     public ResponseEntity<PersonaResponse> updatePersona(
             @PathVariable("personaId") Long personaId,
             @Valid @RequestBody UpdatePersonaRequest request

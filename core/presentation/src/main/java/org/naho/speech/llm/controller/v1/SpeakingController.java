@@ -3,16 +3,41 @@ package org.naho.speech.llm.controller.v1;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.naho.i18n.message.speech.SpeechDetailMessageKey;
-import org.naho.pagination.PageData;
-import org.naho.shared.annotation.ApiResponseMessage;
-import org.naho.speech.llm.command.*;
-import org.naho.speech.llm.dto.mapper.*;
-import org.naho.speech.llm.dto.request.*;
-import org.naho.speech.llm.dto.response.*;
+import org.naho.speech.llm.command.SendAudioMessageCommand;
+import org.naho.speech.llm.command.SendMessageWithSessionCommand;
+import org.naho.speech.llm.command.SpeakingSessionFilterCommand;
+import org.naho.speech.llm.command.StartSpeakingConversationWithAICommand;
+import org.naho.speech.llm.dto.mapper.AudioChatResponseMapper;
+import org.naho.speech.llm.dto.mapper.ChatResponseMapper;
+import org.naho.speech.llm.dto.mapper.ScoringResponseMapper;
+import org.naho.speech.llm.dto.mapper.SuggestedTopicsResponseMapper;
+import org.naho.speech.llm.dto.mapper.StartConversationResponseMapper;
 import org.naho.speech.llm.port.in.EndSessionInputPort;
 import org.naho.speech.llm.port.in.SpeakingSessionInputPort;
 import org.naho.speech.llm.port.in.SuggestedTopicsInputPort;
-import org.naho.speech.llm.result.*;
+import org.naho.speech.llm.dto.request.ChatSessionMessageRequest;
+import org.naho.speech.llm.dto.request.EndSessionRequest;
+import org.naho.speech.llm.dto.request.StartConversationRequest;
+import org.naho.speech.llm.dto.request.SpeakingSessionQueryRequest;
+import org.naho.speech.llm.dto.response.AudioChatResponse;
+import org.naho.speech.llm.dto.response.ChatResponse;
+import org.naho.speech.llm.dto.response.ScoringResponse;
+import org.naho.speech.llm.dto.response.StartSessionResponse;
+import org.naho.speech.llm.dto.response.SuggestedTopicsResponse;
+import org.naho.speech.llm.dto.response.SpeakingSessionDetailResponse;
+import org.naho.speech.llm.dto.response.SpeakingSessionListItemResponse;
+import org.naho.speech.llm.dto.response.StartConversationResponse;
+import org.naho.speech.llm.dto.response.ActiveSpeakingSessionResponse;
+import org.naho.speech.llm.result.ActiveSpeakingSessionResult;
+import org.naho.speech.llm.result.AudioChatResult;
+import org.naho.speech.llm.result.ChatResult;
+import org.naho.speech.llm.result.ScoringResult;
+import org.naho.speech.llm.result.SuggestedTopicsResult;
+import org.naho.speech.llm.result.StartConversationResult;
+import org.naho.pagination.PageData;
+import org.naho.shared.annotation.ApiResponseMessage;
+import org.naho.speech.llm.result.SpeakingSessionDetailResult;
+import org.naho.speech.llm.result.SpeakingSessionListItemResult;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +69,6 @@ public class SpeakingController {
     private final EndSessionInputPort endSessionInputPort;
     private final SuggestedTopicsInputPort suggestedTopicsInputPort;
     private final SuggestedTopicsResponseMapper suggestedTopicsResponseMapper;
-    private final StartTopicResponseMapper startTopicResponseMapper;
     private final ChatResponseMapper chatResponseMapper;
     private final AudioChatResponseMapper audioChatResponseMapper;
     private final ScoringResponseMapper scoringResponseMapper;
@@ -62,20 +86,6 @@ public class SpeakingController {
     // ─── Session Management ─────────────────────────────────────
 
     @PostMapping(
-            value = "/session/start-topic",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_TOPIC_SESSION_START_SUCCESS)
-    public ResponseEntity<StartTopicResponse> startTopicSession(
-            @Valid @RequestBody StartTopicRequest request
-    ) {
-        var command = new StartSpeakingTopicCommand(request.topic());
-        SpeakingTopicResult result = speakingSessionInputPort.startTopicSession(command);
-        return ResponseEntity.ok(startTopicResponseMapper.resultToResponse(result));
-    }
-
-    @PostMapping(
             value = "/session/{personaId}",
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.ALL_VALUE},
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -83,12 +93,58 @@ public class SpeakingController {
     @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_CONVERSATION_START_SUCCESS)
     public ResponseEntity<StartConversationResponse> startConversationWithAISession(
             @PathVariable("personaId") int personaId,
+            @AuthenticationPrincipal AccessTokenPayload payload,
             @RequestBody(required = false) StartConversationRequest request
     ) {
+        Long userId = payload != null ? payload.userId() : null;
         var formalityOverride = request != null ? request.formalityLevel() : null;
         var marugotoOverride = request != null ? request.marugotoLevel() : null;
-        var command = new StartSpeakingConversationWithAICommand(personaId, formalityOverride, marugotoOverride);
+        var command = new StartSpeakingConversationWithAICommand(userId, personaId, formalityOverride, marugotoOverride);
         StartConversationResult result = speakingSessionInputPort.startConversationWithAISession(command);
+        return ResponseEntity.ok(startConversationResponseMapper.resultToResponse(result));
+    }
+
+    @GetMapping(value = "/session/active", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponseMessage(message = "Lấy thông tin phiên nói chuyện dở dang thành công.")
+    public ResponseEntity<ActiveSpeakingSessionResponse> getActiveSession(
+            @AuthenticationPrincipal AccessTokenPayload payload,
+            @RequestParam(value = "personaId", required = false) Integer personaId
+    ) {
+        Long userId = payload != null ? payload.userId() : null;
+        ActiveSpeakingSessionResult result = speakingSessionInputPort.getActiveSession(userId, personaId);
+        if (result == null) {
+            return ResponseEntity.noContent().build();
+        }
+        ActiveSpeakingSessionResponse response = new ActiveSpeakingSessionResponse(
+                result.id(),
+                result.sessionCode(),
+                result.personaId(),
+                result.topic(),
+                result.marugotoLevel(),
+                result.formalityLevel(),
+                result.totalTurns(),
+                result.startedAt(),
+                result.messages().stream().map(m -> new ActiveSpeakingSessionResponse.SessionMessageItem(
+                        m.turnIndex(),
+                        m.senderType(),
+                        m.content(),
+                        m.correctedText(),
+                        m.correctionExplanation(),
+                        m.grammarNote(),
+                        m.hintForLearner()
+                )).toList()
+        );
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping(value = "/session/{sessionCode}/resume", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponseMessage(message = "Khôi phục phiên nói chuyện thành công.")
+    public ResponseEntity<StartConversationResponse> resumeSession(
+            @PathVariable("sessionCode") String sessionCode,
+            @AuthenticationPrincipal AccessTokenPayload payload
+    ) {
+        Long userId = payload != null ? payload.userId() : null;
+        StartConversationResult result = speakingSessionInputPort.resumeSession(sessionCode, userId);
         return ResponseEntity.ok(startConversationResponseMapper.resultToResponse(result));
     }
 
@@ -171,13 +227,15 @@ public class SpeakingController {
     @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_SESSION_END_SUCCESS)
     public ResponseEntity<ScoringResponse> endSession(
             @PathVariable("sessionId") String sessionId,
+            @AuthenticationPrincipal AccessTokenPayload payload,
             @RequestBody(required = false) EndSessionRequest req
     ) {
+        Long userId = payload != null ? payload.userId() : null;
         String topic = (req != null && req.topic() != null) ? req.topic() : "";
         String speechMetadata = (req != null && req.speechMetadata() != null) ? req.speechMetadata() : "";
         String asrConfidence = (req != null && req.asrConfidence() != null) ? req.asrConfidence() : "";
 
-        ScoringResult r = endSessionInputPort.endSession(sessionId, topic, speechMetadata, asrConfidence);
+        ScoringResult r = endSessionInputPort.endSession(userId, sessionId, topic, speechMetadata, asrConfidence);
         return ResponseEntity.ok(scoringResponseMapper.resultToResponse(r));
     }
 
@@ -195,7 +253,6 @@ public class SpeakingController {
         var command = new SpeakingSessionFilterCommand(
                 payload.userId(),
                 request.getPersonaId(),
-                request.getSessionType(),
                 request.getSearch(),
                 request.getPage(),
                 request.getSize(),
@@ -209,7 +266,6 @@ public class SpeakingController {
                 .data(result.getData().stream().map(item -> new SpeakingSessionListItemResponse(
                         item.id(),
                         item.sessionCode(),
-                        item.sessionType(),
                         item.topic(),
                         item.personaId(),
                         item.marugotoLevel(),

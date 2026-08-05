@@ -19,7 +19,6 @@ public class InMemorySessionStore implements SessionStorePort {
     private final ConcurrentHashMap<String, String> voiceNames = new ConcurrentHashMap<>();
 
     private final ConcurrentHashMap<String, Long> userIds = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, String> sessionTypes = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Long> personaIds = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Instant> startedAts = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, String> marugotoLevels = new ConcurrentHashMap<>();
@@ -37,6 +36,26 @@ public class InMemorySessionStore implements SessionStorePort {
     }
 
     @Override
+    public boolean hasSession(String sessionId) {
+        return sessionId != null && transcripts.containsKey(sessionId);
+    }
+
+    @Override
+    public void restoreSession(String sessionId, Long userId, Long personaId, String topic, String marugotoLevel, String formalityLevel, String fullTranscript, int totalTurns, Instant startedAt, List<Map<String, String>> historyMessages) {
+        transcripts.put(sessionId, new StringBuilder(fullTranscript != null ? fullTranscript : ""));
+        histories.put(sessionId, Collections.synchronizedList(new ArrayList<>(historyMessages != null ? historyMessages : List.of())));
+        turnCounts.put(sessionId, new AtomicInteger(totalTurns));
+        if (startedAt != null) startedAts.put(sessionId, startedAt);
+        if (userId != null) userIds.put(sessionId, userId);
+        if (personaId != null) personaIds.put(sessionId, personaId);
+        if (topic != null) topics.put(sessionId, topic);
+        if (marugotoLevel != null) marugotoLevels.put(sessionId, marugotoLevel);
+        if (formalityLevel != null) formalityLevels.put(sessionId, formalityLevel);
+        voiceNames.put(sessionId, "ja-JP-NanamiNeural");
+        System.out.println("[SessionStore] Session restored from DB: " + sessionId + " | Turns: " + totalTurns);
+    }
+
+    @Override
     public void clearSession(String sessionId) {
         transcripts.remove(sessionId);
         topics.remove(sessionId);
@@ -44,7 +63,6 @@ public class InMemorySessionStore implements SessionStorePort {
         personaContexts.remove(sessionId);
         voiceNames.remove(sessionId);
         userIds.remove(sessionId);
-        sessionTypes.remove(sessionId);
         personaIds.remove(sessionId);
         startedAts.remove(sessionId);
         marugotoLevels.remove(sessionId);
@@ -130,17 +148,6 @@ public class InMemorySessionStore implements SessionStorePort {
     @Override
     public Long getUserId(String sessionId) {
         return userIds.get(sessionId);
-    }
-
-    @Override
-    public void setSessionType(String sessionId, String sessionType) {
-        if (sessionType != null)
-            sessionTypes.put(sessionId, sessionType);
-    }
-
-    @Override
-    public String getSessionType(String sessionId) {
-        return sessionTypes.getOrDefault(sessionId, "FREE_TALK");
     }
 
     @Override

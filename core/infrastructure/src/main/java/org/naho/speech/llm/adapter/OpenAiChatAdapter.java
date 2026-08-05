@@ -14,6 +14,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -66,8 +67,7 @@ public class OpenAiChatAdapter implements AiChatPort {
                 throw new InfrastructureException(
                         LlmApplicationError.LLM_API_ERROR,
                         LlmDetailMessageKey.LLM_API_ERROR,
-                        "Status: " + response.statusCode() + " | " + response.body()
-                );
+                        "Status: " + response.statusCode() + " | " + response.body());
             }
             return extractContent(response.body());
         } catch (InterruptedException e) {
@@ -75,16 +75,14 @@ public class OpenAiChatAdapter implements AiChatPort {
             throw new InfrastructureException(
                     LlmApplicationError.LLM_CONNECTION_TIMEOUT,
                     LlmDetailMessageKey.LLM_CONNECTION_TIMEOUT,
-                    e.getMessage()
-            );
+                    e.getMessage());
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
             throw new InfrastructureException(
                     LlmApplicationError.LLM_API_ERROR,
                     LlmDetailMessageKey.LLM_API_ERROR,
-                    e.getMessage()
-            );
+                    e.getMessage());
         }
     }
 
@@ -92,23 +90,23 @@ public class OpenAiChatAdapter implements AiChatPort {
         HttpRequest request = buildHttpRequest(requestBody, Duration.ofSeconds(120));
 
         try {
-            HttpResponse<Stream<String>> response =
-                    httpClient.send(request, HttpResponse.BodyHandlers.ofLines());
+            HttpResponse<Stream<String>> response = httpClient.send(request, HttpResponse.BodyHandlers.ofLines());
 
             if (response.statusCode() != 200) {
                 String errorBody = response.body().reduce("", (a, b) -> a + b);
                 throw new InfrastructureException(
                         LlmApplicationError.LLM_STREAMING_ERROR,
                         LlmDetailMessageKey.LLM_STREAMING_ERROR,
-                        "Status: " + response.statusCode() + " | " + errorBody
-                );
+                        "Status: " + response.statusCode() + " | " + errorBody);
             }
 
             response.body().forEach(line -> {
-                if (!line.startsWith("data: ")) return;
+                if (!line.startsWith("data: "))
+                    return;
 
                 String payload = line.substring(6).trim();
-                if ("[DONE]".equals(payload)) return;
+                if ("[DONE]".equals(payload))
+                    return;
 
                 String token = extractDeltaContent(payload);
                 if (token != null && !token.isEmpty()) {
@@ -121,16 +119,14 @@ public class OpenAiChatAdapter implements AiChatPort {
             throw new InfrastructureException(
                     LlmApplicationError.LLM_CONNECTION_TIMEOUT,
                     LlmDetailMessageKey.LLM_CONNECTION_TIMEOUT,
-                    e.getMessage()
-            );
+                    e.getMessage());
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
             throw new InfrastructureException(
                     LlmApplicationError.LLM_STREAMING_ERROR,
                     LlmDetailMessageKey.LLM_STREAMING_ERROR,
-                    e.getMessage()
-            );
+                    e.getMessage());
         }
     }
 
@@ -139,18 +135,19 @@ public class OpenAiChatAdapter implements AiChatPort {
             StringBuilder messagesJson = new StringBuilder("[");
             for (int i = 0; i < messages.size(); i++) {
                 Map<String, String> msg = messages.get(i);
-                if (i > 0) messagesJson.append(",");
+                if (i > 0)
+                    messagesJson.append(",");
                 messagesJson.append(String.format(
                         "{\"role\":\"%s\",\"content\":%s}",
                         msg.get("role"),
-                        OBJECT_MAPPER.writeValueAsString(msg.get("content"))
-                ));
+                        OBJECT_MAPPER.writeValueAsString(msg.get("content"))));
             }
             messagesJson.append("]");
 
             String streamField = stream ? ",\"stream\":true" : "";
 
             return String.format(
+                    Locale.US,
                     "{\"model\":\"%s\",\"messages\":%s,\"max_tokens\":%d,\"temperature\":%.1f,\"response_format\":{\"type\":\"json_object\"}%s}",
                     properties.getChatModel(),
                     messagesJson,
@@ -188,8 +185,7 @@ public class OpenAiChatAdapter implements AiChatPort {
                 escapedMessage,
                 properties.getMaxTokens(),
                 properties.getTemperature(),
-                streamField
-        );
+                streamField);
     }
 
     private HttpRequest buildHttpRequest(String body, Duration timeout) {
@@ -220,8 +216,7 @@ public class OpenAiChatAdapter implements AiChatPort {
             throw new InfrastructureException(
                     LlmApplicationError.LLM_PARSE_ERROR,
                     LlmDetailMessageKey.LLM_PARSE_ERROR,
-                    e.getMessage()
-            );
+                    e.getMessage());
         }
     }
 

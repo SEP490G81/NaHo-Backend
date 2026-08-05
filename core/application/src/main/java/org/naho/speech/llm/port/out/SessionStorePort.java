@@ -5,10 +5,13 @@ import java.util.List;
 import java.util.Map;
 
 public interface SessionStorePort {
-    //Session lifecycle
     void initSession(String sessionId);
 
+    boolean hasSession(String sessionId);
+
     void clearSession(String sessionId);
+
+    void restoreSession(String sessionId, Long userId, Long personaId, String topic, String marugotoLevel, String formalityLevel, String fullTranscript, int totalTurns, Instant startedAt, List<Map<String, String>> historyMessages);
 
     //Topic Management
     void setTopic(String sessionId, String topic);
@@ -39,10 +42,6 @@ public interface SessionStorePort {
     void setUserId(String sessionId, Long userId);
 
     Long getUserId(String sessionId);
-
-    void setSessionType(String sessionId, String sessionType);
-
-    String getSessionType(String sessionId);
 
     void setPersonaId(String sessionId, Long personaId);
 

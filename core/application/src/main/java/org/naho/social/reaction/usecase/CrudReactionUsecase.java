@@ -25,9 +25,9 @@ public class CrudReactionUsecase implements CrudReactionTypeInputPort {
     private final UserRepositoryPort userRepositoryPort;
 
     public CrudReactionUsecase(ReactionRepositoryPort reactionRepositoryPort,
-                               ReactionActionCommandMapper reactionActionCommandMapper,
-                               ReactionResultResponseMapper reactionResultResponseMapper,
-                               UserRepositoryPort userRepositoryPort) {
+                                ReactionActionCommandMapper reactionActionCommandMapper,
+                                ReactionResultResponseMapper reactionResultResponseMapper,
+                                UserRepositoryPort userRepositoryPort) {
         this.reactionRepositoryPort = reactionRepositoryPort;
         this.reactionActionCommandMapper = reactionActionCommandMapper;
         this.reactionResultResponseMapper = reactionResultResponseMapper;
