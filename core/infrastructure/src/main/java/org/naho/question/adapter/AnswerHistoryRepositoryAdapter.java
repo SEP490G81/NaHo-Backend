@@ -67,6 +67,26 @@ public class AnswerHistoryRepositoryAdapter implements AnswerHistoryRepositoryPo
     }
 
     @Override
+    public AnswerHistory save(AnswerHistory answerHistory) {
+        UserEntity user = userJpaRepository.getReferenceById(answerHistory.getUserId());
+        SpeakingQuestionEntity question = questionJpaRepository.getReferenceById(answerHistory.getSpeakingQuestionId());
+
+        AnswerHistoryEntity entity = AnswerHistoryEntity.builder()
+                .id(answerHistory.getId())
+                .user(user)
+                .speakingQuestion(question)
+                .build();
+
+        if (answerHistory.getAudioFileId() != null) {
+            FileEntity file = fileJpaRepository.getReferenceById(answerHistory.getAudioFileId());
+            entity.setAudioFile(file);
+        }
+        
+        AnswerHistoryEntity saved = answerHistoryJpaRepository.save(entity);
+        return answerHistoryEntityMapper.toDomain(saved);
+    }
+
+    @Override
     public SpeechAssessment saveSpeechAssessment(SpeechAssessment domain) {
         AnswerHistoryEntity answerHistory = answerHistoryJpaRepository.getReferenceById(domain.getAnswerHistoryId());
 

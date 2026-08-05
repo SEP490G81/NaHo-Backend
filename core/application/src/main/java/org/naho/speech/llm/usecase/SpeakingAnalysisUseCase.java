@@ -186,7 +186,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         }
 
         AnswerHistory savedAnswerHistory = answerHistoryRepositoryPort
-                .saveAnswerHistory(answerHistory);
+                .save(answerHistory);
 
         // Speech Assessment
         SpeechAssessmentCommand speechAssessmentCommand = new SpeechAssessmentCommand(

@@ -14,6 +14,8 @@ import java.util.Optional;
 public interface AnswerHistoryRepositoryPort {
     AnswerHistory saveAnswerHistory(AnswerHistory answerHistory);
 
+    AnswerHistory save(AnswerHistory answerHistory);
+
     SpeechAssessment saveSpeechAssessment(SpeechAssessment speechAssessment);
 
     ContentAssessment saveContentAssessment(ContentAssessment contentAssessment);
