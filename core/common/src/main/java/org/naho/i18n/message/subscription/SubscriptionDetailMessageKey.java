@@ -18,6 +18,9 @@ public final class SubscriptionDetailMessageKey {
     public static final String PLAN_UNAVAILABLE = "subscription.plan.unavailable";
     public static final String PLAN_FREE_NOT_PURCHASABLE = "subscription.plan.free_not_purchasable";
     public static final String PLAN_ALREADY_ACTIVE_OR_HIGHER = "subscription.plan.already_active_or_higher";
+    public static final String SUBSCRIPTION_USER_GET_ACTIVE_SUCCESS = "subscription.user.get_active_success";
+    public static final String SUBSCRIPTION_PLANS_GET_LIST_SUCCESS = "subscription.plans.get_list_success";
 
-    private SubscriptionDetailMessageKey() {}
+    private SubscriptionDetailMessageKey() {
+    }
 }

@@ -18,6 +18,7 @@ public class SpeakingQuestion {
     private String titleMarkup;
     private String description;
     private String descriptionMarkup;
+    private String sampleAnswer;
     private QuestionStatus status;
 
     // Private constructor dùng cho Builder
@@ -29,6 +30,7 @@ public class SpeakingQuestion {
         this.titleMarkup = builder.titleMarkup;
         this.description = builder.description;
         this.descriptionMarkup = builder.descriptionMarkup;
+        this.sampleAnswer = builder.sampleAnswer;
         this.status = builder.status;
         this.grammars = builder.grammars;
         this.vocabularies = builder.vocabularies;
@@ -56,10 +58,11 @@ public class SpeakingQuestion {
     }
 
     public void update(String title,
-            String description,
-            String titleMarkup,
-            String descriptionMarkup,
-            Long speakingQuestionAudioFileId) {
+                       String description,
+                       String titleMarkup,
+                       String descriptionMarkup,
+                       String sampleAnswer,
+                       Long speakingQuestionAudioFileId) {
         validateTitle(title);
         validateDescription(description);
 
@@ -67,6 +70,7 @@ public class SpeakingQuestion {
         this.description = description;
         this.titleMarkup = titleMarkup;
         this.descriptionMarkup = descriptionMarkup;
+        this.sampleAnswer = sampleAnswer;
         this.speakingQuestionAudioFileId = speakingQuestionAudioFileId;
     }
 
@@ -103,6 +107,10 @@ public class SpeakingQuestion {
         return descriptionMarkup;
     }
 
+    public String getSampleAnswer() {
+        return sampleAnswer;
+    }
+
     public QuestionStatus getStatus() {
         return status;
     }
@@ -124,6 +132,7 @@ public class SpeakingQuestion {
         private String titleMarkup;
         private String description;
         private String descriptionMarkup;
+        private String sampleAnswer;
         private QuestionStatus status;
         private List<Grammar> grammars;
         private List<Vocabulary> vocabularies;
@@ -160,6 +169,11 @@ public class SpeakingQuestion {
 
         public Builder descriptionMarkup(String descriptionMarkup) {
             this.descriptionMarkup = descriptionMarkup;
+            return this;
+        }
+
+        public Builder sampleAnswer(String sampleAnswer) {
+            this.sampleAnswer = sampleAnswer;
             return this;
         }
 

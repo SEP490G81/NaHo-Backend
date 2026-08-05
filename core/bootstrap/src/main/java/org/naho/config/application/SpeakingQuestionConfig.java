@@ -1,6 +1,8 @@
 package org.naho.config.application;
 
 import org.naho.daily.port.in.CrudUserDailyMissionInputPort;
+import org.naho.file.port.out.FileRepositoryPort;
+import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
 import org.naho.learning.port.in.UserLearningStreakInputPort;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
@@ -9,6 +11,7 @@ import org.naho.point.port.in.CrudPointHistoryInputPort;
 import org.naho.question.adapter.SpeakingQuestionListRepositoryAdapter;
 import org.naho.question.adapter.SpeakingQuestionRepositoryAdapter;
 import org.naho.question.port.in.*;
+import org.naho.question.port.out.AnswerHistoryRepositoryPort;
 import org.naho.question.usecase.*;
 import org.naho.shared.port.out.EventPublisherPort;
 import org.naho.shared.port.out.TransactionPort;
@@ -18,6 +21,19 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SpeakingQuestionConfig {
+
+    @Bean
+    public CrudAnswerHistoryInputPort crudAnswerHistoryInputPort(
+            AnswerHistoryRepositoryPort answerHistoryRepositoryPort,
+            FileRepositoryPort fileRepositoryPort,
+            FileStorageServicePort fileStorageServicePort
+    ) {
+        return new CrudAnswerHistoryUseCase(
+                answerHistoryRepositoryPort,
+                fileRepositoryPort,
+                fileStorageServicePort
+        );
+    }
 
     @Bean
     public SuggestCustomSpeakingQuestionUseCase suggestCustomSpeakingQuestionUseCase(

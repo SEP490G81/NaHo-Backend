@@ -43,7 +43,7 @@ public class UserResultMapper {
                 .roles(roleResultList)
                 .oAuthProviders(oAuthProviderResultList)
                 .userLearningProgressId(domain.getUserLearningProgressId())
-                .avatar(fileResult)
+                .avatarFile(fileResult)
                 .username(domain.getUsername() != null ? domain.getUsername().getValue() : null)
                 .email(domain.getEmail().getValue())
                 .fullName(domain.getFullName())

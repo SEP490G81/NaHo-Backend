@@ -1,6 +1,7 @@
 package org.naho.config.application;
 
 import org.naho.file.port.in.CrudFileInputPort;
+import org.naho.file.port.out.FileValidatorPort;
 import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
 import org.naho.shared.port.out.EmailPort;
 import org.naho.shared.port.out.TransactionPort;
@@ -46,12 +47,18 @@ public class UserConfig {
     @Bean
     public CrudUserInputPort crudUserInputPort(
             UserRepositoryPort userRepositoryPort,
+            FileValidatorPort fileValidatorPort,
+            CrudFileInputPort crudFileInputPort,
             UserResultMapper userResultMapper,
-            RoleRepositoryPort roleRepositoryPort) {
+            RoleRepositoryPort roleRepositoryPort
+    ) {
         return new CrudUserUseCase(
                 userRepositoryPort,
+                fileValidatorPort,
+                crudFileInputPort,
                 userResultMapper,
-                roleRepositoryPort);
+                roleRepositoryPort
+        );
     }
 
     @Bean
@@ -166,5 +173,45 @@ public class UserConfig {
                 userRepositoryPort,
                 otpPort,
                 emailPort);
+    }
+
+    @Bean
+    public ForgotPasswordInputPort forgotPasswordInputPort(
+            UserRepositoryPort userRepositoryPort,
+            PasswordResetOtpPort passwordResetOtpPort,
+            EmailPort emailPort) {
+        return new ForgotPasswordUseCase(
+                userRepositoryPort,
+                passwordResetOtpPort,
+                emailPort);
+    }
+
+    @Bean
+    public ResetPasswordInputPort resetPasswordInputPort(
+            UserRepositoryPort userRepositoryPort,
+            PasswordResetOtpPort passwordResetOtpPort,
+            EncoderPort encoderPort) {
+        return new ResetPasswordUseCase(
+                userRepositoryPort,
+                passwordResetOtpPort,
+                encoderPort);
+    }
+
+    @Bean
+    public VerifyForgotPasswordOtpInputPort verifyForgotPasswordOtpInputPort(
+            UserRepositoryPort userRepositoryPort,
+            PasswordResetOtpPort passwordResetOtpPort) {
+        return new VerifyForgotPasswordOtpUseCase(
+                userRepositoryPort,
+                passwordResetOtpPort);
+    }
+
+    @Bean
+    public ChangePasswordInputPort changePasswordInputPort(
+            UserRepositoryPort userRepositoryPort,
+            EncoderPort encoderPort) {
+        return new ChangePasswordUseCase(
+                userRepositoryPort,
+                encoderPort);
     }
 }

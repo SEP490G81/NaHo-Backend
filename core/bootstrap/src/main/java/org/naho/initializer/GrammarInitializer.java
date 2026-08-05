@@ -3,10 +3,11 @@ package org.naho.initializer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.naho.book.exception.BookErrorCode;
+import org.naho.file.constant.FileFolderConstant;
+import org.naho.file.constant.StaticResourceProperties;
 import org.naho.grammar.port.in.ImportGrammarPort;
 import org.naho.question.repository.GrammarJpaRepository;
 import org.naho.shared.exception.BootstrapException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
@@ -25,9 +26,7 @@ public class GrammarInitializer implements ApplicationRunner {
     private final ResourceLoader resourceLoader;
     private final GrammarJpaRepository grammarJpaRepository;
     private final ImportGrammarPort importGrammarPort;
-
-    @Value("${app.static-resources.base-location}")
-    private String staticResourcesBaseLocation;
+    private final StaticResourceProperties staticResourceProperties;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -35,7 +34,9 @@ public class GrammarInitializer implements ApplicationRunner {
             log.info("Grammar Data existed!");
         } else {
             try (InputStream inputStream = resourceLoader
-                    .getResource(staticResourcesBaseLocation + "books/grammar_data.xlsx")
+                    .getResource(staticResourceProperties.getLocalRoot() +
+                            FileFolderConstant.BOOKS +
+                            "/grammar_data.xlsx")
                     .getInputStream()) {
 
                 log.info("Initializing Grammar Data...");

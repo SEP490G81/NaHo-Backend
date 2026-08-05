@@ -11,8 +11,8 @@ spring:
 
   servlet:
     multipart:
-      max-file-size: 50MB
-      max-request-size: 50MB
+      max-file-size: 100MB
+      max-request-size: 100MB
 
   data:
     redis:
@@ -71,6 +71,10 @@ mybatis:
 
 app:
   frontend-url: ${FRONTEND_URL}
+  nextjs-server-files-api: ${NEXTJS_SERVER_FILES_API}
+  scheduler:
+    file-upload-retry:
+      fixed-delay: 60000
   jwt:
     secret: ${JWT_SECRET}
     access-token-expiration: 5m
@@ -88,8 +92,10 @@ app:
     region: japaneast
     language: ja-JP
   s3:
-    bucket-name: naho-bucket
+    public-bucket-name: naho-public-bucket
+    private-bucket-name: naho-private-bucket
     region: ap-southeast-1
+    signatureDuration: 5m
 
   vnpay:
     tmn-code: AS09APAU
@@ -98,5 +104,7 @@ app:
     return-url: https://groggily-override-wrongly.ngrok-free.dev/api/v1/payments/vnpay-return
     timeout: 5
 
-  static-resources:
-    base-location: ${STATIC_RESOURCES_BASE_LOCATION}
+  static-resource:
+    local-root: ${LOCAL_ROOT}
+    local-path: ${LOCAL_PATH}
+    backend-files-base-url: ${BACKEND_FILES_BASE_URL}

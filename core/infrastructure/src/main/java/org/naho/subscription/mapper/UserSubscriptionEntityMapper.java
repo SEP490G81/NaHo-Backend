@@ -8,12 +8,14 @@ import org.naho.subscription.model.UserSubscription;
 @Mapper(componentModel = "spring")
 public interface UserSubscriptionEntityMapper {
 
+    @Mapping(target = "user", ignore = true)
     @Mapping(target = "subscriptionPlan", ignore = true)
     @Mapping(target = "paymentOrder", ignore = true)
     @Mapping(target = "createdTime", source = "createdTime")
     @Mapping(target = "modifiedTime", ignore = true)
     UserSubscriptionEntity domainToEntity(UserSubscription domain);
 
+    @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "subscriptionPlanId", source = "subscriptionPlan.id")
     @Mapping(target = "paymentOrderId", source = "paymentOrder.id")
     UserSubscription entityToDomain(UserSubscriptionEntity entity);

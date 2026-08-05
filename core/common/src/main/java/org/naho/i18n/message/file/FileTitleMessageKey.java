@@ -9,6 +9,10 @@ public final class FileTitleMessageKey {
             "file.not.valid.title";
     public static final String FILE_DELETE_FAILED_TITLE =
             "file.delete.failed.title";
+    public static final String FILE_GENERATE_PRESIGNED_URL_FAILED_TITLE =
+            "file.generate_presigned_url.failed.title";
+    public static final String FILE_DOWNLOAD_FAILED_TITLE =
+            "file.download.failed.title";
 
     private FileTitleMessageKey() {
     }

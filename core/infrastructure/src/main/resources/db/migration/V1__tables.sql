@@ -5,7 +5,7 @@ CREATE TABLE answer_histories
     modified_time        datetime(6)           NULL,
     user_id              BIGINT                NOT NULL,
     speaking_question_id BIGINT                NOT NULL,
-    audio_file_id        BIGINT                NOT NULL,
+    audio_file_id        BIGINT                NULL,
     CONSTRAINT pk_answer_histories PRIMARY KEY (id)
 );
 
@@ -70,6 +70,7 @@ CREATE TABLE conversation_styles
     `description`   VARCHAR(512)          NULL,
     prompt          TEXT                  NOT NULL,
     formality_level VARCHAR(255)          NOT NULL,
+    marugoto_level  VARCHAR(255)          NULL,
     CONSTRAINT pk_conversation_styles PRIMARY KEY (id)
 );
 
@@ -79,7 +80,7 @@ CREATE TABLE daily_missions
     created_time  datetime(6)           NOT NULL,
     modified_time datetime(6)           NULL,
     title         VARCHAR(255)          NOT NULL,
-    description   VARCHAR(255)          NULL,
+    `description` VARCHAR(255)          NULL,
     mission_type  VARCHAR(255)          NOT NULL,
     point         DOUBLE                NOT NULL,
     CONSTRAINT pk_daily_missions PRIMARY KEY (id)
@@ -98,15 +99,21 @@ CREATE TABLE daily_rewards
 
 CREATE TABLE files
 (
-    id            BIGINT AUTO_INCREMENT NOT NULL,
-    created_time  datetime(6)           NOT NULL,
-    modified_time datetime(6)           NULL,
-    object_key    VARCHAR(2048)         NOT NULL,
-    original_name VARCHAR(255)          NOT NULL,
-    content_type  VARCHAR(100)          NOT NULL,
-    size          BIGINT                NOT NULL,
-    comment_id    BIGINT                NULL,
-    report_id     BIGINT                NULL,
+    id               BIGINT AUTO_INCREMENT NOT NULL,
+    created_time     datetime(6)           NOT NULL,
+    modified_time    datetime(6)           NULL,
+    object_key       VARCHAR(500)          NOT NULL,
+    bucket_name      VARCHAR(255)          NULL,
+    original_name    VARCHAR(255)          NOT NULL,
+    content_type     VARCHAR(100)          NOT NULL,
+    size             BIGINT                NOT NULL,
+    checksum         VARCHAR(255)          NULL,
+    operation_type   VARCHAR(50)           NULL,
+    operation_status VARCHAR(50)           NULL,
+    retry_count      INT                   NOT NULL,
+    next_retry_at    datetime(6)           NULL,
+    comment_id       BIGINT                NULL,
+    report_id        BIGINT                NULL,
     CONSTRAINT pk_files PRIMARY KEY (id)
 );
 
@@ -323,6 +330,19 @@ CREATE TABLE roles_permissions
     CONSTRAINT pk_roles_permissions PRIMARY KEY (permission_id, role_id)
 );
 
+CREATE TABLE speaking_improved_expressions
+(
+    id             BIGINT AUTO_INCREMENT NOT NULL,
+    created_time   datetime(6)           NOT NULL,
+    modified_time  datetime(6)           NULL,
+    assessment_id  BIGINT                NOT NULL,
+    turn_index     INT                   NULL,
+    original_text  TEXT                  NOT NULL,
+    improved_text  TEXT                  NOT NULL,
+    explanation_vi TEXT                  NULL,
+    CONSTRAINT pk_speaking_improved_expressions PRIMARY KEY (id)
+);
+
 CREATE TABLE speaking_questions
 (
     id                              BIGINT AUTO_INCREMENT NOT NULL,
@@ -332,6 +352,7 @@ CREATE TABLE speaking_questions
     title_markup                    VARCHAR(255)          NOT NULL,
     `description`                   TEXT                  NULL,
     description_markup              TEXT                  NULL,
+    sample_answer                   TEXT                  NULL,
     status                          VARCHAR(50)           NULL,
     speaking_question_audio_file_id BIGINT                NULL,
     user_id                         BIGINT                NULL,
@@ -348,6 +369,75 @@ CREATE TABLE speaking_questions_vocabularies
 (
     speaking_question_id BIGINT NOT NULL,
     vocabulary_id        BIGINT NOT NULL
+);
+
+CREATE TABLE speaking_session_assessments
+(
+    id                     BIGINT AUTO_INCREMENT NOT NULL,
+    created_time           datetime(6)           NOT NULL,
+    modified_time          datetime(6)           NULL,
+    session_id             BIGINT                NOT NULL,
+    overall_score          INT                   NOT NULL,
+    jlpt_estimate          VARCHAR(5)            NOT NULL,
+    fluency_score          INT                   NOT NULL,
+    pronunciation_score    INT                   NOT NULL,
+    grammar_score          INT                   NOT NULL,
+    vocabulary_score       INT                   NOT NULL,
+    interaction_score      INT                   NOT NULL,
+    naturalness_score      INT                   NOT NULL,
+    coherence_score        INT                   NOT NULL,
+    summary                TEXT                  NOT NULL,
+    strengths              JSON                  NOT NULL,
+    weaknesses             JSON                  NOT NULL,
+    feedback_fluency       TEXT                  NULL,
+    feedback_pronunciation TEXT                  NULL,
+    feedback_grammar       TEXT                  NULL,
+    feedback_vocabulary    TEXT                  NULL,
+    feedback_interaction   TEXT                  NULL,
+    feedback_naturalness   TEXT                  NULL,
+    feedback_coherence     TEXT                  NULL,
+    study_focus_area       VARCHAR(30)           NULL,
+    study_recommendation   TEXT                  NULL,
+    study_encouragement    TEXT                  NULL,
+    CONSTRAINT pk_speaking_session_assessments PRIMARY KEY (id)
+);
+
+CREATE TABLE speaking_session_messages
+(
+    id                     BIGINT AUTO_INCREMENT NOT NULL,
+    created_time           datetime(6)           NOT NULL,
+    modified_time          datetime(6)           NULL,
+    session_id             BIGINT                NOT NULL,
+    turn_index             INT                   NOT NULL,
+    sender_type            VARCHAR(20)           NOT NULL,
+    content                LONGTEXT              NOT NULL,
+    corrected_text         TEXT                  NULL,
+    correction_explanation TEXT                  NULL,
+    grammar_note           TEXT                  NULL,
+    hint_for_learner       TEXT                  NULL,
+    pronunciation_score    DOUBLE                NULL,
+    CONSTRAINT pk_speaking_session_messages PRIMARY KEY (id)
+);
+
+CREATE TABLE speaking_sessions
+(
+    id               BIGINT AUTO_INCREMENT NOT NULL,
+    created_time     datetime(6)           NOT NULL,
+    modified_time    datetime(6)           NULL,
+    session_code     VARCHAR(36)           NOT NULL,
+    user_id          BIGINT                NOT NULL,
+    persona_id       BIGINT                NULL,
+    topic            VARCHAR(500)          NULL,
+    marugoto_level   VARCHAR(30)           NULL,
+    formality_level  VARCHAR(20)           NULL,
+    duration_seconds INT                   NULL,
+    total_turns      INT                   NOT NULL,
+    asr_confidence   DOUBLE                NULL,
+    full_transcript  LONGTEXT              NULL,
+    status           VARCHAR(20)           NOT NULL,
+    started_at       datetime(6)           NOT NULL,
+    ended_at         datetime(6)           NULL,
+    CONSTRAINT pk_speaking_sessions PRIMARY KEY (id)
 );
 
 CREATE TABLE speech_assessments
@@ -385,6 +475,8 @@ CREATE TABLE subscription_plans
     full_curriculum_access             BIT(1)                NOT NULL,
     progress_analytics_enabled         BIT(1)                NOT NULL,
     sample_answer_enabled              BIT(1)                NOT NULL,
+    max_answer_time_seconds            DOUBLE                NOT NULL,
+    save_answer_history_enabled        BIT(1)                NOT NULL,
     status                             VARCHAR(255)          NOT NULL,
     CONSTRAINT pk_subscription_plans PRIMARY KEY (id)
 );
@@ -566,6 +658,9 @@ ALTER TABLE books
 ALTER TABLE content_assessments
     ADD CONSTRAINT uc_content_assessments_answer_history UNIQUE (answer_history_id);
 
+ALTER TABLE files
+    ADD CONSTRAINT uc_files_object_key UNIQUE (object_key);
+
 ALTER TABLE leagues
     ADD CONSTRAINT uc_leagues_icon_file UNIQUE (icon_file_id);
 
@@ -595,6 +690,12 @@ ALTER TABLE roles
 
 ALTER TABLE speaking_questions
     ADD CONSTRAINT uc_speaking_questions_speaking_question_audio_file UNIQUE (speaking_question_audio_file_id);
+
+ALTER TABLE speaking_session_assessments
+    ADD CONSTRAINT uc_speaking_session_assessments_session UNIQUE (session_id);
+
+ALTER TABLE speaking_sessions
+    ADD CONSTRAINT uc_speaking_sessions_session_code UNIQUE (session_code);
 
 ALTER TABLE speech_assessments
     ADD CONSTRAINT uc_speech_assessments_answer_history UNIQUE (answer_history_id);
@@ -713,11 +814,20 @@ ALTER TABLE reports
 ALTER TABLE reports
     ADD CONSTRAINT FK_REPORTS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
+ALTER TABLE speaking_improved_expressions
+    ADD CONSTRAINT FK_SPEAKING_IMPROVED_EXPRESSIONS_ON_ASSESSMENT FOREIGN KEY (assessment_id) REFERENCES speaking_session_assessments (id);
+
 ALTER TABLE speaking_questions
     ADD CONSTRAINT FK_SPEAKING_QUESTIONS_ON_SPEAKING_QUESTION_AUDIO_FILE FOREIGN KEY (speaking_question_audio_file_id) REFERENCES files (id);
 
 ALTER TABLE speaking_questions
     ADD CONSTRAINT FK_SPEAKING_QUESTIONS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+
+ALTER TABLE speaking_session_assessments
+    ADD CONSTRAINT FK_SPEAKING_SESSION_ASSESSMENTS_ON_SESSION FOREIGN KEY (session_id) REFERENCES speaking_sessions (id);
+
+ALTER TABLE speaking_session_messages
+    ADD CONSTRAINT FK_SPEAKING_SESSION_MESSAGES_ON_SESSION FOREIGN KEY (session_id) REFERENCES speaking_sessions (id);
 
 ALTER TABLE speech_assessments
     ADD CONSTRAINT FK_SPEECH_ASSESSMENTS_ON_ANSWER_HISTORY FOREIGN KEY (answer_history_id) REFERENCES answer_histories (id);
@@ -769,6 +879,9 @@ ALTER TABLE user_subscriptions
 
 ALTER TABLE user_subscriptions
     ADD CONSTRAINT FK_USER_SUBSCRIPTIONS_ON_SUBSCRIPTION_PLAN FOREIGN KEY (subscription_plan_id) REFERENCES subscription_plans (id);
+
+ALTER TABLE user_subscriptions
+    ADD CONSTRAINT FK_USER_SUBSCRIPTIONS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
 ALTER TABLE word_assessments
     ADD CONSTRAINT FK_WORD_ASSESSMENTS_ON_SPEECH_ASSESSMENT FOREIGN KEY (speech_assessment_id) REFERENCES speech_assessments (id);

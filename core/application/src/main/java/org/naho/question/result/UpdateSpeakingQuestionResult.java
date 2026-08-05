@@ -9,6 +9,7 @@ public record UpdateSpeakingQuestionResult(
         String titleMarkup,
         String description,
         String descriptionMarkup,
+        String sampleAnswer,
         QuestionStatus status
 ) {
 }

@@ -28,7 +28,7 @@ public class AnswerHistoryEntity extends BaseEntity {
     SpeakingQuestionEntity speakingQuestion;
 
     @OneToOne
-    @JoinColumn(name = "audio_file_id", nullable = false)
+    @JoinColumn(name = "audio_file_id")
     FileEntity audioFile;
 
     @OneToOne(mappedBy = "answerHistory")

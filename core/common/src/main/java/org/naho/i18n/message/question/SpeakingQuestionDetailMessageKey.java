@@ -17,9 +17,11 @@ public final class SpeakingQuestionDetailMessageKey {
     public static final String SPEAKING_QUESTION_DESCRIPTION_EMPTY =
             "speaking_question.description.empty";
     public static final String ANSWER_HISTORY_NOT_FOUND = "answer_history.not_found";
+    public static final String ANSWER_HISTORY_ID_NULL = "answer_history.id.null";
     public static final String SPEECH_ASSESSMENT_NOT_FOUND = "speech_assessment.not_found";
     public static final String CONTENT_ASSESSMENT_NOT_FOUND = "content_assessment.not_found";
     public static final String SPEAKING_QUESTION_LOCKED = "speaking_question.locked";
+    public static final String SPEAKING_QUESTION_CUSTOM_SUGGEST_SUCCESS = "speaking_question.custom_suggest.success.detail";
 
     private SpeakingQuestionDetailMessageKey() {
     }

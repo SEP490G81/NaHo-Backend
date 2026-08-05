@@ -3,6 +3,7 @@ package org.naho.payment.adapter;
 import org.naho.payment.model.PaymentOrder;
 import org.naho.payment.port.out.PaymentGatewayPort;
 import org.naho.payment.type.PaymentProvider;
+import org.naho.shared.constant.SystemZoneId;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +14,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.Instant;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -74,9 +74,9 @@ public class VnPayPaymentGatewayAdapter implements PaymentGatewayPort {
         String vnp_Amount = String.valueOf(amountInCents);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-        ZonedDateTime nowVn = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
+        ZonedDateTime nowVn = ZonedDateTime.now(SystemZoneId.HO_CHI_MINH_ZONE_ID);
         String vnp_CreateDate = nowVn.format(formatter);
-        ZonedDateTime expireVn = ZonedDateTime.ofInstant(paymentOrder.getExpiresTime(), ZoneId.of("Asia/Ho_Chi_Minh"));
+        ZonedDateTime expireVn = ZonedDateTime.ofInstant(paymentOrder.getExpiresTime(), SystemZoneId.HO_CHI_MINH_ZONE_ID);
         String vnp_ExpireDate = expireVn.format(formatter);
 
         String vnp_TxnRef = paymentOrder.getOrderCode();

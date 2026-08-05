@@ -11,10 +11,12 @@ import org.naho.book.port.out.BookRepositoryPort;
 import org.naho.book.port.out.LessonRepositoryPort;
 import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.book.port.out.TopicRepositoryPort;
-import org.naho.file.command.FileUploadCommand;
-import org.naho.file.port.in.FileStorageInputPort;
+import org.naho.file.model.File;
+import org.naho.file.port.in.UploadFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
+import org.naho.file.port.out.FileResultMapperPort;
 import org.naho.file.result.FileResult;
+import org.naho.file.result.StoredFile;
 import org.naho.furigana.port.out.FuriganaGenerationPort;
 import org.naho.i18n.message.learning.LearningPathNodeDetailMessageKey;
 import org.naho.i18n.message.learning.UserLearningProgressDetailMessageKey;
@@ -32,6 +34,7 @@ import org.naho.question.exception.SpeakingQuestionErrorCode;
 import org.naho.question.model.Grammar;
 import org.naho.question.model.SpeakingQuestion;
 import org.naho.question.port.in.CompleteSpeakingQuestionInputPort;
+import org.naho.question.port.out.AnswerHistoryRepositoryPort;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.TransactionPort;
@@ -41,7 +44,6 @@ import org.naho.speech.llm.command.SpeakingAnalysisCommand;
 import org.naho.speech.llm.command.SpeakingHistoryFilterCommand;
 import org.naho.speech.llm.port.in.SpeakingAnalysisInputPort;
 import org.naho.speech.llm.port.out.AiAnalysisPort;
-import org.naho.speech.llm.port.out.AnswerHistoryRepositoryPort;
 import org.naho.speech.llm.result.SpeakingAnalysisResult;
 import org.naho.speech.llm.result.SpeakingHistoryDetailResult;
 import org.naho.speech.llm.result.SpeakingHistoryListItemResult;
@@ -54,7 +56,6 @@ import org.naho.user.exception.UserErrorCode;
 import org.naho.user.model.User;
 import org.naho.user.port.out.UserRepositoryPort;
 
-import java.io.ByteArrayInputStream;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,10 +64,8 @@ import java.util.Map;
 
 public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
 
-    public static final String RECORDS_FORDER_NAME = "recordings";
     private final UserRepositoryPort userRepositoryPort;
     private final SpeakingQuestionRepositoryPort speakingQuestionRepositoryPort;
-    private final FileStorageInputPort fileStorageInputPort;
     private final FileRepositoryPort fileRepositoryPort;
     private final AnswerHistoryRepositoryPort answerHistoryRepositoryPort;
     private final AzureSpeechServicePort azureSpeechServicePort;
@@ -80,12 +79,13 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     private final TransactionPort transactionPort;
     private final CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort;
     private final UserLearningProgressRepositoryPort userLearningProgressRepositoryPort;
+    private final FileResultMapperPort fileResultMapperPort;
+    private final UploadFileInputPort uploadFileInputPort;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public SpeakingAnalysisUseCase(
             UserRepositoryPort userRepositoryPort,
             SpeakingQuestionRepositoryPort speakingQuestionRepositoryPort,
-            FileStorageInputPort fileStorageInputPort,
             FileRepositoryPort fileRepositoryPort,
             AnswerHistoryRepositoryPort answerHistoryRepositoryPort,
             AzureSpeechServicePort azureSpeechServicePort,
@@ -98,11 +98,11 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             FuriganaGenerationPort furiganaGenerationPort,
             TransactionPort transactionPort,
             CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort,
-            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort
-    ) {
+            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
+            FileResultMapperPort fileResultMapperPort,
+            UploadFileInputPort uploadFileInputPort) {
         this.userRepositoryPort = userRepositoryPort;
         this.speakingQuestionRepositoryPort = speakingQuestionRepositoryPort;
-        this.fileStorageInputPort = fileStorageInputPort;
         this.fileRepositoryPort = fileRepositoryPort;
         this.answerHistoryRepositoryPort = answerHistoryRepositoryPort;
         this.azureSpeechServicePort = azureSpeechServicePort;
@@ -116,11 +116,21 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         this.transactionPort = transactionPort;
         this.completeSpeakingQuestionInputPort = completeSpeakingQuestionInputPort;
         this.userLearningProgressRepositoryPort = userLearningProgressRepositoryPort;
+        this.fileResultMapperPort = fileResultMapperPort;
+        this.uploadFileInputPort = uploadFileInputPort;
     }
 
     @Override
     public SpeakingAnalysisResult analyzeSpeaking(SpeakingAnalysisCommand command) {
-        return transactionPort.execute(() -> doAnalyzeSpeaking(command));
+        SpeakingAnalysisResult result = transactionPort.execute(() -> doAnalyzeSpeaking(command));
+
+        StoredFile storedFile = command.storedFile();
+        if (storedFile != null) {
+            FileResult uploadedFile = uploadFileInputPort.uploadFileToCloud(storedFile);
+            result.setAudioFile(uploadedFile);
+        }
+
+        return result;
     }
 
     private SpeakingAnalysisResult doAnalyzeSpeaking(SpeakingAnalysisCommand command) {
@@ -129,63 +139,60 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 .orElseThrow(() -> new ApplicationException(
                         LearningPathNodeErrorCode.LEARNING_PATH_NODE_NOT_FOUND,
                         LearningPathNodeDetailMessageKey.LEARNING_PATH_NODE_ID_NOT_FOUND,
-                        command.speakingQuestionId()
-                ));
+                        command.speakingQuestionId()));
 
         UserLearningProgress progress = userLearningProgressRepositoryPort
                 .findByUserId(command.userId())
                 .orElseThrow(() -> new ApplicationException(
                         UserLearningProgressErrorCode.USER_LEARNING_PROGRESS_NOT_FOUND,
                         UserLearningProgressDetailMessageKey.USER_LEARNING_PROGRESS_NOT_FOUND_BY_USER_ID,
-                        command.userId()
-                ));
+                        command.userId()));
 
         // nếu node xa nhất người dùng có thể học còn nhỏ hơn node đang định học
-        if (progress.getFarthestAvailableNodeGlobalOrderIndex()
-                < speakingQuestionLearningPathNode.getGlobalOrderIndex()) {
+        if (progress.getFarthestAvailableNodeGlobalOrderIndex() < speakingQuestionLearningPathNode
+                .getGlobalOrderIndex()) {
             throw new ApplicationException(
                     SpeakingQuestionErrorCode.SPEAKING_QUESTION_LOCKED,
-                    SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_LOCKED
-            );
+                    SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_LOCKED);
         }
 
         User user = userRepositoryPort.findById(command.userId())
                 .orElseThrow(() -> new ApplicationException(
                         UserErrorCode.USER_NOT_FOUND,
-                        UserDetailMessageKey.USER_ID_NOT_FOUND
-                ));
+                        UserDetailMessageKey.USER_ID_NOT_FOUND));
 
         SpeakingQuestion speakingQuestion = speakingQuestionRepositoryPort.findById(command.speakingQuestionId())
                 .orElseThrow(() -> new ApplicationException(
                         SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
-                        SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_NOT_FOUND
-                ));
+                        SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_NOT_FOUND));
 
-        // Upload file
-        FileUploadCommand uploadCommand = FileUploadCommand.builder()
-                .folderName(RECORDS_FORDER_NAME)
-                .originalName(command.originalFilename() != null ?
-                        command.originalFilename() :
-                        "recording.wav"
-                )
-                .inputStream(new ByteArrayInputStream(command.audioBytes()))
-                .contentType(command.contentType())
-                .size((long) command.audioBytes().length)
-                .build();
+        File audioFile = null;
 
-        FileResult uploadResult = fileStorageInputPort.uploadFile(uploadCommand);
+        // nếu đã lưu file trong local
+        // (tức là đăng kí gói không phải FREE)
+        // thì mới lưu lại file nói chuyện của người dùng
+        StoredFile storedFile = command.storedFile();
+        if (storedFile != null) {
+            audioFile = fileRepositoryPort.createNewForUpload(storedFile, false);
+        }
 
-        // Save answer history
         AnswerHistory answerHistory = AnswerHistory.builder()
                 .userId(user.getId())
                 .speakingQuestionId(speakingQuestion.getId())
-                .audioFileId(uploadResult.id())
                 .build();
 
-        answerHistory = answerHistoryRepositoryPort.saveAnswerHistory(answerHistory);
+        if (audioFile != null) {
+            answerHistory.setAudioFileId(audioFile.getId());
+        }
+
+        AnswerHistory savedAnswerHistory = answerHistoryRepositoryPort
+                .saveAnswerHistory(answerHistory);
 
         // Speech Assessment
-        SpeechAssessmentCommand speechAssessmentCommand = new SpeechAssessmentCommand(command.audioBytes(), null);
+        SpeechAssessmentCommand speechAssessmentCommand = new SpeechAssessmentCommand(
+                command.audioBytes(),
+                null);
+
         SpeechAssessment azureAssessment = azureSpeechServicePort.assess(speechAssessmentCommand);
 
         SpeechAssessment speechAssessment = SpeechAssessment.builder()
@@ -194,7 +201,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 .fluencyScore(azureAssessment.getFluencyScore())
                 .completenessScore(azureAssessment.getCompletenessScore())
                 .pronunciationScore(azureAssessment.getPronunciationScore())
-                .answerHistoryId(answerHistory.getId())
+                .answerHistoryId(savedAnswerHistory.getId())
                 .build();
 
         speechAssessment = answerHistoryRepositoryPort.saveSpeechAssessment(speechAssessment);
@@ -214,8 +221,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             serializedWordList.add(Map.of(
                     "word", word.getWord(),
                     "score", word.getAccuracyScore(),
-                    "error", word.getErrorType().name()
-            ));
+                    "error", word.getErrorType().name()));
         }
         answerHistoryRepositoryPort.saveAllWordAssessment(wordList);
 
@@ -233,13 +239,16 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
 
         String curriculumVal = (book != null) ? book.getTitle() : "N/A";
         String levelVal = (book != null && book.getJlptLevel() != null) ? book.getJlptLevel().name() : "N/A";
-        String sttVal = (objective != null && objective.getOrderIndex() != null) ? String.valueOf(objective.getOrderIndex()) : "N/A";
+        String sttVal = (objective != null && objective.getOrderIndex() != null)
+                ? String.valueOf(objective.getOrderIndex())
+                : "N/A";
         String topicVal = (topic != null) ? topic.getJapaneseName() : "N/A";
         String lessonVal = (lesson != null) ? lesson.getJapaneseName() : "N/A";
 
         String canDoObjectiveVal;
         if (objective != null) {
-            canDoObjectiveVal = (objective.getJapaneseDescription() != null && !objective.getJapaneseDescription().isBlank())
+            canDoObjectiveVal = (objective.getJapaneseDescription() != null
+                    && !objective.getJapaneseDescription().isBlank())
                     ? objective.getJapaneseDescription()
                     : objective.getJapaneseName();
         } else {
@@ -263,7 +272,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 }
             }
         }
-        String grammarFocusVal = grammarFocusSb.isEmpty() ? "N/A (no specific grammar focus for this lesson)" : grammarFocusSb.toString();
+        String grammarFocusVal = grammarFocusSb.isEmpty() ? "N/A (no specific grammar focus for this lesson)"
+                : grammarFocusSb.toString();
 
         StringBuilder vocabFocusSb = new StringBuilder();
         if (speakingQuestion.getVocabularies() != null) {
@@ -285,18 +295,24 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 vocabFocusSb.append(entry);
             }
         }
-        String vocabFocusVal = vocabFocusSb.isEmpty() ? "N/A (no specific vocabulary focus for this lesson)" : vocabFocusSb.toString();
+        String vocabFocusVal = vocabFocusSb.isEmpty() ? "N/A (no specific vocabulary focus for this lesson)"
+                : vocabFocusSb.toString();
 
         String questionTitleVal = speakingQuestion.getTitle() != null ? speakingQuestion.getTitle() : "N/A";
-        String questionDescriptionVal = speakingQuestion.getDescription() != null && !speakingQuestion.getDescription().isBlank()
+        String questionDescriptionVal = speakingQuestion.getDescription() != null
+                && !speakingQuestion.getDescription().isBlank()
                 ? speakingQuestion.getDescription()
                 : questionTitleVal;
 
         double accuracy = azureAssessment.getAccuracyScore() != null ? azureAssessment.getAccuracyScore() : 0.0;
         double fluency = azureAssessment.getFluencyScore() != null ? azureAssessment.getFluencyScore() : 0.0;
-        double completeness = azureAssessment.getCompletenessScore() != null ? azureAssessment.getCompletenessScore() : 0.0;
-        double overallPronunciation = azureAssessment.getPronunciationScore() != null ? azureAssessment.getPronunciationScore() : 0.0;
-        String studentTranscript = azureAssessment.getTranscriptText() != null ? azureAssessment.getTranscriptText() : "";
+        double completeness = azureAssessment.getCompletenessScore() != null ? azureAssessment.getCompletenessScore()
+                : 0.0;
+        double overallPronunciation = azureAssessment.getPronunciationScore() != null
+                ? azureAssessment.getPronunciationScore()
+                : 0.0;
+        String studentTranscript = azureAssessment.getTranscriptText() != null ? azureAssessment.getTranscriptText()
+                : "";
 
         var evaluationContext = new AiAnalysisPort.Context(
                 curriculumVal,
@@ -313,16 +329,18 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 fluency,
                 completeness,
                 overallPronunciation,
-                studentTranscript
-        );
+                studentTranscript);
 
         String rawLlmFeedback = aiAnalysisPort.analyzeSpeaking(evaluationContext);
 
         double vocabScore = 0.0;
         double grammarScore = 0.0;
         double naturalnessScore = 0.0;
-        double pronScore10 = azureAssessment.getPronunciationScore() != null ? azureAssessment.getPronunciationScore() / 10.0 : 0.0;
-        double fluencyScore10 = azureAssessment.getFluencyScore() != null ? azureAssessment.getFluencyScore() / 10.0 : 0.0;
+        double pronScore10 = azureAssessment.getPronunciationScore() != null
+                ? azureAssessment.getPronunciationScore() / 10.0
+                : 0.0;
+        double fluencyScore10 = azureAssessment.getFluencyScore() != null ? azureAssessment.getFluencyScore() / 10.0
+                : 0.0;
         double overallScore = 0.0;
 
         try {
@@ -388,7 +406,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                     }
                 } else {
                     var errItem = objectMapper.createObjectNode();
-                    errItem.put("text", azureAssessment.getTranscriptText() != null ? azureAssessment.getTranscriptText() : "");
+                    errItem.put("text",
+                            azureAssessment.getTranscriptText() != null ? azureAssessment.getTranscriptText() : "");
                     errItem.set("error", null);
                     utNode.add(errItem);
                 }
@@ -446,8 +465,9 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 .grammarScore(grammarScore)
                 .aiFeedback(rawLlmFeedback)
                 .translationText("")
-                .answerHistoryId(answerHistory.getId())
+                .answerHistoryId(savedAnswerHistory.getId())
                 .build();
+
         answerHistoryRepositoryPort.saveContentAssessment(contentAssessment);
 
         completeSpeakingQuestionInputPort.completeSpeakingQuestion(
@@ -456,46 +476,47 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                         .speakingQuestionLearningPathNode(speakingQuestionLearningPathNode)
                         .userId(command.userId())
                         .overallScore(overallScore)
-                        .build()
-        );
+                        .build());
 
-        org.naho.file.model.File audioFile = fileRepositoryPort.findById(uploadResult.id());
-        String audioUrl = audioFile != null ? audioFile.getObjectKey() : null;
+        SpeakingAnalysisResult result = SpeakingAnalysisResult.builder()
+                .overallScore(overallScore)
+                .answerHistoryId(savedAnswerHistory.getId())
+                .build();
 
-        return new SpeakingAnalysisResult(answerHistory.getId(), overallScore, audioUrl);
+        if (audioFile != null) {
+            result.setAudioFile(fileResultMapperPort.domainToResult(audioFile));
+        }
+
+        return result;
     }
 
     @Override
     public SpeakingHistoryDetailResult getHistoryDetail(Long historyId) {
         System.out.println("[SpeakingAnalysis] Loading history detail for id: " + historyId);
 
-        AnswerHistory history = answerHistoryRepositoryPort.findAnswerHistoryById(historyId)
+        AnswerHistory history = answerHistoryRepositoryPort.findById(historyId)
                 .orElseThrow(() -> new ApplicationException(
                         SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
                         SpeakingQuestionDetailMessageKey.ANSWER_HISTORY_NOT_FOUND,
-                        historyId
-                ));
+                        historyId));
 
         SpeakingQuestion speakingQuestion = speakingQuestionRepositoryPort.findById(history.getSpeakingQuestionId())
                 .orElseThrow(() -> new ApplicationException(
                         SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
                         SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_NOT_FOUND,
-                        history.getSpeakingQuestionId()
-                ));
+                        history.getSpeakingQuestionId()));
 
         SpeechAssessment speech = answerHistoryRepositoryPort.findSpeechAssessmentByAnswerHistoryId(historyId)
                 .orElseThrow(() -> new ApplicationException(
                         SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
                         SpeakingQuestionDetailMessageKey.SPEECH_ASSESSMENT_NOT_FOUND,
-                        historyId
-                ));
+                        historyId));
 
         ContentAssessment content = answerHistoryRepositoryPort.findContentAssessmentByAnswerHistoryId(historyId)
                 .orElseThrow(() -> new ApplicationException(
                         SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
                         SpeakingQuestionDetailMessageKey.CONTENT_ASSESSMENT_NOT_FOUND,
-                        historyId
-                ));
+                        historyId));
 
         JsonNode root;
         try {
@@ -503,8 +524,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         } catch (Exception e) {
             throw new ApplicationException(
                     SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
-                    "Corrupted AI feedback data"
-            );
+                    "Corrupted AI feedback data");
         }
 
         Integer durationSec = root.path("durationSec").asInt(0);
@@ -520,8 +540,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 pronunciationScore,
                 vocabScore,
                 grammarScore,
-                naturalnessScore
-        );
+                naturalnessScore);
 
         List<SpeakingHistoryDetailResult.UserTranscriptItem> userTranscript = new ArrayList<>();
         JsonNode utNode = root.path("userTranscript");
@@ -534,8 +553,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                     error = new SpeakingHistoryDetailResult.ErrorDetail(
                             errNode.path("type").asText(""),
                             errNode.path("explanation").asText(""),
-                            errNode.path("suggestion").asText("")
-                    );
+                            errNode.path("suggestion").asText(""));
                 }
                 userTranscript.add(new SpeakingHistoryDetailResult.UserTranscriptItem(text, error));
             }
@@ -545,8 +563,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         SpeakingHistoryDetailResult.AiSuggestion aiSuggestion = new SpeakingHistoryDetailResult.AiSuggestion(
                 sugNode.path("jp").asText(""),
                 sugNode.path("furigana").asText(""),
-                sugNode.path("vi").asText("")
-        );
+                sugNode.path("vi").asText(""));
 
         Map<String, String> wordNotes = new HashMap<>();
         JsonNode wordNotesNode = root.path("wordNotes");
@@ -576,7 +593,9 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                     if (furiganaText != null && furiganaText.getTokens() != null) {
                         StringBuilder sb = new StringBuilder();
                         for (var token : furiganaText.getTokens()) {
-                            sb.append(token.getFurigana() != null && !token.getFurigana().isBlank() ? token.getFurigana() : token.getKanji());
+                            sb.append(
+                                    token.getFurigana() != null && !token.getFurigana().isBlank() ? token.getFurigana()
+                                            : token.getKanji());
                         }
                         furigana = sb.toString();
                     }
@@ -599,8 +618,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                         wordText,
                         furigana,
                         severity,
-                        note
-                ));
+                        note));
             }
         }
 
@@ -614,8 +632,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                         item.path("jp").asText(""),
                         item.path("furigana").asText(""),
                         item.path("vi").asText(""),
-                        item.path("note").asText("")
-                ));
+                        item.path("note").asText("")));
             }
         }
 
@@ -638,8 +655,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 pronunciation,
                 pronunciationNote,
                 expressions,
-                itVocab
-        );
+                itVocab);
 
         org.naho.file.model.File audioFile = fileRepositoryPort.findById(history.getAudioFileId());
         String audioUrl = audioFile != null ? audioFile.getObjectKey() : null;
@@ -651,8 +667,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         Book book = bookRepositoryPort.findBySpeakingQuestionId(speakingQuestion.getId()).orElse(null);
         Long bookId = book != null ? book.getId() : null;
 
-        org.naho.learning.model.LearningPathNode lpn =
-                learningPathNodeRepositoryPort.findBySpeakingQuestionId(speakingQuestion.getId()).orElse(null);
+        org.naho.learning.model.LearningPathNode lpn = learningPathNodeRepositoryPort
+                .findBySpeakingQuestionId(speakingQuestion.getId()).orElse(null);
         Long learningPathNodeId = lpn != null ? lpn.getId() : null;
 
         return new SpeakingHistoryDetailResult(
@@ -667,8 +683,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 durationSec,
                 overallScore,
                 audioUrl,
-                report
-        );
+                report);
     }
 
     @Override

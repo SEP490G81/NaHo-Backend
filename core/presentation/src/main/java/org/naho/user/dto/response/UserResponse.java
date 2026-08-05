@@ -15,11 +15,10 @@ import java.util.List;
 public record UserResponse(
         Long id,
         List<RoleResult> roles,
-        List<Long> userSessionIds,
         List<OAuthProviderResult> oAuthProviders,
 
         Long userLearningProgressId,
-        FileResult avatar,
+        FileResult avatarFile,
 
         String username,
         String email,

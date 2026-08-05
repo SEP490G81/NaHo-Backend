@@ -1,17 +1,22 @@
 package org.naho.config.application;
 
-import org.naho.book.port.out.TopicRepositoryPort;
 import org.naho.book.port.out.BookRepositoryPort;
 import org.naho.book.port.out.LessonRepositoryPort;
 import org.naho.book.port.out.ObjectiveRepositoryPort;
+import org.naho.book.port.out.TopicRepositoryPort;
+import org.naho.file.port.in.UploadFileInputPort;
+import org.naho.file.port.out.FileRepositoryPort;
+import org.naho.file.port.out.FileResultMapperPort;
+import org.naho.furigana.port.out.FuriganaGenerationPort;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
-import org.naho.file.port.in.FileStorageInputPort;
-import org.naho.file.port.out.FileRepositoryPort;
-import org.naho.furigana.port.out.FuriganaGenerationPort;
 import org.naho.persona.port.out.PersonaRepositoryPort;
+import org.naho.question.port.in.CompleteSpeakingQuestionInputPort;
+import org.naho.question.port.out.AnswerHistoryRepositoryPort;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
+import org.naho.shared.port.out.TransactionPort;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
+import org.naho.speech.azure.port.out.TextToSpeechServicePort;
 import org.naho.speech.llm.adapter.*;
 import org.naho.speech.llm.constant.OpenAiConfigProperties;
 import org.naho.speech.llm.port.in.EndSessionInputPort;
@@ -24,9 +29,6 @@ import org.naho.speech.llm.usecase.SpeakingAnalysisUseCase;
 import org.naho.speech.llm.usecase.SpeakingSessionUseCase;
 import org.naho.speech.llm.usecase.SuggestedTopicsUseCase;
 import org.naho.user.port.out.UserRepositoryPort;
-import org.naho.speech.azure.port.out.TextToSpeechServicePort;
-import org.naho.question.port.in.CompleteSpeakingQuestionInputPort;
-import org.naho.shared.port.out.TransactionPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -112,25 +114,25 @@ public class ChatConfig {
     public SpeakingAnalysisInputPort speakingAnalysisInputPort(
             UserRepositoryPort userRepositoryPort,
             SpeakingQuestionRepositoryPort questionRepositoryPort,
+            FileRepositoryPort fileRepositoryPort,
+            AnswerHistoryRepositoryPort answerHistoryRepositoryPort,
+            AzureSpeechServicePort azureSpeechServicePort,
             TopicRepositoryPort topicRepositoryPort,
             LessonRepositoryPort lessonRepositoryPort,
             ObjectiveRepositoryPort objectiveRepositoryPort,
             BookRepositoryPort bookRepositoryPort,
             LearningPathNodeRepositoryPort learningPathNodeRepositoryPort,
-            FileStorageInputPort fileStorageInputPort,
-            FileRepositoryPort fileRepositoryPort,
-            AnswerHistoryRepositoryPort answerHistoryRepositoryPort,
-            AzureSpeechServicePort azureSpeechServicePort,
             AiAnalysisPort aiAnalysisPort,
             FuriganaGenerationPort furiganaGenerationPort,
             TransactionPort transactionPort,
             CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort,
-            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort
+            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
+            FileResultMapperPort fileResultMapperPort,
+            UploadFileInputPort uploadFileInputPort
     ) {
         return new SpeakingAnalysisUseCase(
                 userRepositoryPort,
                 questionRepositoryPort,
-                fileStorageInputPort,
                 fileRepositoryPort,
                 answerHistoryRepositoryPort,
                 azureSpeechServicePort,
@@ -143,7 +145,9 @@ public class ChatConfig {
                 furiganaGenerationPort,
                 transactionPort,
                 completeSpeakingQuestionInputPort,
-                userLearningProgressRepositoryPort
+                userLearningProgressRepositoryPort,
+                fileResultMapperPort,
+                uploadFileInputPort
         );
     }
 }

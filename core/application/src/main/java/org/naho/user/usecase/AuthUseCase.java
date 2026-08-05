@@ -74,14 +74,12 @@ public class AuthUseCase implements AuthInputPort {
         if (userId == null) {
             throw new ApplicationException(
                     UserErrorCode.USER_UNAUTHORIZED,
-                    UserDetailMessageKey.USER_UNAUTHORIZED
-            );
+                    UserDetailMessageKey.USER_UNAUTHORIZED);
         }
         userSessionRepositoryPort.revokeAllActiveSessionsByUserId(
                 userId,
                 Instant.now(),
-                SessionRevokedReason.USER_LOGOUT_ALL
-        );
+                SessionRevokedReason.USER_LOGOUT_ALL);
     }
 
     @Override
@@ -121,8 +119,7 @@ public class AuthUseCase implements AuthInputPort {
 
         userSessionServicePort.revokeAllSessionsByUserId(
                 user.getId(),
-                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
-        );
+                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE);
 
         Instant now = Instant.now();
 
@@ -149,15 +146,12 @@ public class AuthUseCase implements AuthInputPort {
         userSessionEventPublisherPort.publishForceLogoutEvent(new ForceLogoutCommand(
                 savedUserSession.getUserId(),
                 savedUserSession.getId(),
-                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
-        ));
+                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE));
 
         return new LoginResult(
                 accessToken,
-                refreshToken
-        );
+                refreshToken);
     }
-
 
     @Override
     public LoginResult googleLogin(GoogleLoginCommand command) {
@@ -188,8 +182,7 @@ public class AuthUseCase implements AuthInputPort {
                         .orElseThrow(() -> new ApplicationException(
                                 RoleErrorCode.ROLE_NOT_FOUND,
                                 RoleDetailMessageKey.ROLE_ROLE_NAME_NOT_FOUND,
-                                RoleName.LEARNER.name()
-                        ));
+                                RoleName.LEARNER.name()));
 
                 User newUser = User.builder()
                         .email(Email.of(command.getEmail()))
@@ -205,7 +198,7 @@ public class AuthUseCase implements AuthInputPort {
                 crudUserLearningProgressInputPort.initUserLearningProgress(currentUser.getId());
             } else {
                 // if user is found by email, update OAuthProvider (link to Google)
-                currentUser = userRepositoryPort.save(emailUser, oAuthProvider);
+                currentUser = userRepositoryPort.createNew(emailUser, oAuthProvider);
             }
         }
 
@@ -217,8 +210,7 @@ public class AuthUseCase implements AuthInputPort {
 
         userSessionServicePort.revokeAllSessionsByUserId(
                 currentUser.getId(),
-                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
-        );
+                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE);
 
         Instant now = Instant.now();
 
@@ -245,13 +237,11 @@ public class AuthUseCase implements AuthInputPort {
         userSessionEventPublisherPort.publishForceLogoutEvent(new ForceLogoutCommand(
                 savedUserSession.getUserId(),
                 savedUserSession.getId(),
-                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
-        ));
+                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE));
 
         return new LoginResult(
                 accessToken,
-                refreshToken
-        );
+                refreshToken);
     }
 
     @Override
@@ -265,8 +255,7 @@ public class AuthUseCase implements AuthInputPort {
                 command.userId(),
                 command.userSessionId(),
                 Instant.now(),
-                SessionRevokedReason.USER_LOGOUT
-        );
+                SessionRevokedReason.USER_LOGOUT);
     }
 
     @Override
@@ -310,7 +299,6 @@ public class AuthUseCase implements AuthInputPort {
 
         return new LoginResult(
                 newAccessToken,
-                newRefreshToken
-        );
+                newRefreshToken);
     }
 }

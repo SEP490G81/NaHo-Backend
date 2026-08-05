@@ -2,18 +2,25 @@ package org.naho.social.report.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.naho.question.entity.SpeakingQuestionEntity;
-import org.naho.social.entity.CommentEntity;
-import org.naho.social.report.model.Report;
+import org.naho.file.mapper.FileEntityMapper;
+import org.naho.question.mapper.SpeakingQuestionIdMapper;
+import org.naho.social.comment.mapper.CommentIdMapper;
 import org.naho.social.report.entity.ReportEntity;
-import org.naho.user.entity.UserEntity;
+import org.naho.social.report.model.Report;
+import org.naho.user.mapper.UserIdMapper;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {
+        UserIdMapper.class,
+        SpeakingQuestionIdMapper.class,
+        CommentIdMapper.class,
+        FileEntityMapper.class
+})
 public interface ReportEntityMapper {
 
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "questionId", source = "question.id")
     @Mapping(target = "commentId", source = "comment.id")
+    @Mapping(target = "files", source = "files")
     Report entityToDomain(ReportEntity entity);
 
     @Mapping(target = "user", source = "userId")
@@ -22,33 +29,6 @@ public interface ReportEntityMapper {
     @Mapping(target = "createdTime", ignore = true)
     @Mapping(target = "modifiedTime", ignore = true)
     @Mapping(target = "isResolved", source = "resolved")
-    @Mapping(target = "files", ignore = true)
+    @Mapping(target = "files", source = "files")
     ReportEntity domainToEntity(Report report);
-
-    default UserEntity mapUserIdToUserEntity(Long userId) {
-        if (userId == null) {
-            return null;
-        }
-        UserEntity entity = new UserEntity();
-        entity.setId(userId);
-        return entity;
-    }
-
-    default SpeakingQuestionEntity mapQuestionIdToQuestionEntity(Long questionId) {
-        if (questionId == null) {
-            return null;
-        }
-        SpeakingQuestionEntity entity = new SpeakingQuestionEntity();
-        entity.setId(questionId);
-        return entity;
-    }
-
-    default CommentEntity mapCommentIdToCommentEntity(Long commentId) {
-        if (commentId == null) {
-            return null;
-        }
-        CommentEntity entity = new CommentEntity();
-        entity.setId(commentId);
-        return entity;
-    }
 }

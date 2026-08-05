@@ -12,5 +12,4 @@ public interface CrudUserDailyMissionInputPort {
     UserDailyMissionResult completeMission(CompleteDailyMissionCommand command);
 
     UserDailyMissionResult earnMission(EarnDailyMissionCommand command);
-
 }

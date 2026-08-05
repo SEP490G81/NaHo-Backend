@@ -198,12 +198,17 @@ public class ImportBookAdapter implements ImportBookPort {
                             String title = (speakingQuestionCell != null)
                                     ? speakingQuestionCell.getStringCellValue().trim()
                                     : "";
+
+                            Cell sampleAnswerCell = row.getCell(8);
+                            String sampleAnswer = (sampleAnswerCell != null) ? sampleAnswerCell.getStringCellValue().trim() : "";
+                            
                             SpeakingQuestionEntity speakingQuestionEntity = SpeakingQuestionEntity
                                     .builder()
                                     .title(title)
                                     .titleMarkup(title)
                                     .status(QuestionStatus.PUBLISHED)
                                     .learningPathNode(learningPathNodeEntity)
+                                    .sampleAnswer(sampleAnswer)
                                     .build();
 
                             // add grammars to speaking question

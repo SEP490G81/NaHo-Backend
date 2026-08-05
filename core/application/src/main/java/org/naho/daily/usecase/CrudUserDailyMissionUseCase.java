@@ -29,9 +29,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class CrudUserDailyMissionUseCase implements CrudUserDailyMissionInputPort {
-    private static final int NUMBER_OF_MISSIONS_PER_DAY = 2;
-    private static final long TALK_WITH_AI_MISSION_ID = 1L;
-    private static final long COMPLETE_SPEAKING_QUESTION_NODE_MISSION_ID = 2L;
+    public static final int NUMBER_OF_MISSIONS_PER_DAY = 2;
+    public static final long TALK_WITH_AI_MISSION_ID = 1L;
+    public static final long COMPLETE_SPEAKING_QUESTION_NODE_MISSION_ID = 2L;
 
     private final UserDailyMissionRepositoryPort userDailyMissionRepositoryPort;
     private final UserDailyMissionResultMapper userDailyMissionResultMapper;
@@ -105,6 +105,9 @@ public class CrudUserDailyMissionUseCase implements CrudUserDailyMissionInputPor
     @Override
     public UserDailyMissionResult completeMission(CompleteDailyMissionCommand command) {
         LocalDate today = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID);
+
+        // init nếu chưa tồn tại missions
+        findAllUserTodayMissions(command.userId());
 
         // tìm user daily mission bằng user id, loại mission và thời gian start
         UserDailyMission currentUserDailyMission = userDailyMissionRepositoryPort
@@ -201,5 +204,4 @@ public class CrudUserDailyMissionUseCase implements CrudUserDailyMissionInputPor
 
         return userDailyMissionResultMapper.domainToResult(savedUserDailyMission);
     }
-
 }

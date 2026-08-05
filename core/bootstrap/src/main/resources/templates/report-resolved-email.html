@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Thông báo xử lý báo cáo - NaHo</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f3f4f6;
+            margin: 0;
+            padding: 40px 20px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+        }
+
+        .header {
+            padding: 32px 40px;
+            text-align: center;
+            border-bottom: 1px solid #f9fafb;
+            background-color: #1e293b;
+        }
+
+        .logo-text {
+            font-family: 'Arial Black', Arial, sans-serif;
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: -1.5px;
+            margin: 0;
+            color: #ffffff;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        h1 {
+            color: #111827;
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0 0 20px 0;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        p {
+            color: #4b5563;
+            font-size: 15px;
+            line-height: 1.6;
+            margin: 0 0 16px 0;
+        }
+
+        .greeting {
+            color: #111827;
+            font-weight: 600;
+        }
+
+        .report-card {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin: 24px 0;
+        }
+
+        .report-row {
+            display: flex;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .report-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .report-label {
+            font-weight: 600;
+            color: #64748b;
+            width: 120px;
+            flex-shrink: 0;
+        }
+
+        .report-value {
+            color: #1e293b;
+            font-weight: 500;
+            word-break: break-word;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background-color: #10b981;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .signature {
+            margin-top: 32px;
+            font-size: 14px;
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        .signature strong {
+            color: #111827;
+        }
+
+        .footer {
+            background-color: #f8fafc;
+            padding: 20px 40px;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .footer p {
+            color: #94a3b8;
+            font-size: 13px;
+            margin: 0 0 4px 0;
+        }
+
+        .footer a {
+            color: #64748b;
+            text-decoration: underline;
+        }
+
+        .footer a:hover {
+            color: #111827;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <h2 class="logo-text">
+            <span style="color: #38bdf8;">Na</span><span style="color: #818cf8;">Ho</span>
+        </h2>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <h1>Báo cáo của bạn đã được xử lý</h1>
+
+        <p>Xin chào <span class="greeting" th:text="${fullName}">Quý khách</span>,</p>
+
+        <p>Cảm ơn bạn đã phản hồi đóng góp cho hệ thống NaHo. Báo cáo của bạn đã được đội ngũ Quản trị viên tiếp nhận và xử lý thành công.</p>
+
+        <!-- Report Card -->
+        <div class="report-card">
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr style="height: 32px;">
+                    <td style="width: 130px; font-weight: 600; color: #64748b; font-size: 14px;">Mã báo cáo:</td>
+                    <td style="color: #1e293b; font-weight: 600; font-size: 14px;" th:text="'#' + ${reportId}">#123</td>
+                </tr>
+                <tr style="height: 32px;" th:if="${reportType != null}">
+                    <td style="font-weight: 600; color: #64748b; font-size: 14px;">Loại báo cáo:</td>
+                    <td style="color: #1e293b; font-size: 14px;" th:text="${reportType}">QUESTION</td>
+                </tr>
+                <tr style="height: 32px;" th:if="${reportTitle != null}">
+                    <td style="font-weight: 600; color: #64748b; font-size: 14px;">Tiêu đề:</td>
+                    <td style="color: #1e293b; font-size: 14px;" th:text="${reportTitle}">Tiêu đề báo cáo</td>
+                </tr>
+                <tr style="height: 32px;">
+                    <td style="font-weight: 600; color: #64748b; font-size: 14px;">Trạng thái:</td>
+                    <td><span class="status-badge">Đã xử lý</span></td>
+                </tr>
+            </table>
+        </div>
+
+        <p>Chúng tôi luôn nỗ lực để mang lại trải nghiệm học tập tốt nhất cho bạn. Nếu có thêm bất kỳ thắc mắc hoặc góp ý nào khác, xin vui lòng tạo phản hồi mới hoặc liên hệ trực tiếp với chúng tôi.</p>
+
+        <div class="signature">
+            Trân trọng,<br>
+            <strong>Đội ngũ NaHo App</strong>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>&copy; 2026 NaHo Education. All rights reserved.</p>
+        <p>Nếu bạn không gửi báo cáo này, vui lòng <a href="mailto:support@naho.edu.vn">liên hệ CSKH</a>.</p>
+    </div>
+</div>
+</body>
+</html>

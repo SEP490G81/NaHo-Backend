@@ -59,6 +59,26 @@ public enum UserErrorCode implements ErrorCode {
     USER_OTP_ATTEMPTS_EXCEEDED(
             "USER_A014",
             UserTitleMessageKey.USER_OTP_ATTEMPTS_EXCEEDED_TITLE,
+            400),
+    USER_PASSWORD_NOT_MATCH(
+            "USER_A015",
+            UserTitleMessageKey.USER_PASSWORD_NOT_MATCH_TITLE,
+            400),
+    USER_PASSWORD_SAME_AS_OLD(
+            "USER_A017",
+            UserTitleMessageKey.USER_PASSWORD_SAME_AS_OLD_TITLE,
+            400),
+    USER_OLD_PASSWORD_NOT_MATCH(
+            "USER_A018",
+            UserTitleMessageKey.USER_OLD_PASSWORD_NOT_MATCH_TITLE,
+            400),
+    USER_INVALID_RESET_TOKEN(
+            "USER_A019",
+            UserTitleMessageKey.USER_INVALID_RESET_TOKEN_TITLE,
+            401),
+    USER_SOCIAL_LOGIN_CANNOT_RESET_PASSWORD(
+            "USER_A020",
+            UserTitleMessageKey.USER_SOCIAL_LOGIN_CANNOT_RESET_PASSWORD_TITLE,
             400);
 
     private final String code;

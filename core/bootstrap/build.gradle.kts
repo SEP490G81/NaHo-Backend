@@ -72,6 +72,12 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.apache.commons:commons-pool2:2.13.1")
 
+    // Apache tika
+    implementation("org.apache.tika:tika-core:3.3.1")
+
+    // FFmpeg
+    implementation("net.bramp.ffmpeg:ffmpeg:0.9.2")
+
     // other
     testImplementation("org.testcontainers:mysql:1.21.4")
     testImplementation("org.springframework.boot:spring-boot-starter-test")

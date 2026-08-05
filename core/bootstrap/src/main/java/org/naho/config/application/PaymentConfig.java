@@ -9,6 +9,9 @@ import org.naho.payment.usecase.CancelPaymentUseCase;
 import org.naho.payment.usecase.ConfirmPaymentUseCase;
 import org.naho.payment.usecase.CreatePaymentUseCase;
 import org.naho.payment.usecase.GetPaymentUseCase;
+import org.naho.shared.port.out.TransactionPort;
+import org.naho.subscription.mapper.SubscriptionPlanResultMapper;
+import org.naho.subscription.mapper.UserSubscriptionResultMapper;
 import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
 import org.naho.subscription.port.in.ListActivePlansInputPort;
 import org.naho.subscription.port.out.SubscriptionPlanRepositoryPort;
@@ -19,8 +22,6 @@ import org.naho.user.port.out.UserRepositoryPort;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.support.TransactionTemplate;
 
 @Configuration
 public class PaymentConfig {
@@ -35,10 +36,9 @@ public class PaymentConfig {
             UserRepositoryPort userRepositoryPort,
             PaymentIdempotencyRepositoryPort idempotencyRepositoryPort,
             @Value("${app.vnpay.timeout:5}") int timeoutMinutes,
-            PlatformTransactionManager transactionManager) {
+            TransactionPort transactionPort) {
 
-        // 1. Tạo instance UseCase thuần Java (POJO)
-        CreatePaymentUseCase target = new CreatePaymentUseCase(
+        return new CreatePaymentUseCase(
                 planRepositoryPort,
                 paymentOrderRepositoryPort,
                 userSubscriptionRepositoryPort,
@@ -46,13 +46,8 @@ public class PaymentConfig {
                 orderCodeGenerator,
                 userRepositoryPort,
                 idempotencyRepositoryPort,
-                timeoutMinutes);
-
-        // 2. Khởi tạo bộ quản lý Transaction của Spring
-        TransactionTemplate template = new TransactionTemplate(transactionManager);
-
-        // 3. Trả về Lambda bọc UseCase trong Transaction
-        return command -> template.execute(status -> target.createPayment(command));
+                timeoutMinutes,
+                transactionPort);
     }
 
     @Bean
@@ -62,34 +57,21 @@ public class PaymentConfig {
             SubscriptionPlanRepositoryPort planRepositoryPort,
             UserSubscriptionRepositoryPort subscriptionRepositoryPort,
             org.naho.shared.port.out.EventPublisherPort eventPublisherPort,
-            PlatformTransactionManager transactionManager) {
-        ConfirmPaymentUseCase target = new ConfirmPaymentUseCase(
+            TransactionPort transactionPort) {
+        return new ConfirmPaymentUseCase(
                 orderRepositoryPort,
                 transactionRepositoryPort,
                 planRepositoryPort,
                 subscriptionRepositoryPort,
-                eventPublisherPort);
-        TransactionTemplate template = new TransactionTemplate(transactionManager);
-        return command -> template.execute(status -> target.confirmPayment(command));
+                eventPublisherPort,
+                transactionPort);
     }
 
     @Bean
     public GetPaymentInputPort getPaymentInputPort(
             PaymentOrderRepositoryPort orderRepositoryPort,
-            PlatformTransactionManager transactionManager) {
-        GetPaymentUseCase target = new GetPaymentUseCase(orderRepositoryPort);
-        TransactionTemplate template = new TransactionTemplate(transactionManager);
-        return new GetPaymentInputPort() {
-            @Override
-            public org.naho.payment.result.PaymentOrderResult getPaymentByOrderCode(String orderCode) {
-                return template.execute(status -> target.getPaymentByOrderCode(orderCode));
-            }
-
-            @Override
-            public java.util.List<org.naho.payment.result.PaymentOrderResult> getPaymentsByUserId(Long userId) {
-                return template.execute(status -> target.getPaymentsByUserId(userId));
-            }
-        };
+            TransactionPort transactionPort) {
+        return new GetPaymentUseCase(orderRepositoryPort, transactionPort);
     }
 
     @Bean
@@ -99,25 +81,23 @@ public class PaymentConfig {
             SubscriptionPlanRepositoryPort planRepositoryPort,
             UserSubscriptionRepositoryPort subscriptionRepositoryPort,
             org.naho.shared.port.out.EventPublisherPort eventPublisherPort,
-            PlatformTransactionManager transactionManager) {
-        org.naho.payment.usecase.AdminUpgradeSubscriptionUseCase target = new org.naho.payment.usecase.AdminUpgradeSubscriptionUseCase(
+            TransactionPort transactionPort) {
+        return new org.naho.payment.usecase.AdminUpgradeSubscriptionUseCase(
                 roleRepositoryPort,
                 userRepositoryPort,
                 planRepositoryPort,
                 subscriptionRepositoryPort,
-                eventPublisherPort);
-        TransactionTemplate template = new TransactionTemplate(transactionManager);
-        return command -> template.execute(status -> target.upgradeSubscription(command));
+                eventPublisherPort,
+                transactionPort);
     }
 
     @Bean
     public CancelPaymentInputPort cancelPaymentInputPort(
             PaymentOrderRepositoryPort orderRepositoryPort,
-            PlatformTransactionManager transactionManager) {
-        CancelPaymentUseCase target = new CancelPaymentUseCase(
-                orderRepositoryPort);
-        TransactionTemplate template = new TransactionTemplate(transactionManager);
-        return command -> template.execute(status -> target.cancelPayment(command));
+            TransactionPort transactionPort) {
+        return new CancelPaymentUseCase(
+                orderRepositoryPort,
+                transactionPort);
     }
 
     @Bean
@@ -127,14 +107,28 @@ public class PaymentConfig {
     }
 
     @Bean
+    public SubscriptionPlanResultMapper subscriptionPlanResultMapper() {
+        return new SubscriptionPlanResultMapper();
+    }
+
+    @Bean
+    public UserSubscriptionResultMapper userSubscriptionResultMapper() {
+        return new UserSubscriptionResultMapper();
+    }
+
+    @Bean
     public GetActiveSubscriptionInputPort getActiveSubscriptionInputPort(
-            UserSubscriptionRepositoryPort subscriptionRepositoryPort,
-            SubscriptionPlanRepositoryPort planRepositoryPort,
-            PlatformTransactionManager transactionManager) {
-        GetActiveSubscriptionUseCase target = new GetActiveSubscriptionUseCase(subscriptionRepositoryPort,
-                planRepositoryPort);
-        TransactionTemplate template = new TransactionTemplate(transactionManager);
-        return userId -> template.execute(status -> target.getActiveSubscription(userId));
+            UserSubscriptionRepositoryPort userSubscriptionRepositoryPort,
+            SubscriptionPlanRepositoryPort subscriptionPlanRepositoryPort,
+            SubscriptionPlanResultMapper subscriptionPlanResultMapper,
+            UserSubscriptionResultMapper userSubscriptionResultMapper
+    ) {
+        return new GetActiveSubscriptionUseCase(
+                userSubscriptionRepositoryPort,
+                subscriptionPlanRepositoryPort,
+                subscriptionPlanResultMapper,
+                userSubscriptionResultMapper
+        );
     }
 }
 

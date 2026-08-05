@@ -27,64 +27,64 @@ public class UserDailyMission {
         this.earnedDate = builder.earnedDate;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public Long getId() {
         return id;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public Long getDailyMissionId() {
-        return dailyMissionId;
-    }
-
-    public MissionStatus getStatus() {
-        return status;
-    }
-
-    public LocalDate getStartedDate() {
-        return startedDate;
-    }
-
-    public LocalDate getCompletedDate() {
-        return completedDate;
-    }
-
-    public LocalDate getEarnedDate() {
-        return earnedDate;
     }
 
     public void setId(Long id) {
         this.id = id;
     }
 
+    public Long getUserId() {
+        return userId;
+    }
+
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public Long getDailyMissionId() {
+        return dailyMissionId;
     }
 
     public void setDailyMissionId(Long dailyMissionId) {
         this.dailyMissionId = dailyMissionId;
     }
 
+    public MissionStatus getStatus() {
+        return status;
+    }
+
     public void setStatus(MissionStatus status) {
         this.status = status;
+    }
+
+    public LocalDate getStartedDate() {
+        return startedDate;
     }
 
     public void setStartedDate(LocalDate startedDate) {
         this.startedDate = startedDate;
     }
 
+    public LocalDate getCompletedDate() {
+        return completedDate;
+    }
+
     public void setCompletedDate(LocalDate completedDate) {
         this.completedDate = completedDate;
     }
 
-    public void setEarnedDate(LocalDate earnedDate) {
-        this.earnedDate = earnedDate;
+    public LocalDate getEarnedDate() {
+        return earnedDate;
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public void setEarnedDate(LocalDate earnedDate) {
+        this.earnedDate = earnedDate;
     }
 
     public static class Builder {

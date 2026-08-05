@@ -21,16 +21,8 @@ public abstract class UserLearningProgressEntityMapper {
     @Mapping(target = "lastLearningNodeGlobalOrderIndex", source = "lastLearningNode.globalOrderIndex")
     public abstract UserLearningProgress entityToDomain(UserLearningProgressEntity entity);
 
-    @Mapping(
-            target = "farthestAvailableNode",
-            source = "farthestAvailableNodeId",
-            qualifiedByName = "getFarthestAvailableNodeById"
-    )
-    @Mapping(
-            target = "lastLearningNode",
-            source = "lastLearningNodeId",
-            qualifiedByName = "getLastLearningNodeById"
-    )
+    @Mapping(target = "farthestAvailableNode", source = "farthestAvailableNodeId", qualifiedByName = "getFarthestAvailableNodeById")
+    @Mapping(target = "lastLearningNode", source = "lastLearningNodeId", qualifiedByName = "getLastLearningNodeById")
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "createdTime", ignore = true)
     @Mapping(target = "modifiedTime", ignore = true)

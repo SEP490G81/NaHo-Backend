@@ -18,6 +18,10 @@ ALTER TABLE user_daily_attendances
     ADD CONSTRAINT uk_user_attendance_date
         UNIQUE (user_id, attendance_date);
 
+ALTER TABLE daily_rewards
+    ADD CONSTRAINT uk_daily_rewards_year_month_day
+        UNIQUE (reward_year_month, day_of_month);
+
 ALTER TABLE daily_missions
     ADD CONSTRAINT uk_daily_mission_type
         UNIQUE (mission_type);
@@ -25,3 +29,4 @@ ALTER TABLE daily_missions
 ALTER TABLE user_daily_missions
     ADD CONSTRAINT uk_user_daily_mission
         UNIQUE (user_id, daily_mission_id, started_date);
+

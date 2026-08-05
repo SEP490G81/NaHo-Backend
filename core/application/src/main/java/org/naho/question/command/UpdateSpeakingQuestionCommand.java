@@ -5,6 +5,7 @@ public record UpdateSpeakingQuestionCommand(
         Long userId,
         String titleMarkup,
         String descriptionMarkup,
+        String sampleAnswer,
         boolean isContentManager
 ) {
 }

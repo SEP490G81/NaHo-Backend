@@ -1,14 +1,19 @@
 package org.naho.user.controller.v1;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.file.constant.FileFolderConstant;
+import org.naho.file.port.out.FileStorageServicePort;
+import org.naho.file.port.out.FileValidatorPort;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.user.command.RegisterCommand;
+import org.naho.user.command.UpdateUserInfoCommand;
 import org.naho.user.dto.mapper.RegisterRequestMapper;
 import org.naho.user.dto.mapper.RegisterResponseMapper;
 import org.naho.user.dto.mapper.UserResponseMapper;
 import org.naho.user.dto.request.RegisterRequest;
 import org.naho.user.dto.request.UpdateStatusRequest;
+import org.naho.user.dto.request.UpdateUserInfoRequest;
 import org.naho.user.dto.response.RegisterResponse;
 import org.naho.user.dto.response.UserResponse;
 import org.naho.user.port.in.CrudUserInputPort;
@@ -19,6 +24,7 @@ import org.naho.user.result.AccessTokenPayload;
 import org.naho.user.result.RegisterResult;
 import org.naho.user.result.UserResult;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +35,8 @@ import java.util.List;
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 public class UserController {
+    public static final String AVATAR_FILE_FOLDER = FileFolderConstant.AVATARS;
+
     private final GetUserInputPort getUserInputPort;
     private final UpdateUserInputPort updateUserInputPort;
     private final UserResponseMapper userResponseMapper;
@@ -37,6 +45,8 @@ public class UserController {
     private final RegisterInputPort registerInputPort;
     private final RegisterResponseMapper registerResponseMapper;
     private final RegisterRequestMapper registerRequestMapper;
+    private final FileValidatorPort fileValidatorPort;
+    private final FileStorageServicePort fileStorageServicePort;
 
     @ApiResponseMessage(message = UserDetailMessageKey.USER_GET_SUCCESSFULLY)
     @GetMapping("/me")
@@ -83,5 +93,25 @@ public class UserController {
         UserResult user = updateUserInputPort.updateStatus(id, request.newStatus());
         UserResponse response = userResponseMapper.resultToResponse(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @ApiResponseMessage(message = UserDetailMessageKey.USER_UPDATE_INFO_SUCCESSFULLY)
+    @PatchMapping(value = "/info", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UserResponse> updateUserInfo(
+            @AuthenticationPrincipal AccessTokenPayload payload,
+            @ModelAttribute UpdateUserInfoRequest request
+    ) {
+        UpdateUserInfoCommand command = UpdateUserInfoCommand.builder()
+                .id(payload.userId())
+                .username(request.username())
+                .fullName(request.fullName())
+                .gender(request.gender())
+                .dob(request.dob())
+                .build();
+
+        UserResult result = crudUserInputPort.updateUserInfo(command);
+        UserResponse response = userResponseMapper.resultToResponse(result);
+
+        return ResponseEntity.ok(response);
     }
 }
