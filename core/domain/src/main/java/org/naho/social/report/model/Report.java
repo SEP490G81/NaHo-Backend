@@ -85,6 +85,22 @@ public class Report {
         return files;
     }
 
+    public Report updateStatus(boolean isResolved) {
+        return builder()
+                .id(this.id)
+                .userId(this.userId)
+                .questionId(this.questionId)
+                .commentId(this.commentId)
+                .title(this.title)
+                .description(this.description)
+                .reportType(this.reportType)
+                .isResolved(isResolved)
+                .createdTime(this.createdTime)
+                .modifiedTime(Instant.now())
+                .files(this.files)
+                .build();
+    }
+
     public static class Builder {
 
         private Long id;

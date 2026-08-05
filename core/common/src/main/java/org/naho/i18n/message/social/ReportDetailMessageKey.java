@@ -9,6 +9,9 @@ public final class ReportDetailMessageKey {
     public static final String REPORT_COMMENT_ID_BLANK = "report.comment.id.blank";
     public static final String REPORT_ID_NOT_FOUND = "report.id.not.found";
     public static final String REPORT_CREATE_SUCCESS = "report.create.success";
+    public static final String REPORT_GET_LIST_USER_SUCCESS = "report.get.list.user.success";
+    public static final String REPORT_UPDATE_STATUS_SUCCESS = "report.update.status.success";
+    public static final String REPORT_STATUS_BLANK = "report.status.blank";
 
     private ReportDetailMessageKey() {
     }

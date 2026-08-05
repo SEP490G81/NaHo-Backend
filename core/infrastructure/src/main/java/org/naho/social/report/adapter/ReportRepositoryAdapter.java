@@ -44,4 +44,15 @@ public class ReportRepositoryAdapter implements ReportRepositoryPort {
         ReportEntity savedEntity = reportJpaRepository.save(entity);
         return reportEntityMapper.entityToDomain(savedEntity);
     }
+
+    @Override
+    public List<Report> findByUserId(Long userId) {
+        if (userId == null) {
+            return List.of();
+        }
+        List<ReportEntity> entities = reportJpaRepository.findByUserId(userId);
+        return entities.stream()
+                .map(reportEntityMapper::entityToDomain)
+                .toList();
+    }
 }

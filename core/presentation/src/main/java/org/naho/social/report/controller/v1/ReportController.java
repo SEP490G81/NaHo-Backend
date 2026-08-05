@@ -8,13 +8,18 @@ import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.shared.exception.PresentationException;
 import org.naho.social.report.command.CreateReportCommand;
 import org.naho.social.report.command.GetReportCommand;
+import org.naho.social.report.command.GetReportsByUserCommand;
+import org.naho.social.report.command.UpdateReportStatusCommand;
 import org.naho.social.report.dto.mapper.ReportRequestMapper;
 import org.naho.social.report.dto.mapper.ReportResponseMapper;
 import org.naho.social.report.dto.request.CreateReportRequest;
+import org.naho.social.report.dto.request.UpdateReportStatusRequest;
 import org.naho.social.report.dto.response.ReportResponse;
 import org.naho.social.report.exception.ReportErrorCode;
 import org.naho.social.report.port.in.CreateReportInputPort;
+import org.naho.social.report.port.in.GetListReportByUserInputPort;
 import org.naho.social.report.port.in.GetReportInputPort;
+import org.naho.social.report.port.in.UpdateReportStatusInputPort;
 import org.naho.social.report.result.ReportResult;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.HttpStatus;
@@ -34,6 +39,8 @@ public class ReportController {
 
     private final GetReportInputPort getReportInputPort;
     private final CreateReportInputPort createReportInputPort;
+    private final GetListReportByUserInputPort getListReportByUserInputPort;
+    private final UpdateReportStatusInputPort updateReportStatusInputPort;
     private final ReportResponseMapper reportResponseMapper;
     private final ReportRequestMapper reportRequestMapper;
     private final FileValidatorPort fileValidatorPort;
@@ -84,6 +91,28 @@ public class ReportController {
         return ResponseEntity.ok(results.stream()
                 .map(reportResponseMapper::resultToResponse)
                 .toList());
+    }
+
+    @GetMapping("/user")
+    @ApiResponseMessage(message = ReportDetailMessageKey.REPORT_GET_LIST_USER_SUCCESS)
+    public ResponseEntity<List<ReportResponse>> getReportsByUser(
+            @AuthenticationPrincipal AccessTokenPayload payload) {
+        Long userId = payload != null ? payload.userId() : null;
+        List<ReportResult> results = getListReportByUserInputPort.getReportsByUser(new GetReportsByUserCommand(userId));
+        return ResponseEntity.ok(results.stream()
+                .map(reportResponseMapper::resultToResponse)
+                .toList());
+    }
+
+    @PatchMapping("/{id}/status")
+    @ApiResponseMessage(message = ReportDetailMessageKey.REPORT_UPDATE_STATUS_SUCCESS)
+    public ResponseEntity<ReportResponse> updateReportStatus(
+            @PathVariable("id") Long id,
+            @Valid @RequestBody UpdateReportStatusRequest request) {
+        ReportResult result = updateReportStatusInputPort.updateStatus(
+                new UpdateReportStatusCommand(id, Boolean.TRUE.equals(request.getIsResolved()))
+        );
+        return ResponseEntity.ok(reportResponseMapper.resultToResponse(result));
     }
 
     @GetMapping("/{id}")

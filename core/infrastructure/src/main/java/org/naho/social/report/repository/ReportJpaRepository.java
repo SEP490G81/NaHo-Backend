@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface ReportJpaRepository extends JpaRepository<ReportEntity, Long> {
     List<ReportEntity> findByReportTypeIn(List<ReportType> reportTypes);
+
+    List<ReportEntity> findByUserId(Long userId);
 }

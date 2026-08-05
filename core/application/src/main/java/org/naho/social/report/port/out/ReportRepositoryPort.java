@@ -12,4 +12,6 @@ public interface ReportRepositoryPort {
     List<Report> findByReportTypeIn(List<ReportType> reportTypes);
 
     Report save(Report report);
+
+    List<Report> findByUserId(Long userId);
 }
