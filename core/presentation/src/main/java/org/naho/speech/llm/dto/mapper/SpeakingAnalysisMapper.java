@@ -1,5 +1,8 @@
 package org.naho.speech.llm.dto.mapper;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.naho.shared.constant.SortDirection;
 import org.naho.speech.llm.command.SpeakingHistoryFilterCommand;
 import org.naho.speech.llm.constant.SpeakingHistorySortColumn;
@@ -11,21 +14,16 @@ import org.naho.speech.llm.dto.response.SpeakingHistoryListItemResponse;
 import org.naho.speech.llm.result.SpeakingAnalysisResult;
 import org.naho.speech.llm.result.SpeakingHistoryDetailResult;
 import org.naho.speech.llm.result.SpeakingHistoryListItemResult;
-import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 
-@Component
-public class SpeakingAnalysisMapper {
+@Mapper(componentModel = "spring")
+public interface SpeakingAnalysisMapper {
 
-    private static final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ISO_INSTANT;
+    SpeakingAnalysisResponse toResponse(SpeakingAnalysisResult result);
 
-    public SpeakingAnalysisResponse toResponse(SpeakingAnalysisResult result) {
-        if (result == null) return null;
-        return new SpeakingAnalysisResponse(result.historyId(), result.score(), result.audioUrl());
-    }
-
-    public SpeakingHistoryFilterCommand requestToCommand(SpeakingHistoryQueryRequest request, Long userId) {
+    default SpeakingHistoryFilterCommand requestToCommand(SpeakingHistoryQueryRequest request, Long userId) {
         if (request == null) {
             return new SpeakingHistoryFilterCommand(userId, null, null, null, 0, 10, SpeakingHistorySortColumn.CREATED_TIME, SortDirection.DESC);
         }
@@ -41,7 +39,7 @@ public class SpeakingAnalysisMapper {
         );
     }
 
-    public SpeakingHistoryFilterCommand requestToCommand(SpeakingHistoryFilterRequest request, Long userId) {
+    default SpeakingHistoryFilterCommand requestToCommand(SpeakingHistoryFilterRequest request, Long userId) {
         if (request == null) {
             return new SpeakingHistoryFilterCommand(userId, null, null, null, 0, 10, SpeakingHistorySortColumn.CREATED_TIME, SortDirection.DESC);
         }
@@ -57,99 +55,14 @@ public class SpeakingAnalysisMapper {
         );
     }
 
-    public SpeakingHistoryListItemResponse toListItemResponse(SpeakingHistoryListItemResult result) {
-        if (result == null) return null;
-        return new SpeakingHistoryListItemResponse(
-                result.historyId(),
-                result.speakingQuestionId(),
-                result.speakingQuestionTitle(),
-                result.topicId(),
-                result.topicName(),
-                result.learningPathNodeId(),
-                result.bookId(),
-                result.score(),
-                result.durationSec(),
-                result.audioUrl(),
-                result.practicedAt() != null ? ISO_FORMATTER.format(result.practicedAt()) : null
-        );
-    }
+    @Mapping(target = "practicedAt", source = "practicedAt", qualifiedByName = "formatInstant")
+    SpeakingHistoryListItemResponse toListItemResponse(SpeakingHistoryListItemResult result);
 
-    public SpeakingHistoryDetailResponse toDetailResponse(SpeakingHistoryDetailResult result) {
-        if (result == null) return null;
+    @Mapping(target = "practicedAt", source = "practicedAt", qualifiedByName = "formatInstant")
+    SpeakingHistoryDetailResponse toDetailResponse(SpeakingHistoryDetailResult result);
 
-        var report = result.report();
-        var scores = report.scores();
-
-        var scoresResponse = new SpeakingHistoryDetailResponse.Scores(
-                scores.pronunciation(),
-                scores.vocabulary(),
-                scores.grammar(),
-                scores.naturalness()
-        );
-
-        var userTranscriptResponse = report.userTranscript().stream()
-                .map(item -> new SpeakingHistoryDetailResponse.UserTranscriptItem(
-                        item.text(),
-                        item.error() != null ? new SpeakingHistoryDetailResponse.ErrorDetail(
-                                item.error().type(),
-                                item.error().explanation(),
-                                item.error().suggestion()
-                        ) : null
-                )).toList();
-
-        var aiSuggestionResponse = new SpeakingHistoryDetailResponse.AiSuggestion(
-                report.aiSuggestion().jp(),
-                report.aiSuggestion().furigana(),
-                report.aiSuggestion().vi()
-        );
-
-        var pronunciationResponse = report.pronunciation().stream()
-                .map(item -> new SpeakingHistoryDetailResponse.PronunciationItem(
-                        item.text(),
-                        item.furigana(),
-                        item.severity(),
-                        item.note()
-                )).toList();
-
-        var expressionsResponse = report.expressions().stream()
-                .map(item -> new SpeakingHistoryDetailResponse.ExpressionItem(
-                        item.jp(),
-                        item.furigana(),
-                        item.vi(),
-                        item.note()
-                )).toList();
-
-        var itVocabResponse = report.itVocab().stream()
-                .map(item -> new SpeakingHistoryDetailResponse.ItVocabItem(
-                        item.term(),
-                        item.reading(),
-                        item.meaning()
-                )).toList();
-
-        var reportResponse = new SpeakingHistoryDetailResponse.Report(
-                report.average(),
-                scoresResponse,
-                userTranscriptResponse,
-                aiSuggestionResponse,
-                pronunciationResponse,
-                report.pronunciationNote(),
-                expressionsResponse,
-                itVocabResponse
-        );
-
-        return new SpeakingHistoryDetailResponse(
-                result.historyId(),
-                result.topicId(),
-                result.questionId(),
-                result.speakingQuestionTitle(),
-                result.topicName(),
-                result.learningPathNodeId(),
-                result.bookId(),
-                result.practicedAt() != null ? ISO_FORMATTER.format(result.practicedAt()) : null,
-                result.durationSec(),
-                result.score(),
-                result.audioUrl(),
-                reportResponse
-        );
+    @Named("formatInstant")
+    default String formatInstant(Instant instant) {
+        return instant != null ? DateTimeFormatter.ISO_INSTANT.format(instant) : null;
     }
 }
