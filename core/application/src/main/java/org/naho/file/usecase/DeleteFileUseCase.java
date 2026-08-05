@@ -35,7 +35,7 @@ public class DeleteFileUseCase implements DeleteFileInputPort {
             fileStorageServicePort.deleteFileInCloud(file);
 
             fileRepositoryPort.deleteById(file.getId());
-            
+
         } catch (Exception e) {
 
         }

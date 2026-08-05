@@ -17,10 +17,6 @@ public final class NextRetryAt {
         return new NextRetryAt(value);
     }
 
-    public Instant getValue() {
-        return value;
-    }
-
     public static NextRetryAt getFromRetryCount(int retryCount) {
         Instant now = Instant.now();
 
@@ -36,5 +32,9 @@ public final class NextRetryAt {
             case 5 -> new NextRetryAt(now.plus(Duration.ofHours(2)));
             default -> new NextRetryAt(now.plus(Duration.ofMinutes(4)));
         };
+    }
+
+    public Instant getValue() {
+        return value;
     }
 }

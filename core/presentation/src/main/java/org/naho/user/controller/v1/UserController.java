@@ -1,12 +1,10 @@
 package org.naho.user.controller.v1;
 
 import lombok.RequiredArgsConstructor;
-import org.naho.file.command.UploadFileCommand;
+import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.file.port.out.FileValidatorPort;
 import org.naho.i18n.message.user.UserDetailMessageKey;
-import org.naho.i18n.message.user.UserTitleMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
-import org.naho.shared.exception.PresentationException;
 import org.naho.user.command.RegisterCommand;
 import org.naho.user.command.UpdateUserInfoCommand;
 import org.naho.user.dto.mapper.RegisterRequestMapper;
@@ -17,7 +15,6 @@ import org.naho.user.dto.request.UpdateStatusRequest;
 import org.naho.user.dto.request.UpdateUserInfoRequest;
 import org.naho.user.dto.response.RegisterResponse;
 import org.naho.user.dto.response.UserResponse;
-import org.naho.user.exception.UserErrorCode;
 import org.naho.user.port.in.CrudUserInputPort;
 import org.naho.user.port.in.GetUserInputPort;
 import org.naho.user.port.in.RegisterInputPort;
@@ -30,9 +27,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -50,6 +45,7 @@ public class UserController {
     private final RegisterResponseMapper registerResponseMapper;
     private final RegisterRequestMapper registerRequestMapper;
     private final FileValidatorPort fileValidatorPort;
+    private final FileStorageServicePort fileStorageServicePort;
 
     @ApiResponseMessage(message = UserDetailMessageKey.USER_GET_SUCCESSFULLY)
     @GetMapping("/me")
@@ -102,45 +98,19 @@ public class UserController {
     @PatchMapping(value = "/info", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserResponse> updateUserInfo(
             @AuthenticationPrincipal AccessTokenPayload payload,
-            @ModelAttribute UpdateUserInfoRequest request,
-            @RequestPart(value = "avatarFile", required = false) MultipartFile avatarFile
+            @ModelAttribute UpdateUserInfoRequest request
     ) {
-        try {
-            UploadFileCommand avatarUploadFileCommand = null;
-            if (avatarFile != null && !avatarFile.isEmpty()) {
-                // check định dạng của file có phải là ảnh không?
-                String contentType = fileValidatorPort
-                        .validateImageFile(avatarFile.getInputStream());
+        UpdateUserInfoCommand command = UpdateUserInfoCommand.builder()
+                .id(payload.userId())
+                .username(request.username())
+                .fullName(request.fullName())
+                .gender(request.gender())
+                .dob(request.dob())
+                .build();
 
-                avatarUploadFileCommand = UploadFileCommand.builder()
-//                        .folderName(AVATAR_FILE_FOLDER)
-//                        .originalName(avatarFile.getOriginalFilename())
-                        .inputStream(avatarFile.getInputStream())
-                        .contentType(contentType)
-                        .size(avatarFile.getSize())
-                        .build();
-            }
+        UserResult result = crudUserInputPort.updateUserInfo(command);
+        UserResponse response = userResponseMapper.resultToResponse(result);
 
-            UpdateUserInfoCommand command = UpdateUserInfoCommand.builder()
-                    .id(payload.userId())
-                    .username(request.username())
-                    .avatarFile(avatarUploadFileCommand)
-                    .fullName(request.fullName())
-                    .gender(request.gender())
-                    .dob(request.dob())
-                    .build();
-
-            UserResult result = crudUserInputPort.updateUserInfo(command);
-            UserResponse response = userResponseMapper.resultToResponse(result);
-
-            return ResponseEntity.ok(response);
-
-        } catch (IOException e) {
-            throw new PresentationException(
-                    UserErrorCode.USER_PERSIST_FAILED,
-                    UserTitleMessageKey.USER_PERSIST_FAILED_TITLE,
-                    e.getMessage()
-            );
-        }
+        return ResponseEntity.ok(response);
     }
 }

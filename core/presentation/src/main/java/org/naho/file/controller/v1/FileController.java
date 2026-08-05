@@ -45,7 +45,7 @@ public class FileController {
 
     @ApiResponseMessage(message = FileDetailMessageKey.FILE_DOWNLOAD_SUCCESSFULLY)
     @GetMapping("/download")
-    public ResponseEntity<InputStreamResource> downloadFileFromCloud(@RequestParam("objectKey") String objectKey) {
+    public ResponseEntity<InputStreamResource> downloadFileFromCloud(@RequestParam("object_key") String objectKey) {
         DownloadedFile downloadedFile = downloadFileInputPort.downloadFileFromCloud(objectKey);
         return ResponseEntity.ok()
                 .contentLength(downloadedFile.contentLength())
