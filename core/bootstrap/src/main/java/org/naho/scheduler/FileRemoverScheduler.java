@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class FileRemoverScheduler {
 
-    public void removeTempFiles(){
+    public void removeTempFiles() {
 
     }
 }

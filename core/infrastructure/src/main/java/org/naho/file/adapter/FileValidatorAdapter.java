@@ -30,14 +30,12 @@ public class FileValidatorAdapter implements FileValidatorPort {
     private static final Set<String> ALLOWED_IMAGE_MIME_TYPES = Set.of(
             FileContentType.IMAGE_PNG,
             FileContentType.IMAGE_JPEG,
-            FileContentType.IMAGE_WEBP
-    );
+            FileContentType.IMAGE_WEBP);
 
     private static final Set<String> ALLOWED_WAV_MIME_TYPES = Set.of(
             FileContentType.AUDIO_WAV,
             FileContentType.AUDIO_X_WAV,
-            FileContentType.AUDIO_VND_WAVE
-    );
+            FileContentType.AUDIO_VND_WAVE);
 
     @Override
     public String validateImageFile(InputStream inputStream) {
@@ -47,8 +45,7 @@ public class FileValidatorAdapter implements FileValidatorPort {
                 throw new InfrastructureException(
                         FileErrorCode.FILE_NOT_VALID,
                         FileDetailMessageKey.FILE_NOT_VALID,
-                        detectedMimeType
-                );
+                        detectedMimeType);
             }
 
             return detectedMimeType;
@@ -56,8 +53,7 @@ public class FileValidatorAdapter implements FileValidatorPort {
             throw new InfrastructureException(
                     FileErrorCode.FILE_NOT_VALID,
                     FileDetailMessageKey.FILE_NOT_VALID,
-                    e.getMessage()
-            );
+                    e.getMessage());
         }
     }
 
@@ -66,8 +62,7 @@ public class FileValidatorAdapter implements FileValidatorPort {
         if (audioBytes == null || audioBytes.length == 0) {
             throw new InfrastructureException(
                     FileErrorCode.FILE_NOT_VALID,
-                    FileDetailMessageKey.FILE_EMPTY
-            );
+                    FileDetailMessageKey.FILE_EMPTY);
         }
 
         Path tempFile = null;
@@ -79,14 +74,12 @@ public class FileValidatorAdapter implements FileValidatorPort {
                 throw new InfrastructureException(
                         FileErrorCode.FILE_NOT_VALID,
                         FileDetailMessageKey.FILE_NOT_VALID,
-                        detectedMimeType
-                );
+                        detectedMimeType);
             }
 
             Path tempDirectory = Path.of(
                     staticResourceProperties.getLocalPath(),
-                    staticResourceProperties.getTemp()
-            );
+                    staticResourceProperties.getTemp());
 
             Files.createDirectories(tempDirectory);
 
@@ -102,16 +95,14 @@ public class FileValidatorAdapter implements FileValidatorPort {
                         FileErrorCode.FILE_NOT_VALID,
                         FileDetailMessageKey.FILE_AUDIO_DURATION_EXCEEDED,
                         duration,
-                        maxDuration
-                );
+                        maxDuration);
             }
 
         } catch (IOException e) {
             throw new InfrastructureException(
                     FileErrorCode.FILE_NOT_VALID,
                     FileDetailMessageKey.FILE_NOT_VALID,
-                    e.getMessage()
-            );
+                    e.getMessage());
         } finally {
             if (tempFile != null) {
                 try {

@@ -10,6 +10,8 @@ public interface FileStorageServicePort {
 
     StoredFile saveFileToLocal(Object file);
 
+    StoredFile saveReportFileToLocal(Object file);
+
     void deleteFileInLocal(String localStoragePath);
 
     String generatePresignedUrl(File file);

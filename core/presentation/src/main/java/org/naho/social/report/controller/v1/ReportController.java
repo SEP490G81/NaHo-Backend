@@ -45,7 +45,7 @@ public class ReportController {
     private final ReportRequestMapper reportRequestMapper;
     private final FileValidatorPort fileValidatorPort;
 
-    @PostMapping(value = { "", "/" }, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = {"", "/"}, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiResponseMessage(message = ReportDetailMessageKey.REPORT_CREATE_SUCCESS)
     public ResponseEntity<ReportResponse> createReport(
             @Valid @ModelAttribute CreateReportRequest request,
@@ -110,8 +110,7 @@ public class ReportController {
             @PathVariable("id") Long id,
             @Valid @RequestBody UpdateReportStatusRequest request) {
         ReportResult result = updateReportStatusInputPort.updateStatus(
-                new UpdateReportStatusCommand(id, Boolean.TRUE.equals(request.getIsResolved()))
-        );
+                new UpdateReportStatusCommand(id, Boolean.TRUE.equals(request.getIsResolved())));
         return ResponseEntity.ok(reportResponseMapper.resultToResponse(result));
     }
 

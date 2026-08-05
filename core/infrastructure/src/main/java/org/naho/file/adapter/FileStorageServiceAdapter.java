@@ -52,9 +52,7 @@ public class FileStorageServiceAdapter implements FileStorageServicePort {
                     file.absoluteLocalStoragePath());
         }
 
-        String bucketName = isPublic ?
-                s3Properties.getPublicBucketName() :
-                s3Properties.getPrivateBucketName();
+        String bucketName = isPublic ? s3Properties.getPublicBucketName() : s3Properties.getPrivateBucketName();
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
@@ -70,21 +68,17 @@ public class FileStorageServiceAdapter implements FileStorageServicePort {
 
     @Override
     public void deleteFileInCloud(String objectKey, boolean isPublic) {
-        String bucketName = isPublic ?
-                s3Properties.getPublicBucketName() :
-                s3Properties.getPrivateBucketName();
+        String bucketName = isPublic ? s3Properties.getPublicBucketName() : s3Properties.getPrivateBucketName();
 
         try {
             s3Client.deleteObject(request -> request
                     .bucket(bucketName)
-                    .key(objectKey)
-            );
+                    .key(objectKey));
         } catch (S3Exception e) {
             throw new InfrastructureException(
                     FileErrorCode.FILE_DELETE_FAILED,
                     FileDetailMessageKey.FILE_DELETE_FAILED,
-                    e.getMessage()
-            );
+                    e.getMessage());
         }
     }
 
@@ -114,6 +108,50 @@ public class FileStorageServiceAdapter implements FileStorageServicePort {
             String checksum = fileHelperPort.calculateChecksum(destination);
 
             String objectKey = staticResourceProperties.getRecordings() + "/" + fileName;
+
+            return StoredFile.builder()
+                    .objectKey(objectKey)
+                    .absoluteLocalStoragePath(destination.toAbsolutePath().toString())
+                    .originalFileName(originalFileName)
+                    .contentType(multipartFile.getContentType())
+                    .size(multipartFile.getSize())
+                    .checksum(checksum)
+                    .build();
+
+        } catch (IOException e) {
+            throw new InfrastructureException(
+                    FileErrorCode.FILE_UPLOAD_FAILED,
+                    FileDetailMessageKey.FILE_UPLOAD_FAILED,
+                    e.getMessage());
+        }
+    }
+
+    @Override
+    public StoredFile saveReportFileToLocal(Object file) {
+        if (!(file instanceof MultipartFile multipartFile)) {
+            throw new InfrastructureException(
+                    FileErrorCode.FILE_NOT_VALID,
+                    FileDetailMessageKey.FILE_NOT_VALID);
+        }
+
+        try {
+            String originalFileName = multipartFile.getOriginalFilename();
+
+            String fileName = UUID.randomUUID() + "_" + Instant.now().toEpochMilli() +
+                    fileHelperPort.getExtension(originalFileName);
+
+            Path storageDirectory = Paths.get(staticResourceProperties.getLocalPath()
+                    + staticResourceProperties.getReports());
+
+            Files.createDirectories(storageDirectory);
+
+            Path destination = storageDirectory.resolve(fileName);
+
+            multipartFile.transferTo(destination);
+
+            String checksum = fileHelperPort.calculateChecksum(destination);
+
+            String objectKey = staticResourceProperties.getReports() + "/" + fileName;
 
             return StoredFile.builder()
                     .objectKey(objectKey)
@@ -167,8 +205,7 @@ public class FileStorageServiceAdapter implements FileStorageServicePort {
             throw new InfrastructureException(
                     FileErrorCode.FILE_GENERATE_PRESIGNED_URL_FAILED,
                     FileDetailMessageKey.FILE_GENERATE_PRESIGNED_URL_FAILED,
-                    e.getMessage()
-            );
+                    e.getMessage());
         }
     }
 }

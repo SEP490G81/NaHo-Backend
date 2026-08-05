@@ -108,4 +108,5 @@ app:
     avatars: avatars
     books: books
     recordings: recordings
+    reports: reports
     temp: temp

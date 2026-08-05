@@ -15,9 +15,8 @@ import org.naho.file.type.OperationStatus;
 import org.naho.file.type.OperationType;
 import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.shared.exception.InfrastructureException;
-import org.springframework.stereotype.Component;
-
 import org.naho.social.report.repository.ReportJpaRepository;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -98,7 +97,7 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
                 s3Properties.getPrivateBucketName();
 
         entity.setBucketName(bucketName);
-        
+
         FileEntity savedEntity = fileJpaRepository.save(entity);
         return fileEntityMapper.entityToDomain(savedEntity);
     }

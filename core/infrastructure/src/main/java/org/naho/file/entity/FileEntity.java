@@ -12,8 +12,6 @@ import org.naho.social.entity.CommentEntity;
 import org.naho.social.report.entity.ReportEntity;
 import org.naho.user.entity.UserEntity;
 
-import java.util.List;
-
 @SuperBuilder
 @Getter
 @Setter

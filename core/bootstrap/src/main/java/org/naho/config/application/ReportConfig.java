@@ -27,19 +27,19 @@ public class ReportConfig {
 
     @Bean
     public GetReportInputPort getReportInputPort(ReportRepositoryPort reportRepositoryPort,
-                                                  ReportResultMapper reportResultMapper) {
+                                                 ReportResultMapper reportResultMapper) {
         return new GetReportUseCase(reportRepositoryPort, reportResultMapper);
     }
 
     @Bean
     public GetListReportByUserInputPort getListReportByUserInputPort(ReportRepositoryPort reportRepositoryPort,
-                                                                      ReportResultMapper reportResultMapper) {
+                                                                     ReportResultMapper reportResultMapper) {
         return new GetListReportByUserUseCase(reportRepositoryPort, reportResultMapper);
     }
 
     @Bean
     public UpdateReportStatusInputPort updateReportStatusInputPort(ReportRepositoryPort reportRepositoryPort,
-                                                                    ReportResultMapper reportResultMapper) {
+                                                                   ReportResultMapper reportResultMapper) {
         return new UpdateReportStatusUseCase(reportRepositoryPort, reportResultMapper);
     }
 

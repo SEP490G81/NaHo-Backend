@@ -14,5 +14,6 @@ public class StaticResourceProperties {
     String avatars;
     String books;
     String recordings;
+    String reports;
     String temp;
 }

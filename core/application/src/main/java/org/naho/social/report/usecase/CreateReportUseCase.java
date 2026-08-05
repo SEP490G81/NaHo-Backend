@@ -47,7 +47,7 @@ public class CreateReportUseCase implements CreateReportInputPort {
                 if (fileObj == null) {
                     continue;
                 }
-                StoredFile storedFile = fileStorageServicePort.saveFileToLocal(fileObj);
+                StoredFile storedFile = fileStorageServicePort.saveReportFileToLocal(fileObj);
                 fileRepositoryPort.saveReportFileToDbForUpload(storedFile, savedReport.getId(), true);
                 crudFileInputPort.uploadFileToCloud(storedFile, true);
             }

@@ -6,7 +6,6 @@ import org.naho.file.type.OperationStatus;
 import org.naho.file.type.OperationType;
 
 import java.util.Optional;
-import java.util.Set;
 
 public interface FileOperationRepositoryPort {
     FileOperation save(FileOperation domain);
