@@ -1,6 +1,7 @@
 package org.naho.subscription.controller.v1;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.i18n.message.subscription.SubscriptionDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.subscription.dto.mapper.SubscriptionResponseMapper;
 import org.naho.subscription.dto.response.UserSubscriptionResponse;
@@ -22,7 +23,7 @@ public class UserSubscriptionController {
     private final SubscriptionResponseMapper responseMapper;
 
     @GetMapping("/me")
-    @ApiResponseMessage(message = "subscription.user.get_active_success")
+    @ApiResponseMessage(message = SubscriptionDetailMessageKey.SUBSCRIPTION_USER_GET_ACTIVE_SUCCESS)
     public ResponseEntity<UserSubscriptionResponse> getMyActiveSubscription(
             @AuthenticationPrincipal AccessTokenPayload payload
     ) {

@@ -81,7 +81,7 @@ public class PaymentController {
     }
 
     @PostMapping("/create")
-    @ApiResponseMessage(message = "payment.order.creation_success")
+    @ApiResponseMessage(message = PaymentDetailMessageKey.PAYMENT_ORDER_CREATION_SUCCESS)
     public ResponseEntity<CreatePaymentResponse> createPayment(
             @AuthenticationPrincipal AccessTokenPayload payload,
             @RequestHeader("Idempotency-Key") String idempotencyKey,
@@ -149,7 +149,7 @@ public class PaymentController {
     }
 
     @GetMapping("/{orderCode}")
-    @ApiResponseMessage(message = "payment.order.get_success")
+    @ApiResponseMessage(message = PaymentDetailMessageKey.PAYMENT_ORDER_GET_SUCCESS)
     public ResponseEntity<PaymentOrderResponse> getPaymentByOrderCode(
             @PathVariable String orderCode) {
         PaymentOrderResult result = getPaymentInputPort.getPaymentByOrderCode(orderCode);
@@ -158,7 +158,7 @@ public class PaymentController {
     }
 
     @PostMapping("/{orderCode}/cancel")
-    @ApiResponseMessage(message = "payment.order.cancel_success")
+    @ApiResponseMessage(message = PaymentDetailMessageKey.PAYMENT_ORDER_CANCEL_SUCCESS)
     public ResponseEntity<CancelPaymentResponse> cancelPayment(
             @AuthenticationPrincipal AccessTokenPayload payload,
             @PathVariable String orderCode) {
