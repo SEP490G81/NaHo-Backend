@@ -17,6 +17,10 @@ public final class PaymentDetailMessageKey {
     public static final String PAYMENT_SUBSCRIPTION_MAX_TIER_REACHED = "payment.subscription.max_tier_reached";
     public static final String PAYMENT_SUBSCRIPTION_UPGRADE_SUCCESS = "payment.subscription.upgrade_success";
 
+    public static final String PAYMENT_ORDER_CREATION_SUCCESS = "payment.order.creation_success";
+    public static final String PAYMENT_ORDER_GET_SUCCESS = "payment.order.get_success";
+    public static final String PAYMENT_ORDER_CANCEL_SUCCESS = "payment.order.cancel_success";
+
     private PaymentDetailMessageKey() {
     }
 }

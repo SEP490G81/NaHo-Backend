@@ -6,6 +6,8 @@ import com.microsoft.cognitiveservices.speech.*;
 import com.microsoft.cognitiveservices.speech.audio.PushAudioInputStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.bramp.ffmpeg.FFprobe;
+import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import org.naho.i18n.message.speech.SpeechDetailMessageKey;
 import org.naho.shared.exception.InfrastructureException;
 import org.naho.speech.azure.constant.AzurePronunciationScoreKey;
@@ -39,6 +41,7 @@ public class AzureSpeechServiceHelper {
     private static final int FFMPEG_BUFFER_SIZE = 4096;
     private static final Semaphore FFMPEG_SEMAPHORE = new Semaphore(FFMPEG_MAX_CONCURRENT_PROCESS);
     private final ObjectMapper objectMapper;
+    private final FFprobe ffprobe;
 
     public Path createTempInputAudioFile(byte[] audioBytes) {
         try {
@@ -48,8 +51,7 @@ public class AzureSpeechServiceHelper {
         } catch (IOException e) {
             throw new InfrastructureException(
                     AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
-                    SpeechDetailMessageKey.SPEECH_AUDIO_FILE_EMPTY
-            );
+                    SpeechDetailMessageKey.SPEECH_AUDIO_FILE_EMPTY);
         }
     }
 
@@ -57,60 +59,32 @@ public class AzureSpeechServiceHelper {
         if (rawAudioBytes == null || rawAudioBytes.length == 0) {
             throw new InfrastructureException(
                     AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
-                    SpeechDetailMessageKey.SPEECH_AUDIO_FILE_EMPTY
-            );
+                    SpeechDetailMessageKey.SPEECH_AUDIO_FILE_EMPTY);
         }
 
         if (rawAudioBytes.length > MAX_AUDIO_SIZE_BYTES) {
             throw new InfrastructureException(
                     AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
-                    SpeechDetailMessageKey.SPEECH_AUDIO_FILE_TOO_LARGE
-            );
+                    SpeechDetailMessageKey.SPEECH_AUDIO_FILE_TOO_LARGE);
         }
     }
 
     public double probeAudioDurationSeconds(Path inputFile) {
         try {
-            ProcessBuilder processBuilder = new ProcessBuilder(
-                    "ffprobe",
-                    "-v", "error",
-                    "-show_entries", "format=duration",
-                    "-of", "default=noprint_wrappers=1:nokey=1",
-                    inputFile.toString()
-            );
-
-            Process process = processBuilder.start();
-            boolean finished = process.waitFor(10, TimeUnit.SECONDS);
-
-            if (!finished) {
-                process.destroyForcibly();
+            FFmpegProbeResult probeResult = ffprobe.probe(inputFile.toString());
+            if (probeResult == null || probeResult.getFormat() == null) {
                 throw new InfrastructureException(
                         AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
-                        SpeechDetailMessageKey.SPEECH_AUDIO_DURATION_INVALID
-                );
+                        SpeechDetailMessageKey.SPEECH_AUDIO_DURATION_INVALID);
             }
-
-            String output = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8).trim();
-            String error = new String(process.getErrorStream().readAllBytes(), StandardCharsets.UTF_8).trim();
-
-            if (process.exitValue() != 0 || output.isBlank()) {
-                log.error("FFprobe failed. output={}, error={}", output, error);
-                throw new InfrastructureException(
-                        AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
-                        SpeechDetailMessageKey.SPEECH_AUDIO_DURATION_INVALID
-                );
-            }
-
-            return Double.parseDouble(output);
-
+            return probeResult.getFormat().duration;
         } catch (InfrastructureException e) {
             throw e;
         } catch (Exception e) {
-            log.error("Cannot determine audio duration", e);
+            log.error("Cannot determine audio duration using FFprobe", e);
             throw new InfrastructureException(
                     AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
-                    SpeechDetailMessageKey.SPEECH_AUDIO_DURATION_INVALID
-            );
+                    SpeechDetailMessageKey.SPEECH_AUDIO_DURATION_INVALID);
         }
     }
 
@@ -118,23 +92,20 @@ public class AzureSpeechServiceHelper {
         if (durationSeconds <= 0 || Double.isNaN(durationSeconds) || Double.isInfinite(durationSeconds)) {
             throw new InfrastructureException(
                     AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
-                    SpeechDetailMessageKey.SPEECH_AUDIO_DURATION_INVALID
-            );
+                    SpeechDetailMessageKey.SPEECH_AUDIO_DURATION_INVALID);
         }
 
         if (durationSeconds > MAX_AUDIO_DURATION_SECONDS) {
             throw new InfrastructureException(
                     AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
-                    SpeechDetailMessageKey.SPEECH_AUDIO_DURATION_EXCEEDED
-            );
+                    SpeechDetailMessageKey.SPEECH_AUDIO_DURATION_EXCEEDED);
         }
     }
 
     public long calculateProcessingTimeoutSeconds(double durationSeconds) {
         return Math.min(
                 (long) Math.ceil(durationSeconds) + EXTRA_PROCESSING_TIMEOUT_SECONDS,
-                MAX_PROCESSING_TIMEOUT_SECONDS
-        );
+                MAX_PROCESSING_TIMEOUT_SECONDS);
     }
 
     public CompletableFuture<Void> streamAzurePcmByFfmpegAsync(Path inputFile, PushAudioInputStream pushStream) {
@@ -154,18 +125,19 @@ public class AzureSpeechServiceHelper {
                         "-i", inputFile.toString(),
                         "-vn",
                         // Tạm thời bỏ bộ lọc silenceremove để tránh bị mất đoạn ghi âm sau khi lặng im
-                        // "-af", "silenceremove=start_periods=1:start_duration=0.2:start_threshold=-45dB:stop_periods=1:stop_duration=0.2:stop_threshold=-45dB",
+                        // "-af",
+                        // "silenceremove=start_periods=1:start_duration=0.2:start_threshold=-45dB:stop_periods=1:stop_duration=0.2:stop_threshold=-45dB",
                         "-acodec", "pcm_s16le",
                         "-ac", "1",
                         "-ar", "16000",
                         "-f", "s16le",
-                        "pipe:1"
-                );
+                        "pipe:1");
 
                 process = processBuilder.start();
                 Process ffmpegProcess = process;
 
-                CompletableFuture<String> errorFuture = CompletableFuture.supplyAsync(() -> readStreamAsString(ffmpegProcess.getErrorStream()));
+                CompletableFuture<String> errorFuture = CompletableFuture
+                        .supplyAsync(() -> readStreamAsString(ffmpegProcess.getErrorStream()));
 
                 byte[] buffer = new byte[FFMPEG_BUFFER_SIZE];
                 try (InputStream inputStream = process.getInputStream()) {
@@ -185,8 +157,7 @@ public class AzureSpeechServiceHelper {
                     throw new InfrastructureException(
                             AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
                             SpeechDetailMessageKey.SPEECH_AUDIO_CONVERT_FAILED,
-                            ffmpegError
-                    );
+                            ffmpegError);
                 }
 
             } catch (InfrastructureException e) {
@@ -195,21 +166,18 @@ public class AzureSpeechServiceHelper {
                 Thread.currentThread().interrupt();
                 throw new InfrastructureException(
                         AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
-                        SpeechDetailMessageKey.SPEECH_AUDIO_CONVERT_INTERRUPTED
-                );
+                        SpeechDetailMessageKey.SPEECH_AUDIO_CONVERT_INTERRUPTED);
             } catch (IOException e) {
                 log.error("FFmpeg is not available or cannot start", e);
                 throw new InfrastructureException(
                         AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
-                        SpeechDetailMessageKey.SPEECH_AUDIO_FFMPEG_NOT_AVAILABLE
-                );
+                        SpeechDetailMessageKey.SPEECH_AUDIO_FFMPEG_NOT_AVAILABLE);
             } catch (Exception e) {
                 log.error("Unexpected FFmpeg streaming error", e);
                 throw new InfrastructureException(
                         AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
                         SpeechDetailMessageKey.SPEECH_AUDIO_CONVERT_FAILED,
-                        e.getMessage()
-                );
+                        e.getMessage());
             } finally {
                 try {
                     pushStream.close();
@@ -244,8 +212,7 @@ public class AzureSpeechServiceHelper {
                 normalizedReferenceText,
                 PronunciationAssessmentGradingSystem.HundredMark,
                 PronunciationAssessmentGranularity.Word,
-                miscueEnabled
-        );
+                miscueEnabled);
 
         config.enableProsodyAssessment();
         return config;
@@ -261,8 +228,7 @@ public class AzureSpeechServiceHelper {
                 if (nBestNode == null) {
                     throw new InfrastructureException(
                             AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR,
-                            SpeechDetailMessageKey.SPEECH_AZURE_N_BEST_NODE_NULL
-                    );
+                            SpeechDetailMessageKey.SPEECH_AZURE_N_BEST_NODE_NULL);
                 }
 
                 String displayResultText = nBestNode.path(AzurePronunciationScoreKey.DISPLAY).asText();
@@ -279,8 +245,10 @@ public class AzureSpeechServiceHelper {
                     for (JsonNode wordNode : wordsNode) {
                         String wordStr = wordNode.path(AzurePronunciationScoreKey.WORD).asText();
                         JsonNode wordPronNode = wordNode.path(AzurePronunciationScoreKey.PRONUNCIATION_ASSESSMENT);
-                        double wordAccuracy = wordPronNode.path(AzurePronunciationScoreKey.ACCURACY_SCORE).asDouble(0.0);
-                        String errorType = wordPronNode.path(AzurePronunciationScoreKey.ERROR_TYPE).asText(AzurePronunciationScoreKey.NONE).toUpperCase();
+                        double wordAccuracy = wordPronNode.path(AzurePronunciationScoreKey.ACCURACY_SCORE)
+                                .asDouble(0.0);
+                        String errorType = wordPronNode.path(AzurePronunciationScoreKey.ERROR_TYPE)
+                                .asText(AzurePronunciationScoreKey.NONE).toUpperCase();
 
                         wordList.add(WordAssessment.builder()
                                 .word(wordStr)
@@ -313,20 +281,17 @@ public class AzureSpeechServiceHelper {
         } else if (result.getReason() == ResultReason.NoMatch) {
             throw new InfrastructureException(
                     AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR,
-                    SpeechDetailMessageKey.SPEECH_RECOGNITION_NO_MATCH
-            );
+                    SpeechDetailMessageKey.SPEECH_RECOGNITION_NO_MATCH);
         } else if (result.getReason() == ResultReason.Canceled) {
             CancellationDetails cancellation = CancellationDetails.fromResult(result);
             throw new InfrastructureException(
                     AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR,
                     SpeechDetailMessageKey.SPEECH_RECOGNITION_CANCELLED,
-                    cancellation.getErrorDetails()
-            );
+                    cancellation.getErrorDetails());
         } else {
             throw new InfrastructureException(
                     AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR,
-                    SpeechDetailMessageKey.SPEECH_AZURE_SERVICE_UNKNOWN_ERROR_OCCUR
-            );
+                    SpeechDetailMessageKey.SPEECH_AZURE_SERVICE_UNKNOWN_ERROR_OCCUR);
         }
     }
 

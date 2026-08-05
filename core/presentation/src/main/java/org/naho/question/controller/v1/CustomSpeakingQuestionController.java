@@ -2,6 +2,7 @@ package org.naho.question.controller.v1;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
 import org.naho.question.command.SuggestCustomSpeakingQuestionCommand;
 import org.naho.question.dto.mapper.CustomSpeakingQuestionRequestMapper;
 import org.naho.question.dto.mapper.CustomSpeakingQuestionResponseMapper;
@@ -26,7 +27,7 @@ public class CustomSpeakingQuestionController {
     private final CustomSpeakingQuestionResponseMapper responseMapper;
 
     @PostMapping("/suggest")
-    @ApiResponseMessage(message = "Suggest custom question successfully!")
+    @ApiResponseMessage(message = SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_CUSTOM_SUGGEST_SUCCESS)
     public ResponseEntity<SuggestCustomSpeakingQuestionResponse> suggestCustomSpeakingQuestion(
             @Valid @RequestBody SuggestCustomSpeakingQuestionRequest request
     ) {
