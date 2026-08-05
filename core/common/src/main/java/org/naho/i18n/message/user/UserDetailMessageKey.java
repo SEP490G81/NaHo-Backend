@@ -17,6 +17,10 @@ public final class UserDetailMessageKey {
             "user.timezone.not.found";
     public static final String USER_ID_NOT_FOUND =
             "user.id.not.found";
+    public static final String USER_NOT_FOUND =
+            "user.not_found";
+    public static final String USER_ACCESS_DENIED =
+            "user.access_denied";
     public static final String USER_ID_NULL =
             "user.id.null";
     public static final String USER_EMAIL_NOT_FOUND =

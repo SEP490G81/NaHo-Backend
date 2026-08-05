@@ -1,5 +1,7 @@
 package org.naho.payment.usecase;
 
+import org.naho.i18n.message.payment.PaymentDetailMessageKey;
+import org.naho.i18n.message.subscription.SubscriptionDetailMessageKey;
 import org.naho.payment.command.ConfirmPaymentCommand;
 import org.naho.payment.exception.PaymentErrorCode;
 import org.naho.payment.model.PaymentOrder;
@@ -25,10 +27,10 @@ public class ConfirmPaymentUseCase implements ConfirmPaymentInputPort {
     private final org.naho.shared.port.out.EventPublisherPort eventPublisherPort;
 
     public ConfirmPaymentUseCase(PaymentOrderRepositoryPort orderRepositoryPort,
-                                 PaymentTransactionRepositoryPort transactionRepositoryPort,
-                                 SubscriptionPlanRepositoryPort planRepositoryPort,
-                                 UserSubscriptionRepositoryPort subscriptionRepositoryPort,
-                                 org.naho.shared.port.out.EventPublisherPort eventPublisherPort) {
+            PaymentTransactionRepositoryPort transactionRepositoryPort,
+            SubscriptionPlanRepositoryPort planRepositoryPort,
+            UserSubscriptionRepositoryPort subscriptionRepositoryPort,
+            org.naho.shared.port.out.EventPublisherPort eventPublisherPort) {
         this.orderRepositoryPort = orderRepositoryPort;
         this.transactionRepositoryPort = transactionRepositoryPort;
         this.planRepositoryPort = planRepositoryPort;
@@ -49,7 +51,7 @@ public class ConfirmPaymentUseCase implements ConfirmPaymentInputPort {
         PaymentOrder order = orderRepositoryPort.findByOrderCodeForUpdate(command.orderCode())
                 .orElseThrow(() -> new ApplicationException(
                         PaymentErrorCode.PAYMENT_ORDER_NOT_FOUND,
-                        "payment.order.not_found"));
+                        PaymentDetailMessageKey.PAYMENT_ORDER_NOT_FOUND));
 
         if (order.isPaid()) {
             return ConfirmPaymentResult.alreadyPaid(order.getOrderCode());
@@ -86,7 +88,7 @@ public class ConfirmPaymentUseCase implements ConfirmPaymentInputPort {
         SubscriptionPlan plan = planRepositoryPort.findById(order.getSubscriptionPlanId())
                 .orElseThrow(() -> new ApplicationException(
                         PaymentErrorCode.PLAN_NOT_FOUND,
-                        "subscription.plan.not_found"));
+                        SubscriptionDetailMessageKey.PLAN_NOT_FOUND));
 
         if (!subscriptionRepositoryPort.existsByPaymentOrderId(order.getId())) {
             UserSubscription subscription = UserSubscription.activate(
@@ -100,8 +102,7 @@ public class ConfirmPaymentUseCase implements ConfirmPaymentInputPort {
             // Publish Event Nâng cấp gói
             eventPublisherPort.publish(new org.naho.user.event.UserPlanUpgradedEvent(
                     order.getUserId(),
-                    plan.getCode().name()
-            ));
+                    plan.getCode().name()));
         }
 
         orderRepositoryPort.save(order);

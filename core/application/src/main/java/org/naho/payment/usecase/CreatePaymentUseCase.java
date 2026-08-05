@@ -1,6 +1,7 @@
 package org.naho.payment.usecase;
 
 import org.naho.i18n.message.payment.PaymentDetailMessageKey;
+import org.naho.i18n.message.subscription.SubscriptionDetailMessageKey;
 import org.naho.payment.command.CreatePaymentCommand;
 import org.naho.payment.exception.PaymentErrorCode;
 import org.naho.payment.model.PaymentIdempotency;
@@ -36,13 +37,13 @@ public class CreatePaymentUseCase implements CreatePaymentInputPort {
     private final int timeoutMinutes;
 
     public CreatePaymentUseCase(SubscriptionPlanRepositoryPort planRepositoryPort,
-                                PaymentOrderRepositoryPort paymentOrderRepositoryPort,
-                                UserSubscriptionRepositoryPort subscriptionRepositoryPort,
-                                PaymentGatewayResolver gatewayResolver,
-                                PaymentOrderCodeGenerator orderCodeGenerator,
-                                UserRepositoryPort userRepositoryPort,
-                                PaymentIdempotencyRepositoryPort idempotencyRepositoryPort,
-                                int timeoutMinutes) {
+            PaymentOrderRepositoryPort paymentOrderRepositoryPort,
+            UserSubscriptionRepositoryPort subscriptionRepositoryPort,
+            PaymentGatewayResolver gatewayResolver,
+            PaymentOrderCodeGenerator orderCodeGenerator,
+            UserRepositoryPort userRepositoryPort,
+            PaymentIdempotencyRepositoryPort idempotencyRepositoryPort,
+            int timeoutMinutes) {
         this.planRepositoryPort = planRepositoryPort;
         this.paymentOrderRepositoryPort = paymentOrderRepositoryPort;
         this.subscriptionRepositoryPort = subscriptionRepositoryPort;
@@ -62,18 +63,18 @@ public class CreatePaymentUseCase implements CreatePaymentInputPort {
         SubscriptionPlan plan = planRepositoryPort.findActiveByCode(command.planCode())
                 .orElseThrow(() -> new ApplicationException(
                         SubscriptionErrorCode.PLAN_NOT_FOUND,
-                        "subscription.plan.not_found"));
+                        SubscriptionDetailMessageKey.PLAN_NOT_FOUND));
 
         if (!plan.isAvailableForPurchase()) {
             throw new ApplicationException(
                     SubscriptionErrorCode.PLAN_UNAVAILABLE,
-                    "subscription.plan.unavailable");
+                    SubscriptionDetailMessageKey.PLAN_UNAVAILABLE);
         }
 
         if (plan.getTier() == PlanTier.FREE) {
             throw new ApplicationException(
                     SubscriptionErrorCode.PLAN_UNAVAILABLE,
-                    "subscription.plan.free_not_purchasable");
+                    SubscriptionDetailMessageKey.PLAN_FREE_NOT_PURCHASABLE);
         }
 
         subscriptionRepositoryPort.findActiveByUserId(command.userId(), now)
@@ -82,7 +83,7 @@ public class CreatePaymentUseCase implements CreatePaymentInputPort {
                     if (activePlan.getTier().isHigherOrEqualThan(plan.getTier())) {
                         throw new ApplicationException(
                                 SubscriptionErrorCode.ALREADY_ACTIVE_HIGHER_OR_EQUAL_PLAN,
-                                "subscription.plan.already_active_or_higher");
+                                SubscriptionDetailMessageKey.PLAN_ALREADY_ACTIVE_OR_HIGHER);
                     }
                 });
 

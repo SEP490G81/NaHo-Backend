@@ -1,5 +1,6 @@
 package org.naho.payment.usecase;
 
+import org.naho.i18n.message.payment.PaymentDetailMessageKey;
 import org.naho.payment.exception.PaymentErrorCode;
 import org.naho.payment.model.PaymentOrder;
 import org.naho.payment.port.in.GetPaymentInputPort;
@@ -23,7 +24,7 @@ public class GetPaymentUseCase implements GetPaymentInputPort {
         PaymentOrder order = orderRepositoryPort.findByOrderCode(orderCode)
                 .orElseThrow(() -> new ApplicationException(
                         PaymentErrorCode.PAYMENT_ORDER_NOT_FOUND,
-                        "payment.order.not_found"));
+                        PaymentDetailMessageKey.PAYMENT_ORDER_NOT_FOUND));
 
         Instant now = Instant.now();
         if (order.getStatus() == PaymentStatus.PENDING && order.isExpiredAt(now)) {
@@ -65,4 +66,3 @@ public class GetPaymentUseCase implements GetPaymentInputPort {
                 order.getModifiedTime());
     }
 }
-
