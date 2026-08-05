@@ -8,6 +8,7 @@ public final class FileDetailMessageKey {
             "file.upload.failed";
     public static final String FILE_UPLOAD_SUCCESSFULLY =
             "file.upload.successfully";
+    public static final String FILE_NOT_UPLOADED = "file.not.uploaded";
     public static final String FILE_EMPTY = "file.empty";
     public static final String FILE_FOLDER_NAME_EMPTY = "file.folder.name.empty";
     public static final String FILE_ORIGINAL_NAME_EMPTY = "file.original.name.empty";
@@ -21,10 +22,13 @@ public final class FileDetailMessageKey {
     public static final String FILE_NOT_VALID = "file.not.valid";
     public static final String FILE_AUDIO_DURATION_UNSPECIFIED = "file.audio.duration.unspecified";
     public static final String FILE_AUDIO_DURATION_EXCEEDED = "file.audio.duration.exceeded";
+    public static final String FILE_RETRY_EXCEEDED = "file.retry.exceeded";
     public static final String FILE_DELETE_FAILED = "file.delete.failed";
     public static final String FILE_DELETE_SUCCESSFULLY = "file.delete.successfully";
     public static final String FILE_GENERATE_PRESIGNED_URL_FAILED = "file.generate_presigned_url.failed";
     public static final String FILE_GENERATE_PRESIGNED_URL_SUCCESSFULLY = "file.generate_presigned_url.successfully";
+    public static final String FILE_DOWNLOAD_FAILED = "file.download.failed";
+    public static final String FILE_DOWNLOAD_SUCCESSFULLY = "file.download.successfully";
 
     private FileDetailMessageKey() {
     }

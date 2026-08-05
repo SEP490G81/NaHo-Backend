@@ -13,6 +13,10 @@ public class SpeakingAnalysisResult {
         this.audioFile = audioFile;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public Long getAnswerHistoryId() {
         return answerHistoryId;
     }
@@ -35,10 +39,6 @@ public class SpeakingAnalysisResult {
 
     public void setAudioFile(FileResult audioFile) {
         this.audioFile = audioFile;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     public static final class Builder {

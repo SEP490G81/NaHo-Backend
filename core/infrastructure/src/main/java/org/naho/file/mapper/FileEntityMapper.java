@@ -5,7 +5,9 @@ import org.mapstruct.Mapping;
 import org.naho.file.entity.FileEntity;
 import org.naho.file.model.File;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {
+        FileValueObjectMapper.class
+})
 public interface FileEntityMapper {
     @Mapping(target = "commentId", source = "comment.id")
     @Mapping(target = "reportId", source = "report.id")
@@ -19,6 +21,5 @@ public interface FileEntityMapper {
     @Mapping(target = "report", ignore = true)
     @Mapping(target = "league", ignore = true)
     @Mapping(target = "user", ignore = true)
-    @Mapping(target = "fileOperation", ignore = true)
     FileEntity domainToEntity(File domain);
 }

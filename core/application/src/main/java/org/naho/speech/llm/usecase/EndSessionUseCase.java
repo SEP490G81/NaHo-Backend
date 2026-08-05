@@ -46,7 +46,8 @@ public class EndSessionUseCase implements EndSessionInputPort {
             if (arsConfidence != null && !arsConfidence.isBlank() && !arsConfidence.equals("N/A")) {
                 try {
                     asrConfidenceDouble = Double.parseDouble(arsConfidence.trim());
-                } catch (NumberFormatException ignored) {}
+                } catch (NumberFormatException ignored) {
+                }
             }
 
             speakingSessionRepositoryPort.saveSpeakingSession(

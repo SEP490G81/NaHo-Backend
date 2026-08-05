@@ -1,7 +1,7 @@
 package org.naho.file.port.in;
 
-import org.naho.file.model.StoredFile;
+import org.naho.file.model.File;
 
 public interface AsyncUploadFileInputPort {
-    void uploadFileToCloud(StoredFile file, boolean isPublic);
+    void retryUploadFileToCloudAsync(File file);
 }

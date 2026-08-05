@@ -97,30 +97,23 @@ CREATE TABLE daily_rewards
     CONSTRAINT pk_daily_rewards PRIMARY KEY (id)
 );
 
-CREATE TABLE file_operations
+CREATE TABLE files
 (
     id               BIGINT AUTO_INCREMENT NOT NULL,
     created_time     datetime(6)           NOT NULL,
     modified_time    datetime(6)           NULL,
-    file_id          BIGINT                NOT NULL,
-    operation_type   VARCHAR(255)          NOT NULL,
-    operation_status VARCHAR(255)          NOT NULL,
+    object_key       VARCHAR(500)          NOT NULL,
+    bucket_name      VARCHAR(255)          NULL,
+    original_name    VARCHAR(255)          NOT NULL,
+    content_type     VARCHAR(100)          NOT NULL,
+    size             BIGINT                NOT NULL,
+    checksum         VARCHAR(255)          NULL,
+    operation_type   VARCHAR(50)           NULL,
+    operation_status VARCHAR(50)           NULL,
     retry_count      INT                   NOT NULL,
-    CONSTRAINT pk_file_operations PRIMARY KEY (id)
-);
-
-CREATE TABLE files
-(
-    id            BIGINT AUTO_INCREMENT NOT NULL,
-    created_time  datetime(6)           NOT NULL,
-    modified_time datetime(6)           NULL,
-    object_key    VARCHAR(500)          NOT NULL,
-    bucket_name   VARCHAR(255)          NULL,
-    original_name VARCHAR(255)          NOT NULL,
-    content_type  VARCHAR(100)          NOT NULL,
-    size          BIGINT                NOT NULL,
-    comment_id    BIGINT                NULL,
-    report_id     BIGINT                NULL,
+    next_retry_at    datetime(6)           NULL,
+    comment_id       BIGINT                NULL,
+    report_id        BIGINT                NULL,
     CONSTRAINT pk_files PRIMARY KEY (id)
 );
 
@@ -760,9 +753,6 @@ ALTER TABLE files
 
 ALTER TABLE files
     ADD CONSTRAINT FK_FILES_ON_REPORT FOREIGN KEY (report_id) REFERENCES reports (id);
-
-ALTER TABLE file_operations
-    ADD CONSTRAINT FK_FILE_OPERATIONS_ON_FILE FOREIGN KEY (file_id) REFERENCES files (id);
 
 ALTER TABLE leagues
     ADD CONSTRAINT FK_LEAGUES_ON_ICON_FILE FOREIGN KEY (icon_file_id) REFERENCES files (id);

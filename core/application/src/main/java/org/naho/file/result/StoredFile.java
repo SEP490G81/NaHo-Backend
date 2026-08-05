@@ -1,8 +1,8 @@
-package org.naho.file.model;
+package org.naho.file.result;
 
 public record StoredFile(
         String objectKey,
-        String absoluteLocalStoragePath,
+        String bucketName,
         String originalFileName,
         String contentType,
         Long size,
@@ -15,7 +15,7 @@ public record StoredFile(
 
     public static class Builder {
         private String objectKey;
-        private String absoluteLocalStoragePath;
+        private String bucketName;
         private String originalFileName;
         private String contentType;
         private Long size;
@@ -26,8 +26,8 @@ public record StoredFile(
             return this;
         }
 
-        public Builder absoluteLocalStoragePath(String absoluteLocalStoragePath) {
-            this.absoluteLocalStoragePath = absoluteLocalStoragePath;
+        public Builder bucketName(String bucketName) {
+            this.bucketName = bucketName;
             return this;
         }
 
@@ -54,7 +54,7 @@ public record StoredFile(
         public StoredFile build() {
             return new StoredFile(
                     objectKey,
-                    absoluteLocalStoragePath,
+                    bucketName,
                     originalFileName,
                     contentType,
                     size,

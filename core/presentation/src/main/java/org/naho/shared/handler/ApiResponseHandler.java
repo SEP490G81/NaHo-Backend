@@ -10,6 +10,7 @@ import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.shared.response.ApiMeta;
 import org.naho.shared.response.ApiResponse;
 import org.springframework.core.MethodParameter;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
@@ -39,6 +40,9 @@ public class ApiResponseHandler implements ResponseBodyAdvice<Object> {
         if (String.class.isAssignableFrom(returnType.getParameterType())) {
             return false;
         }
+        if (Resource.class.isAssignableFrom(returnType.getParameterType())) {
+            return false;
+        }
         return true;
     }
 
@@ -53,7 +57,9 @@ public class ApiResponseHandler implements ResponseBodyAdvice<Object> {
         if (body instanceof ApiResponse<?> ||
                 body instanceof ProblemDetail ||
                 body instanceof ByteArrayHttpMessageConverter ||
-                body instanceof String) {
+                body instanceof String ||
+                body instanceof Resource
+        ) {
             return body;
         }
 

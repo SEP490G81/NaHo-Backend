@@ -29,7 +29,4 @@ ALTER TABLE daily_missions
 ALTER TABLE user_daily_missions
     ADD CONSTRAINT uk_user_daily_mission
         UNIQUE (user_id, daily_mission_id, started_date);
-
-ALTER TABLE file_operations
-    ADD CONSTRAINT uk_file_operation_file_id_operation_type
-        UNIQUE (file_id, operation_type);
+

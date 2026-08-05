@@ -1,6 +1,7 @@
 package org.naho.subscription.controller.v1;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.i18n.message.subscription.SubscriptionDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.subscription.dto.mapper.SubscriptionResponseMapper;
 import org.naho.subscription.dto.response.SubscriptionPlanResponse;
@@ -22,7 +23,7 @@ public class SubscriptionPlanController {
     private final SubscriptionResponseMapper responseMapper;
 
     @GetMapping
-    @ApiResponseMessage(message = "subscription.plans.get_list_success")
+    @ApiResponseMessage(message = SubscriptionDetailMessageKey.SUBSCRIPTION_PLANS_GET_LIST_SUCCESS)
     public ResponseEntity<List<SubscriptionPlanResponse>> listActivePlans() {
         List<SubscriptionPlanResult> results = listActivePlansInputPort.listActivePlans();
         List<SubscriptionPlanResponse> response = responseMapper.listPlanResultToResponse(results);

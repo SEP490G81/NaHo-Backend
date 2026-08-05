@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import org.naho.file.type.OperationStatus;
+import org.naho.file.type.OperationType;
 import org.naho.league.entity.LeagueEntity;
 import org.naho.persona.entity.PersonaEntity;
 import org.naho.question.entity.SpeakingQuestionEntity;
@@ -12,7 +14,7 @@ import org.naho.social.entity.CommentEntity;
 import org.naho.social.report.entity.ReportEntity;
 import org.naho.user.entity.UserEntity;
 
-import java.util.List;
+import java.time.Instant;
 
 @SuperBuilder
 @Getter
@@ -38,6 +40,23 @@ public class FileEntity extends BaseEntity {
     @Column(nullable = false)
     Long size; // bytes
 
+    @Column
+    String checksum;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "operation_type", length = 50)
+    OperationType operationType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "operation_status", length = 50)
+    OperationStatus operationStatus;
+
+    @Column(name = "retry_count", nullable = false)
+    Integer retryCount;
+
+    @Column(name = "next_retry_at")
+    Instant nextRetryAt;
+
     @OneToOne(mappedBy = "avatarFile")
     PersonaEntity persona;
 
@@ -57,7 +76,4 @@ public class FileEntity extends BaseEntity {
 
     @OneToOne(mappedBy = "avatarFile")
     UserEntity user;
-
-    @OneToOne(mappedBy = "file", cascade = CascadeType.ALL, orphanRemoval = true)
-    FileOperationEntity fileOperation;
 }

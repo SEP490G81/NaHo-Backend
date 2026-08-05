@@ -9,30 +9,29 @@ INSERT INTO files (id,
                    bucket_name,
                    original_name,
                    content_type,
-                   size)
-VALUES (1, NOW(), 'leagues/bronze.svg', 'naho-public-bucket', 'bronze.svg', 'image/svg+xml', 974),
-       (2, NOW(), 'leagues/silver.svg', 'naho-public-bucket', 'silver.svg', 'image/svg+xml', 974),
-       (3, NOW(), 'leagues/gold.svg', 'naho-public-bucket', 'gold.svg', 'image/svg+xml', 970),
-       (4, NOW(), 'leagues/sapphire.svg', 'naho-public-bucket', 'sapphire.svg', 'image/svg+xml', 1268),
-       (5, NOW(), 'leagues/ruby.svg', 'naho-public-bucket', 'ruby.svg', 'image/svg+xml', 1260),
-       (6, NOW(), 'leagues/emerald.svg', 'naho-public-bucket', 'emerald.svg', 'image/svg+xml', 1266),
-       (7, NOW(), 'leagues/amethyst.svg', 'naho-public-bucket', 'amethyst.svg', 'image/svg+xml', 1442),
-       (8, NOW(), 'leagues/pearl.svg', 'naho-public-bucket', 'pearl.svg', 'image/svg+xml', 1436),
-       (9, NOW(), 'leagues/obsidian.svg', 'naho-public-bucket', 'obsidian.svg', 'image/svg+xml', 1442),
-       (10, NOW(), 'leagues/diamond.svg', 'naho-public-bucket', 'diamond.svg', 'image/svg+xml', 1164);
-
--- Insert file operations for league SVG files
-INSERT INTO file_operations (created_time, file_id, operation_type, operation_status, retry_count)
-VALUES (NOW(), 1, 'UPLOAD', 'COMPLETED', 0),
-       (NOW(), 2, 'UPLOAD', 'COMPLETED', 0),
-       (NOW(), 3, 'UPLOAD', 'COMPLETED', 0),
-       (NOW(), 4, 'UPLOAD', 'COMPLETED', 0),
-       (NOW(), 5, 'UPLOAD', 'COMPLETED', 0),
-       (NOW(), 6, 'UPLOAD', 'COMPLETED', 0),
-       (NOW(), 7, 'UPLOAD', 'COMPLETED', 0),
-       (NOW(), 8, 'UPLOAD', 'COMPLETED', 0),
-       (NOW(), 9, 'UPLOAD', 'COMPLETED', 0),
-       (NOW(), 10, 'UPLOAD', 'COMPLETED', 0);
+                   size,
+                   operation_type,
+                   operation_status,
+                   retry_count)
+VALUES (1, NOW(), 'leagues/bronze.svg', 'naho-public-bucket', 'bronze.svg', 'image/svg+xml', 974, 'UPLOAD', 'COMPLETED',
+        0),
+       (2, NOW(), 'leagues/silver.svg', 'naho-public-bucket', 'silver.svg', 'image/svg+xml', 974, 'UPLOAD', 'COMPLETED',
+        0),
+       (3, NOW(), 'leagues/gold.svg', 'naho-public-bucket', 'gold.svg', 'image/svg+xml', 970, 'UPLOAD', 'COMPLETED', 0),
+       (4, NOW(), 'leagues/sapphire.svg', 'naho-public-bucket', 'sapphire.svg', 'image/svg+xml', 1268, 'UPLOAD',
+        'COMPLETED', 0),
+       (5, NOW(), 'leagues/ruby.svg', 'naho-public-bucket', 'ruby.svg', 'image/svg+xml', 1260, 'UPLOAD', 'COMPLETED',
+        0),
+       (6, NOW(), 'leagues/emerald.svg', 'naho-public-bucket', 'emerald.svg', 'image/svg+xml', 1266, 'UPLOAD',
+        'COMPLETED', 0),
+       (7, NOW(), 'leagues/amethyst.svg', 'naho-public-bucket', 'amethyst.svg', 'image/svg+xml', 1442, 'UPLOAD',
+        'COMPLETED', 0),
+       (8, NOW(), 'leagues/pearl.svg', 'naho-public-bucket', 'pearl.svg', 'image/svg+xml', 1436, 'UPLOAD', 'COMPLETED',
+        0),
+       (9, NOW(), 'leagues/obsidian.svg', 'naho-public-bucket', 'obsidian.svg', 'image/svg+xml', 1442, 'UPLOAD',
+        'COMPLETED', 0),
+       (10, NOW(), 'leagues/diamond.svg', 'naho-public-bucket', 'diamond.svg', 'image/svg+xml', 1164, 'UPLOAD',
+        'COMPLETED', 0);
 
 -- Insert league levels into leagues table
 INSERT INTO leagues (id, created_time, modified_time, name, description, min_point, max_point, icon_file_id)
