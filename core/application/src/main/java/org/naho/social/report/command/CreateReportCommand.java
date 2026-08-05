@@ -1,5 +1,6 @@
 package org.naho.social.report.command;
 
+import org.naho.file.result.StoredFile;
 import org.naho.social.report.type.ReportType;
 
 import java.util.List;
@@ -11,6 +12,6 @@ public record CreateReportCommand(
         String title,
         String description,
         ReportType reportType,
-        List<Object> imageFiles
+        List<StoredFile> imageFiles
 ) {
 }

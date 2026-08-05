@@ -1,5 +1,6 @@
 package org.naho.user.port.out;
 
+import org.naho.user.command.UpdateUserInfoCommand;
 import org.naho.user.model.OAuthProvider;
 import org.naho.user.model.User;
 import org.naho.user.result.LeaderboardUserResult;
@@ -36,4 +37,6 @@ public interface UserRepositoryPort {
     Optional<LeaderboardUserResult> findTopOfUserByUserId(Long userId);
 
     void lockById(Long userId);
+
+    User updateUserInfo(UpdateUserInfoCommand command);
 }

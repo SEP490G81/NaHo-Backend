@@ -72,6 +72,9 @@ mybatis:
 app:
   frontend-url: ${FRONTEND_URL}
   nextjs-server-files-api: ${NEXTJS_SERVER_FILES_API}
+  scheduler:
+    file-upload-retry:
+      fixed-delay: 60000
   jwt:
     secret: ${JWT_SECRET}
     access-token-expiration: 5m

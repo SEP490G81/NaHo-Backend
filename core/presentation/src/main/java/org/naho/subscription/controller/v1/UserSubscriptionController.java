@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.naho.i18n.message.subscription.SubscriptionDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.subscription.dto.mapper.SubscriptionResponseMapper;
-import org.naho.subscription.dto.response.UserSubscriptionResponse;
+import org.naho.subscription.dto.response.SubscriptionPlanResponse;
 import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
-import org.naho.subscription.result.UserSubscriptionResult;
+import org.naho.subscription.result.SubscriptionPlanResult;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,18 +20,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserSubscriptionController {
 
     private final GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
-    private final SubscriptionResponseMapper responseMapper;
+    private final SubscriptionResponseMapper subscriptionResponseMapper;
 
     @GetMapping("/me")
     @ApiResponseMessage(message = SubscriptionDetailMessageKey.SUBSCRIPTION_USER_GET_ACTIVE_SUCCESS)
-    public ResponseEntity<UserSubscriptionResponse> getMyActiveSubscription(
+    public ResponseEntity<SubscriptionPlanResponse> getUserActiveSubscriptionPlan(
             @AuthenticationPrincipal AccessTokenPayload payload
     ) {
-        UserSubscriptionResult result = getActiveSubscriptionInputPort.getActiveSubscription(payload.userId());
-        if (result == null) {
-            return ResponseEntity.notFound().build();
-        }
-        UserSubscriptionResponse response = responseMapper.userSubResultToResponse(result);
+        SubscriptionPlanResult result = getActiveSubscriptionInputPort
+                .getUserActiveSubscriptionPlan(payload.userId());
+
+        SubscriptionPlanResponse response = subscriptionResponseMapper
+                .planResultToResponse(result);
+
         return ResponseEntity.ok(response);
     }
 }

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.naho.file.mybatis.FileQueryMapper">
+    <resultMap id="FileEntityResultMap" type="org.naho.file.entity.FileEntity">
+        <id property="id" column="id"/>
+        <result property="objectKey" column="object_key"/>
+        <result property="bucketName" column="bucket_name"/>
+        <result property="originalFileName" column="original_name"/>
+        <result property="contentType" column="content_type"/>
+        <result property="size" column="size"/>
+        <result property="checksum" column="checksum"/>
+        <result property="operationType" column="operation_type"/>
+        <result property="operationStatus" column="operation_status"/>
+        <result property="retryCount" column="retry_count"/>
+        <result property="nextRetryAt" column="next_retry_at"/>
+        <result property="createdTime" column="created_time"/>
+        <result property="modifiedTime" column="modified_time"/>
+    </resultMap>
+
+    <select id="findAllForSchedulerRetryUpload" resultMap="FileEntityResultMap">
+        select *
+        from files
+        where operation_type = #{operationType}
+          and operation_status = #{operationStatus}
+          and #{maxRetryCount} > retry_count
+          and (next_retry_at is null or #{now} >= next_retry_at)
+        order by created_time
+        limit 100
+    </select>
+</mapper>

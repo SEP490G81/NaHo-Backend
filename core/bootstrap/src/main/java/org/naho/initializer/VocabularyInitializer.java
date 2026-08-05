@@ -3,6 +3,7 @@ package org.naho.initializer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.naho.book.exception.BookErrorCode;
+import org.naho.file.constant.FileFolderConstant;
 import org.naho.file.constant.StaticResourceProperties;
 import org.naho.shared.exception.BootstrapException;
 import org.naho.vocabulary.port.in.ImportVocabularyPort;
@@ -34,7 +35,7 @@ public class VocabularyInitializer implements ApplicationRunner {
         } else {
             try (InputStream inputStream = resourceLoader
                     .getResource(staticResourceProperties.getLocalRoot() +
-                            staticResourceProperties.getBooks() +
+                            FileFolderConstant.BOOKS +
                             "/vocabulary_data.xlsx")
                     .getInputStream()) {
 

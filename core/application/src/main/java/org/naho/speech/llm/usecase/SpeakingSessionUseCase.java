@@ -93,17 +93,6 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         this.speakingSessionRepositoryPort = speakingSessionRepositoryPort;
     }
 
-
-    private record ParsedAiReply(
-            String reply,
-            String replyTranslation,
-            String grammarNote,
-            String correctedUserText,
-            String correctionExplanation,
-            String hintForLearner
-    ) {
-    }
-
     private ParsedAiReply parseAiResponse(String rawResponse) {
         if (rawResponse == null || rawResponse.isBlank()) {
             return new ParsedAiReply("", "", "", "", "", "");
@@ -369,7 +358,6 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                 ));
     }
 
-
     private String toAudioBase64(String sessionId, String text) {
         try {
             String voiceName = sessionStorePort.getVoiceName(sessionId);
@@ -379,5 +367,15 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             System.out.println("[SpeakingSession] TTS failed for session " + sessionId + ": " + e.getMessage());
             return null;
         }
+    }
+
+    private record ParsedAiReply(
+            String reply,
+            String replyTranslation,
+            String grammarNote,
+            String correctedUserText,
+            String correctionExplanation,
+            String hintForLearner
+    ) {
     }
 }

@@ -1,8 +1,14 @@
 package org.naho.user.adapter;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.file.port.in.UploadFileInputPort;
+import org.naho.file.port.out.FileStorageServicePort;
+import org.naho.i18n.message.user.UserDetailMessageKey;
+import org.naho.shared.exception.InfrastructureException;
+import org.naho.user.command.UpdateUserInfoCommand;
 import org.naho.user.entity.OAuthProviderEntity;
 import org.naho.user.entity.UserEntity;
+import org.naho.user.exception.UserErrorCode;
 import org.naho.user.mapper.OAuthProviderEntityMapper;
 import org.naho.user.mapper.UserEntityMapper;
 import org.naho.user.model.OAuthProvider;
@@ -11,12 +17,12 @@ import org.naho.user.mybatis.UserQueryMapper;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.naho.user.repository.UserJpaRepository;
 import org.naho.user.result.LeaderboardUserResult;
-import org.naho.user.type.JLPTLevel;
-import org.naho.user.type.OAuthProviderName;
-import org.naho.user.type.RoleName;
-import org.naho.user.type.UserStatus;
+import org.naho.user.type.*;
+import org.naho.user.valueobject.Dob;
+import org.naho.user.valueobject.Username;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +34,8 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     private final UserEntityMapper userEntityMapper;
     private final UserQueryMapper userQueryMapper;
     private final OAuthProviderEntityMapper oAuthProviderEntityMapper;
+    private final FileStorageServicePort fileStorageServicePort;
+    private final UploadFileInputPort uploadFileInputPort;
 
     @Override
     public Optional<User> findByUsername(String username) {
@@ -150,5 +158,48 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     @Override
     public void lockById(Long userId) {
         userJpaRepository.findByIdForUpdate(userId);
+    }
+
+    @Override
+    public User updateUserInfo(UpdateUserInfoCommand command) {
+        UserEntity user = userJpaRepository.findById(command.id())
+                .orElseThrow(() -> new InfrastructureException(
+                        UserErrorCode.USER_NOT_FOUND,
+                        UserDetailMessageKey.USER_ID_NOT_FOUND,
+                        command.id()
+                ));
+
+        String commandUsername = command.username();
+        if (commandUsername != null && !commandUsername.isBlank()) {
+            if (
+                    !commandUsername.equals(user.getUsername()) &&
+                            userJpaRepository.existsByUsername(commandUsername)
+            ) {
+                throw new InfrastructureException(
+                        UserErrorCode.USER_ALREADY_EXISTS,
+                        UserDetailMessageKey.USER_USERNAME_ALREADY_EXISTS,
+                        commandUsername
+                );
+            }
+            user.setUsername(Username.of(commandUsername).getValue());
+        }
+
+        String commandFullName = command.fullName();
+        if (commandFullName != null && !commandFullName.isBlank()) {
+            user.setFullName(commandFullName);
+        }
+
+        Gender commandGender = command.gender();
+        if (commandGender != null) {
+            user.setGender(commandGender);
+        }
+
+        LocalDate commandDob = command.dob();
+        if (commandDob != null) {
+            user.setDob(Dob.of(commandDob).getValue());
+        }
+
+        UserEntity savedEntity = userJpaRepository.save(user);
+        return userEntityMapper.entityToDomain(savedEntity);
     }
 }

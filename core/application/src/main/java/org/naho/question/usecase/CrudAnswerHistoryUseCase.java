@@ -1,17 +1,14 @@
 package org.naho.question.usecase;
 
 import org.naho.file.exception.FileErrorCode;
-import org.naho.file.exception.FileOperationErrorCode;
 import org.naho.file.model.File;
-import org.naho.file.model.FileOperation;
-import org.naho.file.port.out.FileOperationRepositoryPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.file.type.OperationStatus;
-import org.naho.file.type.OperationType;
 import org.naho.i18n.message.file.FileDetailMessageKey;
-import org.naho.i18n.message.file.FileOperationDetailMessageKey;
+import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
 import org.naho.i18n.message.user.UserDetailMessageKey;
+import org.naho.question.exception.SpeakingQuestionErrorCode;
 import org.naho.question.port.in.CrudAnswerHistoryInputPort;
 import org.naho.question.port.out.AnswerHistoryRepositoryPort;
 import org.naho.shared.exception.ApplicationException;
@@ -21,18 +18,15 @@ import org.naho.user.exception.UserErrorCode;
 public class CrudAnswerHistoryUseCase implements CrudAnswerHistoryInputPort {
     private final AnswerHistoryRepositoryPort answerHistoryRepositoryPort;
     private final FileRepositoryPort fileRepositoryPort;
-    private final FileOperationRepositoryPort fileOperationRepositoryPort;
     private final FileStorageServicePort fileStorageServicePort;
 
     public CrudAnswerHistoryUseCase(
             AnswerHistoryRepositoryPort answerHistoryRepositoryPort,
             FileRepositoryPort fileRepositoryPort,
-            FileOperationRepositoryPort fileOperationRepositoryPort,
             FileStorageServicePort fileStorageServicePort
     ) {
         this.answerHistoryRepositoryPort = answerHistoryRepositoryPort;
         this.fileRepositoryPort = fileRepositoryPort;
-        this.fileOperationRepositoryPort = fileOperationRepositoryPort;
         this.fileStorageServicePort = fileStorageServicePort;
     }
 
@@ -40,15 +34,15 @@ public class CrudAnswerHistoryUseCase implements CrudAnswerHistoryInputPort {
     public String generateAudioFilePresignedUrl(Long id, Long userId) {
         if (id == null) {
             throw new ApplicationException(
-                    FileErrorCode.FILE_NOT_VALID,
-                    FileDetailMessageKey.FILE_ID_NULL
+                    SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
+                    SpeakingQuestionDetailMessageKey.ANSWER_HISTORY_ID_NULL
             );
         }
 
         AnswerHistory answerHistory = answerHistoryRepositoryPort.findById(id)
                 .orElseThrow(() -> new ApplicationException(
-                        FileErrorCode.FILE_NOT_FOUND,
-                        FileDetailMessageKey.FILE_NOT_FOUND,
+                        SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
+                        SpeakingQuestionDetailMessageKey.ANSWER_HISTORY_NOT_FOUND,
                         id
                 ));
 
@@ -61,26 +55,17 @@ public class CrudAnswerHistoryUseCase implements CrudAnswerHistoryInputPort {
 
         if (answerHistory.getAudioFileId() == null) {
             throw new ApplicationException(
-                    FileErrorCode.FILE_NOT_FOUND,
-                    FileDetailMessageKey.FILE_NOT_FOUND,
-                    id
+                    FileErrorCode.FILE_NOT_VALID,
+                    FileDetailMessageKey.FILE_ID_NULL
             );
         }
 
         File file = fileRepositoryPort.findById(answerHistory.getAudioFileId());
 
-        FileOperation uploadOperation = fileOperationRepositoryPort
-                .findByFileIdAndOperationType(file.getId(), OperationType.UPLOAD)
-                .orElseThrow(() -> new ApplicationException(
-                        FileOperationErrorCode.FILE_OPERATION_NOT_FOUND,
-                        FileOperationDetailMessageKey.FILE_OPERATION_NOT_FOUND,
-                        file.getId()
-                ));
-
-        if (!OperationStatus.COMPLETED.equals(uploadOperation.getOperationStatus())) {
+        if (!OperationStatus.COMPLETED.equals(file.getOperationStatus())) {
             throw new ApplicationException(
-                    FileOperationErrorCode.FILE_OPERATION_NOT_VALID,
-                    FileOperationDetailMessageKey.FILE_OPERATION_NOT_VALID
+                    FileErrorCode.FILE_NOT_VALID,
+                    FileDetailMessageKey.FILE_NOT_UPLOADED
             );
         }
 

@@ -5,9 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.naho.social.report.type.ReportType;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -26,7 +23,6 @@ public class CreateReportRequest {
     ReportType reportType;
 
     Long questionId;
+    
     Long commentId;
-
-    List<MultipartFile> files;
 }

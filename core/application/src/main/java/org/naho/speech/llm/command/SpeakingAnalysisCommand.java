@@ -1,6 +1,6 @@
 package org.naho.speech.llm.command;
 
-import org.naho.file.model.StoredFile;
+import org.naho.file.result.StoredFile;
 
 public record SpeakingAnalysisCommand(
         Long userId,

@@ -1,6 +1,5 @@
 package org.naho.social.report.mapper;
 
-import org.naho.file.model.File;
 import org.naho.file.port.out.FileResultMapperPort;
 import org.naho.file.result.FileResult;
 import org.naho.social.report.command.CreateReportCommand;
@@ -36,30 +35,19 @@ public class ReportResultMapper {
         if (domain == null) {
             return null;
         }
-        return domainToResult(domain, domain.getFiles());
-    }
 
-    public ReportResult domainToResult(Report domain, List<File> files) {
-        if (domain == null) {
-            return null;
-        }
+        List<FileResult> fileResults = domain.getFiles().stream().map(fileResultMapperPort::domainToResult).toList();
 
-        List<FileResult> fileResults = files != null
-                ? files.stream()
-                .map(fileResultMapperPort::domainToResult)
-                .toList()
-                : List.of();
-
-        return new ReportResult(
-                domain.getId(),
-                domain.getUserId(),
-                domain.getTitle(),
-                domain.getDescription(),
-                domain.getReportType(),
-                domain.isResolved(),
-                domain.getQuestionId(),
-                domain.getCommentId(),
-                fileResults
-        );
+        return ReportResult.builder()
+                .id(domain.getId())
+                .userId(domain.getUserId())
+                .title(domain.getTitle())
+                .description(domain.getDescription())
+                .reportType(domain.getReportType())
+                .isResolved(domain.isResolved())
+                .questionId(domain.getQuestionId())
+                .commentId(domain.getCommentId())
+                .files(fileResults)
+                .build();
     }
 }

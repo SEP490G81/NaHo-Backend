@@ -37,12 +37,12 @@ public class AnswerHistory {
         return audioFileId;
     }
 
-    public Instant getCreatedTime() {
-        return createdTime;
-    }
-
     public void setAudioFileId(Long audioFileId) {
         this.audioFileId = audioFileId;
+    }
+
+    public Instant getCreatedTime() {
+        return createdTime;
     }
 
     public static class Builder {

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.naho.book.exception.BookErrorCode;
 import org.naho.book.port.in.ImportBookInputPort;
 import org.naho.book.repository.TopicJpaRepository;
+import org.naho.file.constant.FileFolderConstant;
 import org.naho.file.constant.StaticResourceProperties;
 import org.naho.shared.exception.BootstrapException;
 import org.springframework.boot.ApplicationArguments;
@@ -34,7 +35,7 @@ public class BookDataInitializer implements ApplicationRunner {
         } else {
             try (InputStream inputStream = resourceLoader
                     .getResource(staticResourceProperties.getLocalRoot() +
-                            staticResourceProperties.getBooks() +
+                            FileFolderConstant.BOOKS +
                             "/book_data.xlsx")
                     .getInputStream()) {
 
