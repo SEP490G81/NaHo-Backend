@@ -31,4 +31,6 @@ public interface FileRepositoryPort {
             OperationType operationType,
             OperationStatus operationStatus
     );
+
+    void deleteById(Long id);
 }

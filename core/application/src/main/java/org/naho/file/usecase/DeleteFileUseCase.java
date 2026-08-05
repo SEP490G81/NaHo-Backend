@@ -2,18 +2,17 @@ package org.naho.file.usecase;
 
 import org.naho.file.exception.FileErrorCode;
 import org.naho.file.model.File;
-import org.naho.file.port.in.DownloadFileInputPort;
+import org.naho.file.port.in.DeleteFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileStorageServicePort;
-import org.naho.file.result.DownloadedFile;
 import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
 
-public class DownloadFileUseCase implements DownloadFileInputPort {
+public class DeleteFileUseCase implements DeleteFileInputPort {
     private final FileRepositoryPort fileRepositoryPort;
     private final FileStorageServicePort fileStorageServicePort;
 
-    public DownloadFileUseCase(
+    public DeleteFileUseCase(
             FileRepositoryPort fileRepositoryPort,
             FileStorageServicePort fileStorageServicePort
     ) {
@@ -22,7 +21,7 @@ public class DownloadFileUseCase implements DownloadFileInputPort {
     }
 
     @Override
-    public DownloadedFile downloadFileFromCloud(String objectKey) {
+    public void deleteFileInCloud(String objectKey) {
         if (objectKey == null || objectKey.isBlank()) {
             throw new ApplicationException(
                     FileErrorCode.FILE_NOT_VALID,
@@ -31,14 +30,14 @@ public class DownloadFileUseCase implements DownloadFileInputPort {
         }
 
         File file = fileRepositoryPort.findByObjectKey(objectKey);
-        if (file == null) {
-            throw new ApplicationException(
-                    FileErrorCode.FILE_NOT_FOUND,
-                    FileDetailMessageKey.FILE_NOT_FOUND,
-                    objectKey
-            );
-        }
 
-        return fileStorageServicePort.downloadFileFromCloud(file);
+        try {
+            fileStorageServicePort.deleteFileInCloud(file);
+
+            fileRepositoryPort.deleteById(file.getId());
+            
+        } catch (Exception e) {
+
+        }
     }
 }

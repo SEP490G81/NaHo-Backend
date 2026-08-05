@@ -27,6 +27,8 @@ public final class FileDetailMessageKey {
     public static final String FILE_DELETE_SUCCESSFULLY = "file.delete.successfully";
     public static final String FILE_GENERATE_PRESIGNED_URL_FAILED = "file.generate_presigned_url.failed";
     public static final String FILE_GENERATE_PRESIGNED_URL_SUCCESSFULLY = "file.generate_presigned_url.successfully";
+    public static final String FILE_DOWNLOAD_FAILED = "file.download.failed";
+    public static final String FILE_DOWNLOAD_SUCCESSFULLY = "file.download.successfully";
 
     private FileDetailMessageKey() {
     }

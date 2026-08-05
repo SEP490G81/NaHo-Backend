@@ -207,4 +207,9 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
                 ).stream().map(fileEntityMapper::entityToDomain)
                 .toList();
     }
+
+    @Override
+    public void deleteById(Long id) {
+        fileJpaRepository.deleteById(id);
+    }
 }

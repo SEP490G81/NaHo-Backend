@@ -73,21 +73,21 @@ public class FileStorageServiceAdapter implements FileStorageServicePort {
         s3Client.putObject(putObjectRequest, RequestBody.fromFile(path));
     }
 
-//    @Override
-//    public void deleteFileInCloud(String objectKey, String bucketName) {
-//        try {
-//            s3Client.deleteObject(request -> request
-//                    .bucket(bucketName)
-//                    .key(objectKey)
-//            );
-//        } catch (S3Exception e) {
-//            throw new InfrastructureException(
-//                    FileErrorCode.FILE_DELETE_FAILED,
-//                    FileDetailMessageKey.FILE_DELETE_FAILED,
-//                    e.getMessage()
-//            );
-//        }
-//    }
+    @Override
+    public void deleteFileInCloud(File file) {
+        try {
+            s3Client.deleteObject(request -> request
+                    .bucket(file.getBucketName())
+                    .key(file.getObjectKey())
+            );
+        } catch (S3Exception e) {
+            throw new InfrastructureException(
+                    FileErrorCode.FILE_DELETE_FAILED,
+                    FileDetailMessageKey.FILE_DELETE_FAILED,
+                    e.getMessage()
+            );
+        }
+    }
 
     @Override
     public StoredFile saveFileToLocal(Object file, boolean isPublic) {
@@ -184,6 +184,13 @@ public class FileStorageServiceAdapter implements FileStorageServicePort {
 
     @Override
     public DownloadedFile downloadFileFromCloud(File file) {
+        if (file == null || file.getObjectKey() == null || file.getObjectKey().isBlank()) {
+            throw new InfrastructureException(
+                    FileErrorCode.FILE_NOT_VALID,
+                    FileDetailMessageKey.FILE_OBJECT_KEY_EMPTY
+            );
+        }
+
         try {
             GetObjectRequest request = GetObjectRequest.builder()
                     .bucket(file.getBucketName())
@@ -199,7 +206,11 @@ public class FileStorageServiceAdapter implements FileStorageServicePort {
                     .inputStream(stream)
                     .build();
         } catch (Exception e) {
-            throw new InfrastructureException();
+            throw new InfrastructureException(
+                    FileErrorCode.FILE_DOWNLOAD_FAILED,
+                    FileDetailMessageKey.FILE_DOWNLOAD_FAILED,
+                    e.getMessage()
+            );
         }
     }
 }

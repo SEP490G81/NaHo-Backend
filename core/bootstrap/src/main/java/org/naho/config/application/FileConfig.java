@@ -2,13 +2,13 @@ package org.naho.config.application;
 
 import org.naho.file.mapper.StoredFileMapper;
 import org.naho.file.port.in.CrudFileInputPort;
-import org.naho.file.port.in.RetryUploadFileInputPort;
+import org.naho.file.port.in.DownloadFileInputPort;
 import org.naho.file.port.in.UploadFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileResultMapperPort;
 import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.file.usecase.CrudFileUseCase;
-import org.naho.file.usecase.RetryUploadFileUseCase;
+import org.naho.file.usecase.DownloadFileUseCase;
 import org.naho.file.usecase.UploadFileUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,25 +36,25 @@ public class FileConfig {
     public UploadFileInputPort uploadFileInputPort(
             FileRepositoryPort fileRepositoryPort,
             FileStorageServicePort fileStorageServicePort,
-            FileResultMapperPort fileResultMapperPort
+            FileResultMapperPort fileResultMapperPort,
+            StoredFileMapper storedFileMapper
     ) {
         return new UploadFileUseCase(
                 fileRepositoryPort,
                 fileStorageServicePort,
-                fileResultMapperPort
+                fileResultMapperPort,
+                storedFileMapper
         );
     }
 
     @Bean
-    public RetryUploadFileInputPort retryUploadFileInputPort(
+    public DownloadFileInputPort downloadFileInputPort(
             FileRepositoryPort fileRepositoryPort,
-            FileStorageServicePort fileStorageServicePort,
-            StoredFileMapper storedFileMapper
+            FileStorageServicePort fileStorageServicePort
     ) {
-        return new RetryUploadFileUseCase(
+        return new DownloadFileUseCase(
                 fileRepositoryPort,
-                fileStorageServicePort,
-                storedFileMapper
+                fileStorageServicePort
         );
     }
 }
