@@ -93,6 +93,7 @@ public class GetLearningPathNodeDetailUseCase implements GetLearningPathNodeDeta
                     sq.getTitleMarkup(),
                     sq.getDescription(),
                     sq.getDescriptionMarkup(),
+                    sq.getSampleAnswer(),
                     sq.getStatus(),
                     vocabList,
                     grammarList

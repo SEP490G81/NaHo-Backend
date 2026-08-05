@@ -12,6 +12,7 @@ public record SpeakingQuestionListItemResponse(
         String titleMarkup,
         String description,
         String descriptionMarkup,
+        String sampleAnswer,
         QuestionStatus status,
         ZonedDateTime createdTime
 ) {

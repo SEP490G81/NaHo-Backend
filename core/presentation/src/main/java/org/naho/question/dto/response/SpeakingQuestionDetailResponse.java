@@ -9,6 +9,7 @@ public record SpeakingQuestionDetailResponse(
         String titleMarkup,
         String description,
         String descriptionMarkup,
+        String sampleAnswer,
         QuestionStatus status
 ) {
 }

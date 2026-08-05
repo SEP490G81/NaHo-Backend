@@ -23,6 +23,7 @@ public record LearningPathNodeDetailResponse(
             String titleMarkup,
             String description,
             String descriptionMarkup,
+            String sampleAnswer,
             QuestionStatus status,
             List<VocabularyDetailResponse> vocabularies,
             List<GrammarDetailResponse> grammars
