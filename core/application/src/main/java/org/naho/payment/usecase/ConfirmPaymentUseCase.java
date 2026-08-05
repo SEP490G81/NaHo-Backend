@@ -14,6 +14,8 @@ import org.naho.subscription.model.UserSubscription;
 import org.naho.subscription.port.out.SubscriptionPlanRepositoryPort;
 import org.naho.subscription.port.out.UserSubscriptionRepositoryPort;
 
+import org.naho.shared.port.out.TransactionPort;
+
 import java.time.Instant;
 
 public class ConfirmPaymentUseCase implements ConfirmPaymentInputPort {
@@ -23,21 +25,28 @@ public class ConfirmPaymentUseCase implements ConfirmPaymentInputPort {
     private final SubscriptionPlanRepositoryPort planRepositoryPort;
     private final UserSubscriptionRepositoryPort subscriptionRepositoryPort;
     private final org.naho.shared.port.out.EventPublisherPort eventPublisherPort;
+    private final TransactionPort transactionPort;
 
     public ConfirmPaymentUseCase(PaymentOrderRepositoryPort orderRepositoryPort,
                                  PaymentTransactionRepositoryPort transactionRepositoryPort,
                                  SubscriptionPlanRepositoryPort planRepositoryPort,
                                  UserSubscriptionRepositoryPort subscriptionRepositoryPort,
-                                 org.naho.shared.port.out.EventPublisherPort eventPublisherPort) {
+                                 org.naho.shared.port.out.EventPublisherPort eventPublisherPort,
+                                 TransactionPort transactionPort) {
         this.orderRepositoryPort = orderRepositoryPort;
         this.transactionRepositoryPort = transactionRepositoryPort;
         this.planRepositoryPort = planRepositoryPort;
         this.subscriptionRepositoryPort = subscriptionRepositoryPort;
         this.eventPublisherPort = eventPublisherPort;
+        this.transactionPort = transactionPort;
     }
 
     @Override
     public ConfirmPaymentResult confirmPayment(ConfirmPaymentCommand command) {
+        return transactionPort.execute(() -> doConfirmPayment(command));
+    }
+
+    private ConfirmPaymentResult doConfirmPayment(ConfirmPaymentCommand command) {
         Instant now = Instant.now();
 
         if (transactionRepositoryPort.existsByProviderAndTransactionId(
