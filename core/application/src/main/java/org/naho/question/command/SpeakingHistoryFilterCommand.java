@@ -1,7 +1,7 @@
-package org.naho.speech.llm.command;
+package org.naho.question.command;
 
+import org.naho.question.constant.SpeakingHistorySortColumn;
 import org.naho.shared.constant.SortDirection;
-import org.naho.speech.llm.constant.SpeakingHistorySortColumn;
 
 public record SpeakingHistoryFilterCommand(
         Long userId,

@@ -1,4 +1,4 @@
-package org.naho.speech.llm.dto.request;
+package org.naho.question.dto.request;
 
 public record SpeakingHistoryFilterRequest(
         Integer page,

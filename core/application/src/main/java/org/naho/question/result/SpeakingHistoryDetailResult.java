@@ -1,4 +1,4 @@
-package org.naho.speech.llm.result;
+package org.naho.question.result;
 
 import java.time.Instant;
 import java.util.List;

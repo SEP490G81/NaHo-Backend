@@ -8,7 +8,7 @@ import org.naho.question.entity.SpeakingQuestionEntity;
 import org.naho.speech.azure.entity.ContentAssessmentEntity;
 import org.naho.speech.azure.entity.SpeechAssessmentEntity;
 import org.naho.speech.azure.entity.WordAssessmentEntity;
-import org.naho.speech.llm.result.SpeakingHistoryListItemResult;
+import org.naho.question.result.SpeakingHistoryListItemResult;
 import org.naho.speech.model.AnswerHistory;
 import org.naho.speech.model.ContentAssessment;
 import org.naho.speech.model.SpeechAssessment;

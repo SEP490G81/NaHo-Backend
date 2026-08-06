@@ -1,4 +1,4 @@
-package org.naho.speech.llm.constant;
+package org.naho.question.constant;
 
 public enum SpeakingHistorySortColumn {
     CREATED_TIME("createdTime");

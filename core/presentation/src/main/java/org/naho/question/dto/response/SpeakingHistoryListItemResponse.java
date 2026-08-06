@@ -1,4 +1,4 @@
-package org.naho.speech.llm.dto.response;
+package org.naho.question.dto.response;
 
 public record SpeakingHistoryListItemResponse(
         Long historyId,
