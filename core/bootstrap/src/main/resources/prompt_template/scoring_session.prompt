@@ -111,5 +111,11 @@ Return ONLY valid JSON. No markdown fences, no trailing commas, no extra text ou
 },
 "improved_expressions": [
   {"original": "<câu JP học viên đã nói>", "improved": "<câu JP chuẩn hơn phù hợp persona>", "explanationVi": "<giải thích tiếng Việt>"}
-]
+],
+"studyRecommendation": {
+  "focusArea": "<grammar|vocabulary|fluency|pronunciation|interaction|naturalness — chọn 1 điểm yếu QUAN TRỌNG NHẤT cần cải thiện>",
+  "reason": "<1-2 câu tiếng Việt — lý do tại sao đây là ưu tiên cần luyện>",
+  "suggestedPractice": "<tiếng Việt — 1-2 bài tập cụ thể người học có thể làm ngay: ví dụ luyện shadowing, flashcard từ vựng, viết câu với particle X...>",
+  "encouragement": "<1 câu tiếng Việt — lời động viên tích cực, cụ thể và chân thành dựa trên điểm mạnh đã nêu>"
+}
 }

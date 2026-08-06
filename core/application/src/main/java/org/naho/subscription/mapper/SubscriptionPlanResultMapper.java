@@ -9,6 +9,7 @@ public class SubscriptionPlanResultMapper {
         if (plan == null) {
             return null;
         }
+
         return new SubscriptionPlanResult(
                 plan.getId(),
                 plan.getCode(),
@@ -27,8 +28,8 @@ public class SubscriptionPlanResultMapper {
                 plan.isFullCurriculumAccess(),
                 plan.isProgressAnalyticsEnabled(),
                 plan.isSampleAnswerEnabled(),
-                plan.getStatus(),
-                plan.getCreatedTime(),
-                plan.getModifiedTime());
+                plan.getMaxAnswerTimeSeconds(),
+                plan.isSaveAnswerHistoryEnabled(),
+                plan.getStatus());
     }
 }

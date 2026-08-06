@@ -17,8 +17,7 @@ public class UpdateUserUseCase implements UpdateUserInputPort {
 
     public UpdateUserUseCase(
             UserRepositoryPort userRepositoryPort,
-            UserResultMapper userResultMapper
-    ) {
+            UserResultMapper userResultMapper) {
         this.userRepositoryPort = userRepositoryPort;
         this.userResultMapper = userResultMapper;
     }
@@ -28,8 +27,7 @@ public class UpdateUserUseCase implements UpdateUserInputPort {
         User user = userRepositoryPort.findById(id)
                 .orElseThrow(() -> new ApplicationException(
                         UserErrorCode.USER_NOT_FOUND,
-                        UserDetailMessageKey.USER_ID_NOT_FOUND
-                ));
+                        UserDetailMessageKey.USER_ID_NOT_FOUND));
 
         try {
             UserStatus userStatus = UserStatus.valueOf(status.toUpperCase());
@@ -37,11 +35,10 @@ public class UpdateUserUseCase implements UpdateUserInputPort {
         } catch (IllegalArgumentException e) {
             throw new ApplicationException(
                     UserErrorCode.USER_PERSIST_FAILED,
-                    UserDetailMessageKey.USER_UPDATE_STATUS_FAILED
-            );
+                    UserDetailMessageKey.USER_UPDATE_STATUS_FAILED);
         }
 
-        User updatedUser = userRepositoryPort.save(user, null);
+        User updatedUser = userRepositoryPort.save(user);
 
         return userResultMapper.domainToResult(updatedUser);
     }

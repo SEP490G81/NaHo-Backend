@@ -40,6 +40,10 @@ public class PaymentIdempotency {
                 .build();
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public boolean matchesRequestHash(String hash) {
         return this.requestHash.equals(hash);
     }
@@ -70,10 +74,6 @@ public class PaymentIdempotency {
 
     public Instant getRetentionExpiresTime() {
         return retentionExpiresTime;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     public static final class Builder {

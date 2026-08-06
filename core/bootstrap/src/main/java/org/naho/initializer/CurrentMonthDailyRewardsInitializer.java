@@ -30,7 +30,7 @@ public class CurrentMonthDailyRewardsInitializer implements ApplicationRunner {
             log.info("Current Month Daily Rewards existed!");
         } else {
             log.info("Initializing Current Month Daily Rewards...");
-            crudDailyRewardInputPort.createCurrentMonthDailyRewards();
+            crudDailyRewardInputPort.createMonthlyDailyRewards(yearMonth);
             log.info("Current Month Daily Rewards initialized!");
         }
     }

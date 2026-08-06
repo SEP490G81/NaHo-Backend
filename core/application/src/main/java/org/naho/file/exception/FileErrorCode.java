@@ -23,6 +23,16 @@ public enum FileErrorCode implements ErrorCode {
             "FILE_A004",
             FileTitleMessageKey.FILE_DELETE_FAILED_TITLE,
             500
+    ),
+    FILE_GENERATE_PRESIGNED_URL_FAILED(
+            "FILE_A005",
+            FileTitleMessageKey.FILE_GENERATE_PRESIGNED_URL_FAILED_TITLE,
+            500
+    ),
+    FILE_DOWNLOAD_FAILED(
+            "FILE_A006",
+            FileTitleMessageKey.FILE_DOWNLOAD_FAILED_TITLE,
+            500
     );
 
     private final String code;

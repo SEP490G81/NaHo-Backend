@@ -11,7 +11,10 @@ import org.naho.subscription.port.out.UserSubscriptionRepositoryPort;
 import org.naho.subscription.repository.SubscriptionPlanJpaRepository;
 import org.naho.subscription.repository.UserSubscriptionJpaRepository;
 import org.naho.subscription.type.SubscriptionStatus;
+import org.naho.user.entity.UserEntity;
+import org.naho.user.repository.UserJpaRepository;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -23,11 +26,15 @@ public class UserSubscriptionRepositoryAdapter implements UserSubscriptionReposi
     private final UserSubscriptionJpaRepository subscriptionJpaRepository;
     private final SubscriptionPlanJpaRepository planJpaRepository;
     private final PaymentOrderJpaRepository orderJpaRepository;
+    private final UserJpaRepository userJpaRepository;
     private final UserSubscriptionEntityMapper subscriptionEntityMapper;
 
     @Override
     public UserSubscription save(UserSubscription subscription) {
         UserSubscriptionEntity entity = subscriptionEntityMapper.domainToEntity(subscription);
+
+        UserEntity userEntity = userJpaRepository.getReferenceById(subscription.getUserId());
+        entity.setUser(userEntity);
 
         SubscriptionPlanEntity planEntity = planJpaRepository.getReferenceById(subscription.getSubscriptionPlanId());
         entity.setSubscriptionPlan(planEntity);
@@ -42,6 +49,7 @@ public class UserSubscriptionRepositoryAdapter implements UserSubscriptionReposi
     }
 
     @Override
+    @Transactional
     public Optional<UserSubscription> findActiveByUserId(Long userId, Instant now) {
         subscriptionJpaRepository.updateExpiredSubscriptions(now);
         return subscriptionJpaRepository.findActiveSubscriptions(userId, SubscriptionStatus.ACTIVE, now)

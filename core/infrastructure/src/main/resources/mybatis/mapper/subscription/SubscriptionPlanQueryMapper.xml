@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.naho.subscription.mybatis.SubscriptionPlanQueryMapper">
+    <resultMap id="SubscriptionPlanResultMap" type="org.naho.subscription.entity.SubscriptionPlanEntity">
+        <id property="id" column="id"/>
+        <result property="code" column="code"/>
+        <result property="name" column="name"/>
+        <result property="description" column="description"/>
+        <result property="tier" column="tier"/>
+        <result property="priceAmount" column="price_amount"/>
+        <result property="priceCurrency" column="price_currency"/>
+        <result property="durationDays" column="duration_days"/>
+        <result property="monthlyAssessmentLimit" column="monthly_assessment_limit"/>
+        <result property="monthlyAssessmentAudioSeconds" column="monthly_assessment_audio_seconds"/>
+        <result property="maxAssessmentAudioSeconds" column="max_assessment_audio_seconds"/>
+        <result property="monthlyConversationSeconds" column="monthly_conversation_seconds"/>
+        <result property="maxConversationSessionSeconds" column="max_conversation_session_seconds"/>
+        <result property="maxConversationTurnsPerSession" column="max_conversation_turns_per_session"/>
+        <result property="fullCurriculumAccess" column="full_curriculum_access"/>
+        <result property="progressAnalyticsEnabled" column="progress_analytics_enabled"/>
+        <result property="sampleAnswerEnabled" column="sample_answer_enabled"/>
+        <result property="maxAnswerTimeSeconds" column="max_answer_time_seconds"/>
+        <result property="saveAnswerHistoryEnabled" column="save_answer_history_enabled"/>
+        <result property="status" column="status"/>
+        <result property="createdTime" column="created_time"/>
+        <result property="modifiedTime" column="modified_time"/>
+    </resultMap>
+
+    <select id="findCurrentSubscriptionPlanByUserIdAndStatus" resultMap="SubscriptionPlanResultMap">
+        select sp.*
+        from user_subscriptions us
+                 join subscription_plans sp on us.subscription_plan_id = sp.id
+        where us.user_id = #{userId}
+          and us.status = #{status}
+          and #{now} between us.start_time and us.end_time
+    </select>
+</mapper>

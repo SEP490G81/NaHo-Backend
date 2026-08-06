@@ -30,6 +30,7 @@ public class CreateSpeakingQuestionUseCase implements CreateSpeakingQuestionInpu
                 .userId(command.userId())
                 .titleMarkup(command.titleMarkup())
                 .descriptionMarkup(command.descriptionMarkup())
+                .sampleAnswer(command.sampleAnswer())
                 .title(rawTitle)
                 .description(rawDescription)
                 .status(initialStatus)
@@ -46,6 +47,7 @@ public class CreateSpeakingQuestionUseCase implements CreateSpeakingQuestionInpu
                 savedSpeakingQuestion.getTitleMarkup(),
                 savedSpeakingQuestion.getDescription(),
                 savedSpeakingQuestion.getDescriptionMarkup(),
+                savedSpeakingQuestion.getSampleAnswer(),
                 savedSpeakingQuestion.getStatus());
     }
 }

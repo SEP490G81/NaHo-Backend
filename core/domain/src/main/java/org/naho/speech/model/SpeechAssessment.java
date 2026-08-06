@@ -37,6 +37,10 @@ public class SpeechAssessment {
         return answerHistoryId;
     }
 
+    public void setAnswerHistoryId(Long answerHistoryId) {
+        this.answerHistoryId = answerHistoryId;
+    }
+
     public String getTranscriptText() {
         return transcriptText;
     }

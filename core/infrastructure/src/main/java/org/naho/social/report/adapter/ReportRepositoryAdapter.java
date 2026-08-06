@@ -1,12 +1,12 @@
 package org.naho.social.report.adapter;
 
 
-import org.naho.social.report.model.Report;
-import org.naho.social.report.type.ReportType;
 import org.naho.social.report.entity.ReportEntity;
 import org.naho.social.report.mapper.ReportEntityMapper;
+import org.naho.social.report.model.Report;
 import org.naho.social.report.port.out.ReportRepositoryPort;
 import org.naho.social.report.repository.ReportJpaRepository;
+import org.naho.social.report.type.ReportType;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -33,6 +33,21 @@ public class ReportRepositoryAdapter implements ReportRepositoryPort {
     @Override
     public List<Report> findByReportTypeIn(List<ReportType> reportTypes) {
         List<ReportEntity> entities = reportJpaRepository.findByReportTypeIn(reportTypes);
+        return entities.stream()
+                .map(reportEntityMapper::entityToDomain)
+                .toList();
+    }
+
+    @Override
+    public Report save(Report report) {
+        ReportEntity entity = reportEntityMapper.domainToEntity(report);
+        ReportEntity savedEntity = reportJpaRepository.save(entity);
+        return reportEntityMapper.entityToDomain(savedEntity);
+    }
+
+    @Override
+    public List<Report> findAllByUserId(Long userId) {
+        List<ReportEntity> entities = reportJpaRepository.findAllByUser_Id(userId);
         return entities.stream()
                 .map(reportEntityMapper::entityToDomain)
                 .toList();

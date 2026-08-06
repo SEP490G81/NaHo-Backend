@@ -1,6 +1,7 @@
 package org.naho.user.valueobject;
 
 import org.naho.i18n.message.user.UserDetailMessageKey;
+import org.naho.shared.constant.SystemZoneId;
 import org.naho.shared.exception.DomainException;
 import org.naho.user.exception.UserDomainErrorCode;
 
@@ -22,7 +23,7 @@ public class Dob {
             return null;
         }
 
-        LocalDate now = LocalDate.now();
+        LocalDate now = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID);
         int age = Period.between(value, now).getYears();
 
         if (age < MIN_AGE || age > MAX_AGE) {

@@ -72,19 +72,24 @@ public class CrudDailyRewardUseCase implements CrudDailyRewardInputPort {
 
     @Override
     public List<DailyRewardResult> getCurrentMonthDailyRewards() {
+        YearMonth yearMonth = YearMonth.now(SystemZoneId.HO_CHI_MINH_ZONE_ID);
+
         String rewardYearMonth = RewardYearMonth
-                .of(YearMonth.now(SystemZoneId.HO_CHI_MINH_ZONE_ID))
+                .of(yearMonth)
                 .getValue();
 
         List<DailyReward> dailyRewards =
                 dailyRewardRepositoryPort.findAllByRewardYearMonthOrderByDayOfMonth(rewardYearMonth);
 
+        if (dailyRewards.isEmpty()) {
+            return createMonthlyDailyRewards(yearMonth);
+        }
+
         return dailyRewardResultMapper.domainListToResultList(dailyRewards);
     }
 
     @Override
-    public List<DailyRewardResult> createCurrentMonthDailyRewards() {
-        YearMonth yearMonth = YearMonth.now(SystemZoneId.HO_CHI_MINH_ZONE_ID);
+    public List<DailyRewardResult> createMonthlyDailyRewards(YearMonth yearMonth) {
         RewardYearMonth rewardYearMonth = RewardYearMonth.of(yearMonth);
 
         // nếu tháng này đã tồn tại thì ném ra lỗi
@@ -182,7 +187,7 @@ public class CrudDailyRewardUseCase implements CrudDailyRewardInputPort {
         crudPointHistoryInputPort.createPointHistory(PointHistoryCommand.builder()
                 .userId(command.userId())
                 .point(earnedPoint)
-                .transactionType(PointTransactionType.DAILY_REWARD)
+                .transactionType(PointTransactionType.DAILY_LOGIN_REWARD)
                 .build());
 
         // save the daily reward attendance

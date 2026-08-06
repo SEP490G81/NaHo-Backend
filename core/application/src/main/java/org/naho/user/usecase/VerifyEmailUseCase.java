@@ -79,14 +79,13 @@ public class VerifyEmailUseCase implements VerifyEmailInputPort {
 
     private LoginResult doVerifyEmail(User user, VerifyEmailCommand command) {
         user.verifyEmail();
-        userRepositoryPort.save(user, null);
+        userRepositoryPort.save(user);
         otpPort.removeOtp(command.email());
         otpPort.clearFailedAttempts(command.email());
 
         userSessionServicePort.revokeAllSessionsByUserId(
                 user.getId(),
-                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
-        );
+                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE);
 
         Instant now = Instant.now();
         TokenResult refreshToken = tokenServicePort.generateRefreshToken(now);
@@ -110,8 +109,7 @@ public class VerifyEmailUseCase implements VerifyEmailInputPort {
         userSessionEventPublisherPort.publishForceLogoutEvent(new ForceLogoutCommand(
                 savedUserSession.getUserId(),
                 savedUserSession.getId(),
-                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
-        ));
+                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE));
 
         return new LoginResult(accessToken, refreshToken);
     }

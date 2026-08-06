@@ -1,6 +1,7 @@
 package org.naho.payment.usecase;
 
 import org.naho.i18n.message.payment.PaymentDetailMessageKey;
+import org.naho.i18n.message.subscription.SubscriptionDetailMessageKey;
 import org.naho.payment.command.CreatePaymentCommand;
 import org.naho.payment.exception.PaymentErrorCode;
 import org.naho.payment.model.PaymentIdempotency;
@@ -16,6 +17,8 @@ import org.naho.subscription.port.out.SubscriptionPlanRepositoryPort;
 import org.naho.subscription.port.out.UserSubscriptionRepositoryPort;
 import org.naho.subscription.type.PlanTier;
 import org.naho.user.port.out.UserRepositoryPort;
+
+import org.naho.shared.port.out.TransactionPort;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -34,6 +37,7 @@ public class CreatePaymentUseCase implements CreatePaymentInputPort {
     private final UserRepositoryPort userRepositoryPort;
     private final PaymentIdempotencyRepositoryPort idempotencyRepositoryPort;
     private final int timeoutMinutes;
+    private final TransactionPort transactionPort;
 
     public CreatePaymentUseCase(SubscriptionPlanRepositoryPort planRepositoryPort,
                                 PaymentOrderRepositoryPort paymentOrderRepositoryPort,
@@ -42,7 +46,8 @@ public class CreatePaymentUseCase implements CreatePaymentInputPort {
                                 PaymentOrderCodeGenerator orderCodeGenerator,
                                 UserRepositoryPort userRepositoryPort,
                                 PaymentIdempotencyRepositoryPort idempotencyRepositoryPort,
-                                int timeoutMinutes) {
+                                int timeoutMinutes,
+                                TransactionPort transactionPort) {
         this.planRepositoryPort = planRepositoryPort;
         this.paymentOrderRepositoryPort = paymentOrderRepositoryPort;
         this.subscriptionRepositoryPort = subscriptionRepositoryPort;
@@ -51,10 +56,15 @@ public class CreatePaymentUseCase implements CreatePaymentInputPort {
         this.userRepositoryPort = userRepositoryPort;
         this.idempotencyRepositoryPort = idempotencyRepositoryPort;
         this.timeoutMinutes = timeoutMinutes > 0 ? timeoutMinutes : 5;
+        this.transactionPort = transactionPort;
     }
 
     @Override
     public CreatePaymentResult createPayment(CreatePaymentCommand command) {
+        return transactionPort.execute(() -> doCreatePayment(command));
+    }
+
+    private CreatePaymentResult doCreatePayment(CreatePaymentCommand command) {
         Instant now = Instant.now();
 
         validateIdempotencyKey(command.idempotencyKey());
@@ -62,18 +72,18 @@ public class CreatePaymentUseCase implements CreatePaymentInputPort {
         SubscriptionPlan plan = planRepositoryPort.findActiveByCode(command.planCode())
                 .orElseThrow(() -> new ApplicationException(
                         SubscriptionErrorCode.PLAN_NOT_FOUND,
-                        "subscription.plan.not_found"));
+                        SubscriptionDetailMessageKey.PLAN_NOT_FOUND));
 
         if (!plan.isAvailableForPurchase()) {
             throw new ApplicationException(
                     SubscriptionErrorCode.PLAN_UNAVAILABLE,
-                    "subscription.plan.unavailable");
+                    SubscriptionDetailMessageKey.PLAN_UNAVAILABLE);
         }
 
         if (plan.getTier() == PlanTier.FREE) {
             throw new ApplicationException(
                     SubscriptionErrorCode.PLAN_UNAVAILABLE,
-                    "subscription.plan.free_not_purchasable");
+                    SubscriptionDetailMessageKey.PLAN_FREE_NOT_PURCHASABLE);
         }
 
         subscriptionRepositoryPort.findActiveByUserId(command.userId(), now)
@@ -82,7 +92,7 @@ public class CreatePaymentUseCase implements CreatePaymentInputPort {
                     if (activePlan.getTier().isHigherOrEqualThan(plan.getTier())) {
                         throw new ApplicationException(
                                 SubscriptionErrorCode.ALREADY_ACTIVE_HIGHER_OR_EQUAL_PLAN,
-                                "subscription.plan.already_active_or_higher");
+                                SubscriptionDetailMessageKey.PLAN_ALREADY_ACTIVE_OR_HIGHER);
                     }
                 });
 
@@ -191,7 +201,7 @@ public class CreatePaymentUseCase implements CreatePaymentInputPort {
     }
 
     private String createRequestHash(CreatePaymentCommand command) {
-        String raw = command.userId() + "|" + command.planCode() + "|" + command.provider().name();
+        String raw = command.userId() + "|" + command.planCode().name() + "|" + command.provider().name();
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(raw.getBytes(StandardCharsets.UTF_8));

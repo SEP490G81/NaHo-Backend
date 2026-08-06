@@ -10,7 +10,8 @@ public record UsageQuota(
         int maxAssessmentAudioSeconds,
         long monthlyConversationSeconds,
         int maxConversationSessionSeconds,
-        int maxConversationTurnsPerSession) {
+        int maxConversationTurnsPerSession
+) {
     public UsageQuota {
         if (monthlyAssessmentLimit < 0) {
             throw new DomainException(SubscriptionDomainErrorCode.PLAN_QUOTA_EMPTY,

@@ -15,6 +15,7 @@ import org.naho.user.port.out.RoleRepositoryPort;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.naho.user.result.RegisterResult;
 import org.naho.user.type.RoleName;
+import org.naho.user.valueobject.Password;
 
 import java.util.List;
 
@@ -60,8 +61,11 @@ public class RegisterUseCase implements RegisterInputPort {
                     command.email());
         }
 
+        // Validate Password
+        Password password = Password.of(command.password());
+
         // Encode pass
-        String encodedPassword = encoderPort.hashPassword(command.password());
+        String encodedPassword = encoderPort.hashPassword(password.getValue());
 
         // Assign LEARNERRole
         Role defaultRole = roleRepository.findByName(RoleName.LEARNER)

@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.daily.entity.UserDailyAttendanceEntity;
+import org.naho.daily.entity.UserDailyMissionEntity;
 import org.naho.file.entity.FileEntity;
 import org.naho.learning.entity.UserLearningProgressEntity;
 import org.naho.learning.entity.UserNodeProgressEntity;
@@ -12,6 +13,7 @@ import org.naho.point.entity.PointHistoryEntity;
 import org.naho.question.entity.SpeakingQuestionEntity;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.social.report.entity.ReportEntity;
+import org.naho.subscription.entity.UserSubscriptionEntity;
 import org.naho.user.type.Gender;
 import org.naho.user.type.JLPTLevel;
 import org.naho.user.type.UserStatus;
@@ -52,7 +54,7 @@ public class UserEntity extends BaseEntity {
 
     LocalDate dob; // data of birth
 
-    @Column(name = "jlpt_level", nullable = false, length = 2)
+    @Column(name = "jlpt_level", length = 2)
     @Enumerated(EnumType.STRING)
     JLPTLevel jlptLevel;
 
@@ -74,7 +76,7 @@ public class UserEntity extends BaseEntity {
     List<OAuthProviderEntity> oAuthProviders = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
-    List<SpeakingQuestionEntity> questions;
+    List<SpeakingQuestionEntity> speakingQuestions;
 
     @OneToMany(mappedBy = "user")
     List<ReportEntity> reports;
@@ -94,5 +96,11 @@ public class UserEntity extends BaseEntity {
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "avatar_file_id")
-    FileEntity avatar;
+    FileEntity avatarFile;
+
+    @OneToMany(mappedBy = "user")
+    List<UserDailyMissionEntity> userDailyMissions;
+
+    @OneToMany(mappedBy = "user")
+    List<UserSubscriptionEntity> userSubscriptions;
 }

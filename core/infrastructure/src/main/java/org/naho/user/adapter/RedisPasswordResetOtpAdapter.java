@@ -1,0 +1,95 @@
+package org.naho.user.adapter;
+
+import lombok.RequiredArgsConstructor;
+import org.naho.user.port.out.PasswordResetOtpPort;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Component;
+
+import java.time.Duration;
+import java.util.Random;
+
+@Component
+@RequiredArgsConstructor
+public class RedisPasswordResetOtpAdapter implements PasswordResetOtpPort {
+
+    private static final String OTP_PREFIX = "forgot_password_otp:";
+    private static final String ATTEMPTS_PREFIX = "forgot_password_otp_attempts:";
+    private static final long OTP_TTL_MINUTES = 5;
+    private final StringRedisTemplate stringRedisTemplate;
+
+    @Override
+    public void saveOtp(String email, String otpCode) {
+        stringRedisTemplate.opsForValue().set(
+                OTP_PREFIX + email,
+                otpCode,
+                Duration.ofMinutes(OTP_TTL_MINUTES)
+        );
+    }
+
+    @Override
+    public boolean verifyOtp(String email, String otpCode) {
+        String savedOtp = stringRedisTemplate.opsForValue().get(OTP_PREFIX + email);
+        return savedOtp != null && savedOtp.equals(otpCode);
+    }
+
+    @Override
+    public void removeOtp(String email) {
+        stringRedisTemplate.delete(OTP_PREFIX + email);
+    }
+
+    @Override
+    public String generateOtp() {
+        Random random = new Random();
+        int otp = 100000 + random.nextInt(900000); // 6-digit OTP
+        return String.valueOf(otp);
+    }
+
+    @Override
+    public boolean hasValidOtp(String email) {
+        return stringRedisTemplate.hasKey(OTP_PREFIX + email);
+    }
+
+    @Override
+    public long getOtpTtlSeconds(String email) {
+        Long expire = stringRedisTemplate.getExpire(OTP_PREFIX + email);
+        return expire != null ? expire : 0;
+    }
+
+    @Override
+    public void incrementFailedAttempts(String email) {
+        String key = ATTEMPTS_PREFIX + email;
+        stringRedisTemplate.opsForValue().increment(key);
+        stringRedisTemplate.expire(key, Duration.ofMinutes(OTP_TTL_MINUTES));
+    }
+
+    @Override
+    public int getFailedAttempts(String email) {
+        String key = ATTEMPTS_PREFIX + email;
+        String val = stringRedisTemplate.opsForValue().get(key);
+        return val != null ? Integer.parseInt(val) : 0;
+    }
+
+    public void clearFailedAttempts(String email) {
+        stringRedisTemplate.delete(ATTEMPTS_PREFIX + email);
+    }
+
+    @Override
+    public void saveResetToken(String email, String token) {
+        stringRedisTemplate.opsForValue().set(
+                "forgot_password_token:" + email,
+                token,
+                Duration.ofMinutes(15)
+        );
+    }
+
+    @Override
+    public boolean verifyResetToken(String email, String token) {
+        String savedToken = stringRedisTemplate.opsForValue().get("forgot_password_token:" + email);
+        return savedToken != null && savedToken.equals(token);
+    }
+
+    @Override
+    public void removeResetToken(String email) {
+        stringRedisTemplate.delete("forgot_password_token:" + email);
+    }
+}

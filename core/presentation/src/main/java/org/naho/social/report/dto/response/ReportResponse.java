@@ -4,7 +4,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.naho.file.dto.response.FileResponse;
 import org.naho.social.report.type.ReportType;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -19,4 +22,5 @@ public class ReportResponse {
     Boolean isResolved;
     Long questionId;
     Long commentId;
+    List<FileResponse> files;
 }

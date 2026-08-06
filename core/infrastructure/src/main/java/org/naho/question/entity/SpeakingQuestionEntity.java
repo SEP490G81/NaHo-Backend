@@ -37,6 +37,9 @@ public class SpeakingQuestionEntity extends BaseEntity {
     @Column(name = "description_markup", columnDefinition = "TEXT")
     String descriptionMarkup;
 
+    @Column(name = "sample_answer", columnDefinition = "TEXT")
+    String sampleAnswer;
+
     @Column(length = 50)
     @Enumerated(EnumType.STRING)
     QuestionStatus status;

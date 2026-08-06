@@ -1,5 +1,6 @@
 package org.naho.user.port.out;
 
+import org.naho.user.command.UpdateUserInfoCommand;
 import org.naho.user.model.OAuthProvider;
 import org.naho.user.model.User;
 import org.naho.user.result.LeaderboardUserResult;
@@ -21,7 +22,7 @@ public interface UserRepositoryPort {
 
     boolean existsByEmail(String email);
 
-    User save(User user, OAuthProvider oAuthProvider);
+    User save(User user);
 
     User createNew(User user, OAuthProvider oAuthProvider);
 
@@ -36,4 +37,6 @@ public interface UserRepositoryPort {
     Optional<LeaderboardUserResult> findTopOfUserByUserId(Long userId);
 
     void lockById(Long userId);
+
+    User updateUserInfo(UpdateUserInfoCommand command);
 }
