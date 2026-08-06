@@ -54,7 +54,7 @@ public class UserEntity extends BaseEntity {
 
     LocalDate dob; // data of birth
 
-    @Column(name = "jlpt_level", nullable = false, length = 2)
+    @Column(name = "jlpt_level", length = 2)
     @Enumerated(EnumType.STRING)
     JLPTLevel jlptLevel;
 
