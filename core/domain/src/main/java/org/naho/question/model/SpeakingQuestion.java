@@ -14,11 +14,14 @@ public class SpeakingQuestion {
     private final List<Grammar> grammars;
     private final List<Vocabulary> vocabularies;
     private Long speakingQuestionAudioFileId;
-    private String title;
-    private String titleMarkup;
+    private String japaneseName;
+    private String japaneseNameMarkup;
+    private String vietnameseName;
     private String description;
     private String descriptionMarkup;
-    private String sampleAnswer;
+    private String japaneseSampleAnswer;
+    private String japaneseSampleAnswerMarkup;
+    private String vietnameseSampleAnswer;
     private QuestionStatus status;
 
     // Private constructor dùng cho Builder
@@ -26,11 +29,14 @@ public class SpeakingQuestion {
         this.id = builder.id;
         this.speakingQuestionAudioFileId = builder.speakingQuestionAudioFileId;
         this.userId = builder.userId;
-        this.title = builder.title;
-        this.titleMarkup = builder.titleMarkup;
+        this.japaneseName = builder.japaneseName;
+        this.japaneseNameMarkup = builder.japaneseNameMarkup;
+        this.vietnameseName = builder.vietnameseName;
         this.description = builder.description;
         this.descriptionMarkup = builder.descriptionMarkup;
-        this.sampleAnswer = builder.sampleAnswer;
+        this.japaneseSampleAnswer = builder.japaneseSampleAnswer;
+        this.japaneseSampleAnswerMarkup = builder.japaneseSampleAnswerMarkup;
+        this.vietnameseSampleAnswer = builder.vietnameseSampleAnswer;
         this.status = builder.status;
         this.grammars = builder.grammars;
         this.vocabularies = builder.vocabularies;
@@ -40,8 +46,8 @@ public class SpeakingQuestion {
         return new Builder();
     }
 
-    private void validateTitle(String title) {
-        if (title == null || title.isBlank()) {
+    private void validateJapaneseName(String japaneseName) {
+        if (japaneseName == null || japaneseName.isBlank()) {
             throw new DomainException(
                     SpeakingQuestionDomainErrorCode.SPEAKING_QUESTION_TITLE_EMPTY,
                     SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_TITLE_EMPTY);
@@ -57,20 +63,26 @@ public class SpeakingQuestion {
         // }
     }
 
-    public void update(String title,
+    public void update(String japaneseName,
+                       String japaneseNameMarkup,
+                       String vietnameseName,
                        String description,
-                       String titleMarkup,
                        String descriptionMarkup,
-                       String sampleAnswer,
+                       String japaneseSampleAnswer,
+                       String japaneseSampleAnswerMarkup,
+                       String vietnameseSampleAnswer,
                        Long speakingQuestionAudioFileId) {
-        validateTitle(title);
+        validateJapaneseName(japaneseName);
         validateDescription(description);
 
-        this.title = title;
+        this.japaneseName = japaneseName;
+        this.japaneseNameMarkup = japaneseNameMarkup;
+        this.vietnameseName = vietnameseName;
         this.description = description;
-        this.titleMarkup = titleMarkup;
         this.descriptionMarkup = descriptionMarkup;
-        this.sampleAnswer = sampleAnswer;
+        this.japaneseSampleAnswer = japaneseSampleAnswer;
+        this.japaneseSampleAnswerMarkup = japaneseSampleAnswerMarkup;
+        this.vietnameseSampleAnswer = vietnameseSampleAnswer;
         this.speakingQuestionAudioFileId = speakingQuestionAudioFileId;
     }
 
@@ -91,12 +103,16 @@ public class SpeakingQuestion {
         return userId;
     }
 
-    public String getTitle() {
-        return title;
+    public String getJapaneseName() {
+        return japaneseName;
     }
 
-    public String getTitleMarkup() {
-        return titleMarkup;
+    public String getJapaneseNameMarkup() {
+        return japaneseNameMarkup;
+    }
+
+    public String getVietnameseName() {
+        return vietnameseName;
     }
 
     public String getDescription() {
@@ -107,8 +123,16 @@ public class SpeakingQuestion {
         return descriptionMarkup;
     }
 
-    public String getSampleAnswer() {
-        return sampleAnswer;
+    public String getJapaneseSampleAnswer() {
+        return japaneseSampleAnswer;
+    }
+
+    public String getJapaneseSampleAnswerMarkup() {
+        return japaneseSampleAnswerMarkup;
+    }
+
+    public String getVietnameseSampleAnswer() {
+        return vietnameseSampleAnswer;
     }
 
     public QuestionStatus getStatus() {
@@ -128,11 +152,14 @@ public class SpeakingQuestion {
         private Long id;
         private Long speakingQuestionAudioFileId;
         private Long userId;
-        private String title;
-        private String titleMarkup;
+        private String japaneseName;
+        private String japaneseNameMarkup;
+        private String vietnameseName;
         private String description;
         private String descriptionMarkup;
-        private String sampleAnswer;
+        private String japaneseSampleAnswer;
+        private String japaneseSampleAnswerMarkup;
+        private String vietnameseSampleAnswer;
         private QuestionStatus status;
         private List<Grammar> grammars;
         private List<Vocabulary> vocabularies;
@@ -152,13 +179,18 @@ public class SpeakingQuestion {
             return this;
         }
 
-        public Builder title(String title) {
-            this.title = title;
+        public Builder japaneseName(String japaneseName) {
+            this.japaneseName = japaneseName;
             return this;
         }
 
-        public Builder titleMarkup(String titleMarkup) {
-            this.titleMarkup = titleMarkup;
+        public Builder japaneseNameMarkup(String japaneseNameMarkup) {
+            this.japaneseNameMarkup = japaneseNameMarkup;
+            return this;
+        }
+
+        public Builder vietnameseName(String vietnameseName) {
+            this.vietnameseName = vietnameseName;
             return this;
         }
 
@@ -172,8 +204,18 @@ public class SpeakingQuestion {
             return this;
         }
 
-        public Builder sampleAnswer(String sampleAnswer) {
-            this.sampleAnswer = sampleAnswer;
+        public Builder japaneseSampleAnswer(String japaneseSampleAnswer) {
+            this.japaneseSampleAnswer = japaneseSampleAnswer;
+            return this;
+        }
+
+        public Builder japaneseSampleAnswerMarkup(String japaneseSampleAnswerMarkup) {
+            this.japaneseSampleAnswerMarkup = japaneseSampleAnswerMarkup;
+            return this;
+        }
+
+        public Builder vietnameseSampleAnswer(String vietnameseSampleAnswer) {
+            this.vietnameseSampleAnswer = vietnameseSampleAnswer;
             return this;
         }
 
@@ -194,7 +236,7 @@ public class SpeakingQuestion {
 
         public SpeakingQuestion build() {
             SpeakingQuestion speakingQuestion = new SpeakingQuestion(this);
-            speakingQuestion.validateTitle(speakingQuestion.getTitle());
+            speakingQuestion.validateJapaneseName(speakingQuestion.getJapaneseName());
             speakingQuestion.validateDescription(speakingQuestion.getDescription());
             return speakingQuestion;
         }

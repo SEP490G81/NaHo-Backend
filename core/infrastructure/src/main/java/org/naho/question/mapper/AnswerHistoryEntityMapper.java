@@ -79,7 +79,7 @@ public interface AnswerHistoryEntityMapper {
 
     @Mapping(target = "historyId", source = "entity.id")
     @Mapping(target = "speakingQuestionId", source = "entity.speakingQuestion.id")
-    @Mapping(target = "speakingQuestionTitle", source = "entity.speakingQuestion.title")
+    @Mapping(target = "speakingQuestionTitle", source = "entity.speakingQuestion.japaneseName")
     @Mapping(target = "topicId", source = "entity.speakingQuestion.learningPathNode.objective.lesson.topic.id")
     @Mapping(target = "topicName", source = "entity.speakingQuestion.learningPathNode.objective.lesson.topic.japaneseName")
     @Mapping(target = "learningPathNodeId", source = "entity.speakingQuestion.learningPathNode.id")

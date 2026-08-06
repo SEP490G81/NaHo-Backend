@@ -89,11 +89,14 @@ public class GetLearningPathNodeDetailUseCase implements GetLearningPathNodeDeta
             speakingQuestionResult = new SpeakingQuestionDetailResult(
                     sq.getId(),
                     sq.getUserId(),
-                    sq.getTitle(),
-                    sq.getTitleMarkup(),
+                    sq.getJapaneseName(),
+                    sq.getJapaneseNameMarkup(),
+                    sq.getVietnameseName(),
                     sq.getDescription(),
                     sq.getDescriptionMarkup(),
-                    sq.getSampleAnswer(),
+                    sq.getJapaneseSampleAnswer(),
+                    sq.getJapaneseSampleAnswerMarkup(),
+                    sq.getVietnameseSampleAnswer(),
                     sq.getStatus(),
                     vocabList,
                     grammarList

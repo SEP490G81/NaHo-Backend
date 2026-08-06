@@ -298,7 +298,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         String vocabFocusVal = vocabFocusSb.isEmpty() ? "N/A (no specific vocabulary focus for this lesson)"
                 : vocabFocusSb.toString();
 
-        String questionTitleVal = speakingQuestion.getTitle() != null ? speakingQuestion.getTitle() : "N/A";
+        String questionTitleVal = speakingQuestion.getJapaneseName() != null ? speakingQuestion.getJapaneseName() : "N/A";
         String questionDescriptionVal = speakingQuestion.getDescription() != null
                 && !speakingQuestion.getDescription().isBlank()
                 ? speakingQuestion.getDescription()
@@ -675,7 +675,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 history.getId(),
                 topicId,
                 history.getSpeakingQuestionId(),
-                speakingQuestion.getTitle(),
+                speakingQuestion.getJapaneseName(),
                 topicName,
                 learningPathNodeId,
                 bookId,
