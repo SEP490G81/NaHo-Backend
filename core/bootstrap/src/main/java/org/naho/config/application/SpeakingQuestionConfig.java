@@ -1,10 +1,14 @@
 package org.naho.config.application;
 
+import org.naho.book.port.out.BookRepositoryPort;
+import org.naho.book.port.out.TopicRepositoryPort;
 import org.naho.daily.port.in.CrudUserDailyMissionInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileStorageServicePort;
+import org.naho.furigana.port.out.FuriganaGenerationPort;
 import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
 import org.naho.learning.port.in.UserLearningStreakInputPort;
+import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
 import org.naho.learning.port.out.UserNodeProgressRepositoryPort;
 import org.naho.point.port.in.CrudPointHistoryInputPort;
@@ -12,6 +16,7 @@ import org.naho.question.adapter.SpeakingQuestionListRepositoryAdapter;
 import org.naho.question.adapter.SpeakingQuestionRepositoryAdapter;
 import org.naho.question.port.in.*;
 import org.naho.question.port.out.AnswerHistoryRepositoryPort;
+import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.question.usecase.*;
 import org.naho.shared.port.out.EventPublisherPort;
 import org.naho.shared.port.out.TransactionPort;
@@ -25,13 +30,23 @@ public class SpeakingQuestionConfig {
     @Bean
     public CrudAnswerHistoryInputPort crudAnswerHistoryInputPort(
             AnswerHistoryRepositoryPort answerHistoryRepositoryPort,
+            SpeakingQuestionRepositoryPort speakingQuestionRepositoryPort,
             FileRepositoryPort fileRepositoryPort,
-            FileStorageServicePort fileStorageServicePort
+            FileStorageServicePort fileStorageServicePort,
+            TopicRepositoryPort topicRepositoryPort,
+            BookRepositoryPort bookRepositoryPort,
+            LearningPathNodeRepositoryPort learningPathNodeRepositoryPort,
+            FuriganaGenerationPort furiganaGenerationPort
     ) {
         return new CrudAnswerHistoryUseCase(
                 answerHistoryRepositoryPort,
+                speakingQuestionRepositoryPort,
                 fileRepositoryPort,
-                fileStorageServicePort
+                fileStorageServicePort,
+                topicRepositoryPort,
+                bookRepositoryPort,
+                learningPathNodeRepositoryPort,
+                furiganaGenerationPort
         );
     }
 

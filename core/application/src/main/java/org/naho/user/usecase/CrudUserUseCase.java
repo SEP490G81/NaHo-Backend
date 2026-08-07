@@ -2,6 +2,8 @@ package org.naho.user.usecase;
 
 import org.naho.file.port.in.CrudFileInputPort;
 import org.naho.file.port.out.FileValidatorPort;
+import org.naho.file.result.FileResult;
+import org.naho.file.result.StoredFile;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.user.command.UpdateUserInfoCommand;
@@ -68,5 +70,31 @@ public class CrudUserUseCase implements CrudUserInputPort {
         }
         User savedUser = userRepositoryPort.updateUserInfo(command);
         return userResultMapper.domainToResult(savedUser);
+    }
+
+    /**
+     * Method cập nhật avatar của người dùng
+     *
+     * @param id         user id
+     * @param storedFile avatar file mới
+     * @return FileResult
+     */
+    @Override
+    public FileResult updateUserAvatar(Long id, StoredFile storedFile) {
+        if (id == null) {
+            throw new ApplicationException(
+                    UserErrorCode.USER_NOT_FOUND,
+                    UserDetailMessageKey.USER_ID_NULL
+            );
+        }
+        User user = userRepositoryPort.findById(id)
+                .orElseThrow(() -> new ApplicationException(
+                        UserErrorCode.USER_NOT_FOUND,
+                        UserDetailMessageKey.USER_ID_NOT_FOUND,
+                        id
+                ));
+
+
+        return null;
     }
 }

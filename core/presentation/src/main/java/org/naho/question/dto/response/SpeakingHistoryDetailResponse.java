@@ -1,4 +1,4 @@
-package org.naho.speech.llm.dto.response;
+package org.naho.question.dto.response;
 
 import java.util.List;
 
@@ -13,8 +13,8 @@ public record SpeakingHistoryDetailResponse(
         String practicedAt,
         Integer durationSec,
         Double score,
-        String audioUrl,
-        Report report
+        Report report,
+        String audioUrl
 ) {
     public record Report(
             Double average,

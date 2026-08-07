@@ -1,4 +1,4 @@
-package org.naho.speech.llm.result;
+package org.naho.question.result;
 
 import java.time.Instant;
 import java.util.List;
@@ -14,8 +14,8 @@ public record SpeakingHistoryDetailResult(
         Instant practicedAt,
         Integer durationSec,
         Double score,
-        String audioUrl,
-        Report report
+        Report report,
+        String audioUrl
 ) {
     public record Report(
             Double average,

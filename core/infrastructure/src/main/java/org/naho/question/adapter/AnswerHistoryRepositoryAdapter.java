@@ -3,17 +3,20 @@ package org.naho.question.adapter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.naho.file.constant.CloudFrontProperties;
 import org.naho.file.entity.FileEntity;
+import org.naho.file.mapper.FileEntityMapper;
+import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.file.repository.FileJpaRepository;
 import org.naho.pagination.PageData;
 import org.naho.pagination.PageMeta;
+import org.naho.question.command.SpeakingHistoryFilterCommand;
 import org.naho.question.entity.AnswerHistoryEntity;
 import org.naho.question.entity.SpeakingQuestionEntity;
 import org.naho.question.mapper.AnswerHistoryEntityMapper;
 import org.naho.question.port.out.AnswerHistoryRepositoryPort;
 import org.naho.question.repository.AnswerHistoryJpaRepository;
 import org.naho.question.repository.SpeakingQuestionJpaRepository;
+import org.naho.question.result.SpeakingHistoryListItemResult;
 import org.naho.question.specification.AnswerHistorySpecification;
 import org.naho.speech.azure.entity.ContentAssessmentEntity;
 import org.naho.speech.azure.entity.SpeechAssessmentEntity;
@@ -21,8 +24,6 @@ import org.naho.speech.azure.entity.WordAssessmentEntity;
 import org.naho.speech.azure.repository.ContentAssessmentJpaRepository;
 import org.naho.speech.azure.repository.SpeechAssessmentJpaRepository;
 import org.naho.speech.azure.repository.WordAssessmentJpaRepository;
-import org.naho.speech.llm.command.SpeakingHistoryFilterCommand;
-import org.naho.speech.llm.result.SpeakingHistoryListItemResult;
 import org.naho.speech.model.AnswerHistory;
 import org.naho.speech.model.ContentAssessment;
 import org.naho.speech.model.SpeechAssessment;
@@ -51,9 +52,10 @@ public class AnswerHistoryRepositoryAdapter implements AnswerHistoryRepositoryPo
     private final UserJpaRepository userJpaRepository;
     private final SpeakingQuestionJpaRepository questionJpaRepository;
     private final FileJpaRepository fileJpaRepository;
-    private final CloudFrontProperties cloudFrontProperties;
+    private final FileStorageServicePort fileStorageServicePort;
     private final AnswerHistoryEntityMapper answerHistoryEntityMapper;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final FileEntityMapper fileEntityMapper;
 
     @Override
     public AnswerHistory saveAnswerHistory(AnswerHistory domain) {
@@ -81,7 +83,7 @@ public class AnswerHistoryRepositoryAdapter implements AnswerHistoryRepositoryPo
             FileEntity file = fileJpaRepository.getReferenceById(answerHistory.getAudioFileId());
             entity.setAudioFile(file);
         }
-        
+
         AnswerHistoryEntity saved = answerHistoryJpaRepository.save(entity);
         return answerHistoryEntityMapper.toDomain(saved);
     }
@@ -154,26 +156,33 @@ public class AnswerHistoryRepositoryAdapter implements AnswerHistoryRepositoryPo
 
         Page<AnswerHistoryEntity> entityPage = answerHistoryJpaRepository.findAll(specification, pageable);
 
-        List<SpeakingHistoryListItemResult> items = entityPage.getContent().stream().map(entity -> {
-            String audioUrl = null;
-            if (entity.getAudioFile() != null && entity.getAudioFile().getObjectKey() != null) {
-                audioUrl = cloudFrontProperties.getDomain() + entity.getAudioFile().getObjectKey();
-            }
+        List<SpeakingHistoryListItemResult> items = entityPage
+                .getContent()
+                .stream()
+                .map(entity -> {
+                    String audioUrl = null;
+                    FileEntity fileEntity = entity.getAudioFile();
+                    
+                    if (fileEntity != null) {
+                        audioUrl = fileStorageServicePort.generatePresignedUrl(
+                                fileEntityMapper.entityToDomain(fileEntity)
+                        );
+                    }
 
-            Double score = 0.0;
-            Integer durationSec = 0;
-            ContentAssessmentEntity ca = entity.getContentAssessment();
-            if (ca != null && ca.getAiFeedback() != null && !ca.getAiFeedback().isBlank()) {
-                try {
-                    JsonNode root = objectMapper.readTree(ca.getAiFeedback());
-                    score = root.path("overallScore").asDouble(0.0);
-                    durationSec = root.path("durationSec").asInt(0);
-                } catch (Exception ignored) {
-                }
-            }
+                    Double score = 0.0;
+                    Integer durationSec = 0;
+                    ContentAssessmentEntity ca = entity.getContentAssessment();
+                    if (ca != null && ca.getAiFeedback() != null && !ca.getAiFeedback().isBlank()) {
+                        try {
+                            JsonNode root = objectMapper.readTree(ca.getAiFeedback());
+                            score = root.path("overallScore").asDouble(0.0);
+                            durationSec = root.path("durationSec").asInt(0);
+                        } catch (Exception ignored) {
+                        }
+                    }
 
-            return answerHistoryEntityMapper.toListItemResult(entity, score, durationSec, audioUrl);
-        }).toList();
+                    return answerHistoryEntityMapper.toListItemResult(entity, score, durationSec, audioUrl);
+                }).toList();
 
         return PageData.<SpeakingHistoryListItemResult>builder()
                 .pageMeta(PageMeta.builder()

@@ -7,9 +7,10 @@ import org.naho.file.type.OperationType;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 public interface FileRepositoryPort {
-    File findById(Long id);
+    Optional<File> findById(Long id);
 
     List<File> findAllByLeagueIds(List<Long> leagueIds);
 

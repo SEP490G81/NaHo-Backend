@@ -1,4 +1,4 @@
-package org.naho.speech.llm.dto.response;
+package org.naho.question.dto.response;
 
 import java.util.List;
 

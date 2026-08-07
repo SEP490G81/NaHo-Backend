@@ -11,5 +11,6 @@ public record ObjectiveResponse(
         TopicStatus status,
         Double orderIndex,
         Double firstNodeGlobalOrderIndex,
-        Double lastNodeGlobalOrderIndex) {
+        Double lastNodeGlobalOrderIndex
+) {
 }
