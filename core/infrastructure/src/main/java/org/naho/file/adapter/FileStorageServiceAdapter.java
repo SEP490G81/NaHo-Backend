@@ -13,6 +13,8 @@ import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.file.repository.FileJpaRepository;
 import org.naho.file.result.DownloadedFile;
 import org.naho.file.result.StoredFile;
+import org.naho.file.type.OperationStatus;
+import org.naho.file.type.OperationType;
 import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.shared.exception.InfrastructureException;
 import org.springframework.stereotype.Service;
@@ -163,6 +165,16 @@ public class FileStorageServiceAdapter implements FileStorageServicePort {
 
     @Override
     public String generatePresignedUrl(File file) {
+        // nếu file đã bị đánh dấu là xóa thì trả về null
+        if (OperationType.DELETE.equals(file.getOperationType())) {
+            return null;
+        }
+
+        // nếu file đánh dấu là upload nhưng chưa upload thành công thì cũng trả về null
+        if (!OperationStatus.COMPLETED.equals(file.getOperationStatus())) {
+            return null;
+        }
+
         try {
             GetObjectPresignRequest getObjectPresignRequest = GetObjectPresignRequest.builder()
                     .signatureDuration(s3Properties.getSignatureDuration())

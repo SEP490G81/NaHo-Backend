@@ -31,7 +31,11 @@ public class CrudFileUseCase implements CrudFileInputPort {
                     FileDetailMessageKey.FILE_ID_NULL);
         }
 
-        File file = fileRepositoryPort.findById(id);
+        File file = fileRepositoryPort.findById(id)
+                .orElseThrow(() -> new ApplicationException(
+                        FileErrorCode.FILE_NOT_FOUND,
+                        FileDetailMessageKey.FILE_NOT_FOUND,
+                        id));
         return fileResultMapperPort.domainToResult(file);
     }
 

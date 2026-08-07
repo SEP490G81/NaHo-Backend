@@ -13,8 +13,8 @@ public record SpeakingHistoryDetailResponse(
         String practicedAt,
         Integer durationSec,
         Double score,
-        String audioUrl,
-        Report report
+        Report report,
+        String audioUrl
 ) {
     public record Report(
             Double average,

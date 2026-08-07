@@ -10,11 +10,11 @@ import org.naho.file.exception.FileErrorCode;
 import org.naho.file.model.File;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileStorageServicePort;
-import org.naho.file.type.OperationStatus;
 import org.naho.furigana.port.out.FuriganaGenerationPort;
 import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
 import org.naho.i18n.message.user.UserDetailMessageKey;
+import org.naho.learning.model.LearningPathNode;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.pagination.PageData;
 import org.naho.question.command.SpeakingHistoryFilterCommand;
@@ -26,14 +26,13 @@ import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.question.result.SpeakingHistoryDetailResult;
 import org.naho.question.result.SpeakingHistoryListItemResult;
 import org.naho.shared.exception.ApplicationException;
-import org.naho.speech.type.SpeechAssessmentErrorType;
 import org.naho.speech.model.AnswerHistory;
 import org.naho.speech.model.ContentAssessment;
 import org.naho.speech.model.SpeechAssessment;
 import org.naho.speech.model.WordAssessment;
+import org.naho.speech.type.SpeechAssessmentErrorType;
 import org.naho.user.exception.UserErrorCode;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -70,6 +69,13 @@ public class CrudAnswerHistoryUseCase implements CrudAnswerHistoryInputPort {
         this.furiganaGenerationPort = furiganaGenerationPort;
     }
 
+    /**
+     * Lấy presigned url từ s3 của audio file trong 1 answer history
+     *
+     * @param id     answerHistoryId
+     * @param userId user id
+     * @return presigned url
+     */
     @Override
     public String generateAudioFilePresignedUrl(Long id, Long userId) {
         if (id == null) {
@@ -86,6 +92,7 @@ public class CrudAnswerHistoryUseCase implements CrudAnswerHistoryInputPort {
                         id
                 ));
 
+        // nếu câu trả lời không phải của người dùng thì ném ra lỗi
         if (!userId.equals(answerHistory.getUserId())) {
             throw new ApplicationException(
                     UserErrorCode.USER_UNAUTHORIZED,
@@ -93,6 +100,7 @@ public class CrudAnswerHistoryUseCase implements CrudAnswerHistoryInputPort {
             );
         }
 
+        // nếu câu trả lời không có file (tức là trả lời ở tài khoản FREE)
         if (answerHistory.getAudioFileId() == null) {
             throw new ApplicationException(
                     FileErrorCode.FILE_NOT_VALID,
@@ -100,43 +108,50 @@ public class CrudAnswerHistoryUseCase implements CrudAnswerHistoryInputPort {
             );
         }
 
-        File file = fileRepositoryPort.findById(answerHistory.getAudioFileId());
-
-        if (!OperationStatus.COMPLETED.equals(file.getOperationStatus())) {
-            throw new ApplicationException(
-                    FileErrorCode.FILE_NOT_VALID,
-                    FileDetailMessageKey.FILE_NOT_UPLOADED
-            );
-        }
+        File file = fileRepositoryPort.findById(answerHistory.getAudioFileId())
+                .orElseThrow(() -> new ApplicationException(
+                        FileErrorCode.FILE_NOT_FOUND,
+                        FileDetailMessageKey.FILE_NOT_FOUND,
+                        answerHistory.getAudioFileId()
+                ));
 
         return fileStorageServicePort.generatePresignedUrl(file);
     }
 
     @Override
-    public SpeakingHistoryDetailResult getHistoryDetail(Long historyId) {
-        AnswerHistory history = answerHistoryRepositoryPort.findById(historyId)
+    public SpeakingHistoryDetailResult getSpeakingQuestionAnswerHistoryById(
+            Long answerHistoryId
+    ) {
+        AnswerHistory answerHistory = answerHistoryRepositoryPort.findById(answerHistoryId)
                 .orElseThrow(() -> new ApplicationException(
                         SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
                         SpeakingQuestionDetailMessageKey.ANSWER_HISTORY_NOT_FOUND,
-                        historyId));
+                        answerHistoryId
+                ));
 
-        SpeakingQuestion speakingQuestion = speakingQuestionRepositoryPort.findById(history.getSpeakingQuestionId())
+        SpeakingQuestion speakingQuestion = speakingQuestionRepositoryPort
+                .findById(answerHistory.getSpeakingQuestionId())
                 .orElseThrow(() -> new ApplicationException(
                         SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
                         SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_NOT_FOUND,
-                        history.getSpeakingQuestionId()));
+                        answerHistory.getSpeakingQuestionId()
+                ));
 
-        SpeechAssessment speech = answerHistoryRepositoryPort.findSpeechAssessmentByAnswerHistoryId(historyId)
+        SpeechAssessment speech = answerHistoryRepositoryPort
+                .findSpeechAssessmentByAnswerHistoryId(answerHistoryId)
                 .orElseThrow(() -> new ApplicationException(
                         SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
                         SpeakingQuestionDetailMessageKey.SPEECH_ASSESSMENT_NOT_FOUND,
-                        historyId));
+                        answerHistoryId
+                ));
 
-        ContentAssessment content = answerHistoryRepositoryPort.findContentAssessmentByAnswerHistoryId(historyId)
+        ContentAssessment content = answerHistoryRepositoryPort
+                .findContentAssessmentByAnswerHistoryId(answerHistoryId)
                 .orElseThrow(() -> new ApplicationException(
                         SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
                         SpeakingQuestionDetailMessageKey.CONTENT_ASSESSMENT_NOT_FOUND,
-                        historyId));
+                        answerHistoryId
+                ));
 
         JsonNode root;
         try {
@@ -275,10 +290,17 @@ public class CrudAnswerHistoryUseCase implements CrudAnswerHistoryInputPort {
                 pronunciation,
                 pronunciationNote,
                 expressions,
-                itVocab);
+                itVocab
+        );
 
-        File audioFile = fileRepositoryPort.findById(history.getAudioFileId());
-        String audioUrl = audioFile != null ? audioFile.getObjectKey() : null;
+        String audioUrl = null;
+        Long audioFileId = answerHistory.getAudioFileId();
+        if (audioFileId != null) {
+            File audioFile = fileRepositoryPort.findById(audioFileId).orElse(null);
+            if (audioFile != null) {
+                audioUrl = fileStorageServicePort.generatePresignedUrl(audioFile);
+            }
+        }
 
         Topic topic = topicRepositoryPort.findBySpeakingQuestionId(speakingQuestion.getId()).orElse(null);
         Long topicId = topic != null ? topic.getId() : null;
@@ -287,23 +309,24 @@ public class CrudAnswerHistoryUseCase implements CrudAnswerHistoryInputPort {
         Book book = bookRepositoryPort.findBySpeakingQuestionId(speakingQuestion.getId()).orElse(null);
         Long bookId = book != null ? book.getId() : null;
 
-        org.naho.learning.model.LearningPathNode lpn = learningPathNodeRepositoryPort
+        LearningPathNode learningPathNode = learningPathNodeRepositoryPort
                 .findBySpeakingQuestionId(speakingQuestion.getId()).orElse(null);
-        Long learningPathNodeId = lpn != null ? lpn.getId() : null;
+        Long learningPathNodeId = learningPathNode != null ? learningPathNode.getId() : null;
 
         return new SpeakingHistoryDetailResult(
-                history.getId(),
+                answerHistory.getId(),
                 topicId,
-                history.getSpeakingQuestionId(),
+                answerHistory.getSpeakingQuestionId(),
                 speakingQuestion.getJapaneseName(),
                 topicName,
                 learningPathNodeId,
                 bookId,
-                history.getCreatedTime() != null ? history.getCreatedTime() : Instant.now(),
+                answerHistory.getCreatedTime(),
                 durationSec,
                 overallScore,
-                audioUrl,
-                report);
+                report,
+                audioUrl
+        );
     }
 
     @Override

@@ -8,7 +8,7 @@ import org.naho.question.result.SpeakingHistoryListItemResult;
 public interface CrudAnswerHistoryInputPort {
     String generateAudioFilePresignedUrl(Long id, Long userId);
 
-    SpeakingHistoryDetailResult getHistoryDetail(Long answerHistoryId);
+    SpeakingHistoryDetailResult getSpeakingQuestionAnswerHistoryById(Long answerHistoryId);
 
     PageData<SpeakingHistoryListItemResult> getUserHistoryList(SpeakingHistoryFilterCommand command);
 }

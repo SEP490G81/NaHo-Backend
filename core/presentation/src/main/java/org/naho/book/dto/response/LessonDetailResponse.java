@@ -14,5 +14,6 @@ public record LessonDetailResponse(
         Double orderIndex,
         Double firstNodeGlobalOrderIndex,
         Double lastNodeGlobalOrderIndex,
-        List<ObjectiveResponse> objectives) {
+        List<ObjectiveResponse> objectives
+) {
 }

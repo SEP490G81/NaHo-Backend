@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -30,7 +31,7 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
     private final S3Properties s3Properties;
 
     @Override
-    public File findById(Long id) {
+    public Optional<File> findById(Long id) {
         if (id == null) {
             throw new InfrastructureException(
                     FileErrorCode.FILE_NOT_VALID,
@@ -38,14 +39,9 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
             );
         }
 
-        FileEntity entity = fileJpaRepository
+        return fileJpaRepository
                 .findById(id)
-                .orElseThrow(() -> new InfrastructureException(
-                        FileErrorCode.FILE_NOT_FOUND,
-                        FileDetailMessageKey.FILE_NOT_FOUND,
-                        id
-                ));
-        return fileEntityMapper.entityToDomain(entity);
+                .map(fileEntityMapper::entityToDomain);
     }
 
     @Override

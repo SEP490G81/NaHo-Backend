@@ -14,7 +14,6 @@ import org.naho.question.result.SpeakingHistoryListItemResult;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +42,7 @@ public class AnswerHistoryController {
                 .build();
     }
 
-    @PostMapping(value = "/speaking-questions", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/speaking-questions")
     @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_HISTORY_GET_ALL_SUCCESS)
     public ResponseEntity<PageData<SpeakingHistoryListItemResponse>> getUserHistoryList(
             @AuthenticationPrincipal AccessTokenPayload payload,
@@ -73,7 +72,7 @@ public class AnswerHistoryController {
     public ResponseEntity<SpeakingHistoryDetailResponse> getSpeakingHistoryDetail(
             @PathVariable Long answerHistoryId
     ) {
-        var result = crudAnswerHistoryInputPort.getHistoryDetail(answerHistoryId);
+        var result = crudAnswerHistoryInputPort.getSpeakingQuestionAnswerHistoryById(answerHistoryId);
         return ResponseEntity.ok(answerHistoryResponseMapper.toDetailResponse(result));
     }
 }
