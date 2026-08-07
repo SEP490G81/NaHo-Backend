@@ -43,7 +43,7 @@ public class AnswerHistoryController {
                 .build();
     }
 
-    @PostMapping(value = "/speaking-histories", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/speaking-questions", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_HISTORY_GET_ALL_SUCCESS)
     public ResponseEntity<PageData<SpeakingHistoryListItemResponse>> getUserHistoryList(
             @AuthenticationPrincipal AccessTokenPayload payload,
@@ -68,12 +68,12 @@ public class AnswerHistoryController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping(value = "/speaking-histories/{historyId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{answerHistoryId}/speaking-question")
     @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_HISTORY_GET_DETAIL_SUCCESS)
     public ResponseEntity<SpeakingHistoryDetailResponse> getSpeakingHistoryDetail(
-            @PathVariable("historyId") Long historyId
+            @PathVariable Long answerHistoryId
     ) {
-        var result = crudAnswerHistoryInputPort.getHistoryDetail(historyId);
+        var result = crudAnswerHistoryInputPort.getHistoryDetail(answerHistoryId);
         return ResponseEntity.ok(answerHistoryResponseMapper.toDetailResponse(result));
     }
 }
