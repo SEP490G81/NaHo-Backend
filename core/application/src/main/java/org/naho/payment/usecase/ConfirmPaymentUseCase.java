@@ -2,6 +2,8 @@ package org.naho.payment.usecase;
 
 import org.naho.i18n.message.payment.PaymentDetailMessageKey;
 import org.naho.i18n.message.subscription.SubscriptionDetailMessageKey;
+import org.naho.notification.event.SendNotificationEvent;
+import org.naho.notification.type.NotificationType;
 import org.naho.payment.command.ConfirmPaymentCommand;
 import org.naho.payment.exception.PaymentErrorCode;
 import org.naho.payment.model.PaymentOrder;
@@ -11,12 +13,11 @@ import org.naho.payment.port.out.PaymentOrderRepositoryPort;
 import org.naho.payment.port.out.PaymentTransactionRepositoryPort;
 import org.naho.payment.result.ConfirmPaymentResult;
 import org.naho.shared.exception.ApplicationException;
+import org.naho.shared.port.out.TransactionPort;
 import org.naho.subscription.model.SubscriptionPlan;
 import org.naho.subscription.model.UserSubscription;
 import org.naho.subscription.port.out.SubscriptionPlanRepositoryPort;
 import org.naho.subscription.port.out.UserSubscriptionRepositoryPort;
-
-import org.naho.shared.port.out.TransactionPort;
 
 import java.time.Instant;
 
@@ -119,6 +120,18 @@ public class ConfirmPaymentUseCase implements ConfirmPaymentInputPort {
             eventPublisherPort.publish(new org.naho.user.event.UserPlanUpgradedEvent(
                     order.getUserId(),
                     plan.getCode().name()));
+
+            // Send PAYMENT notification
+            String metadata = "{\"paymentOrderId\": " + order.getId() + ", \"orderCode\": \"" + order.getOrderCode() + "\"}";
+            eventPublisherPort.publish(new SendNotificationEvent(
+                    this,
+                    order.getUserId(),
+                    NotificationType.PAYMENT,
+                    "Nâng cấp gói thành công",
+                    "Chúc mừng bạn đã nâng cấp thành công gói " + plan.getName() + ". Hãy trải nghiệm ngay những tính năng cao cấp!",
+                    null,
+                    metadata
+            ));
         }
 
         orderRepositoryPort.save(order);

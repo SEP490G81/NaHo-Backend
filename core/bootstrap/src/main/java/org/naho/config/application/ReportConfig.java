@@ -5,6 +5,7 @@ import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileResultMapperPort;
 import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.shared.port.out.EmailPort;
+import org.naho.shared.port.out.EventPublisherPort;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.social.report.mapper.ReportResultMapper;
 import org.naho.social.report.port.in.CreateReportInputPort;
@@ -45,9 +46,10 @@ public class ReportConfig {
             ReportRepositoryPort reportRepositoryPort,
             ReportResultMapper reportResultMapper,
             UserRepositoryPort userRepositoryPort,
-            EmailPort emailPort
+            EmailPort emailPort,
+            EventPublisherPort eventPublisherPort
     ) {
-        return new UpdateReportStatusUseCase(reportRepositoryPort, reportResultMapper, userRepositoryPort, emailPort);
+        return new UpdateReportStatusUseCase(reportRepositoryPort, reportResultMapper, userRepositoryPort, emailPort, eventPublisherPort);
     }
 
 
@@ -58,7 +60,8 @@ public class ReportConfig {
             FileRepositoryPort fileRepositoryPort,
             ReportResultMapper reportResultMapper,
             UploadFileInputPort uploadFileInputPort,
-            TransactionPort transactionPort
+            TransactionPort transactionPort,
+            EventPublisherPort eventPublisherPort
     ) {
         return new CreateReportUseCase(
                 reportRepositoryPort,
@@ -66,7 +69,8 @@ public class ReportConfig {
                 fileRepositoryPort,
                 reportResultMapper,
                 uploadFileInputPort,
-                transactionPort
+                transactionPort,
+                eventPublisherPort
         );
     }
 }

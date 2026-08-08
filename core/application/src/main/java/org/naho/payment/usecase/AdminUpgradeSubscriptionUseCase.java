@@ -3,10 +3,13 @@ package org.naho.payment.usecase;
 import org.naho.i18n.message.payment.PaymentDetailMessageKey;
 import org.naho.i18n.message.subscription.SubscriptionDetailMessageKey;
 import org.naho.i18n.message.user.UserDetailMessageKey;
+import org.naho.notification.event.SendNotificationEvent;
+import org.naho.notification.type.NotificationType;
 import org.naho.payment.command.AdminUpgradeSubscriptionCommand;
 import org.naho.payment.exception.PaymentErrorCode;
 import org.naho.payment.port.in.AdminUpgradeSubscriptionInputPort;
 import org.naho.shared.exception.ApplicationException;
+import org.naho.shared.port.out.TransactionPort;
 import org.naho.subscription.mapper.SubscriptionPlanResultMapper;
 import org.naho.subscription.mapper.UserSubscriptionResultMapper;
 import org.naho.subscription.model.SubscriptionPlan;
@@ -21,8 +24,6 @@ import org.naho.user.exception.UserErrorCode;
 import org.naho.user.port.out.RoleRepositoryPort;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.naho.user.type.RoleName;
-
-import org.naho.shared.port.out.TransactionPort;
 
 import java.time.Instant;
 import java.util.List;
@@ -156,6 +157,18 @@ public class AdminUpgradeSubscriptionUseCase implements AdminUpgradeSubscription
             eventPublisherPort.publish(new org.naho.user.event.UserPlanUpgradedEvent(
                     command.targetUserId(),
                     targetPlan.getCode().name()
+            ));
+
+            // Send PAYMENT notification
+            String metadata = "{}"; // Admin upgrade might not have an orderCode
+            eventPublisherPort.publish(new SendNotificationEvent(
+                    this,
+                    command.targetUserId(),
+                    NotificationType.PAYMENT,
+                    "Nâng cấp gói thành công",
+                    "Gói của bạn đã được quản trị viên nâng cấp thành " + targetPlan.getName() + ".",
+                    null,
+                    metadata
             ));
         }
 

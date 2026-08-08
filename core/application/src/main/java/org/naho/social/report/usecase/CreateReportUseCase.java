@@ -6,6 +6,9 @@ import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.file.result.FileResult;
 import org.naho.file.result.StoredFile;
+import org.naho.notification.event.SendNotificationEvent;
+import org.naho.notification.type.NotificationType;
+import org.naho.shared.port.out.EventPublisherPort;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.social.report.command.CreateReportCommand;
 import org.naho.social.report.mapper.ReportResultMapper;
@@ -25,6 +28,7 @@ public class CreateReportUseCase implements CreateReportInputPort {
     private final ReportResultMapper reportResultMapper;
     private final UploadFileInputPort uploadFileInputPort;
     private final TransactionPort transactionPort;
+    private final EventPublisherPort eventPublisherPort;
 
     public CreateReportUseCase(
             ReportRepositoryPort reportRepositoryPort,
@@ -32,7 +36,8 @@ public class CreateReportUseCase implements CreateReportInputPort {
             FileRepositoryPort fileRepositoryPort,
             ReportResultMapper reportResultMapper,
             UploadFileInputPort uploadFileInputPort,
-            TransactionPort transactionPort
+            TransactionPort transactionPort,
+            EventPublisherPort eventPublisherPort
     ) {
         this.reportRepositoryPort = reportRepositoryPort;
         this.fileStorageServicePort = fileStorageServicePort;
@@ -40,6 +45,7 @@ public class CreateReportUseCase implements CreateReportInputPort {
         this.reportResultMapper = reportResultMapper;
         this.uploadFileInputPort = uploadFileInputPort;
         this.transactionPort = transactionPort;
+        this.eventPublisherPort = eventPublisherPort;
     }
 
     @Override
@@ -78,6 +84,24 @@ public class CreateReportUseCase implements CreateReportInputPort {
 
         savedReport.setFiles(files);
 
+        // Notify Admin
+        // Typically Admin user ID would be fixed, or fetched from DB.
+        // For demonstration (or specific admin assignment), we might hardcode or use a configuration.
+        // Assuming user ID 1 is admin.
+        String metadata = "{\"reportId\": " + savedReport.getId() + ", \"reportType\": \"" + savedReport.getReportType() + "\"}";
+        eventPublisherPort.publish(new SendNotificationEvent(
+                this,
+                1L, // ADMIN_ID
+                NotificationType.REPORT,
+                "Có báo cáo mới",
+                "Người dùng vừa gửi một báo cáo mới",
+                null,
+                metadata
+        ));
+
         return reportResultMapper.domainToResult(savedReport);
+
+
     }
 }
+

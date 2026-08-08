@@ -1,5 +1,6 @@
 package org.naho.config.application.social;
 
+import org.naho.shared.port.out.EventPublisherPort;
 import org.naho.social.comment.dto.mapper.CommentCommandMapper;
 import org.naho.social.comment.dto.mapper.CommentResponseMapper;
 import org.naho.social.comment.mapper.CommentDomainMapper;
@@ -48,13 +49,15 @@ public class CommentConfig {
             CommentRepositoryPort commentRepositoryPort,
             CommentListResultMapper commentListResultMapper,
             CommentDomainMapper commentDomainMapper,
-            CommentResultMapper commentResultMapper
+            CommentResultMapper commentResultMapper,
+            EventPublisherPort eventPublisherPort
     ) {
         return new CommentCrudUsecase(
                 commentRepositoryPort,
                 commentListResultMapper,
                 commentDomainMapper,
-                commentResultMapper
+                commentResultMapper,
+                eventPublisherPort
         );
     }
 }

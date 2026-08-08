@@ -1,7 +1,10 @@
 package org.naho.social.comment.usecase;
 
 import org.naho.i18n.message.social.CommentDetailMessageKey;
+import org.naho.notification.event.SendNotificationEvent;
+import org.naho.notification.type.NotificationType;
 import org.naho.shared.exception.ApplicationException;
+import org.naho.shared.port.out.EventPublisherPort;
 import org.naho.social.comment.command.CommentCreateCommand;
 import org.naho.social.comment.command.CommentDeleteCommand;
 import org.naho.social.comment.command.CommentReadCommand;
@@ -24,15 +27,18 @@ public class CommentCrudUsecase implements CommentCrudInputPort {
     private final CommentListResultMapper commentListResultMapper;
     private final CommentDomainMapper commentDomainMapper;
     private final CommentResultMapper commentResultMapper;
+    private final EventPublisherPort eventPublisherPort;
 
     public CommentCrudUsecase(CommentRepositoryPort commentRepositoryPort,
-                               CommentListResultMapper commentListResultMapper,
-                               CommentDomainMapper commentDomainMapper,
-                               CommentResultMapper commentResultMapper) {
+                              CommentListResultMapper commentListResultMapper,
+                              CommentDomainMapper commentDomainMapper,
+                              CommentResultMapper commentResultMapper,
+                              EventPublisherPort eventPublisherPort) {
         this.commentRepositoryPort = commentRepositoryPort;
         this.commentListResultMapper = commentListResultMapper;
         this.commentDomainMapper = commentDomainMapper;
         this.commentResultMapper = commentResultMapper;
+        this.eventPublisherPort = eventPublisherPort;
     }
 
     @Override
@@ -45,6 +51,27 @@ public class CommentCrudUsecase implements CommentCrudInputPort {
     public CommentResonseResult createComment(CommentCreateCommand command) {
         Comment newComment = commentDomainMapper.commandToModel(command);
         Comment commentSaved = commentRepositoryPort.save(newComment);
+
+        // Notify parent comment owner if this is a reply, or question owner if it's a top-level comment.
+        // For simplicity, if parentId is present, we try to notify the parent comment's user.
+        if (commentSaved.getParentId() != null) {
+            commentRepositoryPort.findByCommentId(commentSaved.getParentId()).ifPresent(parentComment -> {
+                if (!parentComment.getUserId().equals(commentSaved.getUserId())) {
+                    String metadata = "{\"questionId\": " + commentSaved.getQuestionId() + ", \"commentId\": " + commentSaved.getId() + "}";
+                    eventPublisherPort.publish(new SendNotificationEvent(
+                            this,
+                            parentComment.getUserId(),
+                            NotificationType.SOCIAL,
+                            "Có người trả lời bình luận của bạn",
+                            "Ai đó vừa trả lời bình luận của bạn. Nhấn vào để xem chi tiết.",
+                            null,
+                            metadata
+                    ));
+                }
+            });
+        }
+        // (Optional: also notify question owner if parentId is null. Assuming question owner logic is in another domain port, we can skip for now or add if needed).
+
         return commentResultMapper.domainToResult(commentSaved);
     }
 
