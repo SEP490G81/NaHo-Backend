@@ -8,13 +8,21 @@ import org.naho.file.type.OperationType;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Mapper
 public interface FileQueryMapper {
-    List<FileEntity> findAllForSchedulerRetryUpload(
+    List<FileEntity> findAllForSchedulerRetry(
             @Param("now") Instant now,
             @Param("operationType") OperationType operationType,
             @Param("operationStatus") OperationStatus operationStatus,
             @Param("maxRetryCount") int maxRetryCount
     );
+
+    List<FileEntity> findAllForSchedulerRetryDelete(
+            @Param("now") Instant now,
+            @Param("operationType") OperationType operationType
+    );
+
+    Optional<FileEntity> findAvatarFileByUserId(@Param("userId") Long userId);
 }

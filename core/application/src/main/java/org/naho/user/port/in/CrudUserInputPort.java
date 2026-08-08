@@ -1,7 +1,6 @@
 package org.naho.user.port.in;
 
-import org.naho.file.result.FileResult;
-import org.naho.file.result.StoredFile;
+import org.naho.user.command.UpdateUserAvatarCommand;
 import org.naho.user.command.UpdateUserInfoCommand;
 import org.naho.user.result.UserResult;
 
@@ -10,5 +9,5 @@ public interface CrudUserInputPort {
 
     UserResult updateUserInfo(UpdateUserInfoCommand command);
 
-    FileResult updateUserAvatar(Long id, StoredFile storedFile);
+    UserResult updateUserAvatar(UpdateUserAvatarCommand command);
 }

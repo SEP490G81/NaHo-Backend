@@ -11,12 +11,11 @@ import org.naho.payment.port.out.PaymentOrderRepositoryPort;
 import org.naho.payment.port.out.PaymentTransactionRepositoryPort;
 import org.naho.payment.result.ConfirmPaymentResult;
 import org.naho.shared.exception.ApplicationException;
+import org.naho.shared.port.out.TransactionPort;
 import org.naho.subscription.model.SubscriptionPlan;
 import org.naho.subscription.model.UserSubscription;
 import org.naho.subscription.port.out.SubscriptionPlanRepositoryPort;
 import org.naho.subscription.port.out.UserSubscriptionRepositoryPort;
-
-import org.naho.shared.port.out.TransactionPort;
 
 import java.time.Instant;
 

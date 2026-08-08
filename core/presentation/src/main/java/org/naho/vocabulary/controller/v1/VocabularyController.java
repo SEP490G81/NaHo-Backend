@@ -6,12 +6,16 @@ import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.shared.exception.BaseException;
 import org.naho.shared.exception.PresentationException;
 import org.naho.vocabulary.dto.mapper.VocabularyObjectiveResponseMapper;
+import org.naho.vocabulary.dto.mapper.VocabularyQuizResponseMapper;
+import org.naho.vocabulary.dto.response.VocabularyQuizResponse;
 import org.naho.vocabulary.dto.response.VocabulariesOfObjectiveResponse;
 import org.naho.vocabulary.exception.VocabularyErrorCode;
 import org.naho.vocabulary.port.in.ExportVocabularyInputPort;
+import org.naho.vocabulary.port.in.GetRandomVocabularyQuizInputPort;
 import org.naho.vocabulary.port.in.GetVocabulariesOfObjectiveInputPort;
 import org.naho.vocabulary.port.in.ImportVocabularyPort;
 import org.naho.vocabulary.result.VocabulariesOfObjectiveResult;
+import org.naho.vocabulary.result.VocabularyQuizResult;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/vocabularies")
@@ -29,6 +34,8 @@ public class VocabularyController {
     private final GetVocabulariesOfObjectiveInputPort getVocabulariesOfObjectiveInputPort;
     private final VocabularyObjectiveResponseMapper vocabularyObjectiveResponseMapper;
     private final ExportVocabularyInputPort exportVocabularyInputPort;
+    private final GetRandomVocabularyQuizInputPort getRandomVocabularyQuizInputPort;
+    private final VocabularyQuizResponseMapper vocabularyQuizResponseMapper;
 
     //validate file excel
     @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -53,6 +60,16 @@ public class VocabularyController {
     ) {
         VocabulariesOfObjectiveResult result = getVocabulariesOfObjectiveInputPort.getVocabularyListOfObjective(objectiveId);
         VocabulariesOfObjectiveResponse response = vocabularyObjectiveResponseMapper.toResponse(result);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/quiz")
+    @ApiResponseMessage(message = VocabularyQuestionDetailMessageKey.VOCABULARY_QUIZ_GET_SUCCESS)
+    public ResponseEntity<List<VocabularyQuizResponse>> getRandomQuiz(
+            @RequestParam(value = "count", defaultValue = "1") int count
+    ) {
+        List<VocabularyQuizResult> results = getRandomVocabularyQuizInputPort.getRandomQuiz(count);
+        List<VocabularyQuizResponse> response = vocabularyQuizResponseMapper.toResponseList(results);
         return ResponseEntity.ok(response);
     }
 

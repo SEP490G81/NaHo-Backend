@@ -73,7 +73,7 @@ public class UserEntity extends BaseEntity {
 
     @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<OAuthProviderEntity> oAuthProviders = new ArrayList<>();
+    List<AuthProviderEntity> authProviders = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     List<SpeakingQuestionEntity> speakingQuestions;
@@ -94,7 +94,7 @@ public class UserEntity extends BaseEntity {
     @JoinColumn(name = "user_learning_progress_id")
     UserLearningProgressEntity userLearningProgress;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne
     @JoinColumn(name = "avatar_file_id")
     FileEntity avatarFile;
 

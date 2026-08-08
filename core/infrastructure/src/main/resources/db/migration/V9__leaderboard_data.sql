@@ -1,5 +1,5 @@
 SET
-FOREIGN_KEY_CHECKS = 0;
+    FOREIGN_KEY_CHECKS = 0;
 
 -- 1. Insert into user_learning_progresses
 INSERT INTO user_learning_progresses (id, created_time, modified_time, farthest_available_node_id,
@@ -441,4 +441,4 @@ WHERE u.id BETWEEN 2 AND 101
   AND r.role_name = 'LEARNER';
 
 SET
-FOREIGN_KEY_CHECKS = 1;
+    FOREIGN_KEY_CHECKS = 1;

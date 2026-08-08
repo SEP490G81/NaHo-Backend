@@ -15,7 +15,7 @@ public class GetPersonaUseCase implements GetPersonaInputPort {
     private final ConversationStyleRepositoryPort conversationStyleRepositoryPort;
 
     public GetPersonaUseCase(PersonaRepositoryPort personaRepositoryPort,
-                            ConversationStyleRepositoryPort conversationStyleRepositoryPort) {
+                             ConversationStyleRepositoryPort conversationStyleRepositoryPort) {
         this.personaRepositoryPort = personaRepositoryPort;
         this.conversationStyleRepositoryPort = conversationStyleRepositoryPort;
     }

@@ -6,9 +6,9 @@
     <select id="findByProviderUserIdAndProviderName" resultType="org.naho.user.entity.UserEntity">
         select u.*
         from users u
-        join o_auth_providers o on u.id = o.user_id
+                 join auth_providers o on u.id = o.user_id
         where o.provider_user_id = #{providerUserId}
-        and o.provider_name = #{providerName}
+          and o.provider_name = #{providerName}
     </select>
 
     <resultMap id="LeaderboardUserResultMap" type="org.naho.user.result.LeaderboardUserResult">
@@ -22,7 +22,7 @@
         <result property="totalPoint" column="total_point"/>
 
         <collection
-                property="oAuthAvatarUrl"
+                property="authAvatarUrl"
                 javaType="java.util.ArrayList"
                 ofType="java.lang.String"
         >
@@ -43,13 +43,13 @@
 
                leaderboard.total_point,
                oap.avatar_url
-        FROM (SELECT ROW_NUMBER() OVER (
+        FROM (SELECT DENSE_RANK() OVER (
             ORDER BY
                 ulp.total_point DESC,
                 ulp.modified_time IS NULL,
                 ulp.modified_time DESC,
                 ulp.created_time DESC
-            ) AS position,
+            )             AS position,
                      u.id AS user_id,
                      l.id AS league_id,
                      u.username,
@@ -58,20 +58,18 @@
                      f.object_key,
                      ulp.total_point
               FROM users u
-                  JOIN user_learning_progresses ulp
-              ON u.user_learning_progress_id = ulp.id
-                  LEFT JOIN files f
-                  ON u.avatar_file_id = f.id
-                  JOIN leagues l
-                  ON l.id = #{leagueId}
+                       JOIN user_learning_progresses ulp
+                            ON u.user_learning_progress_id = ulp.id
+                       LEFT JOIN files f
+                                 ON u.avatar_file_id = f.id
+                       JOIN leagues l
+                            ON l.id = #{leagueId}
 
               WHERE u.status = 'ACTIVE'
                 AND ulp.total_point >= l.min_point
-                AND (
-                  l.max_point IS NULL
-                 OR ulp.total_point <= l.max_point
-                  )) leaderboard
-                 LEFT JOIN o_auth_providers oap
+                AND (l.max_point IS NULL OR ulp.total_point <= l.max_point)) leaderboard
+
+                 LEFT JOIN auth_providers oap
                            ON leaderboard.user_id = oap.user_id
         where leaderboard.position <= 10
         ORDER BY leaderboard.position
@@ -93,27 +91,34 @@
                   WHERE u.status = 'ACTIVE'
                     AND u.id = #{userId}),
              leaderboard AS
-                 (SELECT ROW_NUMBER() OVER (
+                 (SELECT DENSE_RANK() OVER (
                      ORDER BY
                          ulp.total_point DESC,
                          ulp.modified_time IS NULL,
                          ulp.modified_time DESC,
                          ulp.created_time DESC
-                     ) AS position, u.id AS user_id, `user_current_league`.league_id, u.username, u.email, u.full_name, f.object_key, ulp.total_point
-        FROM users u
-            JOIN user_learning_progresses ulp
-        ON u.user_learning_progress_id = ulp.id
-            LEFT JOIN files f
-            ON u.avatar_file_id = f.id
-            CROSS JOIN `user_current_league`
-        WHERE u.status = 'ACTIVE'
-          AND ulp.total_point >= `user_current_league`.min_point
-          AND (`user_current_league`.max_point IS NULL
-           OR ulp.total_point <= `user_current_league`.max_point))
+                     )        AS position,
+                         u.id AS user_id,
+                         `user_current_league`.league_id,
+                         u.username,
+                         u.email,
+                         u.full_name,
+                         f.object_key,
+                         ulp.total_point
+                  FROM users u
+                           JOIN user_learning_progresses ulp
+                                ON u.user_learning_progress_id = ulp.id
+                           LEFT JOIN files f
+                                     ON u.avatar_file_id = f.id
+                           CROSS JOIN `user_current_league`
+                  WHERE u.status = 'ACTIVE'
+                    AND ulp.total_point >= `user_current_league`.min_point
+                    AND (`user_current_league`.max_point IS NULL
+                      OR ulp.total_point <= `user_current_league`.max_point))
         SELECT leaderboard.*,
                oap.avatar_url
         FROM leaderboard
-                 LEFT JOIN o_auth_providers oap
+                 LEFT JOIN auth_providers oap
                            ON leaderboard.user_id = oap.user_id
         WHERE leaderboard.user_id = #{userId}
         ]]>

@@ -13,13 +13,16 @@ import org.naho.question.usecase.CompleteVocabularyQuestionUseCase;
 import org.naho.question.usecase.SearchVocabulariesOfQuestionUsecase;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.vocabulary.port.in.ExportVocabularyInputPort;
+import org.naho.vocabulary.port.in.GetRandomVocabularyQuizInputPort;
 import org.naho.vocabulary.port.in.GetVocabulariesOfObjectiveInputPort;
 import org.naho.vocabulary.port.in.ImportVocabularyPort;
 import org.naho.vocabulary.port.out.ExcelWriterPort;
+import org.naho.vocabulary.port.out.RandomVocabularyPort;
 import org.naho.vocabulary.port.out.SaveVocabularyPort;
 import org.naho.vocabulary.port.out.VocabularyExcelParserPort;
 import org.naho.vocabulary.port.out.VocabularyPort;
 import org.naho.vocabulary.usecase.ExportVocabularyUseCase;
+import org.naho.vocabulary.usecase.GetRandomVocabularyQuizUseCase;
 import org.naho.vocabulary.usecase.GetVocabulariesOfObjectiveUseCase;
 import org.naho.vocabulary.usecase.ImportVocabularyUseCase;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +30,13 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class VocabularyConfig {
+
+    @Bean
+    public GetRandomVocabularyQuizInputPort getRandomVocabularyQuizInputPort(
+            RandomVocabularyPort randomVocabularyPort
+    ) {
+        return new GetRandomVocabularyQuizUseCase(randomVocabularyPort);
+    }
 
     @Bean
     public ImportVocabularyPort importVocabularyUseCase(

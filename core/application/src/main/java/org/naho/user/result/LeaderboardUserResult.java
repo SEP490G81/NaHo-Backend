@@ -11,13 +11,13 @@ public class LeaderboardUserResult {
     private String email;
     private String fullName;
     private String avatarObjectKey;
-    private List<String> oAuthAvatarUrl = new ArrayList<String>();
+    private List<String> authAvatarUrl = new ArrayList<String>();
     private Double totalPoint;
 
     public LeaderboardUserResult() {
     }
 
-    public LeaderboardUserResult(Long id, Long leagueId, Integer rank, String username, String email, String fullName, String avatarObjectKey, List<String> oAuthAvatarUrl, Double totalPoint) {
+    public LeaderboardUserResult(Long id, Long leagueId, Integer rank, String username, String email, String fullName, String avatarObjectKey, List<String> authAvatarUrl, Double totalPoint) {
         this.id = id;
         this.leagueId = leagueId;
         this.rank = rank;
@@ -25,7 +25,7 @@ public class LeaderboardUserResult {
         this.email = email;
         this.fullName = fullName;
         this.avatarObjectKey = avatarObjectKey;
-        this.oAuthAvatarUrl = oAuthAvatarUrl;
+        this.authAvatarUrl = authAvatarUrl;
         this.totalPoint = totalPoint;
     }
 
@@ -85,12 +85,12 @@ public class LeaderboardUserResult {
         this.avatarObjectKey = avatarObjectKey;
     }
 
-    public List<String> getoAuthAvatarUrl() {
-        return oAuthAvatarUrl;
+    public List<String> getAuthAvatarUrl() {
+        return authAvatarUrl;
     }
 
-    public void setoAuthAvatarUrl(List<String> oAuthAvatarUrl) {
-        this.oAuthAvatarUrl = oAuthAvatarUrl;
+    public void setAuthAvatarUrl(List<String> authAvatarUrl) {
+        this.authAvatarUrl = authAvatarUrl;
     }
 
     public Double getTotalPoint() {

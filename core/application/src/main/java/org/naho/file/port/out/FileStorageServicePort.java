@@ -13,6 +13,8 @@ public interface FileStorageServicePort {
 
     String generatePresignedUrl(File file);
 
+    String generatePresignedUrl(String objectKey);
+
     DownloadedFile downloadFileFromCloud(File file);
 
     void deleteFileInCloud(File file);
