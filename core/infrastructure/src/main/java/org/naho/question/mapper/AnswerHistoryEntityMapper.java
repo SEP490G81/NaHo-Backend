@@ -23,17 +23,20 @@ public interface AnswerHistoryEntityMapper {
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "speakingQuestionId", source = "speakingQuestion.id")
     @Mapping(target = "audioFileId", source = "audioFile.id")
+    @Mapping(target = "durationSec", source = "durationSec")
     AnswerHistory toDomain(AnswerHistoryEntity entity);
 
     @Mapping(target = "id", source = "domain.id")
     @Mapping(target = "user", source = "user")
     @Mapping(target = "speakingQuestion", source = "question")
     @Mapping(target = "audioFile", source = "file")
+    @Mapping(target = "durationSec", source = "domain.durationSec")
     @Mapping(target = "contentAssessment", ignore = true)
     @Mapping(target = "speechAssessment", ignore = true)
     @Mapping(target = "createdTime", ignore = true)
     @Mapping(target = "modifiedTime", ignore = true)
     AnswerHistoryEntity toEntity(AnswerHistory domain, UserEntity user, SpeakingQuestionEntity question, FileEntity file);
+
 
     @Mapping(target = "answerHistoryId", source = "answerHistory.id")
     SpeechAssessment toDomain(SpeechAssessmentEntity entity);

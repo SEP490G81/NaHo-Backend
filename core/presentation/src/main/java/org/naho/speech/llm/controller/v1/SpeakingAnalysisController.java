@@ -40,15 +40,10 @@ public class SpeakingAnalysisController {
     private final GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
 
     @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_ANALYSIS_SUCCESS)
-    @PostMapping(
-            value = "/analysis",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
+    @PostMapping(value = "/analysis", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SpeakingAnalysisResponse> uploadAudioAndAnalyzeSpeaking(
             @RequestPart("file") MultipartFile file,
             @RequestParam("speakingQuestionId") Long speakingQuestionId,
-            @RequestParam("durationSec") Integer durationSec,
             @AuthenticationPrincipal AccessTokenPayload payload
     ) {
         // lấy gói đăng kí của user
@@ -59,14 +54,16 @@ public class SpeakingAnalysisController {
             StoredFile storedFile = null;
             byte[] audioBytes = file.getBytes();
 
+            // validate xem có phải file .wav không?
+            // và validate xem thời lượng có hợp lệ không?
+            double duration = fileValidatorPort.validateWavFileAndDuration(
+                    audioBytes,
+                    subscriptionPlan.maxAnswerTimeSeconds()
+            );
+
             // nếu đang dùng gói FREE thì không lưu file
             if (!subscriptionPlan.code().equals(PlanCode.FREE)) {
-                // validate xem có phải file .wav không?
-                // và validate xem thời lượng có hợp lệ không?
-                fileValidatorPort.validateWavFileAndDuration(
-                        audioBytes,
-                        subscriptionPlan.maxAnswerTimeSeconds()
-                );
+
                 // Step 1: Lưu file vào local
                 storedFile = fileStorageServicePort.saveFileToLocal(file, FileFolderConstant.RECORDINGS, FileAccessStatus.PRIVATE);
             }
@@ -74,7 +71,7 @@ public class SpeakingAnalysisController {
             SpeakingAnalysisCommand command = SpeakingAnalysisCommand.builder()
                     .userId(payload.userId())
                     .speakingQuestionId(speakingQuestionId)
-                    .durationSec(durationSec)
+                    .durationSec((int) Math.ceil(duration))
                     .storedFile(storedFile)
                     .audioBytes(audioBytes)
                     .build();
@@ -89,8 +86,7 @@ public class SpeakingAnalysisController {
             throw new PresentationException(
                     AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
                     SpeechDetailMessageKey.SPEECH_AUDIO_FILE_EMPTY,
-                    e.getMessage()
-            );
+                    e.getMessage());
         }
     }
 }

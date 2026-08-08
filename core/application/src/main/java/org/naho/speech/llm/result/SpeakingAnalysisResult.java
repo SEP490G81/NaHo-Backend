@@ -6,11 +6,13 @@ public class SpeakingAnalysisResult {
     private Long answerHistoryId;
     private Double overallScore;
     private FileResult audioFile;
+    private SpeakingAnalysisReportResult report;
 
-    private SpeakingAnalysisResult(Long answerHistoryId, Double overallScore, FileResult audioFile) {
+    private SpeakingAnalysisResult(Long answerHistoryId, Double overallScore, FileResult audioFile, SpeakingAnalysisReportResult report) {
         this.answerHistoryId = answerHistoryId;
         this.overallScore = overallScore;
         this.audioFile = audioFile;
+        this.report = report;
     }
 
     public static Builder builder() {
@@ -41,10 +43,19 @@ public class SpeakingAnalysisResult {
         this.audioFile = audioFile;
     }
 
+    public SpeakingAnalysisReportResult getReport() {
+        return report;
+    }
+
+    public void setReport(SpeakingAnalysisReportResult report) {
+        this.report = report;
+    }
+
     public static final class Builder {
         private Long answerHistoryId;
         private Double overallScore;
         private FileResult audioFile;
+        private SpeakingAnalysisReportResult report;
 
         private Builder() {
         }
@@ -64,12 +75,19 @@ public class SpeakingAnalysisResult {
             return this;
         }
 
+        public Builder report(SpeakingAnalysisReportResult report) {
+            this.report = report;
+            return this;
+        }
+
         public SpeakingAnalysisResult build() {
             return new SpeakingAnalysisResult(
                     answerHistoryId,
                     overallScore,
-                    audioFile
+                    audioFile,
+                    report
             );
         }
     }
 }
+

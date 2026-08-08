@@ -6,6 +6,7 @@ CREATE TABLE answer_histories
     user_id              BIGINT                NOT NULL,
     speaking_question_id BIGINT                NOT NULL,
     audio_file_id        BIGINT                NULL,
+    duration_sec         INT                   NULL,
     CONSTRAINT pk_answer_histories PRIMARY KEY (id)
 );
 
@@ -284,6 +285,17 @@ CREATE TABLE point_histories
     user_id               BIGINT                NOT NULL,
     learning_path_node_id BIGINT                NULL,
     CONSTRAINT pk_point_histories PRIMARY KEY (id)
+);
+
+CREATE TABLE quote
+(
+    id           BIGINT AUTO_INCREMENT NOT NULL,
+    kanji        VARCHAR(500)          NOT NULL,
+    hiragana     VARCHAR(500)          NOT NULL,
+    romaji       VARCHAR(500)          NOT NULL,
+    translation  TEXT                  NOT NULL,
+    kanji_detail TEXT                  NULL,
+    CONSTRAINT pk_quote PRIMARY KEY (id)
 );
 
 CREATE TABLE reactions
