@@ -7,10 +7,7 @@ import org.naho.file.constant.StaticResourceProperties;
 import org.naho.file.exception.FileErrorCode;
 import org.naho.file.model.File;
 import org.naho.file.port.out.FileHelperPort;
-import org.naho.file.port.out.FileRepositoryPort;
-import org.naho.file.port.out.FileResultMapperPort;
 import org.naho.file.port.out.FileStorageServicePort;
-import org.naho.file.repository.FileJpaRepository;
 import org.naho.file.result.DownloadedFile;
 import org.naho.file.result.StoredFile;
 import org.naho.file.type.OperationStatus;
@@ -46,9 +43,6 @@ public class FileStorageServiceAdapter implements FileStorageServicePort {
     private final S3Properties s3Properties;
     private final StaticResourceProperties staticResourceProperties;
     private final FileHelperPort fileHelperPort;
-    private final FileRepositoryPort fileRepositoryPort;
-    private final FileResultMapperPort fileResultMapperPort;
-    private final FileJpaRepository fileJpaRepository;
 
     @Override
     public void uploadFileToCloud(StoredFile storedFile) throws S3Exception {

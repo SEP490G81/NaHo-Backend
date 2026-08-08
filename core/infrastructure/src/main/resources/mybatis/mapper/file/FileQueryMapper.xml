@@ -27,4 +27,11 @@
         order by created_time
         limit 100
     </select>
+
+    <select id="findAvatarFileByUserId" resultMap="FileEntityResultMap">
+        select f.*
+        from users u
+                 join files f on u.avatar_file_id = f.id
+        where u.id = #{userId}
+    </select>
 </mapper>

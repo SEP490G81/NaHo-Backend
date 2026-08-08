@@ -2,6 +2,7 @@ package org.naho.social.report.controller.v1;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.naho.file.constant.FileAccessStatus;
 import org.naho.file.constant.FileFolderConstant;
 import org.naho.file.exception.FileErrorCode;
 import org.naho.file.port.out.FileStorageServicePort;
@@ -74,7 +75,7 @@ public class ReportController {
 
             try {
                 fileValidatorPort.validateImageFile(file.getBytes());
-                StoredFile storedFile = fileStorageServicePort.saveFileToLocal(file, FileFolderConstant.REPORTS, false);
+                StoredFile storedFile = fileStorageServicePort.saveFileToLocal(file, FileFolderConstant.REPORTS, FileAccessStatus.PRIVATE);
                 storedFiles.add(storedFile);
             } catch (IOException e) {
                 throw new PresentationException(

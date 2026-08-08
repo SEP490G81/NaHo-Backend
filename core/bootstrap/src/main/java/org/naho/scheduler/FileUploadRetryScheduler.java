@@ -3,7 +3,7 @@ package org.naho.scheduler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.naho.file.model.File;
-import org.naho.file.port.in.AsyncUploadFileInputPort;
+import org.naho.file.port.in.AsyncCrudFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.type.OperationStatus;
 import org.naho.file.type.OperationType;
@@ -18,7 +18,7 @@ import java.util.List;
 @Slf4j
 public class FileUploadRetryScheduler {
     private final FileRepositoryPort fileRepositoryPort;
-    private final AsyncUploadFileInputPort asyncUploadFileInputPort;
+    private final AsyncCrudFileInputPort asyncCrudFileInputPort;
 
     /**
      * Khi hàm này kết thúc thì phải đợi thêm thời gian delay thì mới chạy tiếp.
@@ -41,7 +41,7 @@ public class FileUploadRetryScheduler {
         }
 
         for (File file : files) {
-            asyncUploadFileInputPort.retryUploadFileToCloudAsync(file);
+            asyncCrudFileInputPort.retryUploadFileToCloudAsync(file);
         }
 
         log.info("Retry upload {} files completed!", files.size());

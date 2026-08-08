@@ -1,5 +1,6 @@
 package org.naho.user.port.out;
 
+import org.naho.file.model.File;
 import org.naho.user.command.UpdateUserInfoCommand;
 import org.naho.user.model.OAuthProvider;
 import org.naho.user.model.User;
@@ -39,4 +40,6 @@ public interface UserRepositoryPort {
     void lockById(Long userId);
 
     User updateUserInfo(UpdateUserInfoCommand command);
+
+    User updateUserAvatar(Long userId, File newAvatarFile);
 }

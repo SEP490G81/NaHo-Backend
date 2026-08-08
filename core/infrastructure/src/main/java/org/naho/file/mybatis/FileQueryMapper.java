@@ -8,6 +8,7 @@ import org.naho.file.type.OperationType;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Mapper
 public interface FileQueryMapper {
@@ -17,4 +18,6 @@ public interface FileQueryMapper {
             @Param("operationStatus") OperationStatus operationStatus,
             @Param("maxRetryCount") int maxRetryCount
     );
+
+    Optional<FileEntity> findAvatarFileByUserId(@Param("userId") Long userId);
 }

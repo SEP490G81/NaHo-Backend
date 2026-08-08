@@ -14,7 +14,9 @@ import org.naho.file.result.StoredFile;
 import org.naho.file.type.OperationStatus;
 import org.naho.file.type.OperationType;
 import org.naho.i18n.message.file.FileDetailMessageKey;
+import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.exception.InfrastructureException;
+import org.naho.user.exception.UserErrorCode;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -172,5 +174,19 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
         return entities.stream()
                 .map(fileEntityMapper::entityToDomain)
                 .toList();
+    }
+
+    @Override
+    public Optional<File> findAvatarFileByUserId(Long userId) {
+        if (userId == null) {
+            throw new InfrastructureException(
+                    UserErrorCode.USER_NOT_FOUND,
+                    UserDetailMessageKey.USER_ID_NULL
+            );
+        }
+
+        return fileQueryMapper
+                .findAvatarFileByUserId(userId)
+                .map(fileEntityMapper::entityToDomain);
     }
 }

@@ -1,8 +1,13 @@
 package org.naho.user.adapter;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.file.entity.FileEntity;
+import org.naho.file.mapper.FileEntityMapper;
+import org.naho.file.model.File;
 import org.naho.file.port.in.UploadFileInputPort;
+import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileStorageServicePort;
+import org.naho.file.repository.FileJpaRepository;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.exception.InfrastructureException;
 import org.naho.user.command.UpdateUserInfoCommand;
@@ -36,6 +41,9 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     private final OAuthProviderEntityMapper oAuthProviderEntityMapper;
     private final FileStorageServicePort fileStorageServicePort;
     private final UploadFileInputPort uploadFileInputPort;
+    private final FileEntityMapper fileEntityMapper;
+    private final FileRepositoryPort fileRepositoryPort;
+    private final FileJpaRepository fileJpaRepository;
 
     @Override
     public Optional<User> findByUsername(String username) {
@@ -201,5 +209,22 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
         UserEntity savedEntity = userJpaRepository.save(user);
         return userEntityMapper.entityToDomain(savedEntity);
+    }
+
+    @Override
+    public User updateUserAvatar(Long userId, File newAvatarFile) {
+        UserEntity user = userJpaRepository.findById(userId)
+                .orElseThrow(() -> new InfrastructureException(
+                        UserErrorCode.USER_NOT_FOUND,
+                        UserDetailMessageKey.USER_ID_NOT_FOUND,
+                        userId
+                ));
+
+        FileEntity fileEntity = fileJpaRepository.getReferenceById(newAvatarFile.getId());
+        user.setAvatarFile(fileEntity);
+
+        UserEntity savedUser = userJpaRepository.save(user);
+        
+        return userEntityMapper.entityToDomain(savedUser);
     }
 }

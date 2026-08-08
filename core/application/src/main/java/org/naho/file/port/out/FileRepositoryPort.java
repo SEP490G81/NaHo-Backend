@@ -31,4 +31,6 @@ public interface FileRepositoryPort {
     void deleteById(Long id);
 
     List<File> findAllByReportId(Long reportId);
+
+    Optional<File> findAvatarFileByUserId(Long userId);
 }
