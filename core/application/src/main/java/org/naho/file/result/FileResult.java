@@ -8,6 +8,7 @@ import java.time.Instant;
 public class FileResult {
 
     private Long id;
+    private String objectKey;
     private String accessUrl;
     private String originalFileName;
     private String contentType;
@@ -21,8 +22,9 @@ public class FileResult {
     public FileResult() {
     }
 
-    public FileResult(Long id, String accessUrl, String originalFileName, String contentType, Long size, String checksum, OperationType operationType, OperationStatus operationStatus, Integer retryCount, Instant nextRetryAt) {
+    public FileResult(Long id, String objectKey, String accessUrl, String originalFileName, String contentType, Long size, String checksum, OperationType operationType, OperationStatus operationStatus, Integer retryCount, Instant nextRetryAt) {
         this.id = id;
+        this.objectKey = objectKey;
         this.accessUrl = accessUrl;
         this.originalFileName = originalFileName;
         this.contentType = contentType;
@@ -36,6 +38,7 @@ public class FileResult {
 
     private FileResult(Builder builder) {
         this.id = builder.id;
+        this.objectKey = builder.objectKey;
         this.accessUrl = builder.accessUrl;
         this.originalFileName = builder.originalFileName;
         this.contentType = builder.contentType;
@@ -57,6 +60,14 @@ public class FileResult {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getObjectKey() {
+        return objectKey;
+    }
+
+    public void setObjectKey(String objectKey) {
+        this.objectKey = objectKey;
     }
 
     public String getAccessUrl() {
@@ -135,6 +146,10 @@ public class FileResult {
         return id;
     }
 
+    public String objectKey() {
+        return objectKey;
+    }
+
     public String accessUrl() {
         return accessUrl;
     }
@@ -173,6 +188,7 @@ public class FileResult {
 
     public static final class Builder {
         private Long id;
+        private String objectKey;
         private String accessUrl;
         private String originalFileName;
         private String contentType;
@@ -188,6 +204,11 @@ public class FileResult {
 
         public Builder id(Long id) {
             this.id = id;
+            return this;
+        }
+
+        public Builder objectKey(String objectKey) {
+            this.objectKey = objectKey;
             return this;
         }
 

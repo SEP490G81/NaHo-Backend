@@ -29,9 +29,9 @@ public enum UserDomainErrorCode implements ErrorCode {
             400
     ),
 
-    USER_OAUTH_PROVIDER_NOT_VALID(
+    USER_AUTH_PROVIDER_NOT_VALID(
             "USER_005",
-            UserTitleMessageKey.USER_OAUTH_PROVIDER_NOT_VALID_TITLE,
+            UserTitleMessageKey.USER_AUTH_PROVIDER_NOT_VALID_TITLE,
             400
     ),
 

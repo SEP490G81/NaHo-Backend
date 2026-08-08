@@ -3,12 +3,18 @@ package org.naho.question.dto.request;
 import jakarta.validation.constraints.NotBlank;
 
 public record CreateSpeakingQuestionRequest(
-        @NotBlank(message = "Title is required")
-        String titleMarkup,
+        @NotBlank(message = "Japanese name is required")
+        String japaneseNameMarkup,
+
+        String vietnameseName,
 
         @NotBlank(message = "Description is required")
         String descriptionMarkup,
 
-        String sampleAnswer
+        String japaneseSampleAnswerMarkup,
+
+        String vietnameseSampleAnswer,
+
+        String englishSampleAnswer
 ) {
 }

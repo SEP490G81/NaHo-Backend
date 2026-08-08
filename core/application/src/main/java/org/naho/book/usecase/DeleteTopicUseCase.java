@@ -57,6 +57,8 @@ public class DeleteTopicUseCase implements DeleteTopicInputPort {
                 topic.update(
                         topic.getJapaneseName(),
                         topic.getJapaneseDescription(),
+                        topic.getVietnameseDescription(),
+                        topic.getEnglishDescription(),
                         topic.getJapaneseNameMarkup(),
                         topic.getJapaneseDescriptionMarkup(),
                         TopicStatus.ARCHIVE,

@@ -19,8 +19,9 @@ public class CreateSpeakingQuestionUseCase implements CreateSpeakingQuestionInpu
     @Override
     public CreateSpeakingQuestionResult createSpeakingQuestion(CreateSpeakingQuestionCommand command) {
         // 2. Extract raw text from markup
-        String rawTitle = MarkupParserUtil.extractRawTextFromMarkup(command.titleMarkup());
+        String rawJapaneseName = MarkupParserUtil.extractRawTextFromMarkup(command.japaneseNameMarkup());
         String rawDescription = MarkupParserUtil.extractRawTextFromMarkup(command.descriptionMarkup());
+        String rawJapaneseSampleAnswer = MarkupParserUtil.extractRawTextFromMarkup(command.japaneseSampleAnswerMarkup());
 
         // 4. Determine initial status based on Creator Role
         QuestionStatus initialStatus = command.isContentManager() ? QuestionStatus.DRAFT : QuestionStatus.PRIVATE;
@@ -28,11 +29,15 @@ public class CreateSpeakingQuestionUseCase implements CreateSpeakingQuestionInpu
         // 5. Build Question
         SpeakingQuestion speakingQuestion = SpeakingQuestion.builder()
                 .userId(command.userId())
-                .titleMarkup(command.titleMarkup())
+                .japaneseNameMarkup(command.japaneseNameMarkup())
+                .japaneseName(rawJapaneseName)
+                .vietnameseName(command.vietnameseName())
                 .descriptionMarkup(command.descriptionMarkup())
-                .sampleAnswer(command.sampleAnswer())
-                .title(rawTitle)
                 .description(rawDescription)
+                .japaneseSampleAnswerMarkup(command.japaneseSampleAnswerMarkup())
+                .japaneseSampleAnswer(rawJapaneseSampleAnswer)
+                .vietnameseSampleAnswer(command.vietnameseSampleAnswer())
+                .englishSampleAnswer(command.englishSampleAnswer())
                 .status(initialStatus)
                 .build();
 
@@ -43,11 +48,15 @@ public class CreateSpeakingQuestionUseCase implements CreateSpeakingQuestionInpu
                 savedSpeakingQuestion.getId(),
                 savedSpeakingQuestion.getUserId(),
                 savedSpeakingQuestion.getSpeakingQuestionAudioFileId(),
-                savedSpeakingQuestion.getTitle(),
-                savedSpeakingQuestion.getTitleMarkup(),
+                savedSpeakingQuestion.getJapaneseName(),
+                savedSpeakingQuestion.getJapaneseNameMarkup(),
+                savedSpeakingQuestion.getVietnameseName(),
                 savedSpeakingQuestion.getDescription(),
                 savedSpeakingQuestion.getDescriptionMarkup(),
-                savedSpeakingQuestion.getSampleAnswer(),
+                savedSpeakingQuestion.getJapaneseSampleAnswer(),
+                savedSpeakingQuestion.getJapaneseSampleAnswerMarkup(),
+                savedSpeakingQuestion.getVietnameseSampleAnswer(),
+                savedSpeakingQuestion.getEnglishSampleAnswer(),
                 savedSpeakingQuestion.getStatus());
     }
 }

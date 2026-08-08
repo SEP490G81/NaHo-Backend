@@ -5,10 +5,10 @@ import org.mapstruct.Mapping;
 import org.naho.file.entity.FileEntity;
 import org.naho.question.entity.AnswerHistoryEntity;
 import org.naho.question.entity.SpeakingQuestionEntity;
+import org.naho.question.result.SpeakingHistoryListItemResult;
 import org.naho.speech.azure.entity.ContentAssessmentEntity;
 import org.naho.speech.azure.entity.SpeechAssessmentEntity;
 import org.naho.speech.azure.entity.WordAssessmentEntity;
-import org.naho.speech.llm.result.SpeakingHistoryListItemResult;
 import org.naho.speech.model.AnswerHistory;
 import org.naho.speech.model.ContentAssessment;
 import org.naho.speech.model.SpeechAssessment;
@@ -23,17 +23,20 @@ public interface AnswerHistoryEntityMapper {
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "speakingQuestionId", source = "speakingQuestion.id")
     @Mapping(target = "audioFileId", source = "audioFile.id")
+    @Mapping(target = "durationSec", source = "durationSec")
     AnswerHistory toDomain(AnswerHistoryEntity entity);
 
     @Mapping(target = "id", source = "domain.id")
     @Mapping(target = "user", source = "user")
     @Mapping(target = "speakingQuestion", source = "question")
     @Mapping(target = "audioFile", source = "file")
+    @Mapping(target = "durationSec", source = "domain.durationSec")
     @Mapping(target = "contentAssessment", ignore = true)
     @Mapping(target = "speechAssessment", ignore = true)
     @Mapping(target = "createdTime", ignore = true)
     @Mapping(target = "modifiedTime", ignore = true)
     AnswerHistoryEntity toEntity(AnswerHistory domain, UserEntity user, SpeakingQuestionEntity question, FileEntity file);
+
 
     @Mapping(target = "answerHistoryId", source = "answerHistory.id")
     SpeechAssessment toDomain(SpeechAssessmentEntity entity);
@@ -79,7 +82,7 @@ public interface AnswerHistoryEntityMapper {
 
     @Mapping(target = "historyId", source = "entity.id")
     @Mapping(target = "speakingQuestionId", source = "entity.speakingQuestion.id")
-    @Mapping(target = "speakingQuestionTitle", source = "entity.speakingQuestion.title")
+    @Mapping(target = "speakingQuestionTitle", source = "entity.speakingQuestion.japaneseName")
     @Mapping(target = "topicId", source = "entity.speakingQuestion.learningPathNode.objective.lesson.topic.id")
     @Mapping(target = "topicName", source = "entity.speakingQuestion.learningPathNode.objective.lesson.topic.japaneseName")
     @Mapping(target = "learningPathNodeId", source = "entity.speakingQuestion.learningPathNode.id")

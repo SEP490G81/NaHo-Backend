@@ -25,11 +25,14 @@ import java.util.List;
 @Table(name = "speaking_questions")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SpeakingQuestionEntity extends BaseEntity {
-    @Column(name = "title", nullable = false)
-    String title;
+    @Column(name = "japanese_name", nullable = false, columnDefinition = "TEXT")
+    String japaneseName;
 
-    @Column(name = "title_markup", nullable = false)
-    String titleMarkup;
+    @Column(name = "japanese_name_markup", nullable = false, columnDefinition = "TEXT")
+    String japaneseNameMarkup;
+
+    @Column(name = "vietnamese_name", columnDefinition = "TEXT")
+    String vietnameseName;
 
     @Column(name = "description", columnDefinition = "TEXT")
     String description;
@@ -37,8 +40,17 @@ public class SpeakingQuestionEntity extends BaseEntity {
     @Column(name = "description_markup", columnDefinition = "TEXT")
     String descriptionMarkup;
 
-    @Column(name = "sample_answer", columnDefinition = "TEXT")
-    String sampleAnswer;
+    @Column(name = "japanese_sample_answer", columnDefinition = "TEXT")
+    String japaneseSampleAnswer;
+
+    @Column(name = "japanese_sample_answer_markup", columnDefinition = "TEXT")
+    String japaneseSampleAnswerMarkup;
+
+    @Column(name = "vietnamese_sample_answer", columnDefinition = "TEXT")
+    String vietnameseSampleAnswer;
+
+    @Column(name = "english_sample_answer", columnDefinition = "TEXT")
+    String englishSampleAnswer;
 
     @Column(length = 50)
     @Enumerated(EnumType.STRING)

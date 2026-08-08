@@ -57,10 +57,15 @@ public class SpeakingQuestionRepositoryAdapter implements SpeakingQuestionReposi
             entity.setId(speakingQuestion.getId());
         }
 
-        entity.setTitle(speakingQuestion.getTitle());
-        entity.setTitleMarkup(speakingQuestion.getTitleMarkup());
+        entity.setJapaneseName(speakingQuestion.getJapaneseName());
+        entity.setJapaneseNameMarkup(speakingQuestion.getJapaneseNameMarkup());
+        entity.setVietnameseName(speakingQuestion.getVietnameseName());
         entity.setDescription(speakingQuestion.getDescription());
         entity.setDescriptionMarkup(speakingQuestion.getDescriptionMarkup());
+        entity.setJapaneseSampleAnswer(speakingQuestion.getJapaneseSampleAnswer());
+        entity.setJapaneseSampleAnswerMarkup(speakingQuestion.getJapaneseSampleAnswerMarkup());
+        entity.setVietnameseSampleAnswer(speakingQuestion.getVietnameseSampleAnswer());
+        entity.setEnglishSampleAnswer(speakingQuestion.getEnglishSampleAnswer());
         entity.setStatus(speakingQuestion.getStatus());
 
 

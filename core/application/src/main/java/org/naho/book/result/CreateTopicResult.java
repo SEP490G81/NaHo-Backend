@@ -7,6 +7,8 @@ public record CreateTopicResult(
         Long userId,
         String japaneseName,
         String japaneseDescription,
+        String vietnameseDescription,
+        String englishDescription,
         String japaneseNameMarkup,
         String japaneseDescriptionMarkup,
         TopicStatus status,

@@ -43,7 +43,8 @@ public interface SpeakingQuestionRequestMapper {
             sortBy = switch (sortBy) {
                 case "id" -> "id";
                 case "createdTime", "createdAt" -> "created_time";
-                case "title" -> "title";
+                case "japaneseName", "title" -> "japanese_name";
+                case "vietnameseName" -> "vietnamese_name";
                 case "status" -> "status";
                 default -> "created_time";
             };

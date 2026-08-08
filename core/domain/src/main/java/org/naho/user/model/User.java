@@ -14,7 +14,7 @@ public class User {
     private final Long id;
     private final List<Long> roleIds;
     private final List<Long> userSessionIds;
-    private final List<Long> oAuthProviderIds;
+    private final List<Long> authProviderIds;
     private final List<Long> speakingQuestionIds;
     private final List<Long> reportIds;
     private final List<Long> pointHistoryIds;
@@ -38,7 +38,7 @@ public class User {
         this.id = builder.id;
         this.roleIds = builder.roleIds;
         this.userSessionIds = builder.userSessionIds;
-        this.oAuthProviderIds = builder.oAuthProviderIds;
+        this.authProviderIds = builder.authProviderIds;
         this.speakingQuestionIds = builder.speakingQuestionIds;
         this.reportIds = builder.reportIds;
         this.pointHistoryIds = builder.pointHistoryIds;
@@ -92,7 +92,7 @@ public class User {
                 .id(id)
                 .roleIds(roleIds)
                 .userSessionIds(userSessionIds)
-                .oAuthProviderIds(oAuthProviderIds)
+                .authProviderIds(authProviderIds)
                 .speakingQuestionIds(speakingQuestionIds)
                 .reportIds(reportIds)
                 .pointHistoryIds(pointHistoryIds)
@@ -124,8 +124,8 @@ public class User {
         return userSessionIds;
     }
 
-    public List<Long> getOAuthProviderIds() {
-        return oAuthProviderIds;
+    public List<Long> getAuthProviderIds() {
+        return authProviderIds;
     }
 
     public List<Long> getSpeakingQuestionIds() {
@@ -233,7 +233,7 @@ public class User {
         private Long id;
         private List<Long> roleIds;
         private List<Long> userSessionIds;
-        private List<Long> oAuthProviderIds;
+        private List<Long> authProviderIds;
         private List<Long> speakingQuestionIds;
         private List<Long> reportIds;
         private List<Long> pointHistoryIds;
@@ -274,8 +274,8 @@ public class User {
             return this;
         }
 
-        public Builder oAuthProviderIds(List<Long> oAuthProviderIds) {
-            this.oAuthProviderIds = oAuthProviderIds;
+        public Builder authProviderIds(List<Long> authProviderIds) {
+            this.authProviderIds = authProviderIds;
             return this;
         }
 

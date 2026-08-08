@@ -2,6 +2,7 @@ package org.naho.speech.llm.usecase;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.naho.book.model.Book;
 import org.naho.book.model.Lesson;
@@ -16,8 +17,6 @@ import org.naho.file.port.in.UploadFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileResultMapperPort;
 import org.naho.file.result.FileResult;
-import org.naho.file.result.StoredFile;
-import org.naho.furigana.port.out.FuriganaGenerationPort;
 import org.naho.i18n.message.learning.LearningPathNodeDetailMessageKey;
 import org.naho.i18n.message.learning.UserLearningProgressDetailMessageKey;
 import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
@@ -28,7 +27,6 @@ import org.naho.learning.model.LearningPathNode;
 import org.naho.learning.model.UserLearningProgress;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
-import org.naho.pagination.PageData;
 import org.naho.question.command.CompleteSpeakingQuestionCommand;
 import org.naho.question.exception.SpeakingQuestionErrorCode;
 import org.naho.question.model.Grammar;
@@ -41,26 +39,21 @@ import org.naho.shared.port.out.TransactionPort;
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
 import org.naho.speech.llm.command.SpeakingAnalysisCommand;
-import org.naho.speech.llm.command.SpeakingHistoryFilterCommand;
 import org.naho.speech.llm.port.in.SpeakingAnalysisInputPort;
 import org.naho.speech.llm.port.out.AiAnalysisPort;
+import org.naho.speech.llm.result.SpeakingAnalysisReportResult;
 import org.naho.speech.llm.result.SpeakingAnalysisResult;
-import org.naho.speech.llm.result.SpeakingHistoryDetailResult;
-import org.naho.speech.llm.result.SpeakingHistoryListItemResult;
+import org.naho.speech.llm.result.WordPronunciationResult;
 import org.naho.speech.model.AnswerHistory;
 import org.naho.speech.model.ContentAssessment;
 import org.naho.speech.model.SpeechAssessment;
 import org.naho.speech.model.WordAssessment;
-import org.naho.speech.type.SpeechAssessmentErrorType;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.model.User;
 import org.naho.user.port.out.UserRepositoryPort;
 
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
 
@@ -75,7 +68,6 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     private final BookRepositoryPort bookRepositoryPort;
     private final LearningPathNodeRepositoryPort learningPathNodeRepositoryPort;
     private final AiAnalysisPort aiAnalysisPort;
-    private final FuriganaGenerationPort furiganaGenerationPort;
     private final TransactionPort transactionPort;
     private final CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort;
     private final UserLearningProgressRepositoryPort userLearningProgressRepositoryPort;
@@ -95,7 +87,6 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             BookRepositoryPort bookRepositoryPort,
             LearningPathNodeRepositoryPort learningPathNodeRepositoryPort,
             AiAnalysisPort aiAnalysisPort,
-            FuriganaGenerationPort furiganaGenerationPort,
             TransactionPort transactionPort,
             CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort,
             UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
@@ -112,7 +103,6 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         this.bookRepositoryPort = bookRepositoryPort;
         this.learningPathNodeRepositoryPort = learningPathNodeRepositoryPort;
         this.aiAnalysisPort = aiAnalysisPort;
-        this.furiganaGenerationPort = furiganaGenerationPort;
         this.transactionPort = transactionPort;
         this.completeSpeakingQuestionInputPort = completeSpeakingQuestionInputPort;
         this.userLearningProgressRepositoryPort = userLearningProgressRepositoryPort;
@@ -122,25 +112,44 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
 
     @Override
     public SpeakingAnalysisResult analyzeSpeaking(SpeakingAnalysisCommand command) {
-        SpeakingAnalysisResult result = transactionPort.execute(() -> doAnalyzeSpeaking(command));
+        // DB-R & VALID & DB-W (TX 1): Chuẩn bị context và tạo bản ghi ban đầu
+        AnalysisContext ctx = transactionPort.execute(() -> prepareAnalysis(command));
 
-        StoredFile storedFile = command.storedFile();
-        if (storedFile != null) {
-            FileResult uploadedFile = uploadFileInputPort.uploadFileToCloud(storedFile);
+        // EXT: Gọi mạng ngoài Azure Speech Assessment
+        SpeechAssessment azureAssessment = assessSpeech(command.audioBytes());
+
+        // CALC: Tính toán thuần chuẩn bị context cho AI
+        AiAnalysisPort.Context evalContext = buildEvaluationContext(ctx, azureAssessment);
+
+        // EXT: Gọi mạng ngoài OpenAI LLM
+        String rawLlmFeedback = aiAnalysisPort.analyzeSpeaking(evalContext);
+
+        // CALC: Parse JSON và tính điểm
+        ParsedScores parsedScores = parseLlmFeedback(rawLlmFeedback, azureAssessment, command.durationSec());
+
+        // DB-W (TX 2): Lưu toàn bộ kết quả vào DB
+        SpeakingAnalysisResult result = transactionPort.execute(() ->
+                persistResults(command, ctx, azureAssessment, parsedScores));
+
+        // Upload file audio lên cloud nếu có
+        if (command.storedFile() != null) {
+            FileResult uploadedFile = uploadFileInputPort.uploadFileToCloud(command.storedFile());
             result.setAudioFile(uploadedFile);
         }
 
         return result;
     }
 
-    private SpeakingAnalysisResult doAnalyzeSpeaking(SpeakingAnalysisCommand command) {
-        LearningPathNode speakingQuestionLearningPathNode = learningPathNodeRepositoryPort
+    private AnalysisContext prepareAnalysis(SpeakingAnalysisCommand command) {
+        // DB-R (Database Reading) Lấy learning path node hiện tại của user
+        LearningPathNode learningPathNode = learningPathNodeRepositoryPort
                 .findBySpeakingQuestionId(command.speakingQuestionId())
                 .orElseThrow(() -> new ApplicationException(
                         LearningPathNodeErrorCode.LEARNING_PATH_NODE_NOT_FOUND,
                         LearningPathNodeDetailMessageKey.LEARNING_PATH_NODE_ID_NOT_FOUND,
                         command.speakingQuestionId()));
 
+        // DB-R (Database Reading) - Lấy tiến trình học của user
         UserLearningProgress progress = userLearningProgressRepositoryPort
                 .findByUserId(command.userId())
                 .orElseThrow(() -> new ApplicationException(
@@ -148,100 +157,86 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                         UserLearningProgressDetailMessageKey.USER_LEARNING_PROGRESS_NOT_FOUND_BY_USER_ID,
                         command.userId()));
 
+        // VALID Logic
         // nếu node xa nhất người dùng có thể học còn nhỏ hơn node đang định học
-        if (progress.getFarthestAvailableNodeGlobalOrderIndex() < speakingQuestionLearningPathNode
-                .getGlobalOrderIndex()) {
+        if (progress.getFarthestAvailableNodeGlobalOrderIndex() < learningPathNode.getGlobalOrderIndex()) {
             throw new ApplicationException(
                     SpeakingQuestionErrorCode.SPEAKING_QUESTION_LOCKED,
                     SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_LOCKED);
         }
 
+        // DB-R (Database-Reading) lay du lieu cua nguoi dung
         User user = userRepositoryPort.findById(command.userId())
                 .orElseThrow(() -> new ApplicationException(
                         UserErrorCode.USER_NOT_FOUND,
                         UserDetailMessageKey.USER_ID_NOT_FOUND));
 
-        SpeakingQuestion speakingQuestion = speakingQuestionRepositoryPort.findById(command.speakingQuestionId())
+        // DB-R (Database-Reading) lay du lieu cua speaking question khi nguoi dung truy cap node speaking question
+        SpeakingQuestion speakingQuestion = speakingQuestionRepositoryPort
+                .findById(command.speakingQuestionId())
                 .orElseThrow(() -> new ApplicationException(
                         SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
                         SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_NOT_FOUND));
 
+        // VALID LOGIC + DB-W => xu ly logic file (file luu local neu tk nguoi dung goi FREE, luu lai file noi chuyen cua nguoi dung neu da dang ki goi cao hon)
         File audioFile = null;
-
         // nếu đã lưu file trong local
         // (tức là đăng kí gói không phải FREE)
         // thì mới lưu lại file nói chuyện của người dùng
-        StoredFile storedFile = command.storedFile();
-        if (storedFile != null) {
-            audioFile = fileRepositoryPort.createNewForUpload(storedFile, false);
+        if (command.storedFile() != null) {
+            audioFile = fileRepositoryPort.createNewForUpload(command.storedFile(), false);
         }
 
+        AnswerHistory savedAnswerHistory = createAnswerHistory(user, speakingQuestion, audioFile, command.durationSec());
+
+        // DB-R
+        // Lay du lieu cua object (question speaking nay nam trong objective nao)
+        Objective objective = objectiveRepositoryPort.findBySpeakingQuestionId(speakingQuestion.getId()).orElse(null);
+        // DB-R
+        // Lay du lieu cua lesson (question speaking nay nam trong lesson nao)
+        Lesson lesson = lessonRepositoryPort.findBySpeakingQuestionId(speakingQuestion.getId()).orElse(null);
+        // DB-R
+        // Lay du lieu cua topic (question speaking nay nam trong topic nao)
+        Topic topic = topicRepositoryPort.findBySpeakingQuestionId(speakingQuestion.getId()).orElse(null);
+        // DB-R
+        // Lay du lieu cua book (question speaking nay nam trong book nao)
+        Book book = bookRepositoryPort.findBySpeakingQuestionId(speakingQuestion.getId()).orElse(null);
+
+        return buildAnalysisContext(
+                learningPathNode, progress, speakingQuestion,
+                savedAnswerHistory, audioFile,
+                objective, lesson, topic, book);
+    }
+
+    private AnswerHistory createAnswerHistory(User user, SpeakingQuestion speakingQuestion, File audioFile, Integer durationSec) {
         AnswerHistory answerHistory = AnswerHistory.builder()
                 .userId(user.getId())
                 .speakingQuestionId(speakingQuestion.getId())
+                .durationSec(durationSec)
                 .build();
-
         if (audioFile != null) {
             answerHistory.setAudioFileId(audioFile.getId());
         }
+        return answerHistoryRepositoryPort.save(answerHistory);
+    }
 
-        AnswerHistory savedAnswerHistory = answerHistoryRepositoryPort
-                .save(answerHistory);
 
-        // Speech Assessment
-        SpeechAssessmentCommand speechAssessmentCommand = new SpeechAssessmentCommand(
-                command.audioBytes(),
-                null);
+    private AnalysisContext buildAnalysisContext(
+            LearningPathNode learningPathNode,
+            UserLearningProgress progress,
+            SpeakingQuestion speakingQuestion,
+            AnswerHistory savedAnswerHistory,
+            File audioFile,
+            Objective objective,
+            Lesson lesson,
+            Topic topic,
+            Book book) {
 
-        SpeechAssessment azureAssessment = azureSpeechServicePort.assess(speechAssessmentCommand);
-
-        SpeechAssessment speechAssessment = SpeechAssessment.builder()
-                .transcriptText(azureAssessment.getTranscriptText())
-                .accuracyScore(azureAssessment.getAccuracyScore())
-                .fluencyScore(azureAssessment.getFluencyScore())
-                .completenessScore(azureAssessment.getCompletenessScore())
-                .pronunciationScore(azureAssessment.getPronunciationScore())
-                .answerHistoryId(savedAnswerHistory.getId())
-                .build();
-
-        speechAssessment = answerHistoryRepositoryPort.saveSpeechAssessment(speechAssessment);
-
-        // Word Assessment
-        List<WordAssessment> wordList = new ArrayList<>();
-        List<Map<String, Object>> serializedWordList = new ArrayList<>();
-        for (WordAssessment word : azureAssessment.getWords()) {
-            WordAssessment domainWord = WordAssessment.builder()
-                    .word(word.getWord())
-                    .accuracyScore(word.getAccuracyScore())
-                    .errorType(word.getErrorType())
-                    .speechAssessmentId(speechAssessment.getId())
-                    .build();
-            wordList.add(domainWord);
-
-            serializedWordList.add(Map.of(
-                    "word", word.getWord(),
-                    "score", word.getAccuracyScore(),
-                    "error", word.getErrorType().name()));
-        }
-        answerHistoryRepositoryPort.saveAllWordAssessment(wordList);
-
-        Objective objective = objectiveRepositoryPort.findBySpeakingQuestionId(speakingQuestion.getId())
-                .orElse(null);
-
-        Lesson lesson = lessonRepositoryPort.findBySpeakingQuestionId(speakingQuestion.getId())
-                .orElse(null);
-
-        Topic topic = topicRepositoryPort.findBySpeakingQuestionId(speakingQuestion.getId())
-                .orElse(null);
-
-        Book book = bookRepositoryPort.findBySpeakingQuestionId(speakingQuestion.getId())
-                .orElse(null);
-
+        // VALID LOGIC
         String curriculumVal = (book != null) ? book.getTitle() : "N/A";
         String levelVal = (book != null && book.getJlptLevel() != null) ? book.getJlptLevel().name() : "N/A";
         String sttVal = (objective != null && objective.getOrderIndex() != null)
-                ? String.valueOf(objective.getOrderIndex())
-                : "N/A";
+                ? String.valueOf(objective.getOrderIndex()) : "N/A";
         String topicVal = (topic != null) ? topic.getJapaneseName() : "N/A";
         String lessonVal = (lesson != null) ? lesson.getJapaneseName() : "N/A";
 
@@ -255,439 +250,344 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             canDoObjectiveVal = "N/A";
         }
 
-        StringBuilder grammarFocusSb = new StringBuilder();
+        // VALID LOGIC-Lay 1 chuoi grammar cua 1 cau hoi
+        String grammarFocusVal = buildGrammarFocusText(speakingQuestion);
+        // VALID LOGIC-Lay danh sach vocab cua speaking question
+        String vocabFocusVal = buildVocabFocusText(speakingQuestion);
+
+        // VALID LOGIC
+        String questionTitleVal = speakingQuestion.getJapaneseName() != null
+                ? speakingQuestion.getJapaneseName() : "N/A";
+        String questionDescriptionVal = (speakingQuestion.getDescription() != null
+                && !speakingQuestion.getDescription().isBlank())
+                ? speakingQuestion.getDescription() : questionTitleVal;
+
+        return new AnalysisContext(
+                learningPathNode, progress, speakingQuestion, savedAnswerHistory, audioFile,
+                curriculumVal, levelVal, sttVal, topicVal, lessonVal,
+                canDoObjectiveVal, grammarFocusVal, vocabFocusVal,
+                questionTitleVal, questionDescriptionVal);
+    }
+
+    private String buildGrammarFocusText(SpeakingQuestion speakingQuestion) {
+        StringBuilder sb = new StringBuilder();
         if (speakingQuestion.getGrammars() != null) {
             for (Grammar grammar : speakingQuestion.getGrammars()) {
-                if (!grammarFocusSb.isEmpty()) {
-                    grammarFocusSb.append("\n");
+                if (!sb.isEmpty()) {
+                    sb.append("\n");
                 }
                 String ja = grammar.getJapanese() != null ? grammar.getJapanese() : "";
                 String vi = grammar.getVietnameseMeaningText() != null ? grammar.getVietnameseMeaningText() : "";
                 if (!ja.isEmpty() && !vi.isEmpty()) {
-                    grammarFocusSb.append("- ").append(ja).append("（").append(vi).append("）");
+                    sb.append("- ").append(ja).append("（").append(vi).append("）");
                 } else if (!ja.isEmpty()) {
-                    grammarFocusSb.append("- ").append(ja);
+                    sb.append("- ").append(ja);
                 } else {
-                    grammarFocusSb.append("- ").append(vi);
+                    sb.append("- ").append(vi);
                 }
             }
         }
-        String grammarFocusVal = grammarFocusSb.isEmpty() ? "N/A (no specific grammar focus for this lesson)"
-                : grammarFocusSb.toString();
+        return sb.isEmpty() ? "N/A (no specific grammar focus for this lesson)" : sb.toString();
+    }
 
-        StringBuilder vocabFocusSb = new StringBuilder();
+    private String buildVocabFocusText(SpeakingQuestion speakingQuestion) {
+        StringBuilder sb = new StringBuilder();
         if (speakingQuestion.getVocabularies() != null) {
-            for (var v : speakingQuestion.getVocabularies()) {
-                if (!vocabFocusSb.isEmpty()) {
-                    vocabFocusSb.append("\n");
+            for (var vocab : speakingQuestion.getVocabularies()) {
+                if (!sb.isEmpty()) {
+                    sb.append("\n");
                 }
-                String japanese = v.getJapanese() != null ? v.getJapanese() : "";
-                String reading = v.getReading() != null ? v.getReading() : "";
-                String vi = v.getVietnameseMeaningText() != null ? v.getVietnameseMeaningText() : "";
-                StringBuilder entry = new StringBuilder("- ");
-                entry.append(japanese);
+                String japanese = vocab.getJapanese() != null ? vocab.getJapanese() : "";
+                String reading = vocab.getReading() != null ? vocab.getReading() : "";
+                String vi = vocab.getVietnameseMeaningText() != null ? vocab.getVietnameseMeaningText() : "";
+                StringBuilder entry = new StringBuilder("- ").append(japanese);
                 if (!reading.isEmpty()) {
                     entry.append("（").append(reading).append("）");
                 }
                 if (!vi.isEmpty()) {
                     entry.append(" = ").append(vi);
                 }
-                vocabFocusSb.append(entry);
+                sb.append(entry);
             }
         }
-        String vocabFocusVal = vocabFocusSb.isEmpty() ? "N/A (no specific vocabulary focus for this lesson)"
-                : vocabFocusSb.toString();
+        return sb.isEmpty() ? "N/A (no specific vocabulary focus for this lesson)" : sb.toString();
+    }
 
-        String questionTitleVal = speakingQuestion.getTitle() != null ? speakingQuestion.getTitle() : "N/A";
-        String questionDescriptionVal = speakingQuestion.getDescription() != null
-                && !speakingQuestion.getDescription().isBlank()
-                ? speakingQuestion.getDescription()
-                : questionTitleVal;
+    private SpeechAssessment assessSpeech(byte[] audioBytes) {
+        // EXT - Gọi Azure Speech Assessment
+        return azureSpeechServicePort.assess(new SpeechAssessmentCommand(audioBytes, null));
+    }
 
-        double accuracy = azureAssessment.getAccuracyScore() != null ? azureAssessment.getAccuracyScore() : 0.0;
-        double fluency = azureAssessment.getFluencyScore() != null ? azureAssessment.getFluencyScore() : 0.0;
-        double completeness = azureAssessment.getCompletenessScore() != null ? azureAssessment.getCompletenessScore()
-                : 0.0;
-        double overallPronunciation = azureAssessment.getPronunciationScore() != null
-                ? azureAssessment.getPronunciationScore()
-                : 0.0;
-        String studentTranscript = azureAssessment.getTranscriptText() != null ? azureAssessment.getTranscriptText()
-                : "";
+    private AiAnalysisPort.Context buildEvaluationContext(AnalysisContext ctx, SpeechAssessment azureResult) {
+        // CALC - Tính toán thuần
+        double accuracy = azureResult.getAccuracyScore() != null ? azureResult.getAccuracyScore() : 0.0;
+        double fluency = azureResult.getFluencyScore() != null ? azureResult.getFluencyScore() : 0.0;
+        double completeness = azureResult.getCompletenessScore() != null ? azureResult.getCompletenessScore() : 0.0;
+        double pronunciation = azureResult.getPronunciationScore() != null ? azureResult.getPronunciationScore() : 0.0;
+        String transcript = azureResult.getTranscriptText() != null ? azureResult.getTranscriptText() : "";
 
-        var evaluationContext = new AiAnalysisPort.Context(
-                curriculumVal,
-                levelVal,
-                sttVal,
-                topicVal,
-                lessonVal,
-                canDoObjectiveVal,
-                grammarFocusVal,
-                vocabFocusVal,
-                questionTitleVal,
-                questionDescriptionVal,
-                accuracy,
-                fluency,
-                completeness,
-                overallPronunciation,
-                studentTranscript);
+        return new AiAnalysisPort.Context(
+                ctx.curriculumVal(), ctx.levelVal(), ctx.sttVal(),
+                ctx.topicVal(), ctx.lessonVal(), ctx.canDoObjectiveVal(),
+                ctx.grammarFocusVal(), ctx.vocabFocusVal(),
+                ctx.questionTitleVal(), ctx.questionDescriptionVal(),
+                accuracy, fluency, completeness, pronunciation, transcript);
+    }
 
-        String rawLlmFeedback = aiAnalysisPort.analyzeSpeaking(evaluationContext);
+    private ParsedScores parseLlmFeedback(String rawLlmFeedback, SpeechAssessment azureResult, Integer durationSec) {
+        // CALC - Tính toán thuần & parse response AI
+        double pronScore10 = azureResult.getPronunciationScore() != null
+                ? azureResult.getPronunciationScore() / 10.0 : 0.0;
+        double fluencyScore10 = azureResult.getFluencyScore() != null
+                ? azureResult.getFluencyScore() / 10.0 : 0.0;
 
         double vocabScore = 0.0;
         double grammarScore = 0.0;
         double naturalnessScore = 0.0;
-        double pronScore10 = azureAssessment.getPronunciationScore() != null
-                ? azureAssessment.getPronunciationScore() / 10.0
-                : 0.0;
-        double fluencyScore10 = azureAssessment.getFluencyScore() != null ? azureAssessment.getFluencyScore() / 10.0
-                : 0.0;
         double overallScore = 0.0;
+        String enrichedFeedbackJson;
 
         try {
-            JsonNode rootNode = objectMapper.readTree(rawLlmFeedback);
-
-            double rawVocab = 0.0;
-            if (rootNode.has("vocabulary") && rootNode.path("vocabulary").has("score")) {
-                rawVocab = rootNode.path("vocabulary").path("score").asDouble(0.0);
-            } else if (rootNode.has("scores")) {
-                rawVocab = rootNode.path("scores").path("vocabulary").asDouble(0.0);
-            }
-            vocabScore = Math.min(rawVocab / 2.5, 10.0);
-
-            double rawGrammar = 0.0;
-            if (rootNode.has("grammar") && rootNode.path("grammar").has("score")) {
-                rawGrammar = rootNode.path("grammar").path("score").asDouble(0.0);
-            } else if (rootNode.has("scores")) {
-                rawGrammar = rootNode.path("scores").path("grammar").asDouble(0.0);
-            }
-            grammarScore = Math.min(rawGrammar / 2.5, 10.0);
-
-            double rawNaturalness = 0.0;
-            if (rootNode.has("naturalness") && rootNode.path("naturalness").has("score")) {
-                rawNaturalness = rootNode.path("naturalness").path("score").asDouble(0.0);
-            } else if (rootNode.has("scores")) {
-                rawNaturalness = rootNode.path("scores").path("naturalness").asDouble(0.0);
-            }
-            naturalnessScore = Math.min(rawNaturalness / 2.5, 10.0);
-
-            overallScore = (pronScore10 + fluencyScore10 + vocabScore + grammarScore + naturalnessScore) / 5.0;
-            overallScore = Math.round(overallScore * 10.0) / 10.0;
-
-            if (rootNode instanceof ObjectNode objectNode) {
-                objectNode.put("durationSec", command.durationSec());
-                objectNode.put("overallScore", overallScore);
-
-                ObjectNode scoresNode = objectMapper.createObjectNode();
-                scoresNode.put("vocabulary", vocabScore);
-                scoresNode.put("grammar", grammarScore);
-                scoresNode.put("naturalness", naturalnessScore);
-                objectNode.set("scores", scoresNode);
-
-                ObjectNode sugNode = objectMapper.createObjectNode();
-                String correctedJa = rootNode.path("overall").path("correctedAnswerJa").asText("");
-                String correctedVi = rootNode.path("overall").path("correctedAnswerVi").asText("");
-                sugNode.put("jp", correctedJa);
-                sugNode.put("furigana", correctedJa);
-                sugNode.put("vi", correctedVi);
-                objectNode.set("aiSuggestion", sugNode);
-
-                var utNode = objectMapper.createArrayNode();
-                var mistakes = rootNode.path("grammar").path("mistakes");
-                if (mistakes.isArray() && !mistakes.isEmpty()) {
-                    for (JsonNode m : mistakes) {
-                        var errItem = objectMapper.createObjectNode();
-                        errItem.put("text", m.path("original").asText(""));
-                        var errDetail = objectMapper.createObjectNode();
-                        errDetail.put("type", "Ngữ pháp / Sự tự nhiên");
-                        errDetail.put("explanation", m.path("explanationVi").asText(""));
-                        errDetail.put("suggestion", m.path("corrected").asText(""));
-                        errItem.set("error", errDetail);
-                        utNode.add(errItem);
-                    }
-                } else {
-                    var errItem = objectMapper.createObjectNode();
-                    errItem.put("text",
-                            azureAssessment.getTranscriptText() != null ? azureAssessment.getTranscriptText() : "");
-                    errItem.set("error", null);
-                    utNode.add(errItem);
-                }
-                objectNode.set("userTranscript", utNode);
-
-                objectNode.put("pronunciationNote", rootNode.path("overall").path("summaryVi").asText(""));
-
-                if (!objectNode.has("wordNotes")) {
-                    objectNode.putObject("wordNotes");
-                }
-                if (!objectNode.has("expressions")) {
-                    objectNode.putArray("expressions");
-                }
-                if (!objectNode.has("itVocab")) {
-                    objectNode.putArray("itVocab");
-                }
-
-                rawLlmFeedback = objectMapper.writeValueAsString(objectNode);
-            }
+            JsonNode root = objectMapper.readTree(rawLlmFeedback);
+            vocabScore = Math.min(extractLlmScore(root, "vocabulary") / 2.5, 10.0);
+            grammarScore = Math.min(extractLlmScore(root, "grammar") / 2.5, 10.0);
+            naturalnessScore = Math.min(extractLlmScore(root, "naturalness") / 2.5, 10.0);
+            overallScore = Math.round(
+                    ((pronScore10 + fluencyScore10 + vocabScore + grammarScore + naturalnessScore) / 5.0) * 10.0
+            ) / 10.0;
+            enrichedFeedbackJson = enrichFeedbackJson(
+                    root, azureResult, vocabScore, grammarScore, naturalnessScore, overallScore, durationSec);
         } catch (Exception e) {
             e.printStackTrace();
-            if (vocabScore > 0.0 || grammarScore > 0.0 || naturalnessScore > 0.0) {
-                overallScore = (pronScore10 + fluencyScore10 + vocabScore + grammarScore + naturalnessScore) / 5.0;
-                overallScore = Math.round(overallScore * 10.0) / 10.0;
-            } else {
-                overallScore = Math.round(((pronScore10 + fluencyScore10) / 2.0) * 10.0) / 10.0;
-            }
-            try {
-                ObjectNode fallbackNode = objectMapper.createObjectNode();
-                ObjectNode scoresNode = objectMapper.createObjectNode();
-                scoresNode.put("vocabulary", vocabScore);
-                scoresNode.put("grammar", grammarScore);
-                scoresNode.put("naturalness", naturalnessScore);
-                fallbackNode.set("scores", scoresNode);
-                fallbackNode.putArray("userTranscript");
-                ObjectNode suggestionNode = objectMapper.createObjectNode();
-                suggestionNode.put("jp", "");
-                suggestionNode.put("furigana", "");
-                suggestionNode.put("vi", "");
-                fallbackNode.set("aiSuggestion", suggestionNode);
-                fallbackNode.put("pronunciationNote", "");
-                fallbackNode.putObject("wordNotes");
-                fallbackNode.putArray("expressions");
-                fallbackNode.putArray("itVocab");
-                fallbackNode.put("durationSec", command.durationSec());
-                fallbackNode.put("overallScore", overallScore);
-                rawLlmFeedback = objectMapper.writeValueAsString(fallbackNode);
-            } catch (Exception ex) {
-                rawLlmFeedback = "{}";
-            }
+            overallScore = Math.round(((pronScore10 + fluencyScore10) / 2.0) * 10.0) / 10.0;
+            enrichedFeedbackJson = buildFallbackFeedbackJson(
+                    vocabScore, grammarScore, naturalnessScore, overallScore, durationSec);
         }
 
-        ContentAssessment contentAssessment = ContentAssessment.builder()
-                .vocabularyScore(vocabScore)
-                .grammarScore(grammarScore)
-                .aiFeedback(rawLlmFeedback)
-                .translationText("")
-                .answerHistoryId(savedAnswerHistory.getId())
-                .build();
+        return new ParsedScores(vocabScore, grammarScore, naturalnessScore, overallScore, enrichedFeedbackJson);
+    }
 
+    private double extractLlmScore(JsonNode root, String fieldName) {
+        if (root.has(fieldName) && root.path(fieldName).has("score")) {
+            return root.path(fieldName).path("score").asDouble(0.0);
+        }
+        if (root.has("scores")) {
+            return root.path("scores").path(fieldName).asDouble(0.0);
+        }
+        return 0.0;
+    }
+
+    private String enrichFeedbackJson(JsonNode root, SpeechAssessment azureResult,
+                                      double vocabScore, double grammarScore, double naturalnessScore,
+                                      double overallScore, Integer durationSec) throws Exception {
+        if (!(root instanceof ObjectNode objectNode)) {
+            return objectMapper.writeValueAsString(root);
+        }
+
+        objectNode.put("durationSec", durationSec);
+        objectNode.put("overallScore", overallScore);
+
+        ObjectNode scoresNode = objectMapper.createObjectNode();
+        scoresNode.put("vocabulary", vocabScore);
+        scoresNode.put("grammar", grammarScore);
+        scoresNode.put("naturalness", naturalnessScore);
+        objectNode.set("scores", scoresNode);
+
+        String correctedJa = root.path("overall").path("correctedAnswerJa").asText("");
+        String correctedVi = root.path("overall").path("correctedAnswerVi").asText("");
+        ObjectNode sugNode = objectMapper.createObjectNode();
+        sugNode.put("jp", correctedJa);
+        sugNode.put("furigana", correctedJa);
+        sugNode.put("vi", correctedVi);
+        objectNode.set("aiSuggestion", sugNode);
+
+        ArrayNode utNode = objectMapper.createArrayNode();
+        JsonNode mistakes = root.path("grammar").path("mistakes");
+        if (mistakes.isArray() && !mistakes.isEmpty()) {
+            for (JsonNode mistake : mistakes) {
+                ObjectNode errItem = objectMapper.createObjectNode();
+                errItem.put("text", mistake.path("original").asText(""));
+                ObjectNode errDetail = objectMapper.createObjectNode();
+                errDetail.put("type", "Ngữ pháp / Sự tự nhiên");
+                errDetail.put("explanation", mistake.path("explanationVi").asText(""));
+                errDetail.put("suggestion", mistake.path("corrected").asText(""));
+                errItem.set("error", errDetail);
+                utNode.add(errItem);
+            }
+        } else {
+            ObjectNode errItem = objectMapper.createObjectNode();
+            errItem.put("text", azureResult.getTranscriptText() != null ? azureResult.getTranscriptText() : "");
+            errItem.set("error", null);
+            utNode.add(errItem);
+        }
+        objectNode.set("userTranscript", utNode);
+        objectNode.put("pronunciationNote", root.path("overall").path("summaryVi").asText(""));
+
+        if (!objectNode.has("wordNotes")) {
+            objectNode.putObject("wordNotes");
+        }
+        if (!objectNode.has("expressions")) {
+            objectNode.putArray("expressions");
+        }
+        if (!objectNode.has("itVocab")) {
+            objectNode.putArray("itVocab");
+        }
+
+        return objectMapper.writeValueAsString(objectNode);
+    }
+
+    private String buildFallbackFeedbackJson(double vocabScore, double grammarScore,
+                                             double naturalnessScore, double overallScore,
+                                             Integer durationSec) {
+        try {
+            ObjectNode node = objectMapper.createObjectNode();
+            ObjectNode scores = objectMapper.createObjectNode();
+            scores.put("vocabulary", vocabScore);
+            scores.put("grammar", grammarScore);
+            scores.put("naturalness", naturalnessScore);
+            node.set("scores", scores);
+            node.putArray("userTranscript");
+            ObjectNode sug = objectMapper.createObjectNode();
+            sug.put("jp", "");
+            sug.put("furigana", "");
+            sug.put("vi", "");
+            node.set("aiSuggestion", sug);
+            node.put("pronunciationNote", "");
+            node.putObject("wordNotes");
+            node.putArray("expressions");
+            node.putArray("itVocab");
+            node.put("durationSec", durationSec);
+            node.put("overallScore", overallScore);
+            return objectMapper.writeValueAsString(node);
+        } catch (Exception ex) {
+            return "{}";
+        }
+    }
+
+    private List<WordPronunciationResult> buildWordPronunciations(List<WordAssessment> words) {
+        if (words == null || words.isEmpty()) {
+            return List.of();
+        }
+        return words.stream()
+                .map(w -> WordPronunciationResult.from(
+                        w.getWord(),
+                        w.getAccuracyScore(),
+                        w.getErrorType() != null ? w.getErrorType().name() : "None"
+                ))
+                .toList();
+    }
+
+    private SpeakingAnalysisResult persistResults(SpeakingAnalysisCommand command,
+                                                   AnalysisContext ctx,
+                                                   SpeechAssessment azureAssessment,
+                                                   ParsedScores parsedScores) {
+        // DB-W => Lưu đánh giá phát âm tổng quan của azure speech
+        SpeechAssessment savedSpeechAssessment = persistSpeechAssessment(
+                azureAssessment, ctx.savedAnswerHistory().getId());
+
+        // DB-W => Lưu đánh giá từng chữ (phát âm, điểm chính xác, lỗi phát âm) từ azure speech
+        persistWordAssessments(azureAssessment.getWords(), savedSpeechAssessment.getId());
+
+        // DB-W => Content Assessment (phản hồi từ AI)
+        ContentAssessment contentAssessment = ContentAssessment.builder()
+                .vocabularyScore(parsedScores.vocabScore())
+                .grammarScore(parsedScores.grammarScore())
+                .aiFeedback(parsedScores.enrichedFeedbackJson())
+                .translationText("")
+                .answerHistoryId(ctx.savedAnswerHistory().getId())
+                .build();
         answerHistoryRepositoryPort.saveContentAssessment(contentAssessment);
 
+        // DB-W => Hoàn thành câu hỏi nói và lưu tiến độ người dùng
         completeSpeakingQuestionInputPort.completeSpeakingQuestion(
                 CompleteSpeakingQuestionCommand.builder()
-                        .userLearningProgress(progress)
-                        .speakingQuestionLearningPathNode(speakingQuestionLearningPathNode)
+                        .userLearningProgress(ctx.progress())
+                        .speakingQuestionLearningPathNode(ctx.learningPathNode())
                         .userId(command.userId())
-                        .overallScore(overallScore)
+                        .overallScore(parsedScores.overallScore())
                         .build());
 
+        // Gắn report đầy đủ bao gồm tô màu phát âm từng từ vào result
+        List<WordPronunciationResult> wordPronunciations = buildWordPronunciations(azureAssessment.getWords());
+
+        SpeakingAnalysisReportResult report = new SpeakingAnalysisReportResult(
+                parsedScores.overallScore(),
+                new SpeakingAnalysisReportResult.Scores(
+                        azureAssessment.getPronunciationScore(),
+                        azureAssessment.getFluencyScore(),
+                        parsedScores.vocabScore(),
+                        parsedScores.grammarScore(),
+                        parsedScores.naturalnessScore()
+                ),
+                wordPronunciations,
+                parsedScores.enrichedFeedbackJson()
+        );
+
         SpeakingAnalysisResult result = SpeakingAnalysisResult.builder()
-                .overallScore(overallScore)
-                .answerHistoryId(savedAnswerHistory.getId())
+                .overallScore(parsedScores.overallScore())
+                .answerHistoryId(ctx.savedAnswerHistory().getId())
+                .report(report)
                 .build();
 
-        if (audioFile != null) {
-            result.setAudioFile(fileResultMapperPort.domainToResult(audioFile));
+        if (ctx.audioFile() != null) {
+            result.setAudioFile(fileResultMapperPort.domainToResult(ctx.audioFile()));
         }
 
         return result;
     }
 
-    @Override
-    public SpeakingHistoryDetailResult getHistoryDetail(Long historyId) {
-        System.out.println("[SpeakingAnalysis] Loading history detail for id: " + historyId);
-
-        AnswerHistory history = answerHistoryRepositoryPort.findById(historyId)
-                .orElseThrow(() -> new ApplicationException(
-                        SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
-                        SpeakingQuestionDetailMessageKey.ANSWER_HISTORY_NOT_FOUND,
-                        historyId));
-
-        SpeakingQuestion speakingQuestion = speakingQuestionRepositoryPort.findById(history.getSpeakingQuestionId())
-                .orElseThrow(() -> new ApplicationException(
-                        SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
-                        SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_NOT_FOUND,
-                        history.getSpeakingQuestionId()));
-
-        SpeechAssessment speech = answerHistoryRepositoryPort.findSpeechAssessmentByAnswerHistoryId(historyId)
-                .orElseThrow(() -> new ApplicationException(
-                        SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
-                        SpeakingQuestionDetailMessageKey.SPEECH_ASSESSMENT_NOT_FOUND,
-                        historyId));
-
-        ContentAssessment content = answerHistoryRepositoryPort.findContentAssessmentByAnswerHistoryId(historyId)
-                .orElseThrow(() -> new ApplicationException(
-                        SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
-                        SpeakingQuestionDetailMessageKey.CONTENT_ASSESSMENT_NOT_FOUND,
-                        historyId));
-
-        JsonNode root;
-        try {
-            root = objectMapper.readTree(content.getAiFeedback());
-        } catch (Exception e) {
-            throw new ApplicationException(
-                    SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
-                    "Corrupted AI feedback data");
-        }
-
-        Integer durationSec = root.path("durationSec").asInt(0);
-        Double overallScore = root.path("overallScore").asDouble(0.0);
-
-        JsonNode scoresNode = root.path("scores");
-        Double vocabScore = scoresNode.path("vocabulary").asDouble(0.0);
-        Double grammarScore = scoresNode.path("grammar").asDouble(0.0);
-        Double naturalnessScore = scoresNode.path("naturalness").asDouble(0.0);
-        Double pronunciationScore = Math.round((speech.getPronunciationScore() / 10.0) * 10.0) / 10.0;
-
-        SpeakingHistoryDetailResult.Scores scores = new SpeakingHistoryDetailResult.Scores(
-                pronunciationScore,
-                vocabScore,
-                grammarScore,
-                naturalnessScore);
-
-        List<SpeakingHistoryDetailResult.UserTranscriptItem> userTranscript = new ArrayList<>();
-        JsonNode utNode = root.path("userTranscript");
-        if (utNode.isArray()) {
-            for (JsonNode item : utNode) {
-                String text = item.path("text").asText("");
-                SpeakingHistoryDetailResult.ErrorDetail error = null;
-                JsonNode errNode = item.path("error");
-                if (errNode.isObject()) {
-                    error = new SpeakingHistoryDetailResult.ErrorDetail(
-                            errNode.path("type").asText(""),
-                            errNode.path("explanation").asText(""),
-                            errNode.path("suggestion").asText(""));
-                }
-                userTranscript.add(new SpeakingHistoryDetailResult.UserTranscriptItem(text, error));
-            }
-        }
-
-        JsonNode sugNode = root.path("aiSuggestion");
-        SpeakingHistoryDetailResult.AiSuggestion aiSuggestion = new SpeakingHistoryDetailResult.AiSuggestion(
-                sugNode.path("jp").asText(""),
-                sugNode.path("furigana").asText(""),
-                sugNode.path("vi").asText(""));
-
-        Map<String, String> wordNotes = new HashMap<>();
-        JsonNode wordNotesNode = root.path("wordNotes");
-        if (wordNotesNode.isObject()) {
-            wordNotesNode.fields().forEachRemaining(entry -> {
-                wordNotes.put(entry.getKey().toLowerCase(), entry.getValue().asText());
-            });
-        }
-
-        List<SpeakingHistoryDetailResult.PronunciationItem> pronunciation = new ArrayList<>();
-        if (speech.getWords() != null) {
-            for (WordAssessment wordEntity : speech.getWords()) {
-                String wordText = wordEntity.getWord();
-                double accScore = wordEntity.getAccuracyScore();
-                SpeechAssessmentErrorType errType = wordEntity.getErrorType();
-
-                String severity = "ok";
-                if (errType == SpeechAssessmentErrorType.MISPRONUNCIATION || accScore < 50) {
-                    severity = "error";
-                } else if (errType == SpeechAssessmentErrorType.OMISSION || accScore < 80) {
-                    severity = "warn";
-                }
-
-                String furigana = "";
-                try {
-                    var furiganaText = furiganaGenerationPort.generateFurigana(wordText);
-                    if (furiganaText != null && furiganaText.getTokens() != null) {
-                        StringBuilder sb = new StringBuilder();
-                        for (var token : furiganaText.getTokens()) {
-                            sb.append(
-                                    token.getFurigana() != null && !token.getFurigana().isBlank() ? token.getFurigana()
-                                            : token.getKanji());
-                        }
-                        furigana = sb.toString();
-                    }
-                } catch (Exception e) {
-                    furigana = wordText;
-                }
-
-                String note = wordNotes.get(wordText.toLowerCase());
-                if (note == null || note.isBlank()) {
-                    if ("ok".equals(severity)) {
-                        note = "Phát âm tốt.";
-                    } else if ("warn".equals(severity)) {
-                        note = "Cần phát âm rõ ràng hơn.";
-                    } else {
-                        note = "Chú ý phát âm chuẩn âm tiết.";
-                    }
-                }
-
-                pronunciation.add(new SpeakingHistoryDetailResult.PronunciationItem(
-                        wordText,
-                        furigana,
-                        severity,
-                        note));
-            }
-        }
-
-        String pronunciationNote = root.path("pronunciationNote").asText("Chú ý cải thiện phát âm theo hướng dẫn.");
-
-        List<SpeakingHistoryDetailResult.ExpressionItem> expressions = new ArrayList<>();
-        JsonNode exprsNode = root.path("expressions");
-        if (exprsNode.isArray()) {
-            for (JsonNode item : exprsNode) {
-                expressions.add(new SpeakingHistoryDetailResult.ExpressionItem(
-                        item.path("jp").asText(""),
-                        item.path("furigana").asText(""),
-                        item.path("vi").asText(""),
-                        item.path("note").asText("")));
-            }
-        }
-
-        List<SpeakingHistoryDetailResult.ItVocabItem> itVocab = new ArrayList<>();
-        JsonNode itNode = root.path("itVocab");
-        if (itNode.isArray()) {
-            for (JsonNode item : itNode) {
-                itVocab.add(new SpeakingHistoryDetailResult.ItVocabItem(
-                        item.path("term").asText(""),
-                        item.path("reading").asText(""),
-                        item.path("meaning").asText("")));
-            }
-        }
-
-        SpeakingHistoryDetailResult.Report report = new SpeakingHistoryDetailResult.Report(
-                overallScore,
-                scores,
-                userTranscript,
-                aiSuggestion,
-                pronunciation,
-                pronunciationNote,
-                expressions,
-                itVocab);
-
-        org.naho.file.model.File audioFile = fileRepositoryPort.findById(history.getAudioFileId());
-        String audioUrl = audioFile != null ? audioFile.getObjectKey() : null;
-
-        Topic topic = topicRepositoryPort.findBySpeakingQuestionId(speakingQuestion.getId()).orElse(null);
-        Long topicId = topic != null ? topic.getId() : null;
-        String topicName = topic != null ? topic.getJapaneseName() : null;
-
-        Book book = bookRepositoryPort.findBySpeakingQuestionId(speakingQuestion.getId()).orElse(null);
-        Long bookId = book != null ? book.getId() : null;
-
-        org.naho.learning.model.LearningPathNode lpn = learningPathNodeRepositoryPort
-                .findBySpeakingQuestionId(speakingQuestion.getId()).orElse(null);
-        Long learningPathNodeId = lpn != null ? lpn.getId() : null;
-
-        return new SpeakingHistoryDetailResult(
-                history.getId(),
-                topicId,
-                history.getSpeakingQuestionId(),
-                speakingQuestion.getTitle(),
-                topicName,
-                learningPathNodeId,
-                bookId,
-                history.getCreatedTime() != null ? history.getCreatedTime() : Instant.now(),
-                durationSec,
-                overallScore,
-                audioUrl,
-                report);
+    private SpeechAssessment persistSpeechAssessment(SpeechAssessment azureResult, Long answerHistoryId) {
+        SpeechAssessment speechAssessment = SpeechAssessment.builder()
+                .transcriptText(azureResult.getTranscriptText())
+                .accuracyScore(azureResult.getAccuracyScore())
+                .fluencyScore(azureResult.getFluencyScore())
+                .completenessScore(azureResult.getCompletenessScore())
+                .pronunciationScore(azureResult.getPronunciationScore())
+                .answerHistoryId(answerHistoryId)
+                .build();
+        return answerHistoryRepositoryPort.saveSpeechAssessment(speechAssessment);
     }
 
-    @Override
-    public PageData<SpeakingHistoryListItemResult> getUserHistoryList(SpeakingHistoryFilterCommand command) {
-        return answerHistoryRepositoryPort.findUserAnswerHistories(command);
+    private void persistWordAssessments(List<WordAssessment> azureWords, Long speechAssessmentId) {
+        if (azureWords == null || azureWords.isEmpty()) {
+            return;
+        }
+        List<WordAssessment> wordList = new ArrayList<>();
+        for (WordAssessment word : azureWords) {
+            wordList.add(WordAssessment.builder()
+                    .word(word.getWord())
+                    .accuracyScore(word.getAccuracyScore())
+                    .errorType(word.getErrorType())
+                    .speechAssessmentId(speechAssessmentId)
+                    .build());
+        }
+        answerHistoryRepositoryPort.saveAllWordAssessment(wordList);
     }
+
+
+    private record AnalysisContext(
+            LearningPathNode learningPathNode,
+            UserLearningProgress progress,
+            SpeakingQuestion speakingQuestion,
+            AnswerHistory savedAnswerHistory,
+            File audioFile,
+            String curriculumVal,
+            String levelVal,
+            String sttVal,
+            String topicVal,
+            String lessonVal,
+            String canDoObjectiveVal,
+            String grammarFocusVal,
+            String vocabFocusVal,
+            String questionTitleVal,
+            String questionDescriptionVal
+    ) {}
+
+    private record ParsedScores(
+            double vocabScore,
+            double grammarScore,
+            double naturalnessScore,
+            double overallScore,
+            String enrichedFeedbackJson
+    ) {}
 }

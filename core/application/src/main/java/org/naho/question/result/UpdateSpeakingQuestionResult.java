@@ -5,11 +5,15 @@ import org.naho.question.type.QuestionStatus;
 public record UpdateSpeakingQuestionResult(
         Long id,
         Long userId,
-        String title,
-        String titleMarkup,
+        String japaneseName,
+        String japaneseNameMarkup,
+        String vietnameseName,
         String description,
         String descriptionMarkup,
-        String sampleAnswer,
+        String japaneseSampleAnswer,
+        String japaneseSampleAnswerMarkup,
+        String vietnameseSampleAnswer,
+        String englishSampleAnswer,
         QuestionStatus status
 ) {
 }

@@ -5,6 +5,6 @@ import org.naho.file.dto.response.FileResponse;
 public record SpeakingAnalysisResponse(
         Long answerHistoryId,
         Double overallScore,
-        FileResponse audioFile
-) {
-}
+        FileResponse audioFile,
+        SpeakingAnalysisReportResponse report
+) {}

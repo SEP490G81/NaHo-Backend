@@ -2,9 +2,12 @@ package org.naho.question.command;
 
 public record CreateSpeakingQuestionCommand(
         Long userId,
-        String titleMarkup,
+        String japaneseNameMarkup,
+        String vietnameseName,
         String descriptionMarkup,
-        String sampleAnswer,
+        String japaneseSampleAnswerMarkup,
+        String vietnameseSampleAnswer,
+        String englishSampleAnswer,
         boolean isContentManager
 ) {
 }

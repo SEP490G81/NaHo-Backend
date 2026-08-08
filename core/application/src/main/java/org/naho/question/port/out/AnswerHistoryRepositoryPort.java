@@ -1,8 +1,8 @@
 package org.naho.question.port.out;
 
 import org.naho.pagination.PageData;
-import org.naho.speech.llm.command.SpeakingHistoryFilterCommand;
-import org.naho.speech.llm.result.SpeakingHistoryListItemResult;
+import org.naho.question.command.SpeakingHistoryFilterCommand;
+import org.naho.question.result.SpeakingHistoryListItemResult;
 import org.naho.speech.model.AnswerHistory;
 import org.naho.speech.model.ContentAssessment;
 import org.naho.speech.model.SpeechAssessment;

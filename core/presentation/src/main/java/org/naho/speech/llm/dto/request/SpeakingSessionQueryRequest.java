@@ -5,8 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.naho.question.constant.SpeakingHistorySortColumn;
 import org.naho.shared.constant.SortDirection;
-import org.naho.speech.llm.constant.SpeakingHistorySortColumn;
 
 @Getter
 @Setter

@@ -21,12 +21,15 @@ import org.naho.speech.llm.adapter.*;
 import org.naho.speech.llm.constant.OpenAiConfigProperties;
 import org.naho.speech.llm.port.in.EndSessionInputPort;
 import org.naho.speech.llm.port.in.SpeakingAnalysisInputPort;
+import org.naho.speech.llm.port.in.SpeakingSessionCleanupInputPort;
 import org.naho.speech.llm.port.in.SpeakingSessionInputPort;
 import org.naho.speech.llm.port.in.SuggestedTopicsInputPort;
 import org.naho.speech.llm.port.out.*;
 import org.naho.speech.llm.usecase.EndSessionUseCase;
 import org.naho.speech.llm.usecase.SpeakingAnalysisUseCase;
+import org.naho.speech.llm.usecase.SpeakingSessionCleanupUseCase;
 import org.naho.speech.llm.usecase.SpeakingSessionUseCase;
+
 import org.naho.speech.llm.usecase.SuggestedTopicsUseCase;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.springframework.context.annotation.Bean;
@@ -123,7 +126,6 @@ public class ChatConfig {
             BookRepositoryPort bookRepositoryPort,
             LearningPathNodeRepositoryPort learningPathNodeRepositoryPort,
             AiAnalysisPort aiAnalysisPort,
-            FuriganaGenerationPort furiganaGenerationPort,
             TransactionPort transactionPort,
             CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort,
             UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
@@ -142,7 +144,6 @@ public class ChatConfig {
                 bookRepositoryPort,
                 learningPathNodeRepositoryPort,
                 aiAnalysisPort,
-                furiganaGenerationPort,
                 transactionPort,
                 completeSpeakingQuestionInputPort,
                 userLearningProgressRepositoryPort,
@@ -150,4 +151,14 @@ public class ChatConfig {
                 uploadFileInputPort
         );
     }
+
+    @Bean
+    public SpeakingSessionCleanupInputPort speakingSessionCleanupInputPort(
+            SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
+            TransactionPort transactionPort
+    ) {
+        return new SpeakingSessionCleanupUseCase(speakingSessionRepositoryPort, transactionPort);
+    }
 }
+
+

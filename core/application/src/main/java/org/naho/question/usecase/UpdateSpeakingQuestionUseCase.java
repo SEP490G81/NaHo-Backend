@@ -45,17 +45,21 @@ public class UpdateSpeakingQuestionUseCase implements UpdateSpeakingQuestionInpu
         }
 
         // 3. Extract raw text from markup
-        String rawTitle = MarkupParserUtil.extractRawTextFromMarkup(command.titleMarkup());
+        String rawJapaneseName = MarkupParserUtil.extractRawTextFromMarkup(command.japaneseNameMarkup());
         String rawDescription = MarkupParserUtil.extractRawTextFromMarkup(command.descriptionMarkup());
-
+        String rawJapaneseSampleAnswer = MarkupParserUtil.extractRawTextFromMarkup(command.japaneseSampleAnswerMarkup());
 
         // 5. Update Domain Model
         speakingQuestion.update(
-                rawTitle,
+                rawJapaneseName,
+                command.japaneseNameMarkup(),
+                command.vietnameseName(),
                 rawDescription,
-                command.titleMarkup(),
                 command.descriptionMarkup(),
-                command.sampleAnswer(),
+                rawJapaneseSampleAnswer,
+                command.japaneseSampleAnswerMarkup(),
+                command.vietnameseSampleAnswer(),
+                command.englishSampleAnswer(),
                 null // Audio is null for now
         );
 
@@ -65,11 +69,15 @@ public class UpdateSpeakingQuestionUseCase implements UpdateSpeakingQuestionInpu
         return new UpdateSpeakingQuestionResult(
                 updatedSpeakingQuestion.getId(),
                 updatedSpeakingQuestion.getUserId(),
-                updatedSpeakingQuestion.getTitle(),
-                updatedSpeakingQuestion.getTitleMarkup(),
+                updatedSpeakingQuestion.getJapaneseName(),
+                updatedSpeakingQuestion.getJapaneseNameMarkup(),
+                updatedSpeakingQuestion.getVietnameseName(),
                 updatedSpeakingQuestion.getDescription(),
                 updatedSpeakingQuestion.getDescriptionMarkup(),
-                updatedSpeakingQuestion.getSampleAnswer(),
+                updatedSpeakingQuestion.getJapaneseSampleAnswer(),
+                updatedSpeakingQuestion.getJapaneseSampleAnswerMarkup(),
+                updatedSpeakingQuestion.getVietnameseSampleAnswer(),
+                updatedSpeakingQuestion.getEnglishSampleAnswer(),
                 updatedSpeakingQuestion.getStatus()
         );
     }

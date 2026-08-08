@@ -7,9 +7,10 @@ import org.naho.file.type.OperationType;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 public interface FileRepositoryPort {
-    File findById(Long id);
+    Optional<File> findById(Long id);
 
     List<File> findAllByLeagueIds(List<Long> leagueIds);
 
@@ -21,13 +22,20 @@ public interface FileRepositoryPort {
 
     File save(File file);
 
-    List<File> findAllForSchedulerRetryUpload(
+    List<File> findAllForSchedulerRetry(
             Instant now,
             OperationType operationType,
             OperationStatus operationStatus
     );
 
+    List<File> findAllForSchedulerRetryDelete(
+            Instant now,
+            OperationType operationType
+    );
+
     void deleteById(Long id);
 
     List<File> findAllByReportId(Long reportId);
+
+    Optional<File> findAvatarFileByUserId(Long userId);
 }

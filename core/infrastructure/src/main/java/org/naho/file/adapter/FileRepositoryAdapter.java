@@ -14,11 +14,14 @@ import org.naho.file.result.StoredFile;
 import org.naho.file.type.OperationStatus;
 import org.naho.file.type.OperationType;
 import org.naho.i18n.message.file.FileDetailMessageKey;
+import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.exception.InfrastructureException;
+import org.naho.user.exception.UserErrorCode;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -30,7 +33,7 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
     private final S3Properties s3Properties;
 
     @Override
-    public File findById(Long id) {
+    public Optional<File> findById(Long id) {
         if (id == null) {
             throw new InfrastructureException(
                     FileErrorCode.FILE_NOT_VALID,
@@ -38,14 +41,9 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
             );
         }
 
-        FileEntity entity = fileJpaRepository
+        return fileJpaRepository
                 .findById(id)
-                .orElseThrow(() -> new InfrastructureException(
-                        FileErrorCode.FILE_NOT_FOUND,
-                        FileDetailMessageKey.FILE_NOT_FOUND,
-                        id
-                ));
-        return fileEntityMapper.entityToDomain(entity);
+                .map(fileEntityMapper::entityToDomain);
     }
 
     @Override
@@ -152,13 +150,20 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
     }
 
     @Override
-    public List<File> findAllForSchedulerRetryUpload(Instant now, OperationType operationType, OperationStatus operationStatus) {
-        return fileQueryMapper.findAllForSchedulerRetryUpload(
+    public List<File> findAllForSchedulerRetry(Instant now, OperationType operationType, OperationStatus operationStatus) {
+        return fileQueryMapper.findAllForSchedulerRetry(
                         now,
                         operationType,
                         operationStatus,
                         FileProperties.MAX_RETRY_COUNT
                 ).stream().map(fileEntityMapper::entityToDomain)
+                .toList();
+    }
+
+    @Override
+    public List<File> findAllForSchedulerRetryDelete(Instant now, OperationType operationType) {
+        return fileQueryMapper.findAllForSchedulerRetryDelete(now, operationType)
+                .stream().map(fileEntityMapper::entityToDomain)
                 .toList();
     }
 
@@ -176,5 +181,19 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
         return entities.stream()
                 .map(fileEntityMapper::entityToDomain)
                 .toList();
+    }
+
+    @Override
+    public Optional<File> findAvatarFileByUserId(Long userId) {
+        if (userId == null) {
+            throw new InfrastructureException(
+                    UserErrorCode.USER_NOT_FOUND,
+                    UserDetailMessageKey.USER_ID_NULL
+            );
+        }
+
+        return fileQueryMapper
+                .findAvatarFileByUserId(userId)
+                .map(fileEntityMapper::entityToDomain);
     }
 }

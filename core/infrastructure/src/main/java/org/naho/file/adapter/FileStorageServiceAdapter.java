@@ -4,15 +4,17 @@ import lombok.RequiredArgsConstructor;
 import org.naho.file.constant.S3Metadata;
 import org.naho.file.constant.S3Properties;
 import org.naho.file.constant.StaticResourceProperties;
+import org.naho.file.entity.FileEntity;
 import org.naho.file.exception.FileErrorCode;
+import org.naho.file.mapper.FileEntityMapper;
 import org.naho.file.model.File;
 import org.naho.file.port.out.FileHelperPort;
-import org.naho.file.port.out.FileRepositoryPort;
-import org.naho.file.port.out.FileResultMapperPort;
 import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.file.repository.FileJpaRepository;
 import org.naho.file.result.DownloadedFile;
 import org.naho.file.result.StoredFile;
+import org.naho.file.type.OperationStatus;
+import org.naho.file.type.OperationType;
 import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.shared.exception.InfrastructureException;
 import org.springframework.stereotype.Service;
@@ -44,9 +46,8 @@ public class FileStorageServiceAdapter implements FileStorageServicePort {
     private final S3Properties s3Properties;
     private final StaticResourceProperties staticResourceProperties;
     private final FileHelperPort fileHelperPort;
-    private final FileRepositoryPort fileRepositoryPort;
-    private final FileResultMapperPort fileResultMapperPort;
     private final FileJpaRepository fileJpaRepository;
+    private final FileEntityMapper fileEntityMapper;
 
     @Override
     public void uploadFileToCloud(StoredFile storedFile) throws S3Exception {
@@ -163,6 +164,16 @@ public class FileStorageServiceAdapter implements FileStorageServicePort {
 
     @Override
     public String generatePresignedUrl(File file) {
+        // nếu file đã bị đánh dấu là xóa thì trả về null
+        if (OperationType.DELETE.equals(file.getOperationType())) {
+            return null;
+        }
+
+        // nếu file đánh dấu là upload nhưng chưa upload thành công thì cũng trả về null
+        if (!OperationStatus.COMPLETED.equals(file.getOperationStatus())) {
+            return null;
+        }
+
         try {
             GetObjectPresignRequest getObjectPresignRequest = GetObjectPresignRequest.builder()
                     .signatureDuration(s3Properties.getSignatureDuration())
@@ -180,6 +191,17 @@ public class FileStorageServiceAdapter implements FileStorageServicePort {
                     e.getMessage()
             );
         }
+    }
+
+    @Override
+    public String generatePresignedUrl(String objectKey) {
+        FileEntity entity = fileJpaRepository.findByObjectKey(objectKey)
+                .orElseThrow(() -> new InfrastructureException(
+                        FileErrorCode.FILE_NOT_FOUND,
+                        FileDetailMessageKey.FILE_NOT_FOUND,
+                        objectKey
+                ));
+        return this.generatePresignedUrl(fileEntityMapper.entityToDomain(entity));
     }
 
     @Override

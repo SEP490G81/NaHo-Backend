@@ -8,11 +8,15 @@ public record SpeakingQuestionListItemResponse(
         Long id,
         Long userId,
         Long speakingQuestionAudioFileId,
-        String title,
-        String titleMarkup,
+        String japaneseName,
+        String japaneseNameMarkup,
+        String vietnameseName,
         String description,
         String descriptionMarkup,
-        String sampleAnswer,
+        String japaneseSampleAnswer,
+        String japaneseSampleAnswerMarkup,
+        String vietnameseSampleAnswer,
+        String englishSampleAnswer,
         QuestionStatus status,
         ZonedDateTime createdTime
 ) {

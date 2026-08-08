@@ -14,10 +14,15 @@ import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.shared.exception.InfrastructureException;
 import org.springframework.stereotype.Component;
 
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
+
 
 @Slf4j
 @Component
@@ -26,13 +31,11 @@ public class FileValidatorAdapter implements FileValidatorPort {
     private static final Set<String> ALLOWED_IMAGE_MIME_TYPES = Set.of(
             FileContentType.IMAGE_PNG,
             FileContentType.IMAGE_JPEG,
-            FileContentType.IMAGE_WEBP
-    );
+            FileContentType.IMAGE_WEBP);
     private static final Set<String> ALLOWED_WAV_MIME_TYPES = Set.of(
             FileContentType.AUDIO_WAV,
             FileContentType.AUDIO_X_WAV,
-            FileContentType.AUDIO_VND_WAVE
-    );
+            FileContentType.AUDIO_VND_WAVE);
     private final Tika tika;
     private final FFprobe ffprobe;
     private final StaticResourceProperties staticResourceProperties;
@@ -45,18 +48,16 @@ public class FileValidatorAdapter implements FileValidatorPort {
             throw new InfrastructureException(
                     FileErrorCode.FILE_NOT_VALID,
                     FileDetailMessageKey.FILE_NOT_VALID,
-                    detectedMimeType
-            );
+                    detectedMimeType);
         }
     }
 
     @Override
-    public void validateWavFileAndDuration(byte[] audioBytes, Double maxDuration) {
+    public double validateWavFileAndDuration(byte[] audioBytes, Double maxDuration) {
         if (audioBytes == null || audioBytes.length == 0) {
             throw new InfrastructureException(
                     FileErrorCode.FILE_NOT_VALID,
-                    FileDetailMessageKey.FILE_EMPTY
-            );
+                    FileDetailMessageKey.FILE_EMPTY);
         }
 
         Path tempFile = null;
@@ -68,14 +69,12 @@ public class FileValidatorAdapter implements FileValidatorPort {
                 throw new InfrastructureException(
                         FileErrorCode.FILE_NOT_VALID,
                         FileDetailMessageKey.FILE_NOT_VALID,
-                        detectedMimeType
-                );
+                        detectedMimeType);
             }
 
             Path tempDirectory = Path.of(
                     staticResourceProperties.getLocalPath(),
-                    FileFolderConstant.TEMP
-            );
+                    FileFolderConstant.TEMP);
 
             Files.createDirectories(tempDirectory);
 
@@ -91,16 +90,16 @@ public class FileValidatorAdapter implements FileValidatorPort {
                         FileErrorCode.FILE_NOT_VALID,
                         FileDetailMessageKey.FILE_AUDIO_DURATION_EXCEEDED,
                         duration,
-                        maxDuration
-                );
+                        maxDuration);
             }
+
+            return duration;
 
         } catch (IOException e) {
             throw new InfrastructureException(
                     FileErrorCode.FILE_NOT_VALID,
                     FileDetailMessageKey.FILE_NOT_VALID,
-                    e.getMessage()
-            );
+                    e.getMessage());
         } finally {
             if (tempFile != null) {
                 try {
@@ -113,4 +112,24 @@ public class FileValidatorAdapter implements FileValidatorPort {
             }
         }
     }
+
+    @Override
+    public double calculateWavDurationSeconds(byte[] audioBytes) {
+        if (audioBytes == null || audioBytes.length == 0) {
+            return 0.0;
+        }
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(audioBytes);
+             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(bais)) {
+            AudioFormat format = audioInputStream.getFormat();
+            long frames = audioInputStream.getFrameLength();
+            if (frames <= 0 || format.getFrameRate() <= 0) {
+                return 0.0;
+            }
+            return (double) frames / format.getFrameRate();
+        } catch (Exception e) {
+            return 0.0;
+        }
+    }
 }
+
+

@@ -13,7 +13,7 @@ import org.naho.user.command.GoogleLoginCommand;
 import org.naho.user.command.LogoutCommand;
 import org.naho.user.exception.RoleErrorCode;
 import org.naho.user.exception.UserErrorCode;
-import org.naho.user.model.OAuthProvider;
+import org.naho.user.model.AuthProvider;
 import org.naho.user.model.Role;
 import org.naho.user.model.User;
 import org.naho.user.model.UserSession;
@@ -21,7 +21,7 @@ import org.naho.user.port.in.AuthInputPort;
 import org.naho.user.port.out.*;
 import org.naho.user.result.LoginResult;
 import org.naho.user.result.TokenResult;
-import org.naho.user.type.OAuthProviderName;
+import org.naho.user.type.AuthProviderName;
 import org.naho.user.type.RoleName;
 import org.naho.user.type.SessionRevokedReason;
 import org.naho.user.type.UserStatus;
@@ -163,13 +163,13 @@ public class AuthUseCase implements AuthInputPort {
         String providerUserId = command.getSub();
 
         User currentUser = userRepositoryPort
-                .findByProviderUserIdAndProviderName(providerUserId, OAuthProviderName.GOOGLE)
+                .findByProviderUserIdAndProviderName(providerUserId, AuthProviderName.GOOGLE)
                 .orElse(null);
 
         if (currentUser == null) {
-            OAuthProvider oAuthProvider = OAuthProvider.builder()
+            AuthProvider authProvider = AuthProvider.builder()
                     .providerUserId(providerUserId)
-                    .providerName(OAuthProviderName.GOOGLE)
+                    .providerName(AuthProviderName.GOOGLE)
                     .avatarUrl(command.getPictureUrl())
                     .build();
 
@@ -192,13 +192,13 @@ public class AuthUseCase implements AuthInputPort {
                         .roleIds(List.of(learnerRole.getId()))
                         .build();
 
-                currentUser = userRepositoryPort.createNew(newUser, oAuthProvider);
+                currentUser = userRepositoryPort.createNew(newUser, authProvider);
 
                 // init user learning progress
                 crudUserLearningProgressInputPort.initUserLearningProgress(currentUser.getId());
             } else {
-                // if user is found by email, update OAuthProvider (link to Google)
-                currentUser = userRepositoryPort.createNew(emailUser, oAuthProvider);
+                // if user is found by email, update AuthProvider (link to Google)
+                currentUser = userRepositoryPort.createNew(emailUser, authProvider);
             }
         }
 
