@@ -4,7 +4,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.naho.user.entity.UserEntity;
 import org.naho.user.result.LeaderboardUserResult;
-import org.naho.user.type.OAuthProviderName;
+import org.naho.user.type.AuthProviderName;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface UserQueryMapper {
     Optional<UserEntity> findByProviderUserIdAndProviderName(
             @Param("providerUserId") String providerUserId,
-            @Param("providerName") OAuthProviderName providerName
+            @Param("providerName") AuthProviderName providerName
     );
 
     List<LeaderboardUserResult> findTop10OrderByTotalPointInLeague(@Param("leagueId") Long leagueId);

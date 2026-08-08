@@ -1,5 +1,5 @@
 package org.naho.user.type;
 
-public enum OAuthProviderName {
+public enum AuthProviderName {
     GOOGLE, FACEBOOK, APPLE
 }

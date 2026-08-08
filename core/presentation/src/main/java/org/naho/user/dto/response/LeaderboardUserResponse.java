@@ -9,8 +9,8 @@ public record LeaderboardUserResponse(
         String username,
         String email,
         String fullName,
-        String avatarObjectKey,
-        List<String> oAuthAvatarUrl,
+        String avatarUrl,
+        List<String> authAvatarUrl,
         Double totalPoint
 ) {
 }

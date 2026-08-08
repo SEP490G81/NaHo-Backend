@@ -2,10 +2,10 @@ package org.naho.user.port.out;
 
 import org.naho.file.model.File;
 import org.naho.user.command.UpdateUserInfoCommand;
-import org.naho.user.model.OAuthProvider;
+import org.naho.user.model.AuthProvider;
 import org.naho.user.model.User;
 import org.naho.user.result.LeaderboardUserResult;
-import org.naho.user.type.OAuthProviderName;
+import org.naho.user.type.AuthProviderName;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +15,7 @@ public interface UserRepositoryPort {
 
     Optional<User> findByEmail(String email);
 
-    Optional<User> findByProviderUserIdAndProviderName(String providerUserId, OAuthProviderName providerName);
+    Optional<User> findByProviderUserIdAndProviderName(String providerUserId, AuthProviderName providerName);
 
     Optional<User> findByUsernameOrEmail(String usernameOrEmail);
 
@@ -25,7 +25,7 @@ public interface UserRepositoryPort {
 
     User save(User user);
 
-    User createNew(User user, OAuthProvider oAuthProvider);
+    User createNew(User user, AuthProvider authProvider);
 
     Optional<User> findById(Long id);
 

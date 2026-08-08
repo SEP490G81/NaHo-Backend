@@ -73,14 +73,14 @@ public final class UserDetailMessageKey {
             "user.google.id.token.not.valid";
     public static final String USER_GOOGLE_ID_TOKEN_NOT_FOUND =
             "user.google.id.token.not.found";
-    public static final String USER_OAUTH_PROVIDER_USER_ID_NULL =
-            "user.oauth.provider.user.id.null";
-    public static final String USER_OAUTH_PROVIDER_PROVIDER_USER_ID_BLANK =
-            "user.oauth.provider.provider.user.id.blank";
-    public static final String USER_OAUTH_PROVIDER_PROVIDER_NAME_NULL =
-            "user.oauth.provider.provider.name.null";
-    public static final String USER_OAUTH_PROVIDER_AVATAR_URL_BLANK =
-            "user.oauth.provider.avatar.url.blank";
+    public static final String USER_AUTH_PROVIDER_USER_ID_NULL =
+            "user.auth.provider.user.id.null";
+    public static final String USER_AUTH_PROVIDER_PROVIDER_USER_ID_BLANK =
+            "user.auth.provider.provider.user.id.blank";
+    public static final String USER_AUTH_PROVIDER_PROVIDER_NAME_NULL =
+            "user.auth.provider.provider.name.null";
+    public static final String USER_AUTH_PROVIDER_AVATAR_URL_BLANK =
+            "user.auth.provider.avatar.url.blank";
     public static final String USER_EMAIL_UNVERIFIED_DETAIL = "user.email.unverified.detail";
     public static final String USER_INVALID_OTP_DETAIL = "user.invalid.otp.detail";
     public static final String USER_OTP_COOLDOWN_DETAIL = "user.otp.cooldown.detail";

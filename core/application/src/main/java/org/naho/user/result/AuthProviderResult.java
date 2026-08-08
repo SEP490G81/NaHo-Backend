@@ -1,10 +1,10 @@
 package org.naho.user.result;
 
-import org.naho.user.type.OAuthProviderName;
+import org.naho.user.type.AuthProviderName;
 
-public record OAuthProviderResult(
+public record AuthProviderResult(
         Long id,
-        OAuthProviderName providerName,
+        AuthProviderName providerName,
         String avatarUrl
 ) {
 
@@ -15,7 +15,7 @@ public record OAuthProviderResult(
     public static final class Builder {
 
         private Long id;
-        private OAuthProviderName providerName;
+        private AuthProviderName providerName;
         private String avatarUrl;
 
         private Builder() {
@@ -26,7 +26,7 @@ public record OAuthProviderResult(
             return this;
         }
 
-        public Builder providerName(OAuthProviderName providerName) {
+        public Builder providerName(AuthProviderName providerName) {
             this.providerName = providerName;
             return this;
         }
@@ -36,8 +36,8 @@ public record OAuthProviderResult(
             return this;
         }
 
-        public OAuthProviderResult build() {
-            return new OAuthProviderResult(
+        public AuthProviderResult build() {
+            return new AuthProviderResult(
                     id,
                     providerName,
                     avatarUrl

@@ -1,8 +1,6 @@
 package org.naho.user.dto.response;
 
 import lombok.Builder;
-import org.naho.file.dto.response.FileResponse;
-import org.naho.user.result.OAuthProviderResult;
 import org.naho.user.type.Gender;
 import org.naho.user.type.JLPTLevel;
 
@@ -12,10 +10,10 @@ import java.util.List;
 @Builder
 public record UserResponse(
         Long id,
-        List<OAuthProviderResult> oAuthProviders,
+        List<AuthProviderResponse> authProviders,
 
         Long userLearningProgressId,
-        FileResponse avatarFile,
+        String avatarUrl,
 
         String username,
         String email,

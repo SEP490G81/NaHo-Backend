@@ -13,7 +13,7 @@ public class UserResult {
 
     private Long id;
     private List<RoleResult> roles;
-    private List<OAuthProviderResult> oAuthProviders;
+    private List<AuthProviderResult> authProviders;
     private FileResult avatarFile;
     private Long userLearningProgressId;
 
@@ -31,7 +31,7 @@ public class UserResult {
     public UserResult(
             Long id,
             List<RoleResult> roles,
-            List<OAuthProviderResult> oAuthProviders,
+            List<AuthProviderResult> authProviders,
             FileResult avatarFile,
             Long userLearningProgressId,
             String username,
@@ -44,7 +44,7 @@ public class UserResult {
     ) {
         this.id = id;
         this.roles = roles;
-        this.oAuthProviders = oAuthProviders;
+        this.authProviders = authProviders;
         this.avatarFile = avatarFile;
         this.userLearningProgressId = userLearningProgressId;
         this.username = username;
@@ -59,7 +59,7 @@ public class UserResult {
     private UserResult(Builder builder) {
         this.id = builder.id;
         this.roles = builder.roles;
-        this.oAuthProviders = builder.oAuthProviders;
+        this.authProviders = builder.authProviders;
         this.avatarFile = builder.avatarFile;
         this.userLearningProgressId = builder.userLearningProgressId;
         this.username = builder.username;
@@ -91,12 +91,12 @@ public class UserResult {
         this.roles = roles;
     }
 
-    public List<OAuthProviderResult> getOAuthProviders() {
-        return oAuthProviders;
+    public List<AuthProviderResult> getAuthProviders() {
+        return authProviders;
     }
 
-    public void setOAuthProviders(List<OAuthProviderResult> oAuthProviders) {
-        this.oAuthProviders = oAuthProviders;
+    public void setAuthProviders(List<AuthProviderResult> authProviders) {
+        this.authProviders = authProviders;
     }
 
     public FileResult getAvatarFile() {
@@ -180,8 +180,8 @@ public class UserResult {
         return roles;
     }
 
-    public List<OAuthProviderResult> oAuthProviders() {
-        return oAuthProviders;
+    public List<AuthProviderResult> authProviders() {
+        return authProviders;
     }
 
     public FileResult avatarFile() {
@@ -227,7 +227,7 @@ public class UserResult {
         UserResult that = (UserResult) o;
         return Objects.equals(id, that.id) &&
                 Objects.equals(roles, that.roles) &&
-                Objects.equals(oAuthProviders, that.oAuthProviders) &&
+                Objects.equals(authProviders, that.authProviders) &&
                 Objects.equals(avatarFile, that.avatarFile) &&
                 Objects.equals(userLearningProgressId, that.userLearningProgressId) &&
                 Objects.equals(username, that.username) &&
@@ -241,7 +241,7 @@ public class UserResult {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, roles, oAuthProviders, avatarFile, userLearningProgressId, username, email, fullName, gender, dob, jlptLevel, status);
+        return Objects.hash(id, roles, authProviders, avatarFile, userLearningProgressId, username, email, fullName, gender, dob, jlptLevel, status);
     }
 
     @Override
@@ -249,7 +249,7 @@ public class UserResult {
         return "UserResult{" +
                 "id=" + id +
                 ", roles=" + roles +
-                ", oAuthProviders=" + oAuthProviders +
+                ", authProviders=" + authProviders +
                 ", avatarFile=" + avatarFile +
                 ", userLearningProgressId=" + userLearningProgressId +
                 ", username='" + username + '\'' +
@@ -266,7 +266,7 @@ public class UserResult {
 
         private Long id;
         private List<RoleResult> roles;
-        private List<OAuthProviderResult> oAuthProviders;
+        private List<AuthProviderResult> authProviders;
 
         private Long userLearningProgressId;
         private FileResult avatarFile;
@@ -293,8 +293,8 @@ public class UserResult {
             return this;
         }
 
-        public Builder oAuthProviders(List<OAuthProviderResult> oAuthProviders) {
-            this.oAuthProviders = oAuthProviders;
+        public Builder authProviders(List<AuthProviderResult> authProviders) {
+            this.authProviders = authProviders;
             return this;
         }
 

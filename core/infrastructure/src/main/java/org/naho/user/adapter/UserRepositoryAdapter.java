@@ -11,12 +11,12 @@ import org.naho.file.repository.FileJpaRepository;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.exception.InfrastructureException;
 import org.naho.user.command.UpdateUserInfoCommand;
-import org.naho.user.entity.OAuthProviderEntity;
+import org.naho.user.entity.AuthProviderEntity;
 import org.naho.user.entity.UserEntity;
 import org.naho.user.exception.UserErrorCode;
-import org.naho.user.mapper.OAuthProviderEntityMapper;
+import org.naho.user.mapper.AuthProviderEntityMapper;
 import org.naho.user.mapper.UserEntityMapper;
-import org.naho.user.model.OAuthProvider;
+import org.naho.user.model.AuthProvider;
 import org.naho.user.model.User;
 import org.naho.user.mybatis.UserQueryMapper;
 import org.naho.user.port.out.UserRepositoryPort;
@@ -38,7 +38,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     private final UserJpaRepository userJpaRepository;
     private final UserEntityMapper userEntityMapper;
     private final UserQueryMapper userQueryMapper;
-    private final OAuthProviderEntityMapper oAuthProviderEntityMapper;
+    private final AuthProviderEntityMapper authProviderEntityMapper;
     private final FileStorageServicePort fileStorageServicePort;
     private final UploadFileInputPort uploadFileInputPort;
     private final FileEntityMapper fileEntityMapper;
@@ -58,7 +58,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
-    public Optional<User> findByProviderUserIdAndProviderName(String providerId, OAuthProviderName providerName) {
+    public Optional<User> findByProviderUserIdAndProviderName(String providerId, AuthProviderName providerName) {
         return userQueryMapper.findByProviderUserIdAndProviderName(providerId, providerName)
                 .map(userEntityMapper::entityToDomain);
     }
@@ -87,13 +87,13 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
-    public User createNew(User user, OAuthProvider oAuthProvider) {
+    public User createNew(User user, AuthProvider authProvider) {
         UserEntity userEntity = userEntityMapper.domainToEntity(user);
 
-        if (oAuthProvider != null) {
-            OAuthProviderEntity oAuthProviderEntity = oAuthProviderEntityMapper.domainToEntity(oAuthProvider);
-            oAuthProviderEntity.setUser(userEntity);
-            userEntity.getOAuthProviders().add(oAuthProviderEntity);
+        if (authProvider != null) {
+            AuthProviderEntity authProviderEntity = authProviderEntityMapper.domainToEntity(authProvider);
+            authProviderEntity.setUser(userEntity);
+            userEntity.getAuthProviders().add(authProviderEntity);
         }
 
         UserEntity savedEntity = userJpaRepository.save(userEntity);
@@ -146,13 +146,13 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
     @Override
     public Optional<LeaderboardUserResult> findTopOfUserByUserId(Long userId) {
-        Optional<LeaderboardUserResult> leaderboardUserResult = userQueryMapper.findTopOfUserByUserId(userId);
-        return leaderboardUserResult;
+        return userQueryMapper.findTopOfUserByUserId(userId);
     }
 
     @Override
     public Optional<User> findById(Long id) {
-        return userJpaRepository.findById(id)
+        return userJpaRepository
+                .findById(id)
                 .map(userEntityMapper::entityToDomain);
     }
 
@@ -224,7 +224,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         user.setAvatarFile(fileEntity);
 
         UserEntity savedUser = userJpaRepository.save(user);
-        
+
         return userEntityMapper.entityToDomain(savedUser);
     }
 }

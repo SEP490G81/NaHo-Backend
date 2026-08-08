@@ -73,7 +73,7 @@ public class UserEntity extends BaseEntity {
 
     @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<OAuthProviderEntity> oAuthProviders = new ArrayList<>();
+    List<AuthProviderEntity> authProviders = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     List<SpeakingQuestionEntity> speakingQuestions;

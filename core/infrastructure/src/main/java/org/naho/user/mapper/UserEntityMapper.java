@@ -24,7 +24,7 @@ import org.naho.user.model.User;
                 UserValueObjectMapper.class,
                 RoleIdMapper.class,
                 UserSessionIdMapper.class,
-                OAuthProviderIdMapper.class,
+                AuthProviderIdMapper.class,
                 SpeakingQuestionIdMapper.class,
                 ReportIdMapper.class,
                 PointHistoryIdMapper.class,
@@ -38,7 +38,7 @@ import org.naho.user.model.User;
 public interface UserEntityMapper {
     @Mapping(target = "roleIds", source = "roles")
     @Mapping(target = "userSessionIds", source = "userSessions")
-    @Mapping(target = "oAuthProviderIds", source = "OAuthProviders")
+    @Mapping(target = "authProviderIds", source = "authProviders")
     @Mapping(target = "speakingQuestionIds", source = "speakingQuestions")
     @Mapping(target = "reportIds", source = "reports")
     @Mapping(target = "pointHistoryIds", source = "pointHistories")
@@ -59,7 +59,7 @@ public interface UserEntityMapper {
     @Mapping(target = "reports", source = "reportIds")
     @Mapping(target = "pointHistories", source = "pointHistoryIds")
     @Mapping(target = "userNodeProgresses", source = "userNodeProgressIds")
-    @Mapping(target = "oAuthProviders", source = "OAuthProviderIds")
+    @Mapping(target = "authProviders", source = "authProviderIds")
     @Mapping(target = "avatarFile", source = "avatarFileId")
     @Mapping(target = "userDailyAttendances", source = "userDailyAttendanceIds")
     @Mapping(target = "userDailyMissions", source = "userDailyMissionIds")

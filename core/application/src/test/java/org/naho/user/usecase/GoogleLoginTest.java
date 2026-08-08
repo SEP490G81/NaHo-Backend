@@ -20,14 +20,14 @@ import org.naho.user.command.GoogleLoginCommand;
 import org.naho.user.exception.RoleErrorCode;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.exception.UserSessionDomainErrorCode;
-import org.naho.user.model.OAuthProvider;
+import org.naho.user.model.AuthProvider;
 import org.naho.user.model.Role;
 import org.naho.user.model.User;
 import org.naho.user.model.UserSession;
 import org.naho.user.port.out.*;
 import org.naho.user.result.LoginResult;
 import org.naho.user.result.TokenResult;
-import org.naho.user.type.OAuthProviderName;
+import org.naho.user.type.AuthProviderName;
 import org.naho.user.type.RoleName;
 import org.naho.user.type.SessionRevokedReason;
 import org.naho.user.type.UserStatus;
@@ -122,7 +122,7 @@ class GoogleLoginTest {
                 .lastUsedAt(now)
                 .build();
 
-        when(userRepositoryPort.findByProviderUserIdAndProviderName("google-sub-12345", OAuthProviderName.GOOGLE))
+        when(userRepositoryPort.findByProviderUserIdAndProviderName("google-sub-12345", AuthProviderName.GOOGLE))
                 .thenReturn(Optional.of(user));
         when(tokenServicePort.generateRefreshToken(any())).thenReturn(refreshToken);
         when(encoderPort.hashRefreshToken("refresh-token-value")).thenReturn("hashed-refresh-token");
@@ -187,13 +187,13 @@ class GoogleLoginTest {
                 .lastUsedAt(now)
                 .build();
 
-        when(userRepositoryPort.findByProviderUserIdAndProviderName("google-sub-67890", OAuthProviderName.GOOGLE))
+        when(userRepositoryPort.findByProviderUserIdAndProviderName("google-sub-67890", AuthProviderName.GOOGLE))
                 .thenReturn(Optional.empty());
         when(userRepositoryPort.findByEmail("newgoogleuser@example.com"))
                 .thenReturn(Optional.empty());
         when(roleRepositoryPort.findByName(RoleName.LEARNER))
                 .thenReturn(Optional.of(learnerRole));
-        when(userRepositoryPort.createNew(any(User.class), any(OAuthProvider.class)))
+        when(userRepositoryPort.createNew(any(User.class), any(AuthProvider.class)))
                 .thenReturn(createdUser);
         when(tokenServicePort.generateRefreshToken(any())).thenReturn(refreshToken);
         when(encoderPort.hashRefreshToken("refresh-token-value")).thenReturn("hashed-refresh-token");
@@ -253,11 +253,11 @@ class GoogleLoginTest {
                 .lastUsedAt(now)
                 .build();
 
-        when(userRepositoryPort.findByProviderUserIdAndProviderName("google-sub-99999", OAuthProviderName.GOOGLE))
+        when(userRepositoryPort.findByProviderUserIdAndProviderName("google-sub-99999", AuthProviderName.GOOGLE))
                 .thenReturn(Optional.empty());
         when(userRepositoryPort.findByEmail("existingemail@example.com"))
                 .thenReturn(Optional.of(existingEmailUser));
-        when(userRepositoryPort.createNew(eq(existingEmailUser), any(OAuthProvider.class)))
+        when(userRepositoryPort.createNew(eq(existingEmailUser), any(AuthProvider.class)))
                 .thenReturn(existingEmailUser);
         when(tokenServicePort.generateRefreshToken(any())).thenReturn(refreshToken);
         when(encoderPort.hashRefreshToken("refresh-token-value")).thenReturn("hashed-refresh-token");
@@ -291,7 +291,7 @@ class GoogleLoginTest {
                 .ipAddress("127.0.0.1")
                 .build();
 
-        when(userRepositoryPort.findByProviderUserIdAndProviderName("google-sub-00000", OAuthProviderName.GOOGLE))
+        when(userRepositoryPort.findByProviderUserIdAndProviderName("google-sub-00000", AuthProviderName.GOOGLE))
                 .thenReturn(Optional.empty());
         when(userRepositoryPort.findByEmail("noroleuser@example.com"))
                 .thenReturn(Optional.empty());
@@ -332,7 +332,7 @@ class GoogleLoginTest {
                 .roleIds(List.of(1L))
                 .build();
 
-        when(userRepositoryPort.findByProviderUserIdAndProviderName("google-sub-inactive", OAuthProviderName.GOOGLE))
+        when(userRepositoryPort.findByProviderUserIdAndProviderName("google-sub-inactive", AuthProviderName.GOOGLE))
                 .thenReturn(Optional.of(inactiveUser));
 
         // Act & Assert
@@ -372,7 +372,7 @@ class GoogleLoginTest {
         Instant now = Instant.now();
         TokenResult refreshToken = new TokenResult("refreshToken", "refresh_token", "refresh-token-value", now.plusSeconds(86400), 86400L);
 
-        when(userRepositoryPort.findByProviderUserIdAndProviderName("google-sub-12345", OAuthProviderName.GOOGLE))
+        when(userRepositoryPort.findByProviderUserIdAndProviderName("google-sub-12345", AuthProviderName.GOOGLE))
                 .thenReturn(Optional.of(user));
         when(tokenServicePort.generateRefreshToken(any())).thenReturn(refreshToken);
         when(encoderPort.hashRefreshToken("refresh-token-value")).thenReturn("hashed-refresh-token");

@@ -30,8 +30,8 @@ public final class UserTitleMessageKey {
     public static final String USER_INVALID_OTP_TITLE = "user.invalid.otp.title";
     public static final String USER_OTP_COOLDOWN_TITLE = "user.otp.cooldown.title";
     public static final String USER_OTP_ATTEMPTS_EXCEEDED_TITLE = "user.otp.attempts.exceeded.title";
-    public static final String USER_OAUTH_PROVIDER_NOT_VALID_TITLE =
-            "user.oauth.provider.not.valid.title";
+    public static final String USER_AUTH_PROVIDER_NOT_VALID_TITLE =
+            "user.auth.provider.not.valid.title";
 
     public static final String USER_PASSWORD_NOT_MATCH_TITLE = "user.password.not.match.title";
     public static final String USER_PASSWORD_SAME_AS_OLD_TITLE = "user.password.same.as.old.title";

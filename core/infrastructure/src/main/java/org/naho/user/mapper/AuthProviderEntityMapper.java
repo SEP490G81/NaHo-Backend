@@ -2,16 +2,16 @@ package org.naho.user.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.naho.user.entity.OAuthProviderEntity;
-import org.naho.user.model.OAuthProvider;
+import org.naho.user.entity.AuthProviderEntity;
+import org.naho.user.model.AuthProvider;
 
 @Mapper(componentModel = "spring")
-public interface OAuthProviderEntityMapper {
+public interface AuthProviderEntityMapper {
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "createdTime", ignore = true)
     @Mapping(target = "modifiedTime", ignore = true)
-    OAuthProviderEntity domainToEntity(OAuthProvider domain);
+    AuthProviderEntity domainToEntity(AuthProvider domain);
 
     @Mapping(target = "userId", source = "user.id")
-    OAuthProvider entityToDomain(OAuthProviderEntity entity);
+    AuthProvider entityToDomain(AuthProviderEntity entity);
 }

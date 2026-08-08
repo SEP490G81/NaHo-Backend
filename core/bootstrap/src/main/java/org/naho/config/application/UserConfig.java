@@ -10,7 +10,7 @@ import org.naho.file.port.out.FileValidatorPort;
 import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
 import org.naho.shared.port.out.EmailPort;
 import org.naho.shared.port.out.TransactionPort;
-import org.naho.user.mapper.OAuthProviderResultMapper;
+import org.naho.user.mapper.AuthProviderResultMapper;
 import org.naho.user.mapper.RoleResultMapper;
 import org.naho.user.mapper.UserResultMapper;
 import org.naho.user.port.in.*;
@@ -34,18 +34,18 @@ public class UserConfig {
     }
 
     @Bean
-    public OAuthProviderResultMapper oAuthProviderResultMapper() {
-        return new OAuthProviderResultMapper();
+    public AuthProviderResultMapper authProviderResultMapper() {
+        return new AuthProviderResultMapper();
     }
 
     @Bean
     public UserResultMapper userResultMapper(
             CrudRoleInputPort crudRoleInputPort,
-            CrudOAuthProviderInputPort crudOAuthProviderInputPort,
+            CrudAuthProviderInputPort crudAuthProviderInputPort,
             CrudFileInputPort crudFileInputPort) {
         return new UserResultMapper(
                 crudRoleInputPort,
-                crudOAuthProviderInputPort,
+                crudAuthProviderInputPort,
                 crudFileInputPort);
     }
 
@@ -88,12 +88,12 @@ public class UserConfig {
     }
 
     @Bean
-    public CrudOAuthProviderInputPort crudOAuthProviderInputPort(
-            OAuthProviderRepositoryPort oAuthProviderRepositoryPort,
-            OAuthProviderResultMapper oAuthProviderResultMapper) {
-        return new CrudOAuthProviderUseCase(
-                oAuthProviderRepositoryPort,
-                oAuthProviderResultMapper);
+    public CrudAuthProviderInputPort crudAuthProviderInputPort(
+            AuthProviderRepositoryPort authProviderRepositoryPort,
+            AuthProviderResultMapper authProviderResultMapper) {
+        return new CrudAuthProviderUseCase(
+                authProviderRepositoryPort,
+                authProviderResultMapper);
     }
 
     @Bean
