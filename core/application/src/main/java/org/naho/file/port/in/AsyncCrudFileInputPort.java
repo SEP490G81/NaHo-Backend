@@ -6,4 +6,6 @@ public interface AsyncCrudFileInputPort {
     void retryUploadFileToCloudAsync(File file);
 
     void deleteFileInCloudAsync(String objectKey);
+
+    void retryDeleteFileInCloudAsync(File file);
 }

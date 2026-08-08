@@ -141,7 +141,7 @@ public class CrudUserUseCase implements CrudUserInputPort {
                 currentAvatarFile
         ));
 
-        // nếu các thao tác với db thành công thì mới upload file lên cloud
+        // nếu các thao tác với db thành công thì mới upload avatar file mới lên cloud
         FileResult fileResult = uploadFileInputPort.uploadFileToCloud(command.storedFile());
 
         userResult.setAvatarFile(fileResult);

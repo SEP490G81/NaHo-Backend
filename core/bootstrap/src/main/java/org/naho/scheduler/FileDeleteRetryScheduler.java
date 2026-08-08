@@ -16,23 +16,23 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class FileUploadRetryScheduler {
+public class FileDeleteRetryScheduler {
     private final FileRepositoryPort fileRepositoryPort;
     private final AsyncCrudFileInputPort asyncCrudFileInputPort;
 
     /**
      * Khi hàm này kết thúc thì phải đợi thêm thời gian delay thì mới chạy tiếp.
-     * Ví dụ 10:00 chạy, upload mất 1 phút, thì 10:03 mới chạy tiếp.
+     * Ví dụ 10:00 chạy, delete mất 1 phút, thì 10:03 mới chạy tiếp.
      */
     @Scheduled(fixedDelayString = "${app.scheduler.file-upload-retry.fixed-delay}")
     public void retryUploadFiles() {
-        log.info("Retry upload files!");
+        log.info("Retry delete files!");
 
         Instant now = Instant.now();
 
         List<File> files = fileRepositoryPort.findAllForSchedulerRetry(
                 now,
-                OperationType.UPLOAD,
+                OperationType.DELETE,
                 OperationStatus.FAILED
         );
 
@@ -41,9 +41,9 @@ public class FileUploadRetryScheduler {
         }
 
         for (File file : files) {
-            asyncCrudFileInputPort.retryUploadFileToCloudAsync(file);
+            asyncCrudFileInputPort.retryDeleteFileInCloudAsync(file);
         }
 
-        log.info("Retry upload {} files completed!", files.size());
+        log.info("Retry delete {} files completed!", files.size());
     }
 }

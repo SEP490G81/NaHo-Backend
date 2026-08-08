@@ -25,4 +25,10 @@ public class AsyncCrudFileAdapter implements AsyncCrudFileInputPort {
     public void deleteFileInCloudAsync(String objectKey) {
         deleteFileInputPort.deleteFileInCloud(objectKey);
     }
+
+    @Async("retryDeleteFileInCloudExecutor")
+    @Override
+    public void retryDeleteFileInCloudAsync(File file) {
+        deleteFileInputPort.retryDeleteFileInCloud(file);
+    }
 }

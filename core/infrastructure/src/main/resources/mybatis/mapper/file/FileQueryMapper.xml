@@ -17,7 +17,7 @@
         <result property="modifiedTime" column="modified_time"/>
     </resultMap>
 
-    <select id="findAllForSchedulerRetryUpload" resultMap="FileEntityResultMap">
+    <select id="findAllForSchedulerRetry" resultMap="FileEntityResultMap">
         select *
         from files
         where operation_type = #{operationType}

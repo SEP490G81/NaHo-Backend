@@ -150,13 +150,20 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
     }
 
     @Override
-    public List<File> findAllForSchedulerRetryUpload(Instant now, OperationType operationType, OperationStatus operationStatus) {
-        return fileQueryMapper.findAllForSchedulerRetryUpload(
+    public List<File> findAllForSchedulerRetry(Instant now, OperationType operationType, OperationStatus operationStatus) {
+        return fileQueryMapper.findAllForSchedulerRetry(
                         now,
                         operationType,
                         operationStatus,
                         FileProperties.MAX_RETRY_COUNT
                 ).stream().map(fileEntityMapper::entityToDomain)
+                .toList();
+    }
+
+    @Override
+    public List<File> findAllForSchedulerRetryDelete(Instant now, OperationType operationType) {
+        return fileQueryMapper.findAllForSchedulerRetryDelete(now, operationType)
+                .stream().map(fileEntityMapper::entityToDomain)
                 .toList();
     }
 
