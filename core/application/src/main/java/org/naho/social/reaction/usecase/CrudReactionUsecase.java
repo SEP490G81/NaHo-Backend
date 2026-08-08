@@ -29,19 +29,24 @@ public class CrudReactionUsecase implements CrudReactionTypeInputPort {
     private final UserRepositoryPort userRepositoryPort;
     private final CommentRepositoryPort commentRepositoryPort;
     private final EventPublisherPort eventPublisherPort;
+    private final org.naho.learning.port.out.LearningPathNodeRepositoryPort learningPathNodeRepositoryPort;
 
-    public CrudReactionUsecase(ReactionRepositoryPort reactionRepositoryPort,
-                               ReactionActionCommandMapper reactionActionCommandMapper,
-                               ReactionResultResponseMapper reactionResultResponseMapper,
-                               UserRepositoryPort userRepositoryPort,
-                               CommentRepositoryPort commentRepositoryPort,
-                               EventPublisherPort eventPublisherPort) {
+    public CrudReactionUsecase(
+            ReactionRepositoryPort reactionRepositoryPort,
+            ReactionActionCommandMapper reactionActionCommandMapper,
+            ReactionResultResponseMapper reactionResultResponseMapper,
+            UserRepositoryPort userRepositoryPort,
+            CommentRepositoryPort commentRepositoryPort,
+            EventPublisherPort eventPublisherPort,
+            org.naho.learning.port.out.LearningPathNodeRepositoryPort learningPathNodeRepositoryPort
+    ) {
         this.reactionRepositoryPort = reactionRepositoryPort;
         this.reactionActionCommandMapper = reactionActionCommandMapper;
         this.reactionResultResponseMapper = reactionResultResponseMapper;
         this.userRepositoryPort = userRepositoryPort;
         this.commentRepositoryPort = commentRepositoryPort;
         this.eventPublisherPort = eventPublisherPort;
+        this.learningPathNodeRepositoryPort = learningPathNodeRepositoryPort;
     }
 
     @Override
@@ -67,13 +72,17 @@ public class CrudReactionUsecase implements CrudReactionTypeInputPort {
             commentRepositoryPort.findByCommentId(reactionActionCommand.comment_id()).ifPresent(comment -> {
                 if (!comment.getUserId().equals(reactionActionCommand.userId())) {
                     String metadata = "{\"questionId\": " + comment.getQuestionId() + ", \"commentId\": " + comment.getId() + "}";
+                    String targetUrl = learningPathNodeRepositoryPort.getFrontendUrlPath(comment.getQuestionId())
+                            .map(path -> path + "#comment-" + comment.getId())
+                            .orElse("/speaking-questions/" + comment.getQuestionId() + "#comment-" + comment.getId());
+
                     eventPublisherPort.publish(new SendNotificationEvent(
                             this,
                             comment.getUserId(),
                             NotificationType.SOCIAL,
                             "Có người thích bình luận của bạn",
                             username + " vừa thả cảm xúc vào bình luận của bạn.",
-                            null,
+                            targetUrl,
                             metadata
                     ));
                 }

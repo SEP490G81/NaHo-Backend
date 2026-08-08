@@ -28,17 +28,23 @@ public class CommentCrudUsecase implements CommentCrudInputPort {
     private final CommentDomainMapper commentDomainMapper;
     private final CommentResultMapper commentResultMapper;
     private final EventPublisherPort eventPublisherPort;
+    private final org.naho.user.port.out.UserRepositoryPort userRepositoryPort;
+    private final org.naho.learning.port.out.LearningPathNodeRepositoryPort learningPathNodeRepositoryPort;
 
     public CommentCrudUsecase(CommentRepositoryPort commentRepositoryPort,
                               CommentListResultMapper commentListResultMapper,
                               CommentDomainMapper commentDomainMapper,
                               CommentResultMapper commentResultMapper,
-                              EventPublisherPort eventPublisherPort) {
+                              EventPublisherPort eventPublisherPort,
+                              org.naho.user.port.out.UserRepositoryPort userRepositoryPort,
+                              org.naho.learning.port.out.LearningPathNodeRepositoryPort learningPathNodeRepositoryPort) {
         this.commentRepositoryPort = commentRepositoryPort;
         this.commentListResultMapper = commentListResultMapper;
         this.commentDomainMapper = commentDomainMapper;
         this.commentResultMapper = commentResultMapper;
         this.eventPublisherPort = eventPublisherPort;
+        this.userRepositoryPort = userRepositoryPort;
+        this.learningPathNodeRepositoryPort = learningPathNodeRepositoryPort;
     }
 
     @Override
@@ -52,25 +58,30 @@ public class CommentCrudUsecase implements CommentCrudInputPort {
         Comment newComment = commentDomainMapper.commandToModel(command);
         Comment commentSaved = commentRepositoryPort.save(newComment);
 
-        // Notify parent comment owner if this is a reply, or question owner if it's a top-level comment.
-        // For simplicity, if parentId is present, we try to notify the parent comment's user.
         if (commentSaved.getParentId() != null) {
             commentRepositoryPort.findByCommentId(commentSaved.getParentId()).ifPresent(parentComment -> {
                 if (!parentComment.getUserId().equals(commentSaved.getUserId())) {
+                    String actorName = userRepositoryPort.findById(commentSaved.getUserId())
+                            .map(u -> u.getUsername().getValue())
+                            .orElse("Một người dùng");
+
                     String metadata = "{\"questionId\": " + commentSaved.getQuestionId() + ", \"commentId\": " + commentSaved.getId() + "}";
+                    String targetUrl = learningPathNodeRepositoryPort.getFrontendUrlPath(commentSaved.getQuestionId())
+                            .map(path -> path + "#comment-" + commentSaved.getId())
+                            .orElse("/speaking-questions/" + commentSaved.getQuestionId() + "#comment-" + commentSaved.getId());
+
                     eventPublisherPort.publish(new SendNotificationEvent(
                             this,
                             parentComment.getUserId(),
                             NotificationType.SOCIAL,
                             "Có người trả lời bình luận của bạn",
-                            "Ai đó vừa trả lời bình luận của bạn. Nhấn vào để xem chi tiết.",
-                            null,
+                            actorName + " vừa trả lời bình luận của bạn. Nhấn vào để xem chi tiết.",
+                            targetUrl,
                             metadata
                     ));
                 }
             });
         }
-        // (Optional: also notify question owner if parentId is null. Assuming question owner logic is in another domain port, we can skip for now or add if needed).
 
         return commentResultMapper.domainToResult(commentSaved);
     }

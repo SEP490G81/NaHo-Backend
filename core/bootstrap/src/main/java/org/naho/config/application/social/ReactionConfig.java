@@ -22,9 +22,10 @@ public class ReactionConfig {
             ReactionResultResponseMapper reactionResultResponseMapper,
             UserRepositoryPort userRepositoryPort,
             CommentRepositoryPort commentRepositoryPort,
-            EventPublisherPort eventPublisherPort
+            EventPublisherPort eventPublisherPort,
+            org.naho.learning.port.out.LearningPathNodeRepositoryPort learningPathNodeRepositoryPort
     ) {
-        return new CrudReactionUsecase(reactionRepositoryPort, reactionActionCommandMapper, reactionResultResponseMapper, userRepositoryPort, commentRepositoryPort, eventPublisherPort);
+        return new CrudReactionUsecase(reactionRepositoryPort, reactionActionCommandMapper, reactionResultResponseMapper, userRepositoryPort, commentRepositoryPort, eventPublisherPort, learningPathNodeRepositoryPort);
     }
 
     @Bean

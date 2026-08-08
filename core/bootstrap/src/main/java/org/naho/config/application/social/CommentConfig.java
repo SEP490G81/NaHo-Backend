@@ -50,14 +50,18 @@ public class CommentConfig {
             CommentListResultMapper commentListResultMapper,
             CommentDomainMapper commentDomainMapper,
             CommentResultMapper commentResultMapper,
-            EventPublisherPort eventPublisherPort
+            EventPublisherPort eventPublisherPort,
+            org.naho.user.port.out.UserRepositoryPort userRepositoryPort,
+            org.naho.learning.port.out.LearningPathNodeRepositoryPort learningPathNodeRepositoryPort
     ) {
         return new CommentCrudUsecase(
                 commentRepositoryPort,
                 commentListResultMapper,
                 commentDomainMapper,
                 commentResultMapper,
-                eventPublisherPort
+                eventPublisherPort,
+                userRepositoryPort,
+                learningPathNodeRepositoryPort
         );
     }
 }

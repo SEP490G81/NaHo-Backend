@@ -16,6 +16,7 @@ import org.naho.social.report.model.Report;
 import org.naho.social.report.port.in.CreateReportInputPort;
 import org.naho.social.report.port.out.ReportRepositoryPort;
 import org.naho.social.report.result.ReportResult;
+import org.naho.user.port.out.UserRepositoryPort;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,7 @@ public class CreateReportUseCase implements CreateReportInputPort {
     private final UploadFileInputPort uploadFileInputPort;
     private final TransactionPort transactionPort;
     private final EventPublisherPort eventPublisherPort;
+    private final UserRepositoryPort userRepositoryPort;
 
     public CreateReportUseCase(
             ReportRepositoryPort reportRepositoryPort,
@@ -37,7 +39,8 @@ public class CreateReportUseCase implements CreateReportInputPort {
             ReportResultMapper reportResultMapper,
             UploadFileInputPort uploadFileInputPort,
             TransactionPort transactionPort,
-            EventPublisherPort eventPublisherPort
+            EventPublisherPort eventPublisherPort,
+            UserRepositoryPort userRepositoryPort
     ) {
         this.reportRepositoryPort = reportRepositoryPort;
         this.fileStorageServicePort = fileStorageServicePort;
@@ -46,6 +49,7 @@ public class CreateReportUseCase implements CreateReportInputPort {
         this.uploadFileInputPort = uploadFileInputPort;
         this.transactionPort = transactionPort;
         this.eventPublisherPort = eventPublisherPort;
+        this.userRepositoryPort = userRepositoryPort;
     }
 
     @Override
@@ -84,24 +88,28 @@ public class CreateReportUseCase implements CreateReportInputPort {
 
         savedReport.setFiles(files);
 
-        // Notify Admin
-        // Typically Admin user ID would be fixed, or fetched from DB.
-        // For demonstration (or specific admin assignment), we might hardcode or use a configuration.
-        // Assuming user ID 1 is admin.
+        // Lấy danh sách tất cả Admin thực tế
+        List<org.naho.user.model.User> admins = userRepositoryPort.findByFilters(null, "ADMIN", null, null);
+
+        String reporterName = userRepositoryPort.findById(command.userId())
+                .map(u -> u.getUsername().getValue())
+                .orElse("Một người dùng");
+
+        String targetUrl = "/admin/reports/" + savedReport.getId();
         String metadata = "{\"reportId\": " + savedReport.getId() + ", \"reportType\": \"" + savedReport.getReportType() + "\"}";
-        eventPublisherPort.publish(new SendNotificationEvent(
-                this,
-                1L, // ADMIN_ID
-                NotificationType.REPORT,
-                "Có báo cáo mới",
-                "Người dùng vừa gửi một báo cáo mới",
-                null,
-                metadata
-        ));
+
+        for (org.naho.user.model.User admin : admins) {
+            eventPublisherPort.publish(new SendNotificationEvent(
+                    this,
+                    admin.getId(),
+                    NotificationType.REPORT,
+                    "Có báo cáo mới",
+                    reporterName + " vừa gửi một báo cáo mới",
+                    targetUrl,
+                    metadata
+            ));
+        }
 
         return reportResultMapper.domainToResult(savedReport);
-
-
     }
 }
-

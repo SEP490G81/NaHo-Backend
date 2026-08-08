@@ -22,4 +22,6 @@ public interface LearningPathNodeRepositoryPort {
     Optional<LearningPathNode> findByIdAndNodeType(Long id, NodeType nodeType);
 
     Optional<LearningPathNode> findTopByGlobalOrderIndexGreaterThanOrderByGlobalOrderIndex(Double globalOrderIndex);
+
+    Optional<String> getFrontendUrlPath(Long speakingQuestionId);
 }

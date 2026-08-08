@@ -73,4 +73,15 @@ public class LearningPathNodeRepositoryAdapter implements LearningPathNodeReposi
                 .findTopByGlobalOrderIndexGreaterThanOrderByGlobalOrderIndex(globalOrderIndex)
                 .map(learningPathNodeEntityMapper::entityToDomain);
     }
+
+    @Override
+    public Optional<String> getFrontendUrlPath(Long speakingQuestionId) {
+        return learningPathNodeJpaRepository.findBySpeakingQuestion_Id(speakingQuestionId)
+                .map(node -> {
+                    Long nodeId = node.getId();
+                    Long topicId = node.getObjective().getLesson().getTopic().getId();
+                    Long bookId = node.getObjective().getLesson().getTopic().getBook().getId();
+                    return "/books/" + bookId + "/topics/" + topicId + "/nodes/" + nodeId;
+                });
+    }
 }

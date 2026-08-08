@@ -61,7 +61,8 @@ public class ReportConfig {
             ReportResultMapper reportResultMapper,
             UploadFileInputPort uploadFileInputPort,
             TransactionPort transactionPort,
-            EventPublisherPort eventPublisherPort
+            EventPublisherPort eventPublisherPort,
+            UserRepositoryPort userRepositoryPort
     ) {
         return new CreateReportUseCase(
                 reportRepositoryPort,
@@ -70,7 +71,8 @@ public class ReportConfig {
                 reportResultMapper,
                 uploadFileInputPort,
                 transactionPort,
-                eventPublisherPort
+                eventPublisherPort,
+                userRepositoryPort
         );
     }
 }
