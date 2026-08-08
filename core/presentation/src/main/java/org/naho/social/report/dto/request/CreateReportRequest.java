@@ -23,6 +23,6 @@ public class CreateReportRequest {
     ReportType reportType;
 
     Long questionId;
-    
+
     Long commentId;
 }

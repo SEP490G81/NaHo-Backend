@@ -117,7 +117,7 @@ public class ReportController {
         List<ReportResult> results = getListReportByUserInputPort.getReportsByUser(payload.userId());
 
         List<ReportResponse> responses = results.stream().map(reportResponseMapper::resultToResponse).toList();
-        
+
         return ResponseEntity.ok(responses);
     }
 

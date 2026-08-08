@@ -30,7 +30,6 @@ import org.naho.user.result.AccessTokenPayload;
 import org.naho.user.result.RegisterResult;
 import org.naho.user.result.UserResult;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -102,10 +101,10 @@ public class UserController {
     }
 
     @ApiResponseMessage(message = UserDetailMessageKey.USER_UPDATE_INFO_SUCCESSFULLY)
-    @PatchMapping(value = "/info", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/info")
     public ResponseEntity<UserResponse> updateUserInfo(
             @AuthenticationPrincipal AccessTokenPayload payload,
-            @ModelAttribute UpdateUserInfoRequest request
+            @RequestBody UpdateUserInfoRequest request
     ) {
         UpdateUserInfoCommand command = UpdateUserInfoCommand.builder()
                 .id(payload.userId())
