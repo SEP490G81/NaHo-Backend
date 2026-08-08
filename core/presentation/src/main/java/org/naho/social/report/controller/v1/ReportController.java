@@ -74,7 +74,7 @@ public class ReportController {
 
             try {
                 fileValidatorPort.validateImageFile(file.getBytes());
-                StoredFile storedFile = fileStorageServicePort.saveFileToLocal(file, FileFolderConstant.REPORTS, false);
+                StoredFile storedFile = fileStorageServicePort.saveFileToLocal(file, FileFolderConstant.REPORTS, true);
                 storedFiles.add(storedFile);
             } catch (IOException e) {
                 throw new PresentationException(

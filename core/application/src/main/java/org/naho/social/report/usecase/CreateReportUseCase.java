@@ -32,8 +32,7 @@ public class CreateReportUseCase implements CreateReportInputPort {
             FileRepositoryPort fileRepositoryPort,
             ReportResultMapper reportResultMapper,
             UploadFileInputPort uploadFileInputPort,
-            TransactionPort transactionPort
-    ) {
+            TransactionPort transactionPort) {
         this.reportRepositoryPort = reportRepositoryPort;
         this.fileStorageServicePort = fileStorageServicePort;
         this.fileRepositoryPort = fileRepositoryPort;
@@ -71,7 +70,7 @@ public class CreateReportUseCase implements CreateReportInputPort {
         for (StoredFile storedFile : imageFiles) {
             storedFile.setReportId(savedReport.getId());
 
-            File file = fileRepositoryPort.createNewForUpload(storedFile, false);
+            File file = fileRepositoryPort.createNewForUpload(storedFile, true);
 
             files.add(file);
         }
