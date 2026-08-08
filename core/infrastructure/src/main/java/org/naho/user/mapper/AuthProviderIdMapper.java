@@ -3,22 +3,22 @@ package org.naho.user.mapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.mapstruct.Mapper;
-import org.naho.user.entity.OAuthProviderEntity;
+import org.naho.user.entity.AuthProviderEntity;
 
 @Mapper(componentModel = "spring")
-public abstract class OAuthProviderIdMapper {
+public abstract class AuthProviderIdMapper {
 
     @PersistenceContext
     protected EntityManager entityManager;
 
-    public OAuthProviderEntity idToEntity(Long id) {
+    public AuthProviderEntity idToEntity(Long id) {
         if (id == null) {
             return null;
         }
-        return entityManager.getReference(OAuthProviderEntity.class, id);
+        return entityManager.getReference(AuthProviderEntity.class, id);
     }
 
-    public Long entityToId(OAuthProviderEntity entity) {
+    public Long entityToId(AuthProviderEntity entity) {
         return entity == null ? null : entity.getId();
     }
 }

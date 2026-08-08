@@ -22,13 +22,13 @@ public class PersonaConfig {
 
     @Bean
     public CreatePersonaInputPort createPersonaInputPort(PersonaRepositoryPort personaRepositoryPort,
-                                                      ConversationStyleRepositoryPort conversationStyleRepositoryPort) {
+                                                         ConversationStyleRepositoryPort conversationStyleRepositoryPort) {
         return new CreatePersonaUseCase(personaRepositoryPort, conversationStyleRepositoryPort);
     }
 
     @Bean
     public UpdatePersonaInputPort updatePersonaInputPort(PersonaRepositoryPort personaRepositoryPort,
-                                                      ConversationStyleRepositoryPort conversationStyleRepositoryPort) {
+                                                         ConversationStyleRepositoryPort conversationStyleRepositoryPort) {
         return new UpdatePersonaUseCase(personaRepositoryPort, conversationStyleRepositoryPort);
     }
 }

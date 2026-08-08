@@ -1,5 +1,6 @@
 package org.naho.social.report.usecase;
 
+import org.naho.file.constant.FileAccessStatus;
 import org.naho.file.model.File;
 import org.naho.file.port.in.UploadFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
@@ -32,7 +33,8 @@ public class CreateReportUseCase implements CreateReportInputPort {
             FileRepositoryPort fileRepositoryPort,
             ReportResultMapper reportResultMapper,
             UploadFileInputPort uploadFileInputPort,
-            TransactionPort transactionPort) {
+            TransactionPort transactionPort
+    ) {
         this.reportRepositoryPort = reportRepositoryPort;
         this.fileStorageServicePort = fileStorageServicePort;
         this.fileRepositoryPort = fileRepositoryPort;
@@ -70,7 +72,7 @@ public class CreateReportUseCase implements CreateReportInputPort {
         for (StoredFile storedFile : imageFiles) {
             storedFile.setReportId(savedReport.getId());
 
-            File file = fileRepositoryPort.createNewForUpload(storedFile, true);
+            File file = fileRepositoryPort.createNewForUpload(storedFile, FileAccessStatus.PRIVATE);
 
             files.add(file);
         }

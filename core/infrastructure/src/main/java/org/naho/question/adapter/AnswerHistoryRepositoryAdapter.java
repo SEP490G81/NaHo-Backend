@@ -162,7 +162,7 @@ public class AnswerHistoryRepositoryAdapter implements AnswerHistoryRepositoryPo
                 .map(entity -> {
                     String audioUrl = null;
                     FileEntity fileEntity = entity.getAudioFile();
-                    
+
                     if (fileEntity != null) {
                         audioUrl = fileStorageServicePort.generatePresignedUrl(
                                 fileEntityMapper.entityToDomain(fileEntity)

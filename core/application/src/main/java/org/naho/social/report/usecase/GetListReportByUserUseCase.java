@@ -34,7 +34,7 @@ public class GetListReportByUserUseCase implements GetListReportByUserInputPort 
         }
 
         List<Report> reports = reportRepositoryPort.findAllByUserId(userId);
-        
+
         return reports.stream()
                 .map(reportResultMapper::domainToResult)
                 .toList();

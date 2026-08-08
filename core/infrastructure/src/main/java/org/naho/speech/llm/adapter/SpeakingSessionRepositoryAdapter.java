@@ -9,9 +9,11 @@ import org.naho.speech.llm.command.SpeakingSessionFilterCommand;
 import org.naho.speech.llm.entity.SpeakingImprovedExpressionEntity;
 import org.naho.speech.llm.entity.SpeakingSessionAssessmentEntity;
 import org.naho.speech.llm.entity.SpeakingSessionEntity;
+import org.naho.speech.llm.entity.SpeakingSessionMessageEntity;
 import org.naho.speech.llm.port.out.SpeakingSessionRepositoryPort;
 import org.naho.speech.llm.repository.SpeakingSessionAssessmentJpaRepository;
 import org.naho.speech.llm.repository.SpeakingSessionJpaRepository;
+import org.naho.speech.llm.repository.SpeakingSessionMessageJpaRepository;
 import org.naho.speech.llm.result.ActiveSpeakingSessionResult;
 import org.naho.speech.llm.result.ScoringResult;
 import org.naho.speech.llm.result.SpeakingSessionDetailResult;
@@ -26,25 +28,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import org.naho.speech.llm.entity.SpeakingSessionMessageEntity;
-import org.naho.speech.llm.repository.SpeakingSessionAssessmentJpaRepository;
-import org.naho.speech.llm.repository.SpeakingSessionJpaRepository;
-import org.naho.speech.llm.repository.SpeakingSessionMessageJpaRepository;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
 public class SpeakingSessionRepositoryAdapter implements SpeakingSessionRepositoryPort {
 
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private final SpeakingSessionJpaRepository sessionJpaRepository;
     private final SpeakingSessionAssessmentJpaRepository assessmentJpaRepository;
     private final SpeakingSessionMessageJpaRepository messageJpaRepository;
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Override
     @Transactional
@@ -245,13 +238,20 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
                 strengths = parseJsonList(assessment.getStrengths());
                 weaknesses = parseJsonList(assessment.getWeaknesses());
 
-                if (assessment.getFeedbackFluency() != null) feedbackMap.put("fluency", assessment.getFeedbackFluency());
-                if (assessment.getFeedbackPronunciation() != null) feedbackMap.put("pronunciation", assessment.getFeedbackPronunciation());
-                if (assessment.getFeedbackGrammar() != null) feedbackMap.put("grammar", assessment.getFeedbackGrammar());
-                if (assessment.getFeedbackVocabulary() != null) feedbackMap.put("vocabulary", assessment.getFeedbackVocabulary());
-                if (assessment.getFeedbackInteraction() != null) feedbackMap.put("interaction", assessment.getFeedbackInteraction());
-                if (assessment.getFeedbackNaturalness() != null) feedbackMap.put("naturalness", assessment.getFeedbackNaturalness());
-                if (assessment.getFeedbackCoherence() != null) feedbackMap.put("coherence", assessment.getFeedbackCoherence());
+                if (assessment.getFeedbackFluency() != null)
+                    feedbackMap.put("fluency", assessment.getFeedbackFluency());
+                if (assessment.getFeedbackPronunciation() != null)
+                    feedbackMap.put("pronunciation", assessment.getFeedbackPronunciation());
+                if (assessment.getFeedbackGrammar() != null)
+                    feedbackMap.put("grammar", assessment.getFeedbackGrammar());
+                if (assessment.getFeedbackVocabulary() != null)
+                    feedbackMap.put("vocabulary", assessment.getFeedbackVocabulary());
+                if (assessment.getFeedbackInteraction() != null)
+                    feedbackMap.put("interaction", assessment.getFeedbackInteraction());
+                if (assessment.getFeedbackNaturalness() != null)
+                    feedbackMap.put("naturalness", assessment.getFeedbackNaturalness());
+                if (assessment.getFeedbackCoherence() != null)
+                    feedbackMap.put("coherence", assessment.getFeedbackCoherence());
 
                 if (assessment.getImprovedExpressions() != null) {
                     for (SpeakingImprovedExpressionEntity expr : assessment.getImprovedExpressions()) {
@@ -319,7 +319,8 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
     private List<String> parseJsonList(String json) {
         if (json == null || json.isBlank()) return List.of();
         try {
-            return OBJECT_MAPPER.readValue(json, new TypeReference<List<String>>() {});
+            return OBJECT_MAPPER.readValue(json, new TypeReference<List<String>>() {
+            });
         } catch (Exception e) {
             return List.of();
         }
