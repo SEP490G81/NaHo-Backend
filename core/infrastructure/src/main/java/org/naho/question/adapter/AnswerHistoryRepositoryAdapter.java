@@ -77,7 +77,9 @@ public class AnswerHistoryRepositoryAdapter implements AnswerHistoryRepositoryPo
                 .id(answerHistory.getId())
                 .user(user)
                 .speakingQuestion(question)
+                .durationSec(answerHistory.getDurationSec())
                 .build();
+
 
         if (answerHistory.getAudioFileId() != null) {
             FileEntity file = fileJpaRepository.getReferenceById(answerHistory.getAudioFileId());
