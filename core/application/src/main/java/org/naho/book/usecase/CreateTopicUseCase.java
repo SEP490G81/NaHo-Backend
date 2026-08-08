@@ -49,6 +49,8 @@ public class CreateTopicUseCase implements CreateTopicInputPort {
                 .userId(command.userId())
                 .japaneseName(rawName)
                 .japaneseDescription(rawDescription)
+                .vietnameseDescription(command.vietnameseDescription())
+                .englishDescription(command.englishDescription())
                 .japaneseNameMarkup(command.japaneseNameMarkup())
                 .japaneseDescriptionMarkup(command.japaneseDescriptionMarkup())
                 .bookId(command.bookId())
@@ -64,6 +66,8 @@ public class CreateTopicUseCase implements CreateTopicInputPort {
                 savedTopic.getUserId(),
                 savedTopic.getJapaneseName(),
                 savedTopic.getJapaneseDescription(),
+                savedTopic.getVietnameseDescription(),
+                savedTopic.getEnglishDescription(),
                 savedTopic.getJapaneseNameMarkup(),
                 savedTopic.getJapaneseDescriptionMarkup(),
                 savedTopic.getStatus(),

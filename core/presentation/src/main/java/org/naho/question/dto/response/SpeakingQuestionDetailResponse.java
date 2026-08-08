@@ -13,6 +13,7 @@ public record SpeakingQuestionDetailResponse(
         String japaneseSampleAnswer,
         String japaneseSampleAnswerMarkup,
         String vietnameseSampleAnswer,
+        String englishSampleAnswer,
         QuestionStatus status
 ) {
 }

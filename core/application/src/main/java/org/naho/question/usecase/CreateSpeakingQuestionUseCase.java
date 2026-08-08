@@ -37,6 +37,7 @@ public class CreateSpeakingQuestionUseCase implements CreateSpeakingQuestionInpu
                 .japaneseSampleAnswerMarkup(command.japaneseSampleAnswerMarkup())
                 .japaneseSampleAnswer(rawJapaneseSampleAnswer)
                 .vietnameseSampleAnswer(command.vietnameseSampleAnswer())
+                .englishSampleAnswer(command.englishSampleAnswer())
                 .status(initialStatus)
                 .build();
 
@@ -55,6 +56,7 @@ public class CreateSpeakingQuestionUseCase implements CreateSpeakingQuestionInpu
                 savedSpeakingQuestion.getJapaneseSampleAnswer(),
                 savedSpeakingQuestion.getJapaneseSampleAnswerMarkup(),
                 savedSpeakingQuestion.getVietnameseSampleAnswer(),
+                savedSpeakingQuestion.getEnglishSampleAnswer(),
                 savedSpeakingQuestion.getStatus());
     }
 }

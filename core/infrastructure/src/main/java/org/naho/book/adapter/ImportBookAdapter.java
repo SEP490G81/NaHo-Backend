@@ -92,9 +92,33 @@ public class ImportBookAdapter implements ImportBookPort {
                                 topicMarkupCell.getStringCellValue().trim() :
                                 "";
 
+                        Cell topicDescriptionVietnameseCell = row.getCell(3);
+                        String topicDescriptionVietnamese = topicDescriptionVietnameseCell != null ?
+                                topicDescriptionVietnameseCell.getStringCellValue().trim() :
+                                "";
+
+                        Cell topicDescriptionEnglishCell = row.getCell(4);
+                        String topicDescriptionEnglish = topicDescriptionEnglishCell != null ?
+                                topicDescriptionEnglishCell.getStringCellValue().trim() :
+                                "";
+
+                        Cell topicDescriptionJapaneseCell = row.getCell(5);
+                        String topicDescriptionJapanese = topicDescriptionJapaneseCell != null ?
+                                topicDescriptionJapaneseCell.getStringCellValue().trim() :
+                                "";
+
+                        Cell topicDescriptionJapaneseMarkupCell = row.getCell(6);
+                        String topicDescriptionJapaneseMarkup = topicDescriptionJapaneseMarkupCell != null ?
+                                topicDescriptionJapaneseMarkupCell.getStringCellValue().trim() :
+                                "";
+
                         topicEntity = TopicEntity.builder()
                                 .japaneseName(topicCell.getStringCellValue().trim())
                                 .japaneseNameMarkup(topicMarkup)
+                                .vietnameseDescription(topicDescriptionVietnamese)
+                                .englishDescription(topicDescriptionEnglish)
+                                .japaneseDescription(topicDescriptionJapanese)
+                                .japaneseDescriptionMarkup(topicDescriptionJapaneseMarkup)
                                 .status(TopicStatus.PUBLISHED)
                                 .orderIndex(topicOrderIndex)
                                 .book(bookEntity)
@@ -115,10 +139,10 @@ public class ImportBookAdapter implements ImportBookPort {
                     }
 
                     // lesson
-                    Cell lessonCell = row.getCell(3);
+                    Cell lessonCell = row.getCell(7);
                     if (lessonCell != null && lessonCell.getCellType() != CellType.BLANK) {
 
-                        Cell lessonMarkupCell = row.getCell(4);
+                        Cell lessonMarkupCell = row.getCell(8);
                         String lessonMarkup = lessonMarkupCell != null ?
                                 lessonMarkupCell.getStringCellValue().trim() :
                                 "";
@@ -145,10 +169,10 @@ public class ImportBookAdapter implements ImportBookPort {
                     }
 
                     // objective
-                    Cell objectiveCell = row.getCell(5);
+                    Cell objectiveCell = row.getCell(9);
                     if (objectiveCell != null && objectiveCell.getCellType() != CellType.BLANK) {
 
-                        Cell objectiveMarkupCell = row.getCell(6);
+                        Cell objectiveMarkupCell = row.getCell(10);
                         String objectiveMarkup = objectiveMarkupCell != null ?
                                 objectiveMarkupCell.getStringCellValue().trim() :
                                 "";
@@ -174,7 +198,7 @@ public class ImportBookAdapter implements ImportBookPort {
                     }
 
                     // 3 types of a node: speaking question, vocabulary question, chest
-                    Cell nodeTypeCell = row.getCell(7);
+                    Cell nodeTypeCell = row.getCell(11);
                     if (nodeTypeCell == null ||
                             nodeTypeCell.getCellType() == CellType.BLANK ||
                             nodeTypeCell.getStringCellValue().isBlank()) {
@@ -218,39 +242,45 @@ public class ImportBookAdapter implements ImportBookPort {
                     switch (nodeType) {
                         case SPEAKING_QUESTION -> {
                             // tiêu đề gốc của speaking question
-                            Cell speakingQuestionCell = row.getCell(8);
+                            Cell speakingQuestionCell = row.getCell(12);
                             String japaneseName = (speakingQuestionCell != null)
                                     ? speakingQuestionCell.getStringCellValue().trim()
                                     : "";
 
                             // bản markup của tiêu đề của speaking question
-                            Cell speakingQuestionMarkupCell = row.getCell(9);
+                            Cell speakingQuestionMarkupCell = row.getCell(13);
                             String japaneseMarkup = speakingQuestionMarkupCell != null ?
                                     speakingQuestionMarkupCell.getStringCellValue().trim() :
                                     "";
 
                             // Bản dịch tiếng việt của tiêu đề
-                            Cell vietnameseSpeakingQuestionCell = row.getCell(10);
+                            Cell vietnameseSpeakingQuestionCell = row.getCell(14);
                             String vietnameseName = vietnameseSpeakingQuestionCell != null ?
                                     vietnameseSpeakingQuestionCell.getStringCellValue().trim() :
                                     "";
 
                             // câu trả lời mẫu (tiếng Nhật)
-                            Cell sampleAnswerCell = row.getCell(13);
-                            String sampleAnswer = sampleAnswerCell != null ?
-                                    sampleAnswerCell.getStringCellValue().trim() :
+                            Cell japaneseSampleAnswerCell = row.getCell(17);
+                            String japaneseSampleAnswer = japaneseSampleAnswerCell != null ?
+                                    japaneseSampleAnswerCell.getStringCellValue().trim() :
                                     "";
 
                             // câu trả lời mẫu bản markup
-                            Cell sampleAnswerMarkupCell = row.getCell(14);
-                            String sampleAnswerMarkup = sampleAnswerMarkupCell != null ?
-                                    sampleAnswerMarkupCell.getStringCellValue().trim() :
+                            Cell japaneseSampleAnswerMarkupCell = row.getCell(18);
+                            String japaneseSampleAnswerMarkup = japaneseSampleAnswerMarkupCell != null ?
+                                    japaneseSampleAnswerMarkupCell.getStringCellValue().trim() :
                                     "";
 
                             // câu trả lời mẫu tiếng Việt
-                            Cell vietnameseSampleAnswerCell = row.getCell(15);
+                            Cell vietnameseSampleAnswerCell = row.getCell(19);
                             String vietnameseSampleAnswer = vietnameseSampleAnswerCell != null ?
                                     vietnameseSampleAnswerCell.getStringCellValue().trim() :
+                                    "";
+
+                            // câu trả lời mẫu tiếng Anh
+                            Cell englishSampleAnswerCell = row.getCell(20);
+                            String englishSampleAnswer = englishSampleAnswerCell != null ?
+                                    englishSampleAnswerCell.getStringCellValue().trim() :
                                     "";
 
                             SpeakingQuestionEntity speakingQuestionEntity = SpeakingQuestionEntity
@@ -260,13 +290,14 @@ public class ImportBookAdapter implements ImportBookPort {
                                     .vietnameseName(vietnameseName)
                                     .status(QuestionStatus.PUBLISHED)
                                     .learningPathNode(learningPathNodeEntity)
-                                    .japaneseSampleAnswer(sampleAnswer)
-                                    .japaneseSampleAnswerMarkup(sampleAnswerMarkup)
+                                    .japaneseSampleAnswer(japaneseSampleAnswer)
+                                    .japaneseSampleAnswerMarkup(japaneseSampleAnswerMarkup)
                                     .vietnameseSampleAnswer(vietnameseSampleAnswer)
+                                    .englishSampleAnswer(englishSampleAnswer)
                                     .build();
 
                             // add grammars to speaking question
-                            Cell grammarCell = row.getCell(11);
+                            Cell grammarCell = row.getCell(15);
                             if (grammarCell != null && grammarCell.getCellType() != CellType.BLANK) {
                                 List<Long> grammarIds = Arrays
                                         .stream(grammarCell.getStringCellValue().trim().split(","))
@@ -278,7 +309,7 @@ public class ImportBookAdapter implements ImportBookPort {
                             }
 
                             // add vocabularies to speaking question
-                            Cell vocabularyCell = row.getCell(12);
+                            Cell vocabularyCell = row.getCell(16);
                             if (vocabularyCell != null && vocabularyCell.getCellType() != CellType.BLANK) {
                                 List<Long> vocabularyIds = Arrays
                                         .stream(vocabularyCell.getStringCellValue().trim().split(","))
@@ -293,7 +324,7 @@ public class ImportBookAdapter implements ImportBookPort {
                             learningPathNodeEntity.setSpeakingQuestion(speakingQuestionEntity);
                         }
                         case VOCABULARY_QUESTION -> {
-                            Cell vocabularyQuestionCell = row.getCell(8);
+                            Cell vocabularyQuestionCell = row.getCell(12);
                             Long vocabularyQuestionId = (long) vocabularyQuestionCell.getNumericCellValue();
                             VocabularyQuestionEntity vocabularyQuestionEntity = vocabularyQuestionJpaRepository
                                     .findById(vocabularyQuestionId)
@@ -303,7 +334,7 @@ public class ImportBookAdapter implements ImportBookPort {
                                             vocabularyQuestionId));
 
                             // add vocabularies to vocabulary question
-                            Cell vocabularyCell = row.getCell(12);
+                            Cell vocabularyCell = row.getCell(16);
                             if (vocabularyCell != null && vocabularyCell.getCellType() != CellType.BLANK) {
                                 List<Long> vocabularyIds = Arrays
                                         .stream(vocabularyCell.getStringCellValue().trim().split(","))
@@ -318,7 +349,7 @@ public class ImportBookAdapter implements ImportBookPort {
                             learningPathNodeEntity.setVocabularyQuestion(vocabularyQuestionEntity);
                         }
                         case CHEST -> {
-                            Cell chestCell = row.getCell(8);
+                            Cell chestCell = row.getCell(12);
                             Long chestId = (long) chestCell.getNumericCellValue();
                             ChestEntity chestEntity = chestJpaRepository.findById(chestId)
                                     .orElseThrow(() -> new InfrastructureException(

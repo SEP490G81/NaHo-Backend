@@ -48,6 +48,8 @@ public class TopicRepositoryAdapter implements TopicRepositoryPort {
 
         entity.setJapaneseName(topic.getJapaneseName());
         entity.setJapaneseDescription(topic.getJapaneseDescription());
+        entity.setVietnameseDescription(topic.getVietnameseDescription());
+        entity.setEnglishDescription(topic.getEnglishDescription());
         entity.setJapaneseNameMarkup(topic.getJapaneseNameMarkup());
         entity.setJapaneseDescriptionMarkup(topic.getJapaneseDescriptionMarkup());
         entity.setStatus(topic.getStatus());

@@ -59,6 +59,7 @@ public class UpdateSpeakingQuestionUseCase implements UpdateSpeakingQuestionInpu
                 rawJapaneseSampleAnswer,
                 command.japaneseSampleAnswerMarkup(),
                 command.vietnameseSampleAnswer(),
+                command.englishSampleAnswer(),
                 null // Audio is null for now
         );
 
@@ -76,6 +77,7 @@ public class UpdateSpeakingQuestionUseCase implements UpdateSpeakingQuestionInpu
                 updatedSpeakingQuestion.getJapaneseSampleAnswer(),
                 updatedSpeakingQuestion.getJapaneseSampleAnswerMarkup(),
                 updatedSpeakingQuestion.getVietnameseSampleAnswer(),
+                updatedSpeakingQuestion.getEnglishSampleAnswer(),
                 updatedSpeakingQuestion.getStatus()
         );
     }

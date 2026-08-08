@@ -27,6 +27,12 @@ public class TopicEntity extends BaseEntity {
     @Column(name = "japanese_description")
     String japaneseDescription;
 
+    @Column(name = "vietnamese_description", columnDefinition = "TEXT")
+    String vietnameseDescription;
+
+    @Column(name = "english_description", columnDefinition = "TEXT")
+    String englishDescription;
+
     @Column(name = "japanese_name_markup", columnDefinition = "TEXT")
     String japaneseNameMarkup;
 

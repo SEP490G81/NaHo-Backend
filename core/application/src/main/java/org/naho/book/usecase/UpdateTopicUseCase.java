@@ -57,6 +57,8 @@ public class UpdateTopicUseCase implements UpdateTopicInputPort {
         topic.update(
                 rawName,
                 rawDescription,
+                command.vietnameseDescription(),
+                command.englishDescription(),
                 command.japaneseNameMarkup(),
                 command.japaneseDescriptionMarkup(),
                 command.status(),
@@ -71,6 +73,8 @@ public class UpdateTopicUseCase implements UpdateTopicInputPort {
                 savedTopic.getUserId(),
                 savedTopic.getJapaneseName(),
                 savedTopic.getJapaneseDescription(),
+                savedTopic.getVietnameseDescription(),
+                savedTopic.getEnglishDescription(),
                 savedTopic.getJapaneseNameMarkup(),
                 savedTopic.getJapaneseDescriptionMarkup(),
                 savedTopic.getStatus(),

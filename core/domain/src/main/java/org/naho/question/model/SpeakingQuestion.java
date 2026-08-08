@@ -22,6 +22,7 @@ public class SpeakingQuestion {
     private String japaneseSampleAnswer;
     private String japaneseSampleAnswerMarkup;
     private String vietnameseSampleAnswer;
+    private String englishSampleAnswer;
     private QuestionStatus status;
 
     // Private constructor dùng cho Builder
@@ -37,6 +38,7 @@ public class SpeakingQuestion {
         this.japaneseSampleAnswer = builder.japaneseSampleAnswer;
         this.japaneseSampleAnswerMarkup = builder.japaneseSampleAnswerMarkup;
         this.vietnameseSampleAnswer = builder.vietnameseSampleAnswer;
+        this.englishSampleAnswer = builder.englishSampleAnswer;
         this.status = builder.status;
         this.grammars = builder.grammars;
         this.vocabularies = builder.vocabularies;
@@ -71,6 +73,7 @@ public class SpeakingQuestion {
                        String japaneseSampleAnswer,
                        String japaneseSampleAnswerMarkup,
                        String vietnameseSampleAnswer,
+                       String englishSampleAnswer,
                        Long speakingQuestionAudioFileId) {
         validateJapaneseName(japaneseName);
         validateDescription(description);
@@ -83,6 +86,7 @@ public class SpeakingQuestion {
         this.japaneseSampleAnswer = japaneseSampleAnswer;
         this.japaneseSampleAnswerMarkup = japaneseSampleAnswerMarkup;
         this.vietnameseSampleAnswer = vietnameseSampleAnswer;
+        this.englishSampleAnswer = englishSampleAnswer;
         this.speakingQuestionAudioFileId = speakingQuestionAudioFileId;
     }
 
@@ -135,6 +139,10 @@ public class SpeakingQuestion {
         return vietnameseSampleAnswer;
     }
 
+    public String getEnglishSampleAnswer() {
+        return englishSampleAnswer;
+    }
+
     public QuestionStatus getStatus() {
         return status;
     }
@@ -160,6 +168,7 @@ public class SpeakingQuestion {
         private String japaneseSampleAnswer;
         private String japaneseSampleAnswerMarkup;
         private String vietnameseSampleAnswer;
+        private String englishSampleAnswer;
         private QuestionStatus status;
         private List<Grammar> grammars;
         private List<Vocabulary> vocabularies;
@@ -216,6 +225,11 @@ public class SpeakingQuestion {
 
         public Builder vietnameseSampleAnswer(String vietnameseSampleAnswer) {
             this.vietnameseSampleAnswer = vietnameseSampleAnswer;
+            return this;
+        }
+
+        public Builder englishSampleAnswer(String englishSampleAnswer) {
+            this.englishSampleAnswer = englishSampleAnswer;
             return this;
         }
 

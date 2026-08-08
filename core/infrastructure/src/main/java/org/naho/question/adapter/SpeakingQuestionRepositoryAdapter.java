@@ -65,6 +65,7 @@ public class SpeakingQuestionRepositoryAdapter implements SpeakingQuestionReposi
         entity.setJapaneseSampleAnswer(speakingQuestion.getJapaneseSampleAnswer());
         entity.setJapaneseSampleAnswerMarkup(speakingQuestion.getJapaneseSampleAnswerMarkup());
         entity.setVietnameseSampleAnswer(speakingQuestion.getVietnameseSampleAnswer());
+        entity.setEnglishSampleAnswer(speakingQuestion.getEnglishSampleAnswer());
         entity.setStatus(speakingQuestion.getStatus());
 
 

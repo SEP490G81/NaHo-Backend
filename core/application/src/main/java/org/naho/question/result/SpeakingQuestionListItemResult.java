@@ -14,6 +14,7 @@ public record SpeakingQuestionListItemResult(
         String japaneseSampleAnswer,
         String japaneseSampleAnswerMarkup,
         String vietnameseSampleAnswer,
+        String englishSampleAnswer,
         QuestionStatus status
 ) {
 }

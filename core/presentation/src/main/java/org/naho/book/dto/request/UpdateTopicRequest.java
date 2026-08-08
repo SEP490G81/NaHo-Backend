@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotNull;
 import org.naho.book.type.TopicStatus;
 
 public record UpdateTopicRequest(
+        String vietnameseDescription,
+        String englishDescription,
         String japaneseNameMarkup,
         String japaneseDescriptionMarkup,
         @NotNull TopicStatus status,
