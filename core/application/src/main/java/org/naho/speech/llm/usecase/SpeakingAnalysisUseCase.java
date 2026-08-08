@@ -187,7 +187,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             audioFile = fileRepositoryPort.createNewForUpload(command.storedFile(), false);
         }
 
-        AnswerHistory savedAnswerHistory = createAnswerHistory(user, speakingQuestion, audioFile);
+        AnswerHistory savedAnswerHistory = createAnswerHistory(user, speakingQuestion, audioFile, command.durationSec());
 
         // DB-R
         // Lay du lieu cua object (question speaking nay nam trong objective nao)
@@ -208,16 +208,18 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 objective, lesson, topic, book);
     }
 
-    private AnswerHistory createAnswerHistory(User user, SpeakingQuestion speakingQuestion, File audioFile) {
+    private AnswerHistory createAnswerHistory(User user, SpeakingQuestion speakingQuestion, File audioFile, Integer durationSec) {
         AnswerHistory answerHistory = AnswerHistory.builder()
                 .userId(user.getId())
                 .speakingQuestionId(speakingQuestion.getId())
+                .durationSec(durationSec)
                 .build();
         if (audioFile != null) {
             answerHistory.setAudioFileId(audioFile.getId());
         }
         return answerHistoryRepositoryPort.save(answerHistory);
     }
+
 
     private AnalysisContext buildAnalysisContext(
             LearningPathNode learningPathNode,

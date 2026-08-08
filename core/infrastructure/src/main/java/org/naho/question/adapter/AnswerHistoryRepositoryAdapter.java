@@ -170,19 +170,22 @@ public class AnswerHistoryRepositoryAdapter implements AnswerHistoryRepositoryPo
                     }
 
                     Double score = 0.0;
-                    Integer durationSec = 0;
+                    Integer durationSec = entity.getDurationSec() != null ? entity.getDurationSec() : 0;
                     ContentAssessmentEntity ca = entity.getContentAssessment();
                     if (ca != null && ca.getAiFeedback() != null && !ca.getAiFeedback().isBlank()) {
                         try {
                             JsonNode root = objectMapper.readTree(ca.getAiFeedback());
                             score = root.path("overallScore").asDouble(0.0);
-                            durationSec = root.path("durationSec").asInt(0);
+                            if (durationSec == 0 && root.has("durationSec")) {
+                                durationSec = root.path("durationSec").asInt(0);
+                            }
                         } catch (Exception ignored) {
                         }
                     }
 
                     return answerHistoryEntityMapper.toListItemResult(entity, score, durationSec, audioUrl);
                 }).toList();
+
 
         return PageData.<SpeakingHistoryListItemResult>builder()
                 .pageMeta(PageMeta.builder()

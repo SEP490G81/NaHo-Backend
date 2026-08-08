@@ -7,6 +7,7 @@ public class AnswerHistory {
     private Long userId;
     private Long speakingQuestionId;
     private Long audioFileId;
+    private Integer durationSec;
     private Instant createdTime;
 
     private AnswerHistory(Builder builder) {
@@ -14,6 +15,7 @@ public class AnswerHistory {
         this.userId = builder.userId;
         this.speakingQuestionId = builder.speakingQuestionId;
         this.audioFileId = builder.audioFileId;
+        this.durationSec = builder.durationSec;
         this.createdTime = builder.createdTime;
     }
 
@@ -41,6 +43,14 @@ public class AnswerHistory {
         this.audioFileId = audioFileId;
     }
 
+    public Integer getDurationSec() {
+        return durationSec;
+    }
+
+    public void setDurationSec(Integer durationSec) {
+        this.durationSec = durationSec;
+    }
+
     public Instant getCreatedTime() {
         return createdTime;
     }
@@ -50,6 +60,7 @@ public class AnswerHistory {
         private Long userId;
         private Long speakingQuestionId;
         private Long audioFileId;
+        private Integer durationSec;
         private Instant createdTime;
 
         public Builder id(Long id) {
@@ -72,6 +83,11 @@ public class AnswerHistory {
             return this;
         }
 
+        public Builder durationSec(Integer durationSec) {
+            this.durationSec = durationSec;
+            return this;
+        }
+
         public Builder createdTime(Instant createdTime) {
             this.createdTime = createdTime;
             return this;
@@ -81,4 +97,4 @@ public class AnswerHistory {
             return new AnswerHistory(this);
         }
     }
-}
+}

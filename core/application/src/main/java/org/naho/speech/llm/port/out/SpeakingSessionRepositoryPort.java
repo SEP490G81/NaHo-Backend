@@ -53,4 +53,7 @@ public interface SpeakingSessionRepositoryPort {
     Optional<ActiveSpeakingSessionResult> findActiveSessionByCode(String sessionCode, Long userId);
 
     void updateSessionTurnAndTranscript(String sessionCode, int totalTurns, String fullTranscript);
+
+    int updateStatusForExpiredSessions(String oldStatus, String newStatus, Instant cutoffTime, Instant endedAt);
 }
+

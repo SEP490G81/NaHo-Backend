@@ -31,8 +31,12 @@ public class AnswerHistoryEntity extends BaseEntity {
     @JoinColumn(name = "audio_file_id")
     FileEntity audioFile;
 
+    @Column(name = "duration_sec")
+    Integer durationSec;
+
     @OneToOne(mappedBy = "answerHistory")
     ContentAssessmentEntity contentAssessment;
+
 
     @OneToOne(mappedBy = "answerHistory")
     SpeechAssessmentEntity speechAssessment;

@@ -162,7 +162,10 @@ public class CrudAnswerHistoryUseCase implements CrudAnswerHistoryInputPort {
                     "Corrupted AI feedback data");
         }
 
-        Integer durationSec = root.path("durationSec").asInt(0);
+        Integer durationSec = (answerHistory.getDurationSec() != null && answerHistory.getDurationSec() > 0)
+                ? answerHistory.getDurationSec()
+                : root.path("durationSec").asInt(0);
+
         Double overallScore = root.path("overallScore").asDouble(0.0);
 
         JsonNode scoresNode = root.path("scores");

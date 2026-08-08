@@ -438,4 +438,11 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
             sessionJpaRepository.save(session);
         });
     }
+
+    @Override
+    @Transactional
+    public int updateStatusForExpiredSessions(String oldStatus, String newStatus, Instant cutoffTime, Instant endedAt) {
+        return sessionJpaRepository.updateExpiredSessions(oldStatus, newStatus, cutoffTime, endedAt);
+    }
 }
+

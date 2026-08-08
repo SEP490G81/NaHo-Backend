@@ -32,64 +32,61 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class SpeakingAnalysisController {
 
-    private final SpeakingAnalysisInputPort speakingAnalysisInputPort;
-    private final SpeakingAnalysisResponseMapper speakingAnalysisResponseMapper;
-    private final FileStorageServicePort fileStorageServicePort;
-    private final FileValidatorPort fileValidatorPort;
-    private final GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
+        private final SpeakingAnalysisInputPort speakingAnalysisInputPort;
+        private final SpeakingAnalysisResponseMapper speakingAnalysisResponseMapper;
+        private final FileStorageServicePort fileStorageServicePort;
+        private final FileValidatorPort fileValidatorPort;
+        private final GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
 
-    @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_ANALYSIS_SUCCESS)
-    @PostMapping(
-            value = "/analysis",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<SpeakingAnalysisResponse> uploadAudioAndAnalyzeSpeaking(
-            @RequestPart("file") MultipartFile file,
-            @RequestParam("speakingQuestionId") Long speakingQuestionId,
-            @RequestParam("durationSec") Integer durationSec,
-            @AuthenticationPrincipal AccessTokenPayload payload
-    ) {
-        // lấy gói đăng kí của user
-        SubscriptionPlanResult subscriptionPlan = getActiveSubscriptionInputPort
-                .getUserActiveSubscriptionPlan(payload.userId());
+        @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_ANALYSIS_SUCCESS)
+        @PostMapping(value = "/analysis", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+        public ResponseEntity<SpeakingAnalysisResponse> uploadAudioAndAnalyzeSpeaking(
+                        @RequestPart("file") MultipartFile file,
+                        @RequestParam("speakingQuestionId") Long speakingQuestionId,
+                        @AuthenticationPrincipal AccessTokenPayload payload) {
+                // lấy gói đăng kí của user
+                SubscriptionPlanResult subscriptionPlan = getActiveSubscriptionInputPort
+                                .getUserActiveSubscriptionPlan(payload.userId());
 
-        try {
-            StoredFile storedFile = null;
-            byte[] audioBytes = file.getBytes();
+                try {
+                        StoredFile storedFile = null;
+                        byte[] audioBytes = file.getBytes();
 
-            // nếu đang dùng gói FREE thì không lưu file
-            if (!subscriptionPlan.code().equals(PlanCode.FREE)) {
-                // validate xem có phải file .wav không?
-                // và validate xem thời lượng có hợp lệ không?
-                fileValidatorPort.validateWavFileAndDuration(
-                        audioBytes,
-                        subscriptionPlan.maxAnswerTimeSeconds()
-                );
-                // Step 1: Lưu file vào local
-                storedFile = fileStorageServicePort.saveFileToLocal(file, FileFolderConstant.RECORDINGS, false);
-            }
+                        // nếu đang dùng gói FREE thì không lưu file
+                        if (!subscriptionPlan.code().equals(PlanCode.FREE)) {
+                                // validate xem có phải file .wav không?
+                                // và validate xem thời lượng có hợp lệ không?
+                                fileValidatorPort.validateWavFileAndDuration(
+                                                audioBytes,
+                                                subscriptionPlan.maxAnswerTimeSeconds());
+                                // Step 1: Lưu file vào local
+                                storedFile = fileStorageServicePort.saveFileToLocal(file, FileFolderConstant.RECORDINGS,
+                                                false);
+                        }
 
-            SpeakingAnalysisCommand command = SpeakingAnalysisCommand.builder()
-                    .userId(payload.userId())
-                    .speakingQuestionId(speakingQuestionId)
-                    .durationSec(durationSec)
-                    .storedFile(storedFile)
-                    .audioBytes(audioBytes)
-                    .build();
+                        // Backend tự đo thời lượng audio 100% từ file (bằng Java thuần AudioSystem)
+                        double measuredDuration = fileValidatorPort.calculateWavDurationSeconds(audioBytes);
+                        int durationSec = (int) Math.ceil(measuredDuration);
 
-            SpeakingAnalysisResult result = speakingAnalysisInputPort.analyzeSpeaking(command);
+                        SpeakingAnalysisCommand command = SpeakingAnalysisCommand.builder()
+                                        .userId(payload.userId())
+                                        .speakingQuestionId(speakingQuestionId)
+                                        .durationSec(durationSec)
+                                        .storedFile(storedFile)
+                                        .audioBytes(audioBytes)
+                                        .build();
 
-            SpeakingAnalysisResponse response = speakingAnalysisResponseMapper.resultToResponse(result);
+                        SpeakingAnalysisResult result = speakingAnalysisInputPort.analyzeSpeaking(command);
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+                        SpeakingAnalysisResponse response = speakingAnalysisResponseMapper.resultToResponse(result);
 
-        } catch (IOException e) {
-            throw new PresentationException(
-                    AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
-                    SpeechDetailMessageKey.SPEECH_AUDIO_FILE_EMPTY,
-                    e.getMessage()
-            );
+                        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+                } catch (IOException e) {
+                        throw new PresentationException(
+                                        AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
+                                        SpeechDetailMessageKey.SPEECH_AUDIO_FILE_EMPTY,
+                                        e.getMessage());
+                }
         }
-    }
 }
