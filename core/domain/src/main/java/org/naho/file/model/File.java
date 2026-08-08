@@ -126,6 +126,19 @@ public class File {
         this.nextRetryAt = nextRetryAt;
     }
 
+    public void resetRetry() {
+        this.retryCount = 0;
+        this.nextRetryAt = null;
+    }
+
+    public void markDeleted() {
+        this.operationType = OperationType.DELETE;
+    }
+
+    public void markProcessing() {
+        this.operationStatus = OperationStatus.PROCESSING;
+    }
+
     public void markCompleted() {
         this.operationStatus = OperationStatus.COMPLETED;
         this.nextRetryAt = null;

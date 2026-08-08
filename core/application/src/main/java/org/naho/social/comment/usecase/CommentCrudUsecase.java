@@ -26,9 +26,9 @@ public class CommentCrudUsecase implements CommentCrudInputPort {
     private final CommentResultMapper commentResultMapper;
 
     public CommentCrudUsecase(CommentRepositoryPort commentRepositoryPort,
-                               CommentListResultMapper commentListResultMapper,
-                               CommentDomainMapper commentDomainMapper,
-                               CommentResultMapper commentResultMapper) {
+                              CommentListResultMapper commentListResultMapper,
+                              CommentDomainMapper commentDomainMapper,
+                              CommentResultMapper commentResultMapper) {
         this.commentRepositoryPort = commentRepositoryPort;
         this.commentListResultMapper = commentListResultMapper;
         this.commentDomainMapper = commentDomainMapper;

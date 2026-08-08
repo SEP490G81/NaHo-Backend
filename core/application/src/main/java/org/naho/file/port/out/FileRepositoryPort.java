@@ -22,13 +22,20 @@ public interface FileRepositoryPort {
 
     File save(File file);
 
-    List<File> findAllForSchedulerRetryUpload(
+    List<File> findAllForSchedulerRetry(
             Instant now,
             OperationType operationType,
             OperationStatus operationStatus
     );
 
+    List<File> findAllForSchedulerRetryDelete(
+            Instant now,
+            OperationType operationType
+    );
+
     void deleteById(Long id);
 
     List<File> findAllByReportId(Long reportId);
+
+    Optional<File> findAvatarFileByUserId(Long userId);
 }

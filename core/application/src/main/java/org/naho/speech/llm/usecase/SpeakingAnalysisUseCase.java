@@ -11,6 +11,7 @@ import org.naho.book.port.out.BookRepositoryPort;
 import org.naho.book.port.out.LessonRepositoryPort;
 import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.book.port.out.TopicRepositoryPort;
+import org.naho.file.constant.FileAccessStatus;
 import org.naho.file.model.File;
 import org.naho.file.port.in.UploadFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
@@ -28,7 +29,6 @@ import org.naho.learning.model.LearningPathNode;
 import org.naho.learning.model.UserLearningProgress;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
-import org.naho.pagination.PageData;
 import org.naho.question.command.CompleteSpeakingQuestionCommand;
 import org.naho.question.exception.SpeakingQuestionErrorCode;
 import org.naho.question.model.Grammar;
@@ -48,14 +48,11 @@ import org.naho.speech.model.AnswerHistory;
 import org.naho.speech.model.ContentAssessment;
 import org.naho.speech.model.SpeechAssessment;
 import org.naho.speech.model.WordAssessment;
-import org.naho.speech.type.SpeechAssessmentErrorType;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.model.User;
 import org.naho.user.port.out.UserRepositoryPort;
 
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -121,6 +118,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     public SpeakingAnalysisResult analyzeSpeaking(SpeakingAnalysisCommand command) {
         SpeakingAnalysisResult result = transactionPort.execute(() -> doAnalyzeSpeaking(command));
 
+        // nếu các thao tác với db commit thành công thì mới upload file lên cloud
         StoredFile storedFile = command.storedFile();
         if (storedFile != null) {
             FileResult uploadedFile = uploadFileInputPort.uploadFileToCloud(storedFile);
@@ -170,7 +168,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         // thì mới lưu lại file nói chuyện của người dùng
         StoredFile storedFile = command.storedFile();
         if (storedFile != null) {
-            audioFile = fileRepositoryPort.createNewForUpload(storedFile, false);
+            audioFile = fileRepositoryPort.createNewForUpload(storedFile, FileAccessStatus.PRIVATE);
         }
 
         AnswerHistory answerHistory = AnswerHistory.builder()

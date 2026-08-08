@@ -5,7 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.shared.persistence.BaseEntity;
-import org.naho.user.type.OAuthProviderName;
+import org.naho.user.type.AuthProviderName;
 
 @SuperBuilder
 @Getter
@@ -13,9 +13,9 @@ import org.naho.user.type.OAuthProviderName;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "o_auth_providers")
+@Table(name = "auth_providers")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class OAuthProviderEntity extends BaseEntity {
+public class AuthProviderEntity extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     UserEntity user;
@@ -24,7 +24,7 @@ public class OAuthProviderEntity extends BaseEntity {
     String providerUserId;
 
     @Column(name = "provider_name", nullable = false)
-    OAuthProviderName providerName;
+    AuthProviderName providerName;
 
     @Column(name = "avatar_url")
     String avatarUrl;
