@@ -123,7 +123,6 @@ public class ChatConfig {
             BookRepositoryPort bookRepositoryPort,
             LearningPathNodeRepositoryPort learningPathNodeRepositoryPort,
             AiAnalysisPort aiAnalysisPort,
-            FuriganaGenerationPort furiganaGenerationPort,
             TransactionPort transactionPort,
             CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort,
             UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
@@ -142,7 +141,6 @@ public class ChatConfig {
                 bookRepositoryPort,
                 learningPathNodeRepositoryPort,
                 aiAnalysisPort,
-                furiganaGenerationPort,
                 transactionPort,
                 completeSpeakingQuestionInputPort,
                 userLearningProgressRepositoryPort,
@@ -151,3 +149,4 @@ public class ChatConfig {
         );
     }
 }
+
