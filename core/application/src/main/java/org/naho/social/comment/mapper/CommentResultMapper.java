@@ -56,7 +56,7 @@ public class CommentResultMapper {
                 myReaction
         );
 
-        LeaderboardUserResult userInfo = crudLeagueInputPort.findTopOfUserByUserId(currentUserId);
+        LeaderboardUserResult userInfo = crudLeagueInputPort.findTopOfUserByUserId(comment.getUserId());
 
         return new CommentResult(
                 comment.getId(),

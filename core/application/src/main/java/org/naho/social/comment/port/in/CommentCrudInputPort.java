@@ -14,5 +14,5 @@ public interface CommentCrudInputPort {
 
     CommentResult updateComment(CommentUpdateCommand command);
 
-    CommentResult deleteComment(CommentDeleteCommand command);
+    void deleteComment(CommentDeleteCommand command);
 }

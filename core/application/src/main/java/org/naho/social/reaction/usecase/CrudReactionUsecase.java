@@ -1,10 +1,13 @@
 package org.naho.social.reaction.usecase;
 
+import org.naho.i18n.message.social.CommentDetailMessageKey;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.notification.event.SendNotificationEvent;
 import org.naho.notification.type.NotificationType;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.EventPublisherPort;
+import org.naho.social.comment.exception.CommentErrorCode;
+import org.naho.social.comment.model.Comment;
 import org.naho.social.comment.port.out.CommentRepositoryPort;
 import org.naho.social.reaction.command.ReactionActionCommand;
 import org.naho.social.reaction.mapper.ReactionActionCommandMapper;
@@ -60,6 +63,13 @@ public class CrudReactionUsecase implements CrudReactionTypeInputPort {
                 .getUsername()
                 .getValue();
 
+        Comment comment = commentRepositoryPort.findByCommentId(reactionActionCommand.comment_id())
+                .orElseThrow(() -> new ApplicationException(
+                        CommentErrorCode.COMMENT_NOT_FOUND,
+                        CommentDetailMessageKey.COMMENT_ID_NOT_FOUND,
+                        reactionActionCommand.comment_id()
+                ));
+
         Reaction existingReaction = reactionRepositoryPort.findByUserAndTarget(
                 reactionActionCommand.userId(),
                 reactionActionCommand.comment_id()
@@ -70,24 +80,22 @@ public class CrudReactionUsecase implements CrudReactionTypeInputPort {
             reactionRepositoryPort.save(newReaction);
 
             // Notify comment owner
-            commentRepositoryPort.findByCommentId(reactionActionCommand.comment_id()).ifPresent(comment -> {
-                if (!comment.getUserId().equals(reactionActionCommand.userId())) {
-                    String metadata = "{\"questionId\": " + comment.getQuestionId() + ", \"commentId\": " + comment.getId() + "}";
-                    String targetUrl = learningPathNodeRepositoryPort.getFrontendUrlPath(comment.getQuestionId())
-                            .map(path -> path + "#comment-" + comment.getId())
-                            .orElse("/speaking-questions/" + comment.getQuestionId() + "#comment-" + comment.getId());
+            if (!comment.getUserId().equals(reactionActionCommand.userId())) {
+                String metadata = "{\"questionId\": " + comment.getQuestionId() + ", \"commentId\": " + comment.getId() + "}";
+                String targetUrl = learningPathNodeRepositoryPort.getFrontendUrlPath(comment.getQuestionId())
+                        .map(path -> path + "#comment-" + comment.getId())
+                        .orElse("/speaking-questions/" + comment.getQuestionId() + "#comment-" + comment.getId());
 
-                    eventPublisherPort.publish(new SendNotificationEvent(
-                            this,
-                            comment.getUserId(),
-                            NotificationType.SOCIAL,
-                            "Có người thích bình luận của bạn",
-                            username + " vừa thả cảm xúc vào bình luận của bạn.",
-                            targetUrl,
-                            metadata
-                    ));
-                }
-            });
+                eventPublisherPort.publish(new SendNotificationEvent(
+                        this,
+                        comment.getUserId(),
+                        NotificationType.SOCIAL,
+                        "Có người thích bình luận của bạn",
+                        username + " vừa thả cảm xúc vào bình luận của bạn.",
+                        targetUrl,
+                        metadata
+                ));
+            }
 
             return reactionResultResponseMapper.domainToResult(newReaction, ReactionAction.ADDED, username);
         }
@@ -106,6 +114,14 @@ public class CrudReactionUsecase implements CrudReactionTypeInputPort {
 
     @Override
     public ReactionDetailResult getReactionsByComment(Long commentId) {
+        if (commentRepositoryPort.findByCommentId(commentId).isEmpty()) {
+            throw new ApplicationException(
+                    CommentErrorCode.COMMENT_NOT_FOUND,
+                    CommentDetailMessageKey.COMMENT_ID_NOT_FOUND,
+                    commentId
+            );
+        }
+
         List<Reaction> reactions = reactionRepositoryPort.findByCommentId(commentId);
 
         Map<ReactionType, Long> counts = reactions.stream()
@@ -115,7 +131,14 @@ public class CrudReactionUsecase implements CrudReactionTypeInputPort {
                 .collect(Collectors.groupingBy(
                         Reaction::getReactionType,
                         Collectors.mapping(
-                                r -> new ReactionDetailResult.ReactionUserItem(r.getUserId(), null),
+                                r -> {
+                                    String fullName = userRepositoryPort.findById(r.getUserId())
+                                            .map(u -> u.getFullName() != null && !u.getFullName().isBlank()
+                                                    ? u.getFullName()
+                                                    : u.getUsername().getValue())
+                                            .orElse("Một người dùng");
+                                    return new ReactionDetailResult.ReactionUserItem(r.getUserId(), fullName);
+                                },
                                 Collectors.toList()
                         )
                 ));
