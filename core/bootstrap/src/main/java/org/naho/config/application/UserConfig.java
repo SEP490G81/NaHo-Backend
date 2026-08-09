@@ -226,9 +226,11 @@ public class UserConfig {
     @Bean
     public ChangePasswordInputPort changePasswordInputPort(
             UserRepositoryPort userRepositoryPort,
-            EncoderPort encoderPort) {
+            EncoderPort encoderPort,
+            EmailPort emailPort) {
         return new ChangePasswordUseCase(
                 userRepositoryPort,
-                encoderPort);
+                encoderPort,
+                emailPort);
     }
 }
