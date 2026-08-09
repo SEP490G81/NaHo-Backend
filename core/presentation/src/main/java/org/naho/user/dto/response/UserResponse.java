@@ -2,7 +2,6 @@ package org.naho.user.dto.response;
 
 import lombok.Builder;
 import org.naho.user.type.Gender;
-import org.naho.user.type.JLPTLevel;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -19,7 +18,6 @@ public record UserResponse(
         String email,
         String fullName,
         Gender gender,
-        LocalDate dob,
-        JLPTLevel jlptLevel
+        LocalDate dob
 ) {
 }

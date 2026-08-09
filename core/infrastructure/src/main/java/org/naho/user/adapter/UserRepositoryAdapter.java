@@ -22,7 +22,10 @@ import org.naho.user.mybatis.UserQueryMapper;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.naho.user.repository.UserJpaRepository;
 import org.naho.user.result.LeaderboardUserResult;
-import org.naho.user.type.*;
+import org.naho.user.type.AuthProviderName;
+import org.naho.user.type.Gender;
+import org.naho.user.type.RoleName;
+import org.naho.user.type.UserStatus;
 import org.naho.user.valueobject.Dob;
 import org.naho.user.valueobject.Username;
 import org.springframework.stereotype.Component;
@@ -101,7 +104,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
-    public List<User> findByFilters(String userNameOrMail, String role, String status, String jlptLevel) {
+    public List<User> findByFilters(String userNameOrMail, String role, String status) {
         RoleName roleEnum = null;
         if (role != null && !role.trim().isEmpty()) {
             try {
@@ -120,21 +123,12 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
             }
         }
 
-        JLPTLevel jlptLevelEnum = null;
-        if (jlptLevel != null && !jlptLevel.trim().isEmpty()) {
-            try {
-                jlptLevelEnum = JLPTLevel.valueOf(jlptLevel.trim().toUpperCase());
-            } catch (IllegalArgumentException e) {
-                return List.of();
-            }
-        }
-
         String formattedNameOrMail = null;
         if (userNameOrMail != null && !userNameOrMail.trim().isEmpty()) {
             formattedNameOrMail = "%" + userNameOrMail.trim().toLowerCase() + "%";
         }
 
-        return userJpaRepository.findByFilters(formattedNameOrMail, roleEnum, statusEnum, jlptLevelEnum).stream()
+        return userJpaRepository.findByFilters(formattedNameOrMail, roleEnum, statusEnum).stream()
                 .map(userEntityMapper::entityToDomain)
                 .toList();
     }

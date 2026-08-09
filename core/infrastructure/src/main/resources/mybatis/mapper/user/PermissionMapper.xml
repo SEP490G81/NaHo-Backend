@@ -7,7 +7,7 @@
         select distinct p.permission_code
         from permissions p
                  join roles_permissions rp on p.id = rp.permission_id
-                 join users_roles ur on rp.role_id = ur.role_id
-        where ur.user_id = #{userId};
+                 join users u on rp.role_id = u.role_id
+        where u.id = #{userId};
     </select>
 </mapper>

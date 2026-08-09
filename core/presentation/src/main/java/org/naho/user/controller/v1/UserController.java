@@ -83,10 +83,9 @@ public class UserController {
     public ResponseEntity<List<UserResponse>> getListUser(
             @RequestParam(value = "userNameOrEmail", required = false) String userNameOrEmail,
             @RequestParam(value = "role", required = false) String role,
-            @RequestParam(value = "status", required = false) String status,
-            @RequestParam(value = "jlptLevel", required = false) String jlptLevel
+            @RequestParam(value = "status", required = false) String status
     ) {
-        List<UserResult> results = getUserInputPort.searchUsers(userNameOrEmail, role, status, jlptLevel);
+        List<UserResult> results = getUserInputPort.searchUsers(userNameOrEmail, role, status);
         return ResponseEntity.ok(results.stream().map(userResponseMapper::resultToResponse).toList());
     }
 

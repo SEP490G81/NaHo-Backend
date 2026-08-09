@@ -1,9 +1,11 @@
 package org.naho.social.comment.mapper;
 
+import org.naho.league.port.in.CrudLeagueInputPort;
 import org.naho.social.comment.model.Comment;
-import org.naho.social.comment.result.CommentResonseResult;
+import org.naho.social.comment.result.CommentResult;
 import org.naho.social.reaction.model.Reaction;
 import org.naho.social.reaction.type.ReactionType;
+import org.naho.user.result.LeaderboardUserResult;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -12,12 +14,19 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class CommentResultMapper {
+    private final CrudLeagueInputPort crudLeagueInputPort;
 
-    public CommentResonseResult domainToResult(Comment comment) {
-        return new CommentResonseResult(
+    public CommentResultMapper(CrudLeagueInputPort crudLeagueInputPort) {
+        this.crudLeagueInputPort = crudLeagueInputPort;
+    }
+
+    public CommentResult domainToResult(Comment comment) {
+        LeaderboardUserResult userInfo = crudLeagueInputPort.findTopOfUserByUserId(comment.getUserId());
+
+        return new CommentResult(
                 comment.getId(),
                 comment.getQuestionId(),
-                comment.getUserId(),
+                userInfo,
                 comment.getParentId(),
                 comment.getContent(),
                 toLocalDateTime(comment),
@@ -27,7 +36,7 @@ public class CommentResultMapper {
         );
     }
 
-    public CommentResonseResult domainToResultWithReactions(
+    public CommentResult domainToResultWithReactions(
             Comment comment,
             List<Reaction> reactions,
             Long currentUserId
@@ -41,16 +50,18 @@ public class CommentResultMapper {
                 .findFirst()
                 .orElse(null);
 
-        CommentResonseResult.ReactionSummary summary = new CommentResonseResult.ReactionSummary(
+        CommentResult.ReactionSummaryResult summary = new CommentResult.ReactionSummaryResult(
                 reactions.size(),
                 counts,
                 myReaction
         );
 
-        return new CommentResonseResult(
+        LeaderboardUserResult userInfo = crudLeagueInputPort.findTopOfUserByUserId(currentUserId);
+
+        return new CommentResult(
                 comment.getId(),
                 comment.getQuestionId(),
-                comment.getUserId(),
+                userInfo,
                 comment.getParentId(),
                 comment.getContent(),
                 toLocalDateTime(comment),

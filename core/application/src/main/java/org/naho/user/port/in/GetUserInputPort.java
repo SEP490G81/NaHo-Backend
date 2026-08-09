@@ -9,7 +9,7 @@ public interface GetUserInputPort {
 
     UserResult getUserById(Long userId);
 
-    List<UserResult> searchUsers(String userNameOrEmail, String role, String status, String jlptLevel);
+    List<UserResult> searchUsers(String userNameOrEmail, String role, String status);
 
     UserResult getUserByUserName(String userName);
 }

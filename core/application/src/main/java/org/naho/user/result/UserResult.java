@@ -2,7 +2,6 @@ package org.naho.user.result;
 
 import org.naho.file.result.FileResult;
 import org.naho.user.type.Gender;
-import org.naho.user.type.JLPTLevel;
 import org.naho.user.type.UserStatus;
 
 import java.time.LocalDate;
@@ -22,7 +21,6 @@ public class UserResult {
     private String fullName;
     private Gender gender;
     private LocalDate dob;
-    private JLPTLevel jlptLevel;
     private UserStatus status;
 
     public UserResult() {
@@ -39,7 +37,6 @@ public class UserResult {
             String fullName,
             Gender gender,
             LocalDate dob,
-            JLPTLevel jlptLevel,
             UserStatus status
     ) {
         this.id = id;
@@ -52,7 +49,6 @@ public class UserResult {
         this.fullName = fullName;
         this.gender = gender;
         this.dob = dob;
-        this.jlptLevel = jlptLevel;
         this.status = status;
     }
 
@@ -67,7 +63,6 @@ public class UserResult {
         this.fullName = builder.fullName;
         this.gender = builder.gender;
         this.dob = builder.dob;
-        this.jlptLevel = builder.jlptLevel;
         this.status = builder.status;
     }
 
@@ -155,13 +150,6 @@ public class UserResult {
         this.dob = dob;
     }
 
-    public JLPTLevel getJlptLevel() {
-        return jlptLevel;
-    }
-
-    public void setJlptLevel(JLPTLevel jlptLevel) {
-        this.jlptLevel = jlptLevel;
-    }
 
     public UserStatus getStatus() {
         return status;
@@ -212,9 +200,6 @@ public class UserResult {
         return dob;
     }
 
-    public JLPTLevel jlptLevel() {
-        return jlptLevel;
-    }
 
     public UserStatus status() {
         return status;
@@ -235,13 +220,12 @@ public class UserResult {
                 Objects.equals(fullName, that.fullName) &&
                 gender == that.gender &&
                 Objects.equals(dob, that.dob) &&
-                jlptLevel == that.jlptLevel &&
                 status == that.status;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, roles, authProviders, avatarFile, userLearningProgressId, username, email, fullName, gender, dob, jlptLevel, status);
+        return Objects.hash(id, roles, authProviders, avatarFile, userLearningProgressId, username, email, fullName, gender, dob, status);
     }
 
     @Override
@@ -257,7 +241,6 @@ public class UserResult {
                 ", fullName='" + fullName + '\'' +
                 ", gender=" + gender +
                 ", dob=" + dob +
-                ", jlptLevel=" + jlptLevel +
                 ", status=" + status +
                 '}';
     }
@@ -276,7 +259,6 @@ public class UserResult {
         private String fullName;
         private Gender gender;
         private LocalDate dob;
-        private JLPTLevel jlptLevel;
 
         private UserStatus status;
 
@@ -333,10 +315,6 @@ public class UserResult {
             return this;
         }
 
-        public Builder jlptLevel(JLPTLevel jlptLevel) {
-            this.jlptLevel = jlptLevel;
-            return this;
-        }
 
         public Builder status(UserStatus status) {
             this.status = status;

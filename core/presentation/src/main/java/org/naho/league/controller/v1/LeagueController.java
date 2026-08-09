@@ -9,8 +9,10 @@ import org.naho.league.result.LeagueResult;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.user.dto.mapper.UserResponseMapper;
 import org.naho.user.dto.response.LeaderboardUserResponse;
+import org.naho.user.result.AccessTokenPayload;
 import org.naho.user.result.LeaderboardUserResult;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,5 +52,15 @@ public class LeagueController {
                 .map(userResponseMapper::resultToResponse)
                 .toList();
         return ResponseEntity.ok(responses);
+    }
+
+    @ApiResponseMessage(message = LeagueDetailMessageKey.LEAGUE_GET_USER_LEADERBOARD_SUCCESS)
+    @GetMapping("/me")
+    public ResponseEntity<List<LeaderboardUserResponse>> findTopOfUserByUserId(
+            @AuthenticationPrincipal AccessTokenPayload payload
+    ) {
+        LeaderboardUserResult result = crudLeagueInputPort.findTopOfUserByUserId(payload.userId());
+        LeaderboardUserResponse response = userResponseMapper.resultToResponse(result);
+        return ResponseEntity.ok(List.of(response));
     }
 }

@@ -28,7 +28,6 @@ import org.naho.user.type.UserStatus;
 import org.naho.user.valueobject.Email;
 
 import java.time.Instant;
-import java.util.List;
 
 public class AuthUseCase implements AuthInputPort {
     private final UserRepositoryPort userRepositoryPort;
@@ -189,7 +188,7 @@ public class AuthUseCase implements AuthInputPort {
                         .fullName(command.getFullName())
                         .status(UserStatus.ACTIVE)
                         .isEmailVerified(true)
-                        .roleIds(List.of(learnerRole.getId()))
+                        .roleId(learnerRole.getId())
                         .build();
 
                 currentUser = userRepositoryPort.createNew(newUser, authProvider);
