@@ -100,6 +100,14 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    /**
+     * Cập nhật thông tin cơ bản của người dùng:
+     * username, fullName, gender, dob
+     *
+     * @param payload chứa userId của người dùng đang đăng nhập, tự sinh từ JWT
+     * @param request bao gồm: username, full name, gender, dob
+     * @return UserResponse
+     */
     @ApiResponseMessage(message = UserDetailMessageKey.USER_UPDATE_INFO_SUCCESSFULLY)
     @PatchMapping(value = "/info")
     public ResponseEntity<UserResponse> updateUserInfo(
@@ -120,6 +128,13 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Cập nhật avatar của người dùng
+     *
+     * @param payload    chứa userId của người dùng đang đăng nhập, tự sinh từ JWT
+     * @param avatarFile file avatar mới của người dùng upload lên
+     * @return UserResponse
+     */
     @ApiResponseMessage(message = UserDetailMessageKey.USER_UPDATE_AVATAR_SUCCESSFULLY)
     @PatchMapping("/avatar")
     public ResponseEntity<UserResponse> updateUserAvatar(
