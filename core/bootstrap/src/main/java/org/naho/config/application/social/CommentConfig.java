@@ -10,7 +10,7 @@ import org.naho.social.comment.port.in.CommentCrudInputPort;
 import org.naho.social.comment.port.out.CommentRepositoryPort;
 import org.naho.social.comment.usecase.CommentCrudUsecase;
 import org.naho.social.reaction.port.out.ReactionRepositoryPort;
-import org.naho.user.port.in.CrudOAuthProviderInputPort;
+import org.naho.user.port.in.CrudAuthProviderInputPort;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,9 +27,9 @@ public class CommentConfig {
     public CommentResultMapper commentResultMapper(
             UserRepositoryPort userRepositoryPort,
             CrudFileInputPort crudFileInputPort,
-            CrudOAuthProviderInputPort crudOAuthProviderInputPort
+            CrudAuthProviderInputPort crudAuthProviderInputPort
     ) {
-        return new CommentResultMapper(userRepositoryPort, crudFileInputPort, crudOAuthProviderInputPort);
+        return new CommentResultMapper(userRepositoryPort, crudFileInputPort, crudAuthProviderInputPort);
     }
 
     @Bean

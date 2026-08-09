@@ -7,6 +7,7 @@ public record CreateSpeakingQuestionCommand(
         String descriptionMarkup,
         String japaneseSampleAnswerMarkup,
         String vietnameseSampleAnswer,
+        String englishSampleAnswer,
         boolean isContentManager
 ) {
 }

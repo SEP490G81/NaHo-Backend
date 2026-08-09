@@ -97,6 +97,7 @@ public class GetLearningPathNodeDetailUseCase implements GetLearningPathNodeDeta
                     sq.getJapaneseSampleAnswer(),
                     sq.getJapaneseSampleAnswerMarkup(),
                     sq.getVietnameseSampleAnswer(),
+                    sq.getEnglishSampleAnswer(),
                     sq.getStatus(),
                     vocabList,
                     grammarList

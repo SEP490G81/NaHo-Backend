@@ -9,6 +9,8 @@ public record TopicResponse(
         Long coverImageFileId,
         String japaneseName,
         String japaneseDescription,
+        String vietnameseDescription,
+        String englishDescription,
         String japaneseNameMarkup,
         String japaneseDescriptionMarkup,
         TopicStatus status,

@@ -17,6 +17,7 @@ public record SpeakingQuestionDetailResult(
         String japaneseSampleAnswer,
         String japaneseSampleAnswerMarkup,
         String vietnameseSampleAnswer,
+        String englishSampleAnswer,
         QuestionStatus status,
         List<VocabularyDetailResult> vocabularies,
         List<GrammarDetailResult> grammars

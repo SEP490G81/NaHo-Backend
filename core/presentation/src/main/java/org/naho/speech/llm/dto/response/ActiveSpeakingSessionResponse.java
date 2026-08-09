@@ -22,5 +22,6 @@ public record ActiveSpeakingSessionResponse(
             String correctionExplanation,
             String grammarNote,
             String hintForLearner
-    ) {}
+    ) {
+    }
 }

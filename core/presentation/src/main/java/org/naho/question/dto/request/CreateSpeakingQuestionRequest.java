@@ -13,6 +13,8 @@ public record CreateSpeakingQuestionRequest(
 
         String japaneseSampleAnswerMarkup,
 
-        String vietnameseSampleAnswer
+        String vietnameseSampleAnswer,
+
+        String englishSampleAnswer
 ) {
 }

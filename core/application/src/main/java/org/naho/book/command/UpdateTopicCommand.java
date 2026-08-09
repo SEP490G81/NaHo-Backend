@@ -6,6 +6,8 @@ public record UpdateTopicCommand(
         Long id,
         Long requestUserId,
         boolean isAdminOrManager,
+        String vietnameseDescription,
+        String englishDescription,
         String japaneseNameMarkup,
         String japaneseDescriptionMarkup,
         TopicStatus status,

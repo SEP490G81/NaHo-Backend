@@ -49,6 +49,9 @@ public class SpeakingQuestionEntity extends BaseEntity {
     @Column(name = "vietnamese_sample_answer", columnDefinition = "TEXT")
     String vietnameseSampleAnswer;
 
+    @Column(name = "english_sample_answer", columnDefinition = "TEXT")
+    String englishSampleAnswer;
+
     @Column(length = 50)
     @Enumerated(EnumType.STRING)
     QuestionStatus status;

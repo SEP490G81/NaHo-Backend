@@ -16,6 +16,7 @@ public record SpeakingQuestionListItemResponse(
         String japaneseSampleAnswer,
         String japaneseSampleAnswerMarkup,
         String vietnameseSampleAnswer,
+        String englishSampleAnswer,
         QuestionStatus status,
         ZonedDateTime createdTime
 ) {

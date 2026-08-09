@@ -27,6 +27,7 @@ public record LearningPathNodeDetailResponse(
             String japaneseSampleAnswer,
             String japaneseSampleAnswerMarkup,
             String vietnameseSampleAnswer,
+            String englishSampleAnswer,
             QuestionStatus status,
             List<VocabularyDetailResponse> vocabularies,
             List<GrammarDetailResponse> grammars

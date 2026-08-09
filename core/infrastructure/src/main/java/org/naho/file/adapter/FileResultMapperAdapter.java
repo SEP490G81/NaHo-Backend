@@ -5,8 +5,8 @@ import org.naho.file.constant.CloudFrontProperties;
 import org.naho.file.constant.S3Properties;
 import org.naho.file.model.File;
 import org.naho.file.port.out.FileResultMapperPort;
+import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.file.result.FileResult;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,9 +15,7 @@ public class FileResultMapperAdapter implements FileResultMapperPort {
 
     private final CloudFrontProperties cloudFrontProperties;
     private final S3Properties s3Properties;
-
-    @Value("${app.nextjs-server-files-api}")
-    private String nextjsServerApi;
+    private final FileStorageServicePort fileStorageServicePort;
 
     @Override
     public FileResult domainToResult(File domain) {
@@ -27,13 +25,16 @@ public class FileResultMapperAdapter implements FileResultMapperPort {
 
         String accessUrl;
         if (s3Properties.getPublicBucketName().equals(domain.getBucketName())) {
+            // nếu là ở public bucket thì lấy đường dẫn cloud front
             accessUrl = cloudFrontProperties.getDomain() + domain.getObjectKey();
         } else {
-            accessUrl = nextjsServerApi + domain.getId();
+            // nếu ở bucket private thì lấy presigned url
+            accessUrl = fileStorageServicePort.generatePresignedUrl(domain);
         }
 
         return FileResult.builder()
                 .id(domain.getId())
+                .objectKey(domain.getObjectKey())
                 .accessUrl(accessUrl)
                 .originalFileName(domain.getOriginalFileName())
                 .contentType(domain.getContentType())

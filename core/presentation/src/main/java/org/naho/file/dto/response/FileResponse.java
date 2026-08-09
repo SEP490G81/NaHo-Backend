@@ -5,6 +5,7 @@ import org.naho.file.type.OperationType;
 
 public record FileResponse(
         Long id,
+        String objectKey,
         String accessUrl,
         String originalFileName,
         String contentType,

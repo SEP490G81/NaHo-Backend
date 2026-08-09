@@ -14,14 +14,14 @@ import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.shared.exception.InfrastructureException;
 import org.springframework.stereotype.Component;
 
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
 
 
 @Slf4j
@@ -53,7 +53,7 @@ public class FileValidatorAdapter implements FileValidatorPort {
     }
 
     @Override
-    public void validateWavFileAndDuration(byte[] audioBytes, Double maxDuration) {
+    public double validateWavFileAndDuration(byte[] audioBytes, Double maxDuration) {
         if (audioBytes == null || audioBytes.length == 0) {
             throw new InfrastructureException(
                     FileErrorCode.FILE_NOT_VALID,
@@ -92,6 +92,8 @@ public class FileValidatorAdapter implements FileValidatorPort {
                         duration,
                         maxDuration);
             }
+
+            return duration;
 
         } catch (IOException e) {
             throw new InfrastructureException(

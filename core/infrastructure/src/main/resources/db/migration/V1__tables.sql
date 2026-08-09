@@ -6,7 +6,20 @@ CREATE TABLE answer_histories
     user_id              BIGINT                NOT NULL,
     speaking_question_id BIGINT                NOT NULL,
     audio_file_id        BIGINT                NULL,
+    duration_sec         INT                   NULL,
     CONSTRAINT pk_answer_histories PRIMARY KEY (id)
+);
+
+CREATE TABLE auth_providers
+(
+    id               BIGINT AUTO_INCREMENT NOT NULL,
+    created_time     datetime(6)           NOT NULL,
+    modified_time    datetime(6)           NULL,
+    user_id          BIGINT                NOT NULL,
+    provider_user_id VARCHAR(255)          NOT NULL,
+    provider_name    SMALLINT              NOT NULL,
+    avatar_url       VARCHAR(255)          NULL,
+    CONSTRAINT pk_auth_providers PRIMARY KEY (id)
 );
 
 CREATE TABLE books
@@ -174,18 +187,6 @@ CREATE TABLE lessons
     CONSTRAINT pk_lessons PRIMARY KEY (id)
 );
 
-CREATE TABLE o_auth_providers
-(
-    id               BIGINT AUTO_INCREMENT NOT NULL,
-    created_time     datetime(6)           NOT NULL,
-    modified_time    datetime(6)           NULL,
-    user_id          BIGINT                NOT NULL,
-    provider_user_id VARCHAR(255)          NOT NULL,
-    provider_name    SMALLINT              NOT NULL,
-    avatar_url       VARCHAR(255)          NULL,
-    CONSTRAINT pk_o_auth_providers PRIMARY KEY (id)
-);
-
 CREATE TABLE objectives
 (
     id                            BIGINT AUTO_INCREMENT NOT NULL,
@@ -286,6 +287,17 @@ CREATE TABLE point_histories
     CONSTRAINT pk_point_histories PRIMARY KEY (id)
 );
 
+CREATE TABLE quote
+(
+    id           BIGINT AUTO_INCREMENT NOT NULL,
+    kanji        VARCHAR(500)          NOT NULL,
+    hiragana     VARCHAR(500)          NOT NULL,
+    romaji       VARCHAR(500)          NOT NULL,
+    translation  TEXT                  NOT NULL,
+    kanji_detail TEXT                  NULL,
+    CONSTRAINT pk_quote PRIMARY KEY (id)
+);
+
 CREATE TABLE reactions
 (
     id                   BIGINT AUTO_INCREMENT NOT NULL,
@@ -356,6 +368,7 @@ CREATE TABLE speaking_questions
     japanese_sample_answer          TEXT                  NULL,
     japanese_sample_answer_markup   TEXT                  NULL,
     vietnamese_sample_answer        TEXT                  NULL,
+    english_sample_answer           TEXT                  NULL,
     status                          VARCHAR(50)           NULL,
     speaking_question_audio_file_id BIGINT                NULL,
     user_id                         BIGINT                NULL,
@@ -491,6 +504,8 @@ CREATE TABLE topics
     modified_time                 datetime(6)           NULL,
     japanese_name                 VARCHAR(255)          NULL,
     japanese_description          VARCHAR(255)          NULL,
+    vietnamese_description        TEXT                  NULL,
+    english_description           TEXT                  NULL,
     japanese_name_markup          TEXT                  NULL,
     japanese_description_markup   TEXT                  NULL,
     status                        VARCHAR(50)           NULL,
@@ -733,6 +748,9 @@ ALTER TABLE answer_histories
 ALTER TABLE answer_histories
     ADD CONSTRAINT FK_ANSWER_HISTORIES_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
+ALTER TABLE auth_providers
+    ADD CONSTRAINT FK_AUTH_PROVIDERS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+
 ALTER TABLE books
     ADD CONSTRAINT FK_BOOKS_ON_COVER_IMAGE_FILE FOREIGN KEY (cover_image_file_id) REFERENCES files (id);
 
@@ -777,9 +795,6 @@ ALTER TABLE lessons
 
 ALTER TABLE objectives
     ADD CONSTRAINT FK_OBJECTIVES_ON_LESSON FOREIGN KEY (lesson_id) REFERENCES lessons (id);
-
-ALTER TABLE o_auth_providers
-    ADD CONSTRAINT FK_O_AUTH_PROVIDERS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
 ALTER TABLE payment_orders
     ADD CONSTRAINT FK_PAYMENT_ORDERS_ON_SUBSCRIPTION_PLAN FOREIGN KEY (subscription_plan_id) REFERENCES subscription_plans (id);

@@ -12,7 +12,9 @@
             </if>
             <if test="query.keyword != null and query.keyword != ''">
                 AND (t.japanese_name LIKE CONCAT('%', #{query.keyword}, '%')
-                OR t.japanese_description LIKE CONCAT('%', #{query.keyword}, '%'))
+                OR t.japanese_description LIKE CONCAT('%', #{query.keyword}, '%')
+                OR t.vietnamese_description LIKE CONCAT('%', #{query.keyword}, '%')
+                OR t.english_description LIKE CONCAT('%', #{query.keyword}, '%'))
             </if>
         </where>
     </sql>
@@ -28,6 +30,8 @@
         t.id AS id,
         t.japanese_name AS japaneseName,
         t.japanese_description AS japaneseDescription,
+        t.vietnamese_description AS vietnameseDescription,
+        t.english_description AS englishDescription,
         t.japanese_name_markup AS japaneseNameMarkup,
         t.japanese_description_markup AS japaneseDescriptionMarkup,
         t.status AS status,
@@ -41,7 +45,7 @@
         LEFT JOIN speaking_questions q ON lpn.speaking_question_id = q.id
         <include refid="Base_Where_Clause"/>
         GROUP BY
-        t.id, t.japanese_name, t.japanese_description,
+        t.id, t.japanese_name, t.japanese_description, t.vietnamese_description, t.english_description,
         t.japanese_name_markup, t.japanese_description_markup,
         t.status, t.order_index, t.cover_image_file_id
         <choose>
@@ -69,6 +73,8 @@
         <result property="modifiedTime" column="modified_time"/>
         <result property="japaneseName" column="japanese_name"/>
         <result property="japaneseDescription" column="japanese_description"/>
+        <result property="vietnameseDescription" column="vietnamese_description"/>
+        <result property="englishDescription" column="english_description"/>
         <result property="japaneseNameMarkup" column="japanese_name_markup"/>
         <result property="japaneseDescriptionMarkup" column="japanese_description_markup"/>
         <result property="status" column="status"/>

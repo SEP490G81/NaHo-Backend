@@ -8,6 +8,7 @@ public record UpdateSpeakingQuestionCommand(
         String descriptionMarkup,
         String japaneseSampleAnswerMarkup,
         String vietnameseSampleAnswer,
+        String englishSampleAnswer,
         boolean isContentManager
 ) {
 }

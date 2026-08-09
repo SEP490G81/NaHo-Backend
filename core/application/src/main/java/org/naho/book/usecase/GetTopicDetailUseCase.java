@@ -48,6 +48,8 @@ public class GetTopicDetailUseCase implements GetTopicDetailInputPort {
                 topic.getUserId(),
                 topic.getJapaneseName(),
                 topic.getJapaneseDescription(),
+                topic.getVietnameseDescription(),
+                topic.getEnglishDescription(),
                 topic.getJapaneseNameMarkup(),
                 topic.getJapaneseDescriptionMarkup(),
                 topic.getStatus(),

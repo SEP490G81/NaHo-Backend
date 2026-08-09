@@ -9,6 +9,8 @@ public record TopicResult(
         Long coverImageFileId,
         String japaneseName,
         String japaneseDescription,
+        String vietnameseDescription,
+        String englishDescription,
         String japaneseNameMarkup,
         String japaneseDescriptionMarkup,
         TopicStatus status,
@@ -28,6 +30,8 @@ public record TopicResult(
         private Long coverImageFileId;
         private String japaneseName;
         private String japaneseDescription;
+        private String vietnameseDescription;
+        private String englishDescription;
         private String japaneseNameMarkup;
         private String japaneseDescriptionMarkup;
         private TopicStatus status;
@@ -65,6 +69,16 @@ public record TopicResult(
 
         public Builder japaneseDescription(String japaneseDescription) {
             this.japaneseDescription = japaneseDescription;
+            return this;
+        }
+
+        public Builder vietnameseDescription(String vietnameseDescription) {
+            this.vietnameseDescription = vietnameseDescription;
+            return this;
+        }
+
+        public Builder englishDescription(String englishDescription) {
+            this.englishDescription = englishDescription;
             return this;
         }
 
@@ -106,6 +120,8 @@ public record TopicResult(
                     coverImageFileId,
                     japaneseName,
                     japaneseDescription,
+                    vietnameseDescription,
+                    englishDescription,
                     japaneseNameMarkup,
                     japaneseDescriptionMarkup,
                     status,

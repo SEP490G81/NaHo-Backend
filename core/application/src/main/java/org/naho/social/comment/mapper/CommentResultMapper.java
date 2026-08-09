@@ -7,9 +7,9 @@ import org.naho.social.comment.result.CommentResonseResult;
 import org.naho.social.reaction.model.Reaction;
 import org.naho.social.reaction.type.ReactionType;
 import org.naho.user.model.User;
-import org.naho.user.port.in.CrudOAuthProviderInputPort;
+import org.naho.user.port.in.CrudAuthProviderInputPort;
 import org.naho.user.port.out.UserRepositoryPort;
-import org.naho.user.result.OAuthProviderResult;
+import org.naho.user.result.AuthProviderResult;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -22,7 +22,7 @@ public class CommentResultMapper {
 
     private final UserRepositoryPort userRepositoryPort;
     private final CrudFileInputPort crudFileInputPort;
-    private final CrudOAuthProviderInputPort crudOAuthProviderInputPort;
+    private final CrudAuthProviderInputPort crudAuthProviderInputPort;
 
     public CommentResultMapper() {
         this(null, null, null);
@@ -30,10 +30,10 @@ public class CommentResultMapper {
 
     public CommentResultMapper(UserRepositoryPort userRepositoryPort,
                                CrudFileInputPort crudFileInputPort,
-                               CrudOAuthProviderInputPort crudOAuthProviderInputPort) {
+                               CrudAuthProviderInputPort crudAuthProviderInputPort) {
         this.userRepositoryPort = userRepositoryPort;
         this.crudFileInputPort = crudFileInputPort;
-        this.crudOAuthProviderInputPort = crudOAuthProviderInputPort;
+        this.crudAuthProviderInputPort = crudAuthProviderInputPort;
     }
 
     public CommentResonseResult domainToResult(Comment comment) {
@@ -111,9 +111,9 @@ public class CommentResultMapper {
             } catch (Exception ignored) {
             }
         }
-        if (avatarUrl == null && crudOAuthProviderInputPort != null) {
+        if (avatarUrl == null && crudAuthProviderInputPort != null) {
             try {
-                List<OAuthProviderResult> providers = crudOAuthProviderInputPort.findAllByUser_Id(userId);
+                List<AuthProviderResult> providers = crudAuthProviderInputPort.findAllByUser_Id(userId);
                 if (providers != null && !providers.isEmpty()) {
                     avatarUrl = providers.get(0).avatarUrl();
                 }
@@ -133,5 +133,6 @@ public class CommentResultMapper {
         return LocalDateTime.ofInstant(comment.getModifiedTime(), ZoneId.systemDefault());
     }
 
-    private record UserInfo(String username, String avatarUrl) {}
+    private record UserInfo(String username, String avatarUrl) {
+    }
 }

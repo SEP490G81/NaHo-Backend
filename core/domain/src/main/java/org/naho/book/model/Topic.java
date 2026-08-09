@@ -14,6 +14,8 @@ public class Topic {
     private Long coverImageFileId;
     private String japaneseName;
     private String japaneseDescription;
+    private String vietnameseDescription;
+    private String englishDescription;
     private String japaneseNameMarkup;
     private String japaneseDescriptionMarkup;
     private TopicStatus status;
@@ -27,6 +29,8 @@ public class Topic {
         this.bookId = builder.bookId;
         this.japaneseName = builder.japaneseName;
         this.japaneseDescription = builder.japaneseDescription;
+        this.vietnameseDescription = builder.vietnameseDescription;
+        this.englishDescription = builder.englishDescription;
         this.japaneseNameMarkup = builder.japaneseNameMarkup;
         this.japaneseDescriptionMarkup = builder.japaneseDescriptionMarkup;
         this.status = builder.status;
@@ -77,6 +81,8 @@ public class Topic {
 
     public void update(String japaneseName,
                        String japaneseDescription,
+                       String vietnameseDescription,
+                       String englishDescription,
                        String japaneseNameMarkup,
                        String japaneseDescriptionMarkup,
                        TopicStatus status,
@@ -90,6 +96,8 @@ public class Topic {
 
         this.japaneseName = japaneseName;
         this.japaneseDescription = japaneseDescription;
+        this.vietnameseDescription = vietnameseDescription;
+        this.englishDescription = englishDescription;
         this.japaneseNameMarkup = japaneseNameMarkup;
         this.japaneseDescriptionMarkup = japaneseDescriptionMarkup;
         this.status = status;
@@ -116,6 +124,14 @@ public class Topic {
 
     public String getJapaneseDescription() {
         return japaneseDescription;
+    }
+
+    public String getVietnameseDescription() {
+        return vietnameseDescription;
+    }
+
+    public String getEnglishDescription() {
+        return englishDescription;
     }
 
     public String getJapaneseNameMarkup() {
@@ -154,6 +170,8 @@ public class Topic {
         private Long bookId;
         private String japaneseName;
         private String japaneseDescription;
+        private String vietnameseDescription;
+        private String englishDescription;
         private String japaneseNameMarkup;
         private String japaneseDescriptionMarkup;
         private TopicStatus status;
@@ -188,6 +206,16 @@ public class Topic {
 
         public Builder japaneseDescription(String japaneseDescription) {
             this.japaneseDescription = japaneseDescription;
+            return this;
+        }
+
+        public Builder vietnameseDescription(String vietnameseDescription) {
+            this.vietnameseDescription = vietnameseDescription;
+            return this;
+        }
+
+        public Builder englishDescription(String englishDescription) {
+            this.englishDescription = englishDescription;
             return this;
         }
 

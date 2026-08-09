@@ -187,6 +187,13 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Đổi mật khẩu (khi người dùng nhớ mật khẩu cũ)
+     *
+     * @param payload chứa userId của người đăng nhập (lấy từ JWT token)
+     * @param request bao gồm old password và password mới
+     * @return Void
+     */
     @ApiResponseMessage(message = UserDetailMessageKey.USER_CHANGE_PASSWORD_SUCCESSFULLY)
     @PostMapping("/change-password")
     public ResponseEntity<Void> changePassword(
