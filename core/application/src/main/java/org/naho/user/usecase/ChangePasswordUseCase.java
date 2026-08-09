@@ -2,6 +2,7 @@ package org.naho.user.usecase;
 
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
+import org.naho.shared.port.out.EmailPort;
 import org.naho.user.command.ChangePasswordCommand;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.model.User;
@@ -16,13 +17,16 @@ public class ChangePasswordUseCase implements ChangePasswordInputPort {
 
     private final UserRepositoryPort userRepository;
     private final EncoderPort encoderPort;
+    private final EmailPort emailPort;
 
     public ChangePasswordUseCase(
             UserRepositoryPort userRepository,
-            EncoderPort encoderPort
+            EncoderPort encoderPort,
+            EmailPort emailPort
     ) {
         this.userRepository = userRepository;
         this.encoderPort = encoderPort;
+        this.emailPort = emailPort;
     }
 
     @Override
@@ -72,5 +76,9 @@ public class ChangePasswordUseCase implements ChangePasswordInputPort {
         user.setHashPassword(encodedPassword);
 
         userRepository.save(user);
+
+        if (user.getEmail() != null) {
+            emailPort.sendPasswordChangedEmail(user.getEmail().getValue(), user.getFullName());
+        }
     }
 }

@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.exception.DomainException;
+import org.naho.shared.port.out.EmailPort;
 import org.naho.user.command.ChangePasswordCommand;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.model.User;
@@ -24,9 +25,11 @@ import static org.mockito.Mockito.*;
 class ChangePasswordTest {
 
     @Mock
-    private UserRepositoryPort userRepository;
+    private UserRepositoryPort userRepositoryPort;
     @Mock
     private EncoderPort encoderPort;
+    @Mock
+    private EmailPort emailPort;
 
     @InjectMocks
     private ChangePasswordUseCase changePasswordUseCase;
@@ -44,10 +47,11 @@ class ChangePasswordTest {
 
         User user = User.builder()
                 .id(1L)
+                .email(org.naho.user.valueobject.Email.of("user@example.com"))
                 .hashPassword("$2a$10$oldHashedPassword")
                 .build();
 
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepositoryPort.findById(1L)).thenReturn(Optional.of(user));
         when(encoderPort.matches("OldPassword123@", "$2a$10$oldHashedPassword")).thenReturn(true);
         when(encoderPort.matches("NewPassword123@", "$2a$10$oldHashedPassword")).thenReturn(false);
         when(encoderPort.hashPassword("NewPassword123@")).thenReturn("$2a$10$newHashedPassword");
@@ -56,9 +60,10 @@ class ChangePasswordTest {
         assertDoesNotThrow(() -> changePasswordUseCase.changePassword(command));
 
         // Assert
-        verify(userRepository, times(1)).findById(1L);
+        verify(userRepositoryPort, times(1)).findById(1L);
         verify(encoderPort, times(1)).hashPassword("NewPassword123@");
-        verify(userRepository, times(1)).save(user);
+        verify(userRepositoryPort, times(1)).save(user);
+        verify(emailPort, times(1)).sendPasswordChangedEmail(anyString(), any());
         assertEquals("$2a$10$newHashedPassword", user.getHashPassword());
     }
 
@@ -81,7 +86,7 @@ class ChangePasswordTest {
 
         assertEquals(UserErrorCode.USER_PASSWORD_NOT_MATCH, exception.getErrorCode());
         assertEquals(UserDetailMessageKey.USER_PASSWORD_NOT_MATCH_DETAIL, exception.getMessage());
-        verify(userRepository, never()).findById(any());
+        verify(userRepositoryPort, never()).findById(any());
     }
 
     @Test
@@ -95,7 +100,7 @@ class ChangePasswordTest {
                 "NewPassword123@"
         );
 
-        when(userRepository.findById(99L)).thenReturn(Optional.empty());
+        when(userRepositoryPort.findById(99L)).thenReturn(Optional.empty());
 
         // Act & Assert
         ApplicationException exception = assertThrows(
@@ -105,7 +110,7 @@ class ChangePasswordTest {
 
         assertEquals(UserErrorCode.USER_NOT_FOUND, exception.getErrorCode());
         assertEquals(UserDetailMessageKey.USER_ID_NOT_FOUND, exception.getMessage());
-        verify(userRepository, times(1)).findById(99L);
+        verify(userRepositoryPort, times(1)).findById(99L);
         verify(encoderPort, never()).matches(anyString(), anyString());
     }
 
@@ -125,7 +130,7 @@ class ChangePasswordTest {
                 .hashPassword(null)
                 .build();
 
-        when(userRepository.findById(1L)).thenReturn(Optional.of(socialUser));
+        when(userRepositoryPort.findById(1L)).thenReturn(Optional.of(socialUser));
 
         // Act & Assert
         ApplicationException exception = assertThrows(
@@ -154,7 +159,7 @@ class ChangePasswordTest {
                 .hashPassword("$2a$10$oldHashedPassword")
                 .build();
 
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepositoryPort.findById(1L)).thenReturn(Optional.of(user));
         when(encoderPort.matches("WrongOldPassword123@", "$2a$10$oldHashedPassword")).thenReturn(false);
 
         // Act & Assert
@@ -165,7 +170,7 @@ class ChangePasswordTest {
 
         assertEquals(UserErrorCode.USER_OLD_PASSWORD_NOT_MATCH, exception.getErrorCode());
         assertEquals(UserDetailMessageKey.USER_OLD_PASSWORD_NOT_MATCH_DETAIL, exception.getMessage());
-        verify(userRepository, never()).save(any());
+        verify(userRepositoryPort, never()).save(any());
     }
 
     @Test
@@ -184,7 +189,7 @@ class ChangePasswordTest {
                 .hashPassword("$2a$10$oldHashedPassword")
                 .build();
 
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepositoryPort.findById(1L)).thenReturn(Optional.of(user));
         when(encoderPort.matches("OldPassword123@", "$2a$10$oldHashedPassword")).thenReturn(true);
 
         // Act & Assert
@@ -195,7 +200,7 @@ class ChangePasswordTest {
 
         assertEquals(UserErrorCode.USER_PASSWORD_SAME_AS_OLD, exception.getErrorCode());
         assertEquals(UserDetailMessageKey.USER_PASSWORD_SAME_AS_OLD_DETAIL, exception.getMessage());
-        verify(userRepository, never()).save(any());
+        verify(userRepositoryPort, never()).save(any());
     }
 
     @Test
@@ -214,7 +219,7 @@ class ChangePasswordTest {
                 .hashPassword("$2a$10$oldHashedPassword")
                 .build();
 
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepositoryPort.findById(1L)).thenReturn(Optional.of(user));
         when(encoderPort.matches("OldPassword123@", "$2a$10$oldHashedPassword")).thenReturn(true);
         when(encoderPort.matches("123", "$2a$10$oldHashedPassword")).thenReturn(false);
 
@@ -224,6 +229,6 @@ class ChangePasswordTest {
                 () -> changePasswordUseCase.changePassword(command)
         );
 
-        verify(userRepository, never()).save(any());
+        verify(userRepositoryPort, never()).save(any());
     }
 }

@@ -118,7 +118,8 @@ VALUES
 (100, NOW(), NULL, 1, NULL, NULL, 5950.0, 0, 0);
 
 -- 2. Insert into users
-INSERT INTO users (id, created_time, modified_time, username, email, hash_password, full_name, gender, dob, status, user_learning_progress_id, avatar_file_id)
+INSERT INTO users (id, created_time, modified_time, username, email, hash_password, full_name, gender, dob, status,
+                   user_learning_progress_id, avatar_file_id)
 VALUES
 -- Bronze
 (2, NOW(), NULL, 'bronze_learner_1', 'bronze_learner_1@naho.org',

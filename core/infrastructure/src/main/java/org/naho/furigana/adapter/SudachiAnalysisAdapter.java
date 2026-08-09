@@ -62,7 +62,7 @@ public class SudachiAnalysisAdapter implements FuriganaGenerationPort {
             return text;
         }
 
-        StringBuilder markupString = new StringBuilder();
+        StringBuilder markupString = new StringBuilder("<p>");
 
         Tokenizer tokenizer = dictionary.create(); // sửa lỗi thread-safe
 
@@ -88,6 +88,7 @@ public class SudachiAnalysisAdapter implements FuriganaGenerationPort {
             }
         }
 
+        markupString.append("</p>");
         return markupString.toString();
     }
 

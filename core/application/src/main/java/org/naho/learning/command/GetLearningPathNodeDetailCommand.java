@@ -1,4 +1,4 @@
 package org.naho.learning.command;
 
-public record GetLearningPathNodeDetailCommand(Long id) {
+public record GetLearningPathNodeDetailCommand(Long id, Long userId) {
 }

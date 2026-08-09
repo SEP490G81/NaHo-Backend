@@ -262,7 +262,7 @@ class CredentialsLoginTest {
         assertEquals(UserErrorCode.USER_EMAIL_UNVERIFIED, exception.getErrorCode());
         assertEquals(UserDetailMessageKey.USER_EMAIL_UNVERIFIED_DETAIL, exception.getMessage());
         verify(otpPort).saveOtp("vuongtruc@example.com", "123456");
-        verify(emailPort).sendOtpEmail("vuongtruc@example.com", "123456");
+        verify(emailPort).sendOtpEmail(eq("vuongtruc@example.com"), any(), eq("123456"));
     }
 
     @Test

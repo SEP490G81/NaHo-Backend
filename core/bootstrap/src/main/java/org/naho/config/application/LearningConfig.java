@@ -24,13 +24,15 @@ public class LearningConfig {
             LearningPathNodeRepositoryAdapter learningPathNodeRepositoryAdapter,
             SpeakingQuestionRepositoryAdapter speakingQuestionRepositoryAdapter,
             VocabularyQuestionRepositoryAdapter vocabularyQuestionRepositoryAdapter,
-            ChestRepositoryAdapter chestRepositoryAdapter
+            ChestRepositoryAdapter chestRepositoryAdapter,
+            org.naho.subscription.port.in.GetActiveSubscriptionInputPort getActiveSubscriptionInputPort
     ) {
         return new GetLearningPathNodeDetailUseCase(
                 learningPathNodeRepositoryAdapter,
                 speakingQuestionRepositoryAdapter,
                 vocabularyQuestionRepositoryAdapter,
-                chestRepositoryAdapter
+                chestRepositoryAdapter,
+                getActiveSubscriptionInputPort
         );
     }
 

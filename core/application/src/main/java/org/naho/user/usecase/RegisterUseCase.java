@@ -74,9 +74,11 @@ public class RegisterUseCase implements RegisterInputPort {
 
         User newUser = User.registerNewUser(
                 command.username(),
+                command.fullName(),
                 encodedPassword,
                 command.email(),
-                defaultRole.getId());
+                defaultRole.getId()
+        );
 
         User savedUser = userRepository.createNew(newUser, null);
 
@@ -87,7 +89,7 @@ public class RegisterUseCase implements RegisterInputPort {
         String email = savedUser.getEmail().getValue();
         String otp = otpPort.generateOtp();
         otpPort.saveOtp(email, otp);
-        emailPort.sendOtpEmail(email, otp);
+        emailPort.sendOtpEmail(email, savedUser.getFullName(), otp);
 
         return new RegisterResult(
                 savedUser.getId() != null ? savedUser.getId().toString() : "",

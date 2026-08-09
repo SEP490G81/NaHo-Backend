@@ -65,6 +65,6 @@ public class ForgotPasswordUseCase implements ForgotPasswordInputPort {
 
         String otpCode = passwordResetOtpPort.generateOtp();
         passwordResetOtpPort.saveOtp(email, otpCode);
-        emailPort.sendForgotPasswordOtpEmail(email, otpCode);
+        emailPort.sendForgotPasswordOtpEmail(email, user.getFullName(), otpCode);
     }
 }

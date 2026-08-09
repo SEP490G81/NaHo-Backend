@@ -56,9 +56,10 @@ public class User {
         this.isEmailVerified = builder.isEmailVerified;
     }
 
-    public static User registerNewUser(String rawUsername, String hashPassword, String rawEmail, Long roleId) {
+    public static User registerNewUser(String rawUsername, String fullName, String hashPassword, String rawEmail, Long roleId) {
         return User.builder()
                 .username(Username.of(rawUsername))
+                .fullName(fullName)
                 .email(Email.of(rawEmail))
                 .hashPassword(hashPassword)
                 .status(UserStatus.ACTIVE)

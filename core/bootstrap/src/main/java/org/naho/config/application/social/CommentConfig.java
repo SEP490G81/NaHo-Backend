@@ -42,7 +42,7 @@ public class CommentConfig {
     public CommentCommandMapper commentCommandMapper() {
         return new CommentCommandMapper();
     }
-    
+
     @Bean
     public CommentCrudInputPort commentCrudInputPort(
             CommentRepositoryPort commentRepositoryPort,

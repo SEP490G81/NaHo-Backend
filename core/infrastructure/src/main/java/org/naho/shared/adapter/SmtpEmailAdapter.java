@@ -23,13 +23,14 @@ public class SmtpEmailAdapter implements EmailPort {
 
     @Async
     @Override
-    public void sendOtpEmail(String toEmail, String otpCode) {
+    public void sendOtpEmail(String toEmail, String fullName, String otpCode) {
         try {
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
             Context context = new Context();
             context.setVariable("otpCode", otpCode);
+            context.setVariable("fullName", fullName != null && !fullName.isBlank() ? fullName : "bạn");
 
             String htmlContent = templateEngine.process("otp-email", context);
 
@@ -49,13 +50,14 @@ public class SmtpEmailAdapter implements EmailPort {
 
     @Async
     @Override
-    public void sendForgotPasswordOtpEmail(String toEmail, String otpCode) {
+    public void sendForgotPasswordOtpEmail(String toEmail, String fullName, String otpCode) {
         try {
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
             Context context = new Context();
             context.setVariable("otpCode", otpCode);
+            context.setVariable("fullName", fullName != null && !fullName.isBlank() ? fullName : "bạn");
 
             String htmlContent = templateEngine.process("forgot-password-email", context);
 
@@ -70,6 +72,31 @@ public class SmtpEmailAdapter implements EmailPort {
             throw new InfrastructureException(
                     org.naho.shared.exception.CommonErrorCode.COMMON_INTERNAL_SERVER_ERROR,
                     "Lỗi gửi email khôi phục mật khẩu. Vui lòng thử lại sau.", e);
+        }
+    }
+
+    @Async
+    @Override
+    public void sendPasswordChangedEmail(String toEmail, String fullName) {
+        try {
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+            Context context = new Context();
+            context.setVariable("fullName", fullName != null && !fullName.isBlank() ? fullName : "bạn");
+            String htmlContent = templateEngine.process("password-changed-email", context);
+
+            helper.setTo(toEmail);
+            helper.setSubject("Thay đổi mật khẩu thành công - NaHo App");
+            helper.setText(htmlContent, true);
+
+            javaMailSender.send(mimeMessage);
+            log.info("Sent Password Changed email to {}", toEmail);
+        } catch (MessagingException e) {
+            log.error("Failed to send Password Changed email to {}", toEmail, e);
+            throw new InfrastructureException(
+                    org.naho.shared.exception.CommonErrorCode.COMMON_INTERNAL_SERVER_ERROR,
+                    "Lỗi gửi email thông báo đổi mật khẩu.", e);
         }
     }
 

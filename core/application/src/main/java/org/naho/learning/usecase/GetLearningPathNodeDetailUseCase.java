@@ -22,6 +22,8 @@ import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.question.port.out.VocabularyQuestionRepositoryPort;
 import org.naho.question.result.SpeakingQuestionDetailResult;
 import org.naho.shared.exception.ApplicationException;
+import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
+import org.naho.subscription.result.SubscriptionPlanResult;
 import org.naho.vocabulary.result.VocabularyDetailResult;
 import org.naho.vocabulary.result.VocabularyQuestionDetailResult;
 
@@ -32,17 +34,20 @@ public class GetLearningPathNodeDetailUseCase implements GetLearningPathNodeDeta
     private final SpeakingQuestionRepositoryPort speakingQuestionRepositoryPort;
     private final VocabularyQuestionRepositoryPort vocabularyQuestionRepositoryPort;
     private final ChestRepositoryPort chestRepositoryPort;
+    private final GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
 
     public GetLearningPathNodeDetailUseCase(
             LearningPathNodeRepositoryPort learningPathNodeRepositoryPort,
             SpeakingQuestionRepositoryPort speakingQuestionRepositoryPort,
             VocabularyQuestionRepositoryPort vocabularyQuestionRepositoryPort,
-            ChestRepositoryPort chestRepositoryPort
+            ChestRepositoryPort chestRepositoryPort,
+            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort
     ) {
         this.learningPathNodeRepositoryPort = learningPathNodeRepositoryPort;
         this.speakingQuestionRepositoryPort = speakingQuestionRepositoryPort;
         this.vocabularyQuestionRepositoryPort = vocabularyQuestionRepositoryPort;
         this.chestRepositoryPort = chestRepositoryPort;
+        this.getActiveSubscriptionInputPort = getActiveSubscriptionInputPort;
     }
 
     @Override
@@ -86,6 +91,9 @@ public class GetLearningPathNodeDetailUseCase implements GetLearningPathNodeDeta
                             g.getEnglishMeaningText()))
                     .toList();
 
+            SubscriptionPlanResult plan = getActiveSubscriptionInputPort.getUserActiveSubscriptionPlan(command.userId());
+            boolean canViewSampleAnswer = plan != null && plan.sampleAnswerEnabled() != null && plan.sampleAnswerEnabled();
+
             speakingQuestionResult = new SpeakingQuestionDetailResult(
                     sq.getId(),
                     sq.getUserId(),
@@ -94,10 +102,10 @@ public class GetLearningPathNodeDetailUseCase implements GetLearningPathNodeDeta
                     sq.getVietnameseName(),
                     sq.getDescription(),
                     sq.getDescriptionMarkup(),
-                    sq.getJapaneseSampleAnswer(),
-                    sq.getJapaneseSampleAnswerMarkup(),
-                    sq.getVietnameseSampleAnswer(),
-                    sq.getEnglishSampleAnswer(),
+                    canViewSampleAnswer ? sq.getJapaneseSampleAnswer() : null,
+                    canViewSampleAnswer ? sq.getJapaneseSampleAnswerMarkup() : null,
+                    canViewSampleAnswer ? sq.getVietnameseSampleAnswer() : null,
+                    canViewSampleAnswer ? sq.getEnglishSampleAnswer() : null,
                     sq.getStatus(),
                     vocabList,
                     grammarList
