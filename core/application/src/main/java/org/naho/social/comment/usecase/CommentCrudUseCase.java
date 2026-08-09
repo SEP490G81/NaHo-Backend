@@ -1,6 +1,7 @@
 package org.naho.social.comment.usecase;
 
 import org.naho.i18n.message.social.CommentDetailMessageKey;
+import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.notification.event.SendNotificationEvent;
 import org.naho.notification.type.NotificationType;
 import org.naho.shared.exception.ApplicationException;
@@ -16,28 +17,31 @@ import org.naho.social.comment.mapper.CommentResultMapper;
 import org.naho.social.comment.model.Comment;
 import org.naho.social.comment.port.in.CommentCrudInputPort;
 import org.naho.social.comment.port.out.CommentRepositoryPort;
-import org.naho.social.comment.result.CommentListResponseResult;
-import org.naho.social.comment.result.CommentResonseResult;
+import org.naho.social.comment.result.CommentListResult;
+import org.naho.social.comment.result.CommentResult;
+import org.naho.user.port.out.UserRepositoryPort;
 
 import java.util.List;
 import java.util.Optional;
 
-public class CommentCrudUsecase implements CommentCrudInputPort {
+public class CommentCrudUseCase implements CommentCrudInputPort {
     private final CommentRepositoryPort commentRepositoryPort;
     private final CommentListResultMapper commentListResultMapper;
     private final CommentDomainMapper commentDomainMapper;
     private final CommentResultMapper commentResultMapper;
     private final EventPublisherPort eventPublisherPort;
-    private final org.naho.user.port.out.UserRepositoryPort userRepositoryPort;
-    private final org.naho.learning.port.out.LearningPathNodeRepositoryPort learningPathNodeRepositoryPort;
+    private final UserRepositoryPort userRepositoryPort;
+    private final LearningPathNodeRepositoryPort learningPathNodeRepositoryPort;
 
-    public CommentCrudUsecase(CommentRepositoryPort commentRepositoryPort,
-                              CommentListResultMapper commentListResultMapper,
-                              CommentDomainMapper commentDomainMapper,
-                              CommentResultMapper commentResultMapper,
-                              EventPublisherPort eventPublisherPort,
-                              org.naho.user.port.out.UserRepositoryPort userRepositoryPort,
-                              org.naho.learning.port.out.LearningPathNodeRepositoryPort learningPathNodeRepositoryPort) {
+    public CommentCrudUseCase(
+            CommentRepositoryPort commentRepositoryPort,
+            CommentListResultMapper commentListResultMapper,
+            CommentDomainMapper commentDomainMapper,
+            CommentResultMapper commentResultMapper,
+            EventPublisherPort eventPublisherPort,
+            UserRepositoryPort userRepositoryPort,
+            LearningPathNodeRepositoryPort learningPathNodeRepositoryPort
+    ) {
         this.commentRepositoryPort = commentRepositoryPort;
         this.commentListResultMapper = commentListResultMapper;
         this.commentDomainMapper = commentDomainMapper;
@@ -48,13 +52,13 @@ public class CommentCrudUsecase implements CommentCrudInputPort {
     }
 
     @Override
-    public CommentListResponseResult getListCommentOfQuestion(CommentReadCommand command, Long currentUserId) {
+    public CommentListResult getListCommentOfQuestion(CommentReadCommand command, Long currentUserId) {
         List<Comment> listComment = commentRepositoryPort.getListCommentByQuestionId(command.speakingQuestionId());
         return commentListResultMapper.domainToResult(command.speakingQuestionId(), listComment, currentUserId);
     }
 
     @Override
-    public CommentResonseResult createComment(CommentCreateCommand command) {
+    public CommentResult createComment(CommentCreateCommand command) {
         Comment newComment = commentDomainMapper.commandToModel(command);
         Comment commentSaved = commentRepositoryPort.save(newComment);
 
@@ -87,7 +91,7 @@ public class CommentCrudUsecase implements CommentCrudInputPort {
     }
 
     @Override
-    public CommentResonseResult updateComment(CommentUpdateCommand command) {
+    public CommentResult updateComment(CommentUpdateCommand command) {
         Optional<Comment> commentOpt = commentRepositoryPort.findByCommentId(command.commentId());
         if (commentOpt.isEmpty()) {
             throw new ApplicationException(
@@ -111,7 +115,7 @@ public class CommentCrudUsecase implements CommentCrudInputPort {
     }
 
     @Override
-    public CommentResonseResult deleteComment(CommentDeleteCommand command) {
+    public CommentResult deleteComment(CommentDeleteCommand command) {
         Comment comment = commentRepositoryPort.findByCommentId(command.commentId())
                 .orElseThrow(() -> new ApplicationException(
                         CommentErrorCode.COMMENT_NOT_FOUND,
@@ -119,7 +123,8 @@ public class CommentCrudUsecase implements CommentCrudInputPort {
                         command.commentId()
                 ));
 
-        if (command.userId() != null && !command.userId().equals(comment.getUserId())) {
+        boolean isOwner = command.userId() != null && command.userId().equals(comment.getUserId());
+        if (!isOwner && !command.isAdmin()) {
             throw new ApplicationException(
                     CommentErrorCode.COMMENT_NOT_AUTHORIZED,
                     CommentDetailMessageKey.COMMENT_DELETE_FORBIDDEN

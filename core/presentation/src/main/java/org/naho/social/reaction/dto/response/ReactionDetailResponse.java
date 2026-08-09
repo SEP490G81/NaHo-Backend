@@ -13,7 +13,7 @@ public record ReactionDetailResponse(
 ) {
     public record ReactionUserItem(
             Long userId,
-            String username
+            String fullName
     ) {
     }
 }
