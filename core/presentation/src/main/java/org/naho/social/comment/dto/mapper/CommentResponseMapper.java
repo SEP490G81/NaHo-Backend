@@ -7,10 +7,14 @@ public class CommentResponseMapper {
     public CommentResponse resultToResponse(CommentResonseResult result) {
         return new CommentResponse(
                 result.commentId(),
+                result.questionId(),
                 result.userId(),
                 result.username(),
                 result.avatarUrl(),
-                result.content()
+                result.parentId(),
+                result.content(),
+                result.createdTime(),
+                result.reactionSummary()
         );
     }
 }
