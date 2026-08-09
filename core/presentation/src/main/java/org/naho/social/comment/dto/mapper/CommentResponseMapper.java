@@ -23,7 +23,7 @@ public class CommentResponseMapper {
                     info.getRank(),
                     info.getFullName(),
                     info.getAvatarObjectKey(),
-                    info.getoAuthAvatarUrl(),
+                    info.getAuthAvatarUrl(),
                     info.getTotalPoint()
             );
         }

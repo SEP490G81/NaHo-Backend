@@ -4,6 +4,6 @@ import org.naho.social.reaction.type.ReactionType;
 
 public record ReactionResult(
         ReactionType reactionType,
-        String username
+        String fullName
 ) {
 }

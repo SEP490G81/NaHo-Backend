@@ -12,6 +12,7 @@ import org.naho.social.reaction.result.ReactionDetailResult;
 import org.naho.social.reaction.result.ReactionResult;
 import org.naho.social.reaction.type.ReactionType;
 import org.naho.user.exception.UserErrorCode;
+import org.naho.user.model.User;
 import org.naho.user.port.out.UserRepositoryPort;
 
 import java.util.List;
@@ -36,13 +37,15 @@ public class CrudReactionUsecase implements CrudReactionTypeInputPort {
 
     @Override
     public ReactionResult chooseReaction(ReactionActionCommand reactionActionCommand) {
-        String username = userRepositoryPort.findById(reactionActionCommand.userId())
+        User user = userRepositoryPort.findById(reactionActionCommand.userId())
                 .orElseThrow(() -> new ApplicationException(
                         UserErrorCode.USER_NOT_FOUND,
                         UserDetailMessageKey.USER_ID_NOT_FOUND
-                ))
-                .getUsername()
-                .getValue();
+                ));
+
+        String fullName = (user.getFullName() != null && !user.getFullName().isBlank())
+                ? user.getFullName()
+                : (user.getUsername() != null ? user.getUsername().getValue() : null);
 
         Reaction existingReaction = reactionRepositoryPort.findByUserAndTarget(
                 reactionActionCommand.userId(),
@@ -52,19 +55,19 @@ public class CrudReactionUsecase implements CrudReactionTypeInputPort {
         if (existingReaction == null) {
             Reaction newReaction = reactionActionCommandMapper.commandToDomain(reactionActionCommand);
             reactionRepositoryPort.save(newReaction);
-            return reactionResultResponseMapper.domainToResult(newReaction, username);
+            return reactionResultResponseMapper.domainToResult(newReaction, fullName);
         }
 
         if (existingReaction.getReactionType() == reactionActionCommand.reactionType()) {
             reactionRepositoryPort.delete(existingReaction.getId());
-            return new ReactionResult(null, username);
+            return new ReactionResult(null, fullName);
         }
 
         Reaction updatedReaction = existingReaction.toBuilder()
                 .reactionType(reactionActionCommand.reactionType())
                 .build();
         reactionRepositoryPort.save(updatedReaction);
-        return reactionResultResponseMapper.domainToResult(updatedReaction, username);
+        return reactionResultResponseMapper.domainToResult(updatedReaction, fullName);
     }
 
     @Override
@@ -78,7 +81,14 @@ public class CrudReactionUsecase implements CrudReactionTypeInputPort {
                 .collect(Collectors.groupingBy(
                         Reaction::getReactionType,
                         Collectors.mapping(
-                                r -> new ReactionDetailResult.ReactionUserItem(r.getUserId(), null),
+                                r -> {
+                                    String name = userRepositoryPort.findById(r.getUserId())
+                                            .map(u -> (u.getFullName() != null && !u.getFullName().isBlank())
+                                                    ? u.getFullName()
+                                                    : (u.getUsername() != null ? u.getUsername().getValue() : null))
+                                            .orElse(null);
+                                    return new ReactionDetailResult.ReactionUserItem(r.getUserId(), name);
+                                },
                                 Collectors.toList()
                         )
                 ));

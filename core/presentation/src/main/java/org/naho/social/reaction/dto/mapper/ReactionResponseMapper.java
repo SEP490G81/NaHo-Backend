@@ -16,7 +16,7 @@ public class ReactionResponseMapper {
 
     public ReactionResponse resultToResponse(ReactionResult result) {
         if (result == null) return null;
-        return new ReactionResponse(result.reactionType(), result.username());
+        return new ReactionResponse(result.reactionType(), result.fullName());
     }
 
     public ReactionDetailResponse resultToDetailResponse(ReactionDetailResult result) {
@@ -26,7 +26,7 @@ public class ReactionResponseMapper {
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         e -> e.getValue().stream()
-                                .map(u -> new ReactionDetailResponse.ReactionUserItem(u.userId(), u.username()))
+                                .map(u -> new ReactionDetailResponse.ReactionUserItem(u.userId(), u.fullName()))
                                 .toList()
                 ));
 

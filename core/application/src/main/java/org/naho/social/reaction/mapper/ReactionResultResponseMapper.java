@@ -7,11 +7,11 @@ public class ReactionResultResponseMapper {
 
     public ReactionResult domainToResult(
             Reaction reaction,
-            String username
+            String fullName
     ) {
         return new ReactionResult(
                 reaction.getReactionType(),
-                username
+                fullName
         );
     }
 }

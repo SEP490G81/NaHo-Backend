@@ -123,8 +123,8 @@ public class CommentResultMapper {
         String avatarUrl = null;
         if (leaderboardUserResult.getAvatarObjectKey() != null && !leaderboardUserResult.getAvatarObjectKey().isBlank()) {
             avatarUrl = leaderboardUserResult.getAvatarObjectKey();
-        } else if (leaderboardUserResult.getoAuthAvatarUrl() != null && !leaderboardUserResult.getoAuthAvatarUrl().isEmpty()) {
-            avatarUrl = leaderboardUserResult.getoAuthAvatarUrl().get(0);
+        } else if (leaderboardUserResult.getAuthAvatarUrl() != null && !leaderboardUserResult.getAuthAvatarUrl().isEmpty()) {
+            avatarUrl = leaderboardUserResult.getAuthAvatarUrl().get(0);
         }
 
         return new UserInfo(fullName, avatarUrl, rank, leaderboardUserResult);
