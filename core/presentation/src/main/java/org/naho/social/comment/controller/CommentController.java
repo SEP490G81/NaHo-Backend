@@ -17,7 +17,9 @@ import org.naho.social.comment.dto.response.CommentResponse;
 import org.naho.social.comment.port.in.CommentCrudInputPort;
 import org.naho.social.comment.result.CommentListResponseResult;
 import org.naho.social.comment.result.CommentResonseResult;
+import org.naho.user.port.out.RoleRepositoryPort;
 import org.naho.user.result.AccessTokenPayload;
+import org.naho.user.type.RoleName;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -25,6 +27,8 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/comments")
@@ -35,6 +39,7 @@ public class CommentController {
     private final CommentCommandMapper commentCommandMapper;
     private final CommentResponseMapper commentResponseMapper;
     private final SimpMessagingTemplate messagingTemplate;
+    private final RoleRepositoryPort roleRepositoryPort;
 
     @GetMapping
     @ApiResponseMessage(message = CommentDetailMessageKey.COMMENT_GET_LIST_SUCCESS)
@@ -78,7 +83,8 @@ public class CommentController {
             @Valid @RequestBody DeleteCommandRequest deleteCommandRequest,
             @AuthenticationPrincipal AccessTokenPayload payload) {
         Long userId = payload != null ? payload.userId() : null;
-        CommentDeleteCommand command = commentCommandMapper.requestToDeleteCommand(deleteCommandRequest, userId);
+        boolean isAdmin = checkIsAdmin(userId);
+        CommentDeleteCommand command = commentCommandMapper.requestToDeleteCommand(deleteCommandRequest, userId, isAdmin);
         CommentResonseResult commentResonseResult = commentCrudInputPort.deleteComment(command);
         CommentResponse response = commentResponseMapper.resultToResponse(commentResonseResult);
         messagingTemplate.convertAndSend("/topic/comments", response);
@@ -113,8 +119,15 @@ public class CommentController {
             @Valid @Payload DeleteCommandRequest deleteCommandRequest,
             @AuthenticationPrincipal AccessTokenPayload payload) {
         Long userId = payload != null ? payload.userId() : null;
-        CommentDeleteCommand command = commentCommandMapper.requestToDeleteCommand(deleteCommandRequest, userId);
+        boolean isAdmin = checkIsAdmin(userId);
+        CommentDeleteCommand command = commentCommandMapper.requestToDeleteCommand(deleteCommandRequest, userId, isAdmin);
         CommentResonseResult commentResonseResult = commentCrudInputPort.deleteComment(command);
         return commentResponseMapper.resultToResponse(commentResonseResult);
+    }
+
+    private boolean checkIsAdmin(Long userId) {
+        if (userId == null) return false;
+        List<String> roleSet = roleRepositoryPort.findRoleNamesByUserId(userId);
+        return roleSet.contains(RoleName.ADMIN.name()) || roleSet.contains(RoleName.CONTENT_MANAGER.name());
     }
 }

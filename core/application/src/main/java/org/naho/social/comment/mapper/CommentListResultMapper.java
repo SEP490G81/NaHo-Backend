@@ -52,6 +52,8 @@ public class CommentListResultMapper {
                 result.commentId(),
                 result.questionId(),
                 result.userId(),
+                result.username(),
+                result.avatarUrl(),
                 result.parentId(),
                 result.content(),
                 result.createdTime(),

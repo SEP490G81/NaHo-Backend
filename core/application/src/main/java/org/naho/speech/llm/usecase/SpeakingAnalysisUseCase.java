@@ -41,9 +41,7 @@ import org.naho.speech.azure.port.out.AzureSpeechServicePort;
 import org.naho.speech.llm.command.SpeakingAnalysisCommand;
 import org.naho.speech.llm.port.in.SpeakingAnalysisInputPort;
 import org.naho.speech.llm.port.out.AiAnalysisPort;
-import org.naho.speech.llm.result.SpeakingAnalysisReportResult;
 import org.naho.speech.llm.result.SpeakingAnalysisResult;
-import org.naho.speech.llm.result.WordPronunciationResult;
 import org.naho.speech.model.AnswerHistory;
 import org.naho.speech.model.ContentAssessment;
 import org.naho.speech.model.SpeechAssessment;
@@ -112,7 +110,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
 
     @Override
     public SpeakingAnalysisResult analyzeSpeaking(SpeakingAnalysisCommand command) {
-        // DB-R & VALID & DB-W (TX 1): Chuẩn bị context và tạo bản ghi ban đầu
+        // DB-R & VALID & DB-W : Chuẩn bị context và tạo bản ghi ban đầu
         AnalysisContext ctx = transactionPort.execute(() -> prepareAnalysis(command));
 
         // EXT: Gọi mạng ngoài Azure Speech Assessment
@@ -127,9 +125,9 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         // CALC: Parse JSON và tính điểm
         ParsedScores parsedScores = parseLlmFeedback(rawLlmFeedback, azureAssessment, command.durationSec());
 
-        // DB-W (TX 2): Lưu toàn bộ kết quả vào DB
-        SpeakingAnalysisResult result = transactionPort.execute(() ->
-                persistResults(command, ctx, azureAssessment, parsedScores));
+        // DB-W : Lưu toàn bộ kết quả vào DB
+        SpeakingAnalysisResult result = transactionPort
+                .execute(() -> persistResults(command, ctx, azureAssessment, parsedScores));
 
         // Upload file audio lên cloud nếu có
         if (command.storedFile() != null) {
@@ -171,14 +169,16 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                         UserErrorCode.USER_NOT_FOUND,
                         UserDetailMessageKey.USER_ID_NOT_FOUND));
 
-        // DB-R (Database-Reading) lay du lieu cua speaking question khi nguoi dung truy cap node speaking question
+        // DB-R (Database-Reading) lay du lieu cua speaking question khi nguoi dung truy
+        // cap node speaking question
         SpeakingQuestion speakingQuestion = speakingQuestionRepositoryPort
                 .findById(command.speakingQuestionId())
                 .orElseThrow(() -> new ApplicationException(
                         SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
                         SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_NOT_FOUND));
 
-        // VALID LOGIC + DB-W => xu ly logic file (file luu local neu tk nguoi dung goi FREE, luu lai file noi chuyen cua nguoi dung neu da dang ki goi cao hon)
+        // VALID LOGIC + DB-W => xu ly logic file (file luu local neu tk nguoi dung goi
+        // FREE, luu lai file noi chuyen cua nguoi dung neu da dang ki goi cao hon)
         File audioFile = null;
         // nếu đã lưu file trong local
         // (tức là đăng kí gói không phải FREE)
@@ -187,7 +187,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             audioFile = fileRepositoryPort.createNewForUpload(command.storedFile(), false);
         }
 
-        AnswerHistory savedAnswerHistory = createAnswerHistory(user, speakingQuestion, audioFile, command.durationSec());
+        AnswerHistory savedAnswerHistory = createAnswerHistory(user, speakingQuestion, audioFile);
 
         // DB-R
         // Lay du lieu cua object (question speaking nay nam trong objective nao)
@@ -208,18 +208,16 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 objective, lesson, topic, book);
     }
 
-    private AnswerHistory createAnswerHistory(User user, SpeakingQuestion speakingQuestion, File audioFile, Integer durationSec) {
+    private AnswerHistory createAnswerHistory(User user, SpeakingQuestion speakingQuestion, File audioFile) {
         AnswerHistory answerHistory = AnswerHistory.builder()
                 .userId(user.getId())
                 .speakingQuestionId(speakingQuestion.getId())
-                .durationSec(durationSec)
                 .build();
         if (audioFile != null) {
             answerHistory.setAudioFileId(audioFile.getId());
         }
         return answerHistoryRepositoryPort.save(answerHistory);
     }
-
 
     private AnalysisContext buildAnalysisContext(
             LearningPathNode learningPathNode,
@@ -236,7 +234,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         String curriculumVal = (book != null) ? book.getTitle() : "N/A";
         String levelVal = (book != null && book.getJlptLevel() != null) ? book.getJlptLevel().name() : "N/A";
         String sttVal = (objective != null && objective.getOrderIndex() != null)
-                ? String.valueOf(objective.getOrderIndex()) : "N/A";
+                ? String.valueOf(objective.getOrderIndex())
+                : "N/A";
         String topicVal = (topic != null) ? topic.getJapaneseName() : "N/A";
         String lessonVal = (lesson != null) ? lesson.getJapaneseName() : "N/A";
 
@@ -244,8 +243,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         if (objective != null) {
             canDoObjectiveVal = (objective.getJapaneseDescription() != null
                     && !objective.getJapaneseDescription().isBlank())
-                    ? objective.getJapaneseDescription()
-                    : objective.getJapaneseName();
+                            ? objective.getJapaneseDescription()
+                            : objective.getJapaneseName();
         } else {
             canDoObjectiveVal = "N/A";
         }
@@ -257,10 +256,12 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
 
         // VALID LOGIC
         String questionTitleVal = speakingQuestion.getJapaneseName() != null
-                ? speakingQuestion.getJapaneseName() : "N/A";
+                ? speakingQuestion.getJapaneseName()
+                : "N/A";
         String questionDescriptionVal = (speakingQuestion.getDescription() != null
                 && !speakingQuestion.getDescription().isBlank())
-                ? speakingQuestion.getDescription() : questionTitleVal;
+                        ? speakingQuestion.getDescription()
+                        : questionTitleVal;
 
         return new AnalysisContext(
                 learningPathNode, progress, speakingQuestion, savedAnswerHistory, audioFile,
@@ -337,9 +338,11 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     private ParsedScores parseLlmFeedback(String rawLlmFeedback, SpeechAssessment azureResult, Integer durationSec) {
         // CALC - Tính toán thuần & parse response AI
         double pronScore10 = azureResult.getPronunciationScore() != null
-                ? azureResult.getPronunciationScore() / 10.0 : 0.0;
+                ? azureResult.getPronunciationScore() / 10.0
+                : 0.0;
         double fluencyScore10 = azureResult.getFluencyScore() != null
-                ? azureResult.getFluencyScore() / 10.0 : 0.0;
+                ? azureResult.getFluencyScore() / 10.0
+                : 0.0;
 
         double vocabScore = 0.0;
         double grammarScore = 0.0;
@@ -353,8 +356,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             grammarScore = Math.min(extractLlmScore(root, "grammar") / 2.5, 10.0);
             naturalnessScore = Math.min(extractLlmScore(root, "naturalness") / 2.5, 10.0);
             overallScore = Math.round(
-                    ((pronScore10 + fluencyScore10 + vocabScore + grammarScore + naturalnessScore) / 5.0) * 10.0
-            ) / 10.0;
+                    ((pronScore10 + fluencyScore10 + vocabScore + grammarScore + naturalnessScore) / 5.0) * 10.0)
+                    / 10.0;
             enrichedFeedbackJson = enrichFeedbackJson(
                     root, azureResult, vocabScore, grammarScore, naturalnessScore, overallScore, durationSec);
         } catch (Exception e) {
@@ -378,8 +381,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     }
 
     private String enrichFeedbackJson(JsonNode root, SpeechAssessment azureResult,
-                                      double vocabScore, double grammarScore, double naturalnessScore,
-                                      double overallScore, Integer durationSec) throws Exception {
+            double vocabScore, double grammarScore, double naturalnessScore,
+            double overallScore, Integer durationSec) throws Exception {
         if (!(root instanceof ObjectNode objectNode)) {
             return objectMapper.writeValueAsString(root);
         }
@@ -437,8 +440,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     }
 
     private String buildFallbackFeedbackJson(double vocabScore, double grammarScore,
-                                             double naturalnessScore, double overallScore,
-                                             Integer durationSec) {
+            double naturalnessScore, double overallScore,
+            Integer durationSec) {
         try {
             ObjectNode node = objectMapper.createObjectNode();
             ObjectNode scores = objectMapper.createObjectNode();
@@ -464,28 +467,16 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         }
     }
 
-    private List<WordPronunciationResult> buildWordPronunciations(List<WordAssessment> words) {
-        if (words == null || words.isEmpty()) {
-            return List.of();
-        }
-        return words.stream()
-                .map(w -> WordPronunciationResult.from(
-                        w.getWord(),
-                        w.getAccuracyScore(),
-                        w.getErrorType() != null ? w.getErrorType().name() : "None"
-                ))
-                .toList();
-    }
-
     private SpeakingAnalysisResult persistResults(SpeakingAnalysisCommand command,
-                                                   AnalysisContext ctx,
-                                                   SpeechAssessment azureAssessment,
-                                                   ParsedScores parsedScores) {
+            AnalysisContext ctx,
+            SpeechAssessment azureAssessment,
+            ParsedScores parsedScores) {
         // DB-W => Lưu đánh giá phát âm tổng quan của azure speech
         SpeechAssessment savedSpeechAssessment = persistSpeechAssessment(
                 azureAssessment, ctx.savedAnswerHistory().getId());
 
-        // DB-W => Lưu đánh giá từng chữ (phát âm, điểm chính xác, lỗi phát âm) từ azure speech
+        // DB-W => Lưu đánh giá từng chữ (phát âm, điểm chính xác, lỗi phát âm) từ azure
+        // speech
         persistWordAssessments(azureAssessment.getWords(), savedSpeechAssessment.getId());
 
         // DB-W => Content Assessment (phản hồi từ AI)
@@ -507,26 +498,9 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                         .overallScore(parsedScores.overallScore())
                         .build());
 
-        // Gắn report đầy đủ bao gồm tô màu phát âm từng từ vào result
-        List<WordPronunciationResult> wordPronunciations = buildWordPronunciations(azureAssessment.getWords());
-
-        SpeakingAnalysisReportResult report = new SpeakingAnalysisReportResult(
-                parsedScores.overallScore(),
-                new SpeakingAnalysisReportResult.Scores(
-                        azureAssessment.getPronunciationScore(),
-                        azureAssessment.getFluencyScore(),
-                        parsedScores.vocabScore(),
-                        parsedScores.grammarScore(),
-                        parsedScores.naturalnessScore()
-                ),
-                wordPronunciations,
-                parsedScores.enrichedFeedbackJson()
-        );
-
         SpeakingAnalysisResult result = SpeakingAnalysisResult.builder()
                 .overallScore(parsedScores.overallScore())
                 .answerHistoryId(ctx.savedAnswerHistory().getId())
-                .report(report)
                 .build();
 
         if (ctx.audioFile() != null) {
@@ -564,7 +538,6 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         answerHistoryRepositoryPort.saveAllWordAssessment(wordList);
     }
 
-
     private record AnalysisContext(
             LearningPathNode learningPathNode,
             UserLearningProgress progress,
@@ -580,14 +553,14 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             String grammarFocusVal,
             String vocabFocusVal,
             String questionTitleVal,
-            String questionDescriptionVal
-    ) {}
+            String questionDescriptionVal) {
+    }
 
     private record ParsedScores(
             double vocabScore,
             double grammarScore,
             double naturalnessScore,
             double overallScore,
-            String enrichedFeedbackJson
-    ) {}
+            String enrichedFeedbackJson) {
+    }
 }

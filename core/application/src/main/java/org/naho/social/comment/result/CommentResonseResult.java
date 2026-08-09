@@ -10,6 +10,8 @@ public record CommentResonseResult(
         Long commentId,
         Long questionId,
         Long userId,
+        String username,
+        String avatarUrl,
         Long parentId,
         String content,
         LocalDateTime createdTime,

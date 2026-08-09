@@ -36,14 +36,19 @@ public class CommentCommandMapper {
         return requestToUpdateCommand(updateCommentRequest, updateCommentRequest.userId());
     }
 
-    public CommentDeleteCommand requestToDeleteCommand(DeleteCommandRequest deleteCommandRequest, Long userId) {
+    public CommentDeleteCommand requestToDeleteCommand(DeleteCommandRequest deleteCommandRequest, Long userId, boolean isAdmin) {
         return new CommentDeleteCommand(
                 deleteCommandRequest.commentId(),
-                userId
+                userId,
+                isAdmin
         );
     }
 
+    public CommentDeleteCommand requestToDeleteCommand(DeleteCommandRequest deleteCommandRequest, Long userId) {
+        return requestToDeleteCommand(deleteCommandRequest, userId, false);
+    }
+
     public CommentDeleteCommand requestToDeleteCommand(DeleteCommandRequest deleteCommandRequest) {
-        return requestToDeleteCommand(deleteCommandRequest, null);
+        return requestToDeleteCommand(deleteCommandRequest, null, false);
     }
 }

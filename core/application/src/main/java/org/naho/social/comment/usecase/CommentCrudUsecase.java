@@ -81,7 +81,8 @@ public class CommentCrudUsecase implements CommentCrudInputPort {
                         command.commentId()
                 ));
 
-        if (command.userId() != null && !command.userId().equals(comment.getUserId())) {
+        boolean isOwner = command.userId() != null && command.userId().equals(comment.getUserId());
+        if (!isOwner && !command.isAdmin()) {
             throw new ApplicationException(
                     CommentErrorCode.COMMENT_NOT_AUTHORIZED,
                     CommentDetailMessageKey.COMMENT_DELETE_FORBIDDEN

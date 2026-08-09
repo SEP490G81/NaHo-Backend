@@ -8,6 +8,8 @@ public class CommentResponseMapper {
         return new CommentResponse(
                 result.commentId(),
                 result.userId(),
+                result.username(),
+                result.avatarUrl(),
                 result.content()
         );
     }

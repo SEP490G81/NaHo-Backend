@@ -64,7 +64,7 @@ public class SpeakingAnalysisController {
                                                 false);
                         }
 
-                        // Backend tự đo thời lượng audio 100% từ file (bằng Java thuần AudioSystem)
+                        // dùng audio system java để đo nhé
                         double measuredDuration = fileValidatorPort.calculateWavDurationSeconds(audioBytes);
                         int durationSec = (int) Math.ceil(measuredDuration);
 
