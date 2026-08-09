@@ -16,7 +16,12 @@ public class ReactionResponseMapper {
 
     public ReactionResponse resultToResponse(ReactionResult result) {
         if (result == null) return null;
-        return new ReactionResponse(result.reactionType(), result.fullName());
+        return new ReactionResponse(
+                result.commentId(),
+                result.reactionType(),
+                result.reactionAction(),
+                result.fullName()
+        );
     }
 
     public ReactionDetailResponse resultToDetailResponse(ReactionDetailResult result) {

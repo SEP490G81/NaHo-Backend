@@ -10,6 +10,7 @@ import org.naho.social.reaction.port.in.CrudReactionTypeInputPort;
 import org.naho.social.reaction.port.out.ReactionRepositoryPort;
 import org.naho.social.reaction.result.ReactionDetailResult;
 import org.naho.social.reaction.result.ReactionResult;
+import org.naho.social.reaction.type.ReactionAction;
 import org.naho.social.reaction.type.ReactionType;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.model.User;
@@ -55,19 +56,19 @@ public class CrudReactionUsecase implements CrudReactionTypeInputPort {
         if (existingReaction == null) {
             Reaction newReaction = reactionActionCommandMapper.commandToDomain(reactionActionCommand);
             reactionRepositoryPort.save(newReaction);
-            return reactionResultResponseMapper.domainToResult(newReaction, fullName);
+            return reactionResultResponseMapper.domainToResult(newReaction, ReactionAction.ADDED, fullName);
         }
 
         if (existingReaction.getReactionType() == reactionActionCommand.reactionType()) {
             reactionRepositoryPort.delete(existingReaction.getId());
-            return new ReactionResult(null, fullName);
+            return new ReactionResult(reactionActionCommand.comment_id(), reactionActionCommand.reactionType(), ReactionAction.REMOVED, fullName);
         }
 
         Reaction updatedReaction = existingReaction.toBuilder()
                 .reactionType(reactionActionCommand.reactionType())
                 .build();
         reactionRepositoryPort.save(updatedReaction);
-        return reactionResultResponseMapper.domainToResult(updatedReaction, fullName);
+        return reactionResultResponseMapper.domainToResult(updatedReaction, ReactionAction.UPDATED, fullName);
     }
 
     @Override
