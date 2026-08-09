@@ -26,6 +26,9 @@ public class WordAssessmentEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     SpeechAssessmentErrorType errorType;
 
+    @Column(name = "word_markup", columnDefinition = "TEXT")
+    String wordMarkup;
+
     @ManyToOne
     @JoinColumn(name = "speech_assessment_id", nullable = false)
     SpeechAssessmentEntity speechAssessment;

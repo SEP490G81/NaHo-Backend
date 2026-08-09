@@ -3,11 +3,13 @@ package org.naho.speech.model;
 import org.naho.speech.type.SpeechAssessmentErrorType;
 
 public class WordAssessment {
-    private Long id;
-    private Long speechAssessmentId;
-    private String word;
-    private Double accuracyScore;
-    private SpeechAssessmentErrorType errorType; // Omission, Insertion, Mispronunciation, None
+    private final Long id;
+    private final Long speechAssessmentId;
+    private final String word;
+    private final Double accuracyScore;
+    private final SpeechAssessmentErrorType errorType; // Omission, Insertion, Mispronunciation, None
+
+    private final String wordMarkup;
 
     private WordAssessment(Builder builder) {
         this.id = builder.id;
@@ -15,6 +17,7 @@ public class WordAssessment {
         this.accuracyScore = builder.accuracyScore;
         this.errorType = builder.errorType;
         this.speechAssessmentId = builder.speechAssessmentId;
+        this.wordMarkup = builder.wordMarkup;
     }
 
     public static Builder builder() {
@@ -43,12 +46,17 @@ public class WordAssessment {
         return speechAssessmentId;
     }
 
+    public String getWordMarkup() {
+        return wordMarkup;
+    }
+
     public static class Builder {
         private Long id;
         private String word;
         private Double accuracyScore;
         private SpeechAssessmentErrorType errorType;
         private Long speechAssessmentId;
+        private String wordMarkup;
 
         public Builder id(Long id) {
             this.id = id;
@@ -72,6 +80,11 @@ public class WordAssessment {
 
         public Builder speechAssessmentId(Long speechAssessmentId) {
             this.speechAssessmentId = speechAssessmentId;
+            return this;
+        }
+
+        public Builder wordMarkup(String wordMarkup) {
+            this.wordMarkup = wordMarkup;
             return this;
         }
 

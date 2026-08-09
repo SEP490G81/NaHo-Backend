@@ -678,6 +678,7 @@ CREATE TABLE word_assessments
     word                 VARCHAR(255)          NOT NULL,
     accuracy_score       DOUBLE                NOT NULL,
     error_type           VARCHAR(255)          NOT NULL,
+    word_markup          TEXT                  NULL,
     speech_assessment_id BIGINT                NOT NULL,
     CONSTRAINT pk_word_assessments PRIMARY KEY (id)
 );
