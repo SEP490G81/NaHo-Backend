@@ -1,8 +1,11 @@
 package org.naho.social.report.usecase;
 
 import org.naho.i18n.message.social.ReportDetailMessageKey;
+import org.naho.notification.event.SendNotificationEvent;
+import org.naho.notification.type.NotificationType;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.EmailPort;
+import org.naho.shared.port.out.EventPublisherPort;
 import org.naho.social.report.command.UpdateReportStatusCommand;
 import org.naho.social.report.exception.ReportErrorCode;
 import org.naho.social.report.mapper.ReportResultMapper;
@@ -23,17 +26,20 @@ public class UpdateReportStatusUseCase implements UpdateReportStatusInputPort {
     private final ReportResultMapper reportResultMapper;
     private final UserRepositoryPort userRepositoryPort;
     private final EmailPort emailPort;
+    private final EventPublisherPort eventPublisherPort;
 
     public UpdateReportStatusUseCase(
             ReportRepositoryPort reportRepositoryPort,
             ReportResultMapper reportResultMapper,
             UserRepositoryPort userRepositoryPort,
-            EmailPort emailPort
+            EmailPort emailPort,
+            EventPublisherPort eventPublisherPort
     ) {
         this.reportRepositoryPort = reportRepositoryPort;
         this.reportResultMapper = reportResultMapper;
         this.userRepositoryPort = userRepositoryPort;
         this.emailPort = emailPort;
+        this.eventPublisherPort = eventPublisherPort;
     }
 
     @Override
@@ -58,6 +64,21 @@ public class UpdateReportStatusUseCase implements UpdateReportStatusInputPort {
 
         if (shouldSendEmail) {
             sendReportResolvedEmail(savedReport);
+
+            // Send in-app notification to the reported user (SYSTEM type)
+            // Or the user who created the report (if we want to notify them it was resolved).
+            // Usually we notify the user who got reported if their content was deleted.
+            // Let's notify the reporter that their report was resolved as SYSTEM type.
+            String metadata = "{\"reportId\": " + savedReport.getId() + ", \"action\": \"RESOLVED\"}";
+            eventPublisherPort.publish(new SendNotificationEvent(
+                    this,
+                    savedReport.getUserId(),
+                    NotificationType.SYSTEM,
+                    "Báo cáo đã được xử lý",
+                    "Báo cáo của bạn đã được quản trị viên xử lý thành công.",
+                    null,
+                    metadata
+            ));
         }
 
         return reportResultMapper.domainToResult(savedReport);

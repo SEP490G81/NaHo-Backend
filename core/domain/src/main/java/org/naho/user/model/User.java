@@ -65,6 +65,7 @@ public class User {
                 .email(Email.of(rawEmail))
                 .hashPassword(hashPassword)
                 .status(UserStatus.ACTIVE)
+                .jlptLevel(JLPTLevel.N5)
                 .isEmailVerified(false)
                 .roleIds(roleIds)
                 .build();
