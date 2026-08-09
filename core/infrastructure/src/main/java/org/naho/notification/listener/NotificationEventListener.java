@@ -23,7 +23,7 @@ public class NotificationEventListener {
     @EventListener
     public void handleSendNotificationEvent(SendNotificationEvent event) {
         log.info("Received SendNotificationEvent for user: {}", event.getUserId());
-        
+
         try {
             // 1. Create and save notification to DB
             Notification notification = Notification.builder()
@@ -35,12 +35,12 @@ public class NotificationEventListener {
                     .metadata(event.getMetadata())
                     .isRead(false)
                     .build();
-                    
+
             Notification savedNotification = notificationRepositoryPort.save(notification);
-            
+
             // 2. Publish NotificationCreatedEvent to notify SSE adapter
             applicationEventPublisher.publishEvent(new NotificationCreatedEvent(event.getUserId(), savedNotification));
-            
+
         } catch (Exception e) {
             log.error("Error processing SendNotificationEvent for user: {}", event.getUserId(), e);
         }

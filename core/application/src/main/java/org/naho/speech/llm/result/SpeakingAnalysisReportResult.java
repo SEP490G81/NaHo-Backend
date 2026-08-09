@@ -8,16 +8,17 @@ public record SpeakingAnalysisReportResult(
         List<WordPronunciationResult> wordPronunciations,
         String enrichedFeedbackJson
 ) {
+    public List<WordPronunciationResult> wordPronunciationResultList() {
+        return wordPronunciations;
+    }
+
     public record Scores(
             Double pronunciation,
             Double fluency,
             Double vocabulary,
             Double grammar,
             Double naturalness
-    ) {}
-
-    public List<WordPronunciationResult> wordPronunciationResultList() {
-        return wordPronunciations;
+    ) {
     }
 }
 

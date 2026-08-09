@@ -27,7 +27,8 @@ public class NotificationResponseMapper {
         if (result.metadata() != null && !result.metadata().isBlank()) {
             try {
                 // Parse JSON string to Map so it returns as nested JSON in REST response
-                metadataObj = objectMapper.readValue(result.metadata(), new TypeReference<Map<String, Object>>() {});
+                metadataObj = objectMapper.readValue(result.metadata(), new TypeReference<Map<String, Object>>() {
+                });
             } catch (JsonProcessingException e) {
                 log.warn("Failed to parse metadata JSON for notification {}", result.id(), e);
                 // Fallback to raw string

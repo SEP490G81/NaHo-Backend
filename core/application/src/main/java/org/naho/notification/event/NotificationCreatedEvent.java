@@ -3,7 +3,7 @@ package org.naho.notification.event;
 import org.naho.notification.model.Notification;
 
 public class NotificationCreatedEvent {
-    
+
     private final Long userId;
     private final Notification notification;
 

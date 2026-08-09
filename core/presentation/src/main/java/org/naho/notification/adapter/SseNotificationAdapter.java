@@ -59,7 +59,7 @@ public class SseNotificationAdapter {
     public void pushNotificationToUser(NotificationCreatedEvent event) {
         Long userId = event.getUserId();
         Notification notification = event.getNotification();
-        
+
         SseEmitter emitter = userEmitters.get(userId);
         if (emitter != null) {
             try {

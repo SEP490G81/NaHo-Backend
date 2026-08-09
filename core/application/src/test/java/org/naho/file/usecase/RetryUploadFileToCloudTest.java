@@ -16,7 +16,8 @@ import org.naho.file.result.StoredFile;
 import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

@@ -36,14 +36,14 @@ public class NotificationController {
             @AuthenticationPrincipal AccessTokenPayload payload,
             @RequestParam(defaultValue = "10") int limit,
             @RequestParam(defaultValue = "0") int offset) {
-        
+
         GetListNotificationCommand command = new GetListNotificationCommand(payload.userId(), limit, offset);
         List<NotificationResult> results = getListNotificationByUserInputPort.getListByUserId(command);
-        
+
         List<NotificationResponse> responses = results.stream()
                 .map(notificationResponseMapper::resultToResponse)
                 .toList();
-                
+
         return ResponseEntity.ok(responses);
     }
 
@@ -59,10 +59,10 @@ public class NotificationController {
     public ResponseEntity<NotificationResponse> markAsRead(
             @PathVariable("id") Long id,
             @AuthenticationPrincipal AccessTokenPayload payload) {
-        
+
         MarkNotificationAsReadCommand command = new MarkNotificationAsReadCommand(id, payload.userId());
         NotificationResult result = markNotificationAsReadInputPort.markAsRead(command);
-        
+
         return ResponseEntity.ok(notificationResponseMapper.resultToResponse(result));
     }
 

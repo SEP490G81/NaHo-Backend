@@ -17,7 +17,7 @@ import org.naho.user.entity.UserEntity;
 @Table(name = "notifications")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class NotificationEntity extends BaseEntity {
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     UserEntity user;

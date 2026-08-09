@@ -20,7 +20,7 @@ public class MarkNotificationAsReadUseCase implements MarkNotificationAsReadInpu
     @Override
     public NotificationResult markAsRead(MarkNotificationAsReadCommand command) {
         Notification notification = notificationRepositoryPort.findById(command.notificationId());
-        
+
         if (notification == null || !notification.getUserId().equals(command.userId())) {
             throw new DomainException(
                     new ErrorCode() {
@@ -28,10 +28,12 @@ public class MarkNotificationAsReadUseCase implements MarkNotificationAsReadInpu
                         public String getCode() {
                             return "NOTIFICATION_NOT_FOUND";
                         }
+
                         @Override
                         public String getTitleKey() {
                             return "notification.title.not-found";
                         }
+
                         @Override
                         public int getStatusCode() {
                             return 404;
@@ -43,7 +45,7 @@ public class MarkNotificationAsReadUseCase implements MarkNotificationAsReadInpu
 
         Notification markedNotification = notification.markAsRead();
         Notification savedNotification = notificationRepositoryPort.save(markedNotification);
-        
+
         return NotificationResult.fromDomain(savedNotification);
     }
 }

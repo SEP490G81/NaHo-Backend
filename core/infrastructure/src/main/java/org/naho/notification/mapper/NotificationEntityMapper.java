@@ -7,12 +7,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class NotificationEntityMapper {
-    
+
     public NotificationEntity toEntity(Notification notification) {
         if (notification == null) {
             return null;
         }
-        
+
         return NotificationEntity.builder()
                 .id(notification.getId())
                 .user(UserEntity.builder().id(notification.getUserId()).build())
@@ -27,12 +27,12 @@ public class NotificationEntityMapper {
                 // but typically BaseEntity handles it on insert.
                 .build();
     }
-    
+
     public Notification toDomain(NotificationEntity entity) {
         if (entity == null) {
             return null;
         }
-        
+
         return Notification.builder()
                 .id(entity.getId())
                 .userId(entity.getUser().getId())
@@ -42,7 +42,7 @@ public class NotificationEntityMapper {
                 .isRead(entity.getIsRead())
                 .targetUrl(entity.getTargetUrl())
                 .metadata(entity.getMetadata())
-                .createdTime(entity.getCreatedTime()) 
+                .createdTime(entity.getCreatedTime())
                 .build();
     }
 }
