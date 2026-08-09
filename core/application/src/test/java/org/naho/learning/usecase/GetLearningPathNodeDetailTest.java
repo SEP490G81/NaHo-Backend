@@ -27,6 +27,8 @@ import org.naho.question.model.VocabularyQuestion;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.question.port.out.VocabularyQuestionRepositoryPort;
 import org.naho.shared.exception.ApplicationException;
+import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
+import org.naho.subscription.result.SubscriptionPlanResult;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -48,6 +50,9 @@ class GetLearningPathNodeDetailTest {
 
     @Mock
     private ChestRepositoryPort chestRepositoryPort;
+
+    @Mock
+    private GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
 
     @InjectMocks
     private GetLearningPathNodeDetailUseCase getLearningPathNodeDetailUseCase;
@@ -74,7 +79,11 @@ class GetLearningPathNodeDetailTest {
         when(learningPathNodeRepositoryPort.findById(nodeId)).thenReturn(Optional.of(node));
         when(speakingQuestionRepositoryPort.findById(sqId)).thenReturn(Optional.of(sq));
 
-        GetLearningPathNodeDetailCommand command = new GetLearningPathNodeDetailCommand(nodeId);
+        SubscriptionPlanResult plan = mock(SubscriptionPlanResult.class);
+        when(plan.sampleAnswerEnabled()).thenReturn(true);
+        when(getActiveSubscriptionInputPort.getUserActiveSubscriptionPlan(any())).thenReturn(plan);
+
+        GetLearningPathNodeDetailCommand command = new GetLearningPathNodeDetailCommand(nodeId, 1L);
 
         // Act
         LearningPathNodeDetailResult result = getLearningPathNodeDetailUseCase.getLearningPathNodeDetail(command);
@@ -106,7 +115,7 @@ class GetLearningPathNodeDetailTest {
         when(learningPathNodeRepositoryPort.findById(nodeId)).thenReturn(Optional.of(node));
         when(vocabularyQuestionRepositoryPort.findById(vqId)).thenReturn(Optional.of(vq));
 
-        GetLearningPathNodeDetailCommand command = new GetLearningPathNodeDetailCommand(nodeId);
+        GetLearningPathNodeDetailCommand command = new GetLearningPathNodeDetailCommand(nodeId, 1L);
 
         // Act
         LearningPathNodeDetailResult result = getLearningPathNodeDetailUseCase.getLearningPathNodeDetail(command);
@@ -140,7 +149,7 @@ class GetLearningPathNodeDetailTest {
         when(learningPathNodeRepositoryPort.findById(nodeId)).thenReturn(Optional.of(node));
         when(chestRepositoryPort.findById(chestId)).thenReturn(Optional.of(chest));
 
-        GetLearningPathNodeDetailCommand command = new GetLearningPathNodeDetailCommand(nodeId);
+        GetLearningPathNodeDetailCommand command = new GetLearningPathNodeDetailCommand(nodeId, 1L);
 
         // Act
         LearningPathNodeDetailResult result = getLearningPathNodeDetailUseCase.getLearningPathNodeDetail(command);
@@ -161,7 +170,7 @@ class GetLearningPathNodeDetailTest {
         Long nodeId = 99L;
         when(learningPathNodeRepositoryPort.findById(nodeId)).thenReturn(Optional.empty());
 
-        GetLearningPathNodeDetailCommand command = new GetLearningPathNodeDetailCommand(nodeId);
+        GetLearningPathNodeDetailCommand command = new GetLearningPathNodeDetailCommand(nodeId, 1L);
 
         // Act & Assert
         ApplicationException exception = assertThrows(
@@ -187,7 +196,7 @@ class GetLearningPathNodeDetailTest {
         when(learningPathNodeRepositoryPort.findById(nodeId)).thenReturn(Optional.of(node));
         when(speakingQuestionRepositoryPort.findById(sqId)).thenReturn(Optional.empty());
 
-        GetLearningPathNodeDetailCommand command = new GetLearningPathNodeDetailCommand(nodeId);
+        GetLearningPathNodeDetailCommand command = new GetLearningPathNodeDetailCommand(nodeId, 1L);
 
         // Act & Assert
         ApplicationException exception = assertThrows(
@@ -213,7 +222,7 @@ class GetLearningPathNodeDetailTest {
         when(learningPathNodeRepositoryPort.findById(nodeId)).thenReturn(Optional.of(node));
         when(vocabularyQuestionRepositoryPort.findById(vqId)).thenReturn(Optional.empty());
 
-        GetLearningPathNodeDetailCommand command = new GetLearningPathNodeDetailCommand(nodeId);
+        GetLearningPathNodeDetailCommand command = new GetLearningPathNodeDetailCommand(nodeId, 1L);
 
         // Act & Assert
         ApplicationException exception = assertThrows(
@@ -239,7 +248,7 @@ class GetLearningPathNodeDetailTest {
         when(learningPathNodeRepositoryPort.findById(nodeId)).thenReturn(Optional.of(node));
         when(chestRepositoryPort.findById(chestId)).thenReturn(Optional.empty());
 
-        GetLearningPathNodeDetailCommand command = new GetLearningPathNodeDetailCommand(nodeId);
+        GetLearningPathNodeDetailCommand command = new GetLearningPathNodeDetailCommand(nodeId, 1L);
 
         // Act & Assert
         ApplicationException exception = assertThrows(
