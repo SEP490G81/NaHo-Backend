@@ -4,6 +4,6 @@ import java.util.List;
 
 public record CommentListResponseResult(
         Long speakingQuestionId,
-        List<CommentResonseResult> comments
+        List<CommentResponseResult> comments
 ) {
 }

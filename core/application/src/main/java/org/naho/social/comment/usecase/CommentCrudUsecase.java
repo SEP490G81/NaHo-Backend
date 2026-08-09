@@ -14,7 +14,7 @@ import org.naho.social.comment.model.Comment;
 import org.naho.social.comment.port.in.CommentCrudInputPort;
 import org.naho.social.comment.port.out.CommentRepositoryPort;
 import org.naho.social.comment.result.CommentListResponseResult;
-import org.naho.social.comment.result.CommentResonseResult;
+import org.naho.social.comment.result.CommentResponseResult;
 
 import java.util.List;
 import java.util.Optional;
@@ -42,14 +42,14 @@ public class CommentCrudUsecase implements CommentCrudInputPort {
     }
 
     @Override
-    public CommentResonseResult createComment(CommentCreateCommand command) {
+    public CommentResponseResult createComment(CommentCreateCommand command) {
         Comment newComment = commentDomainMapper.commandToModel(command);
         Comment commentSaved = commentRepositoryPort.save(newComment);
         return commentResultMapper.domainToResult(commentSaved);
     }
 
     @Override
-    public CommentResonseResult updateComment(CommentUpdateCommand command) {
+    public CommentResponseResult updateComment(CommentUpdateCommand command) {
         Optional<Comment> commentOpt = commentRepositoryPort.findByCommentId(command.commentId());
         if (commentOpt.isEmpty()) {
             throw new ApplicationException(
@@ -59,6 +59,15 @@ public class CommentCrudUsecase implements CommentCrudInputPort {
             );
         }
         Comment existing = commentOpt.get();
+
+        boolean isOwner = command.userId() != null && command.userId().equals(existing.getUserId());
+        if (!isOwner) {
+            throw new ApplicationException(
+                    CommentErrorCode.COMMENT_NOT_AUTHORIZED,
+                    CommentDetailMessageKey.COMMENT_DELETE_FORBIDDEN
+            );
+        }
+
         Comment commentToSave = Comment.builder()
                 .id(existing.getId())
                 .userId(existing.getUserId())
@@ -73,7 +82,7 @@ public class CommentCrudUsecase implements CommentCrudInputPort {
     }
 
     @Override
-    public CommentResonseResult deleteComment(CommentDeleteCommand command) {
+    public CommentResponseResult deleteComment(CommentDeleteCommand command) {
         Comment comment = commentRepositoryPort.findByCommentId(command.commentId())
                 .orElseThrow(() -> new ApplicationException(
                         CommentErrorCode.COMMENT_NOT_FOUND,

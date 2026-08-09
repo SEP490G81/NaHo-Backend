@@ -2,7 +2,7 @@ package org.naho.social.comment.mapper;
 
 import org.naho.social.comment.model.Comment;
 import org.naho.social.comment.result.CommentListResponseResult;
-import org.naho.social.comment.result.CommentResonseResult;
+import org.naho.social.comment.result.CommentResponseResult;
 import org.naho.social.reaction.model.Reaction;
 import org.naho.social.reaction.port.out.ReactionRepositoryPort;
 
@@ -27,7 +27,7 @@ public class CommentListResultMapper {
                 .filter(c -> c.getParentId() != null)
                 .collect(Collectors.groupingBy(Comment::getParentId));
 
-        List<CommentResonseResult> roots = allComments.stream()
+        List<CommentResponseResult> roots = allComments.stream()
                 .filter(c -> c.getParentId() == null)
                 .map(parent -> buildWithChildren(parent, childrenByParentId, currentUserId))
                 .toList();
@@ -35,25 +35,27 @@ public class CommentListResultMapper {
         return new CommentListResponseResult(questionId, roots);
     }
 
-    private CommentResonseResult buildWithChildren(
+    private CommentResponseResult buildWithChildren(
             Comment comment,
             Map<Long, List<Comment>> childrenByParentId,
             Long currentUserId
     ) {
         List<Reaction> reactions = reactionRepositoryPort.findByCommentId(comment.getId());
-        CommentResonseResult result = commentResultMapper.domainToResultWithReactions(comment, reactions, currentUserId);
+        CommentResponseResult result = commentResultMapper.domainToResultWithReactions(comment, reactions, currentUserId);
 
         List<Comment> children = childrenByParentId.getOrDefault(comment.getId(), new ArrayList<>());
-        List<CommentResonseResult> childResults = children.stream()
+        List<CommentResponseResult> childResults = children.stream()
                 .map(child -> buildWithChildren(child, childrenByParentId, currentUserId))
                 .toList();
 
-        return new CommentResonseResult(
+        return new CommentResponseResult(
                 result.commentId(),
                 result.questionId(),
                 result.userId(),
-                result.username(),
+                result.fullName(),
                 result.avatarUrl(),
+                result.rank(),
+                result.userInfo(),
                 result.parentId(),
                 result.content(),
                 result.createdTime(),

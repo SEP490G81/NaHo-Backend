@@ -3,13 +3,14 @@ package org.naho.social.comment.mapper;
 import org.naho.file.port.in.CrudFileInputPort;
 import org.naho.file.result.FileResult;
 import org.naho.social.comment.model.Comment;
-import org.naho.social.comment.result.CommentResonseResult;
+import org.naho.social.comment.result.CommentResponseResult;
 import org.naho.social.reaction.model.Reaction;
 import org.naho.social.reaction.type.ReactionType;
 import org.naho.user.model.User;
 import org.naho.user.port.in.CrudAuthProviderInputPort;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.naho.user.result.AuthProviderResult;
+import org.naho.user.result.LeaderboardUserResult;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -36,14 +37,16 @@ public class CommentResultMapper {
         this.crudAuthProviderInputPort = crudAuthProviderInputPort;
     }
 
-    public CommentResonseResult domainToResult(Comment comment) {
+    public CommentResponseResult domainToResult(Comment comment) {
         UserInfo userInfo = fetchUserInfo(comment.getUserId());
-        return new CommentResonseResult(
+        return new CommentResponseResult(
                 comment.getId(),
                 comment.getQuestionId(),
                 comment.getUserId(),
-                userInfo.username(),
+                userInfo.fullName(),
                 userInfo.avatarUrl(),
+                userInfo.rank(),
+                userInfo.leaderboardUserResult(),
                 comment.getParentId(),
                 comment.getContent(),
                 toLocalDateTime(comment),
@@ -53,7 +56,7 @@ public class CommentResultMapper {
         );
     }
 
-    public CommentResonseResult domainToResultWithReactions(
+    public CommentResponseResult domainToResultWithReactions(
             Comment comment,
             List<Reaction> reactions,
             Long currentUserId
@@ -67,7 +70,7 @@ public class CommentResultMapper {
                 .findFirst()
                 .orElse(null);
 
-        CommentResonseResult.ReactionSummary summary = new CommentResonseResult.ReactionSummary(
+        CommentResponseResult.ReactionSummary summary = new CommentResponseResult.ReactionSummary(
                 reactions.size(),
                 counts,
                 myReaction
@@ -75,12 +78,14 @@ public class CommentResultMapper {
 
         UserInfo userInfo = fetchUserInfo(comment.getUserId());
 
-        return new CommentResonseResult(
+        return new CommentResponseResult(
                 comment.getId(),
                 comment.getQuestionId(),
                 comment.getUserId(),
-                userInfo.username(),
+                userInfo.fullName(),
                 userInfo.avatarUrl(),
+                userInfo.rank(),
+                userInfo.leaderboardUserResult(),
                 comment.getParentId(),
                 comment.getContent(),
                 toLocalDateTime(comment),
@@ -92,35 +97,37 @@ public class CommentResultMapper {
 
     private UserInfo fetchUserInfo(Long userId) {
         if (userId == null || userRepositoryPort == null) {
-            return new UserInfo(null, null);
+            return new UserInfo(null, null, null, null);
         }
-        Optional<User> userOpt = userRepositoryPort.findById(userId);
-        if (userOpt.isEmpty()) {
-            return new UserInfo(null, null);
+
+        LeaderboardUserResult leaderboardUserResult = null;
+        try {
+            Optional<LeaderboardUserResult> topOpt = userRepositoryPort.findTopOfUserByUserId(userId);
+            if (topOpt.isPresent()) {
+                leaderboardUserResult = topOpt.get();
+                leaderboardUserResult.setUsername(null);
+            }
+        } catch (Exception ignored) {
         }
-        User user = userOpt.get();
-        String username = user.getUsername() != null ? user.getUsername().getValue() : user.getFullName();
+
+        if (leaderboardUserResult == null) {
+            return new UserInfo(null, null, null, null);
+        }
+
+        String fullName = (leaderboardUserResult.getFullName() != null && !leaderboardUserResult.getFullName().isBlank())
+                ? leaderboardUserResult.getFullName()
+                : null;
+
+        Integer rank = leaderboardUserResult.getRank();
 
         String avatarUrl = null;
-        if (user.getAvatarFileId() != null && crudFileInputPort != null) {
-            try {
-                FileResult fileResult = crudFileInputPort.findById(user.getAvatarFileId());
-                if (fileResult != null) {
-                    avatarUrl = fileResult.getAccessUrl();
-                }
-            } catch (Exception ignored) {
-            }
+        if (leaderboardUserResult.getAvatarObjectKey() != null && !leaderboardUserResult.getAvatarObjectKey().isBlank()) {
+            avatarUrl = leaderboardUserResult.getAvatarObjectKey();
+        } else if (leaderboardUserResult.getoAuthAvatarUrl() != null && !leaderboardUserResult.getoAuthAvatarUrl().isEmpty()) {
+            avatarUrl = leaderboardUserResult.getoAuthAvatarUrl().get(0);
         }
-        if (avatarUrl == null && crudAuthProviderInputPort != null) {
-            try {
-                List<AuthProviderResult> providers = crudAuthProviderInputPort.findAllByUser_Id(userId);
-                if (providers != null && !providers.isEmpty()) {
-                    avatarUrl = providers.get(0).avatarUrl();
-                }
-            } catch (Exception ignored) {
-            }
-        }
-        return new UserInfo(username, avatarUrl);
+
+        return new UserInfo(fullName, avatarUrl, rank, leaderboardUserResult);
     }
 
     private LocalDateTime toLocalDateTime(Comment comment) {
@@ -133,6 +140,5 @@ public class CommentResultMapper {
         return LocalDateTime.ofInstant(comment.getModifiedTime(), ZoneId.systemDefault());
     }
 
-    private record UserInfo(String username, String avatarUrl) {
-    }
+    private record UserInfo(String fullName, String avatarUrl, Integer rank, LeaderboardUserResult leaderboardUserResult) {}
 }
