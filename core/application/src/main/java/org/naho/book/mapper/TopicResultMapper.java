@@ -12,6 +12,8 @@ public class TopicResultMapper {
                 .coverImageFileId(domain.getCoverImageFileId())
                 .japaneseName(domain.getJapaneseName())
                 .japaneseDescription(domain.getJapaneseDescription())
+                .vietnameseDescription(domain.getVietnameseDescription())
+                .englishDescription(domain.getEnglishDescription())
                 .japaneseNameMarkup(domain.getJapaneseNameMarkup())
                 .japaneseDescriptionMarkup(domain.getJapaneseDescriptionMarkup())
                 .status(domain.getStatus())
