@@ -1,20 +1,17 @@
 package org.naho.social.comment.dto.mapper;
 
+import org.mapstruct.Mapper;
+import org.naho.social.comment.dto.response.CommentListResponse;
 import org.naho.social.comment.dto.response.CommentResponse;
-import org.naho.social.comment.result.CommentResonseResult;
+import org.naho.social.comment.result.CommentListResult;
+import org.naho.social.comment.result.CommentResult;
+import org.naho.user.dto.mapper.UserResponseMapper;
 
-public class CommentResponseMapper {
-    public CommentResponse resultToResponse(CommentResonseResult result) {
-        return new CommentResponse(
-                result.commentId(),
-                result.questionId(),
-                result.userId(),
-                result.username(),
-                result.avatarUrl(),
-                result.parentId(),
-                result.content(),
-                result.createdTime(),
-                result.reactionSummary()
-        );
-    }
+@Mapper(componentModel = "spring", uses = {UserResponseMapper.class})
+public interface CommentResponseMapper {
+    CommentResponse resultToResponse(CommentResult result);
+
+    CommentResult.ReactionSummaryResult resultToReactionSummary(CommentResult.ReactionSummaryResult result);
+
+    CommentListResponse resultToResponse(CommentListResult result);
 }

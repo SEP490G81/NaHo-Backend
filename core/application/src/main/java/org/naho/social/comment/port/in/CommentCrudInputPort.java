@@ -4,15 +4,15 @@ import org.naho.social.comment.command.CommentCreateCommand;
 import org.naho.social.comment.command.CommentDeleteCommand;
 import org.naho.social.comment.command.CommentReadCommand;
 import org.naho.social.comment.command.CommentUpdateCommand;
-import org.naho.social.comment.result.CommentListResponseResult;
-import org.naho.social.comment.result.CommentResonseResult;
+import org.naho.social.comment.result.CommentListResult;
+import org.naho.social.comment.result.CommentResult;
 
 public interface CommentCrudInputPort {
-    CommentListResponseResult getListCommentOfQuestion(CommentReadCommand command, Long currentUserId);
+    CommentListResult getListCommentOfQuestion(CommentReadCommand command, Long currentUserId);
 
-    CommentResonseResult createComment(CommentCreateCommand command);
+    CommentResult createComment(CommentCreateCommand command);
 
-    CommentResonseResult updateComment(CommentUpdateCommand command);
+    CommentResult updateComment(CommentUpdateCommand command);
 
-    CommentResonseResult deleteComment(CommentDeleteCommand command);
+    CommentResult deleteComment(CommentDeleteCommand command);
 }

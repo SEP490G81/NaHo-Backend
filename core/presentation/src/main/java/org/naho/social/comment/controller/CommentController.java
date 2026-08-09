@@ -13,10 +13,11 @@ import org.naho.social.comment.dto.mapper.CommentResponseMapper;
 import org.naho.social.comment.dto.request.CreateCommentRequest;
 import org.naho.social.comment.dto.request.DeleteCommandRequest;
 import org.naho.social.comment.dto.request.UpdateCommentRequest;
+import org.naho.social.comment.dto.response.CommentListResponse;
 import org.naho.social.comment.dto.response.CommentResponse;
 import org.naho.social.comment.port.in.CommentCrudInputPort;
-import org.naho.social.comment.result.CommentListResponseResult;
-import org.naho.social.comment.result.CommentResonseResult;
+import org.naho.social.comment.result.CommentListResult;
+import org.naho.social.comment.result.CommentResult;
 import org.naho.user.port.out.RoleRepositoryPort;
 import org.naho.user.result.AccessTokenPayload;
 import org.naho.user.type.RoleName;
@@ -43,14 +44,15 @@ public class CommentController {
 
     @GetMapping
     @ApiResponseMessage(message = CommentDetailMessageKey.COMMENT_GET_LIST_SUCCESS)
-    public ResponseEntity<CommentListResponseResult> getComments(
+    public ResponseEntity<CommentListResponse> getComments(
             @RequestParam("speakingQuestionId") Long speakingQuestionId,
             @AuthenticationPrincipal AccessTokenPayload payload
     ) {
         Long currentUserId = payload != null ? payload.userId() : null;
         CommentReadCommand command = new CommentReadCommand(speakingQuestionId);
-        CommentListResponseResult result = commentCrudInputPort.getListCommentOfQuestion(command, currentUserId);
-        return ResponseEntity.ok(result);
+        CommentListResult result = commentCrudInputPort.getListCommentOfQuestion(command, currentUserId);
+        CommentListResponse response = commentResponseMapper.resultToResponse(result);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
@@ -60,8 +62,8 @@ public class CommentController {
     ) {
         Long userId = payload != null ? payload.userId() : createCommentRequest.userId();
         CommentCreateCommand createCommand = commentCommandMapper.requestToCommand(createCommentRequest, userId);
-        CommentResonseResult commentResonseResult = commentCrudInputPort.createComment(createCommand);
-        CommentResponse response = commentResponseMapper.resultToResponse(commentResonseResult);
+        CommentResult commentResult = commentCrudInputPort.createComment(createCommand);
+        CommentResponse response = commentResponseMapper.resultToResponse(commentResult);
         messagingTemplate.convertAndSend("/topic/comments", response);
         return ResponseEntity.ok(response);
     }
@@ -72,8 +74,8 @@ public class CommentController {
             @AuthenticationPrincipal AccessTokenPayload payload) {
         Long userId = payload != null ? payload.userId() : updateCommentRequest.userId();
         CommentUpdateCommand command = commentCommandMapper.requestToUpdateCommand(updateCommentRequest, userId);
-        CommentResonseResult commentResonseResult = commentCrudInputPort.updateComment(command);
-        CommentResponse response = commentResponseMapper.resultToResponse(commentResonseResult);
+        CommentResult commentResult = commentCrudInputPort.updateComment(command);
+        CommentResponse response = commentResponseMapper.resultToResponse(commentResult);
         messagingTemplate.convertAndSend("/topic/comments", response);
         return ResponseEntity.ok(response);
     }
@@ -85,8 +87,8 @@ public class CommentController {
         Long userId = payload != null ? payload.userId() : null;
         boolean isAdmin = checkIsAdmin(userId);
         CommentDeleteCommand command = commentCommandMapper.requestToDeleteCommand(deleteCommandRequest, userId, isAdmin);
-        CommentResonseResult commentResonseResult = commentCrudInputPort.deleteComment(command);
-        CommentResponse response = commentResponseMapper.resultToResponse(commentResonseResult);
+        CommentResult commentResult = commentCrudInputPort.deleteComment(command);
+        CommentResponse response = commentResponseMapper.resultToResponse(commentResult);
         messagingTemplate.convertAndSend("/topic/comments", response);
         return ResponseEntity.ok(response);
     }
@@ -98,8 +100,8 @@ public class CommentController {
             @AuthenticationPrincipal AccessTokenPayload payload) {
         Long userId = payload != null ? payload.userId() : createCommentRequest.userId();
         CommentCreateCommand createCommand = commentCommandMapper.requestToCommand(createCommentRequest, userId);
-        CommentResonseResult commentResonseResult = commentCrudInputPort.createComment(createCommand);
-        return commentResponseMapper.resultToResponse(commentResonseResult);
+        CommentResult commentResult = commentCrudInputPort.createComment(createCommand);
+        return commentResponseMapper.resultToResponse(commentResult);
     }
 
     @MessageMapping("/comments/update")
@@ -109,8 +111,8 @@ public class CommentController {
             @AuthenticationPrincipal AccessTokenPayload payload) {
         Long userId = payload != null ? payload.userId() : updateCommentRequest.userId();
         CommentUpdateCommand command = commentCommandMapper.requestToUpdateCommand(updateCommentRequest, userId);
-        CommentResonseResult commentResonseResult = commentCrudInputPort.updateComment(command);
-        return commentResponseMapper.resultToResponse(commentResonseResult);
+        CommentResult commentResult = commentCrudInputPort.updateComment(command);
+        return commentResponseMapper.resultToResponse(commentResult);
     }
 
     @MessageMapping("/comments/delete")
@@ -121,8 +123,8 @@ public class CommentController {
         Long userId = payload != null ? payload.userId() : null;
         boolean isAdmin = checkIsAdmin(userId);
         CommentDeleteCommand command = commentCommandMapper.requestToDeleteCommand(deleteCommandRequest, userId, isAdmin);
-        CommentResonseResult commentResonseResult = commentCrudInputPort.deleteComment(command);
-        return commentResponseMapper.resultToResponse(commentResonseResult);
+        CommentResult commentResult = commentCrudInputPort.deleteComment(command);
+        return commentResponseMapper.resultToResponse(commentResult);
     }
 
     private boolean checkIsAdmin(Long userId) {
