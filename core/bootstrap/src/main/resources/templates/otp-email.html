@@ -72,7 +72,7 @@
         <h1>Xác nhận tài khoản NaHo</h1>
     </div>
     <div class="content">
-        <p>Chào bạn,</p>
+        <p>Chào <span th:text="${fullName}">bạn</span>,</p>
         <p>Bạn đã yêu cầu đăng nhập/đăng ký vào ứng dụng NaHo. Đây là mã OTP xác thực email của bạn:</p>
         <div class="otp-box" th:text="${otpCode}">123456</div>
         <p>Mã này có hiệu lực trong vòng <strong>5 phút</strong>.</p>

@@ -78,7 +78,7 @@ public class ChangePasswordUseCase implements ChangePasswordInputPort {
         userRepository.save(user);
 
         if (user.getEmail() != null) {
-            emailPort.sendPasswordChangedEmail(user.getEmail().getValue());
+            emailPort.sendPasswordChangedEmail(user.getEmail().getValue(), user.getFullName());
         }
     }
 }

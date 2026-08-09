@@ -50,6 +50,6 @@ public class ResendOtpUseCase implements ResendOtpInputPort {
 
         String otp = otpPort.generateOtp();
         otpPort.saveOtp(command.email(), otp);
-        emailPort.sendOtpEmail(command.email(), otp);
+        emailPort.sendOtpEmail(command.email(), user.getFullName(), otp);
     }
 }

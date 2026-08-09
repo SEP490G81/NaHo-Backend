@@ -63,7 +63,7 @@ class ChangePasswordTest {
         verify(userRepositoryPort, times(1)).findById(1L);
         verify(encoderPort, times(1)).hashPassword("NewPassword123@");
         verify(userRepositoryPort, times(1)).save(user);
-        verify(emailPort, times(1)).sendPasswordChangedEmail(anyString());
+        verify(emailPort, times(1)).sendPasswordChangedEmail(anyString(), any());
         assertEquals("$2a$10$newHashedPassword", user.getHashPassword());
     }
 

@@ -110,7 +110,7 @@ public class AuthUseCase implements AuthInputPort {
             if (!otpPort.hasValidOtp(email)) {
                 String otp = otpPort.generateOtp();
                 otpPort.saveOtp(email, otp);
-                emailPort.sendOtpEmail(email, otp);
+                emailPort.sendOtpEmail(email, user.getFullName(), otp);
             }
             throw new ApplicationException(
                     UserErrorCode.USER_EMAIL_UNVERIFIED,

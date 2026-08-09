@@ -56,7 +56,7 @@ class ResendOtpTest {
 
         // Assert
         verify(otpPort, times(1)).saveOtp(emailStr, "123456");
-        verify(emailPort, times(1)).sendOtpEmail(emailStr, "123456");
+        verify(emailPort, times(1)).sendOtpEmail(eq(emailStr), any(), eq("123456"));
     }
 
     @Test
@@ -82,7 +82,7 @@ class ResendOtpTest {
 
         // Assert
         verify(otpPort, times(1)).saveOtp(emailStr, "654321");
-        verify(emailPort, times(1)).sendOtpEmail(emailStr, "654321");
+        verify(emailPort, times(1)).sendOtpEmail(eq(emailStr), any(), eq("654321"));
     }
 
     @Test
