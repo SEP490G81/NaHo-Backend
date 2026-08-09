@@ -14,5 +14,6 @@ public record SpeakingAnalysisReportResponse(
             Double vocabulary,
             Double grammar,
             Double naturalness
-    ) {}
+    ) {
+    }
 }

@@ -49,7 +49,6 @@ public class UserResultMapper {
                 .fullName(domain.getFullName())
                 .gender(domain.getGender())
                 .dob(dob)
-                .jlptLevel(domain.getJlptLevel())
                 .status(domain.getStatus())
                 .build();
     }

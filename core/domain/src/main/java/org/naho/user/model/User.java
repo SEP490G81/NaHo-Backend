@@ -1,7 +1,6 @@
 package org.naho.user.model;
 
 import org.naho.user.type.Gender;
-import org.naho.user.type.JLPTLevel;
 import org.naho.user.type.UserStatus;
 import org.naho.user.valueobject.Dob;
 import org.naho.user.valueobject.Email;
@@ -12,7 +11,7 @@ import java.util.List;
 public class User {
 
     private final Long id;
-    private final List<Long> roleIds;
+    private final Long roleId;
     private final List<Long> userSessionIds;
     private final List<Long> authProviderIds;
     private final List<Long> speakingQuestionIds;
@@ -30,13 +29,12 @@ public class User {
     private String fullName;
     private Gender gender;
     private Dob dob;
-    private JLPTLevel jlptLevel;
     private UserStatus status;
     private boolean isEmailVerified;
 
     private User(Builder builder) {
         this.id = builder.id;
-        this.roleIds = builder.roleIds;
+        this.roleId = builder.roleId;
         this.userSessionIds = builder.userSessionIds;
         this.authProviderIds = builder.authProviderIds;
         this.speakingQuestionIds = builder.speakingQuestionIds;
@@ -54,19 +52,18 @@ public class User {
         this.fullName = builder.fullName;
         this.gender = builder.gender;
         this.dob = builder.dob;
-        this.jlptLevel = builder.jlptLevel;
         this.status = builder.status;
         this.isEmailVerified = builder.isEmailVerified;
     }
 
-    public static User registerNewUser(String rawUsername, String hashPassword, String rawEmail, List<Long> roleIds) {
+    public static User registerNewUser(String rawUsername, String hashPassword, String rawEmail, Long roleId) {
         return User.builder()
                 .username(Username.of(rawUsername))
                 .email(Email.of(rawEmail))
                 .hashPassword(hashPassword)
                 .status(UserStatus.ACTIVE)
                 .isEmailVerified(false)
-                .roleIds(roleIds)
+                .roleId(roleId)
                 .build();
     }
 
@@ -89,7 +86,7 @@ public class User {
     public Builder toBuilder() {
         return builder()
                 .id(id)
-                .roleIds(roleIds)
+                .roleId(roleId)
                 .userSessionIds(userSessionIds)
                 .authProviderIds(authProviderIds)
                 .speakingQuestionIds(speakingQuestionIds)
@@ -107,7 +104,6 @@ public class User {
                 .fullName(fullName)
                 .gender(gender)
                 .dob(dob)
-                .jlptLevel(jlptLevel)
                 .status(status);
     }
 
@@ -115,8 +111,8 @@ public class User {
         return id;
     }
 
-    public List<Long> getRoleIds() {
-        return roleIds;
+    public Long getRoleId() {
+        return roleId;
     }
 
     public List<Long> getUserSessionIds() {
@@ -211,13 +207,6 @@ public class User {
         this.dob = dob;
     }
 
-    public JLPTLevel getJlptLevel() {
-        return jlptLevel;
-    }
-
-    public void setJlptLevel(JLPTLevel jlptLevel) {
-        this.jlptLevel = jlptLevel;
-    }
 
     public UserStatus getStatus() {
         return status;
@@ -230,7 +219,7 @@ public class User {
     public static final class Builder {
 
         private Long id;
-        private List<Long> roleIds;
+        private Long roleId;
         private List<Long> userSessionIds;
         private List<Long> authProviderIds;
         private List<Long> speakingQuestionIds;
@@ -250,7 +239,6 @@ public class User {
         private String fullName;
         private Gender gender;
         private Dob dob;
-        private JLPTLevel jlptLevel;
 
         private UserStatus status;
         private boolean isEmailVerified;
@@ -263,8 +251,8 @@ public class User {
             return this;
         }
 
-        public Builder roleIds(List<Long> roleIds) {
-            this.roleIds = roleIds;
+        public Builder roleId(Long roleId) {
+            this.roleId = roleId;
             return this;
         }
 
@@ -353,10 +341,6 @@ public class User {
             return this;
         }
 
-        public Builder jlptLevel(JLPTLevel jlptLevel) {
-            this.jlptLevel = jlptLevel;
-            return this;
-        }
 
         public Builder status(UserStatus status) {
             this.status = status;

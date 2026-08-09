@@ -17,8 +17,6 @@ import org.naho.user.result.RegisterResult;
 import org.naho.user.type.RoleName;
 import org.naho.user.valueobject.Password;
 
-import java.util.List;
-
 public class RegisterUseCase implements RegisterInputPort {
 
     private final UserRepositoryPort userRepository;
@@ -78,7 +76,7 @@ public class RegisterUseCase implements RegisterInputPort {
                 command.username(),
                 encodedPassword,
                 command.email(),
-                List.of(defaultRole.getId()));
+                defaultRole.getId());
 
         User savedUser = userRepository.createNew(newUser, null);
 

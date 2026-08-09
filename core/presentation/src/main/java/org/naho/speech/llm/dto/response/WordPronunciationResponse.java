@@ -6,4 +6,5 @@ public record WordPronunciationResponse(
         String errorType,
         String colorCategory,
         String hexColor
-) {}
+) {
+}

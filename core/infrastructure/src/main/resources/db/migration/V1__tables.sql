@@ -187,6 +187,21 @@ CREATE TABLE lessons
     CONSTRAINT pk_lessons PRIMARY KEY (id)
 );
 
+CREATE TABLE notifications
+(
+    id            BIGINT AUTO_INCREMENT NOT NULL,
+    created_time  datetime(6)           NOT NULL,
+    modified_time datetime(6)           NULL,
+    user_id       BIGINT                NOT NULL,
+    type          VARCHAR(50)           NOT NULL,
+    title         VARCHAR(255)          NOT NULL,
+    content       TEXT                  NOT NULL,
+    is_read       BIT(1)                NOT NULL,
+    target_url    TEXT                  NULL,
+    metadata      TEXT                  NULL,
+    CONSTRAINT pk_notifications PRIMARY KEY (id)
+);
+
 CREATE TABLE objectives
 (
     id                            BIGINT AUTO_INCREMENT NOT NULL,
@@ -612,21 +627,15 @@ CREATE TABLE users
     username                  VARCHAR(36)           NULL,
     email                     VARCHAR(255)          NOT NULL,
     hash_password             VARCHAR(255)          NULL,
-    full_name                 VARCHAR(255)          NULL,
+    full_name                 VARCHAR(255)          NOT NULL,
     is_email_verified         BIT(1)                NOT NULL,
     gender                    VARCHAR(10)           NULL,
     dob                       date                  NULL,
-    jlpt_level                VARCHAR(2)            NULL,
     status                    VARCHAR(20)           NOT NULL,
+    role_id                   BIGINT                NULL,
     user_learning_progress_id BIGINT                NULL,
     avatar_file_id            BIGINT                NULL,
     CONSTRAINT pk_users PRIMARY KEY (id)
-);
-
-CREATE TABLE users_roles
-(
-    role_id BIGINT NOT NULL,
-    user_id BIGINT NOT NULL
 );
 
 CREATE TABLE vocabularies
@@ -663,6 +672,7 @@ CREATE TABLE word_assessments
     word                 VARCHAR(255)          NOT NULL,
     accuracy_score       DOUBLE                NOT NULL,
     error_type           VARCHAR(255)          NOT NULL,
+    word_markup          TEXT                  NULL,
     speech_assessment_id BIGINT                NOT NULL,
     CONSTRAINT pk_word_assessments PRIMARY KEY (id)
 );
@@ -793,6 +803,9 @@ ALTER TABLE learning_path_nodes
 ALTER TABLE lessons
     ADD CONSTRAINT FK_LESSONS_ON_TOPIC FOREIGN KEY (topic_id) REFERENCES topics (id);
 
+ALTER TABLE notifications
+    ADD CONSTRAINT FK_NOTIFICATIONS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+
 ALTER TABLE objectives
     ADD CONSTRAINT FK_OBJECTIVES_ON_LESSON FOREIGN KEY (lesson_id) REFERENCES lessons (id);
 
@@ -863,6 +876,9 @@ ALTER TABLE users
     ADD CONSTRAINT FK_USERS_ON_AVATAR_FILE FOREIGN KEY (avatar_file_id) REFERENCES files (id);
 
 ALTER TABLE users
+    ADD CONSTRAINT FK_USERS_ON_ROLE FOREIGN KEY (role_id) REFERENCES roles (id);
+
+ALTER TABLE users
     ADD CONSTRAINT FK_USERS_ON_USER_LEARNING_PROGRESS FOREIGN KEY (user_learning_progress_id) REFERENCES user_learning_progresses (id);
 
 ALTER TABLE user_daily_attendances
@@ -921,12 +937,6 @@ ALTER TABLE speaking_questions_vocabularies
 
 ALTER TABLE speaking_questions_vocabularies
     ADD CONSTRAINT fk_spequevoc_on_vocabulary_entity FOREIGN KEY (vocabulary_id) REFERENCES vocabularies (id);
-
-ALTER TABLE users_roles
-    ADD CONSTRAINT fk_userol_on_role_entity FOREIGN KEY (role_id) REFERENCES roles (id);
-
-ALTER TABLE users_roles
-    ADD CONSTRAINT fk_userol_on_user_entity FOREIGN KEY (user_id) REFERENCES users (id);
 
 ALTER TABLE vocabulary_questions_vocabularies
     ADD CONSTRAINT fk_vocquevoc_on_vocabulary_entity FOREIGN KEY (vocabulary_id) REFERENCES vocabularies (id);

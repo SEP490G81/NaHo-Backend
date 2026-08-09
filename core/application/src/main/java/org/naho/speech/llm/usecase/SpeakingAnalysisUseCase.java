@@ -17,6 +17,7 @@ import org.naho.file.port.in.UploadFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileResultMapperPort;
 import org.naho.file.result.FileResult;
+import org.naho.furigana.port.out.FuriganaGenerationPort;
 import org.naho.i18n.message.learning.LearningPathNodeDetailMessageKey;
 import org.naho.i18n.message.learning.UserLearningProgressDetailMessageKey;
 import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
@@ -73,6 +74,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     private final UserLearningProgressRepositoryPort userLearningProgressRepositoryPort;
     private final FileResultMapperPort fileResultMapperPort;
     private final UploadFileInputPort uploadFileInputPort;
+    private final FuriganaGenerationPort furiganaGenerationPort;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public SpeakingAnalysisUseCase(
@@ -91,7 +93,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort,
             UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
             FileResultMapperPort fileResultMapperPort,
-            UploadFileInputPort uploadFileInputPort) {
+            UploadFileInputPort uploadFileInputPort,
+            FuriganaGenerationPort furiganaGenerationPort) {
         this.userRepositoryPort = userRepositoryPort;
         this.speakingQuestionRepositoryPort = speakingQuestionRepositoryPort;
         this.fileRepositoryPort = fileRepositoryPort;
@@ -108,6 +111,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         this.userLearningProgressRepositoryPort = userLearningProgressRepositoryPort;
         this.fileResultMapperPort = fileResultMapperPort;
         this.uploadFileInputPort = uploadFileInputPort;
+        this.furiganaGenerationPort = furiganaGenerationPort;
     }
 
     @Override
@@ -478,9 +482,9 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     }
 
     private SpeakingAnalysisResult persistResults(SpeakingAnalysisCommand command,
-                                                   AnalysisContext ctx,
-                                                   SpeechAssessment azureAssessment,
-                                                   ParsedScores parsedScores) {
+                                                  AnalysisContext ctx,
+                                                  SpeechAssessment azureAssessment,
+                                                  ParsedScores parsedScores) {
         // DB-W => Lưu đánh giá phát âm tổng quan của azure speech
         SpeechAssessment savedSpeechAssessment = persistSpeechAssessment(
                 azureAssessment, ctx.savedAnswerHistory().getId());
@@ -559,6 +563,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                     .accuracyScore(word.getAccuracyScore())
                     .errorType(word.getErrorType())
                     .speechAssessmentId(speechAssessmentId)
+                    .wordMarkup(furiganaGenerationPort.generateFuriganaMarkup(word.getWord()))
                     .build());
         }
         answerHistoryRepositoryPort.saveAllWordAssessment(wordList);
@@ -581,7 +586,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             String vocabFocusVal,
             String questionTitleVal,
             String questionDescriptionVal
-    ) {}
+    ) {
+    }
 
     private record ParsedScores(
             double vocabScore,
@@ -589,5 +595,6 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             double naturalnessScore,
             double overallScore,
             String enrichedFeedbackJson
-    ) {}
+    ) {
+    }
 }

@@ -34,22 +34,21 @@ class SearchUsersTest {
         String userNameOrEmail = "truc";
         String role = "LEARNER";
         String status = "ACTIVE";
-        String jlptLevel = "N3";
 
         User user = User.builder().id(1L).fullName("Nguyen Vuong Truc").build();
         UserResult expectedResult = mock(UserResult.class);
 
-        when(userRepositoryPort.findByFilters(userNameOrEmail, role, status, jlptLevel)).thenReturn(List.of(user));
+        when(userRepositoryPort.findByFilters(userNameOrEmail, role, status)).thenReturn(List.of(user));
         when(userResultMapper.domainToResult(user)).thenReturn(expectedResult);
 
         // Act
-        List<UserResult> results = getUserUseCase.searchUsers(userNameOrEmail, role, status, jlptLevel);
+        List<UserResult> results = getUserUseCase.searchUsers(userNameOrEmail, role, status);
 
         // Assert
         assertNotNull(results);
         assertEquals(1, results.size());
         assertEquals(expectedResult, results.get(0));
-        verify(userRepositoryPort, times(1)).findByFilters(userNameOrEmail, role, status, jlptLevel);
+        verify(userRepositoryPort, times(1)).findByFilters(userNameOrEmail, role, status);
         verify(userResultMapper, times(1)).domainToResult(user);
     }
 
@@ -60,17 +59,16 @@ class SearchUsersTest {
         String userNameOrEmail = "nonexistent";
         String role = "ADMIN";
         String status = "DELETED";
-        String jlptLevel = "N1";
 
-        when(userRepositoryPort.findByFilters(userNameOrEmail, role, status, jlptLevel)).thenReturn(List.of());
+        when(userRepositoryPort.findByFilters(userNameOrEmail, role, status)).thenReturn(List.of());
 
         // Act
-        List<UserResult> results = getUserUseCase.searchUsers(userNameOrEmail, role, status, jlptLevel);
+        List<UserResult> results = getUserUseCase.searchUsers(userNameOrEmail, role, status);
 
         // Assert
         assertNotNull(results);
         assertTrue(results.isEmpty());
-        verify(userRepositoryPort, times(1)).findByFilters(userNameOrEmail, role, status, jlptLevel);
+        verify(userRepositoryPort, times(1)).findByFilters(userNameOrEmail, role, status);
         verify(userResultMapper, never()).domainToResult(any());
     }
 
@@ -84,16 +82,16 @@ class SearchUsersTest {
         UserResult result1 = mock(UserResult.class);
         UserResult result2 = mock(UserResult.class);
 
-        when(userRepositoryPort.findByFilters(null, null, null, null)).thenReturn(List.of(user1, user2));
+        when(userRepositoryPort.findByFilters(null, null, null)).thenReturn(List.of(user1, user2));
         when(userResultMapper.domainToResult(user1)).thenReturn(result1);
         when(userResultMapper.domainToResult(user2)).thenReturn(result2);
 
         // Act
-        List<UserResult> results = getUserUseCase.searchUsers(null, null, null, null);
+        List<UserResult> results = getUserUseCase.searchUsers(null, null, null);
 
         // Assert
         assertNotNull(results);
         assertEquals(2, results.size());
-        verify(userRepositoryPort, times(1)).findByFilters(null, null, null, null);
+        verify(userRepositoryPort, times(1)).findByFilters(null, null, null);
     }
 }

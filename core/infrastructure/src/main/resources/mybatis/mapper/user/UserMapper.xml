@@ -15,8 +15,6 @@
         <id property="id" column="user_id"/>
         <result property="leagueId" column="league_id"/>
         <result property="rank" column="position"/>
-        <result property="username" column="username"/>
-        <result property="email" column="email"/>
         <result property="fullName" column="full_name"/>
         <result property="avatarObjectKey" column="object_key"/>
         <result property="totalPoint" column="total_point"/>
@@ -35,8 +33,6 @@
         SELECT leaderboard.user_id,
                leaderboard.league_id,
                leaderboard.position,
-               leaderboard.username,
-               leaderboard.email,
                leaderboard.full_name,
 
                leaderboard.object_key,
@@ -52,8 +48,6 @@
             )             AS position,
                      u.id AS user_id,
                      l.id AS league_id,
-                     u.username,
-                     u.email,
                      u.full_name,
                      f.object_key,
                      ulp.total_point
@@ -100,8 +94,6 @@
                      )        AS position,
                          u.id AS user_id,
                          `user_current_league`.league_id,
-                         u.username,
-                         u.email,
                          u.full_name,
                          f.object_key,
                          ulp.total_point

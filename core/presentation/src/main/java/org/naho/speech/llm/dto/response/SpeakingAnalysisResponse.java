@@ -7,4 +7,5 @@ public record SpeakingAnalysisResponse(
         Double overallScore,
         FileResponse audioFile,
         SpeakingAnalysisReportResponse report
-) {}
+) {
+}

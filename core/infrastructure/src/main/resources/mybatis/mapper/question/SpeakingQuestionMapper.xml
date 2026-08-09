@@ -25,12 +25,12 @@
         <!--                AND q.user_id = #{query.creatorId}-->
         <!--            </if>-->
         <!--            <if test="query.isSystemCreated != null and query.isSystemCreated == true">-->
-        <!--                AND q.user_id IN (SELECT u.id FROM users u JOIN users_roles ur ON u.id = ur.user_id JOIN roles r ON-->
-        <!--                ur.role_id = r.id WHERE r.role_name IN ('ADMIN', 'CONTENT_MANAGER'))-->
+        <!--                AND q.user_id IN (SELECT u.id FROM users u JOIN roles r ON-->
+        <!--                u.role_id = r.id WHERE r.role_name IN ('ADMIN', 'CONTENT_MANAGER'))-->
         <!--            </if>-->
         <!--            <if test="query.isSystemCreated != null and query.isSystemCreated == false">-->
-        <!--                AND q.user_id NOT IN (SELECT u.id FROM users u JOIN users_roles ur ON u.id = ur.user_id JOIN roles r ON-->
-        <!--                ur.role_id = r.id WHERE r.role_name IN ('ADMIN', 'CONTENT_MANAGER'))-->
+        <!--                AND q.user_id NOT IN (SELECT u.id FROM users u JOIN roles r ON-->
+        <!--                u.role_id = r.id WHERE r.role_name IN ('ADMIN', 'CONTENT_MANAGER'))-->
         <!--            </if>-->
         <!--            <if test="query.statuses != null and query.statuses.size() > 0">-->
         <!--                AND q.status IN-->
