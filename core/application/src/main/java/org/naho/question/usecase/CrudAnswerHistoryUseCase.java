@@ -226,20 +226,20 @@ public class CrudAnswerHistoryUseCase implements CrudAnswerHistoryInputPort {
                 }
 
                 String furigana = "";
-                try {
-                    var furiganaText = furiganaGenerationPort.generateFurigana(wordText);
-                    if (furiganaText != null && furiganaText.getTokens() != null) {
-                        StringBuilder sb = new StringBuilder();
-                        for (var token : furiganaText.getTokens()) {
-                            sb.append(
-                                    token.getFurigana() != null && !token.getFurigana().isBlank() ? token.getFurigana()
-                                            : token.getKanji());
-                        }
-                        furigana = sb.toString();
-                    }
-                } catch (Exception e) {
-                    furigana = wordText;
-                }
+//                try {
+//                    var furiganaText = furiganaGenerationPort.generateFurigana(wordText);
+//                    if (furiganaText != null && furiganaText.getTokens() != null) {
+//                        StringBuilder sb = new StringBuilder();
+//                        for (var token : furiganaText.getTokens()) {
+//                            sb.append(
+//                                    token.getFurigana() != null && !token.getFurigana().isBlank() ? token.getFurigana()
+//                                            : token.getKanji());
+//                        }
+//                        furigana = sb.toString();
+//                    }
+//                } catch (Exception e) {
+//                    furigana = wordText;
+//                }
 
                 String note = wordNotes.get(wordText.toLowerCase());
                 if (note == null || note.isBlank()) {
