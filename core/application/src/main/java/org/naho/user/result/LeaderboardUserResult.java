@@ -7,8 +7,6 @@ public class LeaderboardUserResult {
     private Long id;
     private Long leagueId;
     private Integer rank;
-    private String username;
-    private String email;
     private String fullName;
     private String avatarObjectKey;
     private List<String> authAvatarUrl = new ArrayList<String>();
@@ -17,12 +15,10 @@ public class LeaderboardUserResult {
     public LeaderboardUserResult() {
     }
 
-    public LeaderboardUserResult(Long id, Long leagueId, Integer rank, String username, String email, String fullName, String avatarObjectKey, List<String> authAvatarUrl, Double totalPoint) {
+    public LeaderboardUserResult(Long id, Long leagueId, Integer rank, String fullName, String avatarObjectKey, List<String> authAvatarUrl, Double totalPoint) {
         this.id = id;
         this.leagueId = leagueId;
         this.rank = rank;
-        this.username = username;
-        this.email = email;
         this.fullName = fullName;
         this.avatarObjectKey = avatarObjectKey;
         this.authAvatarUrl = authAvatarUrl;
@@ -51,22 +47,6 @@ public class LeaderboardUserResult {
 
     public void setRank(Integer rank) {
         this.rank = rank;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getFullName() {

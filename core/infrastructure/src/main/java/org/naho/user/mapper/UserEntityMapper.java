@@ -36,7 +36,7 @@ import org.naho.user.model.User;
                 FileIdMapper.class
         })
 public interface UserEntityMapper {
-    @Mapping(target = "roleIds", source = "roles")
+    @Mapping(target = "roleId", source = "role")
     @Mapping(target = "userSessionIds", source = "userSessions")
     @Mapping(target = "authProviderIds", source = "authProviders")
     @Mapping(target = "speakingQuestionIds", source = "speakingQuestions")
@@ -51,7 +51,7 @@ public interface UserEntityMapper {
     @Mapping(target = "isEmailVerified", source = "emailVerified")
     User entityToDomain(UserEntity entity);
 
-    @Mapping(target = "roles", source = "roleIds")
+    @Mapping(target = "role", source = "roleId")
     @Mapping(target = "jlptLevel", source = "jlptLevel")
     @Mapping(target = "userLearningProgress", source = "userLearningProgressId")
     @Mapping(target = "userSessions", source = "userSessionIds")

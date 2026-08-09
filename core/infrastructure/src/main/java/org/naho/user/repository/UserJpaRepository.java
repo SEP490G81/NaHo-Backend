@@ -29,7 +29,7 @@ public interface UserJpaRepository extends BaseJpaRepository<UserEntity> {
     Optional<UserEntity> findByIdForUpdate(@Param("userId") Long userId);
 
     @Query("SELECT DISTINCT u FROM UserEntity u " +
-            "LEFT JOIN u.roles r " +
+            "LEFT JOIN u.role r " +
             "WHERE (:userNameOrEmail IS NULL OR :userNameOrEmail = '' " +
             "       OR LOWER(u.username) LIKE :userNameOrEmail " +
             "       OR LOWER(u.email) LIKE :userNameOrEmail) " +

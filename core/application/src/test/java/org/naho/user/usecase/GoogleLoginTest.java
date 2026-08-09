@@ -35,7 +35,6 @@ import org.naho.user.valueobject.Email;
 import org.naho.user.valueobject.Username;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -102,7 +101,7 @@ class GoogleLoginTest {
                 .email(Email.of("googleuser@example.com"))
                 .status(UserStatus.ACTIVE)
                 .isEmailVerified(true)
-                .roleIds(List.of(1L))
+                .roleId(1L)
                 .build();
 
         Instant now = Instant.now();
@@ -167,7 +166,7 @@ class GoogleLoginTest {
                 .fullName("New Google User")
                 .status(UserStatus.ACTIVE)
                 .isEmailVerified(true)
-                .roleIds(List.of(2L))
+                .roleId(2L)
                 .build();
 
         Instant now = Instant.now();
@@ -233,7 +232,7 @@ class GoogleLoginTest {
                 .fullName("Existing User")
                 .status(UserStatus.ACTIVE)
                 .isEmailVerified(true)
-                .roleIds(List.of(2L))
+                .roleId(2L)
                 .build();
 
         Instant now = Instant.now();
@@ -329,7 +328,7 @@ class GoogleLoginTest {
                 .fullName("Inactive User")
                 .status(UserStatus.UNACTIVE)
                 .isEmailVerified(true)
-                .roleIds(List.of(1L))
+                .roleId(1L)
                 .build();
 
         when(userRepositoryPort.findByProviderUserIdAndProviderName("google-sub-inactive", AuthProviderName.GOOGLE))
@@ -366,7 +365,7 @@ class GoogleLoginTest {
                 .email(Email.of("googleuser@example.com"))
                 .status(UserStatus.ACTIVE)
                 .isEmailVerified(true)
-                .roleIds(List.of(1L))
+                .roleId(1L)
                 .build();
 
         Instant now = Instant.now();

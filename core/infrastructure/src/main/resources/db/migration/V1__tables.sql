@@ -627,21 +627,16 @@ CREATE TABLE users
     username                  VARCHAR(36)           NULL,
     email                     VARCHAR(255)          NOT NULL,
     hash_password             VARCHAR(255)          NULL,
-    full_name                 VARCHAR(255)          NULL,
+    full_name                 VARCHAR(255)          NOT NULL,
     is_email_verified         BIT(1)                NOT NULL,
     gender                    VARCHAR(10)           NULL,
     dob                       date                  NULL,
     jlpt_level                VARCHAR(2)            NULL,
     status                    VARCHAR(20)           NOT NULL,
+    role_id                   BIGINT                NULL,
     user_learning_progress_id BIGINT                NULL,
     avatar_file_id            BIGINT                NULL,
     CONSTRAINT pk_users PRIMARY KEY (id)
-);
-
-CREATE TABLE users_roles
-(
-    role_id BIGINT NOT NULL,
-    user_id BIGINT NOT NULL
 );
 
 CREATE TABLE vocabularies
@@ -882,6 +877,9 @@ ALTER TABLE users
     ADD CONSTRAINT FK_USERS_ON_AVATAR_FILE FOREIGN KEY (avatar_file_id) REFERENCES files (id);
 
 ALTER TABLE users
+    ADD CONSTRAINT FK_USERS_ON_ROLE FOREIGN KEY (role_id) REFERENCES roles (id);
+
+ALTER TABLE users
     ADD CONSTRAINT FK_USERS_ON_USER_LEARNING_PROGRESS FOREIGN KEY (user_learning_progress_id) REFERENCES user_learning_progresses (id);
 
 ALTER TABLE user_daily_attendances
@@ -940,12 +938,6 @@ ALTER TABLE speaking_questions_vocabularies
 
 ALTER TABLE speaking_questions_vocabularies
     ADD CONSTRAINT fk_spequevoc_on_vocabulary_entity FOREIGN KEY (vocabulary_id) REFERENCES vocabularies (id);
-
-ALTER TABLE users_roles
-    ADD CONSTRAINT fk_userol_on_role_entity FOREIGN KEY (role_id) REFERENCES roles (id);
-
-ALTER TABLE users_roles
-    ADD CONSTRAINT fk_userol_on_user_entity FOREIGN KEY (user_id) REFERENCES users (id);
 
 ALTER TABLE vocabulary_questions_vocabularies
     ADD CONSTRAINT fk_vocquevoc_on_vocabulary_entity FOREIGN KEY (vocabulary_id) REFERENCES vocabularies (id);

@@ -29,7 +29,6 @@ import org.naho.user.valueobject.Email;
 import org.naho.user.valueobject.Username;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -95,7 +94,7 @@ class CredentialsLoginTest {
                 .hashPassword("$2a$10$hashedPassword")
                 .status(UserStatus.ACTIVE)
                 .isEmailVerified(true)
-                .roleIds(List.of(1L))
+                .roleId(1L)
                 .build();
 
         Instant now = Instant.now();

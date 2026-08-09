@@ -433,12 +433,9 @@ VALUES
  'ACTIVE', 100, NULL);
 
 -- 3. Assign role LEARNER to all seeded users
-INSERT INTO users_roles (user_id, role_id)
-SELECT u.id, r.id
-FROM users u
-         CROSS JOIN roles r
-WHERE u.id BETWEEN 2 AND 101
-  AND r.role_name = 'LEARNER';
+UPDATE users
+SET role_id = (SELECT id FROM roles WHERE role_name = 'LEARNER')
+WHERE id BETWEEN 2 AND 101;
 
 SET
     FOREIGN_KEY_CHECKS = 1;

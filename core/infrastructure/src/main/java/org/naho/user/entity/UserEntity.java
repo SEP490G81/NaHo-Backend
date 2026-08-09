@@ -41,7 +41,7 @@ public class UserEntity extends BaseEntity {
     @Column(name = "hash_password")
     String hashPassword;
 
-    @Column(name = "full_name")
+    @Column(name = "full_name", nullable = false)
     String fullName;
 
     @Column(name = "is_email_verified", nullable = false)
@@ -62,11 +62,9 @@ public class UserEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     UserStatus status;
 
-    @ManyToMany
-    @JoinTable(
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
-    List<RoleEntity> roles;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_id")
+    RoleEntity role;
 
     @OneToMany(mappedBy = "user")
     List<UserSessionEntity> userSessions;

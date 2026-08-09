@@ -8,6 +8,7 @@ public final class LeagueDetailMessageKey {
     public static final String LEAGUE_MIN_POINT_GREATER_THAN_OR_EQUAL_TO_MAX_POINT = "league.min_point.greater_than_or_equal_to_max_point";
     public static final String LEAGUE_GET_ALL_SUCCESS = "league.get.all.success";
     public static final String LEAGUE_GET_LEADERBOARD_SUCCESS = "league.get.leaderboard.success";
+    public static final String LEAGUE_GET_USER_LEADERBOARD_SUCCESS = "league.get.user_leaderboard.success";
 
     private LeagueDetailMessageKey() {
     }

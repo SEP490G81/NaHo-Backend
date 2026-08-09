@@ -12,7 +12,7 @@ import java.util.List;
 public class User {
 
     private final Long id;
-    private final List<Long> roleIds;
+    private final Long roleId;
     private final List<Long> userSessionIds;
     private final List<Long> authProviderIds;
     private final List<Long> speakingQuestionIds;
@@ -36,7 +36,7 @@ public class User {
 
     private User(Builder builder) {
         this.id = builder.id;
-        this.roleIds = builder.roleIds;
+        this.roleId = builder.roleId;
         this.userSessionIds = builder.userSessionIds;
         this.authProviderIds = builder.authProviderIds;
         this.speakingQuestionIds = builder.speakingQuestionIds;
@@ -59,7 +59,7 @@ public class User {
         this.isEmailVerified = builder.isEmailVerified;
     }
 
-    public static User registerNewUser(String rawUsername, String hashPassword, String rawEmail, List<Long> roleIds) {
+    public static User registerNewUser(String rawUsername, String hashPassword, String rawEmail, Long roleId) {
         return User.builder()
                 .username(Username.of(rawUsername))
                 .email(Email.of(rawEmail))
@@ -67,7 +67,7 @@ public class User {
                 .status(UserStatus.ACTIVE)
                 .jlptLevel(JLPTLevel.N5)
                 .isEmailVerified(false)
-                .roleIds(roleIds)
+                .roleId(roleId)
                 .build();
     }
 
@@ -90,7 +90,7 @@ public class User {
     public Builder toBuilder() {
         return builder()
                 .id(id)
-                .roleIds(roleIds)
+                .roleId(roleId)
                 .userSessionIds(userSessionIds)
                 .authProviderIds(authProviderIds)
                 .speakingQuestionIds(speakingQuestionIds)
@@ -116,8 +116,8 @@ public class User {
         return id;
     }
 
-    public List<Long> getRoleIds() {
-        return roleIds;
+    public Long getRoleId() {
+        return roleId;
     }
 
     public List<Long> getUserSessionIds() {
@@ -231,7 +231,7 @@ public class User {
     public static final class Builder {
 
         private Long id;
-        private List<Long> roleIds;
+        private Long roleId;
         private List<Long> userSessionIds;
         private List<Long> authProviderIds;
         private List<Long> speakingQuestionIds;
@@ -264,8 +264,8 @@ public class User {
             return this;
         }
 
-        public Builder roleIds(List<Long> roleIds) {
-            this.roleIds = roleIds;
+        public Builder roleId(Long roleId) {
+            this.roleId = roleId;
             return this;
         }
 
