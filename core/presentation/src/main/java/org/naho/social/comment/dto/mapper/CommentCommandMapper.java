@@ -18,22 +18,12 @@ public class CommentCommandMapper {
         );
     }
 
-    public CommentCreateCommand requestToCommand(CreateCommentRequest createCommentRequest) {
-        return requestToCommand(createCommentRequest, createCommentRequest.userId());
-    }
-
     public CommentUpdateCommand requestToUpdateCommand(UpdateCommentRequest updateCommentRequest, Long userId) {
         return new CommentUpdateCommand(
                 updateCommentRequest.commentId(),
-                userId != null ? userId : updateCommentRequest.userId(),
-                updateCommentRequest.questionId(),
-                updateCommentRequest.newContent(),
-                updateCommentRequest.parentId()
+                userId,
+                updateCommentRequest.newContent()
         );
-    }
-
-    public CommentUpdateCommand requestToUpdateCommand(UpdateCommentRequest updateCommentRequest) {
-        return requestToUpdateCommand(updateCommentRequest, updateCommentRequest.userId());
     }
 
     public CommentDeleteCommand requestToDeleteCommand(DeleteCommandRequest deleteCommandRequest, Long userId, boolean isAdmin) {
@@ -42,13 +32,5 @@ public class CommentCommandMapper {
                 userId,
                 isAdmin
         );
-    }
-
-    public CommentDeleteCommand requestToDeleteCommand(DeleteCommandRequest deleteCommandRequest, Long userId) {
-        return requestToDeleteCommand(deleteCommandRequest, userId, false);
-    }
-
-    public CommentDeleteCommand requestToDeleteCommand(DeleteCommandRequest deleteCommandRequest) {
-        return requestToDeleteCommand(deleteCommandRequest, null, false);
     }
 }

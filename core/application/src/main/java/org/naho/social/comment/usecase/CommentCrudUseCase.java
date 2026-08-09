@@ -59,32 +59,38 @@ public class CommentCrudUseCase implements CommentCrudInputPort {
 
     @Override
     public CommentResult createComment(CommentCreateCommand command) {
+        Comment parentComment = null;
+        if (command.parentId() != null) {
+            parentComment = commentRepositoryPort.findByCommentId(command.parentId())
+                    .orElseThrow(() -> new ApplicationException(
+                            CommentErrorCode.COMMENT_NOT_FOUND,
+                            CommentDetailMessageKey.COMMENT_ID_NOT_FOUND,
+                            command.parentId()
+                    ));
+        }
+
         Comment newComment = commentDomainMapper.commandToModel(command);
         Comment commentSaved = commentRepositoryPort.save(newComment);
 
-        if (commentSaved.getParentId() != null) {
-            commentRepositoryPort.findByCommentId(commentSaved.getParentId()).ifPresent(parentComment -> {
-                if (!parentComment.getUserId().equals(commentSaved.getUserId())) {
-                    String actorName = userRepositoryPort.findById(commentSaved.getUserId())
-                            .map(u -> u.getUsername().getValue())
-                            .orElse("Một người dùng");
+        if (parentComment != null && !parentComment.getUserId().equals(commentSaved.getUserId())) {
+            String actorName = userRepositoryPort.findById(commentSaved.getUserId())
+                    .map(u -> u.getUsername().getValue())
+                    .orElse("Một người dùng");
 
-                    String metadata = "{\"questionId\": " + commentSaved.getQuestionId() + ", \"commentId\": " + commentSaved.getId() + "}";
-                    String targetUrl = learningPathNodeRepositoryPort.getFrontendUrlPath(commentSaved.getQuestionId())
-                            .map(path -> path + "#comment-" + commentSaved.getId())
-                            .orElse("/speaking-questions/" + commentSaved.getQuestionId() + "#comment-" + commentSaved.getId());
+            String metadata = "{\"questionId\": " + commentSaved.getQuestionId() + ", \"commentId\": " + commentSaved.getId() + "}";
+            String targetUrl = learningPathNodeRepositoryPort.getFrontendUrlPath(commentSaved.getQuestionId())
+                    .map(path -> path + "#comment-" + commentSaved.getId())
+                    .orElse("/speaking-questions/" + commentSaved.getQuestionId() + "#comment-" + commentSaved.getId());
 
-                    eventPublisherPort.publish(new SendNotificationEvent(
-                            this,
-                            parentComment.getUserId(),
-                            NotificationType.SOCIAL,
-                            "Có người trả lời bình luận của bạn",
-                            actorName + " vừa trả lời bình luận của bạn. Nhấn vào để xem chi tiết.",
-                            targetUrl,
-                            metadata
-                    ));
-                }
-            });
+            eventPublisherPort.publish(new SendNotificationEvent(
+                    this,
+                    parentComment.getUserId(),
+                    NotificationType.SOCIAL,
+                    "Có người trả lời bình luận của bạn",
+                    actorName + " vừa trả lời bình luận của bạn. Nhấn vào để xem chi tiết.",
+                    targetUrl,
+                    metadata
+            ));
         }
 
         return commentResultMapper.domainToResult(commentSaved);
@@ -92,15 +98,21 @@ public class CommentCrudUseCase implements CommentCrudInputPort {
 
     @Override
     public CommentResult updateComment(CommentUpdateCommand command) {
-        Optional<Comment> commentOpt = commentRepositoryPort.findByCommentId(command.commentId());
-        if (commentOpt.isEmpty()) {
+        Comment existing = commentRepositoryPort.findByCommentId(command.commentId())
+                .orElseThrow(() -> new ApplicationException(
+                        CommentErrorCode.COMMENT_NOT_FOUND,
+                        CommentDetailMessageKey.COMMENT_ID_NOT_FOUND,
+                        command.commentId()
+                ));
+
+        boolean isOwner = command.userId() != null && command.userId().equals(existing.getUserId());
+        if (!isOwner) {
             throw new ApplicationException(
-                    CommentErrorCode.COMMENT_NOT_FOUND,
-                    CommentDetailMessageKey.COMMENT_ID_NOT_FOUND,
-                    command.commentId()
+                    CommentErrorCode.COMMENT_NOT_AUTHORIZED,
+                    CommentDetailMessageKey.COMMENT_DELETE_FORBIDDEN
             );
         }
-        Comment existing = commentOpt.get();
+
         Comment commentToSave = Comment.builder()
                 .id(existing.getId())
                 .userId(existing.getUserId())
@@ -115,7 +127,7 @@ public class CommentCrudUseCase implements CommentCrudInputPort {
     }
 
     @Override
-    public CommentResult deleteComment(CommentDeleteCommand command) {
+    public void deleteComment(CommentDeleteCommand command) {
         Comment comment = commentRepositoryPort.findByCommentId(command.commentId())
                 .orElseThrow(() -> new ApplicationException(
                         CommentErrorCode.COMMENT_NOT_FOUND,
@@ -132,6 +144,5 @@ public class CommentCrudUseCase implements CommentCrudInputPort {
         }
 
         commentRepositoryPort.delete(comment);
-        return commentResultMapper.domainToResult(comment);
     }
 }

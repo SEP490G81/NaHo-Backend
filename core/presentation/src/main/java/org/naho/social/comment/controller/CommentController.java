@@ -69,10 +69,11 @@ public class CommentController {
     }
 
     @PutMapping
+    @ApiResponseMessage(message = CommentDetailMessageKey.COMMENT_UPDATE_SUCCESS)
     public ResponseEntity<CommentResponse> updateCommentRest(
             @Valid @RequestBody UpdateCommentRequest updateCommentRequest,
             @AuthenticationPrincipal AccessTokenPayload payload) {
-        Long userId = payload != null ? payload.userId() : updateCommentRequest.userId();
+        Long userId = payload != null ? payload.userId() : null;
         CommentUpdateCommand command = commentCommandMapper.requestToUpdateCommand(updateCommentRequest, userId);
         CommentResult commentResult = commentCrudInputPort.updateComment(command);
         CommentResponse response = commentResponseMapper.resultToResponse(commentResult);
@@ -81,16 +82,16 @@ public class CommentController {
     }
 
     @DeleteMapping
-    public ResponseEntity<CommentResponse> deleteCommentRest(
+    @ApiResponseMessage(message = CommentDetailMessageKey.COMMENT_DELETE_SUCCESS)
+    public ResponseEntity<Void> deleteCommentRest(
             @Valid @RequestBody DeleteCommandRequest deleteCommandRequest,
             @AuthenticationPrincipal AccessTokenPayload payload) {
         Long userId = payload != null ? payload.userId() : null;
         boolean isAdmin = checkIsAdmin(userId);
         CommentDeleteCommand command = commentCommandMapper.requestToDeleteCommand(deleteCommandRequest, userId, isAdmin);
-        CommentResult commentResult = commentCrudInputPort.deleteComment(command);
-        CommentResponse response = commentResponseMapper.resultToResponse(commentResult);
-        messagingTemplate.convertAndSend("/topic/comments", response);
-        return ResponseEntity.ok(response);
+        commentCrudInputPort.deleteComment(command);
+        messagingTemplate.convertAndSend("/topic/comments", deleteCommandRequest);
+        return ResponseEntity.ok().build();
     }
 
     @MessageMapping("/comments/create")
@@ -109,7 +110,7 @@ public class CommentController {
     public CommentResponse fixComment(
             @Valid @Payload UpdateCommentRequest updateCommentRequest,
             @AuthenticationPrincipal AccessTokenPayload payload) {
-        Long userId = payload != null ? payload.userId() : updateCommentRequest.userId();
+        Long userId = payload != null ? payload.userId() : null;
         CommentUpdateCommand command = commentCommandMapper.requestToUpdateCommand(updateCommentRequest, userId);
         CommentResult commentResult = commentCrudInputPort.updateComment(command);
         return commentResponseMapper.resultToResponse(commentResult);
@@ -117,14 +118,14 @@ public class CommentController {
 
     @MessageMapping("/comments/delete")
     @SendTo("/topic/comments")
-    public CommentResponse deleteComment(
+    public DeleteCommandRequest deleteComment(
             @Valid @Payload DeleteCommandRequest deleteCommandRequest,
             @AuthenticationPrincipal AccessTokenPayload payload) {
         Long userId = payload != null ? payload.userId() : null;
         boolean isAdmin = checkIsAdmin(userId);
         CommentDeleteCommand command = commentCommandMapper.requestToDeleteCommand(deleteCommandRequest, userId, isAdmin);
-        CommentResult commentResult = commentCrudInputPort.deleteComment(command);
-        return commentResponseMapper.resultToResponse(commentResult);
+        commentCrudInputPort.deleteComment(command);
+        return deleteCommandRequest;
     }
 
     private boolean checkIsAdmin(Long userId) {
