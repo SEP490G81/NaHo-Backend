@@ -1,7 +1,6 @@
 package org.naho.user.model;
 
 import org.naho.user.type.Gender;
-import org.naho.user.type.JLPTLevel;
 import org.naho.user.type.UserStatus;
 import org.naho.user.valueobject.Dob;
 import org.naho.user.valueobject.Email;
@@ -30,7 +29,6 @@ public class User {
     private String fullName;
     private Gender gender;
     private Dob dob;
-    private JLPTLevel jlptLevel;
     private UserStatus status;
     private boolean isEmailVerified;
 
@@ -54,7 +52,6 @@ public class User {
         this.fullName = builder.fullName;
         this.gender = builder.gender;
         this.dob = builder.dob;
-        this.jlptLevel = builder.jlptLevel;
         this.status = builder.status;
         this.isEmailVerified = builder.isEmailVerified;
     }
@@ -65,7 +62,6 @@ public class User {
                 .email(Email.of(rawEmail))
                 .hashPassword(hashPassword)
                 .status(UserStatus.ACTIVE)
-                .jlptLevel(JLPTLevel.N5)
                 .isEmailVerified(false)
                 .roleId(roleId)
                 .build();
@@ -108,7 +104,6 @@ public class User {
                 .fullName(fullName)
                 .gender(gender)
                 .dob(dob)
-                .jlptLevel(jlptLevel)
                 .status(status);
     }
 
@@ -212,13 +207,6 @@ public class User {
         this.dob = dob;
     }
 
-    public JLPTLevel getJlptLevel() {
-        return jlptLevel;
-    }
-
-    public void setJlptLevel(JLPTLevel jlptLevel) {
-        this.jlptLevel = jlptLevel;
-    }
 
     public UserStatus getStatus() {
         return status;
@@ -251,7 +239,6 @@ public class User {
         private String fullName;
         private Gender gender;
         private Dob dob;
-        private JLPTLevel jlptLevel;
 
         private UserStatus status;
         private boolean isEmailVerified;
@@ -354,10 +341,6 @@ public class User {
             return this;
         }
 
-        public Builder jlptLevel(JLPTLevel jlptLevel) {
-            this.jlptLevel = jlptLevel;
-            return this;
-        }
 
         public Builder status(UserStatus status) {
             this.status = status;

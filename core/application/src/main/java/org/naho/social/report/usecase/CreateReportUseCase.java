@@ -90,7 +90,7 @@ public class CreateReportUseCase implements CreateReportInputPort {
         savedReport.setFiles(files);
 
         // Lấy danh sách tất cả Admin thực tế
-        List<org.naho.user.model.User> admins = userRepositoryPort.findByFilters(null, "ADMIN", null, null);
+        List<org.naho.user.model.User> admins = userRepositoryPort.findByFilters(null, "ADMIN", null);
 
         String reporterName = userRepositoryPort.findById(command.userId())
                 .map(u -> u.getUsername().getValue())

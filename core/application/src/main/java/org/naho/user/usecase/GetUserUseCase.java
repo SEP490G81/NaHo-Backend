@@ -41,8 +41,8 @@ public class GetUserUseCase implements GetUserInputPort {
     }
 
     @Override
-    public List<UserResult> searchUsers(String userNameOrEmail, String role, String status, String jlptLevel) {
-        List<User> users = userRepositoryPort.findByFilters(userNameOrEmail, role, status, jlptLevel);
+    public List<UserResult> searchUsers(String userNameOrEmail, String role, String status) {
+        List<User> users = userRepositoryPort.findByFilters(userNameOrEmail, role, status);
         return users.stream().map(userResultMapper::domainToResult).toList();
     }
 

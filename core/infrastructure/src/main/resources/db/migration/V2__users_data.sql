@@ -29,7 +29,6 @@ INSERT INTO users (created_time,
                    full_name,
                    is_email_verified,
                    hash_password,
-                   jlpt_level,
                    status,
                    role_id)
 VALUES (NOW(),
@@ -38,7 +37,6 @@ VALUES (NOW(),
         'Nguyễn Vương Trực',
         b'1',
         '{bcrypt}$2a$10$mLvl6v0NmQ4f5cP6360qnueyzPYTyLizOJDyr7gL2DbAnnFzbK0mq',
-        'N5',
         'ACTIVE',
         (SELECT id
          FROM roles

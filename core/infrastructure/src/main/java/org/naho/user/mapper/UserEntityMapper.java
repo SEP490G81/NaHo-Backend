@@ -52,7 +52,6 @@ public interface UserEntityMapper {
     User entityToDomain(UserEntity entity);
 
     @Mapping(target = "role", source = "roleId")
-    @Mapping(target = "jlptLevel", source = "jlptLevel")
     @Mapping(target = "userLearningProgress", source = "userLearningProgressId")
     @Mapping(target = "userSessions", source = "userSessionIds")
     @Mapping(target = "speakingQuestions", source = "speakingQuestionIds")

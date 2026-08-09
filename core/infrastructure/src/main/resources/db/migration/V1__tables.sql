@@ -631,7 +631,6 @@ CREATE TABLE users
     is_email_verified         BIT(1)                NOT NULL,
     gender                    VARCHAR(10)           NULL,
     dob                       date                  NULL,
-    jlpt_level                VARCHAR(2)            NULL,
     status                    VARCHAR(20)           NOT NULL,
     role_id                   BIGINT                NULL,
     user_learning_progress_id BIGINT                NULL,

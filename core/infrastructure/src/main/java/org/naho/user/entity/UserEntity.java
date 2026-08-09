@@ -15,7 +15,6 @@ import org.naho.shared.persistence.BaseEntity;
 import org.naho.social.report.entity.ReportEntity;
 import org.naho.subscription.entity.UserSubscriptionEntity;
 import org.naho.user.type.Gender;
-import org.naho.user.type.JLPTLevel;
 import org.naho.user.type.UserStatus;
 import org.naho.user.valueobject.Username;
 
@@ -53,10 +52,6 @@ public class UserEntity extends BaseEntity {
     Gender gender;
 
     LocalDate dob; // data of birth
-
-    @Column(name = "jlpt_level", length = 2)
-    @Enumerated(EnumType.STRING)
-    JLPTLevel jlptLevel;
 
     @Column(nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
