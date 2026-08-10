@@ -31,7 +31,7 @@ public record UserQueryCommand(
             );
         }
 
-        if (size < 0 || size > 100) {
+        if (size < 20 || size > 100) {
             throw new ApplicationException(
                     UserErrorCode.USER_SIZE_INVALID,
                     UserDetailMessageKey.USER_SIZE_INVALID
