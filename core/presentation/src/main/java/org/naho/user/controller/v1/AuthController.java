@@ -24,184 +24,167 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private final AuthInputPort authInputPort;
-    private final LoginRequestMapper loginRequestMapper;
-    private final CookieFactory cookieFactory;
-    private final LoginRequestResolver loginRequestResolver;
-    private final VerifyEmailInputPort verifyEmailInputPort;
-    private final ResendOtpInputPort resendOtpInputPort;
-    private final VerifyEmailRequestMapper verifyEmailRequestMapper;
-    private final ResendOtpRequestMapper resendOtpRequestMapper;
-    private final ForgotPasswordInputPort forgotPasswordInputPort;
-    private final ResetPasswordInputPort resetPasswordInputPort;
-    private final ForgotPasswordRequestMapper forgotPasswordRequestMapper;
-    private final ResetPasswordRequestMapper resetPasswordRequestMapper;
-    private final VerifyForgotPasswordOtpInputPort verifyForgotPasswordOtpInputPort;
-    private final VerifyForgotPasswordOtpRequestMapper verifyForgotPasswordOtpRequestMapper;
-    private final ChangePasswordInputPort changePasswordInputPort;
-    private final ChangePasswordRequestMapper changePasswordRequestMapper;
+        private final AuthInputPort authInputPort;
+        private final LoginRequestMapper loginRequestMapper;
+        private final CookieFactory cookieFactory;
+        private final LoginRequestResolver loginRequestResolver;
+        private final VerifyEmailInputPort verifyEmailInputPort;
+        private final ResendOtpInputPort resendOtpInputPort;
+        private final VerifyEmailRequestMapper verifyEmailRequestMapper;
+        private final ResendOtpRequestMapper resendOtpRequestMapper;
+        private final ForgotPasswordInputPort forgotPasswordInputPort;
+        private final ResetPasswordInputPort resetPasswordInputPort;
+        private final ForgotPasswordRequestMapper forgotPasswordRequestMapper;
+        private final ResetPasswordRequestMapper resetPasswordRequestMapper;
+        private final VerifyForgotPasswordOtpInputPort verifyForgotPasswordOtpInputPort;
+        private final VerifyForgotPasswordOtpRequestMapper verifyForgotPasswordOtpRequestMapper;
+        private final ChangePasswordInputPort changePasswordInputPort;
+        private final ChangePasswordRequestMapper changePasswordRequestMapper;
 
-    @ApiResponseMessage(message = UserDetailMessageKey.USER_LOGIN_SUCCESSFULLY)
-    @PostMapping("/login")
-    public ResponseEntity<Void> credentialsLogin(
-            @RequestBody CredentialsLoginRequest request,
-            HttpServletRequest httpServletRequest
-    ) {
-        request.setIpAddress(loginRequestResolver.getIpAddress(httpServletRequest));
-        request.setUserAgent(loginRequestResolver.getUserAgent(httpServletRequest));
+        @ApiResponseMessage(message = UserDetailMessageKey.USER_LOGIN_SUCCESSFULLY)
+        @PostMapping("/login")
+        public ResponseEntity<Void> credentialsLogin(
+                        @RequestBody CredentialsLoginRequest request,
+                        HttpServletRequest httpServletRequest) {
+                request.setIpAddress(loginRequestResolver.getIpAddress(httpServletRequest));
+                request.setUserAgent(loginRequestResolver.getUserAgent(httpServletRequest));
 
-        CredentialsLoginCommand command = loginRequestMapper.requestToCommand(request);
-        LoginResult result = authInputPort.credentialsLogin(command);
+                CredentialsLoginCommand command = loginRequestMapper.requestToCommand(request);
+                LoginResult result = authInputPort.credentialsLogin(command);
 
-        ResponseCookie accessTokenCookie =
-                cookieFactory.createCookieForJWTToken(result.accessToken());
-        ResponseCookie refreshTokenCookie =
-                cookieFactory.createCookieForJWTToken(result.refreshToken());
+                ResponseCookie accessTokenCookie = cookieFactory.createCookieForJWTToken(result.accessToken());
+                ResponseCookie refreshTokenCookie = cookieFactory.createCookieForJWTToken(result.refreshToken());
 
-        return ResponseEntity
-                .ok()
-                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
-                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
-                .build();
-    }
+                return ResponseEntity
+                                .ok()
+                                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
+                                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                                .build();
+        }
 
-    @ApiResponseMessage(message = UserDetailMessageKey.USER_LOGOUT_SUCCESSFULLY)
-    @PostMapping("/logout")
-    public ResponseEntity<Void> logout(
-            @AuthenticationPrincipal AccessTokenPayload payload
-    ) {
-        authInputPort.logout(new LogoutCommand(
-                payload.userId(),
-                payload.userSessionId()
-        ));
+        @ApiResponseMessage(message = UserDetailMessageKey.USER_LOGOUT_SUCCESSFULLY)
+        @PostMapping("/logout")
+        public ResponseEntity<Void> logout(
+                        @AuthenticationPrincipal AccessTokenPayload payload) {
+                authInputPort.logout(new LogoutCommand(
+                                payload.userId(),
+                                payload.userSessionId()));
 
-        ResponseCookie clearAccessTokenCookie =
-                cookieFactory.clearCookieForJWTToken(TokenType.ACCESS_TOKEN_COOKIE_NAME);
+                ResponseCookie clearAccessTokenCookie = cookieFactory
+                                .clearCookieForJWTToken(TokenType.ACCESS_TOKEN_COOKIE_NAME);
 
-        ResponseCookie clearRefreshTokenCookie =
-                cookieFactory.clearCookieForJWTToken(TokenType.REFRESH_TOKEN_COOKIE_NAME);
+                ResponseCookie clearRefreshTokenCookie = cookieFactory
+                                .clearCookieForJWTToken(TokenType.REFRESH_TOKEN_COOKIE_NAME);
 
-        return ResponseEntity
-                .noContent()
-                .header(HttpHeaders.SET_COOKIE, clearAccessTokenCookie.toString())
-                .header(HttpHeaders.SET_COOKIE, clearRefreshTokenCookie.toString())
-                .build();
-    }
+                return ResponseEntity
+                                .noContent()
+                                .header(HttpHeaders.SET_COOKIE, clearAccessTokenCookie.toString())
+                                .header(HttpHeaders.SET_COOKIE, clearRefreshTokenCookie.toString())
+                                .build();
+        }
 
-    @ApiResponseMessage(message = UserDetailMessageKey.USER_LOGOUT_ALL_SUCCESSFULLY)
-    @PostMapping("/logout-all")
-    public ResponseEntity<Void> logoutAllSessions(
-            @AuthenticationPrincipal AccessTokenPayload payload
-    ) {
-        authInputPort.logoutAllSessions(payload.userId());
+        @ApiResponseMessage(message = UserDetailMessageKey.USER_LOGOUT_ALL_SUCCESSFULLY)
+        @PostMapping("/logout-all")
+        public ResponseEntity<Void> logoutAllSessions(
+                        @AuthenticationPrincipal AccessTokenPayload payload) {
+                authInputPort.logoutAllSessions(payload.userId());
 
-        ResponseCookie clearAccessTokenCookie =
-                cookieFactory.clearCookieForJWTToken(TokenType.ACCESS_TOKEN_COOKIE_NAME);
+                ResponseCookie clearAccessTokenCookie = cookieFactory
+                                .clearCookieForJWTToken(TokenType.ACCESS_TOKEN_COOKIE_NAME);
 
-        ResponseCookie clearRefreshTokenCookie =
-                cookieFactory.clearCookieForJWTToken(TokenType.REFRESH_TOKEN_COOKIE_NAME);
+                ResponseCookie clearRefreshTokenCookie = cookieFactory
+                                .clearCookieForJWTToken(TokenType.REFRESH_TOKEN_COOKIE_NAME);
 
-        return ResponseEntity
-                .noContent()
-                .header(HttpHeaders.SET_COOKIE, clearAccessTokenCookie.toString())
-                .header(HttpHeaders.SET_COOKIE, clearRefreshTokenCookie.toString())
-                .build();
-    }
+                return ResponseEntity
+                                .noContent()
+                                .header(HttpHeaders.SET_COOKIE, clearAccessTokenCookie.toString())
+                                .header(HttpHeaders.SET_COOKIE, clearRefreshTokenCookie.toString())
+                                .build();
+        }
 
-    @ApiResponseMessage(message = UserDetailMessageKey.USER_ROTATE_TOKEN_SUCCESSFULLY)
-    @PostMapping("/rotation")
-    public ResponseEntity<Void> rotateToken(
-            @CookieValue(TokenType.REFRESH_TOKEN_COOKIE_NAME) String refreshToken
-    ) {
-        LoginResult result = authInputPort.rotateToken(refreshToken);
+        @ApiResponseMessage(message = UserDetailMessageKey.USER_ROTATE_TOKEN_SUCCESSFULLY)
+        @PostMapping("/rotation")
+        public ResponseEntity<Void> rotateToken(
+                        @CookieValue(TokenType.REFRESH_TOKEN_COOKIE_NAME) String refreshToken) {
+                LoginResult result = authInputPort.rotateToken(refreshToken);
 
-        ResponseCookie accessTokenCookie =
-                cookieFactory.createCookieForJWTToken(result.accessToken());
-        ResponseCookie refreshTokenCookie =
-                cookieFactory.createCookieForJWTToken(result.refreshToken());
+                ResponseCookie accessTokenCookie = cookieFactory.createCookieForJWTToken(result.accessToken());
+                ResponseCookie refreshTokenCookie = cookieFactory.createCookieForJWTToken(result.refreshToken());
 
-        return ResponseEntity
-                .ok()
-                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
-                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
-                .build();
-    }
+                return ResponseEntity
+                                .ok()
+                                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
+                                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                                .build();
+        }
 
-    @ApiResponseMessage(message = UserDetailMessageKey.USER_EMAIL_VERIFIED_SUCCESSFULLY)
-    @PostMapping("/verify-email")
-    public ResponseEntity<Void> verifyEmail(
-            @Valid @RequestBody VerifyEmailRequest request
-    ) {
-        VerifyEmailCommand command = verifyEmailRequestMapper.toCommand(request);
-        LoginResult result = verifyEmailInputPort.verifyEmail(command);
+        @ApiResponseMessage(message = UserDetailMessageKey.USER_EMAIL_VERIFIED_SUCCESSFULLY)
+        @PostMapping("/verify-email")
+        public ResponseEntity<Void> verifyEmail(
+                        @Valid @RequestBody VerifyEmailRequest request) {
+                VerifyEmailCommand command = verifyEmailRequestMapper.toCommand(request);
+                LoginResult result = verifyEmailInputPort.verifyEmail(command);
 
-        ResponseCookie accessTokenCookie =
-                cookieFactory.createCookieForJWTToken(result.accessToken());
-        ResponseCookie refreshTokenCookie =
-                cookieFactory.createCookieForJWTToken(result.refreshToken());
+                ResponseCookie accessTokenCookie = cookieFactory.createCookieForJWTToken(result.accessToken());
+                ResponseCookie refreshTokenCookie = cookieFactory.createCookieForJWTToken(result.refreshToken());
 
-        return ResponseEntity
-                .ok()
-                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
-                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
-                .build();
-    }
+                return ResponseEntity
+                                .ok()
+                                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
+                                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                                .build();
+        }
 
-    @ApiResponseMessage(message = UserDetailMessageKey.USER_OTP_RESENT_SUCCESSFULLY)
-    @PostMapping("/resend-otp")
-    public ResponseEntity<Void> resendOtp(
-            @Valid @RequestBody ResendOtpRequest request
-    ) {
-        ResendOtpCommand command = resendOtpRequestMapper.toCommand(request);
-        resendOtpInputPort.resendOtp(command);
-        return ResponseEntity.ok().build();
-    }
+        @ApiResponseMessage(message = UserDetailMessageKey.USER_OTP_RESENT_SUCCESSFULLY)
+        @PostMapping("/resend-otp")
+        public ResponseEntity<Void> resendOtp(
+                        @Valid @RequestBody ResendOtpRequest request) {
+                ResendOtpCommand command = resendOtpRequestMapper.toCommand(request);
+                resendOtpInputPort.resendOtp(command);
+                return ResponseEntity.ok().build();
+        }
 
-    @ApiResponseMessage(message = UserDetailMessageKey.USER_FORGOT_PASSWORD_EMAIL_SENT)
-    @PostMapping("/forgot-password")
-    public ResponseEntity<Void> forgotPassword(
-            @Valid @RequestBody ForgotPasswordRequest request
-    ) {
-        ForgotPasswordCommand command = forgotPasswordRequestMapper.requestToCommand(request);
-        forgotPasswordInputPort.forgotPassword(command);
-        return ResponseEntity.ok().build();
-    }
+        @ApiResponseMessage(message = UserDetailMessageKey.USER_FORGOT_PASSWORD_EMAIL_SENT)
+        @PostMapping("/forgot-password")
+        public ResponseEntity<Void> forgotPassword(
+                        @Valid @RequestBody ForgotPasswordRequest request) {
+                ForgotPasswordCommand command = forgotPasswordRequestMapper.requestToCommand(request);
+                forgotPasswordInputPort.forgotPassword(command);
+                return ResponseEntity.ok().build();
+        }
 
-    @ApiResponseMessage(message = UserDetailMessageKey.USER_OTP_VERIFIED_SUCCESSFULLY)
-    @PostMapping("/forgot-password-otp")
-    public ResponseEntity<java.util.Map<String, String>> verifyForgotPasswordOtp(
-            @Valid @RequestBody VerifyForgotPasswordOtpRequest request
-    ) {
-        VerifyForgotPasswordOtpCommand command = verifyForgotPasswordOtpRequestMapper.toCommand(request);
-        String resetToken = verifyForgotPasswordOtpInputPort.verifyOtp(command);
-        return ResponseEntity.ok(java.util.Map.of("resetToken", resetToken));
-    }
+        @ApiResponseMessage(message = UserDetailMessageKey.USER_OTP_VERIFIED_SUCCESSFULLY)
+        @PostMapping("/forgot-password-otp")
+        public ResponseEntity<java.util.Map<String, String>> verifyForgotPasswordOtp(
+                        @Valid @RequestBody VerifyForgotPasswordOtpRequest request) {
+                VerifyForgotPasswordOtpCommand command = verifyForgotPasswordOtpRequestMapper.toCommand(request);
+                String resetToken = verifyForgotPasswordOtpInputPort.verifyOtp(command);
+                return ResponseEntity.ok(java.util.Map.of("resetToken", resetToken));
+        }
 
-    @ApiResponseMessage(message = UserDetailMessageKey.USER_PASSWORD_RESET_SUCCESSFULLY)
-    @PostMapping("/reset-password")
-    public ResponseEntity<Void> resetPassword(
-            @Valid @RequestBody ResetPasswordRequest request
-    ) {
-        ResetPasswordCommand command = resetPasswordRequestMapper.toCommand(request);
-        resetPasswordInputPort.resetPassword(command);
-        return ResponseEntity.ok().build();
-    }
+        @ApiResponseMessage(message = UserDetailMessageKey.USER_PASSWORD_RESET_SUCCESSFULLY)
+        @PostMapping("/reset-password")
+        public ResponseEntity<Void> resetPassword(
+                        @Valid @RequestBody ResetPasswordRequest request) {
+                ResetPasswordCommand command = resetPasswordRequestMapper.toCommand(request);
+                resetPasswordInputPort.resetPassword(command);
+                return ResponseEntity.ok().build();
+        }
 
-    /**
-     * Đổi mật khẩu (khi người dùng nhớ mật khẩu cũ)
-     *
-     * @param payload chứa userId của người đăng nhập (lấy từ JWT token)
-     * @param request bao gồm old password và password mới
-     * @return Void
-     */
-    @ApiResponseMessage(message = UserDetailMessageKey.USER_CHANGE_PASSWORD_SUCCESSFULLY)
-    @PostMapping("/change-password")
-    public ResponseEntity<Void> changePassword(
-            @AuthenticationPrincipal AccessTokenPayload payload,
-            @Valid @RequestBody ChangePasswordRequest request
-    ) {
-        ChangePasswordCommand command = changePasswordRequestMapper.toCommand(payload.userId(), request);
-        changePasswordInputPort.changePassword(command);
-        return ResponseEntity.ok().build();
-    }
+        /**
+         * Đổi mật khẩu (khi người dùng nhớ mật khẩu cũ)
+         *
+         * @param payload chứa userId của người đăng nhập (lấy từ JWT token)
+         * @param request bao gồm old password và password mới
+         * @return Void
+         */
+        @ApiResponseMessage(message = UserDetailMessageKey.USER_CHANGE_PASSWORD_SUCCESSFULLY)
+        @PostMapping("/change-password")
+        public ResponseEntity<Void> changePassword(
+                        @AuthenticationPrincipal AccessTokenPayload payload,
+                        @Valid @RequestBody ChangePasswordRequest request) {
+                ChangePasswordCommand command = changePasswordRequestMapper.toCommand(payload.userId(), request);
+                changePasswordInputPort.changePassword(command);
+                return ResponseEntity.ok().build();
+        }
 }

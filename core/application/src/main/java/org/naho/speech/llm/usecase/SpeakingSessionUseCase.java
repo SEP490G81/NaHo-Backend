@@ -23,6 +23,7 @@ import org.naho.speech.llm.port.out.SpeechToTextPort;
 import org.naho.speech.llm.result.*;
 
 
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -126,6 +127,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     @Override
     public ChatResult sendMessage(SendMessageWithSessionCommand command) {
         String sessionId = command.sessionId();
+        ensureSessionLoadedInMemory(sessionId);
         String userMessage = command.userMessage();
         sessionStorePort.addMessage(sessionId, "user", userMessage);
 
@@ -163,6 +165,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     @Override
     public void sendMessageStream(SendMessageWithSessionCommand command, Consumer<String> onToken) {
         String sessionId = command.sessionId();
+        ensureSessionLoadedInMemory(sessionId);
         String userMessage = command.userMessage();
         sessionStorePort.addMessage(sessionId, "user", userMessage);
 
@@ -297,6 +300,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     @Override
     public AudioChatResult sendAudioMessage(SendAudioMessageCommand command) {
         String sessionId = command.sessionId();
+        ensureSessionLoadedInMemory(sessionId);
 
         SpeechToTextResult sttResult = speechToTextPort.transcribeAndAssess(
                 command.audioBytes(), command.referenceText());
@@ -359,7 +363,11 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     public ActiveSpeakingSessionResult getActiveSession(Long userId, Integer personaId) {
         if (userId == null) return null;
         Long pId = (personaId != null && personaId > 0) ? personaId.longValue() : null;
-        return speakingSessionRepositoryPort.findActiveSession(userId, pId).orElse(null);
+        ActiveSpeakingSessionResult activeSession = speakingSessionRepositoryPort.findActiveSession(userId, pId).orElse(null);
+        if (activeSession != null) {
+            ensureSessionLoadedInMemory(activeSession.sessionCode());
+        }
+        return activeSession;
     }
 
     @Override
@@ -396,7 +404,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                         "Không tìm thấy phiên nói chuyện dở dang để tiếp tục."
                 ));
 
-        List<Map<String, String>> historyMessages = new java.util.ArrayList<>();
+        List<Map<String, String>> historyMessages = new ArrayList<>();
         String lastAssistantReply = "";
 
         if (activeSession.messages() != null) {
@@ -449,6 +457,50 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             System.out.println("[SpeakingSession] TTS failed for session " + sessionId + ": " + e.getMessage());
             return null;
         }
+    }
+
+    private void ensureSessionLoadedInMemory(String sessionCode) {
+        if (sessionCode == null || sessionCode.isBlank()) {
+            return;
+        }
+
+        if (sessionStorePort.hasSession(sessionCode)) {
+            return;
+        }
+
+        ActiveSpeakingSessionResult activeSession = speakingSessionRepositoryPort.findActiveSessionByCode(sessionCode, null)
+                .orElse(null);
+
+        if (activeSession == null) {
+            return;
+        }
+
+        List<Map<String, String>> historyMessages = new ArrayList<>();
+        if (activeSession.messages() != null) {
+            for (var msg : activeSession.messages()) {
+                historyMessages.add(Map.of("role", msg.senderType(), "content", msg.content()));
+            }
+        }
+
+        StringBuilder fullTranscript = new StringBuilder();
+        if (activeSession.messages() != null) {
+            for (var msg : activeSession.messages()) {
+                fullTranscript.append("[Turn]\n").append(msg.senderType()).append(": ").append(msg.content()).append("\n");
+            }
+        }
+
+        sessionStorePort.restoreSession(
+                sessionCode,
+                null,
+                activeSession.personaId(),
+                activeSession.topic(),
+                activeSession.marugotoLevel(),
+                activeSession.formalityLevel(),
+                fullTranscript.toString(),
+                activeSession.totalTurns(),
+                activeSession.startedAt(),
+                historyMessages
+        );
     }
 
     private record ParsedAiReply(
