@@ -17,6 +17,7 @@ import org.naho.social.report.model.Report;
 import org.naho.social.report.port.in.CreateReportInputPort;
 import org.naho.social.report.port.out.ReportRepositoryPort;
 import org.naho.social.report.result.ReportResult;
+import org.naho.user.model.User;
 import org.naho.user.port.out.UserRepositoryPort;
 
 import java.util.ArrayList;
@@ -41,8 +42,7 @@ public class CreateReportUseCase implements CreateReportInputPort {
             UploadFileInputPort uploadFileInputPort,
             TransactionPort transactionPort,
             EventPublisherPort eventPublisherPort,
-            UserRepositoryPort userRepositoryPort
-    ) {
+            UserRepositoryPort userRepositoryPort) {
         this.reportRepositoryPort = reportRepositoryPort;
         this.fileStorageServicePort = fileStorageServicePort;
         this.fileRepositoryPort = fileRepositoryPort;
@@ -90,16 +90,17 @@ public class CreateReportUseCase implements CreateReportInputPort {
         savedReport.setFiles(files);
 
         // Lấy danh sách tất cả Admin thực tế
-        List<org.naho.user.model.User> admins = userRepositoryPort.findByFilters(null, "ADMIN", null);
+        List<User> admins = userRepositoryPort.findByFilters(null, "ADMIN", null);
 
         String reporterName = userRepositoryPort.findById(command.userId())
-                .map(u -> u.getUsername().getValue())
+                .map(u -> (u.getFullName() != null && !u.getFullName().isBlank()) ? u.getFullName() : "Một người dùng")
                 .orElse("Một người dùng");
 
         String targetUrl = "/admin/reports/" + savedReport.getId();
-        String metadata = "{\"reportId\": " + savedReport.getId() + ", \"reportType\": \"" + savedReport.getReportType() + "\"}";
+        String metadata = "{\"reportId\": " + savedReport.getId() + ", \"reportType\": \"" + savedReport.getReportType()
+                + "\"}";
 
-        for (org.naho.user.model.User admin : admins) {
+        for (User admin : admins) {
             eventPublisherPort.publish(new SendNotificationEvent(
                     this,
                     admin.getId(),
@@ -107,8 +108,7 @@ public class CreateReportUseCase implements CreateReportInputPort {
                     "Có báo cáo mới",
                     reporterName + " vừa gửi một báo cáo mới",
                     targetUrl,
-                    metadata
-            ));
+                    metadata));
         }
 
         return reportResultMapper.domainToResult(savedReport);

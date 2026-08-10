@@ -12,6 +12,7 @@ public class Report {
 
     private final Long id;
     private final Long userId;
+    private final String fullName;
     private final Long questionId;
     private final Long commentId;
     private final String title;
@@ -23,6 +24,7 @@ public class Report {
     private Report(Builder builder) {
         this.id = builder.id;
         this.userId = builder.userId;
+        this.fullName = builder.fullName;
         this.questionId = builder.questionId;
         this.commentId = builder.commentId;
         this.title = builder.title;
@@ -42,6 +44,10 @@ public class Report {
 
     public Long getUserId() {
         return userId;
+    }
+
+    public String getFullName() {
+        return fullName;
     }
 
     public Long getQuestionId() {
@@ -80,6 +86,7 @@ public class Report {
         return builder()
                 .id(this.id)
                 .userId(this.userId)
+                .fullName(this.fullName)
                 .questionId(this.questionId)
                 .commentId(this.commentId)
                 .title(this.title)
@@ -94,6 +101,7 @@ public class Report {
 
         private Long id;
         private Long userId;
+        private String fullName;
         private Long questionId;
         private Long commentId;
         private String title;
@@ -109,6 +117,11 @@ public class Report {
 
         public Builder userId(Long userId) {
             this.userId = userId;
+            return this;
+        }
+
+        public Builder fullName(String fullName) {
+            this.fullName = fullName;
             return this;
         }
 
