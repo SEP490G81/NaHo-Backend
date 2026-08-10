@@ -30,7 +30,7 @@ public class UserSubscriptionEntity extends BaseEntity {
     SubscriptionPlanEntity subscriptionPlan;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_order_id", nullable = false)
+    @JoinColumn(name = "payment_order_id")
     PaymentOrderEntity paymentOrder;
 
     @Enumerated(EnumType.STRING)

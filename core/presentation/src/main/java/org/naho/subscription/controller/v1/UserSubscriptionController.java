@@ -3,10 +3,10 @@ package org.naho.subscription.controller.v1;
 import lombok.RequiredArgsConstructor;
 import org.naho.i18n.message.subscription.SubscriptionDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
-import org.naho.subscription.dto.mapper.SubscriptionResponseMapper;
-import org.naho.subscription.dto.response.SubscriptionPlanResponse;
+import org.naho.subscription.dto.mapper.UserSubscriptionResponseMapper;
+import org.naho.subscription.dto.response.UserSubscriptionResponse;
 import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
-import org.naho.subscription.result.SubscriptionPlanResult;
+import org.naho.subscription.result.UserSubscriptionResult;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserSubscriptionController {
 
     private final GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
-    private final SubscriptionResponseMapper subscriptionResponseMapper;
+    private final UserSubscriptionResponseMapper userSubscriptionResponseMapper;
 
     /**
      * Lấy gói đăng kí hiện tại của người dùng đang đăng nhập
@@ -30,13 +30,13 @@ public class UserSubscriptionController {
      */
     @GetMapping("/me")
     @ApiResponseMessage(message = SubscriptionDetailMessageKey.SUBSCRIPTION_USER_GET_ACTIVE_SUCCESS)
-    public ResponseEntity<SubscriptionPlanResponse> getUserActiveSubscriptionPlan(
+    public ResponseEntity<UserSubscriptionResponse> getUserActiveSubscriptionPlan(
             @AuthenticationPrincipal AccessTokenPayload payload
     ) {
-        SubscriptionPlanResult result = getActiveSubscriptionInputPort
-                .getUserActiveSubscriptionPlan(payload.userId());
+        UserSubscriptionResult result = getActiveSubscriptionInputPort
+                .getUserActiveSubscription(payload.userId());
 
-        SubscriptionPlanResponse response = subscriptionResponseMapper.resultToResponse(result);
+        UserSubscriptionResponse response = userSubscriptionResponseMapper.resultToResponse(result);
 
         return ResponseEntity.ok(response);
     }

@@ -607,7 +607,7 @@ CREATE TABLE user_subscriptions
     modified_time        datetime(6)           NULL,
     user_id              BIGINT                NOT NULL,
     subscription_plan_id BIGINT                NOT NULL,
-    payment_order_id     BIGINT                NOT NULL,
+    payment_order_id     BIGINT                NULL,
     status               VARCHAR(255)          NOT NULL,
     start_time           datetime(6)           NOT NULL,
     end_time             datetime(6)           NOT NULL,
