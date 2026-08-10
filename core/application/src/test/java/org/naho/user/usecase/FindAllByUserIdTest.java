@@ -87,4 +87,36 @@ class FindAllByUserIdTest {
         verify(roleRepositoryPort, times(1)).findAllByUserId(userId);
         verify(roleResultMapper, never()).domainToResult(any());
     }
+
+    @Test
+    @DisplayName("UTCID04 - Lấy vai trò theo roleId thành công")
+    void UTCID04_FindRoleByIdSuccess() {
+        Long roleId = 1L;
+        Role role = Role.builder().id(roleId).roleName(RoleName.LEARNER).build();
+        RoleResult roleResult = mock(RoleResult.class);
+
+        when(roleRepositoryPort.findById(roleId)).thenReturn(java.util.Optional.of(role));
+        when(roleResultMapper.domainToResult(role)).thenReturn(roleResult);
+
+        RoleResult result = crudRoleUseCase.findRoleById(roleId);
+
+        assertNotNull(result);
+        assertEquals(roleResult, result);
+    }
+
+    @Test
+    @DisplayName("UTCID05 - Lấy vai trò theo userId thành công")
+    void UTCID05_FindRoleByUserIdSuccess() {
+        Long userId = 1L;
+        Role role = Role.builder().id(1L).roleName(RoleName.LEARNER).build();
+        RoleResult roleResult = mock(RoleResult.class);
+
+        when(roleRepositoryPort.findByUserId(userId)).thenReturn(java.util.Optional.of(role));
+        when(roleResultMapper.domainToResult(role)).thenReturn(roleResult);
+
+        RoleResult result = crudRoleUseCase.findRoleByUserId(userId);
+
+        assertNotNull(result);
+        assertEquals(roleResult, result);
+    }
 }

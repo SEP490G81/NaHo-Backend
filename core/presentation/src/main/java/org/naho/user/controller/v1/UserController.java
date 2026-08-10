@@ -9,17 +9,21 @@ import org.naho.file.port.out.FileValidatorPort;
 import org.naho.file.result.StoredFile;
 import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.i18n.message.user.UserDetailMessageKey;
+import org.naho.pagination.PageData;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.shared.exception.PresentationException;
 import org.naho.user.command.RegisterCommand;
 import org.naho.user.command.UpdateUserAvatarCommand;
 import org.naho.user.command.UpdateUserInfoCommand;
+import org.naho.user.command.UserQueryCommand;
 import org.naho.user.dto.mapper.RegisterRequestMapper;
 import org.naho.user.dto.mapper.RegisterResponseMapper;
+import org.naho.user.dto.mapper.UserRequestMapper;
 import org.naho.user.dto.mapper.UserResponseMapper;
 import org.naho.user.dto.request.RegisterRequest;
 import org.naho.user.dto.request.UpdateStatusRequest;
 import org.naho.user.dto.request.UpdateUserInfoRequest;
+import org.naho.user.dto.request.UserQueryRequest;
 import org.naho.user.dto.response.RegisterResponse;
 import org.naho.user.dto.response.UserResponse;
 import org.naho.user.port.in.CrudUserInputPort;
@@ -36,7 +40,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -52,6 +55,7 @@ public class UserController {
     private final RegisterRequestMapper registerRequestMapper;
     private final FileValidatorPort fileValidatorPort;
     private final FileStorageServicePort fileStorageServicePort;
+    private final UserRequestMapper userRequestMapper;
 
     @ApiResponseMessage(message = UserDetailMessageKey.USER_GET_SUCCESSFULLY)
     @GetMapping("/me")
@@ -79,14 +83,30 @@ public class UserController {
         return ResponseEntity.ok(userResponseMapper.resultToResponse(result));
     }
 
-    @GetMapping
-    public ResponseEntity<List<UserResponse>> getListUser(
-            @RequestParam(value = "userNameOrEmail", required = false) String userNameOrEmail,
-            @RequestParam(value = "role", required = false) String role,
-            @RequestParam(value = "status", required = false) String status
+    /**
+     * API để cho role Admin lấy ra danh sách người dùng
+     * Có kèm thêm chức năng search, filter, sort.
+     *
+     * @param request chứa các field, page, sort column...
+     * @return PageData<UserResponse>
+     */
+    @ApiResponseMessage(message = UserDetailMessageKey.USER_GET_SUCCESSFULLY)
+    @PostMapping("/all")
+    public ResponseEntity<PageData<UserResponse>> findAllUsers(
+            @RequestBody UserQueryRequest request
     ) {
-        List<UserResult> results = getUserInputPort.searchUsers(userNameOrEmail, role, status);
-        return ResponseEntity.ok(results.stream().map(userResponseMapper::resultToResponse).toList());
+        UserQueryCommand command = userRequestMapper.requestToCommand(request);
+        PageData<UserResult> result = crudUserInputPort.findAllUsers(command);
+
+        PageData<UserResponse> responsePageData = PageData.<UserResponse>builder()
+                .pageMeta(result.getPageMeta())
+                .data(result.getData()
+                        .stream()
+                        .map(userResponseMapper::resultToResponse)
+                        .toList())
+                .build();
+
+        return ResponseEntity.ok(responsePageData);
     }
 
     @PatchMapping("/{id}/status")

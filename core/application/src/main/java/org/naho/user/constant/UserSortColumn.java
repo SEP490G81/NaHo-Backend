@@ -1,6 +1,7 @@
 package org.naho.user.constant;
 
 public enum UserSortColumn {
+    ID("id"),
     EMAIL("email"),
     USERNAME("username"),
     FULL_NAME("fullName"),

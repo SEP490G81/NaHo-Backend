@@ -172,6 +172,14 @@ public class CrudUserUseCase implements CrudUserInputPort {
 
     @Override
     public PageData<UserResult> findAllUsers(UserQueryCommand command) {
-        return null;
+        PageData<User> pageData = userRepositoryPort.findAllUsers(command);
+        return PageData.<UserResult>builder()
+                .pageMeta(pageData.getPageMeta())
+                .data(pageData.getData()
+                        .stream()
+                        .map(userResultMapper::domainToResult)
+                        .toList()
+                )
+                .build();
     }
 }

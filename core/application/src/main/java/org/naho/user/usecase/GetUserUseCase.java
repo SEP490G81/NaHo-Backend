@@ -25,12 +25,6 @@ public class GetUserUseCase implements GetUserInputPort {
     }
 
     @Override
-    public List<UserResult> getListUsers() {
-        List<User> listUsers = userRepositoryPort.getListUser();
-        return listUsers.stream().map(userResultMapper::domainToResult).toList();
-    }
-
-    @Override
     public UserResult getUserById(Long userId) {
         User user = userRepositoryPort.findById(userId)
                 .orElseThrow(() -> new ApplicationException(
@@ -38,12 +32,6 @@ public class GetUserUseCase implements GetUserInputPort {
                         UserDetailMessageKey.USER_GET_FAILED
                 ));
         return userResultMapper.domainToResult(user);
-    }
-
-    @Override
-    public List<UserResult> searchUsers(String userNameOrEmail, String role, String status) {
-        List<User> users = userRepositoryPort.findByFilters(userNameOrEmail, role, status);
-        return users.stream().map(userResultMapper::domainToResult).toList();
     }
 
     @Override

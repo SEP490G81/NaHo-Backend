@@ -11,7 +11,7 @@ import java.util.Objects;
 public class UserResult {
 
     private Long id;
-    private List<RoleResult> roles;
+    private RoleResult role;
     private List<AuthProviderResult> authProviders;
     private FileResult avatarFile;
     private Long userLearningProgressId;
@@ -28,7 +28,7 @@ public class UserResult {
 
     public UserResult(
             Long id,
-            List<RoleResult> roles,
+            RoleResult role,
             List<AuthProviderResult> authProviders,
             FileResult avatarFile,
             Long userLearningProgressId,
@@ -40,7 +40,7 @@ public class UserResult {
             UserStatus status
     ) {
         this.id = id;
-        this.roles = roles;
+        this.role = role;
         this.authProviders = authProviders;
         this.avatarFile = avatarFile;
         this.userLearningProgressId = userLearningProgressId;
@@ -54,7 +54,7 @@ public class UserResult {
 
     private UserResult(Builder builder) {
         this.id = builder.id;
-        this.roles = builder.roles;
+        this.role = builder.role;
         this.authProviders = builder.authProviders;
         this.avatarFile = builder.avatarFile;
         this.userLearningProgressId = builder.userLearningProgressId;
@@ -78,12 +78,12 @@ public class UserResult {
         this.id = id;
     }
 
-    public List<RoleResult> getRoles() {
-        return roles;
+    public RoleResult getRole() {
+        return role;
     }
 
-    public void setRoles(List<RoleResult> roles) {
-        this.roles = roles;
+    public void setRole(RoleResult role) {
+        this.role = role;
     }
 
     public List<AuthProviderResult> getAuthProviders() {
@@ -164,8 +164,8 @@ public class UserResult {
         return id;
     }
 
-    public List<RoleResult> roles() {
-        return roles;
+    public RoleResult role() {
+        return role;
     }
 
     public List<AuthProviderResult> authProviders() {
@@ -211,7 +211,7 @@ public class UserResult {
         if (o == null || getClass() != o.getClass()) return false;
         UserResult that = (UserResult) o;
         return Objects.equals(id, that.id) &&
-                Objects.equals(roles, that.roles) &&
+                Objects.equals(role, that.role) &&
                 Objects.equals(authProviders, that.authProviders) &&
                 Objects.equals(avatarFile, that.avatarFile) &&
                 Objects.equals(userLearningProgressId, that.userLearningProgressId) &&
@@ -225,14 +225,14 @@ public class UserResult {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, roles, authProviders, avatarFile, userLearningProgressId, username, email, fullName, gender, dob, status);
+        return Objects.hash(id, role, authProviders, avatarFile, userLearningProgressId, username, email, fullName, gender, dob, status);
     }
 
     @Override
     public String toString() {
         return "UserResult{" +
                 "id=" + id +
-                ", roles=" + roles +
+                ", role=" + role +
                 ", authProviders=" + authProviders +
                 ", avatarFile=" + avatarFile +
                 ", userLearningProgressId=" + userLearningProgressId +
@@ -248,7 +248,7 @@ public class UserResult {
     public static final class Builder {
 
         private Long id;
-        private List<RoleResult> roles;
+        private RoleResult role;
         private List<AuthProviderResult> authProviders;
 
         private Long userLearningProgressId;
@@ -270,8 +270,8 @@ public class UserResult {
             return this;
         }
 
-        public Builder roles(List<RoleResult> roles) {
-            this.roles = roles;
+        public Builder role(RoleResult role) {
+            this.role = role;
             return this;
         }
 

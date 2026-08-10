@@ -52,26 +52,16 @@ public class UserConfig {
     @Bean
     public CrudUserInputPort crudUserInputPort(
             UserRepositoryPort userRepositoryPort,
-            FileValidatorPort fileValidatorPort,
-            CrudFileInputPort crudFileInputPort,
             UserResultMapper userResultMapper,
-            RoleRepositoryPort roleRepositoryPort,
             FileRepositoryPort fileRepositoryPort,
-            FileStorageServicePort fileStorageServicePort,
-            DeleteFileInputPort deleteFileInputPort,
             UploadFileInputPort uploadFileInputPort,
             TransactionPort transactionPort,
             AsyncCrudFileInputPort asyncCrudFileInputPort
     ) {
         return new CrudUserUseCase(
                 userRepositoryPort,
-                fileValidatorPort,
-                crudFileInputPort,
                 userResultMapper,
-                roleRepositoryPort,
                 fileRepositoryPort,
-                fileStorageServicePort,
-                deleteFileInputPort,
                 uploadFileInputPort,
                 transactionPort,
                 asyncCrudFileInputPort
