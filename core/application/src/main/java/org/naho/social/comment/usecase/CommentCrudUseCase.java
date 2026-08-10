@@ -22,7 +22,6 @@ import org.naho.social.comment.result.CommentResult;
 import org.naho.user.port.out.UserRepositoryPort;
 
 import java.util.List;
-import java.util.Optional;
 
 public class CommentCrudUseCase implements CommentCrudInputPort {
     private final CommentRepositoryPort commentRepositoryPort;

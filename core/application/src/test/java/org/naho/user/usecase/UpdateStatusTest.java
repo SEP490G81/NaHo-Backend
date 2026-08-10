@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
-import org.naho.user.exception.RoleErrorCode;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.mapper.UserResultMapper;
 import org.naho.user.model.Role;

@@ -2,11 +2,8 @@ package org.naho.config.application;
 
 import org.naho.file.port.in.AsyncCrudFileInputPort;
 import org.naho.file.port.in.CrudFileInputPort;
-import org.naho.file.port.in.DeleteFileInputPort;
 import org.naho.file.port.in.UploadFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
-import org.naho.file.port.out.FileStorageServicePort;
-import org.naho.file.port.out.FileValidatorPort;
 import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
 import org.naho.shared.port.out.EmailPort;
 import org.naho.shared.port.out.TransactionPort;

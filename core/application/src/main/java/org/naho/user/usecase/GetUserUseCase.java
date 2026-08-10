@@ -9,8 +9,6 @@ import org.naho.user.port.in.GetUserInputPort;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.naho.user.result.UserResult;
 
-import java.util.List;
-
 public class GetUserUseCase implements GetUserInputPort {
 
     private final UserRepositoryPort userRepositoryPort;
