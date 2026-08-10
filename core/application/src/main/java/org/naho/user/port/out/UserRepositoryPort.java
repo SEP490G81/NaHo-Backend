@@ -8,6 +8,7 @@ import org.naho.user.model.AuthProvider;
 import org.naho.user.model.User;
 import org.naho.user.result.LeaderboardUserResult;
 import org.naho.user.type.AuthProviderName;
+import org.naho.user.type.UserStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -42,6 +43,8 @@ public interface UserRepositoryPort {
     User updateUserInfo(UpdateUserInfoCommand command);
 
     User updateUserAvatar(Long userId, File newAvatarFile);
+
+    User updateUserStatus(Long id, UserStatus newStatus);
 
     PageData<User> findAllUsers(UserQueryCommand command);
 }

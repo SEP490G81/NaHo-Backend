@@ -4,6 +4,7 @@ import jakarta.persistence.criteria.Path;
 import org.naho.shared.specification.SpecificationHelper;
 import org.naho.user.entity.UserEntity;
 import org.naho.user.type.Gender;
+import org.naho.user.type.RoleName;
 import org.naho.user.type.UserStatus;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -11,6 +12,19 @@ import java.time.LocalDate;
 
 public final class UserSpecification {
     private UserSpecification() {
+    }
+
+    // Exclude users with ADMIN role.
+    // Users with NULL role are still included.
+    public static Specification<UserEntity> notAdminRole() {
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.or(
+                        criteriaBuilder.isNull(root.get("role")),
+                        criteriaBuilder.notEqual(
+                                root.get("role").get("roleName"),
+                                RoleName.ADMIN
+                        )
+                );
     }
 
     // filter by username (ignore case)

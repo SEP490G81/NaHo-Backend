@@ -21,7 +21,6 @@ import org.naho.user.dto.mapper.RegisterResponseMapper;
 import org.naho.user.dto.mapper.UserRequestMapper;
 import org.naho.user.dto.mapper.UserResponseMapper;
 import org.naho.user.dto.request.RegisterRequest;
-import org.naho.user.dto.request.UpdateStatusRequest;
 import org.naho.user.dto.request.UpdateUserInfoRequest;
 import org.naho.user.dto.request.UserQueryRequest;
 import org.naho.user.dto.response.RegisterResponse;
@@ -33,7 +32,6 @@ import org.naho.user.port.in.UpdateUserInputPort;
 import org.naho.user.result.AccessTokenPayload;
 import org.naho.user.result.RegisterResult;
 import org.naho.user.result.UserResult;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -57,6 +55,12 @@ public class UserController {
     private final FileStorageServicePort fileStorageServicePort;
     private final UserRequestMapper userRequestMapper;
 
+    /**
+     * Lấy thông tin chi tiết của người dùng đang đăng nhập
+     *
+     * @param payload chứa user id của tài khoản đang đăng nhập thông qua JWT
+     * @return UserResponse
+     */
     @ApiResponseMessage(message = UserDetailMessageKey.USER_GET_SUCCESSFULLY)
     @GetMapping("/me")
     public ResponseEntity<UserResponse> getCurrentLoggedUser(
@@ -109,14 +113,18 @@ public class UserController {
         return ResponseEntity.ok(responsePageData);
     }
 
+    /**
+     * Cập nhật trạng thái của người dùng: ACTIVE, UNACTIVE
+     * Nếu đang là ACTIVE => UNACTIVE và ngược lại
+     *
+     * @param id user id
+     * @return UserResponse
+     */
     @PatchMapping("/{id}/status")
-    public ResponseEntity<UserResponse> updateStatus(
-            @PathVariable Long id,
-            @RequestBody UpdateStatusRequest request
-    ) {
-        UserResult user = updateUserInputPort.updateStatus(id, request.newStatus());
+    public ResponseEntity<UserResponse> updateStatus(@PathVariable Long id) {
+        UserResult user = updateUserInputPort.updateStatus(id);
         UserResponse response = userResponseMapper.resultToResponse(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.ok(response);
     }
 
     /**

@@ -224,6 +224,8 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
      */
     @Override
     public PageData<User> findAllUsers(UserQueryCommand command) {
+        // tạo đối tượng Pageable gồm:
+        // số trang, số element trên 1 trang, sort column, sort direction
         Pageable pageable = PageRequest.of(
                 command.page(),
                 command.size(),
@@ -233,15 +235,22 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
                 )
         );
 
-        Specification<UserEntity> specification = Specification.allOf(
+        // gom các điều kiện của searchKeyword
+        Specification<UserEntity> searchKeywordSpecification = Specification.anyOf(
                 UserSpecification.hasEmail(command.searchKeyword()),
                 UserSpecification.hasUsername(command.searchKeyword()),
-                UserSpecification.hasFullName(command.searchKeyword()),
+                UserSpecification.hasFullName(command.searchKeyword())
+        );
+
+        // điều kiện cuối cùng
+        Specification<UserEntity> specification = Specification.allOf(
+                searchKeywordSpecification,
                 UserSpecification.hasGender(command.gender()),
                 UserSpecification.dobBetween(command.dobFrom(), command.dobTo()),
                 UserSpecification.hasStatus(command.status()),
                 UserSpecification.hasRoleId(command.roleId()),
-                UserSpecification.isEmailVerified(command.isEmailVerified())
+                UserSpecification.isEmailVerified(command.isEmailVerified()),
+                UserSpecification.notAdminRole()
         );
 
         Page<UserEntity> page = userJpaRepository.findAll(specification, pageable);
@@ -261,5 +270,20 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
                         .toList()
                 )
                 .build();
+    }
+
+    @Override
+    public User updateUserStatus(Long id, UserStatus newStatus) {
+        UserEntity user = userJpaRepository.findById(id)
+                .orElseThrow(() -> new InfrastructureException(
+                        UserErrorCode.USER_NOT_FOUND,
+                        UserDetailMessageKey.USER_ID_NOT_FOUND,
+                        id
+                ));
+
+        user.setStatus(newStatus);
+
+        UserEntity savedUser = userJpaRepository.save(user);
+        return userEntityMapper.entityToDomain(savedUser);
     }
 }
