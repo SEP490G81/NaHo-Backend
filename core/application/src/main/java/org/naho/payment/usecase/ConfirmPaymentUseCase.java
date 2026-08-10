@@ -128,7 +128,7 @@ public class ConfirmPaymentUseCase implements ConfirmPaymentInputPort {
                     order.getUserId(),
                     NotificationType.PAYMENT,
                     "Nâng cấp gói thành công",
-                    "Chúc mừng bạn đã nâng cấp thành công gói " + plan.getName() + ". Hãy trải nghiệm ngay những tính năng cao cấp!",
+                    "Chúc mừng bạn đã nâng cấp thành công gói " + plan.getCode() + ". Hãy trải nghiệm ngay những tính năng cao cấp!",
                     null,
                     metadata
             ));

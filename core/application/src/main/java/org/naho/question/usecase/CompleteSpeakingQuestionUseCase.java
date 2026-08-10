@@ -69,7 +69,10 @@ public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestion
                         command.userId())
                 .orElse(null);
 
-        Double point = null;
+        // khởi tạo earnPoint: số điểm sẽ nhận được trong lần học này
+        Double earnPoint = null;
+
+        Double overallScore = command.overallScore();
 
         PointTransactionType pointTransactionType = PointTransactionType.LEARNING_PATH_NODE_COMPLETION;
         // nếu người dùng chưa từng học node này, tạo mới
@@ -78,8 +81,8 @@ public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestion
                     .builder()
                     .learningPathNodeId(speakingQuestionLearningPathNode.getId())
                     .userId(command.userId())
-                    .bestScore(command.overallScore())
-                    .currentScore(command.overallScore())
+                    .bestScore(overallScore)
+                    .currentScore(overallScore)
                     .attemptCount(1)
                     .completedAt(now)
                     .status(NodeStatus.COMPLETED)
@@ -87,20 +90,20 @@ public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestion
 
             userNodeProgressRepositoryPort.save(newUserNodeProgress);
 
-            point = progress.addPoint(command.overallScore());
+            earnPoint = progress.addPoint(overallScore);
 
         } else {
             // nếu đã từng học thì sẽ xem điểm có cao hơn không
             // nếu có thì mới cộng điểm = số chênh lệch
-            double differentScore = command.overallScore() - currentUserNodeProgress.getBestScore();
+            double differentScore = overallScore - currentUserNodeProgress.getBestScore();
 
             if (differentScore > 0) {
-                currentUserNodeProgress.setBestScore(command.overallScore());
-                point = progress.addPoint(differentScore);
+                currentUserNodeProgress.setBestScore(overallScore);
+                earnPoint = progress.addPoint(differentScore);
                 pointTransactionType = PointTransactionType.LEARNING_PATH_NODE_RETAKE;
             }
 
-            currentUserNodeProgress.setCurrentScore(command.overallScore());
+            currentUserNodeProgress.setCurrentScore(overallScore);
             currentUserNodeProgress.increaseAttemptCount();
             currentUserNodeProgress.setCompletedAt(now);
 
@@ -108,10 +111,12 @@ public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestion
         }
 
         // cập nhật node xa nhất mà người dùng có thể học sau khi học xong node này
-        progress = crudUserLearningProgressInputPort.updateFarthestAvailableNodeWhenCompletedANode(
-                new UpdateFarthestAvailableNodeCommand(
-                        progress,
-                        speakingQuestionLearningPathNode));
+        progress = crudUserLearningProgressInputPort
+                .updateFarthestAvailableNodeWhenCompletedANode(
+                        new UpdateFarthestAvailableNodeCommand(
+                                progress,
+                                speakingQuestionLearningPathNode
+                        ));
 
         // update node cuối cùng mà người dùng học
         progress.setLastLearningNodeId(speakingQuestionLearningPathNode.getId());
@@ -129,10 +134,10 @@ public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestion
         userLearningProgressRepositoryPort.save(progress);
 
         // nếu có sự thay đổi điểm thì tạo lịch sử nhận điểm
-        if (point != null) {
+        if (earnPoint != null) {
             PointHistoryCommand pointHistoryCommand = PointHistoryCommand.builder()
                     .userId(command.userId())
-                    .point(point)
+                    .point(earnPoint)
                     .transactionType(pointTransactionType)
                     .learningPathNodeId(speakingQuestionLearningPathNode.getId())
                     .build();

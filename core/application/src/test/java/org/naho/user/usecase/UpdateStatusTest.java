@@ -10,9 +10,12 @@ import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.mapper.UserResultMapper;
+import org.naho.user.model.Role;
 import org.naho.user.model.User;
+import org.naho.user.port.out.RoleRepositoryPort;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.naho.user.result.UserResult;
+import org.naho.user.type.RoleName;
 import org.naho.user.type.UserStatus;
 
 import java.util.Optional;
@@ -26,6 +29,8 @@ class UpdateStatusTest {
     @Mock
     private UserRepositoryPort userRepositoryPort;
     @Mock
+    private RoleRepositoryPort roleRepositoryPort;
+    @Mock
     private UserResultMapper userResultMapper;
 
     @InjectMocks
@@ -36,33 +41,41 @@ class UpdateStatusTest {
     void UTCID01_UpdateStatusSuccess() {
         // Arrange
         Long userId = 1L;
-        String statusStr = "active";
+        Long roleId = 2L;
 
         User user = User.builder()
                 .id(userId)
+                .roleId(roleId)
                 .status(UserStatus.UNACTIVE)
+                .build();
+
+        Role role = Role.builder()
+                .id(roleId)
+                .roleName(RoleName.LEARNER)
                 .build();
 
         User updatedUser = User.builder()
                 .id(userId)
+                .roleId(roleId)
                 .status(UserStatus.ACTIVE)
                 .build();
 
         UserResult expectedResult = mock(UserResult.class);
 
         when(userRepositoryPort.findById(userId)).thenReturn(Optional.of(user));
-        when(userRepositoryPort.save(user)).thenReturn(updatedUser);
+        when(roleRepositoryPort.findById(roleId)).thenReturn(Optional.of(role));
+        when(userRepositoryPort.updateUserStatus(userId, UserStatus.ACTIVE)).thenReturn(updatedUser);
         when(userResultMapper.domainToResult(updatedUser)).thenReturn(expectedResult);
 
         // Act
-        UserResult result = updateUserUseCase.updateStatus(userId, statusStr);
+        UserResult result = updateUserUseCase.updateStatus(userId);
 
         // Assert
         assertNotNull(result);
         assertEquals(expectedResult, result);
-        assertEquals(UserStatus.ACTIVE, user.getStatus());
         verify(userRepositoryPort, times(1)).findById(userId);
-        verify(userRepositoryPort, times(1)).save(user);
+        verify(roleRepositoryPort, times(1)).findById(roleId);
+        verify(userRepositoryPort, times(1)).updateUserStatus(userId, UserStatus.ACTIVE);
         verify(userResultMapper, times(1)).domainToResult(updatedUser);
     }
 
@@ -71,20 +84,19 @@ class UpdateStatusTest {
     void UTCID02_UserNotFound() {
         // Arrange
         Long userId = 99L;
-        String statusStr = "ACTIVE";
 
         when(userRepositoryPort.findById(userId)).thenReturn(Optional.empty());
 
         // Act & Assert
         ApplicationException exception = assertThrows(
                 ApplicationException.class,
-                () -> updateUserUseCase.updateStatus(userId, statusStr)
+                () -> updateUserUseCase.updateStatus(userId)
         );
 
         assertEquals(UserErrorCode.USER_NOT_FOUND, exception.getErrorCode());
         assertEquals(UserDetailMessageKey.USER_ID_NOT_FOUND, exception.getMessage());
         verify(userRepositoryPort, times(1)).findById(userId);
-        verify(userRepositoryPort, never()).save(any());
+        verify(userRepositoryPort, never()).updateUserStatus(any(), any());
     }
 
     @Test
@@ -92,23 +104,62 @@ class UpdateStatusTest {
     void UTCID03_InvalidUserStatus() {
         // Arrange
         Long userId = 1L;
-        String invalidStatusStr = "INVALID_STATUS";
+        Long roleId = 2L;
 
         User user = User.builder()
                 .id(userId)
-                .status(UserStatus.ACTIVE)
+                .roleId(roleId)
+                .status(null)
+                .build();
+
+        Role role = Role.builder()
+                .id(roleId)
+                .roleName(RoleName.LEARNER)
                 .build();
 
         when(userRepositoryPort.findById(userId)).thenReturn(Optional.of(user));
+        when(roleRepositoryPort.findById(roleId)).thenReturn(Optional.of(role));
 
         // Act & Assert
         ApplicationException exception = assertThrows(
                 ApplicationException.class,
-                () -> updateUserUseCase.updateStatus(userId, invalidStatusStr)
+                () -> updateUserUseCase.updateStatus(userId)
         );
 
         assertEquals(UserErrorCode.USER_PERSIST_FAILED, exception.getErrorCode());
         assertEquals(UserDetailMessageKey.USER_UPDATE_STATUS_FAILED, exception.getMessage());
-        verify(userRepositoryPort, never()).save(any());
+        verify(userRepositoryPort, never()).updateUserStatus(any(), any());
+    }
+
+    @Test
+    @DisplayName("UTCID04 - Cập nhật trạng thái thất bại khi người dùng có vai trò ADMIN")
+    void UTCID04_AdminCannotBeDisabled() {
+        // Arrange
+        Long userId = 1L;
+        Long roleId = 1L;
+
+        User user = User.builder()
+                .id(userId)
+                .roleId(roleId)
+                .status(UserStatus.ACTIVE)
+                .build();
+
+        Role role = Role.builder()
+                .id(roleId)
+                .roleName(RoleName.ADMIN)
+                .build();
+
+        when(userRepositoryPort.findById(userId)).thenReturn(Optional.of(user));
+        when(roleRepositoryPort.findById(roleId)).thenReturn(Optional.of(role));
+
+        // Act & Assert
+        ApplicationException exception = assertThrows(
+                ApplicationException.class,
+                () -> updateUserUseCase.updateStatus(userId)
+        );
+
+        assertEquals(UserErrorCode.USER_ACCESS_DENIED, exception.getErrorCode());
+        assertEquals(UserDetailMessageKey.USER_ACCESS_DENIED, exception.getMessage());
+        verify(userRepositoryPort, never()).updateUserStatus(any(), any());
     }
 }

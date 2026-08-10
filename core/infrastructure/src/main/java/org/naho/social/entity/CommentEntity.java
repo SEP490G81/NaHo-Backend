@@ -39,7 +39,7 @@ public class CommentEntity extends BaseEntity {
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     List<CommentEntity> children;
 
-    @OneToMany(mappedBy = "comment")
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
     List<ReactionEntity> reactions;
 
     @OneToMany(mappedBy = "comment")

@@ -2,7 +2,7 @@ package org.naho.usage.model;
 
 import org.naho.i18n.message.usage.UsageDetailMessageKey;
 import org.naho.shared.exception.DomainException;
-import org.naho.subscription.model.UsageQuota;
+import org.naho.subscription.model.SubscriptionPlan;
 import org.naho.usage.exception.UsageDomainErrorCode;
 
 import java.time.Instant;
@@ -58,23 +58,17 @@ public class SubscriptionUsage {
                 .build();
     }
 
-    public void consumeAssessment(UsageQuota quota, long audioSeconds) {
+    public void consumeAssessment(SubscriptionPlan plan, long audioSeconds) {
         if (audioSeconds <= 0) {
             throw new IllegalArgumentException("Audio duration must be positive");
         }
-        if (audioSeconds > quota.maxAssessmentAudioSeconds()) {
+        if (plan.getMaxSpeakingQuestionRecordingSeconds() != null && audioSeconds > plan.getMaxSpeakingQuestionRecordingSeconds()) {
             throw new DomainException(
                     UsageDomainErrorCode.USAGE_AUDIO_DURATION_EXCEEDED,
                     UsageDetailMessageKey.USAGE_AUDIO_DURATION_EXCEEDED
             );
         }
-        if (assessmentAttemptsUsed + 1 > quota.monthlyAssessmentLimit()) {
-            throw new DomainException(
-                    UsageDomainErrorCode.USAGE_LIMIT_EXCEEDED,
-                    UsageDetailMessageKey.USAGE_LIMIT_EXCEEDED
-            );
-        }
-        if (assessmentAudioSecondsUsed + audioSeconds > quota.monthlyAssessmentAudioSeconds()) {
+        if (plan.getDailySpeakingQuestionEvaluationLimit() != null && assessmentAttemptsUsed + 1 > plan.getDailySpeakingQuestionEvaluationLimit()) {
             throw new DomainException(
                     UsageDomainErrorCode.USAGE_LIMIT_EXCEEDED,
                     UsageDetailMessageKey.USAGE_LIMIT_EXCEEDED
@@ -85,11 +79,17 @@ public class SubscriptionUsage {
         assessmentAudioSecondsUsed += audioSeconds;
     }
 
-    public void consumeConversationTurn(UsageQuota quota, long userSpeechSeconds) {
+    public void consumeConversationTurn(SubscriptionPlan plan, long userSpeechSeconds) {
         if (userSpeechSeconds <= 0) {
             throw new IllegalArgumentException("Speech duration must be positive");
         }
-        if (conversationSecondsUsed + userSpeechSeconds > quota.monthlyConversationSeconds()) {
+        if (plan.getMaxAiTurnSpeakingSeconds() != null && userSpeechSeconds > plan.getMaxAiTurnSpeakingSeconds()) {
+            throw new DomainException(
+                    UsageDomainErrorCode.USAGE_AUDIO_DURATION_EXCEEDED,
+                    UsageDetailMessageKey.USAGE_AUDIO_DURATION_EXCEEDED
+            );
+        }
+        if (plan.getMaxTurnsPerAiSession() != null && conversationTurnsUsed + 1 > plan.getMaxTurnsPerAiSession()) {
             throw new DomainException(
                     UsageDomainErrorCode.USAGE_LIMIT_EXCEEDED,
                     UsageDetailMessageKey.USAGE_LIMIT_EXCEEDED

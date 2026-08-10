@@ -1,4 +1,10 @@
 package org.naho.user.dto.response;
 
-public record RoleResponse(String id, String name, String description) {
+import org.naho.user.type.RoleName;
+
+public record RoleResponse(
+        Long id,
+        RoleName roleName,
+        String description
+) {
 }

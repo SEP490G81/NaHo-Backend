@@ -24,9 +24,6 @@ public class SubscriptionPlanEntity extends BaseEntity {
     @Column(nullable = false, unique = true)
     PlanCode code;
 
-    @Column(nullable = false)
-    String name;
-
     @Column(columnDefinition = "TEXT")
     String description;
 
@@ -40,41 +37,29 @@ public class SubscriptionPlanEntity extends BaseEntity {
     @Column(name = "price_currency", nullable = false)
     String priceCurrency;
 
-    @Column(name = "duration_days", nullable = false)
+    @Column(name = "duration_days")
     Integer durationDays;
 
-    @Column(name = "monthly_assessment_limit", nullable = false)
-    Integer monthlyAssessmentLimit;
+    @Column(name = "daily_speaking_question_evaluation_limit", nullable = false)
+    Integer dailySpeakingQuestionEvaluationLimit;
 
-    @Column(name = "monthly_assessment_audio_seconds", nullable = false)
-    Long monthlyAssessmentAudioSeconds;
+    @Column(name = "max_speaking_question_recording_seconds", nullable = false)
+    Integer maxSpeakingQuestionRecordingSeconds;
 
-    @Column(name = "max_assessment_audio_seconds", nullable = false)
-    Integer maxAssessmentAudioSeconds;
+    @Column(name = "max_concurrent_ai_session_count", nullable = false)
+    Integer maxConcurrentAiSessionCount;
 
-    @Column(name = "monthly_conversation_seconds", nullable = false)
-    Long monthlyConversationSeconds;
+    @Column(name = "max_turns_per_ai_session", nullable = false)
+    Integer maxTurnsPerAiSession;
 
-    @Column(name = "max_conversation_session_seconds", nullable = false)
-    Integer maxConversationSessionSeconds;
+    @Column(name = "daily_ai_session_evaluation_limit", nullable = false)
+    Integer dailyAiSessionEvaluationLimit;
 
-    @Column(name = "max_conversation_turns_per_session", nullable = false)
-    Integer maxConversationTurnsPerSession;
-
-    @Column(name = "full_curriculum_access", nullable = false)
-    Boolean fullCurriculumAccess;
-
-    @Column(name = "progress_analytics_enabled", nullable = false)
-    Boolean progressAnalyticsEnabled;
+    @Column(name = "max_ai_turn_speaking_seconds", nullable = false)
+    Integer maxAiTurnSpeakingSeconds;
 
     @Column(name = "sample_answer_enabled", nullable = false)
     Boolean sampleAnswerEnabled;
-
-    @Column(name = "max_answer_time_seconds", nullable = false)
-    Double maxAnswerTimeSeconds;
-
-    @Column(name = "save_answer_history_enabled", nullable = false)
-    Boolean saveAnswerHistoryEnabled;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

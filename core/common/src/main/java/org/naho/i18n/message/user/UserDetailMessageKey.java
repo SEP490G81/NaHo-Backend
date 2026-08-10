@@ -103,6 +103,10 @@ public final class UserDetailMessageKey {
     public static final String USER_PASSWORD_REQUIRED = "user.password.required";
     public static final String USER_PASSWORD_INVALID_FORMAT = "user.password.invalid.format";
 
+    public static final String USER_PAGE_INVALID = "user.page.invalid";
+    public static final String USER_SIZE_INVALID = "user.size.invalid";
+    public static final String USER_DOB_RANGE_INVALID = "user.dob.range.invalid";
+
     private UserDetailMessageKey() {
     }
 }

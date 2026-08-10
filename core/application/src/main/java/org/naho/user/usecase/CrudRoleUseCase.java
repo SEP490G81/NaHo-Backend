@@ -31,6 +31,29 @@ public class CrudRoleUseCase implements CrudRoleInputPort {
     }
 
     @Override
+    public RoleResult findRoleById(Long roleId) {
+        if (roleId == null) {
+            return null;
+        }
+        return roleRepositoryPort.findById(roleId)
+                .map(roleResultMapper::domainToResult)
+                .orElse(null);
+    }
+
+    @Override
+    public RoleResult findRoleByUserId(Long userId) {
+        if (userId == null) {
+            throw new ApplicationException(
+                    UserErrorCode.USER_NOT_FOUND,
+                    UserDetailMessageKey.USER_ID_NULL
+            );
+        }
+        return roleRepositoryPort.findByUserId(userId)
+                .map(roleResultMapper::domainToResult)
+                .orElse(null);
+    }
+
+    @Override
     public List<RoleResult> findAllByUserId(Long userId) {
         if (userId == null) {
             throw new ApplicationException(

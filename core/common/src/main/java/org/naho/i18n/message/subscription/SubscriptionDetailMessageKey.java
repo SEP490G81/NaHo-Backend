@@ -12,6 +12,8 @@ public final class SubscriptionDetailMessageKey {
     public static final String SUBSCRIPTION_USER_ID_EMPTY = "subscription.user_id.empty";
     public static final String SUBSCRIPTION_PLAN_ID_EMPTY = "subscription.plan_id.empty";
     public static final String SUBSCRIPTION_STATUS_EMPTY = "subscription.status.empty";
+    public static final String SUBSCRIPTION_START_TIME_EMPTY = "subscription.start_time.empty";
+    public static final String SUBSCRIPTION_END_TIME_EMPTY = "subscription.end_time.empty";
     public static final String SUBSCRIPTION_TIME_INVALID = "subscription.time.invalid";
 
     public static final String PLAN_NOT_FOUND = "subscription.plan.not_found";

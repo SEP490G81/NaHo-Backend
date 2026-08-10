@@ -28,7 +28,7 @@ public record PointHistoryQueryCommand(
             );
         }
 
-        if (size < 0 || size > 100) {
+        if (size < 20 || size > 100) {
             throw new ApplicationException(
                     PointHistoryErrorCode.POINT_HISTORY_SIZE_INVALID,
                     PointHistoryDetailMessageKey.POINT_HISTORY_SIZE_INVALID

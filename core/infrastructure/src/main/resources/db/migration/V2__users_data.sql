@@ -22,7 +22,7 @@ ALTER TABLE users
 -- =========================================================
 -- 3. Insert User
 -- =========================================================
-
+-- Admin
 INSERT INTO users (created_time,
                    username,
                    email,
@@ -41,3 +41,24 @@ VALUES (NOW(),
         (SELECT id
          FROM roles
          WHERE role_name = 'ADMIN'));
+-- Leaner
+INSERT INTO users (id,
+                   created_time,
+                   username,
+                   email,
+                   full_name,
+                   is_email_verified,
+                   hash_password,
+                   status,
+                   role_id)
+VALUES (1000,
+        NOW(),
+        'nguyenkhoa2004',
+        'nguyendangkhoa5104@gmail.com',
+        'Nguyen Dang Khoa',
+        b'1',
+        '{bcrypt}$2a$10$mLvl6v0NmQ4f5cP6360qnueyzPYTyLizOJDyr7gL2DbAnnFzbK0mq',
+        'ACTIVE',
+        (SELECT id
+         FROM roles
+         WHERE role_name = 'LEARNER'));

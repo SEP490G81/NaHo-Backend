@@ -18,8 +18,6 @@ public class UserSubscriptionResultMapper {
                 subscription.getStatus(),
                 subscription.getStartTime(),
                 subscription.getEndTime(),
-                subscription.getCreatedTime(),
-                subscription.getModifiedTime(),
                 planResult
         );
     }

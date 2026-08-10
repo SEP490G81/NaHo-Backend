@@ -118,16 +118,16 @@ public class PaymentConfig {
 
     @Bean
     public GetActiveSubscriptionInputPort getActiveSubscriptionInputPort(
-            UserSubscriptionRepositoryPort userSubscriptionRepositoryPort,
             SubscriptionPlanRepositoryPort subscriptionPlanRepositoryPort,
             SubscriptionPlanResultMapper subscriptionPlanResultMapper,
-            UserSubscriptionResultMapper userSubscriptionResultMapper
+            UserSubscriptionResultMapper userSubscriptionResultMapper,
+            UserSubscriptionRepositoryPort userSubscriptionRepositoryPort
     ) {
         return new GetActiveSubscriptionUseCase(
-                userSubscriptionRepositoryPort,
                 subscriptionPlanRepositoryPort,
                 subscriptionPlanResultMapper,
-                userSubscriptionResultMapper
+                userSubscriptionResultMapper,
+                userSubscriptionRepositoryPort
         );
     }
 }
