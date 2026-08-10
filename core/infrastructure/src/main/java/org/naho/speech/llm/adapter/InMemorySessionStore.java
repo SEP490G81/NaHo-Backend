@@ -3,12 +3,14 @@ package org.naho.speech.llm.adapter;
 import org.naho.speech.llm.port.out.SessionStorePort;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class InMemorySessionStore implements SessionStorePort {
 
@@ -25,12 +27,16 @@ public class InMemorySessionStore implements SessionStorePort {
     private final ConcurrentHashMap<String, String> formalityLevels = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, AtomicInteger> turnCounts = new ConcurrentHashMap<>();
 
+    // Track last activity time per session — dùng cho eviction
+    private final ConcurrentHashMap<String, Instant> lastAccessTimes = new ConcurrentHashMap<>();
+
     @Override
     public void initSession(String sessionId) {
         transcripts.put(sessionId, new StringBuilder());
         histories.put(sessionId, Collections.synchronizedList(new ArrayList<>()));
         turnCounts.put(sessionId, new AtomicInteger(0));
         startedAts.put(sessionId, Instant.now());
+        lastAccessTimes.put(sessionId, Instant.now());
         System.out.println("[SessionStore] Session initialized: " + sessionId
                 + " | Active sessions: " + transcripts.size());
     }
@@ -52,6 +58,7 @@ public class InMemorySessionStore implements SessionStorePort {
         if (marugotoLevel != null) marugotoLevels.put(sessionId, marugotoLevel);
         if (formalityLevel != null) formalityLevels.put(sessionId, formalityLevel);
         voiceNames.put(sessionId, "ja-JP-NanamiNeural");
+        lastAccessTimes.put(sessionId, Instant.now());
         System.out.println("[SessionStore] Session restored from DB: " + sessionId + " | Turns: " + totalTurns);
     }
 
@@ -68,6 +75,7 @@ public class InMemorySessionStore implements SessionStorePort {
         marugotoLevels.remove(sessionId);
         formalityLevels.remove(sessionId);
         turnCounts.remove(sessionId);
+        lastAccessTimes.remove(sessionId);
         System.out.println("[SessionStore] Session cleared: " + sessionId
                 + " | Remaining sessions: " + transcripts.size());
     }
@@ -87,6 +95,7 @@ public class InMemorySessionStore implements SessionStorePort {
         List<Map<String, String>> history = histories.computeIfAbsent(
                 sessionId, k -> Collections.synchronizedList(new ArrayList<>()));
         history.add(Map.of("role", role, "content", content));
+        lastAccessTimes.put(sessionId, Instant.now()); // cập nhật activity
     }
 
     @Override
@@ -95,6 +104,7 @@ public class InMemorySessionStore implements SessionStorePort {
         if (history == null) {
             return List.of();
         }
+        lastAccessTimes.put(sessionId, Instant.now()); // cập nhật activity
         synchronized (history) {
             return new ArrayList<>(history);
         }
@@ -196,6 +206,7 @@ public class InMemorySessionStore implements SessionStorePort {
 
     @Override
     public int incrementTurnCount(String sessionId) {
+        lastAccessTimes.put(sessionId, Instant.now()); // cập nhật activity khi user gửi message
         return turnCounts.computeIfAbsent(sessionId, k -> new AtomicInteger(0)).incrementAndGet();
     }
 
@@ -203,5 +214,20 @@ public class InMemorySessionStore implements SessionStorePort {
     public int getTurnCount(String sessionId) {
         AtomicInteger count = turnCounts.get(sessionId);
         return count != null ? count.get() : 0;
+    }
+
+    @Override
+    public int evictIdleSessions(int idleMinutes) {
+        Instant cutoff = Instant.now().minus(idleMinutes, ChronoUnit.MINUTES);
+        List<String> toEvict = lastAccessTimes.entrySet().stream()
+                .filter(e -> e.getValue().isBefore(cutoff))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+        toEvict.forEach(this::clearSession);
+        if (!toEvict.isEmpty()) {
+            System.out.println("[SessionStore] Evicted " + toEvict.size()
+                    + " idle sessions (>" + idleMinutes + " min) from memory");
+        }
+        return toEvict.size();
     }
 }

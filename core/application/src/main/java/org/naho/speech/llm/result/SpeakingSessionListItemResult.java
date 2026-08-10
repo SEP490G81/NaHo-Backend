@@ -17,6 +17,7 @@ public record SpeakingSessionListItemResult(
         int totalTurns,
         int durationSeconds,
         Instant startedAt,
-        Instant endedAt
+        Instant endedAt,
+        String status
 ) {
 }

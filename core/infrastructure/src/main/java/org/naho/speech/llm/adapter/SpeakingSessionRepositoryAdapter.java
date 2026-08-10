@@ -154,10 +154,13 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(direction, sortCol));
 
+        String status = command != null ? command.status() : null;
+
         Specification<SpeakingSessionEntity> specification = Specification.allOf(
                 SpeakingSessionSpecification.hasUserId(userId),
                 SpeakingSessionSpecification.hasPersonaId(personaId),
-                SpeakingSessionSpecification.searchByTopic(search)
+                SpeakingSessionSpecification.searchByTopic(search),
+                SpeakingSessionSpecification.hasStatus(status != null && !status.isBlank() ? status : "COMPLETED")
         );
 
         Page<SpeakingSessionEntity> pageResult = sessionJpaRepository.findAll(specification, pageable);
@@ -184,7 +187,8 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
                     session.getTotalTurns(),
                     duration,
                     session.getStartedAt(),
-                    session.getEndedAt()
+                    session.getEndedAt(),
+                    session.getStatus()   // thêm status để FE phân biệt
             );
         }).toList();
 
@@ -397,9 +401,22 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
 
     @Override
     @Transactional(readOnly = true)
+    public boolean isSessionCompleted(String sessionCode) {
+        if (sessionCode == null || sessionCode.isBlank()) return false;
+        return sessionJpaRepository.findBySessionCode(sessionCode)
+                .map(s -> "COMPLETED".equalsIgnoreCase(s.getStatus()))
+                .orElse(false);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<ActiveSpeakingSessionResult> findActiveSessionByCode(String sessionCode, Long userId) {
         if (sessionCode == null || sessionCode.isBlank()) return Optional.empty();
-        Optional<SpeakingSessionEntity> sessionOpt = sessionJpaRepository.findBySessionCodeAndUserId(sessionCode, userId);
+        // Khi userId = null (gọi từ ensureSessionLoadedInMemory sau pod restart),
+        // dùng findBySessionCodeAndStatus để chỉ restore đúng IN_PROGRESS, không restore COMPLETED/EXPIRED
+        Optional<SpeakingSessionEntity> sessionOpt = (userId != null)
+                ? sessionJpaRepository.findBySessionCodeAndUserId(sessionCode, userId)
+                : sessionJpaRepository.findBySessionCodeAndStatus(sessionCode, "IN_PROGRESS");
         return sessionOpt.map(this::toActiveSessionResult);
     }
 
@@ -438,12 +455,6 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
             session.setFullTranscript(fullTranscript);
             sessionJpaRepository.save(session);
         });
-    }
-
-    @Override
-    @Transactional
-    public int updateStatusForExpiredSessions(String oldStatus, String newStatus, Instant cutoffTime, Instant endedAt) {
-        return sessionJpaRepository.updateExpiredSessions(oldStatus, newStatus, cutoffTime, endedAt);
     }
 }
 
