@@ -1,7 +1,9 @@
 package org.naho.user.port.out;
 
 import org.naho.file.model.File;
+import org.naho.pagination.PageData;
 import org.naho.user.command.UpdateUserInfoCommand;
+import org.naho.user.command.UserQueryCommand;
 import org.naho.user.model.AuthProvider;
 import org.naho.user.model.User;
 import org.naho.user.result.LeaderboardUserResult;
@@ -42,4 +44,6 @@ public interface UserRepositoryPort {
     User updateUserInfo(UpdateUserInfoCommand command);
 
     User updateUserAvatar(Long userId, File newAvatarFile);
+
+    PageData<User> findAllUsers(UserQueryCommand command);
 }

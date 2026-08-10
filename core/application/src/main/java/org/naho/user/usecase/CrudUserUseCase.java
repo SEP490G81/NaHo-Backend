@@ -4,62 +4,44 @@ import org.naho.file.constant.FileAccessStatus;
 import org.naho.file.exception.FileErrorCode;
 import org.naho.file.model.File;
 import org.naho.file.port.in.AsyncCrudFileInputPort;
-import org.naho.file.port.in.CrudFileInputPort;
-import org.naho.file.port.in.DeleteFileInputPort;
 import org.naho.file.port.in.UploadFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
-import org.naho.file.port.out.FileStorageServicePort;
-import org.naho.file.port.out.FileValidatorPort;
 import org.naho.file.result.FileResult;
 import org.naho.file.result.StoredFile;
 import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.i18n.message.user.UserDetailMessageKey;
+import org.naho.pagination.PageData;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.user.command.UpdateUserAvatarCommand;
 import org.naho.user.command.UpdateUserInfoCommand;
+import org.naho.user.command.UserQueryCommand;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.mapper.UserResultMapper;
 import org.naho.user.model.User;
 import org.naho.user.port.in.CrudUserInputPort;
-import org.naho.user.port.out.RoleRepositoryPort;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.naho.user.result.UserResult;
 
 public class CrudUserUseCase implements CrudUserInputPort {
     private final UserRepositoryPort userRepositoryPort;
-    private final FileValidatorPort fileValidatorPort;
-    private final CrudFileInputPort crudFileInputPort;
     private final UserResultMapper userResultMapper;
-    private final RoleRepositoryPort roleRepositoryPort;
     private final FileRepositoryPort fileRepositoryPort;
-    private final FileStorageServicePort fileStorageServicePort;
-    private final DeleteFileInputPort deleteFileInputPort;
     private final UploadFileInputPort uploadFileInputPort;
     private final TransactionPort transactionPort;
     private final AsyncCrudFileInputPort asyncCrudFileInputPort;
 
     public CrudUserUseCase(
             UserRepositoryPort userRepositoryPort,
-            FileValidatorPort fileValidatorPort,
-            CrudFileInputPort crudFileInputPort,
             UserResultMapper userResultMapper,
-            RoleRepositoryPort roleRepositoryPort,
             FileRepositoryPort fileRepositoryPort,
-            FileStorageServicePort fileStorageServicePort,
-            DeleteFileInputPort deleteFileInputPort,
             UploadFileInputPort uploadFileInputPort,
             TransactionPort transactionPort,
             AsyncCrudFileInputPort asyncCrudFileInputPort
     ) {
         this.userRepositoryPort = userRepositoryPort;
-        this.fileValidatorPort = fileValidatorPort;
-        this.crudFileInputPort = crudFileInputPort;
         this.userResultMapper = userResultMapper;
-        this.roleRepositoryPort = roleRepositoryPort;
         this.fileRepositoryPort = fileRepositoryPort;
-        this.fileStorageServicePort = fileStorageServicePort;
-        this.deleteFileInputPort = deleteFileInputPort;
         this.uploadFileInputPort = uploadFileInputPort;
         this.transactionPort = transactionPort;
         this.asyncCrudFileInputPort = asyncCrudFileInputPort;
@@ -109,6 +91,13 @@ public class CrudUserUseCase implements CrudUserInputPort {
     }
 
 
+    /**
+     * Method cập nhật avatar của người dùng
+     * Sau đó upload lên cloud và xoá avatar cũ trên cloud
+     *
+     * @param command chứa user id và stored file của avatar mới
+     * @return UserResult
+     */
     @Override
     public UserResult updateUserAvatar(UpdateUserAvatarCommand command) {
         StoredFile storedFile = command.storedFile();
@@ -179,5 +168,10 @@ public class CrudUserUseCase implements CrudUserInputPort {
         User savedUser = userRepositoryPort.updateUserAvatar(userId, file);
 
         return userResultMapper.domainToResult(savedUser);
+    }
+
+    @Override
+    public PageData<UserResult> findAllUsers(UserQueryCommand command) {
+        return null;
     }
 }

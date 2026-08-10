@@ -79,6 +79,18 @@ public enum UserErrorCode implements ErrorCode {
     USER_SOCIAL_LOGIN_CANNOT_RESET_PASSWORD(
             "USER_A020",
             UserTitleMessageKey.USER_SOCIAL_LOGIN_CANNOT_RESET_PASSWORD_TITLE,
+            400),
+    USER_PAGE_INVALID(
+            "USER_A021",
+            UserTitleMessageKey.USER_PAGE_NOT_VALID_TITLE,
+            400),
+    USER_SIZE_INVALID(
+            "USER_A022",
+            UserTitleMessageKey.USER_SIZE_NOT_VALID_TITLE,
+            400),
+    USER_DOB_RANGE_INVALID(
+            "USER_A023",
+            UserTitleMessageKey.USER_DOB_RANGE_NOT_VALID_TITLE,
             400);
 
     private final String code;

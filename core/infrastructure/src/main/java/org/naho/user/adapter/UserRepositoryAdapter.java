@@ -9,8 +9,10 @@ import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.file.repository.FileJpaRepository;
 import org.naho.i18n.message.user.UserDetailMessageKey;
+import org.naho.pagination.PageData;
 import org.naho.shared.exception.InfrastructureException;
 import org.naho.user.command.UpdateUserInfoCommand;
+import org.naho.user.command.UserQueryCommand;
 import org.naho.user.entity.AuthProviderEntity;
 import org.naho.user.entity.UserEntity;
 import org.naho.user.exception.UserErrorCode;
@@ -220,5 +222,10 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         UserEntity savedUser = userJpaRepository.save(user);
 
         return userEntityMapper.entityToDomain(savedUser);
+    }
+
+    @Override
+    public PageData<User> findAllUsers(UserQueryCommand command) {
+        return null;
     }
 }
