@@ -13,7 +13,6 @@ import org.naho.user.port.out.EncoderPort;
 import org.naho.user.port.out.OtpPort;
 import org.naho.user.port.out.RoleRepositoryPort;
 import org.naho.user.port.out.UserRepositoryPort;
-import org.naho.user.result.RegisterResult;
 import org.naho.user.type.RoleName;
 import org.naho.user.valueobject.Password;
 
@@ -43,7 +42,7 @@ public class RegisterUseCase implements RegisterInputPort {
     }
 
     @Override
-    public RegisterResult register(RegisterCommand command) {
+    public void register(RegisterCommand command) {
         // Check already user
         if (userRepository.existsByUsername(command.username())) {
             throw new ApplicationException(
@@ -74,7 +73,7 @@ public class RegisterUseCase implements RegisterInputPort {
 
         User newUser = User.registerNewUser(
                 command.username(),
-                command.fullName(),
+                command.fullname(),
                 encodedPassword,
                 command.email(),
                 defaultRole.getId()
@@ -91,9 +90,5 @@ public class RegisterUseCase implements RegisterInputPort {
         otpPort.saveOtp(email, otp);
         emailPort.sendOtpEmail(email, savedUser.getFullName(), otp);
 
-        return new RegisterResult(
-                savedUser.getId() != null ? savedUser.getId().toString() : "",
-                savedUser.getUsername().getValue(),
-                email);
     }
 }
