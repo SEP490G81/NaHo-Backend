@@ -109,7 +109,7 @@ public class CommentCrudUseCase implements CommentCrudInputPort {
         if (!isOwner) {
             throw new ApplicationException(
                     CommentErrorCode.COMMENT_NOT_AUTHORIZED,
-                    CommentDetailMessageKey.COMMENT_DELETE_FORBIDDEN
+                    CommentDetailMessageKey.COMMENT_UPDATE_FORBIDDEN
             );
         }
 
