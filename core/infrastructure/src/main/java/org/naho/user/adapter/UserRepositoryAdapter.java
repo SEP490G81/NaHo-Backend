@@ -2,15 +2,14 @@ package org.naho.user.adapter;
 
 import lombok.RequiredArgsConstructor;
 import org.naho.file.entity.FileEntity;
-import org.naho.file.mapper.FileEntityMapper;
 import org.naho.file.model.File;
-import org.naho.file.port.in.UploadFileInputPort;
-import org.naho.file.port.out.FileRepositoryPort;
-import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.file.repository.FileJpaRepository;
 import org.naho.i18n.message.user.UserDetailMessageKey;
+import org.naho.pagination.PageData;
+import org.naho.pagination.PageMeta;
 import org.naho.shared.exception.InfrastructureException;
 import org.naho.user.command.UpdateUserInfoCommand;
+import org.naho.user.command.UserQueryCommand;
 import org.naho.user.entity.AuthProviderEntity;
 import org.naho.user.entity.UserEntity;
 import org.naho.user.exception.UserErrorCode;
@@ -22,12 +21,18 @@ import org.naho.user.mybatis.UserQueryMapper;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.naho.user.repository.UserJpaRepository;
 import org.naho.user.result.LeaderboardUserResult;
+import org.naho.user.specification.UserSpecification;
 import org.naho.user.type.AuthProviderName;
 import org.naho.user.type.Gender;
 import org.naho.user.type.RoleName;
 import org.naho.user.type.UserStatus;
 import org.naho.user.valueobject.Dob;
 import org.naho.user.valueobject.Username;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -42,10 +47,6 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     private final UserEntityMapper userEntityMapper;
     private final UserQueryMapper userQueryMapper;
     private final AuthProviderEntityMapper authProviderEntityMapper;
-    private final FileStorageServicePort fileStorageServicePort;
-    private final UploadFileInputPort uploadFileInputPort;
-    private final FileEntityMapper fileEntityMapper;
-    private final FileRepositoryPort fileRepositoryPort;
     private final FileJpaRepository fileJpaRepository;
 
     @Override
@@ -151,13 +152,6 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
-    public List<User> getListUser() {
-        return userJpaRepository.findAll().stream()
-                .map(userEntityMapper::entityToDomain)
-                .toList();
-    }
-
-    @Override
     public void lockById(Long userId) {
         userJpaRepository.findByIdForUpdate(userId);
     }
@@ -219,6 +213,77 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
         UserEntity savedUser = userJpaRepository.save(user);
 
+        return userEntityMapper.entityToDomain(savedUser);
+    }
+
+    /**
+     * Method để query xuống db và lấy ra danh sách người dùng kèm các điều kiện
+     *
+     * @param command chứa các điều kiện search, filter, sort
+     * @return PageData<User>
+     */
+    @Override
+    public PageData<User> findAllUsers(UserQueryCommand command) {
+        // tạo đối tượng Pageable gồm:
+        // số trang, số element trên 1 trang, sort column, sort direction
+        Pageable pageable = PageRequest.of(
+                command.page(),
+                command.size(),
+                Sort.by(
+                        Sort.Direction.valueOf(command.sortDirection().name()),
+                        command.sortColumn().getColumnName()
+                )
+        );
+
+        // gom các điều kiện của searchKeyword
+        Specification<UserEntity> searchKeywordSpecification = Specification.anyOf(
+                UserSpecification.hasEmail(command.searchKeyword()),
+                UserSpecification.hasUsername(command.searchKeyword()),
+                UserSpecification.hasFullName(command.searchKeyword())
+        );
+
+        // điều kiện cuối cùng
+        Specification<UserEntity> specification = Specification.allOf(
+                searchKeywordSpecification,
+                UserSpecification.hasGender(command.gender()),
+                UserSpecification.dobBetween(command.dobFrom(), command.dobTo()),
+                UserSpecification.hasStatus(command.status()),
+                UserSpecification.hasRoleId(command.roleId()),
+                UserSpecification.isEmailVerified(command.isEmailVerified()),
+                UserSpecification.notAdminRole()
+        );
+
+        Page<UserEntity> page = userJpaRepository.findAll(specification, pageable);
+
+        return PageData.<User>builder()
+                .pageMeta(PageMeta.builder()
+                        .currentPage(page.getNumber())
+                        .pageSize(page.getSize())
+                        .totalPages(page.getTotalPages())
+                        .totalElements(page.getTotalElements())
+                        .hasNext(page.hasNext())
+                        .hasPrevious(page.hasPrevious())
+                        .build())
+                .data(page.getContent()
+                        .stream()
+                        .map(userEntityMapper::entityToDomain)
+                        .toList()
+                )
+                .build();
+    }
+
+    @Override
+    public User updateUserStatus(Long id, UserStatus newStatus) {
+        UserEntity user = userJpaRepository.findById(id)
+                .orElseThrow(() -> new InfrastructureException(
+                        UserErrorCode.USER_NOT_FOUND,
+                        UserDetailMessageKey.USER_ID_NOT_FOUND,
+                        id
+                ));
+
+        user.setStatus(newStatus);
+
+        UserEntity savedUser = userJpaRepository.save(user);
         return userEntityMapper.entityToDomain(savedUser);
     }
 }

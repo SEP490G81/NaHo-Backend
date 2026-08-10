@@ -31,8 +31,8 @@ public class UserResultMapper {
     public UserResult domainToResult(User domain) {
         LocalDate dob = domain.getDob() == null ? null : domain.getDob().getValue();
 
-        List<RoleResult> roleResultList =
-                crudRoleInputPort.findAllByUserId(domain.getId());
+        RoleResult roleResult = domain.getRoleId() == null ? null :
+                crudRoleInputPort.findRoleById(domain.getRoleId());
         List<AuthProviderResult> authProviderResultList =
                 crudAuthProviderInputPort.findAllByUser_Id(domain.getId());
         FileResult fileResult = domain.getAvatarFileId() == null ? null :
@@ -40,7 +40,7 @@ public class UserResultMapper {
 
         return UserResult.builder()
                 .id(domain.getId())
-                .roles(roleResultList)
+                .role(roleResult)
                 .authProviders(authProviderResultList)
                 .userLearningProgressId(domain.getUserLearningProgressId())
                 .avatarFile(fileResult)

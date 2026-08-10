@@ -11,33 +11,33 @@ import org.naho.subscription.type.PlanTier;
 public class SubscriptionPlan {
     private final Long id;
     private final PlanCode code;
-    private String name;
     private String description;
     private PlanTier tier;
     private Money price;
     private Integer durationDays;
-    private UsageQuota quota;
-    private Boolean fullCurriculumAccess;
-    private Boolean progressAnalyticsEnabled;
+    private Integer dailySpeakingQuestionEvaluationLimit;
+    private Integer maxSpeakingQuestionRecordingSeconds;
+    private Integer maxConcurrentAiSessionCount;
+    private Integer maxTurnsPerAiSession;
+    private Integer dailyAiSessionEvaluationLimit;
+    private Integer maxAiTurnSpeakingSeconds;
     private Boolean sampleAnswerEnabled;
-    private Double maxAnswerTimeSeconds;
-    private Boolean saveAnswerHistoryEnabled;
     private PlanStatus status;
 
     private SubscriptionPlan(Builder builder) {
         this.id = builder.id;
         this.code = builder.code;
-        this.name = builder.name;
         this.description = builder.description;
         this.tier = builder.tier;
         this.price = builder.price;
         this.durationDays = builder.durationDays;
-        this.quota = builder.quota;
-        this.fullCurriculumAccess = builder.fullCurriculumAccess;
-        this.progressAnalyticsEnabled = builder.progressAnalyticsEnabled;
+        this.dailySpeakingQuestionEvaluationLimit = builder.dailySpeakingQuestionEvaluationLimit;
+        this.maxSpeakingQuestionRecordingSeconds = builder.maxSpeakingQuestionRecordingSeconds;
+        this.maxConcurrentAiSessionCount = builder.maxConcurrentAiSessionCount;
+        this.maxTurnsPerAiSession = builder.maxTurnsPerAiSession;
+        this.dailyAiSessionEvaluationLimit = builder.dailyAiSessionEvaluationLimit;
+        this.maxAiTurnSpeakingSeconds = builder.maxAiTurnSpeakingSeconds;
         this.sampleAnswerEnabled = builder.sampleAnswerEnabled;
-        this.maxAnswerTimeSeconds = builder.maxAnswerTimeSeconds;
-        this.saveAnswerHistoryEnabled = builder.saveAnswerHistoryEnabled;
         this.status = builder.status;
     }
 
@@ -47,30 +47,30 @@ public class SubscriptionPlan {
 
     public static SubscriptionPlan create(
             PlanCode code,
-            String name,
             String description,
             PlanTier tier,
             Money price,
             Integer durationDays,
-            UsageQuota quota,
-            Boolean fullCurriculumAccess,
-            Boolean progressAnalyticsEnabled,
-            Boolean sampleAnswerEnabled,
-            Double maxAnswerTimeSeconds,
-            Boolean saveAnswerHistoryEnabled) {
+            Integer dailySpeakingQuestionEvaluationLimit,
+            Integer maxSpeakingQuestionRecordingSeconds,
+            Integer maxConcurrentAiSessionCount,
+            Integer maxTurnsPerAiSession,
+            Integer dailyAiSessionEvaluationLimit,
+            Integer maxAiTurnSpeakingSeconds,
+            Boolean sampleAnswerEnabled) {
         return builder()
                 .code(code)
-                .name(name)
                 .description(description)
                 .tier(tier)
                 .price(price)
                 .durationDays(durationDays)
-                .quota(quota)
-                .fullCurriculumAccess(fullCurriculumAccess)
-                .progressAnalyticsEnabled(progressAnalyticsEnabled)
+                .dailySpeakingQuestionEvaluationLimit(dailySpeakingQuestionEvaluationLimit)
+                .maxSpeakingQuestionRecordingSeconds(maxSpeakingQuestionRecordingSeconds)
+                .maxConcurrentAiSessionCount(maxConcurrentAiSessionCount)
+                .maxTurnsPerAiSession(maxTurnsPerAiSession)
+                .dailyAiSessionEvaluationLimit(dailyAiSessionEvaluationLimit)
+                .maxAiTurnSpeakingSeconds(maxAiTurnSpeakingSeconds)
                 .sampleAnswerEnabled(sampleAnswerEnabled)
-                .maxAnswerTimeSeconds(maxAnswerTimeSeconds)
-                .saveAnswerHistoryEnabled(saveAnswerHistoryEnabled)
                 .status(PlanStatus.ACTIVE)
                 .build();
     }
@@ -80,7 +80,7 @@ public class SubscriptionPlan {
     }
 
     public boolean isFree() {
-        return price.isZero();
+        return price != null && price.isZero();
     }
 
     // Getters
@@ -90,10 +90,6 @@ public class SubscriptionPlan {
 
     public PlanCode getCode() {
         return code;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -112,28 +108,32 @@ public class SubscriptionPlan {
         return durationDays;
     }
 
-    public UsageQuota getQuota() {
-        return quota;
+    public Integer getDailySpeakingQuestionEvaluationLimit() {
+        return dailySpeakingQuestionEvaluationLimit;
     }
 
-    public Boolean isFullCurriculumAccess() {
-        return fullCurriculumAccess;
+    public Integer getMaxSpeakingQuestionRecordingSeconds() {
+        return maxSpeakingQuestionRecordingSeconds;
     }
 
-    public Boolean isProgressAnalyticsEnabled() {
-        return progressAnalyticsEnabled;
+    public Integer getMaxConcurrentAiSessionCount() {
+        return maxConcurrentAiSessionCount;
+    }
+
+    public Integer getMaxTurnsPerAiSession() {
+        return maxTurnsPerAiSession;
+    }
+
+    public Integer getDailyAiSessionEvaluationLimit() {
+        return dailyAiSessionEvaluationLimit;
+    }
+
+    public Integer getMaxAiTurnSpeakingSeconds() {
+        return maxAiTurnSpeakingSeconds;
     }
 
     public Boolean isSampleAnswerEnabled() {
         return sampleAnswerEnabled;
-    }
-
-    public Double getMaxAnswerTimeSeconds() {
-        return maxAnswerTimeSeconds;
-    }
-
-    public Boolean isSaveAnswerHistoryEnabled() {
-        return saveAnswerHistoryEnabled;
     }
 
     public PlanStatus getStatus() {
@@ -143,17 +143,17 @@ public class SubscriptionPlan {
     public static final class Builder {
         private Long id;
         private PlanCode code;
-        private String name;
         private String description;
         private PlanTier tier;
         private Money price;
         private Integer durationDays;
-        private UsageQuota quota;
-        private Boolean fullCurriculumAccess;
-        private Boolean progressAnalyticsEnabled;
+        private Integer dailySpeakingQuestionEvaluationLimit;
+        private Integer maxSpeakingQuestionRecordingSeconds;
+        private Integer maxConcurrentAiSessionCount;
+        private Integer maxTurnsPerAiSession;
+        private Integer dailyAiSessionEvaluationLimit;
+        private Integer maxAiTurnSpeakingSeconds;
         private Boolean sampleAnswerEnabled;
-        private Double maxAnswerTimeSeconds;
-        private Boolean saveAnswerHistoryEnabled;
         private PlanStatus status;
 
         private Builder() {
@@ -166,11 +166,6 @@ public class SubscriptionPlan {
 
         public Builder code(PlanCode code) {
             this.code = code;
-            return this;
-        }
-
-        public Builder name(String name) {
-            this.name = name;
             return this;
         }
 
@@ -194,33 +189,38 @@ public class SubscriptionPlan {
             return this;
         }
 
-        public Builder quota(UsageQuota quota) {
-            this.quota = quota;
+        public Builder dailySpeakingQuestionEvaluationLimit(Integer dailySpeakingQuestionEvaluationLimit) {
+            this.dailySpeakingQuestionEvaluationLimit = dailySpeakingQuestionEvaluationLimit;
             return this;
         }
 
-        public Builder fullCurriculumAccess(Boolean fullCurriculumAccess) {
-            this.fullCurriculumAccess = fullCurriculumAccess;
+        public Builder maxSpeakingQuestionRecordingSeconds(Integer maxSpeakingQuestionRecordingSeconds) {
+            this.maxSpeakingQuestionRecordingSeconds = maxSpeakingQuestionRecordingSeconds;
             return this;
         }
 
-        public Builder progressAnalyticsEnabled(Boolean progressAnalyticsEnabled) {
-            this.progressAnalyticsEnabled = progressAnalyticsEnabled;
+        public Builder maxConcurrentAiSessionCount(Integer maxConcurrentAiSessionCount) {
+            this.maxConcurrentAiSessionCount = maxConcurrentAiSessionCount;
+            return this;
+        }
+
+        public Builder maxTurnsPerAiSession(Integer maxTurnsPerAiSession) {
+            this.maxTurnsPerAiSession = maxTurnsPerAiSession;
+            return this;
+        }
+
+        public Builder dailyAiSessionEvaluationLimit(Integer dailyAiSessionEvaluationLimit) {
+            this.dailyAiSessionEvaluationLimit = dailyAiSessionEvaluationLimit;
+            return this;
+        }
+
+        public Builder maxAiTurnSpeakingSeconds(Integer maxAiTurnSpeakingSeconds) {
+            this.maxAiTurnSpeakingSeconds = maxAiTurnSpeakingSeconds;
             return this;
         }
 
         public Builder sampleAnswerEnabled(Boolean sampleAnswerEnabled) {
             this.sampleAnswerEnabled = sampleAnswerEnabled;
-            return this;
-        }
-
-        public Builder maxAnswerTimeSeconds(Double maxAnswerTimeSeconds) {
-            this.maxAnswerTimeSeconds = maxAnswerTimeSeconds;
-            return this;
-        }
-
-        public Builder saveAnswerHistoryEnabled(Boolean saveAnswerHistoryEnabled) {
-            this.saveAnswerHistoryEnabled = saveAnswerHistoryEnabled;
             return this;
         }
 
@@ -234,21 +234,13 @@ public class SubscriptionPlan {
                 throw new DomainException(SubscriptionDomainErrorCode.PLAN_CODE_EMPTY,
                         SubscriptionDetailMessageKey.PLAN_CODE_EMPTY);
             }
-            if (name == null || name.isBlank()) {
-                throw new DomainException(SubscriptionDomainErrorCode.PLAN_NAME_EMPTY,
-                        SubscriptionDetailMessageKey.PLAN_NAME_EMPTY);
-            }
             if (price == null) {
                 throw new DomainException(SubscriptionDomainErrorCode.PLAN_PRICE_EMPTY,
                         SubscriptionDetailMessageKey.PLAN_PRICE_EMPTY);
             }
-            if (durationDays == null || durationDays <= 0) {
+            if (durationDays != null && durationDays <= 0) {
                 throw new DomainException(SubscriptionDomainErrorCode.PLAN_DURATION_INVALID,
                         SubscriptionDetailMessageKey.PLAN_DURATION_INVALID);
-            }
-            if (quota == null) {
-                throw new DomainException(SubscriptionDomainErrorCode.PLAN_QUOTA_EMPTY,
-                        SubscriptionDetailMessageKey.PLAN_QUOTA_EMPTY);
             }
             if (tier == null) {
                 throw new DomainException(SubscriptionDomainErrorCode.PLAN_TIER_EMPTY,

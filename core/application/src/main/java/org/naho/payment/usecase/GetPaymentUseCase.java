@@ -12,6 +12,8 @@ import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.TransactionPort;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GetPaymentUseCase implements GetPaymentInputPort {
 
@@ -45,14 +47,14 @@ public class GetPaymentUseCase implements GetPaymentInputPort {
     }
 
     @Override
-    public java.util.List<PaymentOrderResult> getPaymentsByUserId(Long userId) {
+    public List<PaymentOrderResult> getPaymentsByUserId(Long userId) {
         return transactionPort.execute(() -> doGetPaymentsByUserId(userId));
     }
 
-    private java.util.List<PaymentOrderResult> doGetPaymentsByUserId(Long userId) {
-        java.util.List<PaymentOrder> orders = orderRepositoryPort.findAllByUserId(userId);
+    private List<PaymentOrderResult> doGetPaymentsByUserId(Long userId) {
+        List<PaymentOrder> orders = orderRepositoryPort.findAllByUserId(userId);
         Instant now = Instant.now();
-        java.util.List<PaymentOrderResult> results = new java.util.ArrayList<>();
+        List<PaymentOrderResult> results = new ArrayList<>();
         for (PaymentOrder order : orders) {
             if (order.getStatus() == PaymentStatus.PENDING && order.isExpiredAt(now)) {
                 order.expire(now);

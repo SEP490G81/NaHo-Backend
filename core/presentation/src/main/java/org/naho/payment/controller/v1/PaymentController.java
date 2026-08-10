@@ -23,7 +23,7 @@ import org.naho.payment.result.CreatePaymentResult;
 import org.naho.payment.result.PaymentOrderResult;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.shared.exception.ApplicationException;
-import org.naho.subscription.dto.mapper.SubscriptionResponseMapper;
+import org.naho.subscription.dto.mapper.UserSubscriptionResponseMapper;
 import org.naho.subscription.dto.response.UserSubscriptionResponse;
 import org.naho.subscription.result.UserSubscriptionResult;
 import org.naho.user.result.AccessTokenPayload;
@@ -48,27 +48,32 @@ public class PaymentController {
     private final CancelPaymentInputPort cancelPaymentInputPort;
     private final AdminUpgradeSubscriptionInputPort adminUpgradeSubscriptionInputPort;
     private final PaymentResponseMapper responseMapper;
-    private final SubscriptionResponseMapper subscriptionResponseMapper;
+    private final UserSubscriptionResponseMapper userSubscriptionResponseMapper;
     private final VnPayCallbackHelper vnPayCallbackHelper;
+
     @Value("${app.frontend-url:http://localhost:3636}")
     private String frontendUrl;
 
     @GetMapping("/my-orders")
     @ApiResponseMessage(message = PaymentDetailMessageKey.PAYMENT_ORDER_GET_ALL_SUCCESS)
     public ResponseEntity<List<PaymentOrderResponse>> getMyPaymentOrders(
-            @AuthenticationPrincipal AccessTokenPayload payload) {
+            @AuthenticationPrincipal AccessTokenPayload payload
+    ) {
         List<PaymentOrderResult> results = getPaymentInputPort.getPaymentsByUserId(payload.userId());
-        List<PaymentOrderResponse> response = results.stream()
-                .map(responseMapper::resultToOrderResponse)
+
+        List<PaymentOrderResponse> responses = results
+                .stream().map(responseMapper::resultToOrderResponse)
                 .toList();
-        return ResponseEntity.ok(response);
+
+        return ResponseEntity.ok(responses);
     }
 
     @PostMapping("/admin/upgrade-subscription")
     @ApiResponseMessage(message = PaymentDetailMessageKey.PAYMENT_SUBSCRIPTION_UPGRADE_SUCCESS)
     public ResponseEntity<UserSubscriptionResponse> upgradeUserSubscription(
             @AuthenticationPrincipal AccessTokenPayload payload,
-            @RequestBody @Valid AdminUpgradeSubscriptionRequest request) {
+            @RequestBody @Valid AdminUpgradeSubscriptionRequest request
+    ) {
         AdminUpgradeSubscriptionCommand command = new AdminUpgradeSubscriptionCommand(
                 payload.userId(),
                 request.getUserId(),
@@ -76,7 +81,7 @@ public class PaymentController {
                 request.getDurationDays()
         );
         UserSubscriptionResult result = adminUpgradeSubscriptionInputPort.upgradeSubscription(command);
-        UserSubscriptionResponse response = subscriptionResponseMapper.userSubResultToResponse(result);
+        UserSubscriptionResponse response = userSubscriptionResponseMapper.resultToResponse(result);
         return ResponseEntity.ok(response);
     }
 
@@ -86,7 +91,8 @@ public class PaymentController {
             @AuthenticationPrincipal AccessTokenPayload payload,
             @RequestHeader("Idempotency-Key") String idempotencyKey,
             @RequestBody CreatePaymentRequest request,
-            HttpServletRequest httpServletRequest) {
+            HttpServletRequest httpServletRequest
+    ) {
         String clientIp = vnPayCallbackHelper.extractClientIp(httpServletRequest);
 
         CreatePaymentCommand command = new CreatePaymentCommand(
@@ -95,7 +101,8 @@ public class PaymentController {
                 request.getProvider(),
                 clientIp,
                 httpServletRequest.getLocale().getLanguage(),
-                idempotencyKey);
+                idempotencyKey
+        );
 
         CreatePaymentResult result = createPaymentInputPort.createPayment(command);
         CreatePaymentResponse response = responseMapper.resultToCreateResponse(result);

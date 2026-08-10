@@ -22,6 +22,12 @@ public class UserSubscriptionController {
     private final GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
     private final SubscriptionResponseMapper subscriptionResponseMapper;
 
+    /**
+     * Lấy gói đăng kí hiện tại của người dùng đang đăng nhập
+     *
+     * @param payload chứa user id lấy từ JWT token
+     * @return SubscriptionPlanResponse
+     */
     @GetMapping("/me")
     @ApiResponseMessage(message = SubscriptionDetailMessageKey.SUBSCRIPTION_USER_GET_ACTIVE_SUCCESS)
     public ResponseEntity<SubscriptionPlanResponse> getUserActiveSubscriptionPlan(
@@ -30,8 +36,7 @@ public class UserSubscriptionController {
         SubscriptionPlanResult result = getActiveSubscriptionInputPort
                 .getUserActiveSubscriptionPlan(payload.userId());
 
-        SubscriptionPlanResponse response = subscriptionResponseMapper
-                .planResultToResponse(result);
+        SubscriptionPlanResponse response = subscriptionResponseMapper.resultToResponse(result);
 
         return ResponseEntity.ok(response);
     }

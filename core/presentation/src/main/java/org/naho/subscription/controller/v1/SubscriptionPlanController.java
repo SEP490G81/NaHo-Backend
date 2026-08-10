@@ -20,13 +20,22 @@ import java.util.List;
 public class SubscriptionPlanController {
 
     private final ListActivePlansInputPort listActivePlansInputPort;
-    private final SubscriptionResponseMapper responseMapper;
+    private final SubscriptionResponseMapper subscriptionResponseMapper;
 
+    /**
+     * Lấy ra các Subscription Plan đang được ACTIVE
+     *
+     * @return List<SubscriptionPlanResponse>
+     */
     @GetMapping
     @ApiResponseMessage(message = SubscriptionDetailMessageKey.SUBSCRIPTION_PLANS_GET_LIST_SUCCESS)
     public ResponseEntity<List<SubscriptionPlanResponse>> listActivePlans() {
         List<SubscriptionPlanResult> results = listActivePlansInputPort.listActivePlans();
-        List<SubscriptionPlanResponse> response = responseMapper.listPlanResultToResponse(results);
-        return ResponseEntity.ok(response);
+
+        List<SubscriptionPlanResponse> responses = results
+                .stream().map(subscriptionResponseMapper::resultToResponse)
+                .toList();
+
+        return ResponseEntity.ok(responses);
     }
 }
