@@ -15,7 +15,9 @@ public enum SubscriptionDomainErrorCode implements ErrorCode {
     SUBSCRIPTION_USER_ID_EMPTY("SUB_101", SubscriptionTitleMessageKey.SUBSCRIPTION_FAILED_TITLE, 400),
     SUBSCRIPTION_PLAN_ID_EMPTY("SUB_102", SubscriptionTitleMessageKey.SUBSCRIPTION_FAILED_TITLE, 400),
     SUBSCRIPTION_STATUS_EMPTY("SUB_103", SubscriptionTitleMessageKey.SUBSCRIPTION_FAILED_TITLE, 400),
-    SUBSCRIPTION_TIME_INVALID("SUB_104", SubscriptionTitleMessageKey.SUBSCRIPTION_FAILED_TITLE, 400);
+    SUBSCRIPTION_TIME_INVALID("SUB_104", SubscriptionTitleMessageKey.SUBSCRIPTION_FAILED_TITLE, 400),
+    SUBSCRIPTION_START_TIME_EMPTY("SUB_105", SubscriptionTitleMessageKey.SUBSCRIPTION_FAILED_TITLE, 400),
+    SUBSCRIPTION_END_TIME_EMPTY("SUB_106", SubscriptionTitleMessageKey.SUBSCRIPTION_FAILED_TITLE, 400);
 
     private final String code;
     private final String titleKey;

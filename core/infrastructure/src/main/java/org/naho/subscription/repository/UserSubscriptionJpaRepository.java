@@ -14,7 +14,7 @@ import java.util.List;
 @Repository
 public interface UserSubscriptionJpaRepository extends BaseJpaRepository<UserSubscriptionEntity> {
 
-    @Query("SELECT us FROM UserSubscriptionEntity us WHERE us.user.id = :userId AND us.status = :status AND :now >= us.startTime AND :now < us.endTime ORDER BY us.endTime DESC")
+    @Query("SELECT us FROM UserSubscriptionEntity us WHERE us.user.id = :userId AND us.status = :status AND :now >= us.startTime AND (us.endTime IS NULL OR :now < us.endTime) ORDER BY us.endTime DESC NULLS LAST")
     List<UserSubscriptionEntity> findActiveSubscriptions(
             @Param("userId") Long userId,
             @Param("status") SubscriptionStatus status,
@@ -22,7 +22,7 @@ public interface UserSubscriptionJpaRepository extends BaseJpaRepository<UserSub
     );
 
     @Modifying
-    @Query("UPDATE UserSubscriptionEntity us SET us.status = org.naho.subscription.type.SubscriptionStatus.EXPIRED, us.modifiedTime = :now WHERE us.status = org.naho.subscription.type.SubscriptionStatus.ACTIVE AND us.endTime <= :now")
+    @Query("UPDATE UserSubscriptionEntity us SET us.status = org.naho.subscription.type.SubscriptionStatus.EXPIRED, us.modifiedTime = :now WHERE us.status = org.naho.subscription.type.SubscriptionStatus.ACTIVE AND us.endTime IS NOT NULL AND us.endTime <= :now")
     void updateExpiredSubscriptions(@Param("now") Instant now);
 
     boolean existsByPaymentOrderId(Long paymentOrderId);

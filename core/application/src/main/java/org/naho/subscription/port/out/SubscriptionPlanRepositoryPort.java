@@ -2,6 +2,7 @@ package org.naho.subscription.port.out;
 
 import org.naho.subscription.model.SubscriptionPlan;
 import org.naho.subscription.type.PlanCode;
+import org.naho.subscription.type.PlanStatus;
 import org.naho.subscription.type.SubscriptionStatus;
 
 import java.time.Instant;
@@ -17,7 +18,8 @@ public interface SubscriptionPlanRepositoryPort {
 
     Optional<SubscriptionPlan> findCurrentSubscriptionPlanByUserIdAndStatus(
             Long userId,
-            SubscriptionStatus status,
+            SubscriptionStatus subscriptionStatus,
+            PlanStatus planStatus,
             Instant now
     );
 

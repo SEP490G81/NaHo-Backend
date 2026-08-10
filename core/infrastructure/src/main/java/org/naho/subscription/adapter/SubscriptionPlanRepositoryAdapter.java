@@ -37,15 +37,21 @@ public class SubscriptionPlanRepositoryAdapter implements SubscriptionPlanReposi
 
     @Override
     public List<SubscriptionPlan> findAllActive() {
-        return subscriptionPlanJpaRepository.findAllByStatus(PlanStatus.ACTIVE).stream()
-                .map(subscriptionPlanEntityMapper::entityToDomain)
+        return subscriptionPlanJpaRepository
+                .findAllByStatus(PlanStatus.ACTIVE)
+                .stream().map(subscriptionPlanEntityMapper::entityToDomain)
                 .toList();
     }
 
     @Override
-    public Optional<SubscriptionPlan> findCurrentSubscriptionPlanByUserIdAndStatus(Long userId, SubscriptionStatus status, Instant now) {
+    public Optional<SubscriptionPlan> findCurrentSubscriptionPlanByUserIdAndStatus(
+            Long userId,
+            SubscriptionStatus subscriptionStatus,
+            PlanStatus planStatus,
+            Instant now
+    ) {
         return subscriptionPlanQueryMapper
-                .findCurrentSubscriptionPlanByUserIdAndStatus(userId, status, now)
+                .findCurrentSubscriptionPlanByUserIdAndStatus(userId, subscriptionStatus, planStatus, now)
                 .map(subscriptionPlanEntityMapper::entityToDomain);
     }
 

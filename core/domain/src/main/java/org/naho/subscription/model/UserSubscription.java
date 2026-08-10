@@ -8,16 +8,14 @@ import org.naho.subscription.type.SubscriptionStatus;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-public class UserSubscription { //Đăng ký gói của học viên
+public class UserSubscription {
     private final Long id;
     private final Long userId;
     private final Long subscriptionPlanId;
     private final Long paymentOrderId;
     private final Instant startTime;
     private final Instant endTime;
-    private final Instant createdTime;
     private SubscriptionStatus status;
-    private Instant modifiedTime;
 
     private UserSubscription(Builder builder) {
         this.id = builder.id;
@@ -27,8 +25,6 @@ public class UserSubscription { //Đăng ký gói của học viên
         this.status = builder.status;
         this.startTime = builder.startTime;
         this.endTime = builder.endTime;
-        this.createdTime = builder.createdTime;
-        this.modifiedTime = builder.modifiedTime;
     }
 
     public static Builder builder() {
@@ -39,35 +35,33 @@ public class UserSubscription { //Đăng ký gói của học viên
             Long userId,
             Long planId,
             Long paymentOrderId,
-            int durationDays,
+            Integer durationDays,
             Instant now) {
+        Instant endTime = (durationDays != null) ? now.plus(durationDays, ChronoUnit.DAYS) : null;
         return builder()
                 .userId(userId)
                 .subscriptionPlanId(planId)
                 .paymentOrderId(paymentOrderId)
                 .status(SubscriptionStatus.ACTIVE)
                 .startTime(now)
-                .endTime(now.plus(durationDays, ChronoUnit.DAYS))
-                .createdTime(now)
+                .endTime(endTime)
                 .build();
     }
 
     public boolean isActiveAt(Instant now) {
         return status == SubscriptionStatus.ACTIVE
                 && !now.isBefore(startTime)
-                && now.isBefore(endTime);
+                && (endTime == null || now.isBefore(endTime));
     }
 
     public void expire(Instant now) {
-        if (!now.isBefore(endTime)) {
+        if (endTime != null && !now.isBefore(endTime)) {
             status = SubscriptionStatus.EXPIRED;
-            modifiedTime = now;
         }
     }
 
     public void cancel(Instant now) {
         this.status = SubscriptionStatus.CANCELLED;
-        this.modifiedTime = now;
     }
 
     // Getters
@@ -99,14 +93,6 @@ public class UserSubscription { //Đăng ký gói của học viên
         return endTime;
     }
 
-    public Instant getCreatedTime() {
-        return createdTime;
-    }
-
-    public Instant getModifiedTime() {
-        return modifiedTime;
-    }
-
     public static final class Builder {
         private Long id;
         private Long userId;
@@ -115,8 +101,6 @@ public class UserSubscription { //Đăng ký gói của học viên
         private SubscriptionStatus status;
         private Instant startTime;
         private Instant endTime;
-        private Instant createdTime;
-        private Instant modifiedTime;
 
         private Builder() {
         }
@@ -156,16 +140,6 @@ public class UserSubscription { //Đăng ký gói của học viên
             return this;
         }
 
-        public Builder createdTime(Instant createdTime) {
-            this.createdTime = createdTime;
-            return this;
-        }
-
-        public Builder modifiedTime(Instant modifiedTime) {
-            this.modifiedTime = modifiedTime;
-            return this;
-        }
-
         public UserSubscription build() {
             if (userId == null) {
                 throw new DomainException(SubscriptionDomainErrorCode.SUBSCRIPTION_USER_ID_EMPTY,
@@ -179,13 +153,19 @@ public class UserSubscription { //Đăng ký gói của học viên
                 throw new DomainException(SubscriptionDomainErrorCode.SUBSCRIPTION_STATUS_EMPTY,
                         SubscriptionDetailMessageKey.SUBSCRIPTION_STATUS_EMPTY);
             }
-            if (startTime == null || endTime == null || !endTime.isAfter(startTime)) {
+            if (startTime == null) {
+                throw new DomainException(SubscriptionDomainErrorCode.SUBSCRIPTION_START_TIME_EMPTY,
+                        SubscriptionDetailMessageKey.SUBSCRIPTION_START_TIME_EMPTY);
+            }
+            if (endTime == null) {
+                throw new DomainException(SubscriptionDomainErrorCode.SUBSCRIPTION_END_TIME_EMPTY,
+                        SubscriptionDetailMessageKey.SUBSCRIPTION_END_TIME_EMPTY);
+            }
+            if (startTime.isAfter(endTime)) {
                 throw new DomainException(SubscriptionDomainErrorCode.SUBSCRIPTION_TIME_INVALID,
                         SubscriptionDetailMessageKey.SUBSCRIPTION_TIME_INVALID);
             }
-            if (createdTime == null) {
-                createdTime = Instant.now();
-            }
+
             return new UserSubscription(this);
         }
     }

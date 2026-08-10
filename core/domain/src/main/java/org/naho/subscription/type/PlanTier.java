@@ -5,18 +5,18 @@ public enum PlanTier {
     BASIC(1),
     PREMIUM(2);
 
-    private final int level;
+    private final int tier;
 
-    PlanTier(int level) {
-        this.level = level;
+    PlanTier(int tier) {
+        this.tier = tier;
     }
 
     public int getLevel() {
-        return level;
+        return tier;
     }
 
     public boolean isHigherOrEqualThan(PlanTier other) {
         if (other == null) return true;
-        return this.level >= other.level;
+        return this.tier >= other.tier;
     }
 }
