@@ -21,6 +21,7 @@ public class ReportResponse {
     String description;
     ReportType reportType;
     Boolean isResolved;
+    String adminReply;
     Long questionId;
     Long commentId;
     List<FileResponse> files;

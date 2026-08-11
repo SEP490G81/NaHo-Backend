@@ -8,6 +8,8 @@ public final class ReportTitleMessageKey {
     public static final String REPORT_QUESTION_ID_NOT_VALID_TITLE = "report.question.id.not.valid.title";
     public static final String REPORT_COMMENT_ID_NOT_VALID_TITLE = "report.comment.id.not.valid.title";
     public static final String REPORT_GET_FAIL_TITLE = "report.get.fail.title";
+    public static final String REPORT_ALREADY_RESOLVED_TITLE = "report.already.resolved.title";
+    public static final String REPORT_STATUS_CANNOT_BE_UNRESOLVED_TITLE = "report.status.cannot.be.unresolved.title";
 
     private ReportTitleMessageKey() {
     }

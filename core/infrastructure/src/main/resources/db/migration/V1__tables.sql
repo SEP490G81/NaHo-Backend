@@ -334,6 +334,7 @@ CREATE TABLE reports
     `description`        TEXT         NOT NULL,
     report_type          VARCHAR(50)  NOT NULL,
     is_resolved          BIT(1) NULL,
+    admin_reply          TEXT NULL,
     user_id              BIGINT       NOT NULL,
     speaking_question_id BIGINT NULL,
     comment_id           BIGINT NULL,
