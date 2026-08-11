@@ -14,6 +14,7 @@ public class ReportResult {
     private String description;
     private ReportType reportType;
     private Boolean isResolved;
+    private String adminReply;
     private Long questionId;
     private Long commentId;
     private List<FileResult> files;
@@ -21,7 +22,7 @@ public class ReportResult {
     public ReportResult() {
     }
 
-    public ReportResult(Long id, Long userId, String fullName, String title, String description, ReportType reportType, Boolean isResolved, Long questionId, Long commentId, List<FileResult> files) {
+    public ReportResult(Long id, Long userId, String fullName, String title, String description, ReportType reportType, Boolean isResolved, String adminReply, Long questionId, Long commentId, List<FileResult> files) {
         this.id = id;
         this.userId = userId;
         this.fullName = fullName;
@@ -29,6 +30,7 @@ public class ReportResult {
         this.description = description;
         this.reportType = reportType;
         this.isResolved = isResolved;
+        this.adminReply = adminReply;
         this.questionId = questionId;
         this.commentId = commentId;
         this.files = files;
@@ -42,6 +44,7 @@ public class ReportResult {
         this.description = builder.description;
         this.reportType = builder.reportType;
         this.isResolved = builder.isResolved;
+        this.adminReply = builder.adminReply;
         this.questionId = builder.questionId;
         this.commentId = builder.commentId;
         this.files = builder.files;
@@ -107,6 +110,14 @@ public class ReportResult {
         this.isResolved = isResolved;
     }
 
+    public String getAdminReply() {
+        return adminReply;
+    }
+
+    public void setAdminReply(String adminReply) {
+        this.adminReply = adminReply;
+    }
+
     public Long getQuestionId() {
         return questionId;
     }
@@ -139,6 +150,7 @@ public class ReportResult {
         private String description;
         private ReportType reportType;
         private Boolean isResolved;
+        private String adminReply;
         private Long questionId;
         private Long commentId;
         private List<FileResult> files;
@@ -178,6 +190,11 @@ public class ReportResult {
 
         public Builder isResolved(Boolean isResolved) {
             this.isResolved = isResolved;
+            return this;
+        }
+
+        public Builder adminReply(String adminReply) {
+            this.adminReply = adminReply;
             return this;
         }
 

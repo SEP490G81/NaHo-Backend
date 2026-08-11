@@ -33,6 +33,16 @@ public enum ReportDomainErrorCode implements ErrorCode {
             "REPORT_006",
             ReportTitleMessageKey.REPORT_COMMENT_ID_NOT_VALID_TITLE,
             400
+    ),
+    REPORT_ALREADY_RESOLVED(
+            "REPORT_007",
+            ReportTitleMessageKey.REPORT_ALREADY_RESOLVED_TITLE,
+            400
+    ),
+    REPORT_STATUS_CANNOT_BE_UNRESOLVED(
+            "REPORT_008",
+            ReportTitleMessageKey.REPORT_STATUS_CANNOT_BE_UNRESOLVED_TITLE,
+            400
     );
 
     private final String code;

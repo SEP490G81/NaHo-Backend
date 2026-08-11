@@ -19,6 +19,7 @@ public class Report {
     private final String description;
     private final ReportType reportType;
     private final boolean isResolved;
+    private final String adminReply;
     private List<File> files;
 
     private Report(Builder builder) {
@@ -31,6 +32,7 @@ public class Report {
         this.description = builder.description;
         this.reportType = builder.reportType;
         this.isResolved = builder.isResolved;
+        this.adminReply = builder.adminReply;
         this.files = builder.files != null ? builder.files : List.of();
     }
 
@@ -74,6 +76,10 @@ public class Report {
         return isResolved;
     }
 
+    public String getAdminReply() {
+        return adminReply;
+    }
+
     public List<File> getFiles() {
         return files;
     }
@@ -82,7 +88,19 @@ public class Report {
         this.files = files;
     }
 
-    public Report updateStatus(boolean isResolved) {
+    public Report updateStatus(boolean isResolved, String adminReply) {
+        if (this.isResolved) {
+            throw new DomainException(
+                    ReportDomainErrorCode.REPORT_ALREADY_RESOLVED,
+                    ReportDetailMessageKey.REPORT_ALREADY_RESOLVED
+            );
+        }
+        if (!isResolved) {
+            throw new DomainException(
+                    ReportDomainErrorCode.REPORT_STATUS_CANNOT_BE_UNRESOLVED,
+                    ReportDetailMessageKey.REPORT_STATUS_CANNOT_BE_UNRESOLVED
+            );
+        }
         return builder()
                 .id(this.id)
                 .userId(this.userId)
@@ -93,6 +111,7 @@ public class Report {
                 .description(this.description)
                 .reportType(this.reportType)
                 .isResolved(isResolved)
+                .adminReply(adminReply)
                 .files(this.files)
                 .build();
     }
@@ -108,6 +127,7 @@ public class Report {
         private String description;
         private ReportType reportType;
         private boolean isResolved;
+        private String adminReply;
         private List<File> files;
 
         public Builder id(Long id) {
@@ -152,6 +172,11 @@ public class Report {
 
         public Builder isResolved(boolean isResolved) {
             this.isResolved = isResolved;
+            return this;
+        }
+
+        public Builder adminReply(String adminReply) {
+            this.adminReply = adminReply;
             return this;
         }
 

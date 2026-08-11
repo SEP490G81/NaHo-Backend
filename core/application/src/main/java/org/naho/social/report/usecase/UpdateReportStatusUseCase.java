@@ -56,7 +56,7 @@ public class UpdateReportStatusUseCase implements UpdateReportStatusInputPort {
 
         boolean shouldSendEmail = command.isResolved() && !existingReport.isResolved();
 
-        Report updatedReport = existingReport.updateStatus(command.isResolved());
+        Report updatedReport = existingReport.updateStatus(command.isResolved(), command.adminReply());
         Report savedReport = reportRepositoryPort.save(updatedReport);
 
         if (shouldSendEmail) {
@@ -105,6 +105,7 @@ public class UpdateReportStatusUseCase implements UpdateReportStatusInputPort {
             variables.put("reportId", report.getId());
             variables.put("reportTitle", report.getTitle());
             variables.put("reportType", report.getReportType() != null ? report.getReportType().name() : "");
+            variables.put("adminReply", report.getAdminReply() != null ? report.getAdminReply() : "");
 
             emailPort.sendEmail(email, subject, "report-resolved-email", variables);
         } catch (Exception ignored) {

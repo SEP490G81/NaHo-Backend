@@ -46,6 +46,7 @@ public class ReportResultMapper {
                 .description(domain.getDescription())
                 .reportType(domain.getReportType())
                 .isResolved(domain.isResolved())
+                .adminReply(domain.getAdminReply())
                 .questionId(domain.getQuestionId())
                 .commentId(domain.getCommentId())
                 .files(fileResults)

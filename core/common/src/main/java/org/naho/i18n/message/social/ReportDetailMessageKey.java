@@ -15,6 +15,8 @@ public final class ReportDetailMessageKey {
     public static final String REPORT_GET_DETAIL_SUCCESS = "report.get.detail.success";
     public static final String REPORT_UPDATE_STATUS_SUCCESS = "report.update.status.success";
     public static final String REPORT_STATUS_BLANK = "report.status.blank";
+    public static final String REPORT_ALREADY_RESOLVED = "report.already.resolved";
+    public static final String REPORT_STATUS_CANNOT_BE_UNRESOLVED = "report.status.cannot.be.unresolved";
 
     private ReportDetailMessageKey() {
     }

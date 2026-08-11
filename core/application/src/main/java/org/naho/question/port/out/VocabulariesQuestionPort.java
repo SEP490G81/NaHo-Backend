@@ -7,4 +7,5 @@ import java.util.List;
 public interface VocabulariesQuestionPort {
     List<Vocabulary> findVocabularyListOfObjective(int objectiveId);
 
+    List<Vocabulary> findVocabularyListOfTopic(Long topicId);
 }
