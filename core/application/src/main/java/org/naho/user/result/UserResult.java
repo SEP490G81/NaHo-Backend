@@ -22,6 +22,7 @@ public class UserResult {
     private Gender gender;
     private LocalDate dob;
     private UserStatus status;
+    private boolean isEmailVerified;
 
     public UserResult() {
     }
@@ -39,6 +40,23 @@ public class UserResult {
             LocalDate dob,
             UserStatus status
     ) {
+        this(id, role, authProviders, avatarFile, userLearningProgressId, username, email, fullName, gender, dob, status, false);
+    }
+
+    public UserResult(
+            Long id,
+            RoleResult role,
+            List<AuthProviderResult> authProviders,
+            FileResult avatarFile,
+            Long userLearningProgressId,
+            String username,
+            String email,
+            String fullName,
+            Gender gender,
+            LocalDate dob,
+            UserStatus status,
+            boolean isEmailVerified
+    ) {
         this.id = id;
         this.role = role;
         this.authProviders = authProviders;
@@ -50,6 +68,7 @@ public class UserResult {
         this.gender = gender;
         this.dob = dob;
         this.status = status;
+        this.isEmailVerified = isEmailVerified;
     }
 
     private UserResult(Builder builder) {
@@ -64,6 +83,7 @@ public class UserResult {
         this.gender = builder.gender;
         this.dob = builder.dob;
         this.status = builder.status;
+        this.isEmailVerified = builder.isEmailVerified;
     }
 
     public static Builder builder() {
@@ -150,13 +170,20 @@ public class UserResult {
         this.dob = dob;
     }
 
-
     public UserStatus getStatus() {
         return status;
     }
 
     public void setStatus(UserStatus status) {
         this.status = status;
+    }
+
+    public boolean isEmailVerified() {
+        return isEmailVerified;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        isEmailVerified = emailVerified;
     }
 
     // Record-style accessors for backward compatibility
@@ -200,7 +227,6 @@ public class UserResult {
         return dob;
     }
 
-
     public UserStatus status() {
         return status;
     }
@@ -210,7 +236,8 @@ public class UserResult {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserResult that = (UserResult) o;
-        return Objects.equals(id, that.id) &&
+        return isEmailVerified == that.isEmailVerified &&
+                Objects.equals(id, that.id) &&
                 Objects.equals(role, that.role) &&
                 Objects.equals(authProviders, that.authProviders) &&
                 Objects.equals(avatarFile, that.avatarFile) &&
@@ -225,7 +252,7 @@ public class UserResult {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, role, authProviders, avatarFile, userLearningProgressId, username, email, fullName, gender, dob, status);
+        return Objects.hash(id, role, authProviders, avatarFile, userLearningProgressId, username, email, fullName, gender, dob, status, isEmailVerified);
     }
 
     @Override
@@ -242,6 +269,7 @@ public class UserResult {
                 ", gender=" + gender +
                 ", dob=" + dob +
                 ", status=" + status +
+                ", isEmailVerified=" + isEmailVerified +
                 '}';
     }
 
@@ -261,6 +289,7 @@ public class UserResult {
         private LocalDate dob;
 
         private UserStatus status;
+        private boolean isEmailVerified;
 
         private Builder() {
         }
@@ -315,9 +344,13 @@ public class UserResult {
             return this;
         }
 
-
         public Builder status(UserStatus status) {
             this.status = status;
+            return this;
+        }
+
+        public Builder isEmailVerified(boolean isEmailVerified) {
+            this.isEmailVerified = isEmailVerified;
             return this;
         }
 

@@ -50,6 +50,7 @@ public class UserResultMapper {
                 .gender(domain.getGender())
                 .dob(dob)
                 .status(domain.getStatus())
+                .isEmailVerified(domain.isEmailVerified())
                 .build();
     }
 }

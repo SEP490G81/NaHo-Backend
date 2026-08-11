@@ -105,7 +105,8 @@ public class User {
                 .fullName(fullName)
                 .gender(gender)
                 .dob(dob)
-                .status(status);
+                .status(status)
+                .isEmailVerified(isEmailVerified);
     }
 
     public Long getId() {
