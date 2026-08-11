@@ -3,8 +3,8 @@ package org.naho.social.reaction.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.naho.question.entity.SpeakingQuestionEntity;
-import org.naho.social.entity.CommentEntity;
-import org.naho.social.entity.ReactionEntity;
+import org.naho.social.comment.entity.CommentEntity;
+import org.naho.social.comment.entity.ReactionEntity;
 import org.naho.social.reaction.model.Reaction;
 import org.naho.user.entity.UserEntity;
 

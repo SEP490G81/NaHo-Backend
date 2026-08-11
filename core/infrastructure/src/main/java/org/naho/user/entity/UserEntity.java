@@ -12,7 +12,9 @@ import org.naho.learning.entity.UserNodeProgressEntity;
 import org.naho.point.entity.PointHistoryEntity;
 import org.naho.question.entity.SpeakingQuestionEntity;
 import org.naho.shared.persistence.BaseEntity;
+import org.naho.social.comment.entity.CommentEntity;
 import org.naho.social.report.entity.ReportEntity;
+import org.naho.subscription.entity.UserDailyAiUsageEntity;
 import org.naho.subscription.entity.UserSubscriptionEntity;
 import org.naho.user.type.Gender;
 import org.naho.user.type.UserStatus;
@@ -96,4 +98,10 @@ public class UserEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "user")
     List<UserSubscriptionEntity> userSubscriptions;
+
+    @OneToMany(mappedBy = "user")
+    List<CommentEntity> comments;
+
+    @OneToMany(mappedBy = "user")
+    List<UserDailyAiUsageEntity> userDailyAiUsages;
 }

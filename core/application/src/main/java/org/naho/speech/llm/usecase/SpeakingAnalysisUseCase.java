@@ -219,7 +219,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         answerHistory.setAudioFileId(audioFile.getId());
         return answerHistoryRepositoryPort.save(answerHistory);
     }
-    
+
     private AnalysisContext buildAnalysisContext(
             LearningPathNode learningPathNode,
             UserLearningProgress progress,

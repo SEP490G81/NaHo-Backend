@@ -1,6 +1,6 @@
 package org.naho.social.comment.repository;
 
-import org.naho.social.entity.CommentEntity;
+import org.naho.social.comment.entity.CommentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
