@@ -54,6 +54,8 @@ public class SpeakingAnalysisController {
 
             // validate xem có phải file .wav không?
             // và validate xem thời lượng có hợp lệ không?
+            // thời lượng tối đa được phép tùy thuộc vào Subscription plan
+            // method cũng trả về thời lượng của file record
             double duration = fileValidatorPort.validateWavFileAndDuration(
                     audioBytes,
                     subscriptionPlan.maxSpeakingQuestionRecordingSeconds().doubleValue()

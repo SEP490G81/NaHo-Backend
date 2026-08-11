@@ -12,6 +12,7 @@ import org.naho.book.port.out.BookRepositoryPort;
 import org.naho.book.port.out.LessonRepositoryPort;
 import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.book.port.out.TopicRepositoryPort;
+import org.naho.file.constant.FileAccessStatus;
 import org.naho.file.model.File;
 import org.naho.file.port.in.UploadFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
@@ -135,11 +136,9 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         SpeakingAnalysisResult result = transactionPort.execute(() ->
                 persistResults(command, ctx, azureAssessment, parsedScores));
 
-        // Upload file audio lên cloud nếu có
-        if (command.storedFile() != null) {
-            FileResult uploadedFile = uploadFileInputPort.uploadFileToCloud(command.storedFile());
-            result.setAudioFile(uploadedFile);
-        }
+        // Upload file audio lên cloud
+        FileResult uploadedFile = uploadFileInputPort.uploadFileToCloud(command.storedFile());
+        result.setAudioFile(uploadedFile);
 
         return result;
     }
@@ -182,11 +181,13 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                         SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
                         SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_NOT_FOUND));
 
-        File audioFile = null;
-        if (command.storedFile() != null) {
-            audioFile = fileRepositoryPort.createNewForUpload(command.storedFile(), false);
-        }
+        // Lưu file vào database với operation type là Upload
+        File audioFile = fileRepositoryPort.createNewForUpload(
+                command.storedFile(),
+                FileAccessStatus.PRIVATE
+        );
 
+        // Lưu lịch sử trả lời Speaking Question
         AnswerHistory savedAnswerHistory = createAnswerHistory(user, speakingQuestion, audioFile, command.durationSec());
 
         // DB-R
@@ -205,7 +206,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         return buildAnalysisContext(
                 learningPathNode, progress, speakingQuestion,
                 savedAnswerHistory, audioFile,
-                objective, lesson, topic, book);
+                objective, lesson, topic, book
+        );
     }
 
     private AnswerHistory createAnswerHistory(User user, SpeakingQuestion speakingQuestion, File audioFile, Integer durationSec) {
@@ -214,13 +216,10 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 .speakingQuestionId(speakingQuestion.getId())
                 .durationSec(durationSec)
                 .build();
-        if (audioFile != null) {
-            answerHistory.setAudioFileId(audioFile.getId());
-        }
+        answerHistory.setAudioFileId(audioFile.getId());
         return answerHistoryRepositoryPort.save(answerHistory);
     }
-
-
+    
     private AnalysisContext buildAnalysisContext(
             LearningPathNode learningPathNode,
             UserLearningProgress progress,
