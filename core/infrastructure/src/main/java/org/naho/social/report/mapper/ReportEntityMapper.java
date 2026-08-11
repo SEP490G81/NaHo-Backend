@@ -18,6 +18,7 @@ import org.naho.user.mapper.UserIdMapper;
 public interface ReportEntityMapper {
 
     @Mapping(target = "userId", source = "user.id")
+    @Mapping(target = "fullName", source = "user.fullName")
     @Mapping(target = "questionId", source = "question.id")
     @Mapping(target = "commentId", source = "comment.id")
     @Mapping(target = "files", source = "files")

@@ -58,7 +58,9 @@ public class SpeakingAnalysisController {
             // và validate xem thời lượng có hợp lệ không?
             double duration = fileValidatorPort.validateWavFileAndDuration(
                     audioBytes,
-                    subscriptionPlan.maxAnswerTimeSeconds()
+                    subscriptionPlan.maxSpeakingQuestionRecordingSeconds() != null
+                            ? subscriptionPlan.maxSpeakingQuestionRecordingSeconds().doubleValue()
+                            : 0.0
             );
 
             // nếu đang dùng gói FREE thì không lưu file

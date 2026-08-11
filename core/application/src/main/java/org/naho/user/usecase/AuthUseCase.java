@@ -69,23 +69,16 @@ public class AuthUseCase implements AuthInputPort {
     }
 
     @Override
-    public void logoutAllSessions(Long userId) {
-        if (userId == null) {
-            throw new ApplicationException(
-                    UserErrorCode.USER_UNAUTHORIZED,
-                    UserDetailMessageKey.USER_UNAUTHORIZED);
-        }
-        userSessionRepositoryPort.revokeAllActiveSessionsByUserId(
-                userId,
-                Instant.now(),
-                SessionRevokedReason.USER_LOGOUT_ALL);
-    }
-
-    @Override
     public LoginResult credentialsLogin(CredentialsLoginCommand command) {
         return transactionPort.execute(() -> doCredentialsLogin(command));
     }
 
+    /**
+     * Đăng nhập bằng tài khoản, mật khẩu
+     *
+     * @param command chứa các thông tin như username, email, raw password
+     * @return LoginResult: gồm AT và RT
+     */
     private LoginResult doCredentialsLogin(CredentialsLoginCommand command) {
         User user = userRepositoryPort.findByUsernameOrEmail(command.usernameOrEmail())
                 .orElseThrow(() -> new ApplicationException(
@@ -104,6 +97,7 @@ public class AuthUseCase implements AuthInputPort {
                     UserDetailMessageKey.USER_ACCOUNT_NOT_ACTIVE);
         }
 
+        // nếu người dùng chưa verify email thì sẽ tạo otp và gửi mail cho nó
         if (!user.isEmailVerified()) {
             String email = user.getEmail().getValue();
             if (!otpPort.hasValidOtp(email)) {
@@ -113,12 +107,15 @@ public class AuthUseCase implements AuthInputPort {
             }
             throw new ApplicationException(
                     UserErrorCode.USER_EMAIL_UNVERIFIED,
-                    UserDetailMessageKey.USER_EMAIL_UNVERIFIED_DETAIL);
+                    UserDetailMessageKey.USER_EMAIL_UNVERIFIED_DETAIL
+            );
         }
 
-        userSessionServicePort.revokeAllSessionsByUserId(
+        // thu hồi toàn bộ session khác
+        userSessionServicePort.revokeAllActiveSessionsByUserId(
                 user.getId(),
-                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE);
+                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
+        );
 
         Instant now = Instant.now();
 
@@ -145,11 +142,13 @@ public class AuthUseCase implements AuthInputPort {
         userSessionEventPublisherPort.publishForceLogoutEvent(new ForceLogoutCommand(
                 savedUserSession.getUserId(),
                 savedUserSession.getId(),
-                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE));
+                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
+        ));
 
         return new LoginResult(
                 accessToken,
-                refreshToken);
+                refreshToken
+        );
     }
 
     @Override
@@ -207,9 +206,10 @@ public class AuthUseCase implements AuthInputPort {
                     UserDetailMessageKey.USER_ACCOUNT_NOT_ACTIVE);
         }
 
-        userSessionServicePort.revokeAllSessionsByUserId(
+        userSessionServicePort.revokeAllActiveSessionsByUserId(
                 currentUser.getId(),
-                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE);
+                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
+        );
 
         Instant now = Instant.now();
 
@@ -236,11 +236,13 @@ public class AuthUseCase implements AuthInputPort {
         userSessionEventPublisherPort.publishForceLogoutEvent(new ForceLogoutCommand(
                 savedUserSession.getUserId(),
                 savedUserSession.getId(),
-                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE));
+                SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
+        ));
 
         return new LoginResult(
                 accessToken,
-                refreshToken);
+                refreshToken
+        );
     }
 
     @Override
@@ -254,7 +256,8 @@ public class AuthUseCase implements AuthInputPort {
                 command.userId(),
                 command.userSessionId(),
                 Instant.now(),
-                SessionRevokedReason.USER_LOGOUT);
+                SessionRevokedReason.USER_LOGOUT
+        );
     }
 
     @Override

@@ -12,8 +12,6 @@ public record UserSubscriptionResult(
         SubscriptionStatus status,
         Instant startTime,
         Instant endTime,
-        Instant createdTime,
-        Instant modifiedTime,
-        SubscriptionPlanResult planResult
+        SubscriptionPlanResult subscriptionPlan
 ) {
 }

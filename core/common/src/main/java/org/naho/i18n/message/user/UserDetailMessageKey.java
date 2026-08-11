@@ -21,6 +21,8 @@ public final class UserDetailMessageKey {
             "user.not_found";
     public static final String USER_ACCESS_DENIED =
             "user.access_denied";
+    public static final String USER_CANNOT_LOCK_ADMIN =
+            "user.cannot.lock.admin";
     public static final String USER_ID_NULL =
             "user.id.null";
     public static final String USER_EMAIL_NOT_FOUND =
@@ -102,6 +104,10 @@ public final class UserDetailMessageKey {
 
     public static final String USER_PASSWORD_REQUIRED = "user.password.required";
     public static final String USER_PASSWORD_INVALID_FORMAT = "user.password.invalid.format";
+
+    public static final String USER_PAGE_INVALID = "user.page.invalid";
+    public static final String USER_SIZE_INVALID = "user.size.invalid";
+    public static final String USER_DOB_RANGE_INVALID = "user.dob.range.invalid";
 
     private UserDetailMessageKey() {
     }

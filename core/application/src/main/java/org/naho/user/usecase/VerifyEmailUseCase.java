@@ -83,7 +83,7 @@ public class VerifyEmailUseCase implements VerifyEmailInputPort {
         otpPort.removeOtp(command.email());
         otpPort.clearFailedAttempts(command.email());
 
-        userSessionServicePort.revokeAllSessionsByUserId(
+        userSessionServicePort.revokeAllActiveSessionsByUserId(
                 user.getId(),
                 SessionRevokedReason.LOGIN_ON_OTHER_DEVICE);
 

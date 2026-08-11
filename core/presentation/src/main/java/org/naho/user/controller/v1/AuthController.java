@@ -88,26 +88,6 @@ public class AuthController {
                 .build();
     }
 
-    @ApiResponseMessage(message = UserDetailMessageKey.USER_LOGOUT_ALL_SUCCESSFULLY)
-    @PostMapping("/logout-all")
-    public ResponseEntity<Void> logoutAllSessions(
-            @AuthenticationPrincipal AccessTokenPayload payload
-    ) {
-        authInputPort.logoutAllSessions(payload.userId());
-
-        ResponseCookie clearAccessTokenCookie =
-                cookieFactory.clearCookieForJWTToken(TokenType.ACCESS_TOKEN_COOKIE_NAME);
-
-        ResponseCookie clearRefreshTokenCookie =
-                cookieFactory.clearCookieForJWTToken(TokenType.REFRESH_TOKEN_COOKIE_NAME);
-
-        return ResponseEntity
-                .noContent()
-                .header(HttpHeaders.SET_COOKIE, clearAccessTokenCookie.toString())
-                .header(HttpHeaders.SET_COOKIE, clearRefreshTokenCookie.toString())
-                .build();
-    }
-
     @ApiResponseMessage(message = UserDetailMessageKey.USER_ROTATE_TOKEN_SUCCESSFULLY)
     @PostMapping("/rotation")
     public ResponseEntity<Void> rotateToken(

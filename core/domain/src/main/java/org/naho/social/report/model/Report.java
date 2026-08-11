@@ -12,23 +12,27 @@ public class Report {
 
     private final Long id;
     private final Long userId;
+    private final String fullName;
     private final Long questionId;
     private final Long commentId;
     private final String title;
     private final String description;
     private final ReportType reportType;
     private final boolean isResolved;
+    private final String adminReply;
     private List<File> files;
 
     private Report(Builder builder) {
         this.id = builder.id;
         this.userId = builder.userId;
+        this.fullName = builder.fullName;
         this.questionId = builder.questionId;
         this.commentId = builder.commentId;
         this.title = builder.title;
         this.description = builder.description;
         this.reportType = builder.reportType;
         this.isResolved = builder.isResolved;
+        this.adminReply = builder.adminReply;
         this.files = builder.files != null ? builder.files : List.of();
     }
 
@@ -42,6 +46,10 @@ public class Report {
 
     public Long getUserId() {
         return userId;
+    }
+
+    public String getFullName() {
+        return fullName;
     }
 
     public Long getQuestionId() {
@@ -68,6 +76,10 @@ public class Report {
         return isResolved;
     }
 
+    public String getAdminReply() {
+        return adminReply;
+    }
+
     public List<File> getFiles() {
         return files;
     }
@@ -76,16 +88,30 @@ public class Report {
         this.files = files;
     }
 
-    public Report updateStatus(boolean isResolved) {
+    public Report updateStatus(boolean isResolved, String adminReply) {
+        if (this.isResolved) {
+            throw new DomainException(
+                    ReportDomainErrorCode.REPORT_ALREADY_RESOLVED,
+                    ReportDetailMessageKey.REPORT_ALREADY_RESOLVED
+            );
+        }
+        if (!isResolved) {
+            throw new DomainException(
+                    ReportDomainErrorCode.REPORT_STATUS_CANNOT_BE_UNRESOLVED,
+                    ReportDetailMessageKey.REPORT_STATUS_CANNOT_BE_UNRESOLVED
+            );
+        }
         return builder()
                 .id(this.id)
                 .userId(this.userId)
+                .fullName(this.fullName)
                 .questionId(this.questionId)
                 .commentId(this.commentId)
                 .title(this.title)
                 .description(this.description)
                 .reportType(this.reportType)
                 .isResolved(isResolved)
+                .adminReply(adminReply)
                 .files(this.files)
                 .build();
     }
@@ -94,12 +120,14 @@ public class Report {
 
         private Long id;
         private Long userId;
+        private String fullName;
         private Long questionId;
         private Long commentId;
         private String title;
         private String description;
         private ReportType reportType;
         private boolean isResolved;
+        private String adminReply;
         private List<File> files;
 
         public Builder id(Long id) {
@@ -109,6 +137,11 @@ public class Report {
 
         public Builder userId(Long userId) {
             this.userId = userId;
+            return this;
+        }
+
+        public Builder fullName(String fullName) {
+            this.fullName = fullName;
             return this;
         }
 
@@ -139,6 +172,11 @@ public class Report {
 
         public Builder isResolved(boolean isResolved) {
             this.isResolved = isResolved;
+            return this;
+        }
+
+        public Builder adminReply(String adminReply) {
+            this.adminReply = adminReply;
             return this;
         }
 

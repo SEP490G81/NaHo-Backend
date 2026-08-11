@@ -3,7 +3,8 @@
 <mapper namespace="org.naho.question.mybatis.SpeakingQuestionQueryMapper">
 
     <sql id="Base_Select_List">
-        #         q.id as id,
+        #
+        q.id as id,
 #         q.user_id as userId,
 #         q.speaking_question_audio_file_id as speakingQuestionAudioFileId,
 #         q.japanese_name as japaneseName,

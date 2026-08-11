@@ -41,8 +41,7 @@ public class CreateReportUseCase implements CreateReportInputPort {
             UploadFileInputPort uploadFileInputPort,
             TransactionPort transactionPort,
             EventPublisherPort eventPublisherPort,
-            UserRepositoryPort userRepositoryPort
-    ) {
+            UserRepositoryPort userRepositoryPort) {
         this.reportRepositoryPort = reportRepositoryPort;
         this.fileStorageServicePort = fileStorageServicePort;
         this.fileRepositoryPort = fileRepositoryPort;

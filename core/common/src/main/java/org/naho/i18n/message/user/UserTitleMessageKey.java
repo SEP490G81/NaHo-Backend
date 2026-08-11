@@ -42,6 +42,10 @@ public final class UserTitleMessageKey {
 
     public static final String USER_PASSWORD_NOT_VALID_TITLE = "user.password.not.valid.title";
 
+    public static final String USER_PAGE_NOT_VALID_TITLE = "user.page.not.valid.title";
+    public static final String USER_SIZE_NOT_VALID_TITLE = "user.size.not.valid.title";
+    public static final String USER_DOB_RANGE_NOT_VALID_TITLE = "user.dob.range.not.valid.title";
+
     private UserTitleMessageKey() {
     }
 }

@@ -4,23 +4,18 @@
     <resultMap id="SubscriptionPlanResultMap" type="org.naho.subscription.entity.SubscriptionPlanEntity">
         <id property="id" column="id"/>
         <result property="code" column="code"/>
-        <result property="name" column="name"/>
         <result property="description" column="description"/>
         <result property="tier" column="tier"/>
         <result property="priceAmount" column="price_amount"/>
         <result property="priceCurrency" column="price_currency"/>
         <result property="durationDays" column="duration_days"/>
-        <result property="monthlyAssessmentLimit" column="monthly_assessment_limit"/>
-        <result property="monthlyAssessmentAudioSeconds" column="monthly_assessment_audio_seconds"/>
-        <result property="maxAssessmentAudioSeconds" column="max_assessment_audio_seconds"/>
-        <result property="monthlyConversationSeconds" column="monthly_conversation_seconds"/>
-        <result property="maxConversationSessionSeconds" column="max_conversation_session_seconds"/>
-        <result property="maxConversationTurnsPerSession" column="max_conversation_turns_per_session"/>
-        <result property="fullCurriculumAccess" column="full_curriculum_access"/>
-        <result property="progressAnalyticsEnabled" column="progress_analytics_enabled"/>
+        <result property="dailySpeakingQuestionEvaluationLimit" column="daily_speaking_question_evaluation_limit"/>
+        <result property="maxSpeakingQuestionRecordingSeconds" column="max_speaking_question_recording_seconds"/>
+        <result property="maxConcurrentAiSessionCount" column="max_concurrent_ai_session_count"/>
+        <result property="maxTurnsPerAiSession" column="max_turns_per_ai_session"/>
+        <result property="dailyAiSessionEvaluationLimit" column="daily_ai_session_evaluation_limit"/>
+        <result property="maxAiTurnSpeakingSeconds" column="max_ai_turn_speaking_seconds"/>
         <result property="sampleAnswerEnabled" column="sample_answer_enabled"/>
-        <result property="maxAnswerTimeSeconds" column="max_answer_time_seconds"/>
-        <result property="saveAnswerHistoryEnabled" column="save_answer_history_enabled"/>
         <result property="status" column="status"/>
         <result property="createdTime" column="created_time"/>
         <result property="modifiedTime" column="modified_time"/>
@@ -31,7 +26,9 @@
         from user_subscriptions us
                  join subscription_plans sp on us.subscription_plan_id = sp.id
         where us.user_id = #{userId}
-          and us.status = #{status}
-          and #{now} between us.start_time and us.end_time
+          and us.status = #{subscriptionStatus}
+          and sp.status = #{planStatus}
+          and us.start_time &lt;= #{now}
+          and us.end_time &gt;= #{now}
     </select>
 </mapper>

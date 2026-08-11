@@ -11,7 +11,7 @@ import java.util.Objects;
 public class UserResult {
 
     private Long id;
-    private List<RoleResult> roles;
+    private RoleResult role;
     private List<AuthProviderResult> authProviders;
     private FileResult avatarFile;
     private Long userLearningProgressId;
@@ -22,13 +22,14 @@ public class UserResult {
     private Gender gender;
     private LocalDate dob;
     private UserStatus status;
+    private boolean isEmailVerified;
 
     public UserResult() {
     }
 
     public UserResult(
             Long id,
-            List<RoleResult> roles,
+            RoleResult role,
             List<AuthProviderResult> authProviders,
             FileResult avatarFile,
             Long userLearningProgressId,
@@ -39,8 +40,25 @@ public class UserResult {
             LocalDate dob,
             UserStatus status
     ) {
+        this(id, role, authProviders, avatarFile, userLearningProgressId, username, email, fullName, gender, dob, status, false);
+    }
+
+    public UserResult(
+            Long id,
+            RoleResult role,
+            List<AuthProviderResult> authProviders,
+            FileResult avatarFile,
+            Long userLearningProgressId,
+            String username,
+            String email,
+            String fullName,
+            Gender gender,
+            LocalDate dob,
+            UserStatus status,
+            boolean isEmailVerified
+    ) {
         this.id = id;
-        this.roles = roles;
+        this.role = role;
         this.authProviders = authProviders;
         this.avatarFile = avatarFile;
         this.userLearningProgressId = userLearningProgressId;
@@ -50,11 +68,12 @@ public class UserResult {
         this.gender = gender;
         this.dob = dob;
         this.status = status;
+        this.isEmailVerified = isEmailVerified;
     }
 
     private UserResult(Builder builder) {
         this.id = builder.id;
-        this.roles = builder.roles;
+        this.role = builder.role;
         this.authProviders = builder.authProviders;
         this.avatarFile = builder.avatarFile;
         this.userLearningProgressId = builder.userLearningProgressId;
@@ -64,6 +83,7 @@ public class UserResult {
         this.gender = builder.gender;
         this.dob = builder.dob;
         this.status = builder.status;
+        this.isEmailVerified = builder.isEmailVerified;
     }
 
     public static Builder builder() {
@@ -78,12 +98,12 @@ public class UserResult {
         this.id = id;
     }
 
-    public List<RoleResult> getRoles() {
-        return roles;
+    public RoleResult getRole() {
+        return role;
     }
 
-    public void setRoles(List<RoleResult> roles) {
-        this.roles = roles;
+    public void setRole(RoleResult role) {
+        this.role = role;
     }
 
     public List<AuthProviderResult> getAuthProviders() {
@@ -150,7 +170,6 @@ public class UserResult {
         this.dob = dob;
     }
 
-
     public UserStatus getStatus() {
         return status;
     }
@@ -159,13 +178,21 @@ public class UserResult {
         this.status = status;
     }
 
+    public boolean isEmailVerified() {
+        return isEmailVerified;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        isEmailVerified = emailVerified;
+    }
+
     // Record-style accessors for backward compatibility
     public Long id() {
         return id;
     }
 
-    public List<RoleResult> roles() {
-        return roles;
+    public RoleResult role() {
+        return role;
     }
 
     public List<AuthProviderResult> authProviders() {
@@ -200,7 +227,6 @@ public class UserResult {
         return dob;
     }
 
-
     public UserStatus status() {
         return status;
     }
@@ -210,8 +236,9 @@ public class UserResult {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserResult that = (UserResult) o;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(roles, that.roles) &&
+        return isEmailVerified == that.isEmailVerified &&
+                Objects.equals(id, that.id) &&
+                Objects.equals(role, that.role) &&
                 Objects.equals(authProviders, that.authProviders) &&
                 Objects.equals(avatarFile, that.avatarFile) &&
                 Objects.equals(userLearningProgressId, that.userLearningProgressId) &&
@@ -225,14 +252,14 @@ public class UserResult {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, roles, authProviders, avatarFile, userLearningProgressId, username, email, fullName, gender, dob, status);
+        return Objects.hash(id, role, authProviders, avatarFile, userLearningProgressId, username, email, fullName, gender, dob, status, isEmailVerified);
     }
 
     @Override
     public String toString() {
         return "UserResult{" +
                 "id=" + id +
-                ", roles=" + roles +
+                ", role=" + role +
                 ", authProviders=" + authProviders +
                 ", avatarFile=" + avatarFile +
                 ", userLearningProgressId=" + userLearningProgressId +
@@ -242,13 +269,14 @@ public class UserResult {
                 ", gender=" + gender +
                 ", dob=" + dob +
                 ", status=" + status +
+                ", isEmailVerified=" + isEmailVerified +
                 '}';
     }
 
     public static final class Builder {
 
         private Long id;
-        private List<RoleResult> roles;
+        private RoleResult role;
         private List<AuthProviderResult> authProviders;
 
         private Long userLearningProgressId;
@@ -261,6 +289,7 @@ public class UserResult {
         private LocalDate dob;
 
         private UserStatus status;
+        private boolean isEmailVerified;
 
         private Builder() {
         }
@@ -270,8 +299,8 @@ public class UserResult {
             return this;
         }
 
-        public Builder roles(List<RoleResult> roles) {
-            this.roles = roles;
+        public Builder role(RoleResult role) {
+            this.role = role;
             return this;
         }
 
@@ -315,9 +344,13 @@ public class UserResult {
             return this;
         }
 
-
         public Builder status(UserStatus status) {
             this.status = status;
+            return this;
+        }
+
+        public Builder isEmailVerified(boolean isEmailVerified) {
+            this.isEmailVerified = isEmailVerified;
             return this;
         }
 

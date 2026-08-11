@@ -62,5 +62,14 @@ public interface SessionStorePort {
     int incrementTurnCount(String sessionId);
 
     int getTurnCount(String sessionId);
+
+    /**
+     * Xóa các session không hoạt động khỏi memory.
+     * Phù hợp cho speaking model (session ngắn ~15-25 phút).
+     *
+     * @param idleMinutes số phút không có hoạt động để evict
+     * @return số session đã bị evict
+     */
+    int evictIdleSessions(int idleMinutes);
 }
 

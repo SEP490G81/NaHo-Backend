@@ -21,6 +21,7 @@ import org.naho.social.comment.result.CommentResult;
 import org.naho.user.port.out.UserRepositoryPort;
 
 import java.util.List;
+import java.util.Optional;
 
 public class CommentCrudUseCase implements CommentCrudInputPort {
     private final CommentRepositoryPort commentRepositoryPort;
@@ -95,7 +96,7 @@ public class CommentCrudUseCase implements CommentCrudInputPort {
         if (!isOwner) {
             throw new ApplicationException(
                     CommentErrorCode.COMMENT_NOT_AUTHORIZED,
-                    CommentDetailMessageKey.COMMENT_DELETE_FORBIDDEN
+                    CommentDetailMessageKey.COMMENT_UPDATE_FORBIDDEN
             );
         }
 

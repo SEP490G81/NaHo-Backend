@@ -2,11 +2,8 @@ package org.naho.config.application;
 
 import org.naho.file.port.in.AsyncCrudFileInputPort;
 import org.naho.file.port.in.CrudFileInputPort;
-import org.naho.file.port.in.DeleteFileInputPort;
 import org.naho.file.port.in.UploadFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
-import org.naho.file.port.out.FileStorageServicePort;
-import org.naho.file.port.out.FileValidatorPort;
 import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
 import org.naho.shared.port.out.EmailPort;
 import org.naho.shared.port.out.EventPublisherPort;
@@ -53,26 +50,16 @@ public class UserConfig {
     @Bean
     public CrudUserInputPort crudUserInputPort(
             UserRepositoryPort userRepositoryPort,
-            FileValidatorPort fileValidatorPort,
-            CrudFileInputPort crudFileInputPort,
             UserResultMapper userResultMapper,
-            RoleRepositoryPort roleRepositoryPort,
             FileRepositoryPort fileRepositoryPort,
-            FileStorageServicePort fileStorageServicePort,
-            DeleteFileInputPort deleteFileInputPort,
             UploadFileInputPort uploadFileInputPort,
             TransactionPort transactionPort,
             AsyncCrudFileInputPort asyncCrudFileInputPort
     ) {
         return new CrudUserUseCase(
                 userRepositoryPort,
-                fileValidatorPort,
-                crudFileInputPort,
                 userResultMapper,
-                roleRepositoryPort,
                 fileRepositoryPort,
-                fileStorageServicePort,
-                deleteFileInputPort,
                 uploadFileInputPort,
                 transactionPort,
                 asyncCrudFileInputPort
@@ -155,10 +142,18 @@ public class UserConfig {
     @Bean
     public UpdateUserInputPort updateUserInputPort(
             UserRepositoryPort userRepositoryPort,
-            UserResultMapper userResultMapper) {
+            RoleRepositoryPort roleRepositoryPort,
+            UserResultMapper userResultMapper,
+            UserSessionServicePort userSessionServicePort,
+            TransactionPort transactionPort
+    ) {
         return new UpdateUserUseCase(
                 userRepositoryPort,
-                userResultMapper);
+                roleRepositoryPort,
+                userResultMapper,
+                userSessionServicePort,
+                transactionPort
+        );
     }
 
     @Bean

@@ -14,6 +14,10 @@ import org.naho.social.report.port.out.ReportRepositoryPort;
 import org.naho.social.report.result.ReportResult;
 import org.naho.user.port.out.UserRepositoryPort;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 public class UpdateReportStatusUseCase implements UpdateReportStatusInputPort {
 
     private final ReportRepositoryPort reportRepositoryPort;
@@ -27,8 +31,7 @@ public class UpdateReportStatusUseCase implements UpdateReportStatusInputPort {
             ReportResultMapper reportResultMapper,
             UserRepositoryPort userRepositoryPort,
             EmailPort emailPort,
-            EventPublisherPort eventPublisherPort
-    ) {
+            EventPublisherPort eventPublisherPort) {
         this.reportRepositoryPort = reportRepositoryPort;
         this.reportResultMapper = reportResultMapper;
         this.userRepositoryPort = userRepositoryPort;
@@ -41,19 +44,17 @@ public class UpdateReportStatusUseCase implements UpdateReportStatusInputPort {
         if (command == null || command.reportId() == null) {
             throw new ApplicationException(
                     ReportErrorCode.REPORT_NOT_FOUND,
-                    ReportDetailMessageKey.REPORT_TITLE_BLANK
-            );
+                    ReportDetailMessageKey.REPORT_TITLE_BLANK);
         }
 
         Report existingReport = reportRepositoryPort.findById(command.reportId())
                 .orElseThrow(() -> new ApplicationException(
                         ReportErrorCode.REPORT_NOT_FOUND,
-                        ReportDetailMessageKey.REPORT_TITLE_BLANK
-                ));
+                        ReportDetailMessageKey.REPORT_TITLE_BLANK));
 
         boolean shouldSendEmail = command.isResolved() && !existingReport.isResolved();
 
-        Report updatedReport = existingReport.updateStatus(command.isResolved());
+        Report updatedReport = existingReport.updateStatus(command.isResolved(), command.adminReply());
         Report savedReport = reportRepositoryPort.save(updatedReport);
 
         if (shouldSendEmail) {

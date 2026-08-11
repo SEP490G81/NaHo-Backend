@@ -11,7 +11,7 @@ public interface UserSubscriptionEntityMapper {
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "subscriptionPlan", ignore = true)
     @Mapping(target = "paymentOrder", ignore = true)
-    @Mapping(target = "createdTime", source = "createdTime")
+    @Mapping(target = "createdTime", ignore = true)
     @Mapping(target = "modifiedTime", ignore = true)
     UserSubscriptionEntity domainToEntity(UserSubscription domain);
 

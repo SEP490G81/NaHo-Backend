@@ -1,11 +1,14 @@
 package org.naho.user.port.out;
 
 import org.naho.file.model.File;
+import org.naho.pagination.PageData;
 import org.naho.user.command.UpdateUserInfoCommand;
+import org.naho.user.command.UserQueryCommand;
 import org.naho.user.model.AuthProvider;
 import org.naho.user.model.User;
 import org.naho.user.result.LeaderboardUserResult;
 import org.naho.user.type.AuthProviderName;
+import org.naho.user.type.UserStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,8 +32,6 @@ public interface UserRepositoryPort {
 
     Optional<User> findById(Long id);
 
-    List<User> getListUser();
-
     List<User> findByFilters(String userNameOrMail, String role, String status);
 
     List<LeaderboardUserResult> findTop10OrderByTotalPointInLeague(Long leagueId);
@@ -42,4 +43,8 @@ public interface UserRepositoryPort {
     User updateUserInfo(UpdateUserInfoCommand command);
 
     User updateUserAvatar(Long userId, File newAvatarFile);
+
+    User updateUserStatus(Long id, UserStatus newStatus);
+
+    PageData<User> findAllUsers(UserQueryCommand command);
 }

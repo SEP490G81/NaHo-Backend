@@ -21,7 +21,9 @@ import org.naho.subscription.result.UserSubscriptionResult;
 import org.naho.subscription.type.PlanCode;
 import org.naho.subscription.type.PlanTier;
 import org.naho.user.event.UserPlanUpgradedEvent;
+import org.naho.user.exception.RoleErrorCode;
 import org.naho.user.exception.UserErrorCode;
+import org.naho.user.model.Role;
 import org.naho.user.port.out.RoleRepositoryPort;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.naho.user.type.RoleName;
@@ -87,8 +89,12 @@ public class AdminUpgradeSubscriptionUseCase implements AdminUpgradeSubscription
         Instant now = Instant.now();
 
         // 1. Verify Admin Role
-        List<String> adminRoles = roleRepositoryPort.findRoleNamesByUserId(command.adminUserId());
-        if (adminRoles == null || !adminRoles.contains(RoleName.ADMIN.name())) {
+        Role role = roleRepositoryPort.findByUserId(command.adminUserId())
+                .orElseThrow(() -> new ApplicationException(
+                        RoleErrorCode.ROLE_NOT_FOUND, UserDetailMessageKey.USER_ROLE_NOT_FOUND
+                ));
+
+        if (!RoleName.ADMIN.equals(role.getRoleName())) {
             throw new ApplicationException(UserErrorCode.USER_ACCESS_DENIED, UserDetailMessageKey.USER_ACCESS_DENIED);
         }
 
@@ -138,7 +144,7 @@ public class AdminUpgradeSubscriptionUseCase implements AdminUpgradeSubscription
         }
 
         // 7. Create & Save New Subscription
-        int durationDays = (command.customDurationDays() != null && command.customDurationDays() > 0)
+        Integer durationDays = (command.customDurationDays() != null && command.customDurationDays() > 0)
                 ? command.customDurationDays()
                 : targetPlan.getDurationDays();
 

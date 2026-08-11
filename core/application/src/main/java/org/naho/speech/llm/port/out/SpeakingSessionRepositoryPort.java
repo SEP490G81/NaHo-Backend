@@ -54,6 +54,10 @@ public interface SpeakingSessionRepositoryPort {
 
     void updateSessionTurnAndTranscript(String sessionCode, int totalTurns, String fullTranscript);
 
-    int updateStatusForExpiredSessions(String oldStatus, String newStatus, Instant cutoffTime, Instant endedAt);
+    /**
+     * Kiểm tra phiên đã hoàn thành và chấm điểm (status == COMPLETED) chưa.
+     * Dùng để khóa không cho tiếp tục gửi tin nhắn vào phiên COMPLETED.
+     */
+    boolean isSessionCompleted(String sessionCode);
 }
 

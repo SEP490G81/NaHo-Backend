@@ -37,4 +37,17 @@ public final class SpeakingSessionSpecification {
             );
         };
     }
+
+    /**
+     * Filter theo status. Truyền null để lấy tất cả.
+     * Thường dùng: hasStatus("COMPLETED") cho history API.
+     */
+    public static Specification<SpeakingSessionEntity> hasStatus(String status) {
+        return (root, query, criteriaBuilder) -> {
+            if (status == null || status.isBlank()) {
+                return criteriaBuilder.conjunction();
+            }
+            return criteriaBuilder.equal(root.get("status"), status);
+        };
+    }
 }

@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
         uses = {
                 AuthProviderResponseMapper.class,
                 FileResponseMapper.class,
+                RoleResponseMapper.class
         }
 )
 public abstract class UserResponseMapper {
@@ -28,6 +29,7 @@ public abstract class UserResponseMapper {
             source = "avatarFile",
             qualifiedByName = "getAvatarUrlFromAvatarFile"
     )
+    @Mapping(target = "isEmailVerified", source = "emailVerified")
     public abstract UserResponse resultToResponse(UserResult result);
 
     @Mapping(

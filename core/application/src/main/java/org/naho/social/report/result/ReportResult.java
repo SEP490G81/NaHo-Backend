@@ -9,10 +9,12 @@ public class ReportResult {
 
     private Long id;
     private Long userId;
+    private String fullName;
     private String title;
     private String description;
     private ReportType reportType;
     private Boolean isResolved;
+    private String adminReply;
     private Long questionId;
     private Long commentId;
     private List<FileResult> files;
@@ -20,13 +22,15 @@ public class ReportResult {
     public ReportResult() {
     }
 
-    public ReportResult(Long id, Long userId, String title, String description, ReportType reportType, Boolean isResolved, Long questionId, Long commentId, List<FileResult> files) {
+    public ReportResult(Long id, Long userId, String fullName, String title, String description, ReportType reportType, Boolean isResolved, String adminReply, Long questionId, Long commentId, List<FileResult> files) {
         this.id = id;
         this.userId = userId;
+        this.fullName = fullName;
         this.title = title;
         this.description = description;
         this.reportType = reportType;
         this.isResolved = isResolved;
+        this.adminReply = adminReply;
         this.questionId = questionId;
         this.commentId = commentId;
         this.files = files;
@@ -35,10 +39,12 @@ public class ReportResult {
     private ReportResult(Builder builder) {
         this.id = builder.id;
         this.userId = builder.userId;
+        this.fullName = builder.fullName;
         this.title = builder.title;
         this.description = builder.description;
         this.reportType = builder.reportType;
         this.isResolved = builder.isResolved;
+        this.adminReply = builder.adminReply;
         this.questionId = builder.questionId;
         this.commentId = builder.commentId;
         this.files = builder.files;
@@ -62,6 +68,14 @@ public class ReportResult {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getTitle() {
@@ -96,6 +110,14 @@ public class ReportResult {
         this.isResolved = isResolved;
     }
 
+    public String getAdminReply() {
+        return adminReply;
+    }
+
+    public void setAdminReply(String adminReply) {
+        this.adminReply = adminReply;
+    }
+
     public Long getQuestionId() {
         return questionId;
     }
@@ -123,10 +145,12 @@ public class ReportResult {
     public static final class Builder {
         private Long id;
         private Long userId;
+        private String fullName;
         private String title;
         private String description;
         private ReportType reportType;
         private Boolean isResolved;
+        private String adminReply;
         private Long questionId;
         private Long commentId;
         private List<FileResult> files;
@@ -141,6 +165,11 @@ public class ReportResult {
 
         public Builder userId(Long userId) {
             this.userId = userId;
+            return this;
+        }
+
+        public Builder fullName(String fullName) {
+            this.fullName = fullName;
             return this;
         }
 
@@ -161,6 +190,11 @@ public class ReportResult {
 
         public Builder isResolved(Boolean isResolved) {
             this.isResolved = isResolved;
+            return this;
+        }
+
+        public Builder adminReply(String adminReply) {
+            this.adminReply = adminReply;
             return this;
         }
 

@@ -82,10 +82,10 @@ public class ConfirmPaymentUseCase implements ConfirmPaymentInputPort {
 
         if (!command.successful()) {
             if (order.isExpiredAt(now)) {
-                order.expire(now); // Convert to EXPIRED if past 5 minutes
+                order.expire(now); // Chuyển trạng thái chuẩn sang EXPIRED nếu đã quá 5 phút
             } else {
-                order.markFailed(now); // Convert to FAILED if within 5 minutes
-                // (e.g., wrong OTP, insufficient funds)
+                order.markFailed(now); // Chuyển sang FAILED nếu thất bại trong thời hạn 5 phút (ví dụ: sai OTP, tài
+                // khoản không đủ tiền)
             }
             orderRepositoryPort.save(order);
             return ConfirmPaymentResult.failed(order.getOrderCode());

@@ -42,21 +42,15 @@ public class UserSessionRepositoryAdapter implements UserSessionRepositoryPort {
         return userSessionEntityMapper.entityToDomain(savedUserSessionEntity);
     }
 
-    @Override
-    public void revokeActiveSessionsByUserIdAndDeviceId(
-            Long userId,
-            String deviceId,
-            Instant revokedAt,
-            SessionRevokedReason reason
-    ) {
-        userSessionQueryMapper.revokeActiveSessionsByUserIdAndDeviceId(
-                userId,
-                deviceId,
-                revokedAt,
-                reason
-        );
-    }
-
+    /**
+     * Thu hồi session của người dùng theo user id và user session id
+     * Sử dụng cho việc logout (để thu hồi phiên đăng nhập hiện tại của người dùng)
+     *
+     * @param userId        user id
+     * @param userSessionId user session id
+     * @param revokedAt     thời điểm bị thu hồi (now)
+     * @param reason        lí do thu hồi
+     */
     @Override
     public void revokeActiveSessionsByUserIdAndUserSessionId(
             Long userId,
@@ -72,6 +66,15 @@ public class UserSessionRepositoryAdapter implements UserSessionRepositoryPort {
         );
     }
 
+    /**
+     * Thu hồi toàn bộ các session đang hoạt động của người dùng
+     * Hiện tại sử dụng cho việc khi đăng nhập trên thiết bị khác => logout toàn bộ
+     * Và sử dụng khi 1 tài khoản bị UNACTIVE
+     *
+     * @param userId    user id
+     * @param revokedAt thời điểm thu hồi (now)
+     * @param reason    lí do thu hồi
+     */
     @Override
     public void revokeAllActiveSessionsByUserId(
             Long userId,
@@ -83,11 +86,6 @@ public class UserSessionRepositoryAdapter implements UserSessionRepositoryPort {
                 revokedAt,
                 reason
         );
-    }
-
-    @Override
-    public List<Long> findAllActiveSessionIdsByUserId(Long userId) {
-        return userSessionQueryMapper.findAllActiveSessionIdsByUserId(userId);
     }
 
     @Override
@@ -124,25 +122,6 @@ public class UserSessionRepositoryAdapter implements UserSessionRepositoryPort {
                 .orElseThrow(() -> new InfrastructureException(
                         UserErrorCode.USER_INVALID_REFRESH_TOKEN,
                         UserDetailMessageKey.USER_REFRESH_TOKEN_NOT_FOUND
-                ));
-        return userSessionEntityMapper.entityToDomain(userSessionEntity);
-    }
-
-    @Override
-    public UserSession findBySessionId(Long sessionId) {
-        if (sessionId == null) {
-            throw new InfrastructureException(
-                    UserSessionErrorCode.USER_SESSION_NOT_FOUND,
-                    UserSessionDetailMessageKey.USER_SESSION_ID_NULL
-            );
-        }
-
-        UserSessionEntity userSessionEntity = userSessionJpaRepository
-                .findById(sessionId)
-                .orElseThrow(() -> new InfrastructureException(
-                        UserSessionErrorCode.USER_SESSION_NOT_FOUND,
-                        UserSessionDetailMessageKey.USER_SESSION_ID_NOT_FOUND,
-                        sessionId
                 ));
         return userSessionEntityMapper.entityToDomain(userSessionEntity);
     }

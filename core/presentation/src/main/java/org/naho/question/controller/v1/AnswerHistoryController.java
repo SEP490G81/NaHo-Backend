@@ -70,9 +70,11 @@ public class AnswerHistoryController {
     @GetMapping(value = "/{answerHistoryId}/speaking-question")
     @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_HISTORY_GET_DETAIL_SUCCESS)
     public ResponseEntity<SpeakingHistoryDetailResponse> getSpeakingHistoryDetail(
-            @PathVariable Long answerHistoryId
+            @PathVariable Long answerHistoryId,
+            @AuthenticationPrincipal AccessTokenPayload payload
     ) {
-        var result = crudAnswerHistoryInputPort.getSpeakingQuestionAnswerHistoryById(answerHistoryId);
+        Long userId = payload != null ? payload.userId() : null;
+        var result = crudAnswerHistoryInputPort.getSpeakingQuestionAnswerHistoryById(answerHistoryId, userId);
         return ResponseEntity.ok(answerHistoryResponseMapper.toDetailResponse(result));
     }
 }

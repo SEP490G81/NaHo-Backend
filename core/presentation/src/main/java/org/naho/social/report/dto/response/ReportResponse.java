@@ -16,10 +16,12 @@ import java.util.List;
 public class ReportResponse {
     Long id;
     Long userId;
+    String fullName;
     String title;
     String description;
     ReportType reportType;
     Boolean isResolved;
+    String adminReply;
     Long questionId;
     Long commentId;
     List<FileResponse> files;

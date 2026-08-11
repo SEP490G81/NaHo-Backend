@@ -61,7 +61,8 @@
 
               WHERE u.status = 'ACTIVE'
                 AND ulp.total_point >= l.min_point
-                AND (l.max_point IS NULL OR ulp.total_point <= l.max_point)) leaderboard
+                AND (l.max_point IS NULL
+                  OR ulp.total_point <= l.max_point)) leaderboard
 
                  LEFT JOIN auth_providers oap
                            ON leaderboard.user_id = oap.user_id

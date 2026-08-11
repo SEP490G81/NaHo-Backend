@@ -120,7 +120,8 @@ public class CrudAnswerHistoryUseCase implements CrudAnswerHistoryInputPort {
 
     @Override
     public SpeakingHistoryDetailResult getSpeakingQuestionAnswerHistoryById(
-            Long answerHistoryId
+            Long answerHistoryId,
+            Long userId
     ) {
         AnswerHistory answerHistory = answerHistoryRepositoryPort.findById(answerHistoryId)
                 .orElseThrow(() -> new ApplicationException(
@@ -128,6 +129,13 @@ public class CrudAnswerHistoryUseCase implements CrudAnswerHistoryInputPort {
                         SpeakingQuestionDetailMessageKey.ANSWER_HISTORY_NOT_FOUND,
                         answerHistoryId
                 ));
+
+        if (userId == null || !userId.equals(answerHistory.getUserId())) {
+            throw new ApplicationException(
+                    UserErrorCode.USER_UNAUTHORIZED,
+                    UserDetailMessageKey.USER_UNAUTHORIZED
+            );
+        }
 
         SpeakingQuestion speakingQuestion = speakingQuestionRepositoryPort
                 .findById(answerHistory.getSpeakingQuestionId())

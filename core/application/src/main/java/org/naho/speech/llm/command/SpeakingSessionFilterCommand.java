@@ -7,6 +7,7 @@ public record SpeakingSessionFilterCommand(
         Long userId,
         Long personaId,
         String search,
+        String status,
         Integer page,
         Integer size,
         SpeakingHistorySortColumn sortColumn,
