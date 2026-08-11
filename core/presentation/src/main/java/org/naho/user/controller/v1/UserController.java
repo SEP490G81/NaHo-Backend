@@ -29,6 +29,7 @@ import org.naho.user.port.in.CrudUserInputPort;
 import org.naho.user.port.in.GetUserInputPort;
 import org.naho.user.port.in.RegisterInputPort;
 import org.naho.user.port.in.UpdateUserInputPort;
+import org.naho.user.type.UserStatus;
 import org.naho.user.result.AccessTokenPayload;
 import org.naho.user.result.RegisterResult;
 import org.naho.user.result.UserResult;
@@ -118,13 +119,12 @@ public class UserController {
      * Nếu đang là ACTIVE => UNACTIVE và ngược lại
      *
      * @param id user id
-     * @return UserResponse
+     * @return UserStatus
      */
     @PatchMapping("/{id}/status")
-    public ResponseEntity<UserResponse> updateStatus(@PathVariable Long id) {
-        UserResult user = updateUserInputPort.updateStatus(id);
-        UserResponse response = userResponseMapper.resultToResponse(user);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<UserStatus> updateStatus(@PathVariable Long id) {
+        UserStatus newStatus = updateUserInputPort.updateStatus(id);
+        return ResponseEntity.ok(newStatus);
     }
 
     /**

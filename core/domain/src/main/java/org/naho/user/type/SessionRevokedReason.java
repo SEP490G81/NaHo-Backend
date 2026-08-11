@@ -11,4 +11,5 @@ public enum SessionRevokedReason {
     EXPIRED,
     ROTATED,
     LOGIN_ON_OTHER_DEVICE,
+    UNACTIVE_ACCOUNT
 }
