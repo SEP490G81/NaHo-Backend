@@ -577,7 +577,7 @@ CREATE TABLE user_node_progresses
     best_score            DOUBLE                NULL,
     current_score         DOUBLE                NULL,
     attempt_count         INT                   NULL,
-    completed_at          datetime(6)           NULL,
+    last_completed_at     datetime(6)           NULL,
     status                VARCHAR(255)          NULL,
     learning_path_node_id BIGINT                NOT NULL,
     user_id               BIGINT                NOT NULL,

@@ -28,8 +28,8 @@ public class UserNodeProgressEntity extends BaseEntity {
     @Column(name = "attempt_count")
     Integer attemptCount;
 
-    @Column(name = "completed_at")
-    Instant completedAt;
+    @Column(name = "last_completed_at")
+    Instant lastCompletedAt;
 
     @Enumerated(EnumType.STRING)
     NodeStatus status;

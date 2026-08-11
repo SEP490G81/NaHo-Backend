@@ -182,11 +182,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                         SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
                         SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_NOT_FOUND));
 
-        // VALID LOGIC + DB-W => xu ly logic file (file luu local neu tk nguoi dung goi FREE, luu lai file noi chuyen cua nguoi dung neu da dang ki goi cao hon)
         File audioFile = null;
-        // nếu đã lưu file trong local
-        // (tức là đăng kí gói không phải FREE)
-        // thì mới lưu lại file nói chuyện của người dùng
         if (command.storedFile() != null) {
             audioFile = fileRepositoryPort.createNewForUpload(command.storedFile(), false);
         }
