@@ -7,16 +7,16 @@ import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.file.result.FileResult;
 import org.naho.file.result.StoredFile;
-import org.naho.notification.event.SendNotificationEvent;
-import org.naho.notification.type.NotificationType;
 import org.naho.shared.port.out.EventPublisherPort;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.social.report.command.CreateReportCommand;
+import org.naho.social.report.event.ReportCreatedEvent;
 import org.naho.social.report.mapper.ReportResultMapper;
 import org.naho.social.report.model.Report;
 import org.naho.social.report.port.in.CreateReportInputPort;
 import org.naho.social.report.port.out.ReportRepositoryPort;
 import org.naho.social.report.result.ReportResult;
+import org.naho.user.model.User;
 import org.naho.user.port.out.UserRepositoryPort;
 
 import java.util.ArrayList;
@@ -90,26 +90,13 @@ public class CreateReportUseCase implements CreateReportInputPort {
         savedReport.setFiles(files);
 
         // Lấy danh sách tất cả Admin thực tế
-        List<org.naho.user.model.User> admins = userRepositoryPort.findByFilters(null, "ADMIN", null);
+        List<User> admins = userRepositoryPort.findByFilters(null, "ADMIN", null);
 
-        String reporterName = userRepositoryPort.findById(command.userId())
-                .map(u -> u.getUsername().getValue())
-                .orElse("Một người dùng");
-
-        String targetUrl = "/admin/reports/" + savedReport.getId();
-        String metadata = "{\"reportId\": " + savedReport.getId() + ", \"reportType\": \"" + savedReport.getReportType() + "\"}";
-
-        for (org.naho.user.model.User admin : admins) {
-            eventPublisherPort.publish(new SendNotificationEvent(
-                    this,
-                    admin.getId(),
-                    NotificationType.REPORT,
-                    "Có báo cáo mới",
-                    reporterName + " vừa gửi một báo cáo mới",
-                    targetUrl,
-                    metadata
-            ));
-        }
+        eventPublisherPort.publish(new ReportCreatedEvent(
+                command.userId(),
+                savedReport.getId(),
+                savedReport.getReportType().name()
+        ));
 
         return reportResultMapper.domainToResult(savedReport);
     }

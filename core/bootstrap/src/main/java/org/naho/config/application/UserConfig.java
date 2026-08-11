@@ -9,6 +9,7 @@ import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.file.port.out.FileValidatorPort;
 import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
 import org.naho.shared.port.out.EmailPort;
+import org.naho.shared.port.out.EventPublisherPort;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.user.mapper.AuthProviderResultMapper;
 import org.naho.user.mapper.RoleResultMapper;
@@ -132,7 +133,7 @@ public class UserConfig {
             RoleRepositoryPort roleRepository,
             CrudUserLearningProgressInputPort crudUserLearningProgressInputPort,
             OtpPort otpPort,
-            EmailPort emailPort
+            EventPublisherPort eventPublisherPort
     ) {
         return new RegisterUseCase(
                 userRepository,
@@ -140,7 +141,7 @@ public class UserConfig {
                 roleRepository,
                 crudUserLearningProgressInputPort,
                 otpPort,
-                emailPort
+                eventPublisherPort
         );
     }
 
@@ -227,10 +228,10 @@ public class UserConfig {
     public ChangePasswordInputPort changePasswordInputPort(
             UserRepositoryPort userRepositoryPort,
             EncoderPort encoderPort,
-            EmailPort emailPort) {
+            EventPublisherPort eventPublisherPort) {
         return new ChangePasswordUseCase(
                 userRepositoryPort,
                 encoderPort,
-                emailPort);
+                eventPublisherPort);
     }
 }

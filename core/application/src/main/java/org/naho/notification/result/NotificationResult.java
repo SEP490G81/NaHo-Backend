@@ -13,7 +13,7 @@ public record NotificationResult(
         String content,
         boolean isRead,
         String targetUrl,
-        String metadata,
+
         Instant createdTime
 ) {
     public static NotificationResult fromDomain(Notification notification) {
@@ -25,7 +25,7 @@ public record NotificationResult(
                 notification.getContent(),
                 notification.isRead(),
                 notification.getTargetUrl(),
-                notification.getMetadata(),
+
                 notification.getCreatedTime()
         );
     }

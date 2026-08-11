@@ -21,9 +21,9 @@ public class NotificationEntityMapper {
                 .content(notification.getContent())
                 .isRead(notification.isRead())
                 .targetUrl(notification.getTargetUrl())
-                .metadata(notification.getMetadata())
-                // createdTime is handled by BaseEntity's @CreatedDate if mapped, 
-                // but we also have it in domain. We can set it if needed, 
+
+                // createdTime is handled by BaseEntity's @CreatedDate if mapped,
+                // but we also have it in domain. We can set it if needed,
                 // but typically BaseEntity handles it on insert.
                 .build();
     }
@@ -41,7 +41,7 @@ public class NotificationEntityMapper {
                 .content(entity.getContent())
                 .isRead(entity.getIsRead())
                 .targetUrl(entity.getTargetUrl())
-                .metadata(entity.getMetadata())
+
                 .createdTime(entity.getCreatedTime())
                 .build();
     }

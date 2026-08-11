@@ -1,24 +1,18 @@
 package org.naho.social.report.usecase;
 
 import org.naho.i18n.message.social.ReportDetailMessageKey;
-import org.naho.notification.event.SendNotificationEvent;
-import org.naho.notification.type.NotificationType;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.EmailPort;
 import org.naho.shared.port.out.EventPublisherPort;
 import org.naho.social.report.command.UpdateReportStatusCommand;
+import org.naho.social.report.event.ReportStatusUpdatedEvent;
 import org.naho.social.report.exception.ReportErrorCode;
 import org.naho.social.report.mapper.ReportResultMapper;
 import org.naho.social.report.model.Report;
 import org.naho.social.report.port.in.UpdateReportStatusInputPort;
 import org.naho.social.report.port.out.ReportRepositoryPort;
 import org.naho.social.report.result.ReportResult;
-import org.naho.user.model.User;
 import org.naho.user.port.out.UserRepositoryPort;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
 public class UpdateReportStatusUseCase implements UpdateReportStatusInputPort {
 
@@ -63,21 +57,19 @@ public class UpdateReportStatusUseCase implements UpdateReportStatusInputPort {
         Report savedReport = reportRepositoryPort.save(updatedReport);
 
         if (shouldSendEmail) {
-            sendReportResolvedEmail(savedReport);
+            // [TEMPORARY COMMENT OUT] Old email logic tightly coupled in UseCase.
+            // sendReportResolvedEmail(savedReport);
 
             // Send in-app notification to the reported user (SYSTEM type)
             // Or the user who created the report (if we want to notify them it was resolved).
             // Usually we notify the user who got reported if their content was deleted.
             // Let's notify the reporter that their report was resolved as SYSTEM type.
-            String metadata = "{\"reportId\": " + savedReport.getId() + ", \"action\": \"RESOLVED\"}";
-            eventPublisherPort.publish(new SendNotificationEvent(
-                    this,
+            eventPublisherPort.publish(new ReportStatusUpdatedEvent(
                     savedReport.getUserId(),
-                    NotificationType.SYSTEM,
-                    "Báo cáo đã được xử lý",
-                    "Báo cáo của bạn đã được quản trị viên xử lý thành công.",
-                    null,
-                    metadata
+                    savedReport.getId(),
+                    "RESOLVED",
+                    savedReport.getTitle(),
+                    null
             ));
         }
 
@@ -85,6 +77,8 @@ public class UpdateReportStatusUseCase implements UpdateReportStatusInputPort {
     }
 
     private void sendReportResolvedEmail(Report report) {
+        // [TEMPORARY COMMENT OUT] - Moved to ReportEmailEventListener
+        /*
         if (report.getUserId() == null) {
             return;
         }
@@ -112,6 +106,7 @@ public class UpdateReportStatusUseCase implements UpdateReportStatusInputPort {
             emailPort.sendEmail(email, subject, "report-resolved-email", variables);
         } catch (Exception ignored) {
         }
+        */
     }
 }
 

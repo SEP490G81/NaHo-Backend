@@ -198,7 +198,6 @@ CREATE TABLE notifications
     content       TEXT                  NOT NULL,
     is_read       BIT(1)                NOT NULL,
     target_url    TEXT                  NULL,
-    metadata      TEXT                  NULL,
     CONSTRAINT pk_notifications PRIMARY KEY (id)
 );
 
