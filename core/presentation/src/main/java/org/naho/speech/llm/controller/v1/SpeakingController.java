@@ -94,7 +94,7 @@ public class SpeakingController {
         Long userId = payload != null ? payload.userId() : null;
         ActiveSpeakingSessionResult result = speakingSessionInputPort.getActiveSession(userId, personaId);
         if (result == null) {
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok(null);
         }
         ActiveSpeakingSessionResponse response = new ActiveSpeakingSessionResponse(
                 result.id(),
