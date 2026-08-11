@@ -13,4 +13,6 @@ import lombok.experimental.FieldDefaults;
 public class UpdateReportStatusRequest {
     @NotNull(message = "report.status.blank")
     Boolean isResolved;
+
+    String adminReply;
 }

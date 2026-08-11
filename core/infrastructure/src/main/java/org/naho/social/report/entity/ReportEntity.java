@@ -35,6 +35,9 @@ public class ReportEntity extends BaseEntity {
     @Builder.Default
     Boolean isResolved = false;
 
+    @Column(columnDefinition = "TEXT")
+    String adminReply;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     UserEntity user;

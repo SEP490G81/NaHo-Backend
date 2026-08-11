@@ -60,8 +60,7 @@ public class ReportController {
         if (files == null || files.isEmpty()) {
             throw new PresentationException(
                     FileErrorCode.FILE_NOT_VALID,
-                    FileDetailMessageKey.FILE_NOT_VALID
-            );
+                    FileDetailMessageKey.FILE_NOT_VALID);
         }
 
         List<StoredFile> storedFiles = new ArrayList<>();
@@ -69,20 +68,19 @@ public class ReportController {
             if (file == null || file.isEmpty()) {
                 throw new PresentationException(
                         FileErrorCode.FILE_NOT_VALID,
-                        FileDetailMessageKey.FILE_EMPTY
-                );
+                        FileDetailMessageKey.FILE_EMPTY);
             }
 
             try {
                 fileValidatorPort.validateImageFile(file.getBytes());
-                StoredFile storedFile = fileStorageServicePort.saveFileToLocal(file, FileFolderConstant.REPORTS, FileAccessStatus.PRIVATE);
+                StoredFile storedFile = fileStorageServicePort.saveFileToLocal(file, FileFolderConstant.REPORTS,
+                        FileAccessStatus.PRIVATE);
                 storedFiles.add(storedFile);
             } catch (IOException e) {
                 throw new PresentationException(
                         FileErrorCode.FILE_UPLOAD_FAILED,
                         FileDetailMessageKey.FILE_UPLOAD_FAILED,
-                        e.getMessage()
-                );
+                        e.getMessage());
             }
         }
 
@@ -112,8 +110,7 @@ public class ReportController {
     @GetMapping("/user")
     @ApiResponseMessage(message = ReportDetailMessageKey.REPORT_GET_LIST_USER_SUCCESS)
     public ResponseEntity<List<ReportResponse>> getReportsByUser(
-            @AuthenticationPrincipal AccessTokenPayload payload
-    ) {
+            @AuthenticationPrincipal AccessTokenPayload payload) {
         List<ReportResult> results = getListReportByUserInputPort.getReportsByUser(payload.userId());
 
         List<ReportResponse> responses = results.stream().map(reportResponseMapper::resultToResponse).toList();
@@ -127,7 +124,8 @@ public class ReportController {
             @PathVariable("id") Long id,
             @Valid @RequestBody UpdateReportStatusRequest request) {
         ReportResult result = updateReportStatusInputPort.updateStatus(
-                new UpdateReportStatusCommand(id, Boolean.TRUE.equals(request.getIsResolved())));
+                new UpdateReportStatusCommand(id, Boolean.TRUE.equals(request.getIsResolved()),
+                        request.getAdminReply()));
         return ResponseEntity.ok(reportResponseMapper.resultToResponse(result));
     }
 
