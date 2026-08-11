@@ -319,7 +319,6 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         sessionStorePort.addMessage(sessionId, "assistant", parsed.reply());
         sessionStorePort.appendTranscript(sessionId,
                 "[Turn]\nUser: こんにちは、話しましょう！\nAssistant: " + parsed.reply() + "\n");
-        sessionStorePort.incrementTurnCount(sessionId);
 
         // Create IN_PROGRESS session in DB
         try {

@@ -50,6 +50,6 @@ public class ReportEntity extends BaseEntity {
     @JoinColumn(name = "comment_id")
     CommentEntity comment;
 
-    @OneToMany(mappedBy = "report")
+    @OneToMany(mappedBy = "report", cascade = CascadeType.ALL, orphanRemoval = true)
     List<FileEntity> files;
 }
