@@ -7,14 +7,18 @@ import org.naho.shared.exception.BaseException;
 import org.naho.shared.exception.PresentationException;
 import org.naho.vocabulary.dto.mapper.VocabularyObjectiveResponseMapper;
 import org.naho.vocabulary.dto.mapper.VocabularyQuizResponseMapper;
+import org.naho.vocabulary.dto.mapper.VocabularyTopicResponseMapper;
 import org.naho.vocabulary.dto.response.VocabulariesOfObjectiveResponse;
+import org.naho.vocabulary.dto.response.VocabulariesOfTopicResponse;
 import org.naho.vocabulary.dto.response.VocabularyQuizResponse;
 import org.naho.vocabulary.exception.VocabularyErrorCode;
 import org.naho.vocabulary.port.in.ExportVocabularyInputPort;
 import org.naho.vocabulary.port.in.GetRandomVocabularyQuizInputPort;
 import org.naho.vocabulary.port.in.GetVocabulariesOfObjectiveInputPort;
+import org.naho.vocabulary.port.in.GetVocabulariesOfTopicInputPort;
 import org.naho.vocabulary.port.in.ImportVocabularyPort;
 import org.naho.vocabulary.result.VocabulariesOfObjectiveResult;
+import org.naho.vocabulary.result.VocabulariesOfTopicResult;
 import org.naho.vocabulary.result.VocabularyQuizResult;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -33,6 +37,8 @@ public class VocabularyController {
     private final ImportVocabularyPort importVocabularyPort;
     private final GetVocabulariesOfObjectiveInputPort getVocabulariesOfObjectiveInputPort;
     private final VocabularyObjectiveResponseMapper vocabularyObjectiveResponseMapper;
+    private final GetVocabulariesOfTopicInputPort getVocabulariesOfTopicInputPort;
+    private final VocabularyTopicResponseMapper vocabularyTopicResponseMapper;
     private final ExportVocabularyInputPort exportVocabularyInputPort;
     private final GetRandomVocabularyQuizInputPort getRandomVocabularyQuizInputPort;
     private final VocabularyQuizResponseMapper vocabularyQuizResponseMapper;
@@ -60,6 +66,16 @@ public class VocabularyController {
     ) {
         VocabulariesOfObjectiveResult result = getVocabulariesOfObjectiveInputPort.getVocabularyListOfObjective(objectiveId);
         VocabulariesOfObjectiveResponse response = vocabularyObjectiveResponseMapper.toResponse(result);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/topic/{topicId}")
+    @ApiResponseMessage(message = VocabularyQuestionDetailMessageKey.VOCABULARY_TOPIC_GET_SUCCESS)
+    public ResponseEntity<VocabulariesOfTopicResponse> getVocabulariesOfTopic(
+            @PathVariable("topicId") Long topicId
+    ) {
+        VocabulariesOfTopicResult result = getVocabulariesOfTopicInputPort.getVocabularyListOfTopic(topicId);
+        VocabulariesOfTopicResponse response = vocabularyTopicResponseMapper.toResponse(result);
         return ResponseEntity.ok(response);
     }
 

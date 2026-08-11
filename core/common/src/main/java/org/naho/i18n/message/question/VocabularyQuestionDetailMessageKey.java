@@ -14,6 +14,8 @@ public final class VocabularyQuestionDetailMessageKey {
     public static final String VOCABULARY_IMPORT_INVALID_FILE = "vocabulary.import.invalid_file";
     public static final String VOCABULARY_QUESTION_COMPLETE_SUCCESS = "vocabulary_question.complete.success.detail";
     public static final String VOCABULARY_QUESTION_LOCKED = "vocabulary_question.locked";
+    public static final String VOCABULARY_TOPIC_GET_SUCCESS = "vocabulary_topic.get.success.detail";
+    public static final String VOCABULARY_TOPIC_NOT_FOUND = "vocabulary.topic.not_found";
 
     private VocabularyQuestionDetailMessageKey() {
     }
