@@ -13,7 +13,6 @@ import org.naho.i18n.message.user.UserSessionDetailMessageKey;
 import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.exception.DomainException;
-import org.naho.shared.port.out.EmailPort;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.user.command.ForceLogoutCommand;
 import org.naho.user.command.GoogleLoginCommand;

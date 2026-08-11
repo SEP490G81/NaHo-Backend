@@ -2,7 +2,9 @@ package org.naho.user.usecase;
 
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
+import org.naho.shared.port.out.EventPublisherPort;
 import org.naho.user.command.ResetPasswordCommand;
+import org.naho.user.event.PasswordChangedEvent;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.model.User;
 import org.naho.user.port.in.ResetPasswordInputPort;
@@ -18,15 +20,18 @@ public class ResetPasswordUseCase implements ResetPasswordInputPort {
     private final UserRepositoryPort userRepository;
     private final PasswordResetOtpPort passwordResetOtpPort;
     private final EncoderPort encoderPort;
+    private final EventPublisherPort eventPublisherPort;
 
     public ResetPasswordUseCase(
             UserRepositoryPort userRepository,
             PasswordResetOtpPort passwordResetOtpPort,
-            EncoderPort encoderPort
+            EncoderPort encoderPort,
+            EventPublisherPort eventPublisherPort
     ) {
         this.userRepository = userRepository;
         this.passwordResetOtpPort = passwordResetOtpPort;
         this.encoderPort = encoderPort;
+        this.eventPublisherPort = eventPublisherPort;
     }
 
     @Override
@@ -79,5 +84,11 @@ public class ResetPasswordUseCase implements ResetPasswordInputPort {
         userRepository.save(user);
 
         passwordResetOtpPort.removeResetToken(email);
+
+        String fullName = user.getFullName() != null && !user.getFullName().isBlank()
+                ? user.getFullName()
+                : (user.getUsername() != null ? user.getUsername().getValue() : "User");
+
+        eventPublisherPort.publish(new PasswordChangedEvent(user.getId(), email, fullName));
     }
 }

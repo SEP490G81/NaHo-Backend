@@ -1,8 +1,9 @@
 package org.naho.email.listener;
 
-import org.naho.shared.port.out.EmailPort;
+import org.naho.email.port.out.EmailPort;
 import org.naho.social.report.event.ReportStatusUpdatedEvent;
 import org.naho.user.event.PasswordChangedEvent;
+import org.naho.user.event.UserPlanUpgradedEvent;
 import org.naho.user.event.UserRegisteredEvent;
 import org.naho.user.model.User;
 import org.naho.user.port.out.UserRepositoryPort;
@@ -41,12 +42,12 @@ public class EmailEventListener {
             if (userOpt.isEmpty()) {
                 return;
             }
-            
+
             User user = userOpt.get();
             if (user.getEmail() == null || user.getEmail().getValue() == null || user.getEmail().getValue().isBlank()) {
                 return;
             }
-            
+
             String email = user.getEmail().getValue();
             String fullName = user.getFullName() != null && !user.getFullName().isBlank()
                     ? user.getFullName()
@@ -57,6 +58,9 @@ public class EmailEventListener {
             variables.put("fullName", fullName);
             variables.put("reportId", event.reportId());
             variables.put("reportTitle", event.reportTitle() != null ? event.reportTitle() : "N/A");
+            if (event.adminNote() != null && !event.adminNote().isBlank()) {
+                variables.put("adminNote", event.adminNote());
+            }
 
             emailPort.sendEmail(email, subject, "report-resolved-email", variables);
         } catch (Exception ignored) {
@@ -79,6 +83,36 @@ public class EmailEventListener {
     public void handleUserRegistered(UserRegisteredEvent event) {
         try {
             emailPort.sendOtpEmail(event.email(), event.fullName(), event.otpCode());
+        } catch (Exception ignored) {
+            // Log error in production
+        }
+    }
+
+    @Async
+    @EventListener
+    public void handleUserPlanUpgraded(UserPlanUpgradedEvent event) {
+        try {
+            Optional<User> userOpt = userRepositoryPort.findById(event.userId());
+            if (userOpt.isEmpty()) {
+                return;
+            }
+
+            User user = userOpt.get();
+            if (user.getEmail() == null || user.getEmail().getValue() == null || user.getEmail().getValue().isBlank()) {
+                return;
+            }
+
+            String email = user.getEmail().getValue();
+            String fullName = user.getFullName() != null && !user.getFullName().isBlank()
+                    ? user.getFullName()
+                    : (user.getUsername() != null ? user.getUsername().getValue() : "User");
+
+            String subject = "Chúc mừng bạn đã nâng cấp gói thành công - NaHo App";
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("fullName", fullName);
+            variables.put("planName", event.newPlanName());
+
+            emailPort.sendEmail(email, subject, "plan-upgraded-email", variables);
         } catch (Exception ignored) {
             // Log error in production
         }

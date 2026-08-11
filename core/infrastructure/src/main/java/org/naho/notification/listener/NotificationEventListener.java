@@ -7,12 +7,11 @@ import org.naho.notification.event.NotificationCreatedEvent;
 import org.naho.notification.model.Notification;
 import org.naho.notification.port.out.NotificationRepositoryPort;
 import org.naho.notification.type.NotificationType;
-import org.naho.payment.event.PaymentConfirmedEvent;
-import org.naho.payment.event.SubscriptionUpgradedEvent;
 import org.naho.social.comment.event.CommentRepliedEvent;
 import org.naho.social.reaction.event.ReactionCreatedEvent;
 import org.naho.social.report.event.ReportCreatedEvent;
 import org.naho.social.report.event.ReportStatusUpdatedEvent;
+import org.naho.user.event.UserPlanUpgradedEvent;
 import org.naho.user.model.User;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.springframework.context.ApplicationEventPublisher;
@@ -96,7 +95,12 @@ public class NotificationEventListener {
     @EventListener
     public void handleReportStatusUpdated(ReportStatusUpdatedEvent event) {
         String title = messageSource.getMessage("notification.report.resolved.title", null, "Bao cao da duoc xu ly", DEFAULT_LOCALE);
-        String content = messageSource.getMessage("notification.report.resolved.content", null, "Bao cao cua ban da duoc quan tri vien xu ly thanh cong.", DEFAULT_LOCALE);
+        String content;
+        if (event.adminNote() != null && !event.adminNote().isBlank()) {
+            content = messageSource.getMessage("notification.report.resolved.admin.content", new Object[]{event.adminNote()}, "Bao cao cua ban da duoc quan tri vien xu ly thanh cong. Loi nhan: " + event.adminNote(), DEFAULT_LOCALE);
+        } else {
+            content = messageSource.getMessage("notification.report.resolved.content", null, "Bao cao cua ban da duoc quan tri vien xu ly thanh cong.", DEFAULT_LOCALE);
+        }
 
         saveAndPublish(Notification.builder()
                 .userId(event.reporterId())
@@ -108,23 +112,9 @@ public class NotificationEventListener {
     }
 
     @EventListener
-    public void handleSubscriptionUpgraded(SubscriptionUpgradedEvent event) {
-        String title = messageSource.getMessage("notification.payment.subscription.upgraded.title", null, "Nang cap goi thanh cong", DEFAULT_LOCALE);
-        String content = messageSource.getMessage("notification.payment.subscription.upgraded.content", new Object[]{event.planName()}, "Goi cua ban da duoc quan tri vien nang cap thanh " + event.planName() + ".", DEFAULT_LOCALE);
-
-        saveAndPublish(Notification.builder()
-                .userId(event.targetUserId())
-                .type(NotificationType.PAYMENT)
-                .title(title)
-                .content(content)
-                .isRead(false)
-                .build());
-    }
-
-    @EventListener
-    public void handlePaymentConfirmed(PaymentConfirmedEvent event) {
+    public void handleUserPlanUpgraded(UserPlanUpgradedEvent event) {
         String title = messageSource.getMessage("notification.payment.confirmed.title", null, "Nang cap goi thanh cong", DEFAULT_LOCALE);
-        String content = messageSource.getMessage("notification.payment.confirmed.content", new Object[]{event.planName()}, "Chuc mung ban da nang cap thanh cong goi " + event.planName() + ". Hay trai nghiem ngay nhung tinh nang cao cap!", DEFAULT_LOCALE);
+        String content = messageSource.getMessage("notification.payment.confirmed.content", new Object[]{event.newPlanName()}, "Chuc mung ban da nang cap thanh cong goi " + event.newPlanName() + ". Hay trai nghiem ngay nhung tinh nang cao cap!", DEFAULT_LOCALE);
 
         saveAndPublish(Notification.builder()
                 .userId(event.userId())

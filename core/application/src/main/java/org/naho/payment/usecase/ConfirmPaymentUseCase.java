@@ -126,7 +126,7 @@ public class ConfirmPaymentUseCase implements ConfirmPaymentInputPort {
                     order.getUserId(),
                     order.getId(),
                     order.getOrderCode(),
-                    plan.getName()
+                    plan.getCode().name()
             ));
         }
 

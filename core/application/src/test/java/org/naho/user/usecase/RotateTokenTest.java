@@ -10,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
 import org.naho.shared.exception.ApplicationException;
-import org.naho.shared.port.out.EmailPort;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.model.UserSession;

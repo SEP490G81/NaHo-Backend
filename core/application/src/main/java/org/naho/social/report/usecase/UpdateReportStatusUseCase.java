@@ -1,8 +1,8 @@
 package org.naho.social.report.usecase;
 
+import org.naho.email.port.out.EmailPort;
 import org.naho.i18n.message.social.ReportDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
-import org.naho.shared.port.out.EmailPort;
 import org.naho.shared.port.out.EventPublisherPort;
 import org.naho.social.report.command.UpdateReportStatusCommand;
 import org.naho.social.report.event.ReportStatusUpdatedEvent;
@@ -13,10 +13,6 @@ import org.naho.social.report.port.in.UpdateReportStatusInputPort;
 import org.naho.social.report.port.out.ReportRepositoryPort;
 import org.naho.social.report.result.ReportResult;
 import org.naho.user.port.out.UserRepositoryPort;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
 public class UpdateReportStatusUseCase implements UpdateReportStatusInputPort {
 
@@ -70,7 +66,7 @@ public class UpdateReportStatusUseCase implements UpdateReportStatusInputPort {
                     savedReport.getId(),
                     "RESOLVED",
                     savedReport.getTitle(),
-                    null
+                    savedReport.getAdminReply()
             ));
         }
 

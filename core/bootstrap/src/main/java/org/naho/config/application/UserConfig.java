@@ -1,11 +1,11 @@
 package org.naho.config.application;
 
+import org.naho.email.port.out.EmailPort;
 import org.naho.file.port.in.AsyncCrudFileInputPort;
 import org.naho.file.port.in.CrudFileInputPort;
 import org.naho.file.port.in.UploadFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
-import org.naho.shared.port.out.EmailPort;
 import org.naho.shared.port.out.EventPublisherPort;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.user.mapper.AuthProviderResultMapper;
@@ -203,11 +203,13 @@ public class UserConfig {
     public ResetPasswordInputPort resetPasswordInputPort(
             UserRepositoryPort userRepositoryPort,
             PasswordResetOtpPort passwordResetOtpPort,
-            EncoderPort encoderPort) {
+            EncoderPort encoderPort,
+            EventPublisherPort eventPublisherPort) {
         return new ResetPasswordUseCase(
                 userRepositoryPort,
                 passwordResetOtpPort,
-                encoderPort);
+                encoderPort,
+                eventPublisherPort);
     }
 
     @Bean

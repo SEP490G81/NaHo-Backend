@@ -1,8 +1,8 @@
 package org.naho.user.usecase;
 
+import org.naho.email.port.out.EmailPort;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
-import org.naho.shared.port.out.EmailPort;
 import org.naho.user.command.ResendOtpCommand;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.model.User;

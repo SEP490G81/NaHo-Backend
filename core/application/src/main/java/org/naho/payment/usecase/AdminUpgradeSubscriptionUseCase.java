@@ -4,7 +4,6 @@ import org.naho.i18n.message.payment.PaymentDetailMessageKey;
 import org.naho.i18n.message.subscription.SubscriptionDetailMessageKey;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.payment.command.AdminUpgradeSubscriptionCommand;
-import org.naho.payment.event.SubscriptionUpgradedEvent;
 import org.naho.payment.exception.PaymentErrorCode;
 import org.naho.payment.port.in.AdminUpgradeSubscriptionInputPort;
 import org.naho.shared.exception.ApplicationException;
@@ -29,7 +28,6 @@ import org.naho.user.port.out.UserRepositoryPort;
 import org.naho.user.type.RoleName;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 
 public class AdminUpgradeSubscriptionUseCase implements AdminUpgradeSubscriptionInputPort {
@@ -164,11 +162,6 @@ public class AdminUpgradeSubscriptionUseCase implements AdminUpgradeSubscription
             eventPublisherPort.publish(new UserPlanUpgradedEvent(
                     command.targetUserId(),
                     targetPlan.getCode().name()
-            ));
-
-            eventPublisherPort.publish(new SubscriptionUpgradedEvent(
-                    command.targetUserId(),
-                    targetPlan.getName()
             ));
         }
 
