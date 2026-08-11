@@ -4,10 +4,14 @@ import org.naho.chest.adapter.ChestRepositoryAdapter;
 import org.naho.learning.adapter.LearningPathNodeRepositoryAdapter;
 import org.naho.learning.adapter.UserLearningProgressRepositoryAdapter;
 import org.naho.learning.mapper.UserLearningProgressResultMapper;
+import org.naho.learning.mapper.UserNodeProgressResultMapper;
 import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
+import org.naho.learning.port.in.CrudUserNodeProgressPort;
 import org.naho.learning.port.in.GetLearningPathNodeDetailInputPort;
 import org.naho.learning.port.in.UserLearningStreakInputPort;
+import org.naho.learning.port.out.UserNodeProgressRepositoryPort;
 import org.naho.learning.usecase.CrudUserLearningProgressUseCase;
+import org.naho.learning.usecase.CrudUserNodeProgressUseCase;
 import org.naho.learning.usecase.GetLearningPathNodeDetailUseCase;
 import org.naho.learning.usecase.UserLearningStreakUseCase;
 import org.naho.question.adapter.SpeakingQuestionRepositoryAdapter;
@@ -61,5 +65,21 @@ public class LearningConfig {
     @Bean
     public UserLearningStreakInputPort userLearningStreakInputPort() {
         return new UserLearningStreakUseCase();
+    }
+
+    @Bean
+    public UserNodeProgressResultMapper userNodeProgressResultMapper() {
+        return new UserNodeProgressResultMapper();
+    }
+
+    @Bean
+    public CrudUserNodeProgressPort crudUserNodeProgressPort(
+            UserNodeProgressRepositoryPort userNodeProgressRepositoryPort,
+            UserNodeProgressResultMapper userNodeProgressResultMapper
+    ) {
+        return new CrudUserNodeProgressUseCase(
+                userNodeProgressRepositoryPort,
+                userNodeProgressResultMapper
+        );
     }
 }
