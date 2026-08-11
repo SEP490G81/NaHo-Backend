@@ -23,6 +23,9 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.naho.shared.port.out.TransactionPort;
+
 @ExtendWith(MockitoExtension.class)
 class UpdateStatusTest {
 
@@ -32,9 +35,19 @@ class UpdateStatusTest {
     private RoleRepositoryPort roleRepositoryPort;
     @Mock
     private UserResultMapper userResultMapper;
+    @Mock
+    private TransactionPort transactionPort;
 
     @InjectMocks
     private UpdateUserUseCase updateUserUseCase;
+
+    @BeforeEach
+    void setUp() {
+        lenient().doAnswer(invocation -> {
+            java.util.function.Supplier<?> action = invocation.getArgument(0);
+            return action.get();
+        }).when(transactionPort).execute(any(java.util.function.Supplier.class));
+    }
 
     @Test
     @DisplayName("UTCID01 - Cập nhật trạng thái người dùng thành công khi id và status hợp lệ")
@@ -60,23 +73,18 @@ class UpdateStatusTest {
                 .status(UserStatus.ACTIVE)
                 .build();
 
-        UserResult expectedResult = mock(UserResult.class);
-
         when(userRepositoryPort.findById(userId)).thenReturn(Optional.of(user));
         when(roleRepositoryPort.findById(roleId)).thenReturn(Optional.of(role));
         when(userRepositoryPort.updateUserStatus(userId, UserStatus.ACTIVE)).thenReturn(updatedUser);
-        when(userResultMapper.domainToResult(updatedUser)).thenReturn(expectedResult);
 
         // Act
-        UserResult result = updateUserUseCase.updateStatus(userId);
+        UserStatus result = updateUserUseCase.updateStatus(userId);
 
         // Assert
-        assertNotNull(result);
-        assertEquals(expectedResult, result);
+        assertEquals(UserStatus.ACTIVE, result);
         verify(userRepositoryPort, times(1)).findById(userId);
         verify(roleRepositoryPort, times(1)).findById(roleId);
         verify(userRepositoryPort, times(1)).updateUserStatus(userId, UserStatus.ACTIVE);
-        verify(userResultMapper, times(1)).domainToResult(updatedUser);
     }
 
     @Test
@@ -159,7 +167,7 @@ class UpdateStatusTest {
         );
 
         assertEquals(UserErrorCode.USER_ACCESS_DENIED, exception.getErrorCode());
-        assertEquals(UserDetailMessageKey.USER_ACCESS_DENIED, exception.getMessage());
+        assertEquals(UserDetailMessageKey.USER_CANNOT_LOCK_ADMIN, exception.getMessage());
         verify(userRepositoryPort, never()).updateUserStatus(any(), any());
     }
 }

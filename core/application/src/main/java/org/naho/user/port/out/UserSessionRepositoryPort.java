@@ -9,12 +9,6 @@ import java.util.List;
 public interface UserSessionRepositoryPort {
     UserSession save(UserSession userSession);
 
-    void revokeActiveSessionsByUserIdAndDeviceId(
-            Long userId,
-            String deviceId,
-            Instant revokedAt,
-            SessionRevokedReason reason);
-
     void revokeActiveSessionsByUserIdAndUserSessionId(
             Long userId,
             Long userSessionId,
@@ -26,16 +20,12 @@ public interface UserSessionRepositoryPort {
             Instant revokedAt,
             SessionRevokedReason reason
     );
-
-    List<Long> findAllActiveSessionIdsByUserId(Long userId);
-
+    
     List<UserSession> findAllActiveSessionsByUserId(Long userId);
 
     UserSession findByUserId(Long userId);
 
     UserSession findByHashRefreshToken(String hashRefreshToken);
-
-    UserSession findBySessionId(Long sessionId);
 
     void verifyUserSession(UserSession userSession, Instant now);
 }

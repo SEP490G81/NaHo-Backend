@@ -29,6 +29,7 @@ public abstract class UserResponseMapper {
             source = "avatarFile",
             qualifiedByName = "getAvatarUrlFromAvatarFile"
     )
+    @Mapping(target = "isEmailVerified", source = "emailVerified")
     public abstract UserResponse resultToResponse(UserResult result);
 
     @Mapping(

@@ -1,7 +1,7 @@
 package org.naho.user.port.in;
 
-import org.naho.user.result.UserResult;
+import org.naho.user.type.UserStatus;
 
 public interface UpdateUserInputPort {
-    UserResult updateStatus(Long id);
+    UserStatus updateStatus(Long id);
 }

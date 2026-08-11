@@ -129,7 +129,7 @@ class CredentialsLoginTest {
         assertEquals(accessToken, result.accessToken());
         assertEquals(refreshToken, result.refreshToken());
 
-        verify(userSessionServicePort).revokeAllSessionsByUserId(1L, SessionRevokedReason.LOGIN_ON_OTHER_DEVICE);
+        verify(userSessionServicePort).revokeAllActiveSessionsByUserId(1L, SessionRevokedReason.LOGIN_ON_OTHER_DEVICE);
         verify(userSessionRepositoryPort).save(any(UserSession.class));
         verify(userSessionEventPublisherPort).publishForceLogoutEvent(any(ForceLogoutCommand.class));
     }

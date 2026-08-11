@@ -30,6 +30,7 @@ INSERT INTO users (created_time,
                    is_email_verified,
                    hash_password,
                    status,
+                   gender,
                    role_id)
 VALUES (NOW(),
         'vuongtruc2004',
@@ -38,6 +39,7 @@ VALUES (NOW(),
         b'1',
         '{bcrypt}$2a$10$mLvl6v0NmQ4f5cP6360qnueyzPYTyLizOJDyr7gL2DbAnnFzbK0mq',
         'ACTIVE',
+        'MALE',
         (SELECT id
          FROM roles
          WHERE role_name = 'ADMIN'));
@@ -50,15 +52,17 @@ INSERT INTO users (id,
                    is_email_verified,
                    hash_password,
                    status,
+                   gender,
                    role_id)
-VALUES (1000,
+VALUES (102,
         NOW(),
         'nguyenkhoa2004',
         'nguyendangkhoa5104@gmail.com',
-        'Nguyen Dang Khoa',
+        'Nguyễn Đăng Khoa',
         b'1',
         '{bcrypt}$2a$10$mLvl6v0NmQ4f5cP6360qnueyzPYTyLizOJDyr7gL2DbAnnFzbK0mq',
         'ACTIVE',
+        'MALE',
         (SELECT id
          FROM roles
          WHERE role_name = 'LEARNER'));

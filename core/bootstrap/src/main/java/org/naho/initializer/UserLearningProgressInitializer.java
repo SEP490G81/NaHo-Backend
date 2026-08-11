@@ -16,17 +16,20 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserLearningProgressInitializer implements ApplicationRunner {
     private static final Long ADMIN_USER_ID = 1L;
+    private static final Long DEFAULT_LEARNER_USER_ID = 102L;
     private final UserLearningProgressRepositoryPort userLearningProgressRepositoryPort;
     private final CrudUserLearningProgressInputPort crudUserLearningProgressInputPort;
 
     @Override
     @Transactional
     public void run(ApplicationArguments args) throws Exception {
-        if (userLearningProgressRepositoryPort.existsByUserId(ADMIN_USER_ID)) {
+        if (userLearningProgressRepositoryPort.existsByUserId(ADMIN_USER_ID)
+                || userLearningProgressRepositoryPort.existsByUserId(DEFAULT_LEARNER_USER_ID)) {
             log.info("UserLearningProgress Data existed!");
         } else {
             log.info("Initializing UserLearningProgress Data...");
             crudUserLearningProgressInputPort.initUserLearningProgress(ADMIN_USER_ID);
+            crudUserLearningProgressInputPort.initUserLearningProgress(DEFAULT_LEARNER_USER_ID);
             log.info("UserLearningProgress Data initialized!");
         }
     }

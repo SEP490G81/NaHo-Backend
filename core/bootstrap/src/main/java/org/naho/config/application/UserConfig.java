@@ -142,11 +142,17 @@ public class UserConfig {
     public UpdateUserInputPort updateUserInputPort(
             UserRepositoryPort userRepositoryPort,
             RoleRepositoryPort roleRepositoryPort,
-            UserResultMapper userResultMapper) {
+            UserResultMapper userResultMapper,
+            UserSessionServicePort userSessionServicePort,
+            TransactionPort transactionPort
+    ) {
         return new UpdateUserUseCase(
                 userRepositoryPort,
                 roleRepositoryPort,
-                userResultMapper);
+                userResultMapper,
+                userSessionServicePort,
+                transactionPort
+        );
     }
 
     @Bean

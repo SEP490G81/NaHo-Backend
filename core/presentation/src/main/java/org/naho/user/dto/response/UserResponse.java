@@ -21,6 +21,7 @@ public record UserResponse(
         String fullName,
         Gender gender,
         LocalDate dob,
-        UserStatus status
+        UserStatus status,
+        boolean isEmailVerified
 ) {
 }

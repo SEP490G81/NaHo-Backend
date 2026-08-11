@@ -112,7 +112,7 @@ public class AuthUseCase implements AuthInputPort {
         }
 
         // thu hồi toàn bộ session khác
-        userSessionServicePort.revokeAllSessionsByUserId(
+        userSessionServicePort.revokeAllActiveSessionsByUserId(
                 user.getId(),
                 SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
         );
@@ -206,7 +206,7 @@ public class AuthUseCase implements AuthInputPort {
                     UserDetailMessageKey.USER_ACCOUNT_NOT_ACTIVE);
         }
 
-        userSessionServicePort.revokeAllSessionsByUserId(
+        userSessionServicePort.revokeAllActiveSessionsByUserId(
                 currentUser.getId(),
                 SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
         );

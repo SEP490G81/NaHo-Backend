@@ -136,7 +136,7 @@ class GoogleLoginTest {
         assertEquals(accessToken, result.accessToken());
         assertEquals(refreshToken, result.refreshToken());
 
-        verify(userSessionServicePort).revokeAllSessionsByUserId(1L, SessionRevokedReason.LOGIN_ON_OTHER_DEVICE);
+        verify(userSessionServicePort).revokeAllActiveSessionsByUserId(1L, SessionRevokedReason.LOGIN_ON_OTHER_DEVICE);
         verify(userSessionRepositoryPort).save(any(UserSession.class));
         verify(userSessionEventPublisherPort).publishForceLogoutEvent(any(ForceLogoutCommand.class));
     }
@@ -208,7 +208,7 @@ class GoogleLoginTest {
         assertEquals(refreshToken, result.refreshToken());
 
         verify(crudUserLearningProgressInputPort).initUserLearningProgress(10L);
-        verify(userSessionServicePort).revokeAllSessionsByUserId(10L, SessionRevokedReason.LOGIN_ON_OTHER_DEVICE);
+        verify(userSessionServicePort).revokeAllActiveSessionsByUserId(10L, SessionRevokedReason.LOGIN_ON_OTHER_DEVICE);
         verify(userSessionRepositoryPort).save(any(UserSession.class));
     }
 
@@ -273,7 +273,7 @@ class GoogleLoginTest {
 
         verify(roleRepositoryPort, never()).findByName(any());
         verify(crudUserLearningProgressInputPort, never()).initUserLearningProgress(anyLong());
-        verify(userSessionServicePort).revokeAllSessionsByUserId(5L, SessionRevokedReason.LOGIN_ON_OTHER_DEVICE);
+        verify(userSessionServicePort).revokeAllActiveSessionsByUserId(5L, SessionRevokedReason.LOGIN_ON_OTHER_DEVICE);
     }
 
     @Test
