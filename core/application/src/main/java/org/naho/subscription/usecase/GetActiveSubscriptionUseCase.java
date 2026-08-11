@@ -21,79 +21,79 @@ import java.util.Optional;
 
 public class GetActiveSubscriptionUseCase implements GetActiveSubscriptionInputPort {
 
-        private final SubscriptionPlanRepositoryPort subscriptionPlanRepositoryPort;
-        private final SubscriptionPlanResultMapper subscriptionPlanResultMapper;
-        private final UserSubscriptionResultMapper userSubscriptionResultMapper;
-        private final UserSubscriptionRepositoryPort userSubscriptionRepositoryPort;
+    private final SubscriptionPlanRepositoryPort subscriptionPlanRepositoryPort;
+    private final SubscriptionPlanResultMapper subscriptionPlanResultMapper;
+    private final UserSubscriptionResultMapper userSubscriptionResultMapper;
+    private final UserSubscriptionRepositoryPort userSubscriptionRepositoryPort;
 
-        public GetActiveSubscriptionUseCase(
-                        SubscriptionPlanRepositoryPort subscriptionPlanRepositoryPort,
-                        SubscriptionPlanResultMapper subscriptionPlanResultMapper,
-                        UserSubscriptionResultMapper userSubscriptionResultMapper,
-                        UserSubscriptionRepositoryPort userSubscriptionRepositoryPort) {
-                this.subscriptionPlanRepositoryPort = subscriptionPlanRepositoryPort;
-                this.subscriptionPlanResultMapper = subscriptionPlanResultMapper;
-                this.userSubscriptionRepositoryPort = userSubscriptionRepositoryPort;
-                this.userSubscriptionResultMapper = userSubscriptionResultMapper;
+    public GetActiveSubscriptionUseCase(
+            SubscriptionPlanRepositoryPort subscriptionPlanRepositoryPort,
+            SubscriptionPlanResultMapper subscriptionPlanResultMapper,
+            UserSubscriptionResultMapper userSubscriptionResultMapper,
+            UserSubscriptionRepositoryPort userSubscriptionRepositoryPort) {
+        this.subscriptionPlanRepositoryPort = subscriptionPlanRepositoryPort;
+        this.subscriptionPlanResultMapper = subscriptionPlanResultMapper;
+        this.userSubscriptionRepositoryPort = userSubscriptionRepositoryPort;
+        this.userSubscriptionResultMapper = userSubscriptionResultMapper;
+    }
+
+    /**
+     * Lấy ra gói đăng kí hiện tại của người dùng
+     *
+     * @param userId user id (lấy từ JWT)
+     * @return SubscriptionPlanResult
+     */
+    @Override
+    public SubscriptionPlanResult getUserActiveSubscriptionPlan(Long userId) {
+        Instant now = Instant.now();
+
+        // Lấy gói đăng kí hiện tại của người dùng
+        Optional<SubscriptionPlan> subscriptionPlan = subscriptionPlanRepositoryPort
+                .findCurrentSubscriptionPlanByUserIdAndStatus(
+                        userId,
+                        SubscriptionStatus.ACTIVE,
+                        PlanStatus.ACTIVE,
+                        now);
+
+        // nếu có thì trả về
+        if (subscriptionPlan.isPresent()) {
+            return subscriptionPlanResultMapper.mapToPlanResult(subscriptionPlan.get());
         }
 
-        /**
-         * Lấy ra gói đăng kí hiện tại của người dùng
-         *
-         * @param userId user id (lấy từ JWT)
-         * @return SubscriptionPlanResult
-         */
-        @Override
-        public SubscriptionPlanResult getUserActiveSubscriptionPlan(Long userId) {
-                Instant now = Instant.now();
+        // nếu không có thì trả về gói FREE
+        return subscriptionPlanRepositoryPort.findByCode(PlanCode.FREE)
+                .map(subscriptionPlanResultMapper::mapToPlanResult)
+                .orElseThrow(() -> new ApplicationException(
+                        SubscriptionErrorCode.PLAN_NOT_FOUND,
+                        SubscriptionDetailMessageKey.PLAN_NOT_FOUND));
+    }
 
-                // Lấy gói đăng kí hiện tại của người dùng
-                Optional<SubscriptionPlan> subscriptionPlan = subscriptionPlanRepositoryPort
-                                .findCurrentSubscriptionPlanByUserIdAndStatus(
-                                                userId,
-                                                SubscriptionStatus.ACTIVE,
-                                                PlanStatus.ACTIVE,
-                                                now);
+    @Override
+    public UserSubscriptionResult getUserActiveSubscription(Long userId) {
+        Instant now = Instant.now();
 
-                // nếu có thì trả về
-                if (subscriptionPlan.isPresent()) {
-                        return subscriptionPlanResultMapper.mapToPlanResult(subscriptionPlan.get());
-                }
+        // Lấy thông tin gói đăng kí hiện tại của người dùng
+        SubscriptionPlanResult planResult = getUserActiveSubscriptionPlan(userId);
 
-                // nếu không có thì trả về gói FREE
-                return subscriptionPlanRepositoryPort.findByCode(PlanCode.FREE)
-                                .map(subscriptionPlanResultMapper::mapToPlanResult)
-                                .orElseThrow(() -> new ApplicationException(
-                                                SubscriptionErrorCode.PLAN_NOT_FOUND,
-                                                SubscriptionDetailMessageKey.PLAN_NOT_FOUND));
+        // Lấy bản ghi đăng kí gói dịch vụ đang active của người dùng
+        Optional<UserSubscription> userSubscription = userSubscriptionRepositoryPort
+                .findActiveByUserId(userId, now);
+
+        if (userSubscription.isPresent()) {
+            return userSubscriptionResultMapper.mapToUserSubscriptionResult(userSubscription.get(),
+                    planResult);
         }
 
-        @Override
-        public UserSubscriptionResult getUserActiveSubscription(Long userId) {
-                Instant now = Instant.now();
-
-                // Lấy thông tin gói đăng kí hiện tại của người dùng
-                SubscriptionPlanResult planResult = getUserActiveSubscriptionPlan(userId);
-
-                // Lấy bản ghi đăng kí gói dịch vụ đang active của người dùng
-                Optional<UserSubscription> userSubscription = userSubscriptionRepositoryPort
-                                .findActiveByUserId(userId, now);
-
-                if (userSubscription.isPresent()) {
-                        return userSubscriptionResultMapper.mapToUserSubscriptionResult(userSubscription.get(),
-                                        planResult);
-                }
-
-                // Trường hợp người dùng dùng gói FREE mặc định (chưa có bản ghi
-                // UserSubscription)
-                return new UserSubscriptionResult(
-                                null,
-                                userId,
-                                planResult.id(),
-                                null,
-                                SubscriptionStatus.ACTIVE,
-                                null,
-                                null,
-                                planResult);
-        }
+        // Trường hợp người dùng dùng gói FREE mặc định (chưa có bản ghi
+        // UserSubscription)
+        return new UserSubscriptionResult(
+                null,
+                userId,
+                planResult.id(),
+                null,
+                SubscriptionStatus.ACTIVE,
+                null,
+                null,
+                planResult);
+    }
 }

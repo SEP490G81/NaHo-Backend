@@ -11,12 +11,12 @@ import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.naho.persona.type.FormalityLevel;
 import org.naho.persona.type.MarugotoLevel;
 import org.naho.shared.exception.ApplicationException;
-import org.naho.speech.llm.exception.LlmApplicationError;
 import org.naho.speech.azure.port.out.TextToSpeechServicePort;
 import org.naho.speech.llm.command.SendAudioMessageCommand;
 import org.naho.speech.llm.command.SendMessageWithSessionCommand;
 import org.naho.speech.llm.command.SpeakingSessionFilterCommand;
 import org.naho.speech.llm.command.StartSpeakingConversationWithAICommand;
+import org.naho.speech.llm.exception.LlmApplicationError;
 import org.naho.speech.llm.port.in.SpeakingSessionInputPort;
 import org.naho.speech.llm.port.out.AiChatPort;
 import org.naho.speech.llm.port.out.SessionStorePort;
@@ -24,11 +24,7 @@ import org.naho.speech.llm.port.out.SpeakingSessionRepositoryPort;
 import org.naho.speech.llm.port.out.SpeechToTextPort;
 import org.naho.speech.llm.result.*;
 
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
@@ -38,7 +34,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     private static final String SYSTEM_PROMPT_TEMPLATE = """
             You are a Japanese conversation partner on the NaHo language learning platform.
             %s
-
+            
             ## CONVERSATION BEHAVIOR RULES
             1. **Language**: The "reply" field MUST be in Japanese ONLY. No English or Vietnamese in "reply".
             2. **Length calibration**:
@@ -57,7 +53,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             5. **Topic steering**: Gently redirect off-topic responses. Stay on session topic.
             6. **If no grammar errors found**: correctionExplanation = "Câu của bạn đã rất tự nhiên và chính xác!"
             7. **Naturalness over perfection**: Prefer warm, natural Japanese over formal textbook phrases.
-
+            
             ## OUTPUT FORMAT (MANDATORY)
             Respond ONLY with a valid raw JSON object. No markdown, no code fences. All 6 fields required:
             {
@@ -72,7 +68,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
 
     private static final String PERSONA_INSTRUCTION = "- You are roleplaying as the specified persona. Adapt your tone, formality, and personality accordingly.\n"
             + "- Start by greeting the learner in character and inviting them to converse.";
-
+    private static final int MAX_SLIDING_WINDOW_MESSAGES = 16; // 8 lượt thoại gần nhất
     private final AiChatPort aiChatPort;
     private final SessionStorePort sessionStorePort;
     private final SpeechToTextPort speechToTextPort;
@@ -81,11 +77,11 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     private final SpeakingSessionRepositoryPort speakingSessionRepositoryPort;
 
     public SpeakingSessionUseCase(AiChatPort aiChatPort,
-            SessionStorePort sessionStorePort,
-            SpeechToTextPort speechToTextPort,
-            PersonaRepositoryPort personaRepositoryPort,
-            TextToSpeechServicePort textToSpeechServicePort,
-            SpeakingSessionRepositoryPort speakingSessionRepositoryPort) {
+                                  SessionStorePort sessionStorePort,
+                                  SpeechToTextPort speechToTextPort,
+                                  PersonaRepositoryPort personaRepositoryPort,
+                                  TextToSpeechServicePort textToSpeechServicePort,
+                                  SpeakingSessionRepositoryPort speakingSessionRepositoryPort) {
         this.aiChatPort = aiChatPort;
         this.sessionStorePort = sessionStorePort;
         this.speechToTextPort = speechToTextPort;
@@ -124,8 +120,6 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             return new ParsedAiReply(rawResponse, "", "", "", "", "");
         }
     }
-
-    private static final int MAX_SLIDING_WINDOW_MESSAGES = 16; // 8 lượt thoại gần nhất
 
     private void validateSessionNotCompleted(String sessionId) {
         if (speakingSessionRepositoryPort.isSessionCompleted(sessionId)) {
