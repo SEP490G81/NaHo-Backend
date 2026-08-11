@@ -235,6 +235,7 @@ public class SpeakingController {
                 payload.userId(),
                 request.getPersonaId(),
                 request.getSearch(),
+                request.getStatus(),
                 request.getPage(),
                 request.getSize(),
                 request.getSortColumn(),
@@ -256,7 +257,8 @@ public class SpeakingController {
                         item.totalTurns(),
                         item.durationSeconds(),
                         item.startedAt(),
-                        item.endedAt()
+                        item.endedAt(),
+                        item.status()   // status: COMPLETED hoặc IN_PROGRESS
                 )).toList())
                 .build();
 

@@ -41,6 +41,7 @@ public class ReportResultMapper {
         return ReportResult.builder()
                 .id(domain.getId())
                 .userId(domain.getUserId())
+                .fullName(domain.getFullName())
                 .title(domain.getTitle())
                 .description(domain.getDescription())
                 .reportType(domain.getReportType())

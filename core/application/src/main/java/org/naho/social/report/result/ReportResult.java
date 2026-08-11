@@ -9,6 +9,7 @@ public class ReportResult {
 
     private Long id;
     private Long userId;
+    private String fullName;
     private String title;
     private String description;
     private ReportType reportType;
@@ -20,9 +21,10 @@ public class ReportResult {
     public ReportResult() {
     }
 
-    public ReportResult(Long id, Long userId, String title, String description, ReportType reportType, Boolean isResolved, Long questionId, Long commentId, List<FileResult> files) {
+    public ReportResult(Long id, Long userId, String fullName, String title, String description, ReportType reportType, Boolean isResolved, Long questionId, Long commentId, List<FileResult> files) {
         this.id = id;
         this.userId = userId;
+        this.fullName = fullName;
         this.title = title;
         this.description = description;
         this.reportType = reportType;
@@ -35,6 +37,7 @@ public class ReportResult {
     private ReportResult(Builder builder) {
         this.id = builder.id;
         this.userId = builder.userId;
+        this.fullName = builder.fullName;
         this.title = builder.title;
         this.description = builder.description;
         this.reportType = builder.reportType;
@@ -62,6 +65,14 @@ public class ReportResult {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getTitle() {
@@ -123,6 +134,7 @@ public class ReportResult {
     public static final class Builder {
         private Long id;
         private Long userId;
+        private String fullName;
         private String title;
         private String description;
         private ReportType reportType;
@@ -141,6 +153,11 @@ public class ReportResult {
 
         public Builder userId(Long userId) {
             this.userId = userId;
+            return this;
+        }
+
+        public Builder fullName(String fullName) {
+            this.fullName = fullName;
             return this;
         }
 

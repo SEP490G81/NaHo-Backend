@@ -20,4 +20,5 @@ public class SpeakingSessionQueryRequest {
     SortDirection sortDirection = SortDirection.DESC;
     Long personaId;
     String search;
+    String status;
 }

@@ -148,9 +148,10 @@ public class ChatConfig {
     @Bean
     public SpeakingSessionCleanupInputPort speakingSessionCleanupInputPort(
             SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
-            TransactionPort transactionPort
+            TransactionPort transactionPort,
+            SessionStorePort sessionStorePort
     ) {
-        return new SpeakingSessionCleanupUseCase(speakingSessionRepositoryPort, transactionPort);
+        return new SpeakingSessionCleanupUseCase(speakingSessionRepositoryPort, transactionPort, sessionStorePort);
     }
 }
 

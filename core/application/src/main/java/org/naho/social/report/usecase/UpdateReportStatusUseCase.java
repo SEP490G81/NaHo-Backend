@@ -33,8 +33,7 @@ public class UpdateReportStatusUseCase implements UpdateReportStatusInputPort {
             ReportResultMapper reportResultMapper,
             UserRepositoryPort userRepositoryPort,
             EmailPort emailPort,
-            EventPublisherPort eventPublisherPort
-    ) {
+            EventPublisherPort eventPublisherPort) {
         this.reportRepositoryPort = reportRepositoryPort;
         this.reportResultMapper = reportResultMapper;
         this.userRepositoryPort = userRepositoryPort;
@@ -47,15 +46,13 @@ public class UpdateReportStatusUseCase implements UpdateReportStatusInputPort {
         if (command == null || command.reportId() == null) {
             throw new ApplicationException(
                     ReportErrorCode.REPORT_NOT_FOUND,
-                    ReportDetailMessageKey.REPORT_TITLE_BLANK
-            );
+                    ReportDetailMessageKey.REPORT_TITLE_BLANK);
         }
 
         Report existingReport = reportRepositoryPort.findById(command.reportId())
                 .orElseThrow(() -> new ApplicationException(
                         ReportErrorCode.REPORT_NOT_FOUND,
-                        ReportDetailMessageKey.REPORT_TITLE_BLANK
-                ));
+                        ReportDetailMessageKey.REPORT_TITLE_BLANK));
 
         boolean shouldSendEmail = command.isResolved() && !existingReport.isResolved();
 
@@ -66,7 +63,8 @@ public class UpdateReportStatusUseCase implements UpdateReportStatusInputPort {
             sendReportResolvedEmail(savedReport);
 
             // Send in-app notification to the reported user (SYSTEM type)
-            // Or the user who created the report (if we want to notify them it was resolved).
+            // Or the user who created the report (if we want to notify them it was
+            // resolved).
             // Usually we notify the user who got reported if their content was deleted.
             // Let's notify the reporter that their report was resolved as SYSTEM type.
             String metadata = "{\"reportId\": " + savedReport.getId() + ", \"action\": \"RESOLVED\"}";
@@ -77,8 +75,7 @@ public class UpdateReportStatusUseCase implements UpdateReportStatusInputPort {
                     "Báo cáo đã được xử lý",
                     "Báo cáo của bạn đã được quản trị viên xử lý thành công.",
                     null,
-                    metadata
-            ));
+                    metadata));
         }
 
         return reportResultMapper.domainToResult(savedReport);
@@ -98,9 +95,9 @@ public class UpdateReportStatusUseCase implements UpdateReportStatusInputPort {
                 return;
             }
             String email = user.getEmail().getValue();
-            String fullName = user.getFullName() != null && !user.getFullName().isBlank()
+            String fullName = (user.getFullName() != null && !user.getFullName().isBlank())
                     ? user.getFullName()
-                    : (user.getUsername() != null ? user.getUsername().getValue() : "User");
+                    : "User";
 
             String subject = "NaHo - Báo cáo #" + report.getId() + " của bạn đã được xử lý";
             Map<String, Object> variables = new HashMap<>();
@@ -114,4 +111,3 @@ public class UpdateReportStatusUseCase implements UpdateReportStatusInputPort {
         }
     }
 }
-

@@ -73,7 +73,7 @@ public class CommentCrudUseCase implements CommentCrudInputPort {
 
         if (parentComment != null && !parentComment.getUserId().equals(commentSaved.getUserId())) {
             String actorName = userRepositoryPort.findById(commentSaved.getUserId())
-                    .map(u -> u.getUsername().getValue())
+                    .map(u -> (u.getFullName() != null && !u.getFullName().isBlank()) ? u.getFullName() : "Một người dùng")
                     .orElse("Một người dùng");
 
             String metadata = "{\"questionId\": " + commentSaved.getQuestionId() + ", \"commentId\": " + commentSaved.getId() + "}";

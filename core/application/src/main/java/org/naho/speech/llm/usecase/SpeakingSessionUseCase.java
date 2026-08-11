@@ -2,6 +2,7 @@ package org.naho.speech.llm.usecase;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.naho.i18n.message.llm.LlmDetailMessageKey;
 import org.naho.i18n.message.persona.PersonaDetailMessageKey;
 import org.naho.pagination.PageData;
 import org.naho.persona.exception.PersonaErrorCode;
@@ -10,6 +11,7 @@ import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.naho.persona.type.FormalityLevel;
 import org.naho.persona.type.MarugotoLevel;
 import org.naho.shared.exception.ApplicationException;
+import org.naho.speech.llm.exception.LlmApplicationError;
 import org.naho.speech.azure.port.out.TextToSpeechServicePort;
 import org.naho.speech.llm.command.SendAudioMessageCommand;
 import org.naho.speech.llm.command.SendMessageWithSessionCommand;
@@ -22,7 +24,11 @@ import org.naho.speech.llm.port.out.SpeakingSessionRepositoryPort;
 import org.naho.speech.llm.port.out.SpeechToTextPort;
 import org.naho.speech.llm.result.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
@@ -32,7 +38,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     private static final String SYSTEM_PROMPT_TEMPLATE = """
             You are a Japanese conversation partner on the NaHo language learning platform.
             %s
-            
+
             ## CONVERSATION BEHAVIOR RULES
             1. **Language**: The "reply" field MUST be in Japanese ONLY. No English or Vietnamese in "reply".
             2. **Length calibration**:
@@ -51,7 +57,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             5. **Topic steering**: Gently redirect off-topic responses. Stay on session topic.
             6. **If no grammar errors found**: correctionExplanation = "Câu của bạn đã rất tự nhiên và chính xác!"
             7. **Naturalness over perfection**: Prefer warm, natural Japanese over formal textbook phrases.
-            
+
             ## OUTPUT FORMAT (MANDATORY)
             Respond ONLY with a valid raw JSON object. No markdown, no code fences. All 6 fields required:
             {
@@ -64,9 +70,8 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             }
             """;
 
-    private static final String PERSONA_INSTRUCTION =
-            "- You are roleplaying as the specified persona. Adapt your tone, formality, and personality accordingly.\n"
-                    + "- Start by greeting the learner in character and inviting them to converse.";
+    private static final String PERSONA_INSTRUCTION = "- You are roleplaying as the specified persona. Adapt your tone, formality, and personality accordingly.\n"
+            + "- Start by greeting the learner in character and inviting them to converse.";
 
     private final AiChatPort aiChatPort;
     private final SessionStorePort sessionStorePort;
@@ -76,11 +81,11 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     private final SpeakingSessionRepositoryPort speakingSessionRepositoryPort;
 
     public SpeakingSessionUseCase(AiChatPort aiChatPort,
-                                  SessionStorePort sessionStorePort,
-                                  SpeechToTextPort speechToTextPort,
-                                  PersonaRepositoryPort personaRepositoryPort,
-                                  TextToSpeechServicePort textToSpeechServicePort,
-                                  SpeakingSessionRepositoryPort speakingSessionRepositoryPort) {
+            SessionStorePort sessionStorePort,
+            SpeechToTextPort speechToTextPort,
+            PersonaRepositoryPort personaRepositoryPort,
+            TextToSpeechServicePort textToSpeechServicePort,
+            SpeakingSessionRepositoryPort speakingSessionRepositoryPort) {
         this.aiChatPort = aiChatPort;
         this.sessionStorePort = sessionStorePort;
         this.speechToTextPort = speechToTextPort;
@@ -112,38 +117,91 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             String correctedUserText = root.path("correctedUserText").asText("");
             String correctionExplanation = root.path("correctionExplanation").asText("");
             String hintForLearner = root.path("hintForLearner").asText("");
-            return new ParsedAiReply(reply, replyTranslation, grammarNote, correctedUserText, correctionExplanation, hintForLearner);
+            return new ParsedAiReply(reply, replyTranslation, grammarNote, correctedUserText, correctionExplanation,
+                    hintForLearner);
         } catch (Exception e) {
             System.out.println("[SpeakingSessionUseCase] Fallback raw text parsing: " + e.getMessage());
             return new ParsedAiReply(rawResponse, "", "", "", "", "");
         }
     }
 
+    private static final int MAX_SLIDING_WINDOW_MESSAGES = 16; // 8 lượt thoại gần nhất
+
+    private void validateSessionNotCompleted(String sessionId) {
+        if (speakingSessionRepositoryPort.isSessionCompleted(sessionId)) {
+            throw new ApplicationException(
+                    LlmApplicationError.LLM_SESSION_ALREADY_COMPLETED,
+                    LlmDetailMessageKey.LLM_SESSION_ALREADY_COMPLETED);
+        }
+    }
+
+    private List<Map<String, String>> getSlidingWindowMessages(String sessionId) {
+        List<Map<String, String>> history = sessionStorePort.getConversationHistory(sessionId);
+        if (history == null || history.isEmpty()) {
+            return List.of();
+        }
+
+        Map<String, String> systemPrompt = null;
+        if ("system".equals(history.get(0).get("role"))) {
+            systemPrompt = history.get(0);
+        }
+
+        int totalMessages = history.size();
+        int nonSystemStartIndex = (systemPrompt != null) ? 1 : 0;
+        int nonSystemCount = totalMessages - nonSystemStartIndex;
+
+        if (nonSystemCount <= MAX_SLIDING_WINDOW_MESSAGES) {
+            return history;
+        }
+
+        List<Map<String, String>> slidingWindow = new ArrayList<>();
+        if (systemPrompt != null) {
+            slidingWindow.add(systemPrompt);
+        }
+        int fromIndex = totalMessages - MAX_SLIDING_WINDOW_MESSAGES;
+        slidingWindow.addAll(history.subList(fromIndex, totalMessages));
+        return slidingWindow;
+    }
+
     @Override
     public ChatResult sendMessage(SendMessageWithSessionCommand command) {
         String sessionId = command.sessionId();
+        validateSessionNotCompleted(sessionId);
         ensureSessionLoadedInMemory(sessionId);
         String userMessage = command.userMessage();
         sessionStorePort.addMessage(sessionId, "user", userMessage);
 
-        List<Map<String, String>> messages = sessionStorePort.getConversationHistory(sessionId);
+        List<Map<String, String>> messages = getSlidingWindowMessages(sessionId);
         String rawReply = aiChatPort.chatWithContext(messages);
         ParsedAiReply parsed = parseAiResponse(rawReply);
 
         sessionStorePort.addMessage(sessionId, "assistant", parsed.reply());
         sessionStorePort.appendTranscript(sessionId,
-                "[Turn]\nUser: " + userMessage + "\nAssistant: " + parsed.reply() + "\n"
-        );
+                "[Turn]\nUser: " + userMessage + "\nAssistant: " + parsed.reply() + "\n");
         int currentTurn = sessionStorePort.incrementTurnCount(sessionId);
 
-        // Real-time persistence to DB for session resume
-        try {
-            speakingSessionRepositoryPort.saveSessionMessage(sessionId, currentTurn, "user", userMessage, parsed.correctedUserText(), parsed.correctionExplanation(), null, parsed.hintForLearner(), null);
-            speakingSessionRepositoryPort.saveSessionMessage(sessionId, currentTurn, "assistant", parsed.reply(), null, null, parsed.grammarNote(), null, null);
-            speakingSessionRepositoryPort.updateSessionTurnAndTranscript(sessionId, currentTurn, sessionStorePort.getFullTranscript(sessionId));
-        } catch (Exception e) {
-            System.err.println("[SpeakingSessionUseCase] Failed to persist turn message to DB: " + e.getMessage());
-        }
+        // Async persistence to DB via Virtual Threads to optimize turn latency
+        final String sCode = sessionId;
+        final int sTurn = currentTurn;
+        final String uMsg = userMessage;
+        final String aMsg = parsed.reply();
+        final String cText = parsed.correctedUserText();
+        final String cExp = parsed.correctionExplanation();
+        final String gNote = parsed.grammarNote();
+        final String hLearner = parsed.hintForLearner();
+        final String fTranscript = sessionStorePort.getFullTranscript(sessionId);
+
+        Thread.ofVirtual().start(() -> {
+            try {
+                speakingSessionRepositoryPort.saveSessionMessage(sCode, sTurn, "user", uMsg,
+                        cText, cExp, null, hLearner, null);
+                speakingSessionRepositoryPort.saveSessionMessage(sCode, sTurn, "assistant", aMsg, null,
+                        null, gNote, null, null);
+                speakingSessionRepositoryPort.updateSessionTurnAndTranscript(sCode, sTurn, fTranscript);
+            } catch (Exception e) {
+                System.err.println("[SpeakingSessionUseCase] Failed to persist turn message asynchronously: " + e.getMessage());
+            }
+        });
 
         String aiAudio = toAudioBase64(sessionId, parsed.reply());
 
@@ -153,18 +211,18 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                 parsed.grammarNote(),
                 parsed.correctedUserText(),
                 parsed.correctionExplanation(),
-                aiAudio
-        );
+                aiAudio);
     }
 
     @Override
     public void sendMessageStream(SendMessageWithSessionCommand command, Consumer<String> onToken) {
         String sessionId = command.sessionId();
+        validateSessionNotCompleted(sessionId);
         ensureSessionLoadedInMemory(sessionId);
         String userMessage = command.userMessage();
         sessionStorePort.addMessage(sessionId, "user", userMessage);
 
-        List<Map<String, String>> messages = sessionStorePort.getConversationHistory(sessionId);
+        List<Map<String, String>> messages = getSlidingWindowMessages(sessionId);
         StringBuilder fullReply = new StringBuilder();
         aiChatPort.chatStreamWithContext(messages, token -> {
             fullReply.append(token);
@@ -181,14 +239,14 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     }
 
     @Override
-    public StartConversationResult startConversationWithAISession(StartSpeakingConversationWithAICommand startSpeakingConversationWithAICommand) {
+    public StartConversationResult startConversationWithAISession(
+            StartSpeakingConversationWithAICommand startSpeakingConversationWithAICommand) {
         String sessionId = UUID.randomUUID().toString();
         Persona persona = personaRepositoryPort.findById((long) startSpeakingConversationWithAICommand.personaId())
                 .orElseThrow(() -> new ApplicationException(
                         PersonaErrorCode.PERSONA_NOT_FOUND,
                         PersonaDetailMessageKey.PERSONA_NOT_FOUND,
-                        startSpeakingConversationWithAICommand.personaId()
-                ));
+                        startSpeakingConversationWithAICommand.personaId()));
 
         sessionStorePort.initSession(sessionId);
         sessionStorePort.setTopic(sessionId, "Conversation with " + persona.getName());
@@ -211,10 +269,12 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         }
         if (persona.getConversationStyle() != null) {
             if (persona.getConversationStyle().getDescription() != null) {
-                personaCtx.append("Style description: ").append(persona.getConversationStyle().getDescription()).append("\n");
+                personaCtx.append("Style description: ").append(persona.getConversationStyle().getDescription())
+                        .append("\n");
             }
             if (persona.getConversationStyle().getPrompt() != null) {
-                personaCtx.append("Style instructions: ").append(persona.getConversationStyle().getPrompt()).append("\n");
+                personaCtx.append("Style instructions: ").append(persona.getConversationStyle().getPrompt())
+                        .append("\n");
             }
         }
         if (effectiveFormality != null) {
@@ -229,10 +289,12 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         customInstruction.append("\n- Your persona role & prompt: ").append(persona.getPrompt());
         if (persona.getConversationStyle() != null) {
             if (persona.getConversationStyle().getDescription() != null) {
-                customInstruction.append("\n- Conversation style description: ").append(persona.getConversationStyle().getDescription());
+                customInstruction.append("\n- Conversation style description: ")
+                        .append(persona.getConversationStyle().getDescription());
             }
             if (persona.getConversationStyle().getPrompt() != null) {
-                customInstruction.append("\n- Conversation style prompt: ").append(persona.getConversationStyle().getPrompt());
+                customInstruction.append("\n- Conversation style prompt: ")
+                        .append(persona.getConversationStyle().getPrompt());
             }
         }
         if (effectiveFormality != null) {
@@ -262,8 +324,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
 
         sessionStorePort.addMessage(sessionId, "assistant", parsed.reply());
         sessionStorePort.appendTranscript(sessionId,
-                "[Turn]\nUser: こんにちは、話しましょう！\nAssistant: " + parsed.reply() + "\n"
-        );
+                "[Turn]\nUser: こんにちは、話しましょう！\nAssistant: " + parsed.reply() + "\n");
         sessionStorePort.incrementTurnCount(sessionId);
 
         // Create IN_PROGRESS session in DB
@@ -274,11 +335,12 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                     (long) startSpeakingConversationWithAICommand.personaId(),
                     "Conversation with " + persona.getName(),
                     effectiveMarugoto != null ? effectiveMarugoto.name() : null,
-                    effectiveFormality != null ? effectiveFormality.name() : null
-            );
-            speakingSessionRepositoryPort.saveSessionMessage(sessionId, 0, "assistant", parsed.reply(), null, null, parsed.grammarNote(), null, null);
+                    effectiveFormality != null ? effectiveFormality.name() : null);
+            speakingSessionRepositoryPort.saveSessionMessage(sessionId, 0, "assistant", parsed.reply(), null, null,
+                    parsed.grammarNote(), null, null);
         } catch (Exception e) {
-            System.err.println("[SpeakingSessionUseCase] Failed to create IN_PROGRESS session in DB: " + e.getMessage());
+            System.err
+                    .println("[SpeakingSessionUseCase] Failed to create IN_PROGRESS session in DB: " + e.getMessage());
         }
 
         String audioBase64 = toAudioBase64(sessionId, parsed.reply());
@@ -288,13 +350,13 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                 audioBase64,
                 parsed.reply(),
                 parsed.replyTranslation(),
-                parsed.grammarNote()
-        );
+                parsed.grammarNote());
     }
 
     @Override
     public AudioChatResult sendAudioMessage(SendAudioMessageCommand command) {
         String sessionId = command.sessionId();
+        validateSessionNotCompleted(sessionId);
         ensureSessionLoadedInMemory(sessionId);
 
         SpeechToTextResult sttResult = speechToTextPort.transcribeAndAssess(
@@ -305,7 +367,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
 
         sessionStorePort.addMessage(sessionId, "user", transcribedText);
 
-        List<Map<String, String>> messages = sessionStorePort.getConversationHistory(sessionId);
+        List<Map<String, String>> messages = getSlidingWindowMessages(sessionId);
         String rawReply = aiChatPort.chatWithContext(messages);
         ParsedAiReply parsed = parseAiResponse(rawReply);
 
@@ -314,14 +376,29 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                 "[Turn]\nUser: " + transcribedText + "\nAssistant: " + parsed.reply() + "\n");
         int currentTurn = sessionStorePort.incrementTurnCount(sessionId);
 
-        // Real-time persistence to DB for session resume
-        try {
-            speakingSessionRepositoryPort.saveSessionMessage(sessionId, currentTurn, "user", transcribedText, parsed.correctedUserText(), parsed.correctionExplanation(), null, parsed.hintForLearner(), sttResult.pronunciationScore());
-            speakingSessionRepositoryPort.saveSessionMessage(sessionId, currentTurn, "assistant", parsed.reply(), null, null, parsed.grammarNote(), null, null);
-            speakingSessionRepositoryPort.updateSessionTurnAndTranscript(sessionId, currentTurn, sessionStorePort.getFullTranscript(sessionId));
-        } catch (Exception e) {
-            System.err.println("[SpeakingSessionUseCase] Failed to persist audio message to DB: " + e.getMessage());
-        }
+        // Async persistence to DB via Virtual Threads to optimize turn latency
+        final String sCode = sessionId;
+        final int sTurn = currentTurn;
+        final String uMsg = transcribedText;
+        final String aMsg = parsed.reply();
+        final String cText = parsed.correctedUserText();
+        final String cExp = parsed.correctionExplanation();
+        final String gNote = parsed.grammarNote();
+        final String hLearner = parsed.hintForLearner();
+        final Double pronScore = sttResult.pronunciationScore();
+        final String fTranscript = sessionStorePort.getFullTranscript(sessionId);
+
+        Thread.ofVirtual().start(() -> {
+            try {
+                speakingSessionRepositoryPort.saveSessionMessage(sCode, sTurn, "user", uMsg,
+                        cText, cExp, null, hLearner, pronScore);
+                speakingSessionRepositoryPort.saveSessionMessage(sCode, sTurn, "assistant", aMsg, null,
+                        null, gNote, null, null);
+                speakingSessionRepositoryPort.updateSessionTurnAndTranscript(sCode, sTurn, fTranscript);
+            } catch (Exception e) {
+                System.err.println("[SpeakingSessionUseCase] Failed to persist audio message asynchronously: " + e.getMessage());
+            }
+        });
 
         String aiAudio = toAudioBase64(sessionId, parsed.reply());
 
@@ -336,8 +413,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                 sttResult.accuracyScore(),
                 sttResult.fluencyScore(),
                 sttResult.completenessScore(),
-                sttResult.pronunciationScore()
-        );
+                sttResult.pronunciationScore());
     }
 
     @Override
@@ -349,16 +425,17 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     public SpeakingSessionDetailResult getSessionHistoryDetail(String sessionCode, Long userId) {
         return speakingSessionRepositoryPort.findSessionDetailByCode(sessionCode, userId)
                 .orElseThrow(() -> new ApplicationException(
-                        PersonaErrorCode.PERSONA_NOT_FOUND,
-                        "Không tìm thấy thông tin buổi nói chuyện hoặc không có quyền truy cập."
-                ));
+                        LlmApplicationError.LLM_SESSION_NOT_FOUND,
+                        LlmDetailMessageKey.LLM_SESSION_NOT_FOUND));
     }
 
     @Override
     public ActiveSpeakingSessionResult getActiveSession(Long userId, Integer personaId) {
-        if (userId == null) return null;
+        if (userId == null)
+            return null;
         Long pId = (personaId != null && personaId > 0) ? personaId.longValue() : null;
-        ActiveSpeakingSessionResult activeSession = speakingSessionRepositoryPort.findActiveSession(userId, pId).orElse(null);
+        ActiveSpeakingSessionResult activeSession = speakingSessionRepositoryPort.findActiveSession(userId, pId)
+                .orElse(null);
         if (activeSession != null) {
             ensureSessionLoadedInMemory(activeSession.sessionCode());
         }
@@ -368,7 +445,9 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     @Override
     public StartConversationResult resumeSession(String sessionCode, Long userId) {
         if (sessionCode == null || sessionCode.isBlank()) {
-            throw new ApplicationException(PersonaErrorCode.PERSONA_NOT_FOUND, "Mã phiên nói chuyện không hợp lệ.");
+            throw new ApplicationException(
+                    LlmApplicationError.LLM_SESSION_ID_INVALID,
+                    LlmDetailMessageKey.LLM_SESSION_ID_INVALID);
         }
 
         // 1. Nếu session đang còn trong memory
@@ -381,23 +460,25 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                     break;
                 }
             }
-            ParsedAiReply parsed = parseAiResponse(lastAssistantReply);
-            String audioBase64 = toAudioBase64(sessionCode, parsed.reply());
+            // lastAssistantReply đã là plain Japanese text (parsed.reply() khi lưu vào
+            // memory)
+            // Không re-parse qua parseAiResponse() vì sẽ fail JSON →
+            // replyTranslation/grammarNote trống
+            String audioBase64 = toAudioBase64(sessionCode, lastAssistantReply);
             return new StartConversationResult(
                     sessionCode,
                     audioBase64,
-                    parsed.reply(),
-                    parsed.replyTranslation(),
-                    parsed.grammarNote()
-            );
+                    lastAssistantReply,
+                    "",
+                    "");
         }
 
         // 2. Khôi phục từ DB nếu session bị mất trong memory
-        ActiveSpeakingSessionResult activeSession = speakingSessionRepositoryPort.findActiveSessionByCode(sessionCode, userId)
+        ActiveSpeakingSessionResult activeSession = speakingSessionRepositoryPort
+                .findActiveSessionByCode(sessionCode, userId)
                 .orElseThrow(() -> new ApplicationException(
-                        PersonaErrorCode.PERSONA_NOT_FOUND,
-                        "Không tìm thấy phiên nói chuyện dở dang để tiếp tục."
-                ));
+                        LlmApplicationError.LLM_SESSION_NOT_FOUND,
+                        LlmDetailMessageKey.LLM_SESSION_NOT_FOUND));
 
         List<Map<String, String>> historyMessages = new ArrayList<>();
         String lastAssistantReply = "";
@@ -414,7 +495,8 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         StringBuilder fullTranscript = new StringBuilder();
         if (activeSession.messages() != null) {
             for (var msg : activeSession.messages()) {
-                fullTranscript.append("[Turn]\n").append(msg.senderType()).append(": ").append(msg.content()).append("\n");
+                fullTranscript.append("[Turn]\n").append(msg.senderType()).append(": ").append(msg.content())
+                        .append("\n");
             }
         }
 
@@ -428,19 +510,18 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                 fullTranscript.toString(),
                 activeSession.totalTurns(),
                 activeSession.startedAt(),
-                historyMessages
-        );
+                historyMessages);
 
-        ParsedAiReply parsed = parseAiResponse(lastAssistantReply);
-        String audioBase64 = toAudioBase64(sessionCode, parsed.reply());
+        // lastAssistantReply đã là plain Japanese text (parsed.reply() khi lưu vào DB)
+        // Không re-parse vì sẽ fail JSON → replyTranslation/grammarNote trống
+        String audioBase64 = toAudioBase64(sessionCode, lastAssistantReply);
 
         return new StartConversationResult(
                 sessionCode,
                 audioBase64,
-                parsed.reply(),
-                parsed.replyTranslation(),
-                parsed.grammarNote()
-        );
+                lastAssistantReply,
+                "",
+                "");
     }
 
     private String toAudioBase64(String sessionId, String text) {
@@ -456,19 +537,20 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
 
     private void ensureSessionLoadedInMemory(String sessionCode) {
         if (sessionCode == null || sessionCode.isBlank()) {
-            return;
+            throw new ApplicationException(
+                    LlmApplicationError.LLM_SESSION_ID_INVALID,
+                    LlmDetailMessageKey.LLM_SESSION_ID_INVALID);
         }
 
         if (sessionStorePort.hasSession(sessionCode)) {
             return;
         }
 
-        ActiveSpeakingSessionResult activeSession = speakingSessionRepositoryPort.findActiveSessionByCode(sessionCode, null)
-                .orElse(null);
-
-        if (activeSession == null) {
-            return;
-        }
+        ActiveSpeakingSessionResult activeSession = speakingSessionRepositoryPort
+                .findActiveSessionByCode(sessionCode, null)
+                .orElseThrow(() -> new ApplicationException(
+                        LlmApplicationError.LLM_SESSION_NOT_FOUND,
+                        LlmDetailMessageKey.LLM_SESSION_NOT_FOUND));
 
         List<Map<String, String>> historyMessages = new ArrayList<>();
         if (activeSession.messages() != null) {
@@ -480,7 +562,8 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         StringBuilder fullTranscript = new StringBuilder();
         if (activeSession.messages() != null) {
             for (var msg : activeSession.messages()) {
-                fullTranscript.append("[Turn]\n").append(msg.senderType()).append(": ").append(msg.content()).append("\n");
+                fullTranscript.append("[Turn]\n").append(msg.senderType()).append(": ").append(msg.content())
+                        .append("\n");
             }
         }
 
@@ -494,8 +577,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                 fullTranscript.toString(),
                 activeSession.totalTurns(),
                 activeSession.startedAt(),
-                historyMessages
-        );
+                historyMessages);
     }
 
     private record ParsedAiReply(
@@ -504,7 +586,6 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             String grammarNote,
             String correctedUserText,
             String correctionExplanation,
-            String hintForLearner
-    ) {
+            String hintForLearner) {
     }
 }
