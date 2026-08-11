@@ -10,6 +10,8 @@ import java.util.Optional;
 public interface LearningPathNodeJpaRepository extends BaseJpaRepository<LearningPathNodeEntity> {
     List<LearningPathNodeEntity> findAllByObjectiveId(Long objectiveId);
 
+    List<LearningPathNodeEntity> findAllByObjective_Lesson_Topic_Id(Long topicId);
+
     Optional<LearningPathNodeEntity> findFirstByOrderByGlobalOrderIndexAsc();
 
     Optional<LearningPathNodeEntity> findByChestId(Long chestId);

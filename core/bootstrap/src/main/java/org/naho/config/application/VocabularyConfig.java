@@ -15,11 +15,13 @@ import org.naho.shared.port.out.TransactionPort;
 import org.naho.vocabulary.port.in.ExportVocabularyInputPort;
 import org.naho.vocabulary.port.in.GetRandomVocabularyQuizInputPort;
 import org.naho.vocabulary.port.in.GetVocabulariesOfObjectiveInputPort;
+import org.naho.vocabulary.port.in.GetVocabulariesOfTopicInputPort;
 import org.naho.vocabulary.port.in.ImportVocabularyPort;
 import org.naho.vocabulary.port.out.*;
 import org.naho.vocabulary.usecase.ExportVocabularyUseCase;
 import org.naho.vocabulary.usecase.GetRandomVocabularyQuizUseCase;
 import org.naho.vocabulary.usecase.GetVocabulariesOfObjectiveUseCase;
+import org.naho.vocabulary.usecase.GetVocabulariesOfTopicUseCase;
 import org.naho.vocabulary.usecase.ImportVocabularyUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,6 +51,13 @@ public class VocabularyConfig {
             VocabulariesQuestionPort vocabulariesQuestionPort
     ) {
         return new GetVocabulariesOfObjectiveUseCase(vocabulariesQuestionPort);
+    }
+
+    @Bean
+    public GetVocabulariesOfTopicInputPort getVocabulariesOfTopicInputPort(
+            VocabulariesQuestionPort vocabulariesQuestionPort
+    ) {
+        return new GetVocabulariesOfTopicUseCase(vocabulariesQuestionPort);
     }
 
     @Bean
