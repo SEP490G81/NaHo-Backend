@@ -54,56 +54,14 @@ public class UpdateReportStatusUseCase implements UpdateReportStatusInputPort {
         Report savedReport = reportRepositoryPort.save(updatedReport);
 
         if (shouldSendEmail) {
-            // [TEMPORARY COMMENT OUT] Old email logic tightly coupled in UseCase.
-            // sendReportResolvedEmail(savedReport);
-
-            // Send in-app notification to the reported user (SYSTEM type)
-            // Or the user who created the report (if we want to notify them it was resolved).
-            // Usually we notify the user who got reported if their content was deleted.
-            // Let's notify the reporter that their report was resolved as SYSTEM type.
             eventPublisherPort.publish(new ReportStatusUpdatedEvent(
                     savedReport.getUserId(),
                     savedReport.getId(),
-                    "RESOLVED",
                     savedReport.getTitle(),
-                    savedReport.getAdminReply()
-            ));
+                    savedReport.getAdminReply(),
+                    savedReport.getReportType().name()));
         }
-
+        
         return reportResultMapper.domainToResult(savedReport);
     }
-
-    private void sendReportResolvedEmail(Report report) {
-        // [TEMPORARY COMMENT OUT] - Moved to ReportEmailEventListener
-        /*
-        if (report.getUserId() == null) {
-            return;
-        }
-        try {
-            Optional<User> userOpt = userRepositoryPort.findById(report.getUserId());
-            if (userOpt.isEmpty()) {
-                return;
-            }
-            User user = userOpt.get();
-            if (user.getEmail() == null || user.getEmail().getValue() == null || user.getEmail().getValue().isBlank()) {
-                return;
-            }
-            String email = user.getEmail().getValue();
-            String fullName = user.getFullName() != null && !user.getFullName().isBlank()
-                    ? user.getFullName()
-                    : (user.getUsername() != null ? user.getUsername().getValue() : "User");
-
-            String subject = "NaHo - Báo cáo #" + report.getId() + " của bạn đã được xử lý";
-            Map<String, Object> variables = new HashMap<>();
-            variables.put("fullName", fullName);
-            variables.put("reportId", report.getId());
-            variables.put("reportTitle", report.getTitle());
-            variables.put("reportType", report.getReportType() != null ? report.getReportType().name() : "");
-
-            emailPort.sendEmail(email, subject, "report-resolved-email", variables);
-        } catch (Exception ignored) {
-        }
-        */
-    }
 }
-

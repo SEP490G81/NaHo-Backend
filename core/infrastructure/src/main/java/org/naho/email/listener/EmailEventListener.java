@@ -13,12 +13,14 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
+@Transactional(readOnly = true)
 @Component
 public class EmailEventListener {
 
@@ -41,10 +43,6 @@ public class EmailEventListener {
     @Async
     @EventListener
     public void handleReportStatusUpdated(ReportStatusUpdatedEvent event) {
-        if (!"RESOLVED".equals(event.newStatus()) || event.reporterId() == null) {
-            return;
-        }
-
         try {
             Optional<User> userOpt = userRepositoryPort.findById(event.reporterId());
             if (userOpt.isEmpty()) {
@@ -66,13 +64,17 @@ public class EmailEventListener {
             variables.put("fullName", fullName);
             variables.put("reportId", event.reportId());
             variables.put("reportTitle", event.reportTitle() != null ? event.reportTitle() : "N/A");
+            if (event.reportType() != null) {
+                variables.put("reportType", event.reportType());
+            }
             if (event.adminNote() != null && !event.adminNote().isBlank()) {
                 variables.put("adminNote", event.adminNote());
             }
 
             emailPort.sendEmail(email, subject, "report-resolved-email", variables);
-        } catch (Exception ignored) {
-            // Log error in production
+        } catch (Exception e) {
+            System.err.println("Failed to send ReportStatusUpdatedEvent email: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -81,8 +83,9 @@ public class EmailEventListener {
     public void handlePasswordChanged(PasswordChangedEvent event) {
         try {
             emailPort.sendPasswordChangedEmail(event.email(), event.fullName());
-        } catch (Exception ignored) {
-            // Log error in production
+        } catch (Exception e) {
+            System.err.println("Failed to send PasswordChangedEvent email: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -91,8 +94,9 @@ public class EmailEventListener {
     public void handleUserRegistered(UserRegisteredEvent event) {
         try {
             emailPort.sendOtpEmail(event.email(), event.fullName(), event.otpCode());
-        } catch (Exception ignored) {
-            // Log error in production
+        } catch (Exception e) {
+            System.err.println("Failed to send UserRegisteredEvent email: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -121,8 +125,9 @@ public class EmailEventListener {
             variables.put("planName", event.newPlanName());
 
             emailPort.sendEmail(email, subject, "plan-upgraded-email", variables);
-        } catch (Exception ignored) {
-            // Log error in production
+        } catch (Exception e) {
+            System.err.println("Failed to send UserPlanUpgradedEvent email: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

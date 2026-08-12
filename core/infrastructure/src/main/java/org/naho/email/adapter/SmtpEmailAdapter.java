@@ -140,6 +140,9 @@ public class SmtpEmailAdapter implements EmailPort {
             throw new InfrastructureException(
                     org.naho.shared.exception.CommonErrorCode.COMMON_INTERNAL_SERVER_ERROR,
                     errorMsg, e);
+        } catch (Exception e) {
+            log.error("Unexpected error sending email to {}", toEmail, e);
+            throw e;
         }
     }
 }
