@@ -16,6 +16,8 @@ import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.naho.persona.type.FormalityLevel;
 import org.naho.persona.type.MarugotoLevel;
 import org.naho.shared.exception.ApplicationException;
+import org.naho.user.exception.UserErrorCode;
+import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.speech.azure.port.out.TextToSpeechServicePort;
 import org.naho.speech.llm.command.SendAudioMessageCommand;
 import org.naho.speech.llm.command.SendMessageWithSessionCommand;
@@ -162,6 +164,24 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         }
     }
 
+    private void validateConcurrentSessionLimit(Long userId) {
+        if (userId == null) {
+            throw new ApplicationException(
+                    UserErrorCode.USER_UNAUTHORIZED,
+                    UserDetailMessageKey.USER_UNAUTHORIZED);
+        }
+
+        SubscriptionPlanResult plan = getActiveSubscriptionInputPort.getUserActiveSubscriptionPlan(userId);
+        if (plan != null && plan.maxConcurrentAiSessionCount() != null) {
+            int activeSessionCount = speakingSessionRepositoryPort.countActiveSessionsByUserId(userId);
+            if (activeSessionCount >= plan.maxConcurrentAiSessionCount()) {
+                throw new ApplicationException(
+                        LlmApplicationError.LLM_SESSION_CONCURRENT_LIMIT_EXCEEDED,
+                        LlmDetailMessageKey.LLM_SESSION_CONCURRENT_LIMIT_EXCEEDED);
+            }
+        }
+    }
+
     private List<Map<String, String>> getSlidingWindowMessages(String sessionId) {
         List<Map<String, String>> history = sessionStorePort.getConversationHistory(sessionId);
         if (history == null || history.isEmpty()) {
@@ -270,6 +290,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     @Override
     public StartConversationResult startConversationWithAISession(
             StartSpeakingConversationWithAICommand startSpeakingConversationWithAICommand) {
+        validateConcurrentSessionLimit(startSpeakingConversationWithAICommand.userId());
         String sessionId = UUID.randomUUID().toString();
         Persona persona = personaRepositoryPort.findById((long) startSpeakingConversationWithAICommand.personaId())
                 .orElseThrow(() -> new ApplicationException(

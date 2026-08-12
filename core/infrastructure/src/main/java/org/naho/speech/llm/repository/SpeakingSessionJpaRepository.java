@@ -20,5 +20,7 @@ public interface SpeakingSessionJpaRepository extends JpaRepository<SpeakingSess
     Optional<SpeakingSessionEntity> findFirstByUserIdAndStatusOrderByStartedAtDesc(Long userId, String status);
 
     Optional<SpeakingSessionEntity> findFirstByUserIdAndPersonaIdAndStatusOrderByStartedAtDesc(Long userId, Long personaId, String status);
+
+    int countByUserIdAndStatus(Long userId, String status);
 }
 

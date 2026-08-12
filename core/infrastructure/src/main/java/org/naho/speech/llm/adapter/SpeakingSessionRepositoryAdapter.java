@@ -502,4 +502,12 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
             sessionJpaRepository.save(session);
         });
     }
+
+    @Override
+    public int countActiveSessionsByUserId(Long userId) {
+        if (userId == null) {
+            return 0;
+        }
+        return sessionJpaRepository.countByUserIdAndStatus(userId, "IN_PROGRESS");
+    }
 }

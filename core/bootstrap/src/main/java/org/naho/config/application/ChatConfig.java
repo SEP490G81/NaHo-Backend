@@ -14,6 +14,7 @@ import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.naho.question.port.in.CompleteSpeakingQuestionInputPort;
 import org.naho.question.port.out.AnswerHistoryRepositoryPort;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
+import org.naho.subscription.port.out.UserDailyAiUsageRepositoryPort;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
 import org.naho.speech.azure.port.out.TextToSpeechServicePort;
@@ -129,6 +130,7 @@ public class ChatConfig {
             UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
             FileResultMapperPort fileResultMapperPort,
             UploadFileInputPort uploadFileInputPort,
+            UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort,
             FuriganaGenerationPort furiganaGenerationPort
     ) {
         return new SpeakingAnalysisUseCase(
@@ -148,6 +150,7 @@ public class ChatConfig {
                 userLearningProgressRepositoryPort,
                 fileResultMapperPort,
                 uploadFileInputPort,
+                userDailyAiUsageRepositoryPort,
                 furiganaGenerationPort
         );
     }

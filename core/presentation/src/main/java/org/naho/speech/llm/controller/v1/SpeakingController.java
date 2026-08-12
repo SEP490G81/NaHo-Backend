@@ -221,9 +221,7 @@ public class SpeakingController {
                             : 0.0;
                     fileValidatorPort.validateWavFileAndDuration(audioBytes, durationLimit);
 
-                    if (!subscriptionPlan.code().equals(PlanCode.FREE)) {
-                        storedFile = fileStorageServicePort.saveFileToLocal(file, FileFolderConstant.RECORDINGS, FileAccessStatus.PRIVATE);
-                    }
+                    storedFile = fileStorageServicePort.saveFileToLocal(file, FileFolderConstant.RECORDINGS, FileAccessStatus.PRIVATE);
                 }
             }
 

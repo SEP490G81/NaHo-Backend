@@ -72,5 +72,10 @@ public interface SpeakingSessionRepositoryPort {
      * Dùng để khóa không cho tiếp tục gửi tin nhắn vào phiên COMPLETED.
      */
     boolean isSessionCompleted(String sessionCode);
+
+    /**
+     * Đếm số phiên đang ở trạng thái IN_PROGRESS của người dùng.
+     */
+    int countActiveSessionsByUserId(Long userId);
 }
 
