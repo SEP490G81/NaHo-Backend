@@ -22,6 +22,7 @@ import org.naho.speech.llm.constant.OpenAiConfigProperties;
 import org.naho.speech.llm.port.in.*;
 import org.naho.speech.llm.port.out.*;
 import org.naho.speech.llm.usecase.*;
+import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -73,7 +74,10 @@ public class ChatConfig {
             SpeechToTextPort speechToTextPort,
             PersonaRepositoryPort personaRepositoryPort,
             TextToSpeechServicePort textToSpeechServicePort,
-            SpeakingSessionRepositoryPort speakingSessionRepositoryPort
+            SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
+            FileRepositoryPort fileRepositoryPort,
+            UploadFileInputPort uploadFileInputPort,
+            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort
     ) {
         return new SpeakingSessionUseCase(
                 aiChatPort,
@@ -81,7 +85,10 @@ public class ChatConfig {
                 speechToTextPort,
                 personaRepositoryPort,
                 textToSpeechServicePort,
-                speakingSessionRepositoryPort
+                speakingSessionRepositoryPort,
+                fileRepositoryPort,
+                uploadFileInputPort,
+                getActiveSubscriptionInputPort
         );
     }
 

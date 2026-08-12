@@ -2,9 +2,16 @@ package org.naho.speech.llm.controller.v1;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.naho.file.constant.FileAccessStatus;
+import org.naho.file.constant.FileFolderConstant;
+import org.naho.file.port.out.FileStorageServicePort;
+import org.naho.file.port.out.FileValidatorPort;
+import org.naho.file.result.StoredFile;
 import org.naho.i18n.message.speech.SpeechDetailMessageKey;
 import org.naho.pagination.PageData;
 import org.naho.shared.annotation.ApiResponseMessage;
+import org.naho.shared.exception.PresentationException;
+import org.naho.speech.azure.exception.AzureSpeechErrorCode;
 import org.naho.speech.llm.command.SendAudioMessageCommand;
 import org.naho.speech.llm.command.SendMessageWithSessionCommand;
 import org.naho.speech.llm.command.SpeakingSessionFilterCommand;
@@ -19,6 +26,9 @@ import org.naho.speech.llm.port.in.EndSessionInputPort;
 import org.naho.speech.llm.port.in.SpeakingSessionInputPort;
 import org.naho.speech.llm.port.in.SuggestedTopicsInputPort;
 import org.naho.speech.llm.result.*;
+import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
+import org.naho.subscription.result.SubscriptionPlanResult;
+import org.naho.subscription.type.PlanCode;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -54,6 +64,9 @@ public class SpeakingController {
     private final AudioChatResponseMapper audioChatResponseMapper;
     private final ScoringResponseMapper scoringResponseMapper;
     private final StartConversationResponseMapper startConversationResponseMapper;
+    private final FileStorageServicePort fileStorageServicePort;
+    private final FileValidatorPort fileValidatorPort;
+    private final GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
 
     // ─── Topics ─────────────────────────────────────────────────
 
@@ -112,7 +125,8 @@ public class SpeakingController {
                         m.correctedText(),
                         m.correctionExplanation(),
                         m.grammarNote(),
-                        m.hintForLearner()
+                        m.hintForLearner(),
+                        m.audioUrl()
                 )).toList()
         );
         return ResponseEntity.ok(response);
@@ -191,11 +205,45 @@ public class SpeakingController {
     public ResponseEntity<AudioChatResponse> sendAudioMessage(
             @PathVariable("sessionId") String sessionId,
             @RequestPart("file") MultipartFile file,
-            @RequestParam(value = "reference-text", required = false) String referenceText
-    ) throws IOException {
-        var command = new SendAudioMessageCommand(sessionId, file.getBytes(), referenceText);
-        AudioChatResult result = speakingSessionInputPort.sendAudioMessage(command);
-        return ResponseEntity.ok(audioChatResponseMapper.resultToResponse(result));
+            @RequestParam(value = "reference-text", required = false) String referenceText,
+            @AuthenticationPrincipal AccessTokenPayload payload
+    ) {
+        try {
+            StoredFile storedFile = null;
+            Long userId = payload != null ? payload.userId() : null;
+            byte[] audioBytes = file != null ? file.getBytes() : new byte[0];
+
+            if (userId != null) {
+                SubscriptionPlanResult subscriptionPlan = getActiveSubscriptionInputPort.getUserActiveSubscriptionPlan(userId);
+                if (subscriptionPlan != null) {
+                    double durationLimit = subscriptionPlan.maxSpeakingQuestionRecordingSeconds() != null
+                            ? subscriptionPlan.maxSpeakingQuestionRecordingSeconds().doubleValue()
+                            : 0.0;
+                    fileValidatorPort.validateWavFileAndDuration(audioBytes, durationLimit);
+
+                    if (!subscriptionPlan.code().equals(PlanCode.FREE)) {
+                        storedFile = fileStorageServicePort.saveFileToLocal(file, FileFolderConstant.RECORDINGS, FileAccessStatus.PRIVATE);
+                    }
+                }
+            }
+
+            var command = SendAudioMessageCommand.builder()
+                    .sessionId(sessionId)
+                    .audioBytes(audioBytes)
+                    .referenceText(referenceText)
+                    .storedFile(storedFile)
+                    .userId(userId)
+                    .build();
+
+            AudioChatResult result = speakingSessionInputPort.sendAudioMessage(command);
+            return ResponseEntity.ok(audioChatResponseMapper.resultToResponse(result));
+
+        } catch (IOException e) {
+            throw new PresentationException(
+                    AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
+                    SpeechDetailMessageKey.SPEECH_AUDIO_FILE_EMPTY,
+                    e.getMessage());
+        }
     }
 
     // ─── End Session + Scoring ───────────────────────────────────

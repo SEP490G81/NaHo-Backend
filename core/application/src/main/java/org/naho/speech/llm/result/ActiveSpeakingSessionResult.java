@@ -21,7 +21,19 @@ public record ActiveSpeakingSessionResult(
             String correctedText,
             String correctionExplanation,
             String grammarNote,
-            String hintForLearner
+            String hintForLearner,
+            String audioUrl
     ) {
+        public SessionMessageItem(
+                int turnIndex,
+                String senderType,
+                String content,
+                String correctedText,
+                String correctionExplanation,
+                String grammarNote,
+                String hintForLearner
+        ) {
+            this(turnIndex, senderType, content, correctedText, correctionExplanation, grammarNote, hintForLearner, null);
+        }
     }
 }

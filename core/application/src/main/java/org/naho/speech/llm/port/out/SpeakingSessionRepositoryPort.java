@@ -1,5 +1,6 @@
 package org.naho.speech.llm.port.out;
 
+import org.naho.file.model.File;
 import org.naho.pagination.PageData;
 import org.naho.speech.llm.command.SpeakingSessionFilterCommand;
 import org.naho.speech.llm.result.ActiveSpeakingSessionResult;
@@ -47,6 +48,18 @@ public interface SpeakingSessionRepositoryPort {
             String grammarNote,
             String hintForLearner,
             Double pronunciationScore);
+
+    void saveSessionMessage(
+            String sessionCode,
+            int turnIndex,
+            String senderType,
+            String content,
+            String correctedText,
+            String correctionExplanation,
+            String grammarNote,
+            String hintForLearner,
+            Double pronunciationScore,
+            File audioFile);
 
     Optional<ActiveSpeakingSessionResult> findActiveSession(Long userId, Long personaId);
 

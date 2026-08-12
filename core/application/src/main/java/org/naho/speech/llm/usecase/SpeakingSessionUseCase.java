@@ -2,6 +2,11 @@ package org.naho.speech.llm.usecase;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.naho.file.constant.FileAccessStatus;
+import org.naho.file.model.File;
+import org.naho.file.port.in.UploadFileInputPort;
+import org.naho.file.port.out.FileRepositoryPort;
+import org.naho.file.result.StoredFile;
 import org.naho.i18n.message.llm.LlmDetailMessageKey;
 import org.naho.i18n.message.persona.PersonaDetailMessageKey;
 import org.naho.pagination.PageData;
@@ -23,6 +28,8 @@ import org.naho.speech.llm.port.out.SessionStorePort;
 import org.naho.speech.llm.port.out.SpeakingSessionRepositoryPort;
 import org.naho.speech.llm.port.out.SpeechToTextPort;
 import org.naho.speech.llm.result.*;
+import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
+import org.naho.subscription.result.SubscriptionPlanResult;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -75,19 +82,28 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     private final PersonaRepositoryPort personaRepositoryPort;
     private final TextToSpeechServicePort textToSpeechServicePort;
     private final SpeakingSessionRepositoryPort speakingSessionRepositoryPort;
+    private final FileRepositoryPort fileRepositoryPort;
+    private final UploadFileInputPort uploadFileInputPort;
+    private final GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
 
     public SpeakingSessionUseCase(AiChatPort aiChatPort,
                                   SessionStorePort sessionStorePort,
                                   SpeechToTextPort speechToTextPort,
                                   PersonaRepositoryPort personaRepositoryPort,
                                   TextToSpeechServicePort textToSpeechServicePort,
-                                  SpeakingSessionRepositoryPort speakingSessionRepositoryPort) {
+                                  SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
+                                  FileRepositoryPort fileRepositoryPort,
+                                  UploadFileInputPort uploadFileInputPort,
+                                  GetActiveSubscriptionInputPort getActiveSubscriptionInputPort) {
         this.aiChatPort = aiChatPort;
         this.sessionStorePort = sessionStorePort;
         this.speechToTextPort = speechToTextPort;
         this.personaRepositoryPort = personaRepositoryPort;
         this.textToSpeechServicePort = textToSpeechServicePort;
         this.speakingSessionRepositoryPort = speakingSessionRepositoryPort;
+        this.fileRepositoryPort = fileRepositoryPort;
+        this.uploadFileInputPort = uploadFileInputPort;
+        this.getActiveSubscriptionInputPort = getActiveSubscriptionInputPort;
     }
 
     private ParsedAiReply parseAiResponse(String rawResponse) {
@@ -129,6 +145,23 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         }
     }
 
+    private void validateSessionTurnLimit(String sessionId, Long userId) {
+        Long targetUserId = userId != null ? userId : sessionStorePort.getUserId(sessionId);
+        if (targetUserId == null) {
+            return;
+        }
+
+        SubscriptionPlanResult plan = getActiveSubscriptionInputPort.getUserActiveSubscriptionPlan(targetUserId);
+        if (plan != null && plan.maxTurnsPerAiSession() != null) {
+            int currentTurnCount = sessionStorePort.getTurnCount(sessionId);
+            if (currentTurnCount >= plan.maxTurnsPerAiSession()) {
+                throw new ApplicationException(
+                        LlmApplicationError.LLM_SESSION_TURN_LIMIT_EXCEEDED,
+                        LlmDetailMessageKey.LLM_SESSION_TURN_LIMIT_EXCEEDED);
+            }
+        }
+    }
+
     private List<Map<String, String>> getSlidingWindowMessages(String sessionId) {
         List<Map<String, String>> history = sessionStorePort.getConversationHistory(sessionId);
         if (history == null || history.isEmpty()) {
@@ -161,6 +194,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     public ChatResult sendMessage(SendMessageWithSessionCommand command) {
         String sessionId = command.sessionId();
         validateSessionNotCompleted(sessionId);
+        validateSessionTurnLimit(sessionId, null);
         ensureSessionLoadedInMemory(sessionId);
         String userMessage = command.userMessage();
         sessionStorePort.addMessage(sessionId, "user", userMessage);
@@ -212,6 +246,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     public void sendMessageStream(SendMessageWithSessionCommand command, Consumer<String> onToken) {
         String sessionId = command.sessionId();
         validateSessionNotCompleted(sessionId);
+        validateSessionTurnLimit(sessionId, null);
         ensureSessionLoadedInMemory(sessionId);
         String userMessage = command.userMessage();
         sessionStorePort.addMessage(sessionId, "user", userMessage);
@@ -350,6 +385,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     public AudioChatResult sendAudioMessage(SendAudioMessageCommand command) {
         String sessionId = command.sessionId();
         validateSessionNotCompleted(sessionId);
+        validateSessionTurnLimit(sessionId, command.userId());
         ensureSessionLoadedInMemory(sessionId);
 
         SpeechToTextResult sttResult = speechToTextPort.transcribeAndAssess(
@@ -381,13 +417,23 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         final Double pronScore = sttResult.pronunciationScore();
         final String fTranscript = sessionStorePort.getFullTranscript(sessionId);
 
+        final StoredFile storedFile = command.storedFile();
+
         Thread.ofVirtual().start(() -> {
             try {
+                File audioFile = null;
+                if (storedFile != null) {
+                    audioFile = fileRepositoryPort.createNewForUpload(storedFile, FileAccessStatus.PRIVATE);
+                }
                 speakingSessionRepositoryPort.saveSessionMessage(sCode, sTurn, "user", uMsg,
-                        cText, cExp, null, hLearner, pronScore);
+                        cText, cExp, null, hLearner, pronScore, audioFile);
                 speakingSessionRepositoryPort.saveSessionMessage(sCode, sTurn, "assistant", aMsg, null,
                         null, gNote, null, null);
                 speakingSessionRepositoryPort.updateSessionTurnAndTranscript(sCode, sTurn, fTranscript);
+
+                if (storedFile != null) {
+                    uploadFileInputPort.uploadFileToCloud(storedFile);
+                }
             } catch (Exception e) {
                 System.err.println("[SpeakingSessionUseCase] Failed to persist audio message asynchronously: " + e.getMessage());
             }

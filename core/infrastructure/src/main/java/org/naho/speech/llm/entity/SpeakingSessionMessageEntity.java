@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import org.naho.file.entity.FileEntity;
 import org.naho.shared.persistence.BaseEntity;
 
 @SuperBuilder
@@ -43,4 +44,8 @@ public class SpeakingSessionMessageEntity extends BaseEntity {
 
     @Column(name = "pronunciation_score")
     Double pronunciationScore;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "audio_file_id")
+    FileEntity audioFile;
 }

@@ -27,6 +27,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.naho.file.entity.FileEntity;
+import org.naho.file.mapper.FileEntityMapper;
+import org.naho.file.model.File;
+import org.naho.file.port.out.FileStorageServicePort;
+import org.naho.file.repository.FileJpaRepository;
+
 import java.time.Instant;
 import java.util.*;
 
@@ -38,6 +44,9 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
     private final SpeakingSessionJpaRepository sessionJpaRepository;
     private final SpeakingSessionAssessmentJpaRepository assessmentJpaRepository;
     private final SpeakingSessionMessageJpaRepository messageJpaRepository;
+    private final FileJpaRepository fileJpaRepository;
+    private final FileEntityMapper fileEntityMapper;
+    private final FileStorageServicePort fileStorageServicePort;
 
     @Override
     @Transactional
@@ -52,8 +61,7 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
             int totalTurns,
             Double asrConfidence,
             Instant startedAt,
-            ScoringResult scoringResult
-    ) {
+            ScoringResult scoringResult) {
         // 1. Lưu/Cập nhật speaking_sessions thành COMPLETED
         SpeakingSessionEntity sessionEntity = sessionJpaRepository.findBySessionCode(sessionCode)
                 .orElseGet(() -> SpeakingSessionEntity.builder().sessionCode(sessionCode).build());
@@ -73,7 +81,8 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
         Instant endedAt = Instant.now();
         sessionEntity.setEndedAt(endedAt);
         if (sessionEntity.getStartedAt() != null) {
-            sessionEntity.setDurationSeconds((int) java.time.Duration.between(sessionEntity.getStartedAt(), endedAt).getSeconds());
+            sessionEntity.setDurationSeconds(
+                    (int) java.time.Duration.between(sessionEntity.getStartedAt(), endedAt).getSeconds());
         }
         SpeakingSessionEntity savedSession = sessionJpaRepository.save(sessionEntity);
 
@@ -82,28 +91,28 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
         String weaknessesJson = toJson(scoringResult.weaknesses());
         Map<String, String> feedback = scoringResult.feedback() != null ? scoringResult.feedback() : Map.of();
 
-        SpeakingSessionAssessmentEntity.SpeakingSessionAssessmentEntityBuilder assessmentBuilder =
-                SpeakingSessionAssessmentEntity.builder()
-                        .session(savedSession)
-                        .overallScore(scoringResult.overallScore())
-                        .jlptEstimate(scoringResult.jlptEstimate())
-                        .fluencyScore(scoringResult.fluencyScore())
-                        .pronunciationScore(scoringResult.pronunciationScore())
-                        .grammarScore(scoringResult.grammarScore())
-                        .vocabularyScore(scoringResult.vocabularyScore())
-                        .interactionScore(scoringResult.interactionScore())
-                        .naturalnessScore(scoringResult.naturalnessScore())
-                        .coherenceScore(scoringResult.coherenceScore())
-                        .summary(scoringResult.summary())
-                        .strengths(strengthsJson)
-                        .weaknesses(weaknessesJson)
-                        .feedbackFluency(feedback.get("fluency"))
-                        .feedbackPronunciation(feedback.get("pronunciation"))
-                        .feedbackGrammar(feedback.get("grammar"))
-                        .feedbackVocabulary(feedback.get("vocabulary"))
-                        .feedbackInteraction(feedback.get("interaction"))
-                        .feedbackNaturalness(feedback.get("naturalness"))
-                        .feedbackCoherence(feedback.get("coherence"));
+        SpeakingSessionAssessmentEntity.SpeakingSessionAssessmentEntityBuilder assessmentBuilder = SpeakingSessionAssessmentEntity
+                .builder()
+                .session(savedSession)
+                .overallScore(scoringResult.overallScore())
+                .jlptEstimate(scoringResult.jlptEstimate())
+                .fluencyScore(scoringResult.fluencyScore())
+                .pronunciationScore(scoringResult.pronunciationScore())
+                .grammarScore(scoringResult.grammarScore())
+                .vocabularyScore(scoringResult.vocabularyScore())
+                .interactionScore(scoringResult.interactionScore())
+                .naturalnessScore(scoringResult.naturalnessScore())
+                .coherenceScore(scoringResult.coherenceScore())
+                .summary(scoringResult.summary())
+                .strengths(strengthsJson)
+                .weaknesses(weaknessesJson)
+                .feedbackFluency(feedback.get("fluency"))
+                .feedbackPronunciation(feedback.get("pronunciation"))
+                .feedbackGrammar(feedback.get("grammar"))
+                .feedbackVocabulary(feedback.get("vocabulary"))
+                .feedbackInteraction(feedback.get("interaction"))
+                .feedbackNaturalness(feedback.get("naturalness"))
+                .feedbackCoherence(feedback.get("coherence"));
 
         // Thêm studyRecommendation nếu có
         if (scoringResult.studyRecommendation() != null) {
@@ -121,7 +130,8 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
             List<SpeakingImprovedExpressionEntity> expressions = new ArrayList<>();
             for (int i = 0; i < scoringResult.improvedExpressions().size(); i++) {
                 ScoringResult.ImprovedExpression expr = scoringResult.improvedExpressions().get(i);
-                if (expr.original() == null || expr.original().isBlank()) continue;
+                if (expr.original() == null || expr.original().isBlank())
+                    continue;
                 expressions.add(SpeakingImprovedExpressionEntity.builder()
                         .assessment(savedAssessment)
                         .turnIndex(i)
@@ -160,8 +170,7 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
                 SpeakingSessionSpecification.hasUserId(userId),
                 SpeakingSessionSpecification.hasPersonaId(personaId),
                 SpeakingSessionSpecification.searchByTopic(search),
-                SpeakingSessionSpecification.hasStatus(status != null && !status.isBlank() ? status : "COMPLETED")
-        );
+                SpeakingSessionSpecification.hasStatus(status != null && !status.isBlank() ? status : "COMPLETED"));
 
         Page<SpeakingSessionEntity> pageResult = sessionJpaRepository.findAll(specification, pageable);
 
@@ -188,7 +197,7 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
                     duration,
                     session.getStartedAt(),
                     session.getEndedAt(),
-                    session.getStatus()   // thêm status để FE phân biệt
+                    session.getStatus() // thêm status để FE phân biệt
             );
         }).toList();
 
@@ -262,8 +271,7 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
                         improvedExpressions.add(new ScoringResult.ImprovedExpression(
                                 expr.getOriginalText(),
                                 expr.getImprovedText(),
-                                expr.getExplanationVi()
-                        ));
+                                expr.getExplanationVi()));
                     }
                 }
 
@@ -272,8 +280,7 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
                             assessment.getStudyFocusArea(),
                             "",
                             assessment.getStudyRecommendation(),
-                            assessment.getStudyEncouragement()
-                    );
+                            assessment.getStudyEncouragement());
                 }
             }
 
@@ -306,13 +313,13 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
                     weaknesses,
                     feedbackMap,
                     improvedExpressions,
-                    studyRecommendation
-            );
+                    studyRecommendation);
         });
     }
 
     private String toJson(Object obj) {
-        if (obj == null) return "[]";
+        if (obj == null)
+            return "[]";
         try {
             return OBJECT_MAPPER.writeValueAsString(obj);
         } catch (Exception e) {
@@ -321,7 +328,8 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
     }
 
     private List<String> parseJsonList(String json) {
-        if (json == null || json.isBlank()) return List.of();
+        if (json == null || json.isBlank())
+            return List.of();
         try {
             return OBJECT_MAPPER.readValue(json, new TypeReference<List<String>>() {
             });
@@ -338,9 +346,9 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
             Long personaId,
             String topic,
             String marugotoLevel,
-            String formalityLevel
-    ) {
-        if (userId == null) return;
+            String formalityLevel) {
+        if (userId == null)
+            return;
         SpeakingSessionEntity sessionEntity = SpeakingSessionEntity.builder()
                 .sessionCode(sessionCode)
                 .userId(userId)
@@ -366,12 +374,34 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
             String correctionExplanation,
             String grammarNote,
             String hintForLearner,
-            Double pronunciationScore
-    ) {
+            Double pronunciationScore) {
+        saveSessionMessage(sessionCode, turnIndex, senderType, content, correctedText, correctionExplanation, grammarNote, hintForLearner, pronunciationScore, null);
+    }
+
+    @Override
+    @Transactional
+    public void saveSessionMessage(
+            String sessionCode,
+            int turnIndex,
+            String senderType,
+            String content,
+            String correctedText,
+            String correctionExplanation,
+            String grammarNote,
+            String hintForLearner,
+            Double pronunciationScore,
+            File audioFile) {
         Optional<SpeakingSessionEntity> sessionOpt = sessionJpaRepository.findBySessionCode(sessionCode);
-        if (sessionOpt.isEmpty()) return;
+        if (sessionOpt.isEmpty())
+            return;
 
         SpeakingSessionEntity session = sessionOpt.get();
+
+        FileEntity audioFileEntity = null;
+        if (audioFile != null && audioFile.getObjectKey() != null) {
+            audioFileEntity = fileJpaRepository.findByObjectKey(audioFile.getObjectKey()).orElse(null);
+        }
+
         SpeakingSessionMessageEntity messageEntity = SpeakingSessionMessageEntity.builder()
                 .session(session)
                 .turnIndex(turnIndex)
@@ -382,6 +412,7 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
                 .grammarNote(grammarNote)
                 .hintForLearner(hintForLearner)
                 .pronunciationScore(pronunciationScore)
+                .audioFile(audioFileEntity)
                 .build();
         messageJpaRepository.save(messageEntity);
     }
@@ -389,10 +420,12 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
     @Override
     @Transactional(readOnly = true)
     public Optional<ActiveSpeakingSessionResult> findActiveSession(Long userId, Long personaId) {
-        if (userId == null) return Optional.empty();
+        if (userId == null)
+            return Optional.empty();
         Optional<SpeakingSessionEntity> sessionOpt;
         if (personaId != null && personaId > 0) {
-            sessionOpt = sessionJpaRepository.findFirstByUserIdAndPersonaIdAndStatusOrderByStartedAtDesc(userId, personaId, "IN_PROGRESS");
+            sessionOpt = sessionJpaRepository.findFirstByUserIdAndPersonaIdAndStatusOrderByStartedAtDesc(userId,
+                    personaId, "IN_PROGRESS");
         } else {
             sessionOpt = sessionJpaRepository.findFirstByUserIdAndStatusOrderByStartedAtDesc(userId, "IN_PROGRESS");
         }
@@ -402,7 +435,8 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
     @Override
     @Transactional(readOnly = true)
     public boolean isSessionCompleted(String sessionCode) {
-        if (sessionCode == null || sessionCode.isBlank()) return false;
+        if (sessionCode == null || sessionCode.isBlank())
+            return false;
         return sessionJpaRepository.findBySessionCode(sessionCode)
                 .map(s -> "COMPLETED".equalsIgnoreCase(s.getStatus()))
                 .orElse(false);
@@ -411,9 +445,11 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
     @Override
     @Transactional(readOnly = true)
     public Optional<ActiveSpeakingSessionResult> findActiveSessionByCode(String sessionCode, Long userId) {
-        if (sessionCode == null || sessionCode.isBlank()) return Optional.empty();
+        if (sessionCode == null || sessionCode.isBlank())
+            return Optional.empty();
         // Khi userId = null (gọi từ ensureSessionLoadedInMemory sau pod restart),
-        // dùng findBySessionCodeAndStatus để chỉ restore đúng IN_PROGRESS, không restore COMPLETED/EXPIRED
+        // dùng findBySessionCodeAndStatus để chỉ restore đúng IN_PROGRESS, không
+        // restore COMPLETED/EXPIRED
         Optional<SpeakingSessionEntity> sessionOpt = (userId != null)
                 ? sessionJpaRepository.findBySessionCodeAndUserId(sessionCode, userId)
                 : sessionJpaRepository.findBySessionCodeAndStatus(sessionCode, "IN_PROGRESS");
@@ -421,18 +457,29 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
     }
 
     private ActiveSpeakingSessionResult toActiveSessionResult(SpeakingSessionEntity session) {
-        List<SpeakingSessionMessageEntity> messageEntities = messageJpaRepository.findBySessionIdOrderByTurnIndexAscIdAsc(session.getId());
-        List<ActiveSpeakingSessionResult.SessionMessageItem> messages = messageEntities.stream().map(m ->
-                new ActiveSpeakingSessionResult.SessionMessageItem(
-                        m.getTurnIndex(),
-                        m.getSenderType(),
-                        m.getContent(),
-                        m.getCorrectedText(),
-                        m.getCorrectionExplanation(),
-                        m.getGrammarNote(),
-                        m.getHintForLearner()
-                )
-        ).toList();
+        List<SpeakingSessionMessageEntity> messageEntities = messageJpaRepository
+                .findBySessionIdOrderByTurnIndexAscIdAsc(session.getId());
+        List<ActiveSpeakingSessionResult.SessionMessageItem> messages = messageEntities.stream()
+                .map(m -> {
+                    String audioUrl = null;
+                    if (m.getAudioFile() != null) {
+                        try {
+                            audioUrl = fileStorageServicePort.generatePresignedUrl(fileEntityMapper.entityToDomain(m.getAudioFile()));
+                        } catch (Exception e) {
+                            // Presigned URL might return null if file is not completed yet or deleted
+                        }
+                    }
+                    return new ActiveSpeakingSessionResult.SessionMessageItem(
+                            m.getTurnIndex(),
+                            m.getSenderType(),
+                            m.getContent(),
+                            m.getCorrectedText(),
+                            m.getCorrectionExplanation(),
+                            m.getGrammarNote(),
+                            m.getHintForLearner(),
+                            audioUrl);
+                })
+                .toList();
 
         return new ActiveSpeakingSessionResult(
                 session.getId(),
@@ -443,8 +490,7 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
                 session.getFormalityLevel(),
                 session.getTotalTurns(),
                 session.getStartedAt(),
-                messages
-        );
+                messages);
     }
 
     @Override
@@ -457,4 +503,3 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
         });
     }
 }
-
