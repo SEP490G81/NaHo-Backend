@@ -36,6 +36,7 @@ import org.naho.question.model.SpeakingQuestion;
 import org.naho.question.port.in.CompleteSpeakingQuestionInputPort;
 import org.naho.question.port.out.AnswerHistoryRepositoryPort;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
+import org.naho.shared.constant.SystemZoneId;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
@@ -50,10 +51,12 @@ import org.naho.speech.model.AnswerHistory;
 import org.naho.speech.model.ContentAssessment;
 import org.naho.speech.model.SpeechAssessment;
 import org.naho.speech.model.WordAssessment;
+import org.naho.subscription.port.out.UserDailyAiUsageRepositoryPort;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.model.User;
 import org.naho.user.port.out.UserRepositoryPort;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,6 +79,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     private final FileResultMapperPort fileResultMapperPort;
     private final UploadFileInputPort uploadFileInputPort;
     private final FuriganaGenerationPort furiganaGenerationPort;
+    private final UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public SpeakingAnalysisUseCase(
@@ -95,7 +99,9 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
             FileResultMapperPort fileResultMapperPort,
             UploadFileInputPort uploadFileInputPort,
-            FuriganaGenerationPort furiganaGenerationPort) {
+            UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort,
+            FuriganaGenerationPort furiganaGenerationPort
+    ) {
         this.userRepositoryPort = userRepositoryPort;
         this.speakingQuestionRepositoryPort = speakingQuestionRepositoryPort;
         this.fileRepositoryPort = fileRepositoryPort;
@@ -112,11 +118,13 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         this.userLearningProgressRepositoryPort = userLearningProgressRepositoryPort;
         this.fileResultMapperPort = fileResultMapperPort;
         this.uploadFileInputPort = uploadFileInputPort;
+        this.userDailyAiUsageRepositoryPort = userDailyAiUsageRepositoryPort;
         this.furiganaGenerationPort = furiganaGenerationPort;
     }
 
     @Override
     public SpeakingAnalysisResult analyzeSpeaking(SpeakingAnalysisCommand command) {
+        LocalDate today = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID);
         // DB-R & VALID & DB-W (TX 1): Chuẩn bị context và tạo bản ghi ban đầu
         AnalysisContext ctx = transactionPort.execute(() -> prepareAnalysis(command));
 

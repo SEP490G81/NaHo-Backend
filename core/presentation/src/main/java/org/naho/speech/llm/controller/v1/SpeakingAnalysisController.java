@@ -64,12 +64,15 @@ public class SpeakingAnalysisController {
             // Step 1: Lưu file vào local
             StoredFile storedFile = fileStorageServicePort.saveFileToLocal(file, FileFolderConstant.RECORDINGS, FileAccessStatus.PRIVATE);
 
+            // Build 1 speaking analysis command với
+            // giới hạn đánh giá speaking question hàng ngày
             SpeakingAnalysisCommand command = SpeakingAnalysisCommand.builder()
                     .userId(payload.userId())
                     .speakingQuestionId(speakingQuestionId)
                     .durationSec((int) Math.ceil(duration))
                     .storedFile(storedFile)
                     .audioBytes(audioBytes)
+                    .dailySpeakingQuestionEvaluationLimit(subscriptionPlan.dailySpeakingQuestionEvaluationLimit())
                     .build();
 
             SpeakingAnalysisResult result = speakingAnalysisInputPort.analyzeSpeaking(command);
