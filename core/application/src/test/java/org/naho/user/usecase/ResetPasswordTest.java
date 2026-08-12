@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.exception.DomainException;
+import org.naho.shared.port.out.EventPublisherPort;
 import org.naho.user.command.ResetPasswordCommand;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.model.User;
@@ -31,6 +32,8 @@ class ResetPasswordTest {
     private PasswordResetOtpPort passwordResetOtpPort;
     @Mock
     private EncoderPort encoderPort;
+    @Mock
+    private EventPublisherPort eventPublisherPort;
 
     @InjectMocks
     private ResetPasswordUseCase resetPasswordUseCase;
@@ -69,6 +72,7 @@ class ResetPasswordTest {
         assertEquals("$2a$10$newHashedPassword", user.getHashPassword());
         verify(userRepository, times(1)).save(user);
         verify(passwordResetOtpPort, times(1)).removeResetToken(emailStr);
+        verify(eventPublisherPort, times(1)).publish(any());
     }
 
     @Test

@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface SpeakingSessionMessageJpaRepository extends JpaRepository<SpeakingSessionMessageEntity, Long> {
-    List<SpeakingSessionMessageEntity> findBySessionIdOrderByTurnIndex(Long sessionId);
+    List<SpeakingSessionMessageEntity> findBySessionIdOrderByTurnIndexAscIdAsc(Long sessionId);
 }

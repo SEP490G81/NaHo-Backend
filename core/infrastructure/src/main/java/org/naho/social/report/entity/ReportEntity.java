@@ -7,7 +7,7 @@ import lombok.experimental.SuperBuilder;
 import org.naho.file.entity.FileEntity;
 import org.naho.question.entity.SpeakingQuestionEntity;
 import org.naho.shared.persistence.BaseEntity;
-import org.naho.social.entity.CommentEntity;
+import org.naho.social.comment.entity.CommentEntity;
 import org.naho.social.report.type.ReportType;
 import org.naho.user.entity.UserEntity;
 
@@ -50,6 +50,6 @@ public class ReportEntity extends BaseEntity {
     @JoinColumn(name = "comment_id")
     CommentEntity comment;
 
-    @OneToMany(mappedBy = "report")
+    @OneToMany(mappedBy = "report", cascade = CascadeType.ALL, orphanRemoval = true)
     List<FileEntity> files;
 }

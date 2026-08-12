@@ -421,7 +421,7 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
     }
 
     private ActiveSpeakingSessionResult toActiveSessionResult(SpeakingSessionEntity session) {
-        List<SpeakingSessionMessageEntity> messageEntities = messageJpaRepository.findBySessionIdOrderByTurnIndex(session.getId());
+        List<SpeakingSessionMessageEntity> messageEntities = messageJpaRepository.findBySessionIdOrderByTurnIndexAscIdAsc(session.getId());
         List<ActiveSpeakingSessionResult.SessionMessageItem> messages = messageEntities.stream().map(m ->
                 new ActiveSpeakingSessionResult.SessionMessageItem(
                         m.getTurnIndex(),

@@ -97,6 +97,7 @@ public class CrudUserLearningProgressUseCase implements CrudUserLearningProgress
             return progress;
         }
 
+        // Lấy ra node tiếp theo (ngay sau node hiện tại đang/đã học)
         LearningPathNode nextLearningPathNode = learningPathNodeRepositoryPort
                 .findTopByGlobalOrderIndexGreaterThanOrderByGlobalOrderIndex(currentLearningPathNodeGlobalOrderIndex)
                 .orElse(null);

@@ -15,7 +15,7 @@ public class UserNodeProgress {
     private Double bestScore;
     private Double currentScore;
     private Integer attemptCount;
-    private Instant completedAt;
+    private Instant lastCompletedAt;
     private NodeStatus status;
 
     private UserNodeProgress(Builder builder) {
@@ -25,7 +25,7 @@ public class UserNodeProgress {
         this.bestScore = builder.bestScore;
         this.currentScore = builder.currentScore;
         this.attemptCount = builder.attemptCount;
-        this.completedAt = builder.completedAt;
+        this.lastCompletedAt = builder.lastCompletedAt;
         this.status = builder.status;
     }
 
@@ -35,12 +35,6 @@ public class UserNodeProgress {
 
     public void increaseAttemptCount() {
         this.attemptCount = this.attemptCount == null ? 1 : this.attemptCount + 1;
-    }
-
-    public void updateBestScore(Double bestScore) {
-        if (this.bestScore == null || this.bestScore < bestScore) {
-            this.bestScore = bestScore;
-        }
     }
 
     public Long getId() {
@@ -79,12 +73,12 @@ public class UserNodeProgress {
         this.attemptCount = attemptCount;
     }
 
-    public Instant getCompletedAt() {
-        return completedAt;
+    public Instant getLastCompletedAt() {
+        return lastCompletedAt;
     }
 
-    public void setCompletedAt(Instant completedAt) {
-        this.completedAt = completedAt;
+    public void setLastCompletedAt(Instant lastCompletedAt) {
+        this.lastCompletedAt = lastCompletedAt;
     }
 
     public NodeStatus getStatus() {
@@ -103,7 +97,7 @@ public class UserNodeProgress {
         private Double bestScore;
         private Double currentScore;
         private Integer attemptCount;
-        private Instant completedAt;
+        private Instant lastCompletedAt;
         private NodeStatus status;
 
         private Builder() {
@@ -139,8 +133,8 @@ public class UserNodeProgress {
             return this;
         }
 
-        public Builder completedAt(Instant completedAt) {
-            this.completedAt = completedAt;
+        public Builder lastCompletedAt(Instant lastCompletedAt) {
+            this.lastCompletedAt = lastCompletedAt;
             return this;
         }
 
