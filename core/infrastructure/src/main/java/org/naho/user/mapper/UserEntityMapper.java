@@ -11,6 +11,7 @@ import org.naho.learning.mapper.UserNodeProgressIdMapper;
 import org.naho.point.mapper.PointHistoryIdMapper;
 import org.naho.question.mapper.SpeakingQuestionIdMapper;
 import org.naho.social.report.mapper.ReportIdMapper;
+import org.naho.subscription.mapper.UserDailyAiUsageIdMapper;
 import org.naho.subscription.mapper.UserSubscriptionIdMapper;
 import org.naho.user.entity.UserEntity;
 import org.naho.user.model.User;
@@ -33,6 +34,7 @@ import org.naho.user.model.User;
                 UserDailyMissionIdMapper.class,
                 UserLearningProgressIdMapper.class,
                 UserSubscriptionIdMapper.class,
+                UserDailyAiUsageIdMapper.class,
                 FileIdMapper.class
         })
 public interface UserEntityMapper {
@@ -46,6 +48,7 @@ public interface UserEntityMapper {
     @Mapping(target = "userDailyAttendanceIds", source = "userDailyAttendances")
     @Mapping(target = "userDailyMissionIds", source = "userDailyMissions")
     @Mapping(target = "userSubscriptionIds", source = "userSubscriptions")
+    @Mapping(target = "userDailyAiUsageIds", source = "userDailyAiUsages")
     @Mapping(target = "avatarFileId", source = "avatarFile.id")
     @Mapping(target = "userLearningProgressId", source = "userLearningProgress.id")
     @Mapping(target = "isEmailVerified", source = "emailVerified")
@@ -63,7 +66,9 @@ public interface UserEntityMapper {
     @Mapping(target = "userDailyAttendances", source = "userDailyAttendanceIds")
     @Mapping(target = "userDailyMissions", source = "userDailyMissionIds")
     @Mapping(target = "userSubscriptions", source = "userSubscriptionIds")
+    @Mapping(target = "userDailyAiUsages", source = "userDailyAiUsageIds")
     @Mapping(target = "isEmailVerified", source = "emailVerified")
+    @Mapping(target = "comments", ignore = true)
     @Mapping(target = "createdTime", ignore = true)
     @Mapping(target = "modifiedTime", ignore = true)
     UserEntity domainToEntity(User user);

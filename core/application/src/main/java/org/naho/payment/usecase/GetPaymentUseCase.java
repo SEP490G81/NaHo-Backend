@@ -1,6 +1,8 @@
 package org.naho.payment.usecase;
 
 import org.naho.i18n.message.payment.PaymentDetailMessageKey;
+import org.naho.pagination.PageData;
+import org.naho.payment.command.PaymentOrderQueryCommand;
 import org.naho.payment.exception.PaymentErrorCode;
 import org.naho.payment.model.PaymentOrder;
 import org.naho.payment.port.in.GetPaymentInputPort;
@@ -63,6 +65,30 @@ public class GetPaymentUseCase implements GetPaymentInputPort {
             results.add(mapToResult(order));
         }
         return results;
+    }
+
+    @Override
+    public PageData<PaymentOrderResult> getAllPaymentOrders(PaymentOrderQueryCommand command) {
+        return transactionPort.execute(() -> doGetAllPaymentOrders(command));
+    }
+
+    private PageData<PaymentOrderResult> doGetAllPaymentOrders(PaymentOrderQueryCommand command) {
+        PageData<PaymentOrder> pageData = orderRepositoryPort.findAllPaymentOrders(command);
+        Instant now = Instant.now();
+        List<PaymentOrderResult> results = new ArrayList<>();
+
+        for (PaymentOrder order : pageData.getData()) {
+            if (order.getStatus() == PaymentStatus.PENDING && order.isExpiredAt(now)) {
+                order.expire(now);
+                orderRepositoryPort.save(order);
+            }
+            results.add(mapToResult(order));
+        }
+
+        return PageData.<PaymentOrderResult>builder()
+                .pageMeta(pageData.getPageMeta())
+                .data(results)
+                .build();
     }
 
     private PaymentOrderResult mapToResult(PaymentOrder order) {

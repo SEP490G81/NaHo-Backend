@@ -29,4 +29,8 @@ ALTER TABLE daily_missions
 ALTER TABLE user_daily_missions
     ADD CONSTRAINT uk_user_daily_mission
         UNIQUE (user_id, daily_mission_id, started_date);
-
+
+ALTER TABLE user_daily_ai_usages
+    ADD CONSTRAINT uk_user_daily_ai_usage
+        UNIQUE (user_id, usage_date);
+

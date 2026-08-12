@@ -319,7 +319,7 @@ CREATE TABLE reactions
     modified_time        datetime(6)           NULL,
     reaction_type        VARCHAR(255)          NOT NULL,
     user_id              BIGINT                NOT NULL,
-    comment_id           BIGINT                NULL,
+    comment_id           BIGINT                NOT NULL,
     speaking_question_id BIGINT                NULL,
     CONSTRAINT pk_reactions PRIMARY KEY (id)
 );
@@ -528,6 +528,18 @@ CREATE TABLE topics
     CONSTRAINT pk_topics PRIMARY KEY (id)
 );
 
+CREATE TABLE user_daily_ai_usages
+(
+    id                          BIGINT AUTO_INCREMENT NOT NULL,
+    created_time                datetime(6)           NOT NULL,
+    modified_time               datetime(6)           NULL,
+    usage_date                  date                  NOT NULL,
+    speaking_evaluation_count   INT                   NOT NULL,
+    ai_session_evaluation_count INT                   NOT NULL,
+    user_id                     BIGINT                NOT NULL,
+    CONSTRAINT pk_user_daily_ai_usages PRIMARY KEY (id)
+);
+
 CREATE TABLE user_daily_attendances
 (
     id              BIGINT AUTO_INCREMENT NOT NULL,
@@ -576,7 +588,7 @@ CREATE TABLE user_node_progresses
     best_score            DOUBLE                NULL,
     current_score         DOUBLE                NULL,
     attempt_count         INT                   NULL,
-    completed_at          datetime(6)           NULL,
+    last_completed_at     datetime(6)           NULL,
     status                VARCHAR(255)          NULL,
     learning_path_node_id BIGINT                NOT NULL,
     user_id               BIGINT                NOT NULL,
@@ -875,6 +887,9 @@ ALTER TABLE users
 
 ALTER TABLE users
     ADD CONSTRAINT FK_USERS_ON_USER_LEARNING_PROGRESS FOREIGN KEY (user_learning_progress_id) REFERENCES user_learning_progresses (id);
+
+ALTER TABLE user_daily_ai_usages
+    ADD CONSTRAINT FK_USER_DAILY_AI_USAGES_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
 ALTER TABLE user_daily_attendances
     ADD CONSTRAINT FK_USER_DAILY_ATTENDANCES_ON_DAILY_REWARD FOREIGN KEY (daily_reward_id) REFERENCES daily_rewards (id);

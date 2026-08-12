@@ -10,7 +10,7 @@ import org.naho.league.entity.LeagueEntity;
 import org.naho.persona.entity.PersonaEntity;
 import org.naho.question.entity.SpeakingQuestionEntity;
 import org.naho.shared.persistence.BaseEntity;
-import org.naho.social.entity.CommentEntity;
+import org.naho.social.comment.entity.CommentEntity;
 import org.naho.social.report.entity.ReportEntity;
 import org.naho.user.entity.UserEntity;
 

@@ -1,11 +1,11 @@
 package org.naho.social.comment.adapter;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.social.comment.entity.CommentEntity;
 import org.naho.social.comment.mapper.CommentEntityMapper;
 import org.naho.social.comment.model.Comment;
 import org.naho.social.comment.port.out.CommentRepositoryPort;
 import org.naho.social.comment.repository.CommentJpaRepository;
-import org.naho.social.entity.CommentEntity;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

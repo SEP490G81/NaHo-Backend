@@ -12,6 +12,7 @@ import org.naho.book.port.out.BookRepositoryPort;
 import org.naho.book.port.out.LessonRepositoryPort;
 import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.book.port.out.TopicRepositoryPort;
+import org.naho.file.constant.FileAccessStatus;
 import org.naho.file.model.File;
 import org.naho.file.port.in.UploadFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
@@ -21,6 +22,7 @@ import org.naho.furigana.port.out.FuriganaGenerationPort;
 import org.naho.i18n.message.learning.LearningPathNodeDetailMessageKey;
 import org.naho.i18n.message.learning.UserLearningProgressDetailMessageKey;
 import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
+import org.naho.i18n.message.subscription.SubscriptionDetailMessageKey;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.learning.exception.LearningPathNodeErrorCode;
 import org.naho.learning.exception.UserLearningProgressErrorCode;
@@ -35,6 +37,7 @@ import org.naho.question.model.SpeakingQuestion;
 import org.naho.question.port.in.CompleteSpeakingQuestionInputPort;
 import org.naho.question.port.out.AnswerHistoryRepositoryPort;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
+import org.naho.shared.constant.SystemZoneId;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
@@ -49,10 +52,15 @@ import org.naho.speech.model.AnswerHistory;
 import org.naho.speech.model.ContentAssessment;
 import org.naho.speech.model.SpeechAssessment;
 import org.naho.speech.model.WordAssessment;
+import org.naho.subscription.exception.SubscriptionErrorCode;
+import org.naho.subscription.model.UserDailyAiUsage;
+import org.naho.subscription.port.in.CrudUserDailyAiUsageInputPort;
+import org.naho.subscription.port.out.UserDailyAiUsageRepositoryPort;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.model.User;
 import org.naho.user.port.out.UserRepositoryPort;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,6 +83,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     private final FileResultMapperPort fileResultMapperPort;
     private final UploadFileInputPort uploadFileInputPort;
     private final FuriganaGenerationPort furiganaGenerationPort;
+    private final CrudUserDailyAiUsageInputPort crudUserDailyAiUsageInputPort;
+    private final UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public SpeakingAnalysisUseCase(
@@ -94,7 +104,10 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
             FileResultMapperPort fileResultMapperPort,
             UploadFileInputPort uploadFileInputPort,
-            FuriganaGenerationPort furiganaGenerationPort) {
+            CrudUserDailyAiUsageInputPort crudUserDailyAiUsageInputPort,
+            UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort,
+            FuriganaGenerationPort furiganaGenerationPort
+    ) {
         this.userRepositoryPort = userRepositoryPort;
         this.speakingQuestionRepositoryPort = speakingQuestionRepositoryPort;
         this.fileRepositoryPort = fileRepositoryPort;
@@ -111,11 +124,40 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         this.userLearningProgressRepositoryPort = userLearningProgressRepositoryPort;
         this.fileResultMapperPort = fileResultMapperPort;
         this.uploadFileInputPort = uploadFileInputPort;
+        this.crudUserDailyAiUsageInputPort = crudUserDailyAiUsageInputPort;
+        this.userDailyAiUsageRepositoryPort = userDailyAiUsageRepositoryPort;
         this.furiganaGenerationPort = furiganaGenerationPort;
     }
 
     @Override
     public SpeakingAnalysisResult analyzeSpeaking(SpeakingAnalysisCommand command) {
+        LocalDate today = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID);
+
+        UserDailyAiUsage userDailyAiUsage = crudUserDailyAiUsageInputPort
+                .findByUserIdAndUsageDate(command.userId(), today);
+
+        // findByUserIdAndUsageDate luôn tạo mới nếu chưa có – trường hợp này không nên xảy ra
+        if (userDailyAiUsage == null) {
+            throw new ApplicationException(
+                    SubscriptionErrorCode.USER_DAILY_AI_USAGE_NOT_FOUND,
+                    SubscriptionDetailMessageKey.USER_DAILY_AI_USAGE_NOT_FOUND
+            );
+        }
+
+        // nếu người dùng đã sử dụng hết lượt đánh giá trong ngày hôm nay
+        if (userDailyAiUsage.getSpeakingEvaluationCount() >= command.dailySpeakingQuestionEvaluationLimit()) {
+            throw new ApplicationException(
+                    SpeakingQuestionErrorCode.SPEAKING_QUESTION_DAILY_LIMIT_EXCEEDED,
+                    SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_DAILY_LIMIT_EXCEEDED
+            );
+        }
+
+        // tăng số lần đánh giá AI với speaking question của người dùng trong ngày hôm nay lên 1
+        userDailyAiUsage.increaseSpeakingEvaluationCount();
+
+        // lưu
+        userDailyAiUsageRepositoryPort.save(userDailyAiUsage);
+
         // DB-R & VALID & DB-W (TX 1): Chuẩn bị context và tạo bản ghi ban đầu
         AnalysisContext ctx = transactionPort.execute(() -> prepareAnalysis(command));
 
@@ -135,11 +177,9 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         SpeakingAnalysisResult result = transactionPort.execute(() ->
                 persistResults(command, ctx, azureAssessment, parsedScores));
 
-        // Upload file audio lên cloud nếu có
-        if (command.storedFile() != null) {
-            FileResult uploadedFile = uploadFileInputPort.uploadFileToCloud(command.storedFile());
-            result.setAudioFile(uploadedFile);
-        }
+        // Upload file audio lên cloud
+        FileResult uploadedFile = uploadFileInputPort.uploadFileToCloud(command.storedFile());
+        result.setAudioFile(uploadedFile);
 
         return result;
     }
@@ -182,15 +222,13 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                         SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
                         SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_NOT_FOUND));
 
-        // VALID LOGIC + DB-W => xu ly logic file (file luu local neu tk nguoi dung goi FREE, luu lai file noi chuyen cua nguoi dung neu da dang ki goi cao hon)
-        File audioFile = null;
-        // nếu đã lưu file trong local
-        // (tức là đăng kí gói không phải FREE)
-        // thì mới lưu lại file nói chuyện của người dùng
-        if (command.storedFile() != null) {
-            audioFile = fileRepositoryPort.createNewForUpload(command.storedFile(), false);
-        }
+        // Lưu file vào database với operation type là Upload
+        File audioFile = fileRepositoryPort.createNewForUpload(
+                command.storedFile(),
+                FileAccessStatus.PRIVATE
+        );
 
+        // Lưu lịch sử trả lời Speaking Question
         AnswerHistory savedAnswerHistory = createAnswerHistory(user, speakingQuestion, audioFile, command.durationSec());
 
         // DB-R
@@ -209,7 +247,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         return buildAnalysisContext(
                 learningPathNode, progress, speakingQuestion,
                 savedAnswerHistory, audioFile,
-                objective, lesson, topic, book);
+                objective, lesson, topic, book
+        );
     }
 
     private AnswerHistory createAnswerHistory(User user, SpeakingQuestion speakingQuestion, File audioFile, Integer durationSec) {
@@ -218,12 +257,9 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 .speakingQuestionId(speakingQuestion.getId())
                 .durationSec(durationSec)
                 .build();
-        if (audioFile != null) {
-            answerHistory.setAudioFileId(audioFile.getId());
-        }
+        answerHistory.setAudioFileId(audioFile.getId());
         return answerHistoryRepositoryPort.save(answerHistory);
     }
-
 
     private AnalysisContext buildAnalysisContext(
             LearningPathNode learningPathNode,
@@ -345,10 +381,10 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         double fluencyScore10 = azureResult.getFluencyScore() != null
                 ? azureResult.getFluencyScore() / 10.0 : 0.0;
 
-        double vocabScore = 0.0;
-        double grammarScore = 0.0;
-        double naturalnessScore = 0.0;
-        double overallScore = 0.0;
+        double vocabScore;
+        double grammarScore;
+        double naturalnessScore;
+        double overallScore;
         String enrichedFeedbackJson;
 
         try {
@@ -362,10 +398,10 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             enrichedFeedbackJson = enrichFeedbackJson(
                     root, azureResult, vocabScore, grammarScore, naturalnessScore, overallScore, durationSec);
         } catch (Exception e) {
-            e.printStackTrace();
-            overallScore = Math.round(((pronScore10 + fluencyScore10) / 2.0) * 10.0) / 10.0;
-            enrichedFeedbackJson = buildFallbackFeedbackJson(
-                    vocabScore, grammarScore, naturalnessScore, overallScore, durationSec);
+            throw new ApplicationException(
+                    SpeakingQuestionErrorCode.SPEAKING_QUESTION_EVALUATION_FAILED,
+                    SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_EVALUATION_FAILED
+            );
         }
 
         return new ParsedScores(vocabScore, grammarScore, naturalnessScore, overallScore, enrichedFeedbackJson);
