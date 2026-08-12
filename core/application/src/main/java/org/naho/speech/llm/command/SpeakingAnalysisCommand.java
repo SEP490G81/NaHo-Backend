@@ -7,7 +7,8 @@ public record SpeakingAnalysisCommand(
         Long speakingQuestionId,
         Integer durationSec,
         StoredFile storedFile,
-        byte[] audioBytes
+        byte[] audioBytes,
+        Integer dailySpeakingQuestionEvaluationLimit
 ) {
 
     public static Builder builder() {
@@ -20,6 +21,7 @@ public record SpeakingAnalysisCommand(
         private Integer durationSec;
         private StoredFile storedFile;
         private byte[] audioBytes;
+        private Integer dailySpeakingQuestionEvaluationLimit;
 
         public Builder userId(Long userId) {
             this.userId = userId;
@@ -46,13 +48,19 @@ public record SpeakingAnalysisCommand(
             return this;
         }
 
+        public Builder dailySpeakingQuestionEvaluationLimit(Integer dailySpeakingQuestionEvaluationLimit) {
+            this.dailySpeakingQuestionEvaluationLimit = dailySpeakingQuestionEvaluationLimit;
+            return this;
+        }
+
         public SpeakingAnalysisCommand build() {
             return new SpeakingAnalysisCommand(
                     userId,
                     speakingQuestionId,
                     durationSec,
                     storedFile,
-                    audioBytes
+                    audioBytes,
+                    dailySpeakingQuestionEvaluationLimit
             );
         }
     }

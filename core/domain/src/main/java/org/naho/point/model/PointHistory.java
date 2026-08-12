@@ -109,7 +109,7 @@ public class PointHistory {
                 );
             }
 
-            if (point == null || point == 0) {
+            if (point == null) {
                 throw new DomainException(
                         PointHistoryDomainErrorCode.POINT_HISTORY_POINT_NOT_VALID,
                         PointHistoryDetailMessageKey.POINT_HISTORY_POINT_INVALID

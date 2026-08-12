@@ -12,7 +12,6 @@ import org.naho.user.port.in.UpdateUserInputPort;
 import org.naho.user.port.out.RoleRepositoryPort;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.naho.user.port.out.UserSessionServicePort;
-import org.naho.user.result.UserResult;
 import org.naho.user.type.RoleName;
 import org.naho.user.type.SessionRevokedReason;
 import org.naho.user.type.UserStatus;

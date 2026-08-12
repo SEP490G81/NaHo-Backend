@@ -1,4 +1,4 @@
-package org.naho.social.entity;
+package org.naho.social.comment.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -10,6 +10,7 @@ import org.naho.shared.persistence.BaseEntity;
 import org.naho.social.report.entity.ReportEntity;
 import org.naho.user.entity.UserEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @SuperBuilder
@@ -36,15 +37,19 @@ public class CommentEntity extends BaseEntity {
     @JoinColumn(name = "parent_id")
     CommentEntity parent;
 
+    @Builder.Default
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<CommentEntity> children;
+    List<CommentEntity> children = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<ReactionEntity> reactions;
+    List<ReactionEntity> reactions = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<ReportEntity> reports;
+    List<ReportEntity> reports = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<FileEntity> files;
+    List<FileEntity> files = new ArrayList<>();
 }

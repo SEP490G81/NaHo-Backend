@@ -22,6 +22,8 @@ public final class SubscriptionDetailMessageKey {
     public static final String PLAN_ALREADY_ACTIVE_OR_HIGHER = "subscription.plan.already_active_or_higher";
     public static final String SUBSCRIPTION_USER_GET_ACTIVE_SUCCESS = "subscription.user.get_active_success";
     public static final String SUBSCRIPTION_PLANS_GET_LIST_SUCCESS = "subscription.plans.get_list_success";
+    public static final String USER_DAILY_AI_USAGE_NOT_FOUND = "subscription.user_daily_ai_usage.not_found";
+    public static final String USER_DAILY_AI_USAGE_GET_TODAY_SUCCESS = "subscription.user_daily_ai_usage.get_today_success";
 
     private SubscriptionDetailMessageKey() {
     }

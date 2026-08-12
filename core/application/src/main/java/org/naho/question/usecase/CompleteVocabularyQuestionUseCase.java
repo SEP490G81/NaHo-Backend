@@ -109,8 +109,8 @@ public class CompleteVocabularyQuestionUseCase implements CompleteVocabularyQues
                 .userId(command.userId())
                 .bestScore(DEFAULT_SCORE_OF_VOCABULARY_QUESTION)
                 .currentScore(DEFAULT_SCORE_OF_VOCABULARY_QUESTION)
-                .completedAt(now)
-                .status(NodeStatus.COMPLETED)
+                .lastCompletedAt(now)
+                .status(NodeStatus.PASSED)
                 .build();
 
         userNodeProgressRepositoryPort.save(currentUserNodeProgress);
