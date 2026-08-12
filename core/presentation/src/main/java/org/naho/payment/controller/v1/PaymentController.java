@@ -27,6 +27,10 @@ import org.naho.subscription.dto.mapper.UserSubscriptionResponseMapper;
 import org.naho.subscription.dto.response.UserSubscriptionResponse;
 import org.naho.subscription.result.UserSubscriptionResult;
 import org.naho.user.result.AccessTokenPayload;
+import org.naho.pagination.PageData;
+import org.naho.payment.command.PaymentOrderQueryCommand;
+import org.naho.payment.dto.mapper.PaymentRequestMapper;
+import org.naho.payment.dto.request.PaymentOrderQueryRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,11 +52,31 @@ public class PaymentController {
     private final CancelPaymentInputPort cancelPaymentInputPort;
     private final AdminUpgradeSubscriptionInputPort adminUpgradeSubscriptionInputPort;
     private final PaymentResponseMapper responseMapper;
+    private final PaymentRequestMapper paymentRequestMapper;
     private final UserSubscriptionResponseMapper userSubscriptionResponseMapper;
     private final VnPayCallbackHelper vnPayCallbackHelper;
 
     @Value("${app.frontend-url:http://localhost:3636}")
     private String frontendUrl;
+
+    @ApiResponseMessage(message = PaymentDetailMessageKey.PAYMENT_ORDER_GET_ALL_SUCCESS)
+    @PostMapping("/all")
+    public ResponseEntity<PageData<PaymentOrderResponse>> findAllPaymentOrders(
+            @RequestBody PaymentOrderQueryRequest request
+    ) {
+        PaymentOrderQueryCommand command = paymentRequestMapper.requestToCommand(request);
+        PageData<PaymentOrderResult> result = getPaymentInputPort.getAllPaymentOrders(command);
+
+        PageData<PaymentOrderResponse> responsePageData = PageData.<PaymentOrderResponse>builder()
+                .pageMeta(result.getPageMeta())
+                .data(result.getData()
+                        .stream()
+                        .map(responseMapper::resultToOrderResponse)
+                        .toList())
+                .build();
+
+        return ResponseEntity.ok(responsePageData);
+    }
 
     @GetMapping("/my-orders")
     @ApiResponseMessage(message = PaymentDetailMessageKey.PAYMENT_ORDER_GET_ALL_SUCCESS)
