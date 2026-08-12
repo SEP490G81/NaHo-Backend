@@ -5,25 +5,33 @@ import org.naho.social.report.event.ReportStatusUpdatedEvent;
 import org.naho.user.event.PasswordChangedEvent;
 import org.naho.user.event.UserPlanUpgradedEvent;
 import org.naho.user.event.UserRegisteredEvent;
+import org.naho.user.event.UserStatusChangedEvent;
 import org.naho.user.model.User;
 import org.naho.user.port.out.UserRepositoryPort;
+import org.naho.user.type.UserStatus;
+import org.springframework.context.MessageSource;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
 @Component
 public class EmailEventListener {
 
+    private static final Locale DEFAULT_LOCALE = new Locale("vi", "VN");
+
     private final UserRepositoryPort userRepositoryPort;
     private final EmailPort emailPort;
+    private final MessageSource messageSource;
 
-    public EmailEventListener(UserRepositoryPort userRepositoryPort, EmailPort emailPort) {
+    public EmailEventListener(UserRepositoryPort userRepositoryPort, EmailPort emailPort, MessageSource messageSource) {
         this.userRepositoryPort = userRepositoryPort;
         this.emailPort = emailPort;
+        this.messageSource = messageSource;
     }
 
     /**
@@ -53,7 +61,7 @@ public class EmailEventListener {
                     ? user.getFullName()
                     : (user.getUsername() != null ? user.getUsername().getValue() : "User");
 
-            String subject = "NaHo - Báo cáo #" + event.reportId() + " của bạn đã được xử lý";
+            String subject = messageSource.getMessage("email.report.resolved.subject", new Object[]{event.reportId()}, "NaHo - Báo cáo #" + event.reportId() + " của bạn đã được xử lý", DEFAULT_LOCALE);
             Map<String, Object> variables = new HashMap<>();
             variables.put("fullName", fullName);
             variables.put("reportId", event.reportId());
@@ -107,7 +115,7 @@ public class EmailEventListener {
                     ? user.getFullName()
                     : (user.getUsername() != null ? user.getUsername().getValue() : "User");
 
-            String subject = "Chúc mừng bạn đã nâng cấp gói thành công - NaHo App";
+            String subject = messageSource.getMessage("email.plan.upgraded.subject", null, "Chúc mừng bạn đã nâng cấp gói thành công - NaHo App", DEFAULT_LOCALE);
             Map<String, Object> variables = new HashMap<>();
             variables.put("fullName", fullName);
             variables.put("planName", event.newPlanName());
@@ -115,6 +123,33 @@ public class EmailEventListener {
             emailPort.sendEmail(email, subject, "plan-upgraded-email", variables);
         } catch (Exception ignored) {
             // Log error in production
+        }
+    }
+
+    @Async
+    @EventListener
+    public void handleUserStatusChanged(UserStatusChangedEvent event) {
+        try {
+            String subject;
+            String templateName;
+
+            if (UserStatus.UNACTIVE.equals(event.newStatus())) {
+                subject = messageSource.getMessage("email.account.locked.subject", null, "Tài khoản của bạn đã bị khóa - NaHo App", DEFAULT_LOCALE);
+                templateName = "account-locked-email";
+            } else if (UserStatus.ACTIVE.equals(event.newStatus())) {
+                subject = messageSource.getMessage("email.account.unlocked.subject", null, "Tài khoản của bạn đã được mở khóa - NaHo App", DEFAULT_LOCALE);
+                templateName = "account-unlocked-email";
+            } else {
+                return;
+            }
+
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("fullName", event.fullName());
+
+            emailPort.sendEmail(event.email(), subject, templateName, variables);
+        } catch (Exception ignored) {
+            // Log error in production
+            System.err.println(ignored.getMessage());
         }
     }
 }

@@ -145,14 +145,16 @@ public class UserConfig {
             RoleRepositoryPort roleRepositoryPort,
             UserResultMapper userResultMapper,
             UserSessionServicePort userSessionServicePort,
-            TransactionPort transactionPort
+            TransactionPort transactionPort,
+            EventPublisherPort eventPublisherPort
     ) {
         return new UpdateUserUseCase(
                 userRepositoryPort,
                 roleRepositoryPort,
                 userResultMapper,
                 userSessionServicePort,
-                transactionPort
+                transactionPort,
+                eventPublisherPort
         );
     }
 
