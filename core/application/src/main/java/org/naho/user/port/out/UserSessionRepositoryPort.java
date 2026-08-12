@@ -20,7 +20,7 @@ public interface UserSessionRepositoryPort {
             Instant revokedAt,
             SessionRevokedReason reason
     );
-    
+
     List<UserSession> findAllActiveSessionsByUserId(Long userId);
 
     UserSession findByUserId(Long userId);

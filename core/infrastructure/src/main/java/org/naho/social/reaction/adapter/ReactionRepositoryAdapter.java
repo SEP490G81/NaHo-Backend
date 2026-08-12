@@ -1,6 +1,6 @@
 package org.naho.social.reaction.adapter;
 
-import org.naho.social.entity.ReactionEntity;
+import org.naho.social.comment.entity.ReactionEntity;
 import org.naho.social.reaction.mapper.ReactionEntityMapper;
 import org.naho.social.reaction.model.Reaction;
 import org.naho.social.reaction.port.out.ReactionRepositoryPort;

@@ -1,4 +1,4 @@
-package org.naho.social.entity;
+package org.naho.social.comment.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,7 +27,7 @@ public class ReactionEntity extends BaseEntity {
     UserEntity user;
 
     @ManyToOne
-    @JoinColumn(name = "comment_id")
+    @JoinColumn(name = "comment_id", nullable = false)
     CommentEntity comment;
 
     @ManyToOne

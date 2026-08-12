@@ -13,6 +13,10 @@ public final class SpeakingQuestionTitleMessageKey {
             "speaking_question.delete.failed.title";
     public static final String SPEAKING_QUESTION_LOCKED_TITLE =
             "speaking_question.locked.title";
+    public static final String SPEAKING_QUESTION_DAILY_LIMIT_EXCEEDED_TITLE =
+            "speaking_question.daily_limit_exceeded.title";
+    public static final String SPEAKING_QUESTION_EVALUATION_FAILED_TITLE =
+            "speaking_question.evaluation_failed.title";
 
     private SpeakingQuestionTitleMessageKey() {
     }
