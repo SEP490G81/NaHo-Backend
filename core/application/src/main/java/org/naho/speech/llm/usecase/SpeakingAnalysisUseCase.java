@@ -22,6 +22,7 @@ import org.naho.furigana.port.out.FuriganaGenerationPort;
 import org.naho.i18n.message.learning.LearningPathNodeDetailMessageKey;
 import org.naho.i18n.message.learning.UserLearningProgressDetailMessageKey;
 import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
+import org.naho.i18n.message.subscription.SubscriptionDetailMessageKey;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.learning.exception.LearningPathNodeErrorCode;
 import org.naho.learning.exception.UserLearningProgressErrorCode;
@@ -51,6 +52,9 @@ import org.naho.speech.model.AnswerHistory;
 import org.naho.speech.model.ContentAssessment;
 import org.naho.speech.model.SpeechAssessment;
 import org.naho.speech.model.WordAssessment;
+import org.naho.subscription.exception.SubscriptionErrorCode;
+import org.naho.subscription.model.UserDailyAiUsage;
+import org.naho.subscription.port.in.CrudUserDailyAiUsageInputPort;
 import org.naho.subscription.port.out.UserDailyAiUsageRepositoryPort;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.model.User;
@@ -79,6 +83,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     private final FileResultMapperPort fileResultMapperPort;
     private final UploadFileInputPort uploadFileInputPort;
     private final FuriganaGenerationPort furiganaGenerationPort;
+    private final CrudUserDailyAiUsageInputPort crudUserDailyAiUsageInputPort;
     private final UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -99,6 +104,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
             FileResultMapperPort fileResultMapperPort,
             UploadFileInputPort uploadFileInputPort,
+            CrudUserDailyAiUsageInputPort crudUserDailyAiUsageInputPort,
             UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort,
             FuriganaGenerationPort furiganaGenerationPort
     ) {
@@ -118,6 +124,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         this.userLearningProgressRepositoryPort = userLearningProgressRepositoryPort;
         this.fileResultMapperPort = fileResultMapperPort;
         this.uploadFileInputPort = uploadFileInputPort;
+        this.crudUserDailyAiUsageInputPort = crudUserDailyAiUsageInputPort;
         this.userDailyAiUsageRepositoryPort = userDailyAiUsageRepositoryPort;
         this.furiganaGenerationPort = furiganaGenerationPort;
     }
@@ -125,6 +132,32 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     @Override
     public SpeakingAnalysisResult analyzeSpeaking(SpeakingAnalysisCommand command) {
         LocalDate today = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID);
+
+        UserDailyAiUsage userDailyAiUsage = crudUserDailyAiUsageInputPort
+                .findByUserIdAndUsageDate(command.userId(), today);
+
+        // findByUserIdAndUsageDate luôn tạo mới nếu chưa có – trường hợp này không nên xảy ra
+        if (userDailyAiUsage == null) {
+            throw new ApplicationException(
+                    SubscriptionErrorCode.USER_DAILY_AI_USAGE_NOT_FOUND,
+                    SubscriptionDetailMessageKey.USER_DAILY_AI_USAGE_NOT_FOUND
+            );
+        }
+
+        // nếu người dùng đã sử dụng hết lượt đánh giá trong ngày hôm nay
+        if (userDailyAiUsage.getSpeakingEvaluationCount() >= command.dailySpeakingQuestionEvaluationLimit()) {
+            throw new ApplicationException(
+                    SpeakingQuestionErrorCode.SPEAKING_QUESTION_DAILY_LIMIT_EXCEEDED,
+                    SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_DAILY_LIMIT_EXCEEDED
+            );
+        }
+
+        // tăng số lần đánh giá AI với speaking question của người dùng trong ngày hôm nay lên 1
+        userDailyAiUsage.increaseSpeakingEvaluationCount();
+
+        // lưu
+        userDailyAiUsageRepositoryPort.save(userDailyAiUsage);
+
         // DB-R & VALID & DB-W (TX 1): Chuẩn bị context và tạo bản ghi ban đầu
         AnalysisContext ctx = transactionPort.execute(() -> prepareAnalysis(command));
 
@@ -348,10 +381,10 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         double fluencyScore10 = azureResult.getFluencyScore() != null
                 ? azureResult.getFluencyScore() / 10.0 : 0.0;
 
-        double vocabScore = 0.0;
-        double grammarScore = 0.0;
-        double naturalnessScore = 0.0;
-        double overallScore = 0.0;
+        double vocabScore;
+        double grammarScore;
+        double naturalnessScore;
+        double overallScore;
         String enrichedFeedbackJson;
 
         try {
@@ -365,10 +398,10 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             enrichedFeedbackJson = enrichFeedbackJson(
                     root, azureResult, vocabScore, grammarScore, naturalnessScore, overallScore, durationSec);
         } catch (Exception e) {
-            e.printStackTrace();
-            overallScore = Math.round(((pronScore10 + fluencyScore10) / 2.0) * 10.0) / 10.0;
-            enrichedFeedbackJson = buildFallbackFeedbackJson(
-                    vocabScore, grammarScore, naturalnessScore, overallScore, durationSec);
+            throw new ApplicationException(
+                    SpeakingQuestionErrorCode.SPEAKING_QUESTION_EVALUATION_FAILED,
+                    SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_EVALUATION_FAILED
+            );
         }
 
         return new ParsedScores(vocabScore, grammarScore, naturalnessScore, overallScore, enrichedFeedbackJson);

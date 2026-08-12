@@ -22,6 +22,8 @@ import org.naho.speech.llm.constant.OpenAiConfigProperties;
 import org.naho.speech.llm.port.in.*;
 import org.naho.speech.llm.port.out.*;
 import org.naho.speech.llm.usecase.*;
+import org.naho.subscription.port.in.CrudUserDailyAiUsageInputPort;
+import org.naho.subscription.port.out.UserDailyAiUsageRepositoryPort;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -122,6 +124,8 @@ public class ChatConfig {
             UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
             FileResultMapperPort fileResultMapperPort,
             UploadFileInputPort uploadFileInputPort,
+            CrudUserDailyAiUsageInputPort crudUserDailyAiUsageInputPort,
+            UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort,
             FuriganaGenerationPort furiganaGenerationPort
     ) {
         return new SpeakingAnalysisUseCase(
@@ -141,6 +145,8 @@ public class ChatConfig {
                 userLearningProgressRepositoryPort,
                 fileResultMapperPort,
                 uploadFileInputPort,
+                crudUserDailyAiUsageInputPort,
+                userDailyAiUsageRepositoryPort,
                 furiganaGenerationPort
         );
     }

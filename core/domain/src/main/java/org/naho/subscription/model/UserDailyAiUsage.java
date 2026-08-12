@@ -22,6 +22,14 @@ public class UserDailyAiUsage {
         this.aiSessionEvaluationCount = builder.aiSessionEvaluationCount;
     }
 
+    public void increaseSpeakingEvaluationCount() {
+        this.speakingEvaluationCount++;
+    }
+
+    public void increaseAiSessionEvaluationCount() {
+        this.aiSessionEvaluationCount++;
+    }
+
     public static UserDailyAiUsage init(Long userId, LocalDate usageDate) {
         return UserDailyAiUsage.builder()
                 .userId(userId)

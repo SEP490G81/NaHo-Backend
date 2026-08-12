@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface UserDailyAiUsageRepositoryPort {
     Optional<UserDailyAiUsage> findByUserIdAndUsageDate(Long userId, LocalDate usageDate);
+
+    UserDailyAiUsage save(UserDailyAiUsage userDailyAiUsage);
 }

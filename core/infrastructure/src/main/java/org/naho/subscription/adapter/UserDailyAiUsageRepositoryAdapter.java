@@ -3,6 +3,7 @@ package org.naho.subscription.adapter;
 import lombok.RequiredArgsConstructor;
 import org.naho.i18n.message.subscription.SubscriptionDetailMessageKey;
 import org.naho.shared.exception.InfrastructureException;
+import org.naho.subscription.entity.UserDailyAiUsageEntity;
 import org.naho.subscription.exception.SubscriptionDomainErrorCode;
 import org.naho.subscription.mapper.UserDailyAiUsageEntityMapper;
 import org.naho.subscription.model.UserDailyAiUsage;
@@ -37,5 +38,12 @@ public class UserDailyAiUsageRepositoryAdapter implements UserDailyAiUsageReposi
         return userDailyAiUsageJpaRepository
                 .findByUser_IdAndUsageDate(userId, usageDate)
                 .map(userDailyAiUsageEntityMapper::entityToDomain);
+    }
+
+    @Override
+    public UserDailyAiUsage save(UserDailyAiUsage userDailyAiUsage) {
+        UserDailyAiUsageEntity entity = userDailyAiUsageEntityMapper.domainToEntity(userDailyAiUsage);
+        UserDailyAiUsageEntity savedEntity = userDailyAiUsageJpaRepository.save(entity);
+        return userDailyAiUsageEntityMapper.entityToDomain(savedEntity);
     }
 }
