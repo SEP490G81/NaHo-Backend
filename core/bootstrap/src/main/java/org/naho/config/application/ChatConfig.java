@@ -23,6 +23,7 @@ import org.naho.speech.llm.port.in.*;
 import org.naho.speech.llm.port.out.*;
 import org.naho.speech.llm.usecase.*;
 import org.naho.subscription.port.in.CrudUserDailyAiUsageInputPort;
+import org.naho.subscription.port.out.SubscriptionPlanRepositoryPort;
 import org.naho.subscription.port.out.UserDailyAiUsageRepositoryPort;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.springframework.context.annotation.Bean;
@@ -91,9 +92,19 @@ public class ChatConfig {
     public EndSessionInputPort endSessionInputPort(
             SessionStorePort sessionStorePort,
             AiScoringPort aiScoringPort,
-            SpeakingSessionRepositoryPort speakingSessionRepositoryPort
+            SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
+            CrudUserDailyAiUsageInputPort crudUserDailyAiUsageInputPort,
+            SubscriptionPlanRepositoryPort subscriptionPlanRepositoryPort,
+            UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort
     ) {
-        return new EndSessionUseCase(sessionStorePort, aiScoringPort, speakingSessionRepositoryPort);
+        return new EndSessionUseCase(
+                sessionStorePort,
+                aiScoringPort,
+                speakingSessionRepositoryPort,
+                crudUserDailyAiUsageInputPort,
+                subscriptionPlanRepositoryPort,
+                userDailyAiUsageRepositoryPort
+        );
     }
 
     @Bean
