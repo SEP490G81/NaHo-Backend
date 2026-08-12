@@ -398,6 +398,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             enrichedFeedbackJson = enrichFeedbackJson(
                     root, azureResult, vocabScore, grammarScore, naturalnessScore, overallScore, durationSec);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new ApplicationException(
                     SpeakingQuestionErrorCode.SPEAKING_QUESTION_EVALUATION_FAILED,
                     SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_EVALUATION_FAILED

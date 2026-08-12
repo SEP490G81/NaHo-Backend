@@ -111,45 +111,44 @@ public class EndSessionUseCase implements EndSessionInputPort {
 
         // Persist session result to DB
         try {
-            if (userId == null) {
-                userId = requestUserId;
-            }
+            Long personaId = sessionStorePort.getPersonaId(sessionId);
+            String marugotoLevel = sessionStorePort.getMarugotoLevel(sessionId);
+            String formalityLevel = sessionStorePort.getFormalityLevel(sessionId);
+            int totalTurns = sessionStorePort.getTurnCount(sessionId);
+            Instant startedAt = sessionStorePort.getStartedAt(sessionId);
 
-            if (userId == null) {
-                System.err.println("[EndSessionUseCase] WARNING: userId is NULL for session " + sessionId + ". Cannot save session history to DB.");
-            } else {
-                Long personaId = sessionStorePort.getPersonaId(sessionId);
-                String marugotoLevel = sessionStorePort.getMarugotoLevel(sessionId);
-                String formalityLevel = sessionStorePort.getFormalityLevel(sessionId);
-                int totalTurns = sessionStorePort.getTurnCount(sessionId);
-                Instant startedAt = sessionStorePort.getStartedAt(sessionId);
-
-                Double asrConfidenceDouble = null;
-                if (arsConfidence != null && !arsConfidence.isBlank() && !arsConfidence.equals("N/A")) {
-                    try {
-                        asrConfidenceDouble = Double.parseDouble(arsConfidence.trim());
-                    } catch (NumberFormatException ignored) {
-                    }
+            Double asrConfidenceDouble = null;
+            if (arsConfidence != null && !arsConfidence.isBlank() && !arsConfidence.equals("N/A")) {
+                try {
+                    asrConfidenceDouble = Double.parseDouble(arsConfidence.trim());
+                } catch (NumberFormatException ignored) {
+                    throw new ApplicationException(
+                            LlmApplicationError.LLM_PARSE_ERROR,
+                            LlmDetailMessageKey.LLM_PARSE_ERROR
+                    );
                 }
-
-                speakingSessionRepositoryPort.saveSpeakingSession(
-                        sessionId,
-                        userId,
-                        personaId,
-                        effectiveTopic,
-                        marugotoLevel,
-                        formalityLevel,
-                        fullTranscript,
-                        totalTurns,
-                        asrConfidenceDouble,
-                        startedAt,
-                        result
-                );
-                System.out.println("[EndSessionUseCase] Successfully saved session " + sessionId + " to DB for userId: " + userId);
             }
+
+            speakingSessionRepositoryPort.saveSpeakingSession(
+                    sessionId,
+                    userId,
+                    personaId,
+                    effectiveTopic,
+                    marugotoLevel,
+                    formalityLevel,
+                    fullTranscript,
+                    totalTurns,
+                    asrConfidenceDouble,
+                    startedAt,
+                    result
+            );
+            System.out.println("[EndSessionUseCase] Successfully saved session " + sessionId + " to DB for userId: " + userId);
         } catch (Exception e) {
             System.err.println("[EndSessionUseCase] Failed to persist session to DB: " + e.getMessage());
-            e.printStackTrace();
+            throw new ApplicationException(
+                    LlmApplicationError.LLM_SAVE_SESSION_FAILED,
+                    LlmDetailMessageKey.LLM_SAVE_SESSION_FAILED
+            );
         }
 
         sessionStorePort.clearSession(sessionId);
