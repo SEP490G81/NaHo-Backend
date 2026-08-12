@@ -17,7 +17,6 @@ import org.naho.speech.llm.port.in.SpeakingAnalysisInputPort;
 import org.naho.speech.llm.result.SpeakingAnalysisResult;
 import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
 import org.naho.subscription.result.SubscriptionPlanResult;
-import org.naho.subscription.type.PlanCode;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -64,11 +63,11 @@ public class SpeakingAnalysisController {
             );
 
             // nếu đang dùng gói FREE thì không lưu file
-            if (!subscriptionPlan.code().equals(PlanCode.FREE)) {
+//            if (!subscriptionPlan.code().equals(PlanCode.FREE)) {
 
-                // Step 1: Lưu file vào local
-                storedFile = fileStorageServicePort.saveFileToLocal(file, FileFolderConstant.RECORDINGS, FileAccessStatus.PRIVATE);
-            }
+            // Step 1: Lưu file vào local
+            storedFile = fileStorageServicePort.saveFileToLocal(file, FileFolderConstant.RECORDINGS, FileAccessStatus.PRIVATE);
+//            }
 
             SpeakingAnalysisCommand command = SpeakingAnalysisCommand.builder()
                     .userId(payload.userId())
