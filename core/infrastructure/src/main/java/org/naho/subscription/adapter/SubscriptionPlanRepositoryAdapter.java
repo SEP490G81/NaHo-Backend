@@ -61,4 +61,11 @@ public class SubscriptionPlanRepositoryAdapter implements SubscriptionPlanReposi
                 .findByCode(code)
                 .map(subscriptionPlanEntityMapper::entityToDomain);
     }
+
+    @Override
+    public SubscriptionPlan save(SubscriptionPlan domain) {
+        var entity = subscriptionPlanEntityMapper.domainToEntity(domain);
+        var savedEntity = subscriptionPlanJpaRepository.save(entity);
+        return subscriptionPlanEntityMapper.entityToDomain(savedEntity);
+    }
 }
