@@ -70,8 +70,8 @@ mybatis:
   mapper-locations: classpath*:mybatis/mapper/**/*.xml
 
 app:
+  start-date: 2026-04-30
   frontend-url: ${FRONTEND_URL}
-  nextjs-server-files-api: ${NEXTJS_SERVER_FILES_API}
   scheduler:
     file-upload-retry:
       fixed-delay: 60000
