@@ -10,10 +10,12 @@ import org.naho.i18n.message.speech.SpeechDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.speech.azure.command.AzureCostQueryCommand;
 import org.naho.speech.azure.port.in.GetAzureCostInputPort;
+import org.naho.speech.azure.port.in.SyncAzureCostInputPort;
 import org.naho.speech.azure.result.AzureCostChartResult;
 import org.naho.speech.azure.result.AzureCostSummaryResult;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminAzureCostController {
 
     private final GetAzureCostInputPort getAzureCostInputPort;
+    private final SyncAzureCostInputPort syncAzureCostInputPort;
     private final AzureCostRequestMapper azureCostRequestMapper;
     private final AzureCostResponseMapper azureCostResponseMapper;
 
@@ -41,5 +44,11 @@ public class AdminAzureCostController {
         AzureCostChartResult result = getAzureCostInputPort.getChartData(command);
         AzureCostChartResponse response = azureCostResponseMapper.resultToChartResponse(result);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/sync")
+    public ResponseEntity<Void> triggerManualSync() {
+        syncAzureCostInputPort.syncIncremental(3);
+        return ResponseEntity.ok().build();
     }
 }

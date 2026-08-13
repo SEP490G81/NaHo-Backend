@@ -8,19 +8,18 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.naho.i18n.message.speech.SpeechDetailMessageKey;
-import org.naho.shared.exception.ApplicationException;
-import org.naho.speech.azure.command.AzureCostQueryCommand;
+import org.naho.shared.exception.InfrastructureException;
 import org.naho.speech.azure.config.AzureCostConfigProperties;
 import org.naho.speech.azure.exception.AzureSpeechErrorCode;
+import org.naho.speech.azure.model.AzureDailyCost;
 import org.naho.speech.azure.port.out.AzureCostManagementPort;
-import org.naho.speech.azure.result.AzureCostChartResult;
-import org.naho.speech.azure.result.AzureCostPointResult;
-import org.naho.speech.azure.result.AzureCostSummaryResult;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,13 +47,18 @@ public class AzureCostManagementAdapter implements AzureCostManagementPort {
     }
 
     @Override
-    public AzureCostSummaryResult fetchCostSummary(String timeframe) {
+    public List<AzureDailyCost> fetchDailyCostsFromAzure(LocalDate fromDate, LocalDate toDate) {
         String token = getAccessToken();
         String url = String.format(configProperties.getQueryUrlTemplate(), configProperties.getSubscriptionId());
 
         Map<String, Object> body = new HashMap<>();
         body.put("type", "Usage");
-        body.put("timeframe", timeframe != null ? timeframe : "MonthToDate");
+        body.put("timeframe", "Custom");
+
+        Map<String, String> timePeriod = new HashMap<>();
+        timePeriod.put("from", fromDate.atStartOfDay(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT));
+        timePeriod.put("to", toDate.atTime(23, 59, 59).atZone(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT));
+        body.put("timePeriod", timePeriod);
 
         Map<String, Object> totalCostAgg = new HashMap<>();
         totalCostAgg.put("name", "PreTaxCost");
@@ -64,80 +68,7 @@ public class AzureCostManagementAdapter implements AzureCostManagementPort {
         aggregation.put("totalCost", totalCostAgg);
 
         Map<String, Object> dataset = new HashMap<>();
-        dataset.put("granularity", "None");
-        dataset.put("aggregation", aggregation);
-        body.put("dataset", dataset);
-
-        try {
-            JsonNode root = executePostQuery(url, token, body);
-            JsonNode properties = root.path("properties");
-            JsonNode columns = properties.path("columns");
-            JsonNode rows = properties.path("rows");
-
-            int costIndex = -1;
-            int currencyIndex = -1;
-
-            for (int i = 0; i < columns.size(); i++) {
-                String colName = columns.get(i).path("name").asText();
-                if ("PreTaxCost".equalsIgnoreCase(colName) || "totalCost".equalsIgnoreCase(colName)) {
-                    costIndex = i;
-                } else if ("Currency".equalsIgnoreCase(colName)) {
-                    currencyIndex = i;
-                }
-            }
-
-            BigDecimal totalCost = BigDecimal.ZERO;
-            String currency = "USD";
-
-            if (rows.isArray() && !rows.isEmpty()) {
-                JsonNode firstRow = rows.get(0);
-                if (costIndex != -1 && firstRow.has(costIndex) && !firstRow.get(costIndex).isNull()) {
-                    totalCost = new BigDecimal(firstRow.get(costIndex).asText());
-                }
-                if (currencyIndex != -1 && firstRow.has(currencyIndex) && !firstRow.get(currencyIndex).isNull()) {
-                    currency = firstRow.get(currencyIndex).asText();
-                }
-            }
-
-            return new AzureCostSummaryResult(totalCost, currency, timeframe);
-
-        } catch (Exception e) {
-            log.error("Error fetching Azure cost summary: ", e);
-            throw new ApplicationException(
-                    AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR,
-                    SpeechDetailMessageKey.AZURE_COST_API_FETCH_FAILED,
-                    e.getMessage());
-        }
-    }
-
-    @Override
-    public AzureCostChartResult fetchCostChart(AzureCostQueryCommand command) {
-        String token = getAccessToken();
-        String url = String.format(configProperties.getQueryUrlTemplate(), configProperties.getSubscriptionId());
-
-        Map<String, Object> body = new HashMap<>();
-        body.put("type", "Usage");
-
-        String timeframe = command.getTimeframe();
-        if ("Custom".equalsIgnoreCase(timeframe) && command.getFromDate() != null && command.getToDate() != null) {
-            body.put("timeframe", "Custom");
-            Map<String, String> timePeriod = new HashMap<>();
-            timePeriod.put("from", command.getFromDate().format(DateTimeFormatter.ISO_INSTANT));
-            timePeriod.put("to", command.getToDate().format(DateTimeFormatter.ISO_INSTANT));
-            body.put("timePeriod", timePeriod);
-        } else {
-            body.put("timeframe", timeframe != null ? timeframe : "MonthToDate");
-        }
-
-        Map<String, Object> totalCostAgg = new HashMap<>();
-        totalCostAgg.put("name", "PreTaxCost");
-        totalCostAgg.put("function", "Sum");
-
-        Map<String, Object> aggregation = new HashMap<>();
-        aggregation.put("totalCost", totalCostAgg);
-
-        Map<String, Object> dataset = new HashMap<>();
-        dataset.put("granularity", command.getGranularity() != null ? command.getGranularity() : "Monthly");
+        dataset.put("granularity", "Daily");
         dataset.put("aggregation", aggregation);
 
         body.put("dataset", dataset);
@@ -154,51 +85,55 @@ public class AzureCostManagementAdapter implements AzureCostManagementPort {
 
             for (int i = 0; i < columns.size(); i++) {
                 String colName = columns.get(i).path("name").asText();
-                if ("PreTaxCost".equalsIgnoreCase(colName) || "totalCost".equalsIgnoreCase(colName)) {
+                if ("PreTaxCost".equalsIgnoreCase(colName) || "totalCost".equalsIgnoreCase(colName) || "Cost".equalsIgnoreCase(colName)) {
                     costIndex = i;
-                } else if ("BillingMonth".equalsIgnoreCase(colName) || "UsageDate".equalsIgnoreCase(colName)
-                        || "Date".equalsIgnoreCase(colName)) {
+                } else if ("UsageDate".equalsIgnoreCase(colName) || "Date".equalsIgnoreCase(colName) || "BillingMonth".equalsIgnoreCase(colName)) {
                     dateIndex = i;
                 } else if ("Currency".equalsIgnoreCase(colName)) {
                     currencyIndex = i;
                 }
             }
 
-            BigDecimal totalCostAccumulated = BigDecimal.ZERO;
-            String currency = "USD";
-            List<AzureCostPointResult> points = new ArrayList<>();
-
+            List<AzureDailyCost> list = new ArrayList<>();
             if (rows.isArray()) {
                 for (JsonNode row : rows) {
                     BigDecimal cost = BigDecimal.ZERO;
-                    String dateOrMonth = "";
+                    LocalDate usageDate = null;
+                    String currency = "USD";
 
                     if (costIndex != -1 && row.has(costIndex) && !row.get(costIndex).isNull()) {
                         cost = new BigDecimal(row.get(costIndex).asText());
-                        totalCostAccumulated = totalCostAccumulated.add(cost);
                     }
 
                     if (dateIndex != -1 && row.has(dateIndex) && !row.get(dateIndex).isNull()) {
-                        dateOrMonth = row.get(dateIndex).asText();
+                        String dateStr = row.get(dateIndex).asText();
+                        if (dateStr.length() == 8 && !dateStr.contains("-")) {
+                            usageDate = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyyMMdd"));
+                        } else if (dateStr.contains("T")) {
+                            usageDate = LocalDate.parse(dateStr.split("T")[0]);
+                        } else {
+                            usageDate = LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE);
+                        }
                     }
 
                     if (currencyIndex != -1 && row.has(currencyIndex) && !row.get(currencyIndex).isNull()) {
                         currency = row.get(currencyIndex).asText();
                     }
 
-                    points.add(new AzureCostPointResult(dateOrMonth, cost, currency));
+                    if (usageDate != null) {
+                        list.add(AzureDailyCost.builder()
+                                .recordDate(usageDate)
+                                .costAmount(cost)
+                                .currency(currency)
+                                .build());
+                    }
                 }
             }
-
-            return new AzureCostChartResult(
-                    totalCostAccumulated,
-                    currency,
-                    command.getGranularity() != null ? command.getGranularity() : "Monthly",
-                    points);
+            return list;
 
         } catch (Exception e) {
-            log.error("Error fetching Azure cost chart data: ", e);
-            throw new ApplicationException(
+            log.error("Error fetching Azure daily costs from API: ", e);
+            throw new InfrastructureException(
                     AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR,
                     SpeechDetailMessageKey.AZURE_COST_API_FETCH_FAILED,
                     e.getMessage());
@@ -215,7 +150,7 @@ public class AzureCostManagementAdapter implements AzureCostManagementPort {
             return accessToken.getToken();
         } catch (Exception e) {
             log.error("Failed to acquire Azure OAuth2 access token", e);
-            throw new ApplicationException(
+            throw new InfrastructureException(
                     AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR,
                     SpeechDetailMessageKey.AZURE_COST_API_FETCH_FAILED,
                     e.getMessage());
