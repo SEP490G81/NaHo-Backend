@@ -1,10 +1,10 @@
 package org.naho.config.application;
 
+import org.naho.email.port.out.EmailPort;
 import org.naho.file.port.in.UploadFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileResultMapperPort;
 import org.naho.file.port.out.FileStorageServicePort;
-import org.naho.shared.port.out.EmailPort;
 import org.naho.shared.port.out.EventPublisherPort;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.social.report.mapper.ReportResultMapper;

@@ -2,7 +2,9 @@ package org.naho.user.usecase;
 
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
+import org.naho.shared.port.out.EventPublisherPort;
 import org.naho.shared.port.out.TransactionPort;
+import org.naho.user.event.UserStatusChangedEvent;
 import org.naho.user.exception.RoleErrorCode;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.mapper.UserResultMapper;
@@ -23,19 +25,23 @@ public class UpdateUserUseCase implements UpdateUserInputPort {
     private final UserResultMapper userResultMapper;
     private final UserSessionServicePort userSessionServicePort;
     private final TransactionPort transactionPort;
+    // Code by AI - Inject thêm EventPublisherPort để bắn sự kiện gửi mail
+    private final EventPublisherPort eventPublisherPort;
 
     public UpdateUserUseCase(
             UserRepositoryPort userRepositoryPort,
             RoleRepositoryPort roleRepositoryPort,
             UserResultMapper userResultMapper,
             UserSessionServicePort userSessionServicePort,
-            TransactionPort transactionPort
+            TransactionPort transactionPort,
+            EventPublisherPort eventPublisherPort
     ) {
         this.userRepositoryPort = userRepositoryPort;
         this.roleRepositoryPort = roleRepositoryPort;
         this.userResultMapper = userResultMapper;
         this.userSessionServicePort = userSessionServicePort;
         this.transactionPort = transactionPort;
+        this.eventPublisherPort = eventPublisherPort;
     }
 
     /**
@@ -92,6 +98,18 @@ public class UpdateUserUseCase implements UpdateUserInputPort {
                     id,
                     SessionRevokedReason.UNACTIVE_ACCOUNT
             );
+        }
+
+        if (user.getEmail() != null && user.getEmail().getValue() != null && !user.getEmail().getValue().isBlank()) {
+            String fullName = user.getFullName() != null && !user.getFullName().isBlank()
+                    ? user.getFullName()
+                    : (user.getUsername() != null ? user.getUsername().getValue() : "User");
+            eventPublisherPort.publish(new UserStatusChangedEvent(
+                    id,
+                    user.getEmail().getValue(),
+                    fullName,
+                    newStatus
+            ));
         }
 
         return newStatus;

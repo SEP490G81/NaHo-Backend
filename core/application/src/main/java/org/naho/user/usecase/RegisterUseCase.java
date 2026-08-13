@@ -3,8 +3,9 @@ package org.naho.user.usecase;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
 import org.naho.shared.exception.ApplicationException;
-import org.naho.shared.port.out.EmailPort;
+import org.naho.shared.port.out.EventPublisherPort;
 import org.naho.user.command.RegisterCommand;
+import org.naho.user.event.UserRegisteredEvent;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.model.Role;
 import org.naho.user.model.User;
@@ -13,7 +14,6 @@ import org.naho.user.port.out.EncoderPort;
 import org.naho.user.port.out.OtpPort;
 import org.naho.user.port.out.RoleRepositoryPort;
 import org.naho.user.port.out.UserRepositoryPort;
-import org.naho.user.result.RegisterResult;
 import org.naho.user.type.RoleName;
 import org.naho.user.valueobject.Password;
 
@@ -24,7 +24,7 @@ public class RegisterUseCase implements RegisterInputPort {
     private final EncoderPort encoderPort;
     private final CrudUserLearningProgressInputPort crudUserLearningProgressInputPort;
     private final OtpPort otpPort;
-    private final EmailPort emailPort;
+    private final EventPublisherPort eventPublisherPort;
 
     public RegisterUseCase(
             UserRepositoryPort userRepository,
@@ -32,18 +32,18 @@ public class RegisterUseCase implements RegisterInputPort {
             RoleRepositoryPort roleRepository,
             CrudUserLearningProgressInputPort crudUserLearningProgressInputPort,
             OtpPort otpPort,
-            EmailPort emailPort
+            EventPublisherPort eventPublisherPort
     ) {
         this.userRepository = userRepository;
         this.encoderPort = encoderPort;
         this.roleRepository = roleRepository;
         this.crudUserLearningProgressInputPort = crudUserLearningProgressInputPort;
         this.otpPort = otpPort;
-        this.emailPort = emailPort;
+        this.eventPublisherPort = eventPublisherPort;
     }
 
     @Override
-    public RegisterResult register(RegisterCommand command) {
+    public void register(RegisterCommand command) {
         // Check already user
         if (userRepository.existsByUsername(command.username())) {
             throw new ApplicationException(
@@ -74,7 +74,7 @@ public class RegisterUseCase implements RegisterInputPort {
 
         User newUser = User.registerNewUser(
                 command.username(),
-                command.fullName(),
+                command.fullname(),
                 encodedPassword,
                 command.email(),
                 defaultRole.getId()
@@ -89,11 +89,7 @@ public class RegisterUseCase implements RegisterInputPort {
         String email = savedUser.getEmail().getValue();
         String otp = otpPort.generateOtp();
         otpPort.saveOtp(email, otp);
-        emailPort.sendOtpEmail(email, savedUser.getFullName(), otp);
+        eventPublisherPort.publish(new UserRegisteredEvent(savedUser.getId(), email, savedUser.getFullName(), otp));
 
-        return new RegisterResult(
-                savedUser.getId() != null ? savedUser.getId().toString() : "",
-                savedUser.getUsername().getValue(),
-                email);
     }
 }

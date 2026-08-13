@@ -3,12 +3,11 @@ package org.naho.payment.usecase;
 import org.naho.i18n.message.payment.PaymentDetailMessageKey;
 import org.naho.i18n.message.subscription.SubscriptionDetailMessageKey;
 import org.naho.i18n.message.user.UserDetailMessageKey;
-import org.naho.notification.event.SendNotificationEvent;
-import org.naho.notification.type.NotificationType;
 import org.naho.payment.command.AdminUpgradeSubscriptionCommand;
 import org.naho.payment.exception.PaymentErrorCode;
 import org.naho.payment.port.in.AdminUpgradeSubscriptionInputPort;
 import org.naho.shared.exception.ApplicationException;
+import org.naho.shared.port.out.EventPublisherPort;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.subscription.mapper.SubscriptionPlanResultMapper;
 import org.naho.subscription.mapper.UserSubscriptionResultMapper;
@@ -20,6 +19,7 @@ import org.naho.subscription.result.SubscriptionPlanResult;
 import org.naho.subscription.result.UserSubscriptionResult;
 import org.naho.subscription.type.PlanCode;
 import org.naho.subscription.type.PlanTier;
+import org.naho.user.event.UserPlanUpgradedEvent;
 import org.naho.user.exception.RoleErrorCode;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.model.Role;
@@ -38,7 +38,7 @@ public class AdminUpgradeSubscriptionUseCase implements AdminUpgradeSubscription
     private final UserSubscriptionRepositoryPort subscriptionRepositoryPort;
     private final SubscriptionPlanResultMapper planResultMapper;
     private final UserSubscriptionResultMapper userSubscriptionResultMapper;
-    private final org.naho.shared.port.out.EventPublisherPort eventPublisherPort;
+    private final EventPublisherPort eventPublisherPort;
     private final TransactionPort transactionPort;
 
     public AdminUpgradeSubscriptionUseCase(RoleRepositoryPort roleRepositoryPort,
@@ -47,7 +47,7 @@ public class AdminUpgradeSubscriptionUseCase implements AdminUpgradeSubscription
                                            UserSubscriptionRepositoryPort subscriptionRepositoryPort,
                                            SubscriptionPlanResultMapper planResultMapper,
                                            UserSubscriptionResultMapper userSubscriptionResultMapper,
-                                           org.naho.shared.port.out.EventPublisherPort eventPublisherPort,
+                                           EventPublisherPort eventPublisherPort,
                                            TransactionPort transactionPort) {
         this.roleRepositoryPort = roleRepositoryPort;
         this.userRepositoryPort = userRepositoryPort;
@@ -64,7 +64,7 @@ public class AdminUpgradeSubscriptionUseCase implements AdminUpgradeSubscription
                                            SubscriptionPlanRepositoryPort planRepositoryPort,
                                            UserSubscriptionRepositoryPort subscriptionRepositoryPort,
                                            SubscriptionPlanResultMapper planResultMapper,
-                                           org.naho.shared.port.out.EventPublisherPort eventPublisherPort,
+                                           EventPublisherPort eventPublisherPort,
                                            TransactionPort transactionPort) {
         this(roleRepositoryPort, userRepositoryPort, planRepositoryPort, subscriptionRepositoryPort, planResultMapper, new UserSubscriptionResultMapper(), eventPublisherPort, transactionPort);
     }
@@ -73,7 +73,7 @@ public class AdminUpgradeSubscriptionUseCase implements AdminUpgradeSubscription
                                            UserRepositoryPort userRepositoryPort,
                                            SubscriptionPlanRepositoryPort planRepositoryPort,
                                            UserSubscriptionRepositoryPort subscriptionRepositoryPort,
-                                           org.naho.shared.port.out.EventPublisherPort eventPublisherPort,
+                                           EventPublisherPort eventPublisherPort,
                                            TransactionPort transactionPort) {
         this(roleRepositoryPort, userRepositoryPort, planRepositoryPort, subscriptionRepositoryPort, new SubscriptionPlanResultMapper(), new UserSubscriptionResultMapper(), eventPublisherPort, transactionPort);
     }
@@ -159,21 +159,9 @@ public class AdminUpgradeSubscriptionUseCase implements AdminUpgradeSubscription
 
         // Publish Event Nâng cấp gói bởi Admin
         if (eventPublisherPort != null) {
-            eventPublisherPort.publish(new org.naho.user.event.UserPlanUpgradedEvent(
+            eventPublisherPort.publish(new UserPlanUpgradedEvent(
                     command.targetUserId(),
                     targetPlan.getCode().name()
-            ));
-
-            // Send PAYMENT notification
-            String metadata = "{}"; // Admin upgrade might not have an orderCode
-            eventPublisherPort.publish(new SendNotificationEvent(
-                    this,
-                    command.targetUserId(),
-                    NotificationType.PAYMENT,
-                    "Nâng cấp gói thành công",
-                    "Gói của bạn đã được quản trị viên nâng cấp thành " + targetPlan.getCode() + ".",
-                    null,
-                    metadata
             ));
         }
 

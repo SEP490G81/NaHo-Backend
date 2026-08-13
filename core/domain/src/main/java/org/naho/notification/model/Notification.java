@@ -15,7 +15,7 @@ public class Notification {
     private final String content;
     private final boolean isRead;
     private final String targetUrl;
-    private final String metadata; // JSON string containing additional context (e.g., commentId, reportId)
+
     private final Instant createdTime;
 
     private Notification(Builder builder) {
@@ -26,7 +26,7 @@ public class Notification {
         this.content = builder.content;
         this.isRead = builder.isRead;
         this.targetUrl = builder.targetUrl;
-        this.metadata = builder.metadata;
+
         this.createdTime = builder.createdTime;
     }
 
@@ -62,9 +62,6 @@ public class Notification {
         return targetUrl;
     }
 
-    public String getMetadata() {
-        return metadata;
-    }
 
     public Instant getCreatedTime() {
         return createdTime;
@@ -79,7 +76,7 @@ public class Notification {
                 .content(this.content)
                 .isRead(true)
                 .targetUrl(this.targetUrl)
-                .metadata(this.metadata)
+
                 .createdTime(this.createdTime)
                 .build();
     }
@@ -92,7 +89,7 @@ public class Notification {
         private String content;
         private boolean isRead;
         private String targetUrl;
-        private String metadata;
+
         private Instant createdTime;
 
         public Builder id(Long id) {
@@ -130,10 +127,6 @@ public class Notification {
             return this;
         }
 
-        public Builder metadata(String metadata) {
-            this.metadata = metadata;
-            return this;
-        }
 
         public Builder createdTime(Instant createdTime) {
             this.createdTime = createdTime;

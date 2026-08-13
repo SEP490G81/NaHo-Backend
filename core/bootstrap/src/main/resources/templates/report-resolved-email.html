@@ -174,6 +174,13 @@
                     <td style="font-weight: 600; color: #64748b; font-size: 14px;">Tiêu đề:</td>
                     <td style="color: #1e293b; font-size: 14px;" th:text="${reportTitle}">Tiêu đề báo cáo</td>
                 </tr>
+                <tr style="height: 32px;" th:if="${adminNote != null and !adminNote.isBlank()}">
+                    <td style="font-weight: 600; color: #64748b; font-size: 14px; vertical-align: top;">Phản hồi từ
+                        Admin:
+                    </td>
+                    <td style="color: #1e293b; font-size: 14px; font-style: italic; word-break: break-word;"
+                        th:text="${adminNote}"></td>
+                </tr>
                 <tr style="height: 32px;">
                     <td style="font-weight: 600; color: #64748b; font-size: 14px;">Trạng thái:</td>
                     <td><span class="status-badge">Đã xử lý</span></td>

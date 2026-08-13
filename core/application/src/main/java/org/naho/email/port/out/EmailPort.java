@@ -1,4 +1,4 @@
-package org.naho.shared.port.out;
+package org.naho.email.port.out;
 
 public interface EmailPort {
     void sendOtpEmail(String toEmail, String fullName, String otpCode);
