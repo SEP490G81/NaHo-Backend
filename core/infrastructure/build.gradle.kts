@@ -57,6 +57,7 @@ dependencies {
 
     // Azure Identity - lấy OAuth2 Access Token từ Microsoft Entra ID
     implementation("com.azure:azure-identity:1.18.4")
+    implementation("com.azure:azure-core:1.55.0")
 
     // MapStructs
     implementation("org.mapstruct:mapstruct:1.6.3")
