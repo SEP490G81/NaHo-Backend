@@ -22,6 +22,17 @@ CREATE TABLE auth_providers
     CONSTRAINT pk_auth_providers PRIMARY KEY (id)
 );
 
+CREATE TABLE aws_daily_costs
+(
+    id            BIGINT AUTO_INCREMENT NOT NULL,
+    created_time  datetime(6)           NOT NULL,
+    modified_time datetime(6)           NULL,
+    record_date   date                  NOT NULL,
+    cost_amount   DECIMAL(18, 12)       NOT NULL,
+    currency      VARCHAR(10)           NOT NULL,
+    CONSTRAINT pk_aws_daily_costs PRIMARY KEY (id)
+);
+
 CREATE TABLE books
 (
     id                            BIGINT AUTO_INCREMENT NOT NULL,
@@ -689,6 +700,9 @@ CREATE TABLE word_assessments
 
 ALTER TABLE answer_histories
     ADD CONSTRAINT uc_answer_histories_audio_file UNIQUE (audio_file_id);
+
+ALTER TABLE aws_daily_costs
+    ADD CONSTRAINT uc_aws_daily_costs_record_date UNIQUE (record_date);
 
 ALTER TABLE books
     ADD CONSTRAINT uc_books_cover_image_file UNIQUE (cover_image_file_id);
