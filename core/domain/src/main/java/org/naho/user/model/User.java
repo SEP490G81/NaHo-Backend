@@ -9,10 +9,11 @@ import org.naho.user.valueobject.Username;
 import java.time.Instant;
 import java.util.List;
 
+import static org.naho.user.constant.UserLoginConstant.LOCK_DURATION_MINUTES;
+import static org.naho.user.constant.UserLoginConstant.MAX_FAILED_ATTEMPTS;
+
 public class User {
 
-    public static final int MAX_FAILED_ATTEMPTS = 5;
-    public static final int LOCK_DURATION_MINUTES = 15;
 
     private final Long id;
     private final Long roleId;
@@ -249,8 +250,8 @@ public class User {
      * @param now thời điểm hiện tại
      * @return true nếu tài khoản đang bị khoá
      */
-    public boolean isLocked(Instant now) {
-        return lockedUntil != null && now.isBefore(lockedUntil);
+    public boolean isLockedByLoginFailed(Instant now) {
+        return lockedUntil != null && !now.isAfter(lockedUntil);
     }
 
     /**
@@ -260,16 +261,22 @@ public class User {
      * @param now thời điểm hiện tại
      */
     public void incrementFailedLoginAttempt(Instant now) {
-        int count = (this.failedLoginAttemptCount == null ? 0 : this.failedLoginAttemptCount) + 1;
-        this.failedLoginAttemptCount = count;
-        if (count >= MAX_FAILED_ATTEMPTS) {
-            this.lockedUntil = now.plusSeconds((long) LOCK_DURATION_MINUTES * 60);
+        int currentCount = this.failedLoginAttemptCount == null ? 0 : this.failedLoginAttemptCount;
+
+        int newCount = currentCount + 1;
+
+        // nếu số lần đăng nhập thất bại >= giới hạn thì lock
+        if (newCount >= MAX_FAILED_ATTEMPTS) {
+            this.lockedUntil = now.plus(LOCK_DURATION_MINUTES);
             this.failedLoginAttemptCount = 0;
+            return;
         }
+
+        this.failedLoginAttemptCount = newCount;
     }
 
     /**
-     * Reset số lần đăng nhập thất bại sau khi đăng nhập thành công.
+     * Reset trạng thái lock của tài khoản
      */
     public void resetFailedLoginAttempt() {
         this.failedLoginAttemptCount = 0;

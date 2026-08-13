@@ -40,7 +40,7 @@ public class AuthController {
     private final VerifyForgotPasswordOtpRequestMapper verifyForgotPasswordOtpRequestMapper;
     private final ChangePasswordInputPort changePasswordInputPort;
     private final ChangePasswordRequestMapper changePasswordRequestMapper;
-
+    
     @ApiResponseMessage(message = UserDetailMessageKey.USER_LOGIN_SUCCESSFULLY)
     @PostMapping("/login")
     public ResponseEntity<Void> credentialsLogin(
