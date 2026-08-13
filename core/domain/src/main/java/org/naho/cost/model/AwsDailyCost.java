@@ -21,6 +21,22 @@ public class AwsDailyCost {
         return new Builder();
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public LocalDate getRecordDate() {
+        return recordDate;
+    }
+
+    public BigDecimal getCostAmount() {
+        return costAmount;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
     public static class Builder {
 
         private Long id;
@@ -51,21 +67,5 @@ public class AwsDailyCost {
         public AwsDailyCost build() {
             return new AwsDailyCost(this);
         }
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public LocalDate getRecordDate() {
-        return recordDate;
-    }
-
-    public BigDecimal getCostAmount() {
-        return costAmount;
-    }
-
-    public String getCurrency() {
-        return currency;
     }
 }

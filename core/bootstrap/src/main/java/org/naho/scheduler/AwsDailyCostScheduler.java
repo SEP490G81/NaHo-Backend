@@ -27,7 +27,7 @@ public class AwsDailyCostScheduler {
 
         // hôm kìa
         LocalDate from = today.minusDays(3);
-        
+
         // hôm qua
         LocalDate to = today.minusDays(1);
 

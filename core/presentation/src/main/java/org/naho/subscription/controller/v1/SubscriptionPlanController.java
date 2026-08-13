@@ -49,7 +49,7 @@ public class SubscriptionPlanController {
     /**
      * Admin cập nhật thông số của gói Subscription Plan
      *
-     * @param id ID của gói học cần cập nhật
+     * @param id      ID của gói học cần cập nhật
      * @param request dữ liệu cập nhật
      * @param payload thông tin token người dùng
      * @return SubscriptionPlanResponse
