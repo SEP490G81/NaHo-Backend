@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Tài khoản được mở khóa - NaHo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background-color: #198754; /* Green success */
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .content {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .content p {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .footer {
+            background-color: #f1f1f1;
+            padding: 15px;
+            text-align: center;
+            font-size: 14px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Thông báo Mở khóa tài khoản</h1>
+    </div>
+    <div class="content">
+        <p>Chào <span th:text="${fullName}">bạn</span>,</p>
+        <p>Chúc mừng! Tài khoản NaHo của bạn đã được Quản trị viên mở khóa thành công và có thể hoạt động trở lại bình
+            thường.</p>
+        <p>Bạn đã có thể đăng nhập vào ứng dụng và tiếp tục trải nghiệm các dịch vụ của chúng tôi.</p>
+        <p>Trân trọng,<br>Đội ngũ NaHo</p>
+    </div>
+    <div class="footer">
+        &copy; 2026 NaHo App. All rights reserved.
+    </div>
+</div>
+</body>
+</html>

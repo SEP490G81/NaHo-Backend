@@ -50,31 +50,29 @@ public class SpeakingAnalysisController {
                 .getUserActiveSubscriptionPlan(payload.userId());
 
         try {
-            StoredFile storedFile = null;
             byte[] audioBytes = file.getBytes();
 
             // validate xem có phải file .wav không?
             // và validate xem thời lượng có hợp lệ không?
+            // thời lượng tối đa được phép tùy thuộc vào Subscription plan
+            // method cũng trả về thời lượng của file record
             double duration = fileValidatorPort.validateWavFileAndDuration(
                     audioBytes,
-                    subscriptionPlan.maxSpeakingQuestionRecordingSeconds() != null
-                            ? subscriptionPlan.maxSpeakingQuestionRecordingSeconds().doubleValue()
-                            : 0.0
+                    subscriptionPlan.maxSpeakingQuestionRecordingSeconds().doubleValue()
             );
 
-            // nếu đang dùng gói FREE thì không lưu file
-//            if (!subscriptionPlan.code().equals(PlanCode.FREE)) {
-
             // Step 1: Lưu file vào local
-            storedFile = fileStorageServicePort.saveFileToLocal(file, FileFolderConstant.RECORDINGS, FileAccessStatus.PRIVATE);
-//            }
+            StoredFile storedFile = fileStorageServicePort.saveFileToLocal(file, FileFolderConstant.RECORDINGS, FileAccessStatus.PRIVATE);
 
+            // Build 1 speaking analysis command với
+            // giới hạn đánh giá speaking question hàng ngày
             SpeakingAnalysisCommand command = SpeakingAnalysisCommand.builder()
                     .userId(payload.userId())
                     .speakingQuestionId(speakingQuestionId)
                     .durationSec((int) Math.ceil(duration))
                     .storedFile(storedFile)
                     .audioBytes(audioBytes)
+                    .dailySpeakingQuestionEvaluationLimit(subscriptionPlan.dailySpeakingQuestionEvaluationLimit())
                     .build();
 
             SpeakingAnalysisResult result = speakingAnalysisInputPort.analyzeSpeaking(command);

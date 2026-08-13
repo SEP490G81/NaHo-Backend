@@ -17,6 +17,7 @@ import org.naho.point.command.PointHistoryCommand;
 import org.naho.point.port.in.CrudPointHistoryInputPort;
 import org.naho.point.type.PointTransactionType;
 import org.naho.question.command.CompleteSpeakingQuestionCommand;
+import org.naho.question.constant.QuestionConstant;
 import org.naho.question.port.in.CompleteSpeakingQuestionInputPort;
 import org.naho.shared.constant.SystemZoneId;
 import org.naho.shared.port.out.TransactionPort;
@@ -51,6 +52,13 @@ public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestion
         this.crudUserDailyMissionInputPort = crudUserDailyMissionInputPort;
     }
 
+    /**
+     * Method được gọi sau khi hoàn thành 1 câu hỏi nói (duolingo)
+     *
+     * @param command bao gồm:
+     *                userLearningProgress, speakingQuestionLearningPathNode
+     *                userId, overallScore
+     */
     @Override
     public void completeSpeakingQuestion(CompleteSpeakingQuestionCommand command) {
         transactionPort.execute(() -> doCompleteSpeakingQuestion(command));
@@ -84,9 +92,23 @@ public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestion
                     .bestScore(overallScore)
                     .currentScore(overallScore)
                     .attemptCount(1)
-                    .completedAt(now)
-                    .status(NodeStatus.COMPLETED)
+                    .lastCompletedAt(now)
                     .build();
+
+            // nếu điểm thấp hơn điểm tối thiểu cần pass => FAILED
+            if (overallScore < QuestionConstant.MIN_POINT_OF_SPEAKING_QUESTION_TO_PASS) {
+                newUserNodeProgress.setStatus(NodeStatus.FAILED);
+            } else {
+                newUserNodeProgress.setStatus(NodeStatus.PASSED);
+
+                // cập nhật node xa nhất mà người dùng có thể học sau khi học xong node này
+                progress = crudUserLearningProgressInputPort
+                        .updateFarthestAvailableNodeWhenCompletedANode(
+                                new UpdateFarthestAvailableNodeCommand(
+                                        progress,
+                                        speakingQuestionLearningPathNode
+                                ));
+            }
 
             userNodeProgressRepositoryPort.save(newUserNodeProgress);
 
@@ -103,20 +125,28 @@ public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestion
                 pointTransactionType = PointTransactionType.LEARNING_PATH_NODE_RETAKE;
             }
 
+            // nếu trạng thái đang là FAILED và
+            // điểm cao hơn điểm tối thiểu để pass => PASSED
+            if (NodeStatus.FAILED.equals(currentUserNodeProgress.getStatus()) &&
+                    overallScore >= QuestionConstant.MIN_POINT_OF_SPEAKING_QUESTION_TO_PASS
+            ) {
+                currentUserNodeProgress.setStatus(NodeStatus.PASSED);
+
+                // cập nhật node xa nhất mà người dùng có thể học sau khi học xong node này
+                progress = crudUserLearningProgressInputPort
+                        .updateFarthestAvailableNodeWhenCompletedANode(
+                                new UpdateFarthestAvailableNodeCommand(
+                                        progress,
+                                        speakingQuestionLearningPathNode
+                                ));
+            }
+
             currentUserNodeProgress.setCurrentScore(overallScore);
-            currentUserNodeProgress.increaseAttemptCount();
-            currentUserNodeProgress.setCompletedAt(now);
+            currentUserNodeProgress.increaseAttemptCount(); // tăng attemptCount lên 1
+            currentUserNodeProgress.setLastCompletedAt(now);
 
             userNodeProgressRepositoryPort.save(currentUserNodeProgress);
         }
-
-        // cập nhật node xa nhất mà người dùng có thể học sau khi học xong node này
-        progress = crudUserLearningProgressInputPort
-                .updateFarthestAvailableNodeWhenCompletedANode(
-                        new UpdateFarthestAvailableNodeCommand(
-                                progress,
-                                speakingQuestionLearningPathNode
-                        ));
 
         // update node cuối cùng mà người dùng học
         progress.setLastLearningNodeId(speakingQuestionLearningPathNode.getId());
@@ -129,12 +159,13 @@ public class CompleteSpeakingQuestionUseCase implements CompleteSpeakingQuestion
                         .userId(command.userId())
                         .now(now)
                         .zoneId(SystemZoneId.HO_CHI_MINH_ZONE_ID)
-                        .build());
+                        .build()
+        );
 
         userLearningProgressRepositoryPort.save(progress);
 
         // nếu có sự thay đổi điểm thì tạo lịch sử nhận điểm
-        if (earnPoint != null) {
+        if (earnPoint != null && earnPoint > 0) {
             PointHistoryCommand pointHistoryCommand = PointHistoryCommand.builder()
                     .userId(command.userId())
                     .point(earnPoint)

@@ -3,7 +3,7 @@ package org.naho.social.comment.mapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.mapstruct.Mapper;
-import org.naho.social.entity.CommentEntity;
+import org.naho.social.comment.entity.CommentEntity;
 
 @Mapper(componentModel = "spring")
 public abstract class CommentIdMapper {

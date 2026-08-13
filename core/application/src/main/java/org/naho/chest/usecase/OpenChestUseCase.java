@@ -169,8 +169,8 @@ public class OpenChestUseCase implements OpenChestInputPort {
                 .bestScore(earnedPoint)
                 .currentScore(earnedPoint)
                 .attemptCount(1)
-                .completedAt(now)
-                .status(NodeStatus.COMPLETED)
+                .lastCompletedAt(now)
+                .status(NodeStatus.PASSED)
                 .build();
 
         userNodeProgressRepositoryPort.save(userNodeProgress);
