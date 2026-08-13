@@ -61,7 +61,7 @@ public class UpdateReportStatusUseCase implements UpdateReportStatusInputPort {
                     savedReport.getAdminReply(),
                     savedReport.getReportType().name()));
         }
-        
+
         return reportResultMapper.domainToResult(savedReport);
     }
 }

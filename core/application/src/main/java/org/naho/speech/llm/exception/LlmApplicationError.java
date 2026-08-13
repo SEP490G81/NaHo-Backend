@@ -26,6 +26,14 @@ public enum LlmApplicationError implements ErrorCode {
             "LLM_A005",
             LlmTitleMessageKey.LLM_SESSION_NOT_FOUND_TITLE,
             404),
+    LLM_SESSION_TURN_LIMIT_EXCEEDED(
+            "LLM_A006",
+            LlmTitleMessageKey.LLM_SESSION_TURN_LIMIT_EXCEEDED_TITLE,
+            400),
+    LLM_SESSION_CONCURRENT_LIMIT_EXCEEDED(
+            "LLM_A007",
+            LlmTitleMessageKey.LLM_SESSION_CONCURRENT_LIMIT_EXCEEDED_TITLE,
+            400),
     LLM_DAILY_LIMIT_EXCEEDED(
             "LLM_A006",
             LlmTitleMessageKey.LLM_DAILY_LIMIT_EXCEEDED_TITLE,

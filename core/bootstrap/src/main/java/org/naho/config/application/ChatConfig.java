@@ -22,7 +22,7 @@ import org.naho.speech.llm.constant.OpenAiConfigProperties;
 import org.naho.speech.llm.port.in.*;
 import org.naho.speech.llm.port.out.*;
 import org.naho.speech.llm.usecase.*;
-import org.naho.subscription.port.in.CrudUserDailyAiUsageInputPort;
+import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
 import org.naho.subscription.port.out.SubscriptionPlanRepositoryPort;
 import org.naho.subscription.port.out.UserDailyAiUsageRepositoryPort;
 import org.naho.user.port.out.UserRepositoryPort;
@@ -76,7 +76,10 @@ public class ChatConfig {
             SpeechToTextPort speechToTextPort,
             PersonaRepositoryPort personaRepositoryPort,
             TextToSpeechServicePort textToSpeechServicePort,
-            SpeakingSessionRepositoryPort speakingSessionRepositoryPort
+            SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
+            FileRepositoryPort fileRepositoryPort,
+            UploadFileInputPort uploadFileInputPort,
+            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort
     ) {
         return new SpeakingSessionUseCase(
                 aiChatPort,
@@ -84,7 +87,10 @@ public class ChatConfig {
                 speechToTextPort,
                 personaRepositoryPort,
                 textToSpeechServicePort,
-                speakingSessionRepositoryPort
+                speakingSessionRepositoryPort,
+                fileRepositoryPort,
+                uploadFileInputPort,
+                getActiveSubscriptionInputPort
         );
     }
 
@@ -93,7 +99,6 @@ public class ChatConfig {
             SessionStorePort sessionStorePort,
             AiScoringPort aiScoringPort,
             SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
-            CrudUserDailyAiUsageInputPort crudUserDailyAiUsageInputPort,
             SubscriptionPlanRepositoryPort subscriptionPlanRepositoryPort,
             UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort
     ) {
@@ -101,7 +106,6 @@ public class ChatConfig {
                 sessionStorePort,
                 aiScoringPort,
                 speakingSessionRepositoryPort,
-                crudUserDailyAiUsageInputPort,
                 subscriptionPlanRepositoryPort,
                 userDailyAiUsageRepositoryPort
         );
@@ -135,7 +139,6 @@ public class ChatConfig {
             UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
             FileResultMapperPort fileResultMapperPort,
             UploadFileInputPort uploadFileInputPort,
-            CrudUserDailyAiUsageInputPort crudUserDailyAiUsageInputPort,
             UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort,
             FuriganaGenerationPort furiganaGenerationPort
     ) {
@@ -156,7 +159,6 @@ public class ChatConfig {
                 userLearningProgressRepositoryPort,
                 fileResultMapperPort,
                 uploadFileInputPort,
-                crudUserDailyAiUsageInputPort,
                 userDailyAiUsageRepositoryPort,
                 furiganaGenerationPort
         );

@@ -20,8 +20,16 @@ public class UserDailyAiUsageRepositoryAdapter implements UserDailyAiUsageReposi
     private final UserDailyAiUsageJpaRepository userDailyAiUsageJpaRepository;
     private final UserDailyAiUsageEntityMapper userDailyAiUsageEntityMapper;
 
+    /**
+     * Method tìm số lượt dùng AI của người dùng bằng user id và ngày dùng
+     * Nếu chưa có thì sẽ tạo mới
+     *
+     * @param userId    mã người dùng
+     * @param usageDate ngày sử dụng
+     * @return UserDailyAiUsage
+     */
     @Override
-    public Optional<UserDailyAiUsage> findByUserIdAndUsageDate(Long userId, LocalDate usageDate) {
+    public UserDailyAiUsage findByUserIdAndUsageDateCreateIfNotExists(Long userId, LocalDate usageDate) {
         if (userId == null) {
             throw new InfrastructureException(
                     SubscriptionDomainErrorCode.SUBSCRIPTION_USER_ID_EMPTY,
@@ -35,9 +43,17 @@ public class UserDailyAiUsageRepositoryAdapter implements UserDailyAiUsageReposi
             );
         }
 
-        return userDailyAiUsageJpaRepository
-                .findByUser_IdAndUsageDate(userId, usageDate)
-                .map(userDailyAiUsageEntityMapper::entityToDomain);
+        Optional<UserDailyAiUsageEntity> currentEntity = userDailyAiUsageJpaRepository
+                .findByUser_IdAndUsageDate(userId, usageDate);
+
+        // nếu đã tồn tại thì trả về
+        if (currentEntity.isPresent()) {
+            return userDailyAiUsageEntityMapper.entityToDomain(currentEntity.get());
+        }
+
+        // nếu chưa thì init
+        UserDailyAiUsage userDailyAiUsage = UserDailyAiUsage.init(userId, usageDate);
+        return this.save(userDailyAiUsage);
     }
 
     @Override

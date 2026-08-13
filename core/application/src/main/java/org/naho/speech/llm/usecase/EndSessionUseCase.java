@@ -13,7 +13,6 @@ import org.naho.speech.llm.result.ScoringResult;
 import org.naho.subscription.exception.SubscriptionErrorCode;
 import org.naho.subscription.model.SubscriptionPlan;
 import org.naho.subscription.model.UserDailyAiUsage;
-import org.naho.subscription.port.in.CrudUserDailyAiUsageInputPort;
 import org.naho.subscription.port.out.SubscriptionPlanRepositoryPort;
 import org.naho.subscription.port.out.UserDailyAiUsageRepositoryPort;
 import org.naho.subscription.type.PlanStatus;
@@ -26,7 +25,6 @@ public class EndSessionUseCase implements EndSessionInputPort {
     private final SessionStorePort sessionStorePort;
     private final AiScoringPort aiScoringPort;
     private final SpeakingSessionRepositoryPort speakingSessionRepositoryPort;
-    private final CrudUserDailyAiUsageInputPort crudUserDailyAiUsageInputPort;
     private final SubscriptionPlanRepositoryPort subscriptionPlanRepositoryPort;
     private final UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort;
 
@@ -34,14 +32,12 @@ public class EndSessionUseCase implements EndSessionInputPort {
             SessionStorePort sessionStorePort,
             AiScoringPort aiScoringPort,
             SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
-            CrudUserDailyAiUsageInputPort crudUserDailyAiUsageInputPort,
             SubscriptionPlanRepositoryPort subscriptionPlanRepositoryPort,
             UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort
     ) {
         this.sessionStorePort = sessionStorePort;
         this.aiScoringPort = aiScoringPort;
         this.speakingSessionRepositoryPort = speakingSessionRepositoryPort;
-        this.crudUserDailyAiUsageInputPort = crudUserDailyAiUsageInputPort;
         this.subscriptionPlanRepositoryPort = subscriptionPlanRepositoryPort;
         this.userDailyAiUsageRepositoryPort = userDailyAiUsageRepositoryPort;
     }
@@ -67,15 +63,8 @@ public class EndSessionUseCase implements EndSessionInputPort {
         LocalDate today = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID);
 
         // lấy số lượt dùng của người dùng trong hôm nay
-        UserDailyAiUsage userDailyAiUsage = crudUserDailyAiUsageInputPort
-                .findByUserIdAndUsageDate(userId, today);
-
-        if (userDailyAiUsage == null) {
-            throw new ApplicationException(
-                    SubscriptionErrorCode.USER_DAILY_AI_USAGE_NOT_FOUND,
-                    SubscriptionDetailMessageKey.USER_DAILY_AI_USAGE_NOT_FOUND
-            );
-        }
+        UserDailyAiUsage userDailyAiUsage = userDailyAiUsageRepositoryPort
+                .findByUserIdAndUsageDateCreateIfNotExists(userId, today);
 
         // lấy ra gói đăng kí của người dùng hiện tại
         SubscriptionPlan subscriptionPlan = subscriptionPlanRepositoryPort
