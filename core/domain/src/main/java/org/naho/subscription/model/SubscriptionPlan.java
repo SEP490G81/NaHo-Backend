@@ -83,6 +83,64 @@ public class SubscriptionPlan {
         return price != null && price.isZero();
     }
 
+    public void updateDetails(
+            String description,
+            PlanTier tier,
+            Money price,
+            Integer durationDays,
+            Integer dailySpeakingQuestionEvaluationLimit,
+            Integer maxSpeakingQuestionRecordingSeconds,
+            Integer maxConcurrentAiSessionCount,
+            Integer maxTurnsPerAiSession,
+            Integer dailyAiSessionEvaluationLimit,
+            Integer maxAiTurnSpeakingSeconds,
+            Boolean sampleAnswerEnabled,
+            PlanStatus status) {
+        if (description != null) {
+            this.description = description;
+        }
+        if (tier != null) {
+            this.tier = tier;
+        }
+        if (price != null) {
+            this.price = price;
+        }
+        PlanTier effectiveTier = (tier != null) ? tier : this.tier;
+        if (effectiveTier == PlanTier.FREE) {
+            this.durationDays = null;
+        } else if (durationDays != null) {
+            if (durationDays <= 0) {
+                throw new DomainException(SubscriptionDomainErrorCode.PLAN_DURATION_INVALID,
+                        SubscriptionDetailMessageKey.PLAN_DURATION_INVALID);
+            }
+            this.durationDays = durationDays;
+        }
+        if (dailySpeakingQuestionEvaluationLimit != null) {
+            this.dailySpeakingQuestionEvaluationLimit = dailySpeakingQuestionEvaluationLimit;
+        }
+        if (maxSpeakingQuestionRecordingSeconds != null) {
+            this.maxSpeakingQuestionRecordingSeconds = maxSpeakingQuestionRecordingSeconds;
+        }
+        if (maxConcurrentAiSessionCount != null) {
+            this.maxConcurrentAiSessionCount = maxConcurrentAiSessionCount;
+        }
+        if (maxTurnsPerAiSession != null) {
+            this.maxTurnsPerAiSession = maxTurnsPerAiSession;
+        }
+        if (dailyAiSessionEvaluationLimit != null) {
+            this.dailyAiSessionEvaluationLimit = dailyAiSessionEvaluationLimit;
+        }
+        if (maxAiTurnSpeakingSeconds != null) {
+            this.maxAiTurnSpeakingSeconds = maxAiTurnSpeakingSeconds;
+        }
+        if (sampleAnswerEnabled != null) {
+            this.sampleAnswerEnabled = sampleAnswerEnabled;
+        }
+        if (status != null) {
+            this.status = status;
+        }
+    }
+
     // Getters
     public Long getId() {
         return id;

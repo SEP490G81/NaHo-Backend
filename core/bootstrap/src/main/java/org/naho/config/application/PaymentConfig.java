@@ -22,6 +22,7 @@ import org.naho.subscription.port.out.UserSubscriptionRepositoryPort;
 import org.naho.subscription.usecase.CrudUserDailyAiUsageUseCase;
 import org.naho.subscription.usecase.GetActiveSubscriptionUseCase;
 import org.naho.subscription.usecase.ListActivePlansUseCase;
+import org.naho.subscription.usecase.UpdateSubscriptionPlanUseCase;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -108,6 +109,19 @@ public class PaymentConfig {
     public ListActivePlansInputPort listActivePlansInputPort(
             SubscriptionPlanRepositoryPort planRepositoryPort) {
         return new ListActivePlansUseCase(planRepositoryPort);
+    }
+
+    @Bean
+    public org.naho.subscription.port.in.UpdateSubscriptionPlanInputPort updateSubscriptionPlanInputPort(
+            org.naho.user.port.out.RoleRepositoryPort roleRepositoryPort,
+            SubscriptionPlanRepositoryPort planRepositoryPort,
+            SubscriptionPlanResultMapper planResultMapper,
+            TransactionPort transactionPort) {
+        return new UpdateSubscriptionPlanUseCase(
+                roleRepositoryPort,
+                planRepositoryPort,
+                planResultMapper,
+                transactionPort);
     }
 
     @Bean
