@@ -6,9 +6,14 @@ import org.naho.user.valueobject.Dob;
 import org.naho.user.valueobject.Email;
 import org.naho.user.valueobject.Username;
 
+import java.time.Instant;
 import java.util.List;
 
+import static org.naho.user.constant.UserLoginConstant.LOCK_DURATION_MINUTES;
+import static org.naho.user.constant.UserLoginConstant.MAX_FAILED_ATTEMPTS;
+
 public class User {
+
 
     private final Long id;
     private final Long roleId;
@@ -32,6 +37,8 @@ public class User {
     private Dob dob;
     private UserStatus status;
     private boolean isEmailVerified;
+    private Integer failedLoginAttemptCount;
+    private Instant lockedUntil;
 
     private User(Builder builder) {
         this.id = builder.id;
@@ -56,6 +63,8 @@ public class User {
         this.dob = builder.dob;
         this.status = builder.status;
         this.isEmailVerified = builder.isEmailVerified;
+        this.failedLoginAttemptCount = builder.failedLoginAttemptCount;
+        this.lockedUntil = builder.lockedUntil;
     }
 
     public static User registerNewUser(String rawUsername, String fullName, String hashPassword, String rawEmail, Long roleId) {
@@ -109,7 +118,9 @@ public class User {
                 .gender(gender)
                 .dob(dob)
                 .status(status)
-                .isEmailVerified(isEmailVerified);
+                .isEmailVerified(isEmailVerified)
+                .failedLoginAttemptCount(failedLoginAttemptCount)
+                .lockedUntil(lockedUntil);
     }
 
     public Long getId() {
@@ -225,6 +236,53 @@ public class User {
         this.status = status;
     }
 
+    public Integer getFailedLoginAttemptCount() {
+        return failedLoginAttemptCount;
+    }
+
+    public Instant getLockedUntil() {
+        return lockedUntil;
+    }
+
+    /**
+     * Kiểm tra tài khoản có đang bị khoá tạm thời hay không.
+     *
+     * @param now thời điểm hiện tại
+     * @return true nếu tài khoản đang bị khoá
+     */
+    public boolean isLockedByLoginFailed(Instant now) {
+        return lockedUntil != null && !now.isAfter(lockedUntil);
+    }
+
+    /**
+     * Tăng số lần đăng nhập thất bại. Nếu đạt ngưỡng MAX_FAILED_ATTEMPTS,
+     * tài khoản sẽ bị khoá tạm thời trong LOCK_DURATION_MINUTES phút.
+     *
+     * @param now thời điểm hiện tại
+     */
+    public void incrementFailedLoginAttempt(Instant now) {
+        int currentCount = this.failedLoginAttemptCount == null ? 0 : this.failedLoginAttemptCount;
+
+        int newCount = currentCount + 1;
+
+        // nếu số lần đăng nhập thất bại >= giới hạn thì lock
+        if (newCount >= MAX_FAILED_ATTEMPTS) {
+            this.lockedUntil = now.plus(LOCK_DURATION_MINUTES);
+            this.failedLoginAttemptCount = 0;
+            return;
+        }
+
+        this.failedLoginAttemptCount = newCount;
+    }
+
+    /**
+     * Reset trạng thái lock của tài khoản
+     */
+    public void resetFailedLoginAttempt() {
+        this.failedLoginAttemptCount = 0;
+        this.lockedUntil = null;
+    }
+
     public static final class Builder {
 
         private Long id;
@@ -252,6 +310,8 @@ public class User {
 
         private UserStatus status;
         private boolean isEmailVerified;
+        private Integer failedLoginAttemptCount;
+        private Instant lockedUntil;
 
         private Builder() {
         }
@@ -364,6 +424,16 @@ public class User {
 
         public Builder isEmailVerified(boolean isEmailVerified) {
             this.isEmailVerified = isEmailVerified;
+            return this;
+        }
+
+        public Builder failedLoginAttemptCount(Integer failedLoginAttemptCount) {
+            this.failedLoginAttemptCount = failedLoginAttemptCount;
+            return this;
+        }
+
+        public Builder lockedUntil(Instant lockedUntil) {
+            this.lockedUntil = lockedUntil;
             return this;
         }
 
