@@ -7,11 +7,10 @@ import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.file.result.FileResult;
 import org.naho.file.result.StoredFile;
-import org.naho.notification.event.SendNotificationEvent;
-import org.naho.notification.type.NotificationType;
 import org.naho.shared.port.out.EventPublisherPort;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.social.report.command.CreateReportCommand;
+import org.naho.social.report.event.ReportCreatedEvent;
 import org.naho.social.report.mapper.ReportResultMapper;
 import org.naho.social.report.model.Report;
 import org.naho.social.report.port.in.CreateReportInputPort;
@@ -92,24 +91,11 @@ public class CreateReportUseCase implements CreateReportInputPort {
         // Lấy danh sách tất cả Admin thực tế
         List<User> admins = userRepositoryPort.findByFilters(null, "ADMIN", null);
 
-        String reporterName = userRepositoryPort.findById(command.userId())
-                .map(u -> (u.getFullName() != null && !u.getFullName().isBlank()) ? u.getFullName() : "Một người dùng")
-                .orElse("Một người dùng");
-
-        String targetUrl = "/admin/reports/" + savedReport.getId();
-        String metadata = "{\"reportId\": " + savedReport.getId() + ", \"reportType\": \"" + savedReport.getReportType()
-                + "\"}";
-
-        for (User admin : admins) {
-            eventPublisherPort.publish(new SendNotificationEvent(
-                    this,
-                    admin.getId(),
-                    NotificationType.REPORT,
-                    "Có báo cáo mới",
-                    reporterName + " vừa gửi một báo cáo mới",
-                    targetUrl,
-                    metadata));
-        }
+        eventPublisherPort.publish(new ReportCreatedEvent(
+                command.userId(),
+                savedReport.getId(),
+                savedReport.getReportType().name()
+        ));
 
         return reportResultMapper.domainToResult(savedReport);
     }

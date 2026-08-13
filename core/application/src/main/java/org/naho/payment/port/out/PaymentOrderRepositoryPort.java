@@ -1,5 +1,7 @@
 package org.naho.payment.port.out;
 
+import org.naho.pagination.PageData;
+import org.naho.payment.command.PaymentOrderQueryCommand;
 import org.naho.payment.model.PaymentOrder;
 
 import java.time.Instant;
@@ -20,6 +22,8 @@ public interface PaymentOrderRepositoryPort {
     Optional<PaymentOrder> findPendingByUserId(Long userId);
 
     List<PaymentOrder> findAllByUserId(Long userId);
+
+    PageData<PaymentOrder> findAllPaymentOrders(PaymentOrderQueryCommand command);
 
     void expirePendingBefore(Instant now);
 }

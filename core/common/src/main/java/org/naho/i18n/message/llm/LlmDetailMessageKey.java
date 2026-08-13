@@ -11,6 +11,8 @@ public final class LlmDetailMessageKey {
     public static final String LLM_SESSION_ALREADY_COMPLETED = "ai.application.session.already.completed";
     public static final String LLM_SESSION_TURN_LIMIT_EXCEEDED = "ai.application.session.turn.limit.exceeded";
     public static final String LLM_SESSION_CONCURRENT_LIMIT_EXCEEDED = "ai.application.session.concurrent.limit.exceeded";
+    public static final String LLM_DAILY_LIMIT_EXCEEDED = "ai.application.session.daily_limit_exceeded";
+    public static final String LLM_SAVE_SESSION_FAILED = "ai.application.session.save_failed";
 
     private LlmDetailMessageKey() {
     }

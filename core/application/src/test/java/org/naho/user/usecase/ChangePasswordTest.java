@@ -9,7 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.exception.DomainException;
-import org.naho.shared.port.out.EmailPort;
+import org.naho.shared.port.out.EventPublisherPort;
 import org.naho.user.command.ChangePasswordCommand;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.model.User;
@@ -29,7 +29,7 @@ class ChangePasswordTest {
     @Mock
     private EncoderPort encoderPort;
     @Mock
-    private EmailPort emailPort;
+    private EventPublisherPort eventPublisherPort;
 
     @InjectMocks
     private ChangePasswordUseCase changePasswordUseCase;
@@ -63,7 +63,7 @@ class ChangePasswordTest {
         verify(userRepositoryPort, times(1)).findById(1L);
         verify(encoderPort, times(1)).hashPassword("NewPassword123@");
         verify(userRepositoryPort, times(1)).save(user);
-        verify(emailPort, times(1)).sendPasswordChangedEmail(anyString(), any());
+        verify(eventPublisherPort, times(1)).publish(any());
         assertEquals("$2a$10$newHashedPassword", user.getHashPassword());
     }
 

@@ -14,7 +14,6 @@ import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.naho.question.port.in.CompleteSpeakingQuestionInputPort;
 import org.naho.question.port.out.AnswerHistoryRepositoryPort;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
-import org.naho.subscription.port.out.UserDailyAiUsageRepositoryPort;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
 import org.naho.speech.azure.port.out.TextToSpeechServicePort;
@@ -24,6 +23,8 @@ import org.naho.speech.llm.port.in.*;
 import org.naho.speech.llm.port.out.*;
 import org.naho.speech.llm.usecase.*;
 import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
+import org.naho.subscription.port.out.SubscriptionPlanRepositoryPort;
+import org.naho.subscription.port.out.UserDailyAiUsageRepositoryPort;
 import org.naho.user.port.out.UserRepositoryPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -97,9 +98,17 @@ public class ChatConfig {
     public EndSessionInputPort endSessionInputPort(
             SessionStorePort sessionStorePort,
             AiScoringPort aiScoringPort,
-            SpeakingSessionRepositoryPort speakingSessionRepositoryPort
+            SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
+            SubscriptionPlanRepositoryPort subscriptionPlanRepositoryPort,
+            UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort
     ) {
-        return new EndSessionUseCase(sessionStorePort, aiScoringPort, speakingSessionRepositoryPort);
+        return new EndSessionUseCase(
+                sessionStorePort,
+                aiScoringPort,
+                speakingSessionRepositoryPort,
+                subscriptionPlanRepositoryPort,
+                userDailyAiUsageRepositoryPort
+        );
     }
 
     @Bean

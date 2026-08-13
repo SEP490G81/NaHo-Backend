@@ -1,13 +1,22 @@
 package org.naho.payment.adapter;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.pagination.PageData;
+import org.naho.pagination.PageMeta;
+import org.naho.payment.command.PaymentOrderQueryCommand;
 import org.naho.payment.entity.PaymentOrderEntity;
 import org.naho.payment.mapper.PaymentOrderEntityMapper;
 import org.naho.payment.model.PaymentOrder;
 import org.naho.payment.port.out.PaymentOrderRepositoryPort;
 import org.naho.payment.repository.PaymentOrderJpaRepository;
+import org.naho.payment.specification.PaymentOrderSpecification;
 import org.naho.subscription.entity.SubscriptionPlanEntity;
 import org.naho.subscription.repository.SubscriptionPlanJpaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -73,6 +82,48 @@ public class PaymentOrderRepositoryAdapter implements PaymentOrderRepositoryPort
                 .toList();
     }
 
+    @Override
+    public PageData<PaymentOrder> findAllPaymentOrders(PaymentOrderQueryCommand command) {
+        Pageable pageable = PageRequest.of(
+                command.page() != null ? command.page() : 0,
+                command.size() != null ? command.size() : 20,
+                Sort.by(
+                        Sort.Direction.valueOf(command.sortDirection() != null ? command.sortDirection().name() : "DESC"),
+                        command.sortColumn() != null ? command.sortColumn().getColumnName() : "createdTime"
+                )
+        );
+
+        Specification<PaymentOrderEntity> searchKeywordSpecification = Specification.anyOf(
+                PaymentOrderSpecification.hasOrderCode(command.searchKeyword()),
+                PaymentOrderSpecification.hasProviderTransactionId(command.searchKeyword())
+        );
+
+        Specification<PaymentOrderEntity> specification = Specification.allOf(
+                searchKeywordSpecification,
+                PaymentOrderSpecification.hasUserId(command.userId()),
+                PaymentOrderSpecification.hasStatus(command.status()),
+                PaymentOrderSpecification.hasProvider(command.provider()),
+                PaymentOrderSpecification.createdTimeBetween(command.createdTimeFrom(), command.createdTimeTo())
+        );
+
+        Page<PaymentOrderEntity> page = orderJpaRepository.findAll(specification, pageable);
+
+        return PageData.<PaymentOrder>builder()
+                .pageMeta(PageMeta.builder()
+                        .currentPage(page.getNumber())
+                        .pageSize(page.getSize())
+                        .totalPages(page.getTotalPages())
+                        .totalElements(page.getTotalElements())
+                        .hasNext(page.hasNext())
+                        .hasPrevious(page.hasPrevious())
+                        .build())
+                .data(page.getContent()
+                        .stream()
+                        .map(orderEntityMapper::entityToDomain)
+                        .toList()
+                )
+                .build();
+    }
 
     @Override
     public void expirePendingBefore(Instant now) {

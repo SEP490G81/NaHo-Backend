@@ -11,11 +11,15 @@ import org.naho.payment.usecase.CreatePaymentUseCase;
 import org.naho.payment.usecase.GetPaymentUseCase;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.subscription.mapper.SubscriptionPlanResultMapper;
+import org.naho.subscription.mapper.UserDailyAiUsageResultMapper;
 import org.naho.subscription.mapper.UserSubscriptionResultMapper;
+import org.naho.subscription.port.in.CrudUserDailyAiUsageInputPort;
 import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
 import org.naho.subscription.port.in.ListActivePlansInputPort;
 import org.naho.subscription.port.out.SubscriptionPlanRepositoryPort;
+import org.naho.subscription.port.out.UserDailyAiUsageRepositoryPort;
 import org.naho.subscription.port.out.UserSubscriptionRepositoryPort;
+import org.naho.subscription.usecase.CrudUserDailyAiUsageUseCase;
 import org.naho.subscription.usecase.GetActiveSubscriptionUseCase;
 import org.naho.subscription.usecase.ListActivePlansUseCase;
 import org.naho.user.port.out.UserRepositoryPort;
@@ -128,6 +132,22 @@ public class PaymentConfig {
                 subscriptionPlanResultMapper,
                 userSubscriptionResultMapper,
                 userSubscriptionRepositoryPort
+        );
+    }
+
+    @Bean
+    public UserDailyAiUsageResultMapper userDailyAiUsageResultMapper() {
+        return new UserDailyAiUsageResultMapper();
+    }
+
+    @Bean
+    public CrudUserDailyAiUsageInputPort crudUserDailyAiUsageInputPort(
+            UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort,
+            UserDailyAiUsageResultMapper userDailyAiUsageResultMapper
+    ) {
+        return new CrudUserDailyAiUsageUseCase(
+                userDailyAiUsageRepositoryPort,
+                userDailyAiUsageResultMapper
         );
     }
 }

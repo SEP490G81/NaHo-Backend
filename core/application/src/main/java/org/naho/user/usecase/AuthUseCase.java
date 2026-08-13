@@ -1,11 +1,11 @@
 package org.naho.user.usecase;
 
+import org.naho.email.port.out.EmailPort;
 import org.naho.i18n.message.user.RoleDetailMessageKey;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.i18n.message.user.UserTitleMessageKey;
 import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
 import org.naho.shared.exception.ApplicationException;
-import org.naho.shared.port.out.EmailPort;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.user.command.CredentialsLoginCommand;
 import org.naho.user.command.ForceLogoutCommand;

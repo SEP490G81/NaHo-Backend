@@ -8,6 +8,7 @@ public final class LlmTitleMessageKey {
     public static final String LLM_SESSION_NOT_FOUND_TITLE = "Speaking session not found";
     public static final String LLM_SESSION_TURN_LIMIT_EXCEEDED_TITLE = "Session turn limit exceeded";
     public static final String LLM_SESSION_CONCURRENT_LIMIT_EXCEEDED_TITLE = "Concurrent session limit exceeded";
+    public static final String LLM_DAILY_LIMIT_EXCEEDED_TITLE = "Daily AI speaking session evaluation limit reached";
 
     private LlmTitleMessageKey() {
     }

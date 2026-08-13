@@ -28,7 +28,6 @@ import org.naho.speech.llm.port.in.SuggestedTopicsInputPort;
 import org.naho.speech.llm.result.*;
 import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
 import org.naho.subscription.result.SubscriptionPlanResult;
-import org.naho.subscription.type.PlanCode;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

@@ -2,7 +2,7 @@ package org.naho.user.adapter.listener;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.naho.shared.port.out.EmailPort;
+import org.naho.email.port.out.EmailPort;
 import org.naho.user.event.UserPlanUpgradedEvent;
 import org.naho.user.model.User;
 import org.naho.user.port.out.UserRepositoryPort;

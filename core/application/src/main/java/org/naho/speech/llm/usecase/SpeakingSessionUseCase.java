@@ -9,6 +9,7 @@ import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.result.StoredFile;
 import org.naho.i18n.message.llm.LlmDetailMessageKey;
 import org.naho.i18n.message.persona.PersonaDetailMessageKey;
+import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.pagination.PageData;
 import org.naho.persona.exception.PersonaErrorCode;
 import org.naho.persona.model.Persona;
@@ -16,8 +17,6 @@ import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.naho.persona.type.FormalityLevel;
 import org.naho.persona.type.MarugotoLevel;
 import org.naho.shared.exception.ApplicationException;
-import org.naho.user.exception.UserErrorCode;
-import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.speech.azure.port.out.TextToSpeechServicePort;
 import org.naho.speech.llm.command.SendAudioMessageCommand;
 import org.naho.speech.llm.command.SendMessageWithSessionCommand;
@@ -32,6 +31,7 @@ import org.naho.speech.llm.port.out.SpeechToTextPort;
 import org.naho.speech.llm.result.*;
 import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
 import org.naho.subscription.result.SubscriptionPlanResult;
+import org.naho.user.exception.UserErrorCode;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -88,15 +88,17 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     private final UploadFileInputPort uploadFileInputPort;
     private final GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
 
-    public SpeakingSessionUseCase(AiChatPort aiChatPort,
-                                  SessionStorePort sessionStorePort,
-                                  SpeechToTextPort speechToTextPort,
-                                  PersonaRepositoryPort personaRepositoryPort,
-                                  TextToSpeechServicePort textToSpeechServicePort,
-                                  SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
-                                  FileRepositoryPort fileRepositoryPort,
-                                  UploadFileInputPort uploadFileInputPort,
-                                  GetActiveSubscriptionInputPort getActiveSubscriptionInputPort) {
+    public SpeakingSessionUseCase(
+            AiChatPort aiChatPort,
+            SessionStorePort sessionStorePort,
+            SpeechToTextPort speechToTextPort,
+            PersonaRepositoryPort personaRepositoryPort,
+            TextToSpeechServicePort textToSpeechServicePort,
+            SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
+            FileRepositoryPort fileRepositoryPort,
+            UploadFileInputPort uploadFileInputPort,
+            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort
+    ) {
         this.aiChatPort = aiChatPort;
         this.sessionStorePort = sessionStorePort;
         this.speechToTextPort = speechToTextPort;

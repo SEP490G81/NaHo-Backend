@@ -51,6 +51,7 @@ import org.naho.speech.model.AnswerHistory;
 import org.naho.speech.model.ContentAssessment;
 import org.naho.speech.model.SpeechAssessment;
 import org.naho.speech.model.WordAssessment;
+import org.naho.subscription.model.UserDailyAiUsage;
 import org.naho.subscription.port.out.UserDailyAiUsageRepositoryPort;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.model.User;
@@ -125,6 +126,24 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     @Override
     public SpeakingAnalysisResult analyzeSpeaking(SpeakingAnalysisCommand command) {
         LocalDate today = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID);
+
+        UserDailyAiUsage userDailyAiUsage = userDailyAiUsageRepositoryPort
+                .findByUserIdAndUsageDateCreateIfNotExists(command.userId(), today);
+
+        // nếu người dùng đã sử dụng hết lượt đánh giá trong ngày hôm nay
+        if (userDailyAiUsage.getSpeakingEvaluationCount() >= command.dailySpeakingQuestionEvaluationLimit()) {
+            throw new ApplicationException(
+                    SpeakingQuestionErrorCode.SPEAKING_QUESTION_DAILY_LIMIT_EXCEEDED,
+                    SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_DAILY_LIMIT_EXCEEDED
+            );
+        }
+
+        // tăng số lần đánh giá AI với speaking question của người dùng trong ngày hôm nay lên 1
+        userDailyAiUsage.increaseSpeakingEvaluationCount();
+
+        // lưu
+        userDailyAiUsageRepositoryPort.save(userDailyAiUsage);
+
         // DB-R & VALID & DB-W (TX 1): Chuẩn bị context và tạo bản ghi ban đầu
         AnalysisContext ctx = transactionPort.execute(() -> prepareAnalysis(command));
 
@@ -348,10 +367,10 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         double fluencyScore10 = azureResult.getFluencyScore() != null
                 ? azureResult.getFluencyScore() / 10.0 : 0.0;
 
-        double vocabScore = 0.0;
-        double grammarScore = 0.0;
-        double naturalnessScore = 0.0;
-        double overallScore = 0.0;
+        double vocabScore;
+        double grammarScore;
+        double naturalnessScore;
+        double overallScore;
         String enrichedFeedbackJson;
 
         try {
@@ -366,9 +385,10 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                     root, azureResult, vocabScore, grammarScore, naturalnessScore, overallScore, durationSec);
         } catch (Exception e) {
             e.printStackTrace();
-            overallScore = Math.round(((pronScore10 + fluencyScore10) / 2.0) * 10.0) / 10.0;
-            enrichedFeedbackJson = buildFallbackFeedbackJson(
-                    vocabScore, grammarScore, naturalnessScore, overallScore, durationSec);
+            throw new ApplicationException(
+                    SpeakingQuestionErrorCode.SPEAKING_QUESTION_EVALUATION_FAILED,
+                    SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_EVALUATION_FAILED
+            );
         }
 
         return new ParsedScores(vocabScore, grammarScore, naturalnessScore, overallScore, enrichedFeedbackJson);

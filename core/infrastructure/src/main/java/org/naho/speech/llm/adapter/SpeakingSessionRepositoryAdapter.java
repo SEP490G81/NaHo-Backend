@@ -3,6 +3,11 @@ package org.naho.speech.llm.adapter;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.naho.file.entity.FileEntity;
+import org.naho.file.mapper.FileEntityMapper;
+import org.naho.file.model.File;
+import org.naho.file.port.out.FileStorageServicePort;
+import org.naho.file.repository.FileJpaRepository;
 import org.naho.pagination.PageData;
 import org.naho.pagination.PageMeta;
 import org.naho.speech.llm.command.SpeakingSessionFilterCommand;
@@ -26,12 +31,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import org.naho.file.entity.FileEntity;
-import org.naho.file.mapper.FileEntityMapper;
-import org.naho.file.model.File;
-import org.naho.file.port.out.FileStorageServicePort;
-import org.naho.file.repository.FileJpaRepository;
 
 import java.time.Instant;
 import java.util.*;

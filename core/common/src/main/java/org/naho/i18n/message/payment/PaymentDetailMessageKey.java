@@ -22,6 +22,10 @@ public final class PaymentDetailMessageKey {
     public static final String PAYMENT_ORDER_GET_SUCCESS = "payment.order.get_success";
     public static final String PAYMENT_ORDER_CANCEL_SUCCESS = "payment.order.cancel_success";
 
+    public static final String PAYMENT_PAGE_INVALID = "payment.page.invalid";
+    public static final String PAYMENT_SIZE_INVALID = "payment.size.invalid";
+    public static final String PAYMENT_CREATED_TIME_RANGE_INVALID = "payment.created_time_range.invalid";
+
     private PaymentDetailMessageKey() {
     }
 }

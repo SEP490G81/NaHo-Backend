@@ -9,6 +9,6 @@ public record RegisterRequest(
         String email,
         @NotBlank(message = "{USER_FULL_NAME_REQUIRED}")
         @Size(min = 2, max = 100, message = "{USER_FULL_NAME_INVALID_LENGTH}")
-        String fullName
+        String fullname
 ) {
 }

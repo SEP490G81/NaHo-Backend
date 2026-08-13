@@ -39,6 +39,4 @@ public class NotificationEntity extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     String targetUrl;
 
-    @Column(columnDefinition = "TEXT")
-    String metadata;
 }

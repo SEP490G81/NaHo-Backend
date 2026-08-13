@@ -35,6 +35,14 @@ public class UserDailyAiUsage {
         return new Builder();
     }
 
+    public void increaseSpeakingEvaluationCount() {
+        this.speakingEvaluationCount++;
+    }
+
+    public void increaseAiSessionEvaluationCount() {
+        this.aiSessionEvaluationCount++;
+    }
+
     public Long getId() {
         return id;
     }

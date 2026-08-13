@@ -2,14 +2,13 @@ package org.naho.social.comment.usecase;
 
 import org.naho.i18n.message.social.CommentDetailMessageKey;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
-import org.naho.notification.event.SendNotificationEvent;
-import org.naho.notification.type.NotificationType;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.EventPublisherPort;
 import org.naho.social.comment.command.CommentCreateCommand;
 import org.naho.social.comment.command.CommentDeleteCommand;
 import org.naho.social.comment.command.CommentReadCommand;
 import org.naho.social.comment.command.CommentUpdateCommand;
+import org.naho.social.comment.event.CommentRepliedEvent;
 import org.naho.social.comment.exception.CommentErrorCode;
 import org.naho.social.comment.mapper.CommentDomainMapper;
 import org.naho.social.comment.mapper.CommentListResultMapper;
@@ -72,23 +71,11 @@ public class CommentCrudUseCase implements CommentCrudInputPort {
         Comment commentSaved = commentRepositoryPort.save(newComment);
 
         if (parentComment != null && !parentComment.getUserId().equals(commentSaved.getUserId())) {
-            String actorName = userRepositoryPort.findById(commentSaved.getUserId())
-                    .map(u -> (u.getFullName() != null && !u.getFullName().isBlank()) ? u.getFullName() : "Một người dùng")
-                    .orElse("Một người dùng");
-
-            String metadata = "{\"questionId\": " + commentSaved.getQuestionId() + ", \"commentId\": " + commentSaved.getId() + "}";
-            String targetUrl = learningPathNodeRepositoryPort.getFrontendUrlPath(commentSaved.getQuestionId())
-                    .map(path -> path + "#comment-" + commentSaved.getId())
-                    .orElse("/speaking-questions/" + commentSaved.getQuestionId() + "#comment-" + commentSaved.getId());
-
-            eventPublisherPort.publish(new SendNotificationEvent(
-                    this,
+            eventPublisherPort.publish(new CommentRepliedEvent(
                     parentComment.getUserId(),
-                    NotificationType.SOCIAL,
-                    "Có người trả lời bình luận của bạn",
-                    actorName + " vừa trả lời bình luận của bạn. Nhấn vào để xem chi tiết.",
-                    targetUrl,
-                    metadata
+                    commentSaved.getUserId(),
+                    commentSaved.getQuestionId(),
+                    commentSaved.getId()
             ));
         }
 
