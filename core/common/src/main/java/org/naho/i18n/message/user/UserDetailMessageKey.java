@@ -109,6 +109,8 @@ public final class UserDetailMessageKey {
     public static final String USER_SIZE_INVALID = "user.size.invalid";
     public static final String USER_DOB_RANGE_INVALID = "user.dob.range.invalid";
 
+    public static final String USER_ACCOUNT_LOCKED = "user.account.locked";
+
     private UserDetailMessageKey() {
     }
 }

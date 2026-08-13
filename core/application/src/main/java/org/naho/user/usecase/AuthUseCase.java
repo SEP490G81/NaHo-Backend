@@ -85,7 +85,21 @@ public class AuthUseCase implements AuthInputPort {
                         UserErrorCode.USER_LOGIN_FAILED,
                         UserDetailMessageKey.USER_WRONG_LOGIN_INFO));
 
+        Instant now = Instant.now();
+
+        // kiểm tra tài khoản có đang bị khoá tạm thời không
+        if (user.isLocked(now)) {
+            long remainingMinutes = (user.getLockedUntil().getEpochSecond() - now.getEpochSecond() + 59) / 60;
+            throw new ApplicationException(
+                    UserErrorCode.USER_ACCOUNT_LOCKED,
+                    UserDetailMessageKey.USER_ACCOUNT_LOCKED,
+                    remainingMinutes);
+        }
+
         if (!encoderPort.matches(command.rawPassword(), user.getHashPassword())) {
+            // tăng số lần đăng nhập sai và lưu lại
+            user.incrementFailedLoginAttempt(now);
+            userRepositoryPort.save(user);
             throw new ApplicationException(
                     UserErrorCode.USER_LOGIN_FAILED,
                     UserDetailMessageKey.USER_WRONG_LOGIN_INFO);
@@ -111,13 +125,15 @@ public class AuthUseCase implements AuthInputPort {
             );
         }
 
+        // reset số lần đăng nhập sai sau khi đăng nhập thành công
+        user.resetFailedLoginAttempt();
+        userRepositoryPort.save(user);
+
         // thu hồi toàn bộ session khác
         userSessionServicePort.revokeAllActiveSessionsByUserId(
                 user.getId(),
                 SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
         );
-
-        Instant now = Instant.now();
 
         TokenResult refreshToken = tokenServicePort.generateRefreshToken(now);
 
