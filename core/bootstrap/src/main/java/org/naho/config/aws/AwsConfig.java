@@ -1,6 +1,9 @@
 package org.naho.config.aws;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.cost.port.in.GetAwsCostInputPort;
+import org.naho.cost.port.out.AwsCostRepositoryPort;
+import org.naho.cost.usecase.AwsCostUseCase;
 import org.naho.file.constant.S3Properties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,8 +32,7 @@ public class AwsConfig {
     @Bean
     public S3Client s3Client(
             AwsCredentialsProvider credentialsProvider,
-            Region region
-    ) {
+            Region region) {
         return S3Client.builder()
                 .credentialsProvider(credentialsProvider)
                 .region(region)
@@ -40,8 +42,7 @@ public class AwsConfig {
     @Bean
     public S3Presigner s3Presigner(
             AwsCredentialsProvider credentialsProvider,
-            Region region
-    ) {
+            Region region) {
         return S3Presigner.builder()
                 .credentialsProvider(credentialsProvider)
                 .region(region)
@@ -51,11 +52,15 @@ public class AwsConfig {
     @Bean
     public CostExplorerClient costExplorerClient(
             AwsCredentialsProvider credentialsProvider,
-            Region region
-    ) {
+            Region region) {
         return CostExplorerClient.builder()
                 .credentialsProvider(credentialsProvider)
                 .region(region)
                 .build();
+    }
+
+    @Bean
+    public GetAwsCostInputPort getAwsCostInputPort(AwsCostRepositoryPort awsCostRepositoryPort) {
+        return new AwsCostUseCase(awsCostRepositoryPort);
     }
 }
