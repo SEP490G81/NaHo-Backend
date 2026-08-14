@@ -17,7 +17,7 @@ import java.time.LocalDate;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class AzureDailyCostInitializer7 implements ApplicationRunner {
+public class AzureDailyCostInitializer8 implements ApplicationRunner {
     private final SyncAzureCostInputPort syncAzureCostInputPort;
     private final AzureDailyCostJpaRepository azureDailyCostJpaRepository;
 
