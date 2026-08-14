@@ -75,6 +75,7 @@ public class User {
                 .hashPassword(hashPassword)
                 .status(UserStatus.ACTIVE)
                 .isEmailVerified(false)
+                .failedLoginAttemptCount(0)
                 .roleId(roleId)
                 .build();
     }

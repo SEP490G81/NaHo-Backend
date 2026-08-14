@@ -277,26 +277,12 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         Map<String, String> systemPrompt = new HashMap<>();
         systemPrompt.put("role", "system");
         systemPrompt.put("content", systemPromptTemplate);
-//        if ("system".equals(history.get(0).get("role"))) {
-//            systemPrompt = history.get(0);
-//        }
-
-        int totalMessages = history.size();
-        int nonSystemStartIndex = (systemPrompt != null) ? 1 : 0;
-        int nonSystemCount = totalMessages - nonSystemStartIndex;
-
-//        if (nonSystemCount <= MAX_SLIDING_WINDOW_MESSAGES) {
-//            return history;
-//        }
 
         List<Map<String, String>> slidingWindow = new ArrayList<>();
 
-        int fromIndex = totalMessages - MAX_SLIDING_WINDOW_MESSAGES;
-        slidingWindow.addAll(history.subList(fromIndex, totalMessages));
+        slidingWindow.addAll(history);
 
-        if (systemPrompt != null) {
-            slidingWindow.add(systemPrompt);
-        }
+        slidingWindow.add(systemPrompt);
         return slidingWindow;
     }
 
