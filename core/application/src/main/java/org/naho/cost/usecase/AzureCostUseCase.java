@@ -1,12 +1,14 @@
 package org.naho.cost.usecase;
 
 import org.naho.cost.command.AzureCostQueryCommand;
+import org.naho.cost.constant.CostProperties;
 import org.naho.cost.model.AzureDailyCost;
 import org.naho.cost.port.in.GetAzureCostInputPort;
 import org.naho.cost.port.out.AzureCostRepositoryPort;
 import org.naho.cost.result.AzureCostChartResult;
 import org.naho.cost.result.AzureCostPointResult;
 import org.naho.cost.result.AzureCostSummaryResult;
+import org.naho.shared.constant.SystemZoneId;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -25,13 +27,13 @@ public class AzureCostUseCase implements GetAzureCostInputPort {
 
     @Override
     public AzureCostSummaryResult getSummary() {
-        LocalDate startDate = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
-        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID).with(TemporalAdjusters.firstDayOfMonth());
+        LocalDate endDate = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID);
 
         BigDecimal totalCost = azureCostRepositoryPort.sumCostBetween(startDate, endDate)
                 .orElse(BigDecimal.ZERO);
 
-        return new AzureCostSummaryResult(totalCost, "USD", "MonthToDate");
+        return new AzureCostSummaryResult(totalCost, CostProperties.USD_CURRENCY, "MonthToDate");
     }
 
     @Override
@@ -52,8 +54,8 @@ public class AzureCostUseCase implements GetAzureCostInputPort {
                 fromDate = command.getFromDate().toLocalDate();
                 toDate = command.getToDate().toLocalDate();
             } else {
-                fromDate = LocalDate.now().minusDays(30);
-                toDate = LocalDate.now();
+                fromDate = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID).minusDays(30);
+                toDate = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID);
             }
 
             List<AzureDailyCost> dailyCosts = azureCostRepositoryPort.findDailyCostsBetween(fromDate, toDate);
@@ -65,23 +67,23 @@ public class AzureCostUseCase implements GetAzureCostInputPort {
                 BigDecimal cost = daily.getCostAmount() != null ? daily.getCostAmount() : BigDecimal.ZERO;
                 totalAccumulated = totalAccumulated.add(cost);
                 String dateStr = daily.getRecordDate() != null ? daily.getRecordDate().format(formatter) : "";
-                String currency = daily.getCurrency() != null ? daily.getCurrency() : "USD";
+                String currency = daily.getCurrency() != null ? daily.getCurrency() : CostProperties.USD_CURRENCY;
                 points.add(new AzureCostPointResult(dateStr, cost, currency));
             }
 
-            return new AzureCostChartResult(totalAccumulated, "USD", "Daily", points);
+            return new AzureCostChartResult(totalAccumulated, CostProperties.USD_CURRENCY, "Daily", points);
         } else {
             // Default: Monthly
             LocalDate startDate;
             if ("Last3Months".equalsIgnoreCase(timeframe)) {
-                startDate = LocalDate.now().minusMonths(2).with(TemporalAdjusters.firstDayOfMonth());
+                startDate = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID).minusMonths(2).with(TemporalAdjusters.firstDayOfMonth());
             } else if ("Last12Months".equalsIgnoreCase(timeframe)) {
-                startDate = LocalDate.now().minusMonths(11).with(TemporalAdjusters.firstDayOfMonth());
-            } else if ("Custom".equalsIgnoreCase(timeframe) && command != null && command.getFromDate() != null) {
+                startDate = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID).minusMonths(11).with(TemporalAdjusters.firstDayOfMonth());
+            } else if ("Custom".equalsIgnoreCase(timeframe) && command.getFromDate() != null) {
                 startDate = command.getFromDate().toLocalDate().with(TemporalAdjusters.firstDayOfMonth());
             } else {
                 // Last6Months default
-                startDate = LocalDate.now().minusMonths(5).with(TemporalAdjusters.firstDayOfMonth());
+                startDate = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID).minusMonths(5).with(TemporalAdjusters.firstDayOfMonth());
             }
 
             List<AzureCostPointResult> points = azureCostRepositoryPort.findMonthlyCostsSummary(startDate);
@@ -91,7 +93,7 @@ public class AzureCostUseCase implements GetAzureCostInputPort {
                     totalAccumulated = totalAccumulated.add(p.getCost());
                 }
             }
-            return new AzureCostChartResult(totalAccumulated, "USD", "Monthly", points);
+            return new AzureCostChartResult(totalAccumulated, CostProperties.USD_CURRENCY, "Monthly", points);
         }
     }
 }

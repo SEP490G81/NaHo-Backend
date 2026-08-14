@@ -1,6 +1,7 @@
 package org.naho.cost.adapter;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.cost.constant.CostProperties;
 import org.naho.cost.entity.AwsDailyCostEntity;
 import org.naho.cost.mapper.AwsDailyCostMapper;
 import org.naho.cost.model.AwsDailyCost;
@@ -47,7 +48,7 @@ public class AwsDailyCostRepositoryClient implements AwsCostRepositoryPort {
             results.add(new AwsCostPointResult(
                     proj.getDateOrMonth(),
                     proj.getCost() != null ? proj.getCost() : BigDecimal.ZERO,
-                    proj.getCurrency() != null ? proj.getCurrency() : "USD"));
+                    proj.getCurrency() != null ? proj.getCurrency() : CostProperties.USD_CURRENCY));
         }
         return results;
     }

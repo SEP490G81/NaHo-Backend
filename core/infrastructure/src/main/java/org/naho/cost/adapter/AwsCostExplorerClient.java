@@ -17,28 +17,6 @@ public class AwsCostExplorerClient {
     private final CostExplorerClient costExplorerClient;
 
     /**
-     * Method trả về GetCostAndUsageResponse từ AWS
-     * AWS sẽ lấy data theo [start, end) nên phải cho end = recordDate + 1
-     *
-     * @param recordDate ngày muốn lấy ra data
-     * @return GetCostAndUsageResponse
-     */
-    public GetCostAndUsageResponse getDailyCost(LocalDate recordDate) {
-        GetCostAndUsageRequest request = GetCostAndUsageRequest.builder()
-                .timePeriod(interval -> interval
-                        .start(recordDate.toString())
-                        .end(recordDate.plusDays(1).toString())
-                )
-                // lấy dữ liệu theo ngày
-                .granularity(Granularity.DAILY)
-                // chi phí AWS được tính theo đơn giá của từng dịch vụ (không trộn lại với nhau)
-                .metrics(CostProperties.UNBLENDED_COST)
-                .build();
-
-        return costExplorerClient.getCostAndUsage(request);
-    }
-
-    /**
      * Method lấy cost data từ [from, end]
      *
      * @param from từ ngày

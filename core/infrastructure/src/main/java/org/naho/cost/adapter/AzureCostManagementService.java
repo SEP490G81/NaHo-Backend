@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.naho.cost.constant.AzureCostConfigProperties;
+import org.naho.cost.constant.CostProperties;
 import org.naho.cost.model.AzureDailyCost;
 import org.naho.cost.port.out.AzureCostManagementPort;
 import org.naho.i18n.message.speech.SpeechDetailMessageKey;
@@ -99,7 +100,7 @@ public class AzureCostManagementService implements AzureCostManagementPort {
                 for (JsonNode row : rows) {
                     BigDecimal cost = BigDecimal.ZERO;
                     LocalDate usageDate = null;
-                    String currency = "USD";
+                    String currency = CostProperties.USD_CURRENCY;
 
                     if (costIndex != -1 && row.has(costIndex) && !row.get(costIndex).isNull()) {
                         cost = new BigDecimal(row.get(costIndex).asText());

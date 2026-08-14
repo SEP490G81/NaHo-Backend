@@ -1,6 +1,7 @@
 package org.naho.cost.adapter;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.cost.constant.CostProperties;
 import org.naho.cost.entity.AzureDailyCostEntity;
 import org.naho.cost.mapper.AzureDailyCostMapper;
 import org.naho.cost.model.AzureDailyCost;
@@ -33,7 +34,7 @@ public class AzureDailyCostRepositoryClient implements AzureCostRepositoryPort {
                 .orElseGet(() -> mapper.toEntity(dailyCost));
 
         entity.setCostAmount(dailyCost.getCostAmount());
-        entity.setCurrency(dailyCost.getCurrency() != null ? dailyCost.getCurrency() : "USD");
+        entity.setCurrency(dailyCost.getCurrency() != null ? dailyCost.getCurrency() : CostProperties.USD_CURRENCY);
 
         AzureDailyCostEntity saved = azureDailyCostJpaRepository.save(entity);
         return mapper.toDomain(saved);
@@ -78,7 +79,7 @@ public class AzureDailyCostRepositoryClient implements AzureCostRepositoryPort {
             results.add(new AzureCostPointResult(
                     proj.getDateOrMonth(),
                     proj.getCost() != null ? proj.getCost() : BigDecimal.ZERO,
-                    proj.getCurrency() != null ? proj.getCurrency() : "USD"
+                    proj.getCurrency() != null ? proj.getCurrency() : CostProperties.USD_CURRENCY
             ));
         }
         return results;

@@ -10,7 +10,7 @@ public class AwsCostChartResult {
     private final List<AwsCostPointResult> points;
 
     public AwsCostChartResult(BigDecimal totalCost, String currency, String granularity,
-            List<AwsCostPointResult> points) {
+                              List<AwsCostPointResult> points) {
         this.totalCost = totalCost;
         this.currency = currency;
         this.granularity = granularity;

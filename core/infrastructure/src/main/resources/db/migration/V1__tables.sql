@@ -33,6 +33,17 @@ CREATE TABLE aws_daily_costs
     CONSTRAINT pk_aws_daily_costs PRIMARY KEY (id)
 );
 
+CREATE TABLE azure_daily_costs
+(
+    id            BIGINT AUTO_INCREMENT NOT NULL,
+    created_time  datetime(6)           NOT NULL,
+    modified_time datetime(6)           NULL,
+    record_date   date                  NOT NULL,
+    cost_amount   DECIMAL(18, 12)       NOT NULL,
+    currency      VARCHAR(10)           NOT NULL,
+    CONSTRAINT pk_azure_daily_costs PRIMARY KEY (id)
+);
+
 CREATE TABLE books
 (
     id                            BIGINT AUTO_INCREMENT NOT NULL,
@@ -703,6 +714,9 @@ ALTER TABLE answer_histories
 
 ALTER TABLE aws_daily_costs
     ADD CONSTRAINT uc_aws_daily_costs_record_date UNIQUE (record_date);
+
+ALTER TABLE azure_daily_costs
+    ADD CONSTRAINT uc_azure_daily_costs_record_date UNIQUE (record_date);
 
 ALTER TABLE books
     ADD CONSTRAINT uc_books_cover_image_file UNIQUE (cover_image_file_id);

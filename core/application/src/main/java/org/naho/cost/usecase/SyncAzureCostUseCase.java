@@ -4,6 +4,7 @@ import org.naho.cost.model.AzureDailyCost;
 import org.naho.cost.port.in.SyncAzureCostInputPort;
 import org.naho.cost.port.out.AzureCostManagementPort;
 import org.naho.cost.port.out.AzureCostRepositoryPort;
+import org.naho.shared.constant.SystemZoneId;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -24,8 +25,8 @@ public class SyncAzureCostUseCase implements SyncAzureCostInputPort {
 
     @Override
     public void syncFullBackfill(LocalDate startDate) {
-        LocalDate fromDate = startDate != null ? startDate : LocalDate.now().minusMonths(6);
-        LocalDate toDate = LocalDate.now();
+        LocalDate fromDate = startDate != null ? startDate : LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID).minusMonths(6);
+        LocalDate toDate = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID);
         log.info("Triggering full Azure cost backfill from " + fromDate + " to " + toDate);
         syncCustomRange(fromDate, toDate);
     }
@@ -33,8 +34,8 @@ public class SyncAzureCostUseCase implements SyncAzureCostInputPort {
     @Override
     public void syncIncremental(int lookbackDays) {
         int effectiveLookback = lookbackDays > 0 ? lookbackDays : 3;
-        LocalDate startDate = LocalDate.now().minusDays(effectiveLookback);
-        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID).minusDays(effectiveLookback);
+        LocalDate endDate = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID);
         log.info("Running incremental Azure cost sync from " + startDate + " to " + endDate);
         syncCustomRange(startDate, endDate);
     }
