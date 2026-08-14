@@ -1,12 +1,12 @@
 package org.naho.config.azure;
 
-import org.naho.speech.azure.config.AzureCostConfigProperties;
-import org.naho.speech.azure.port.in.GetAzureCostInputPort;
-import org.naho.speech.azure.port.in.SyncAzureCostInputPort;
-import org.naho.speech.azure.port.out.AzureCostManagementPort;
-import org.naho.speech.azure.port.out.AzureCostRepositoryPort;
-import org.naho.speech.azure.usecase.AzureCostUseCase;
-import org.naho.speech.azure.usecase.SyncAzureCostUseCase;
+import org.naho.cost.constant.AzureCostConfigProperties;
+import org.naho.cost.port.in.GetAzureCostInputPort;
+import org.naho.cost.port.in.SyncAzureCostInputPort;
+import org.naho.cost.port.out.AzureCostManagementPort;
+import org.naho.cost.port.out.AzureCostRepositoryPort;
+import org.naho.cost.usecase.AzureCostUseCase;
+import org.naho.cost.usecase.SyncAzureCostUseCase;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

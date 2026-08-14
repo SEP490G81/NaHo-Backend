@@ -125,6 +125,16 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
 
     @Override
     public SpeakingAnalysisResult analyzeSpeaking(SpeakingAnalysisCommand command) {
+        SpeakingAnalysisResult speakingAnalysisResult = transactionPort.execute(() -> doAnalyzeSpeaking(command));
+
+        // Upload file audio lên cloud
+        FileResult uploadedFile = uploadFileInputPort.uploadFileToCloud(command.storedFile());
+        speakingAnalysisResult.setAudioFile(uploadedFile);
+
+        return speakingAnalysisResult;
+    }
+
+    private SpeakingAnalysisResult doAnalyzeSpeaking(SpeakingAnalysisCommand command) {
         LocalDate today = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID);
 
         UserDailyAiUsage userDailyAiUsage = userDailyAiUsageRepositoryPort
@@ -153,21 +163,12 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         // CALC: Parse JSON và tính điểm
         ParsedScores parsedScores = parseLlmFeedback(rawLlmFeedback, azureAssessment, command.durationSec());
 
-        // DB-W (SINGLE TX): Lưu TẤT CẢ dữ liệu ghi DB vào 1 Transaction duy nhất sau khi API ngoài thành công
-        SpeakingAnalysisResult result = transactionPort.execute(() -> {
-            // Tăng số lần đánh giá AI với speaking question của người dùng trong ngày hôm nay lên 1
-            userDailyAiUsage.increaseSpeakingEvaluationCount();
-            userDailyAiUsageRepositoryPort.save(userDailyAiUsage);
+        // Tăng số lần đánh giá AI với speaking question của người dùng trong ngày hôm nay lên 1
+        userDailyAiUsage.increaseSpeakingEvaluationCount();
+        userDailyAiUsageRepositoryPort.save(userDailyAiUsage);
 
-            // Lưu File, AnswerHistory, SpeechAssessment, ContentAssessment và Cập nhật tiến độ
-            return persistResults(command, ctx, azureAssessment, parsedScores);
-        });
-
-        // Upload file audio lên cloud
-        FileResult uploadedFile = uploadFileInputPort.uploadFileToCloud(command.storedFile());
-        result.setAudioFile(uploadedFile);
-
-        return result;
+        // Lưu File, AnswerHistory, SpeechAssessment, ContentAssessment và Cập nhật tiến độ
+        return persistResults(command, ctx, azureAssessment, parsedScores);
     }
 
     private AnalysisContext prepareAnalysis(SpeakingAnalysisCommand command) {
@@ -452,33 +453,33 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         return objectMapper.writeValueAsString(objectNode);
     }
 
-    private String buildFallbackFeedbackJson(double vocabScore, double grammarScore,
-                                             double naturalnessScore, double overallScore,
-                                             Integer durationSec) {
-        try {
-            ObjectNode node = objectMapper.createObjectNode();
-            ObjectNode scores = objectMapper.createObjectNode();
-            scores.put("vocabulary", vocabScore);
-            scores.put("grammar", grammarScore);
-            scores.put("naturalness", naturalnessScore);
-            node.set("scores", scores);
-            node.putArray("userTranscript");
-            ObjectNode sug = objectMapper.createObjectNode();
-            sug.put("jp", "");
-            sug.put("furigana", "");
-            sug.put("vi", "");
-            node.set("aiSuggestion", sug);
-            node.put("pronunciationNote", "");
-            node.putObject("wordNotes");
-            node.putArray("expressions");
-            node.putArray("itVocab");
-            node.put("durationSec", durationSec);
-            node.put("overallScore", overallScore);
-            return objectMapper.writeValueAsString(node);
-        } catch (Exception ex) {
-            return "{}";
-        }
-    }
+//    private String buildFallbackFeedbackJson(double vocabScore, double grammarScore,
+//                                             double naturalnessScore, double overallScore,
+//                                             Integer durationSec) {
+//        try {
+//            ObjectNode node = objectMapper.createObjectNode();
+//            ObjectNode scores = objectMapper.createObjectNode();
+//            scores.put("vocabulary", vocabScore);
+//            scores.put("grammar", grammarScore);
+//            scores.put("naturalness", naturalnessScore);
+//            node.set("scores", scores);
+//            node.putArray("userTranscript");
+//            ObjectNode sug = objectMapper.createObjectNode();
+//            sug.put("jp", "");
+//            sug.put("furigana", "");
+//            sug.put("vi", "");
+//            node.set("aiSuggestion", sug);
+//            node.put("pronunciationNote", "");
+//            node.putObject("wordNotes");
+//            node.putArray("expressions");
+//            node.putArray("itVocab");
+//            node.put("durationSec", durationSec);
+//            node.put("overallScore", overallScore);
+//            return objectMapper.writeValueAsString(node);
+//        } catch (Exception ex) {
+//            return "{}";
+//        }
+//    }
 
     private List<WordPronunciationResult> buildWordPronunciations(List<WordAssessment> words) {
         if (words == null || words.isEmpty()) {
@@ -554,9 +555,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 .report(report)
                 .build();
 
-        if (audioFile != null) {
-            result.setAudioFile(fileResultMapperPort.domainToResult(audioFile));
-        }
+        result.setAudioFile(fileResultMapperPort.domainToResult(audioFile));
 
         return result;
     }

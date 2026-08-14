@@ -53,7 +53,8 @@ public class GetActiveSubscriptionUseCase implements GetActiveSubscriptionInputP
                         userId,
                         SubscriptionStatus.ACTIVE,
                         PlanStatus.ACTIVE,
-                        now);
+                        now
+                );
 
         // nếu có thì trả về
         if (subscriptionPlan.isPresent()) {

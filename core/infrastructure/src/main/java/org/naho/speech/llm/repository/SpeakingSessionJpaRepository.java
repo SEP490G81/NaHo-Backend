@@ -21,7 +21,7 @@ public interface SpeakingSessionJpaRepository
     Optional<SpeakingSessionEntity> findFirstByUserIdAndStatusOrderByStartedAtDesc(Long userId, String status);
 
     Optional<SpeakingSessionEntity> findFirstByUserIdAndPersonaIdAndStatusOrderByStartedAtDesc(Long userId,
-            Long personaId, String status);
+                                                                                               Long personaId, String status);
 
     int countByUserIdAndStatus(Long userId, String status);
 }

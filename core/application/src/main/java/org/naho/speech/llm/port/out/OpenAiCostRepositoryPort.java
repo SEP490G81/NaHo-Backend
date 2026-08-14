@@ -1,6 +1,6 @@
 package org.naho.speech.llm.port.out;
 
-import org.naho.speech.llm.model.OpenAiDailyCost;
+import org.naho.cost.model.OpenAiDailyCost;
 import org.naho.speech.llm.result.OpenAiCostPointResult;
 
 import java.math.BigDecimal;

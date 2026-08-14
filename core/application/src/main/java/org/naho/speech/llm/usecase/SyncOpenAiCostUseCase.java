@@ -1,6 +1,6 @@
 package org.naho.speech.llm.usecase;
 
-import org.naho.speech.llm.model.OpenAiDailyCost;
+import org.naho.cost.model.OpenAiDailyCost;
 import org.naho.speech.llm.port.in.SyncOpenAiCostInputPort;
 import org.naho.speech.llm.port.out.OpenAiCostManagementPort;
 import org.naho.speech.llm.port.out.OpenAiCostRepositoryPort;

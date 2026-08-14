@@ -6,5 +6,6 @@ import org.naho.speech.llm.result.OpenAiCostSummaryResult;
 
 public interface GetOpenAiCostInputPort {
     OpenAiCostSummaryResult getSummary();
+
     OpenAiCostChartResult getChartData(OpenAiCostQueryCommand command);
 }

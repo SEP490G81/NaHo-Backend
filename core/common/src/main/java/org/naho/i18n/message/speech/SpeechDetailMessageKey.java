@@ -76,6 +76,12 @@ public final class SpeechDetailMessageKey {
     public static final String AZURE_COST_INVALID_TIMEFRAME =
             "azure.cost.invalid.timeframe";
 
+    // AWS Cost Management
+    public static final String AWS_COST_SUMMARY_GET_SUCCESS =
+            "aws.cost.summary.get.success";
+    public static final String AWS_COST_CHART_GET_SUCCESS =
+            "aws.cost.chart.get.success";
+
     private SpeechDetailMessageKey() {
     }
 

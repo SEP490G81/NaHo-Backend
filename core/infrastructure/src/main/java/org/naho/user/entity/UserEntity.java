@@ -20,6 +20,7 @@ import org.naho.user.type.Gender;
 import org.naho.user.type.UserStatus;
 import org.naho.user.valueobject.Username;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +49,13 @@ public class UserEntity extends BaseEntity {
     @Column(name = "is_email_verified", nullable = false)
     @Builder.Default
     boolean isEmailVerified = false;
+
+    @Column(name = "failed_login_attempt_count", nullable = false)
+    @Builder.Default
+    Integer failedLoginAttemptCount = 0;
+
+    @Column(name = "locked_until")
+    Instant lockedUntil;
 
     @Column(length = 10)
     @Enumerated(EnumType.STRING)

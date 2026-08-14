@@ -1,6 +1,6 @@
 package org.naho.speech.llm.port.out;
 
-import org.naho.speech.llm.model.OpenAiDailyCost;
+import org.naho.cost.model.OpenAiDailyCost;
 
 import java.time.LocalDate;
 import java.util.List;

@@ -91,7 +91,12 @@ public enum UserErrorCode implements ErrorCode {
     USER_DOB_RANGE_INVALID(
             "USER_A023",
             UserTitleMessageKey.USER_DOB_RANGE_NOT_VALID_TITLE,
-            400);
+            400),
+    USER_ACCOUNT_LOCKED(
+            "USER_A024",
+            UserTitleMessageKey.USER_ACCOUNT_LOCKED_TITLE,
+            423);
+
 
     private final String code;
     private final String titleKey;

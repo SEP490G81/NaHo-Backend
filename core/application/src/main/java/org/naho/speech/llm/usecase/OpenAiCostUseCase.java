@@ -1,7 +1,7 @@
 package org.naho.speech.llm.usecase;
 
+import org.naho.cost.model.OpenAiDailyCost;
 import org.naho.speech.llm.command.OpenAiCostQueryCommand;
-import org.naho.speech.llm.model.OpenAiDailyCost;
 import org.naho.speech.llm.port.in.GetOpenAiCostInputPort;
 import org.naho.speech.llm.port.out.OpenAiCostRepositoryPort;
 import org.naho.speech.llm.result.OpenAiCostChartResult;
