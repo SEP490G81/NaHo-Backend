@@ -97,8 +97,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
             FileRepositoryPort fileRepositoryPort,
             UploadFileInputPort uploadFileInputPort,
-            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort
-    ) {
+            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort) {
         this.aiChatPort = aiChatPort;
         this.sessionStorePort = sessionStorePort;
         this.speechToTextPort = speechToTextPort;
@@ -249,7 +248,8 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                         null, gNote, null, null);
                 speakingSessionRepositoryPort.updateSessionTurnAndTranscript(sCode, sTurn, fTranscript);
             } catch (Exception e) {
-                System.err.println("[SpeakingSessionUseCase] Failed to persist turn message asynchronously: " + e.getMessage());
+                System.err.println(
+                        "[SpeakingSessionUseCase] Failed to persist turn message asynchronously: " + e.getMessage());
             }
         });
 
@@ -458,7 +458,8 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                     uploadFileInputPort.uploadFileToCloud(storedFile);
                 }
             } catch (Exception e) {
-                System.err.println("[SpeakingSessionUseCase] Failed to persist audio message asynchronously: " + e.getMessage());
+                System.err.println(
+                        "[SpeakingSessionUseCase] Failed to persist audio message asynchronously: " + e.getMessage());
             }
         });
 

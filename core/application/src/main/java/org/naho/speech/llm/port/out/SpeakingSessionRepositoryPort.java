@@ -78,4 +78,3 @@ public interface SpeakingSessionRepositoryPort {
      */
     int countActiveSessionsByUserId(Long userId);
 }
-

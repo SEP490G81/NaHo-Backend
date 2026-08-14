@@ -240,6 +240,17 @@ CREATE TABLE objectives
     CONSTRAINT pk_objectives PRIMARY KEY (id)
 );
 
+CREATE TABLE openai_daily_costs
+(
+    id            BIGINT AUTO_INCREMENT NOT NULL,
+    created_time  datetime(6)           NOT NULL,
+    modified_time datetime(6)           NULL,
+    record_date   date                  NOT NULL,
+    cost_amount   DECIMAL(12, 6)        NOT NULL,
+    currency      VARCHAR(10)           NOT NULL,
+    CONSTRAINT pk_openai_daily_costs PRIMARY KEY (id)
+);
+
 CREATE TABLE payment_idempotencies
 (
     id                     BIGINT AUTO_INCREMENT NOT NULL,
@@ -786,6 +797,9 @@ ALTER TABLE users
 
 ALTER TABLE users
     ADD CONSTRAINT uc_users_username UNIQUE (username);
+
+ALTER TABLE openai_daily_costs
+    ADD CONSTRAINT uk_openai_daily_costs_date UNIQUE (record_date);
 
 ALTER TABLE payment_idempotencies
     ADD CONSTRAINT uk_payment_idempotency_user_key UNIQUE (user_id, idempotency_key);

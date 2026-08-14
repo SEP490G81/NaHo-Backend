@@ -11,6 +11,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class OpenAiConfigProperties {
     String apiKey;
+    String adminApiKey;
     String chatModel;
     String scoringModel;
     int maxTokens;

@@ -8,7 +8,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.Optional;
 
-public interface SpeakingSessionJpaRepository extends JpaRepository<SpeakingSessionEntity, Long>, JpaSpecificationExecutor<SpeakingSessionEntity> {
+public interface SpeakingSessionJpaRepository
+        extends JpaRepository<SpeakingSessionEntity, Long>, JpaSpecificationExecutor<SpeakingSessionEntity> {
     Optional<SpeakingSessionEntity> findBySessionCode(String sessionCode);
 
     Page<SpeakingSessionEntity> findByUserId(Long userId, Pageable pageable);
@@ -19,8 +20,8 @@ public interface SpeakingSessionJpaRepository extends JpaRepository<SpeakingSess
 
     Optional<SpeakingSessionEntity> findFirstByUserIdAndStatusOrderByStartedAtDesc(Long userId, String status);
 
-    Optional<SpeakingSessionEntity> findFirstByUserIdAndPersonaIdAndStatusOrderByStartedAtDesc(Long userId, Long personaId, String status);
+    Optional<SpeakingSessionEntity> findFirstByUserIdAndPersonaIdAndStatusOrderByStartedAtDesc(Long userId,
+                                                                                               Long personaId, String status);
 
     int countByUserIdAndStatus(Long userId, String status);
 }
-
