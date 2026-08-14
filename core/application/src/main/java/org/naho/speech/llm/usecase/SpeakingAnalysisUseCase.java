@@ -138,30 +138,30 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             );
         }
 
-        // tăng số lần đánh giá AI với speaking question của người dùng trong ngày hôm nay lên 1
-        userDailyAiUsage.increaseSpeakingEvaluationCount();
+        // DB-R & VALIDATE: Chuẩn bị context (chỉ đọc DB, chưa ghi DB)
+        AnalysisContext ctx = prepareAnalysis(command);
 
-        // lưu
-        userDailyAiUsageRepositoryPort.save(userDailyAiUsage);
-
-        // DB-R & VALID & DB-W (TX 1): Chuẩn bị context và tạo bản ghi ban đầu
-        AnalysisContext ctx = transactionPort.execute(() -> prepareAnalysis(command));
-
-        // EXT: Gọi mạng ngoài Azure Speech Assessment
+        // EXT: Gọi mạng ngoài Azure Speech Assessment (Không giữ DB Transaction)
         SpeechAssessment azureAssessment = assessSpeech(command.audioBytes());
 
         // CALC: Tính toán thuần chuẩn bị context cho AI
         AiAnalysisPort.Context evalContext = buildEvaluationContext(ctx, azureAssessment);
 
-        // EXT: Gọi mạng ngoài OpenAI LLM
+        // EXT: Gọi mạng ngoài OpenAI LLM (Không giữ DB Transaction)
         String rawLlmFeedback = aiAnalysisPort.analyzeSpeaking(evalContext);
 
         // CALC: Parse JSON và tính điểm
         ParsedScores parsedScores = parseLlmFeedback(rawLlmFeedback, azureAssessment, command.durationSec());
 
-        // DB-W (TX 2): Lưu toàn bộ kết quả vào DB
-        SpeakingAnalysisResult result = transactionPort.execute(() ->
-                persistResults(command, ctx, azureAssessment, parsedScores));
+        // DB-W (SINGLE TX): Lưu TẤT CẢ dữ liệu ghi DB vào 1 Transaction duy nhất sau khi API ngoài thành công
+        SpeakingAnalysisResult result = transactionPort.execute(() -> {
+            // Tăng số lần đánh giá AI với speaking question của người dùng trong ngày hôm nay lên 1
+            userDailyAiUsage.increaseSpeakingEvaluationCount();
+            userDailyAiUsageRepositoryPort.save(userDailyAiUsage);
+
+            // Lưu File, AnswerHistory, SpeechAssessment, ContentAssessment và Cập nhật tiến độ
+            return persistResults(command, ctx, azureAssessment, parsedScores);
+        });
 
         // Upload file audio lên cloud
         FileResult uploadedFile = uploadFileInputPort.uploadFileToCloud(command.storedFile());
@@ -208,15 +208,6 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                         SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
                         SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_NOT_FOUND));
 
-        // Lưu file vào database với operation type là Upload
-        File audioFile = fileRepositoryPort.createNewForUpload(
-                command.storedFile(),
-                FileAccessStatus.PRIVATE
-        );
-
-        // Lưu lịch sử trả lời Speaking Question
-        AnswerHistory savedAnswerHistory = createAnswerHistory(user, speakingQuestion, audioFile, command.durationSec());
-
         // DB-R
         // Lay du lieu cua object (question speaking nay nam trong objective nao)
         Objective objective = objectiveRepositoryPort.findBySpeakingQuestionId(speakingQuestion.getId()).orElse(null);
@@ -231,8 +222,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         Book book = bookRepositoryPort.findBySpeakingQuestionId(speakingQuestion.getId()).orElse(null);
 
         return buildAnalysisContext(
-                learningPathNode, progress, speakingQuestion,
-                savedAnswerHistory, audioFile,
+                learningPathNode, progress, speakingQuestion, user,
                 objective, lesson, topic, book
         );
     }
@@ -251,8 +241,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             LearningPathNode learningPathNode,
             UserLearningProgress progress,
             SpeakingQuestion speakingQuestion,
-            AnswerHistory savedAnswerHistory,
-            File audioFile,
+            User user,
             Objective objective,
             Lesson lesson,
             Topic topic,
@@ -289,7 +278,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 ? speakingQuestion.getDescription() : questionTitleVal;
 
         return new AnalysisContext(
-                learningPathNode, progress, speakingQuestion, savedAnswerHistory, audioFile,
+                learningPathNode, progress, speakingQuestion, user,
                 curriculumVal, levelVal, sttVal, topicVal, lessonVal,
                 canDoObjectiveVal, grammarFocusVal, vocabFocusVal,
                 questionTitleVal, questionDescriptionVal);
@@ -508,9 +497,18 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                                                   AnalysisContext ctx,
                                                   SpeechAssessment azureAssessment,
                                                   ParsedScores parsedScores) {
+        // DB-W => Lưu file vào database với operation type là Upload
+        File audioFile = fileRepositoryPort.createNewForUpload(
+                command.storedFile(),
+                FileAccessStatus.PRIVATE
+        );
+
+        // DB-W => Lưu lịch sử trả lời Speaking Question
+        AnswerHistory savedAnswerHistory = createAnswerHistory(ctx.user(), ctx.speakingQuestion(), audioFile, command.durationSec());
+
         // DB-W => Lưu đánh giá phát âm tổng quan của azure speech
         SpeechAssessment savedSpeechAssessment = persistSpeechAssessment(
-                azureAssessment, ctx.savedAnswerHistory().getId());
+                azureAssessment, savedAnswerHistory.getId());
 
         // DB-W => Lưu đánh giá từng chữ (phát âm, điểm chính xác, lỗi phát âm) từ azure speech
         persistWordAssessments(azureAssessment.getWords(), savedSpeechAssessment.getId());
@@ -521,7 +519,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                 .grammarScore(parsedScores.grammarScore())
                 .aiFeedback(parsedScores.enrichedFeedbackJson())
                 .translationText("")
-                .answerHistoryId(ctx.savedAnswerHistory().getId())
+                .answerHistoryId(savedAnswerHistory.getId())
                 .build();
         answerHistoryRepositoryPort.saveContentAssessment(contentAssessment);
 
@@ -552,12 +550,12 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
 
         SpeakingAnalysisResult result = SpeakingAnalysisResult.builder()
                 .overallScore(parsedScores.overallScore())
-                .answerHistoryId(ctx.savedAnswerHistory().getId())
+                .answerHistoryId(savedAnswerHistory.getId())
                 .report(report)
                 .build();
 
-        if (ctx.audioFile() != null) {
-            result.setAudioFile(fileResultMapperPort.domainToResult(ctx.audioFile()));
+        if (audioFile != null) {
+            result.setAudioFile(fileResultMapperPort.domainToResult(audioFile));
         }
 
         return result;
@@ -597,8 +595,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             LearningPathNode learningPathNode,
             UserLearningProgress progress,
             SpeakingQuestion speakingQuestion,
-            AnswerHistory savedAnswerHistory,
-            File audioFile,
+            User user,
             String curriculumVal,
             String levelVal,
             String sttVal,

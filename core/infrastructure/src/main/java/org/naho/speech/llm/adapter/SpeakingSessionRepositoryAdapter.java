@@ -374,7 +374,8 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
             String grammarNote,
             String hintForLearner,
             Double pronunciationScore) {
-        saveSessionMessage(sessionCode, turnIndex, senderType, content, correctedText, correctionExplanation, grammarNote, hintForLearner, pronunciationScore, null);
+        saveSessionMessage(sessionCode, turnIndex, senderType, content, correctedText, correctionExplanation,
+                grammarNote, hintForLearner, pronunciationScore, null);
     }
 
     @Override
@@ -463,7 +464,8 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
                     String audioUrl = null;
                     if (m.getAudioFile() != null) {
                         try {
-                            audioUrl = fileStorageServicePort.generatePresignedUrl(fileEntityMapper.entityToDomain(m.getAudioFile()));
+                            audioUrl = fileStorageServicePort
+                                    .generatePresignedUrl(fileEntityMapper.entityToDomain(m.getAudioFile()));
                         } catch (Exception e) {
                             // Presigned URL might return null if file is not completed yet or deleted
                         }

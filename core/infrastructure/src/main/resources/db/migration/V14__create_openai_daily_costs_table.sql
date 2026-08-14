@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS openai_daily_costs (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    record_date DATE NOT NULL UNIQUE,
+    cost_amount DECIMAL(12, 6) NOT NULL DEFAULT 0.000000,
+    currency VARCHAR(10) NOT NULL DEFAULT 'USD',
+    created_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    modified_time DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT uk_openai_daily_costs_date UNIQUE (record_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

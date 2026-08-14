@@ -43,7 +43,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     private static final String SYSTEM_PROMPT_TEMPLATE = """
             You are a Japanese conversation partner on the NaHo language learning platform.
             %s
-            
+
             ## CONVERSATION BEHAVIOR RULES
             1. **Language**: The "reply" field MUST be in Japanese ONLY. No English or Vietnamese in "reply".
             2. **Length calibration**:
@@ -62,7 +62,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             5. **Topic steering**: Gently redirect off-topic responses. Stay on session topic.
             6. **If no grammar errors found**: correctionExplanation = "Câu của bạn đã rất tự nhiên và chính xác!"
             7. **Naturalness over perfection**: Prefer warm, natural Japanese over formal textbook phrases.
-            
+
             ## OUTPUT FORMAT (MANDATORY)
             Respond ONLY with a valid raw JSON object. No markdown, no code fences. All 6 fields required:
             {
@@ -97,8 +97,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
             FileRepositoryPort fileRepositoryPort,
             UploadFileInputPort uploadFileInputPort,
-            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort
-    ) {
+            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort) {
         this.aiChatPort = aiChatPort;
         this.sessionStorePort = sessionStorePort;
         this.speechToTextPort = speechToTextPort;
@@ -249,7 +248,8 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                         null, gNote, null, null);
                 speakingSessionRepositoryPort.updateSessionTurnAndTranscript(sCode, sTurn, fTranscript);
             } catch (Exception e) {
-                System.err.println("[SpeakingSessionUseCase] Failed to persist turn message asynchronously: " + e.getMessage());
+                System.err.println(
+                        "[SpeakingSessionUseCase] Failed to persist turn message asynchronously: " + e.getMessage());
             }
         });
 
@@ -458,7 +458,8 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                     uploadFileInputPort.uploadFileToCloud(storedFile);
                 }
             } catch (Exception e) {
-                System.err.println("[SpeakingSessionUseCase] Failed to persist audio message asynchronously: " + e.getMessage());
+                System.err.println(
+                        "[SpeakingSessionUseCase] Failed to persist audio message asynchronously: " + e.getMessage());
             }
         });
 

@@ -82,6 +82,7 @@ app:
 
   openai:
     api-key: ${LLM_API_KEY}
+    admin-api-key: ${LLM_ADMIN_API_KEY}
     chat-model: gpt-4o-mini
     scoring-model: gpt-4o
     max-tokens: 10000

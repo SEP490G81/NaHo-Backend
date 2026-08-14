@@ -107,6 +107,7 @@ public class OpenAiAnalysisAdapter implements AiAnalysisPort {
         try {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(responseJson);
+
             String rawContent = root.path("choices").path(0).path("message").path("content").asText("");
             String trimmed = rawContent.trim();
             if (trimmed.startsWith("```")) {

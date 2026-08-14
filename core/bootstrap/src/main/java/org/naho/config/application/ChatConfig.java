@@ -122,6 +122,11 @@ public class ChatConfig {
     }
 
     @Bean
+    public GetOpenAiCostInputPort getOpenAiCostInputPort(OpenAiCostPort openAiCostPort) {
+        return new GetOpenAiCostUseCase(openAiCostPort);
+    }
+
+    @Bean
     public SpeakingAnalysisInputPort speakingAnalysisInputPort(
             UserRepositoryPort userRepositoryPort,
             SpeakingQuestionRepositoryPort questionRepositoryPort,
