@@ -36,15 +36,15 @@ WORKDIR /app
 USER root
 
 RUN apt-get update \
- && apt-get install -y ffmpeg \
- && rm -rf /var/lib/apt/lists/*
+    && apt-get install -y ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN groupadd spring \
     && useradd -r -g spring spring
 
 COPY --from=builder \
-     /app/core/bootstrap/build/libs/*.jar \
-     app.jar
+    /app/core/bootstrap/build/libs/*.jar \
+    app.jar
 
 USER spring
 

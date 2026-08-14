@@ -123,7 +123,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                 }
             }
             JsonNode root = OBJECT_MAPPER.readTree(cleaned);
-            String reply = root.path("reply").asText(rawResponse);
+            String reply = root.path("reply").asText("");
             String replyTranslation = root.path("replyTranslation").asText("");
             // Support both old 'grammarExplanation' and new 'grammarNote' field names
             String grammarNote = root.has("grammarNote")
@@ -135,7 +135,9 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             return new ParsedAiReply(reply, replyTranslation, grammarNote, correctedUserText, correctionExplanation,
                     hintForLearner);
         } catch (Exception e) {
+
             System.out.println("[SpeakingSessionUseCase] Fallback raw text parsing: " + e.getMessage());
+            System.out.println("[SpeakingSessionUseCase] Raw response: " + rawResponse);
             return new ParsedAiReply(rawResponse, "", "", "", "", "");
         }
     }
@@ -189,25 +191,112 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             return List.of();
         }
 
-        Map<String, String> systemPrompt = null;
-        if ("system".equals(history.get(0).get("role"))) {
-            systemPrompt = history.get(0);
-        }
+        String systemPromptTemplate = """
+                You are a Japanese conversation partner on the NaHo language learning platform.
+                
+                - You are roleplaying as the specified persona. Adapt your tone, formality, and personality accordingly.
+                - Start by greeting the learner in character and inviting them to converse.
+                
+                - Your persona role & prompt:
+                  You are Tanaka Sensei, a patient, warm, and encouraging language teacher on the NaHo platform.
+                  Your role is to help learners practice daily conversation.
+                  Speak in clear, polite form (desu/masu).
+                  Gently guide the learner when they make mistakes,
+                  ask open-ended questions about their daily life, hobbies, and learning goals,
+                  and encourage them continuously.
+                
+                - Conversation style description:
+                  Neutral/Polite Japanese (ます form)
+                
+                - Conversation style prompt:
+                  Please respond using polite, standard Japanese (desu/masu form).
+                  Avoid casual talk or heavy honorifics unless appropriate.
+                
+                - Formality level (Keigo/Style):
+                  NEUTRAL
+                
+                
+                ## CONVERSATION BEHAVIOR RULES
+                
+                1. **Language**
+                   The "reply" field MUST be in Japanese ONLY.
+                   No English or Vietnamese in "reply".
+                
+                2. **Length calibration**
+                   - Learner message ≤ 10 words → reply ≤ 2 sentences + 1 follow-up question.
+                   - Learner message > 10 words → reply 2–4 sentences.
+                   - NEVER write a wall of text.
+                   - You are a conversation partner, not a lecturer.
+                
+                3. **Grammar error handling**
+                   - If learner uses wrong particle, wrong verb conjugation,
+                     or unnatural phrasing:
+                     → Subtly model the correct form naturally in your Japanese reply.
+                     → Then fill correctedUserText + correctionExplanation fields.
+                
+                   - Common errors to watch:
+                     - は/が confusion
+                     - を/に confusion
+                     - plain vs polite form mismatch
+                
+                4. **Stuck learner detection**
+                   - If learner sends only fillers (あー, えーと, うーん)
+                     or ≤ 3 meaningful words:
+                     → Your reply MUST include a simpler re-ask or a scaffolding hint.
+                
+                   - Example:
+                     「少し難しかったですか？「〇〇は△△です」のように言えますよ。」
+                
+                5. **Topic steering**
+                   Gently redirect off-topic responses.
+                   Stay on session topic.
+                
+                6. **If no grammar errors found**
+                   correctionExplanation = "Câu của bạn đã rất tự nhiên và chính xác!"
+                
+                7. **Naturalness over perfection**
+                   Prefer warm, natural Japanese over formal textbook phrases.
+                
+                
+                ## OUTPUT FORMAT (MANDATORY)
+                
+                Respond ONLY with a valid raw JSON object.
+                No markdown, no code fences.
+                All 6 fields are required.
+                
+                {
+                  "reply": "<Full Japanese response — naturally phrased>",
+                  "replyTranslation": "<Natural Vietnamese translation of reply>",
+                  "grammarNote": "<Vietnamese: Explain 1-2 grammar points/vocab used in YOUR reply>",
+                  "correctedUserText": "<Corrected Japanese of learner's last turn, or natural alternative if no error>",
+                  "correctionExplanation": "<Vietnamese: what was wrong and why correction is better, or praise if correct>",
+                  "hintForLearner": "<Optional Vietnamese tip for next turn, empty string \\"\\" if no tip>"
+                }
+                """;
+
+        Map<String, String> systemPrompt = new HashMap<>();
+        systemPrompt.put("role", "system");
+        systemPrompt.put("content", systemPromptTemplate);
+//        if ("system".equals(history.get(0).get("role"))) {
+//            systemPrompt = history.get(0);
+//        }
 
         int totalMessages = history.size();
         int nonSystemStartIndex = (systemPrompt != null) ? 1 : 0;
         int nonSystemCount = totalMessages - nonSystemStartIndex;
 
-        if (nonSystemCount <= MAX_SLIDING_WINDOW_MESSAGES) {
-            return history;
-        }
+//        if (nonSystemCount <= MAX_SLIDING_WINDOW_MESSAGES) {
+//            return history;
+//        }
 
         List<Map<String, String>> slidingWindow = new ArrayList<>();
+
+        int fromIndex = totalMessages - MAX_SLIDING_WINDOW_MESSAGES;
+        slidingWindow.addAll(history.subList(fromIndex, totalMessages));
+
         if (systemPrompt != null) {
             slidingWindow.add(systemPrompt);
         }
-        int fromIndex = totalMessages - MAX_SLIDING_WINDOW_MESSAGES;
-        slidingWindow.addAll(history.subList(fromIndex, totalMessages));
         return slidingWindow;
     }
 
@@ -292,7 +381,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     @Override
     public StartConversationResult startConversationWithAISession(
             StartSpeakingConversationWithAICommand startSpeakingConversationWithAICommand) {
-        validateConcurrentSessionLimit(startSpeakingConversationWithAICommand.userId());
+//        validateConcurrentSessionLimit(startSpeakingConversationWithAICommand.userId());
         String sessionId = UUID.randomUUID().toString();
         Persona persona = personaRepositoryPort.findById((long) startSpeakingConversationWithAICommand.personaId())
                 .orElseThrow(() -> new ApplicationException(
@@ -421,6 +510,11 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
 
         List<Map<String, String>> messages = getSlidingWindowMessages(sessionId);
         String rawReply = aiChatPort.chatWithContext(messages);
+
+        for (Map<String, String> m : messages) {
+            System.out.println("[SpeakingSession] Message: " + m.get("content"));
+        }
+
         ParsedAiReply parsed = parseAiResponse(rawReply);
 
         sessionStorePort.addMessage(sessionId, "assistant", parsed.reply());
