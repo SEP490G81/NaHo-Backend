@@ -92,6 +92,14 @@ app:
     subscription-key: ${AZURE_SPEECH_KEY}
     region: japaneast
     language: ja-JP
+    cost:
+      tenant-id: ${AZURE_TENANT_ID}
+      client-id: ${AZURE_CLIENT_ID}
+      client-secret: ${AZURE_CLIENT_SECRET}
+      subscription-id: ${AZURE_SUBSCRIPTION_ID}
+      scope: ${AZURE_COST_SCOPE:https://management.azure.com/.default}
+      query-url-template: ${AZURE_COST_QUERY_URL_TEMPLATE:https://management.azure.com/subscriptions/%s/providers/Microsoft.CostManagement/query?api-version=2025-03-01}
+
   s3:
     public-bucket-name: naho-public-bucket
     private-bucket-name: naho-private-bucket

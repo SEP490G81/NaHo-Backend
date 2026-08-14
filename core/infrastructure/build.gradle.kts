@@ -55,6 +55,10 @@ dependencies {
     // Azure Speech SDK
     implementation("com.microsoft.cognitiveservices.speech:client-sdk:1.49.1@jar")
 
+    // Azure Identity - lấy OAuth2 Access Token từ Microsoft Entra ID
+    implementation("com.azure:azure-identity:1.18.4")
+    implementation("com.azure:azure-core:1.55.0")
+
     // MapStructs
     implementation("org.mapstruct:mapstruct:1.6.3")
     annotationProcessor("org.mapstruct:mapstruct-processor:1.6.3")
