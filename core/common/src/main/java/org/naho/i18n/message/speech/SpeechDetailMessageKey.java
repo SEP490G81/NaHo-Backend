@@ -66,7 +66,24 @@ public final class SpeechDetailMessageKey {
     public static final String SPEECH_AZURE_EXECUTION_FAILED =
             "speech.azure.execution.failed";
 
+    // Azure Cost Management
+    public static final String AZURE_COST_SUMMARY_GET_SUCCESS =
+            "azure.cost.summary.get.success";
+    public static final String AZURE_COST_CHART_GET_SUCCESS =
+            "azure.cost.chart.get.success";
+    public static final String AZURE_COST_API_FETCH_FAILED =
+            "azure.cost.api.fetch.failed";
+    public static final String AZURE_COST_INVALID_TIMEFRAME =
+            "azure.cost.invalid.timeframe";
+
+    // AWS Cost Management
+    public static final String AWS_COST_SUMMARY_GET_SUCCESS =
+            "aws.cost.summary.get.success";
+    public static final String AWS_COST_CHART_GET_SUCCESS =
+            "aws.cost.chart.get.success";
+
     private SpeechDetailMessageKey() {
     }
 
 }
+
