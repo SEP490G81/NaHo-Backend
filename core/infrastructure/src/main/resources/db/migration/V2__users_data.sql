@@ -16,7 +16,7 @@ VALUES (NOW(), NULL, 'ADMIN', ''),
 -- =========================================================
 
 ALTER TABLE users
-    MODIFY COLUMN is_email_verified BIT (1) NOT NULL DEFAULT b'0';
+    MODIFY COLUMN is_email_verified BIT(1) NOT NULL DEFAULT b'0';
 
 
 -- =========================================================
@@ -28,6 +28,7 @@ INSERT INTO users (created_time,
                    email,
                    full_name,
                    is_email_verified,
+                   failed_login_attempt_count,
                    hash_password,
                    status,
                    gender,
@@ -37,6 +38,7 @@ VALUES (NOW(),
         'vuongtrucwork2004@gmail.com',
         'Nguyễn Vương Trực',
         b'1',
+        0,
         '{bcrypt}$2a$10$mLvl6v0NmQ4f5cP6360qnueyzPYTyLizOJDyr7gL2DbAnnFzbK0mq',
         'ACTIVE',
         'MALE',
@@ -50,6 +52,7 @@ INSERT INTO users (id,
                    email,
                    full_name,
                    is_email_verified,
+                   failed_login_attempt_count,
                    hash_password,
                    status,
                    gender,
@@ -60,6 +63,7 @@ VALUES (102,
         'nguyendangkhoa5104@gmail.com',
         'Nguyễn Đăng Khoa',
         b'1',
+        0,
         '{bcrypt}$2a$10$mLvl6v0NmQ4f5cP6360qnueyzPYTyLizOJDyr7gL2DbAnnFzbK0mq',
         'ACTIVE',
         'MALE',

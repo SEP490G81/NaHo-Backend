@@ -24,4 +24,6 @@ public interface SubscriptionPlanRepositoryPort {
     );
 
     Optional<SubscriptionPlan> findByCode(PlanCode code);
+
+    SubscriptionPlan save(SubscriptionPlan domain);
 }

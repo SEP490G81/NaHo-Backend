@@ -11,6 +11,7 @@ import org.naho.user.command.CredentialsLoginCommand;
 import org.naho.user.command.ForceLogoutCommand;
 import org.naho.user.command.GoogleLoginCommand;
 import org.naho.user.command.LogoutCommand;
+import org.naho.user.constant.UserLoginConstant;
 import org.naho.user.exception.RoleErrorCode;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.model.AuthProvider;
@@ -68,43 +69,79 @@ public class AuthUseCase implements AuthInputPort {
         this.emailPort = emailPort;
     }
 
-    @Override
-    public LoginResult credentialsLogin(CredentialsLoginCommand command) {
-        return transactionPort.execute(() -> doCredentialsLogin(command));
-    }
-
     /**
      * Đăng nhập bằng tài khoản, mật khẩu
      *
      * @param command chứa các thông tin như username, email, raw password
      * @return LoginResult: gồm AT và RT
      */
-    private LoginResult doCredentialsLogin(CredentialsLoginCommand command) {
-        User user = userRepositoryPort.findByUsernameOrEmail(command.usernameOrEmail())
+    @Override
+    public LoginResult credentialsLogin(CredentialsLoginCommand command) {
+        // trước tiên phải tìm người dùng qua username hoặc email
+        User user = userRepositoryPort
+                .findByUsernameOrEmail(command.usernameOrEmail())
                 .orElseThrow(() -> new ApplicationException(
                         UserErrorCode.USER_LOGIN_FAILED,
-                        UserDetailMessageKey.USER_WRONG_LOGIN_INFO));
+                        UserDetailMessageKey.USER_WRONG_LOGIN_INFO
+                ));
 
-        if (!encoderPort.matches(command.rawPassword(), user.getHashPassword())) {
+        Instant now = Instant.now();
+
+        // nếu tài khoản bị khóa do đăng nhập quá nhiều
+        if (user.isLockedByLoginFailed(now)) {
             throw new ApplicationException(
-                    UserErrorCode.USER_LOGIN_FAILED,
-                    UserDetailMessageKey.USER_WRONG_LOGIN_INFO);
+                    UserErrorCode.USER_ACCOUNT_LOCKED,
+                    UserDetailMessageKey.USER_ACCOUNT_LOCKED,
+                    UserLoginConstant.LOCK_DURATION_MINUTES.toMinutes()
+            );
         }
 
+        // nếu mật khẩu sai thì tăng số lần đăng nhập failed
+        // sau đó lưu lại rồi ném ra lỗi
+        // vì lưu rồi ném ra lỗi nên không để trong transaction được
+        if (!encoderPort.matches(command.rawPassword(), user.getHashPassword())) {
+            user.incrementFailedLoginAttempt(now);
+            userRepositoryPort.save(user);
+
+            throw new ApplicationException(
+                    UserErrorCode.USER_LOGIN_FAILED,
+                    UserDetailMessageKey.USER_WRONG_LOGIN_INFO
+            );
+        }
+
+        // 1 transaction
+        return transactionPort.execute(() ->
+                doCredentialsLogin(command, user, now));
+    }
+
+    private LoginResult doCredentialsLogin(
+            CredentialsLoginCommand command,
+            User user,
+            Instant now
+    ) {
+        // Password đúng => reset failed login state
+        user.resetFailedLoginAttempt();
+        userRepositoryPort.save(user);
+
+        // nếu tài khoản bị unactive
         if (!user.isActive()) {
             throw new ApplicationException(
                     UserErrorCode.USER_LOGIN_FAILED,
-                    UserDetailMessageKey.USER_ACCOUNT_NOT_ACTIVE);
+                    UserDetailMessageKey.USER_ACCOUNT_NOT_ACTIVE
+            );
         }
 
         // nếu người dùng chưa verify email thì sẽ tạo otp và gửi mail cho nó
+        // vì lưu rồi ném ra lỗi nên không để trong transaction được
         if (!user.isEmailVerified()) {
             String email = user.getEmail().getValue();
+
             if (!otpPort.hasValidOtp(email)) {
                 String otp = otpPort.generateOtp();
                 otpPort.saveOtp(email, otp);
                 emailPort.sendOtpEmail(email, user.getFullName(), otp);
             }
+
             throw new ApplicationException(
                     UserErrorCode.USER_EMAIL_UNVERIFIED,
                     UserDetailMessageKey.USER_EMAIL_UNVERIFIED_DETAIL
@@ -112,12 +149,11 @@ public class AuthUseCase implements AuthInputPort {
         }
 
         // thu hồi toàn bộ session khác
+        // có 1 câu lệnh update
         userSessionServicePort.revokeAllActiveSessionsByUserId(
                 user.getId(),
                 SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
         );
-
-        Instant now = Instant.now();
 
         TokenResult refreshToken = tokenServicePort.generateRefreshToken(now);
 
@@ -135,6 +171,7 @@ public class AuthUseCase implements AuthInputPort {
                 .lastUsedAt(now)
                 .build();
 
+        // câu lệnh insert
         UserSession savedUserSession = userSessionRepositoryPort.save(userSession);
 
         TokenResult accessToken = tokenServicePort.generateAccessToken(savedUserSession);
@@ -203,7 +240,8 @@ public class AuthUseCase implements AuthInputPort {
         if (!currentUser.isActive()) {
             throw new ApplicationException(
                     UserErrorCode.USER_LOGIN_FAILED,
-                    UserDetailMessageKey.USER_ACCOUNT_NOT_ACTIVE);
+                    UserDetailMessageKey.USER_ACCOUNT_NOT_ACTIVE
+            );
         }
 
         userSessionServicePort.revokeAllActiveSessionsByUserId(

@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Order(4)
 @Component
 @RequiredArgsConstructor
-public class UserLearningProgressInitializer implements ApplicationRunner {
+public class UserLearningProgressInitializer4 implements ApplicationRunner {
     private static final Long ADMIN_USER_ID = 1L;
     private static final Long DEFAULT_LEARNER_USER_ID = 102L;
     private final UserLearningProgressRepositoryPort userLearningProgressRepositoryPort;

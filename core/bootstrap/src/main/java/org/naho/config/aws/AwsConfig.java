@@ -1,4 +1,4 @@
-package org.naho.config.s3;
+package org.naho.config.aws;
 
 import lombok.RequiredArgsConstructor;
 import org.naho.file.constant.S3Properties;
@@ -7,12 +7,13 @@ import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.costexplorer.CostExplorerClient;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 @Configuration
 @RequiredArgsConstructor
-public class S3Config {
+public class AwsConfig {
     private final S3Properties s3Properties;
 
     @Bean
@@ -42,6 +43,17 @@ public class S3Config {
             Region region
     ) {
         return S3Presigner.builder()
+                .credentialsProvider(credentialsProvider)
+                .region(region)
+                .build();
+    }
+
+    @Bean
+    public CostExplorerClient costExplorerClient(
+            AwsCredentialsProvider credentialsProvider,
+            Region region
+    ) {
+        return CostExplorerClient.builder()
                 .credentialsProvider(credentialsProvider)
                 .region(region)
                 .build();

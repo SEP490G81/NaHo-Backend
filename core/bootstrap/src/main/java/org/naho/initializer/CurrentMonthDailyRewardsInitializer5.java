@@ -17,7 +17,7 @@ import java.time.YearMonth;
 @Order(5)
 @Component
 @RequiredArgsConstructor
-public class CurrentMonthDailyRewardsInitializer implements ApplicationRunner {
+public class CurrentMonthDailyRewardsInitializer5 implements ApplicationRunner {
     private final CrudDailyRewardInputPort crudDailyRewardInputPort;
     private final DailyRewardRepositoryPort dailyRewardRepositoryPort;
 

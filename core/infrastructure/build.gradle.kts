@@ -82,6 +82,9 @@ dependencies {
     // FFmpeg
     implementation("net.bramp.ffmpeg:ffmpeg:0.9.2")
 
+    // AWS Cost explorer
+    implementation("software.amazon.awssdk:costexplorer:2.51.3")
+
     // other
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
