@@ -1,10 +1,10 @@
 package org.naho.speech.llm.port.in;
 
-import org.naho.speech.llm.result.OpenAiCostStatResult;
-
-import java.time.YearMonth;
+import org.naho.speech.llm.command.OpenAiCostQueryCommand;
+import org.naho.speech.llm.result.OpenAiCostChartResult;
+import org.naho.speech.llm.result.OpenAiCostSummaryResult;
 
 public interface GetOpenAiCostInputPort {
-    OpenAiCostStatResult getMonthlyCostStat(YearMonth yearMonth);
-    OpenAiCostStatResult getAllDailyCosts();
+    OpenAiCostSummaryResult getSummary();
+    OpenAiCostChartResult getChartData(OpenAiCostQueryCommand command);
 }

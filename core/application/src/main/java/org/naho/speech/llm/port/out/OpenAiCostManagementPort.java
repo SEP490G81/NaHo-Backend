@@ -1,0 +1,10 @@
+package org.naho.speech.llm.port.out;
+
+import org.naho.speech.llm.model.OpenAiDailyCost;
+
+import java.time.LocalDate;
+import java.util.List;
+
+public interface OpenAiCostManagementPort {
+    List<OpenAiDailyCost> fetchDailyCostsFromOpenAi(LocalDate fromDate, LocalDate toDate);
+}
