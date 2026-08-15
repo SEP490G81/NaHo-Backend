@@ -73,7 +73,7 @@ public class NotificationEventListener {
     @EventListener
     public void handleReportCreated(ReportCreatedEvent event) {
         String reporterName = getFullName(event.reporterId());
-        String targetUrl = "/admin/reports/" + event.reportId();
+        String targetUrl = "/reports#report-" + event.reportId();
 
         String title = messageSource.getMessage("notification.report.created.title", null, "Co bao cao moi", DEFAULT_LOCALE);
         String content = messageSource.getMessage("notification.report.created.content", new Object[]{reporterName}, reporterName + " vua gui mot bao cao moi", DEFAULT_LOCALE);
@@ -107,6 +107,7 @@ public class NotificationEventListener {
                 .type(NotificationType.SYSTEM)
                 .title(title)
                 .content(content)
+                .targetUrl("/reports#report-" + event.reportId())
                 .isRead(false)
                 .build());
     }
@@ -121,6 +122,7 @@ public class NotificationEventListener {
                 .type(NotificationType.PAYMENT)
                 .title(title)
                 .content(content)
+                .targetUrl("/settings/billing")
                 .isRead(false)
                 .build());
     }
