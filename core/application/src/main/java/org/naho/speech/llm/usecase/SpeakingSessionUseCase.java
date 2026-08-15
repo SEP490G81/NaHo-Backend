@@ -1,7 +1,5 @@
 package org.naho.speech.llm.usecase;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.naho.file.constant.FileAccessStatus;
 import org.naho.file.model.File;
 import org.naho.file.port.in.UploadFileInputPort;
@@ -22,58 +20,30 @@ import org.naho.speech.llm.command.SendMessageWithSessionCommand;
 import org.naho.speech.llm.command.SpeakingSessionFilterCommand;
 import org.naho.speech.llm.command.StartSpeakingConversationWithAICommand;
 import org.naho.speech.llm.exception.LlmApplicationError;
+import org.naho.speech.llm.helper.SpeakingSessionHelper;
+import org.naho.speech.llm.helper.SpeakingSessionHelper.ParsedAiReply;
 import org.naho.speech.llm.port.in.SpeakingSessionInputPort;
 import org.naho.speech.llm.port.out.AiChatPort;
 import org.naho.speech.llm.port.out.SessionStorePort;
 import org.naho.speech.llm.port.out.SpeakingSessionRepositoryPort;
 import org.naho.speech.llm.port.out.SpeechToTextPort;
-import org.naho.speech.llm.result.*;
+import org.naho.speech.llm.result.ActiveSpeakingSessionResult;
+import org.naho.speech.llm.result.AudioChatResult;
+import org.naho.speech.llm.result.ChatResult;
+import org.naho.speech.llm.result.SpeakingSessionDetailResult;
+import org.naho.speech.llm.result.SpeakingSessionListItemResult;
+import org.naho.speech.llm.result.SpeechToTextResult;
+import org.naho.speech.llm.result.StartConversationResult;
 import org.naho.speech.llm.validator.SessionValidator;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private static final String SYSTEM_PROMPT_TEMPLATE = """
-            You are a Japanese conversation partner on the NaHo language learning platform.
-            %s
-            
-            ## CONVERSATION BEHAVIOR RULES
-            1. **Language**: The "reply" field MUST be in Japanese ONLY. No English or Vietnamese in "reply".
-            2. **Length calibration**:
-               - Learner message ≤ 10 words → reply ≤ 2 sentences + 1 follow-up question.
-               - Learner message > 10 words → reply 2–4 sentences.
-               - NEVER write a wall of text. You are a conversation partner, not a lecturer.
-            3. **Grammar error handling**:
-               - If learner uses wrong particle, wrong verb conjugation, or unnatural phrasing:
-                 → Subtly model the correct form naturally in your Japanese reply.
-                 → Then fill correctedUserText + correctionExplanation fields.
-               - Common errors to watch: は/が confusion, を/に confusion, plain vs polite form mismatch.
-            4. **Stuck learner detection**:
-               - If learner sends only fillers (あー, えーと, うーん) or ≤ 3 meaningful words:
-                 → Your reply MUST include a simpler re-ask or a scaffolding hint.
-                 → Example: 「少し難しかったですか？「〇〇は△△です」のように言えますよ。」
-            5. **Topic steering**: Gently redirect off-topic responses. Stay on session topic.
-            6. **If no grammar errors found**: correctionExplanation = "Câu của bạn đã rất tự nhiên và chính xác!"
-            7. **Naturalness over perfection**: Prefer warm, natural Japanese over formal textbook phrases.
-            
-            ## OUTPUT FORMAT (MANDATORY)
-            Respond ONLY with a valid raw JSON object. No markdown, no code fences. All 6 fields required:
-            {
-              "reply": "<Full Japanese response — naturally phrased>",
-              "replyTranslation": "<Natural Vietnamese translation of reply>",
-              "grammarNote": "<Vietnamese: Explain 1-2 grammar points/vocab used in YOUR reply>",
-              "correctedUserText": "<Corrected Japanese of learner's last turn, or natural alternative if no error>",
-              "correctionExplanation": "<Vietnamese: what was wrong and why correction is better, or praise if correct>",
-              "hintForLearner": "<Optional Vietnamese tip for next turn, empty string \"\" if no tip>"
-            }
-            """;
-
-    private static final String PERSONA_INSTRUCTION = "- You are roleplaying as the specified persona. Adapt your tone, formality, and personality accordingly.\n"
-            + "- Start by greeting the learner in character and inviting them to converse.";
-    private static final int MAX_SLIDING_WINDOW_MESSAGES = 16; // 8 lượt thoại gần nhất
     private final AiChatPort aiChatPort;
     private final SessionStorePort sessionStorePort;
     private final SpeechToTextPort speechToTextPort;
@@ -83,6 +53,31 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     private final FileRepositoryPort fileRepositoryPort;
     private final UploadFileInputPort uploadFileInputPort;
     private final SessionValidator sessionValidator;
+    private final SpeakingSessionHelper speakingSessionHelper;
+
+    public SpeakingSessionUseCase(
+            AiChatPort aiChatPort,
+            SessionStorePort sessionStorePort,
+            SpeechToTextPort speechToTextPort,
+            PersonaRepositoryPort personaRepositoryPort,
+            TextToSpeechServicePort textToSpeechServicePort,
+            SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
+            FileRepositoryPort fileRepositoryPort,
+            UploadFileInputPort uploadFileInputPort,
+            SessionValidator sessionValidator,
+            SpeakingSessionHelper speakingSessionHelper
+    ) {
+        this.aiChatPort = aiChatPort;
+        this.sessionStorePort = sessionStorePort;
+        this.speechToTextPort = speechToTextPort;
+        this.personaRepositoryPort = personaRepositoryPort;
+        this.textToSpeechServicePort = textToSpeechServicePort;
+        this.speakingSessionRepositoryPort = speakingSessionRepositoryPort;
+        this.fileRepositoryPort = fileRepositoryPort;
+        this.uploadFileInputPort = uploadFileInputPort;
+        this.sessionValidator = sessionValidator;
+        this.speakingSessionHelper = speakingSessionHelper;
+    }
 
     public SpeakingSessionUseCase(
             AiChatPort aiChatPort,
@@ -95,149 +90,18 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             UploadFileInputPort uploadFileInputPort,
             SessionValidator sessionValidator
     ) {
-        this.aiChatPort = aiChatPort;
-        this.sessionStorePort = sessionStorePort;
-        this.speechToTextPort = speechToTextPort;
-        this.personaRepositoryPort = personaRepositoryPort;
-        this.textToSpeechServicePort = textToSpeechServicePort;
-        this.speakingSessionRepositoryPort = speakingSessionRepositoryPort;
-        this.fileRepositoryPort = fileRepositoryPort;
-        this.uploadFileInputPort = uploadFileInputPort;
-        this.sessionValidator = sessionValidator;
-    }
-
-    private ParsedAiReply parseAiResponse(String rawResponse) {
-        if (rawResponse == null || rawResponse.isBlank()) {
-            return new ParsedAiReply("", "", "", "", "", "");
-        }
-        try {
-            String cleaned = rawResponse.trim();
-            if (cleaned.startsWith("```")) {
-                int firstNewline = cleaned.indexOf("\n");
-                int lastBacktick = cleaned.lastIndexOf("```");
-                if (firstNewline != -1 && lastBacktick > firstNewline) {
-                    cleaned = cleaned.substring(firstNewline + 1, lastBacktick).trim();
-                }
-            }
-            JsonNode root = OBJECT_MAPPER.readTree(cleaned);
-            String reply = root.path("reply").asText("");
-            String replyTranslation = root.path("replyTranslation").asText("");
-            // Support both old 'grammarExplanation' and new 'grammarNote' field names
-            String grammarNote = root.has("grammarNote")
-                    ? root.path("grammarNote").asText("")
-                    : root.path("grammarExplanation").asText("");
-            String correctedUserText = root.path("correctedUserText").asText("");
-            String correctionExplanation = root.path("correctionExplanation").asText("");
-            String hintForLearner = root.path("hintForLearner").asText("");
-            return new ParsedAiReply(reply, replyTranslation, grammarNote, correctedUserText, correctionExplanation,
-                    hintForLearner);
-        } catch (Exception e) {
-
-            System.out.println("[SpeakingSessionUseCase] Fallback raw text parsing: " + e.getMessage());
-            System.out.println("[SpeakingSessionUseCase] Raw response: " + rawResponse);
-            return new ParsedAiReply(rawResponse, "", "", "", "", "");
-        }
-    }
-
-    private List<Map<String, String>> getSlidingWindowMessages(String sessionId) {
-        List<Map<String, String>> history = sessionStorePort.getConversationHistory(sessionId);
-        if (history == null || history.isEmpty()) {
-            return List.of();
-        }
-
-        String systemPromptTemplate = """
-                You are a Japanese conversation partner on the NaHo language learning platform.
-                
-                - You are roleplaying as the specified persona. Adapt your tone, formality, and personality accordingly.
-                - Start by greeting the learner in character and inviting them to converse.
-                
-                - Your persona role & prompt:
-                  You are Tanaka Sensei, a patient, warm, and encouraging language teacher on the NaHo platform.
-                  Your role is to help learners practice daily conversation.
-                  Speak in clear, polite form (desu/masu).
-                  Gently guide the learner when they make mistakes,
-                  ask open-ended questions about their daily life, hobbies, and learning goals,
-                  and encourage them continuously.
-                
-                - Conversation style description:
-                  Neutral/Polite Japanese (ます form)
-                
-                - Conversation style prompt:
-                  Please respond using polite, standard Japanese (desu/masu form).
-                  Avoid casual talk or heavy honorifics unless appropriate.
-                
-                - Formality level (Keigo/Style):
-                  NEUTRAL
-                
-                
-                ## CONVERSATION BEHAVIOR RULES
-                
-                1. **Language**
-                   The "reply" field MUST be in Japanese ONLY.
-                   No English or Vietnamese in "reply".
-                
-                2. **Length calibration**
-                   - Learner message ≤ 10 words → reply ≤ 2 sentences + 1 follow-up question.
-                   - Learner message > 10 words → reply 2–4 sentences.
-                   - NEVER write a wall of text.
-                   - You are a conversation partner, not a lecturer.
-                
-                3. **Grammar error handling**
-                   - If learner uses wrong particle, wrong verb conjugation,
-                     or unnatural phrasing:
-                     → Subtly model the correct form naturally in your Japanese reply.
-                     → Then fill correctedUserText + correctionExplanation fields.
-                
-                   - Common errors to watch:
-                     - は/が confusion
-                     - を/に confusion
-                     - plain vs polite form mismatch
-                
-                4. **Stuck learner detection**
-                   - If learner sends only fillers (あー, えーと, うーん)
-                     or ≤ 3 meaningful words:
-                     → Your reply MUST include a simpler re-ask or a scaffolding hint.
-                
-                   - Example:
-                     「少し難しかったですか？「〇〇は△△です」のように言えますよ。」
-                
-                5. **Topic steering**
-                   Gently redirect off-topic responses.
-                   Stay on session topic.
-                
-                6. **If no grammar errors found**
-                   correctionExplanation = "Câu của bạn đã rất tự nhiên và chính xác!"
-                
-                7. **Naturalness over perfection**
-                   Prefer warm, natural Japanese over formal textbook phrases.
-                
-                
-                ## OUTPUT FORMAT (MANDATORY)
-                
-                Respond ONLY with a valid raw JSON object.
-                No markdown, no code fences.
-                All 6 fields are required.
-                
-                {
-                  "reply": "<Full Japanese response — naturally phrased>",
-                  "replyTranslation": "<Natural Vietnamese translation of reply>",
-                  "grammarNote": "<Vietnamese: Explain 1-2 grammar points/vocab used in YOUR reply>",
-                  "correctedUserText": "<Corrected Japanese of learner's last turn, or natural alternative if no error>",
-                  "correctionExplanation": "<Vietnamese: what was wrong and why correction is better, or praise if correct>",
-                  "hintForLearner": "<Optional Vietnamese tip for next turn, empty string \\"\\" if no tip>"
-                }
-                """;
-
-        Map<String, String> systemPrompt = new HashMap<>();
-        systemPrompt.put("role", "system");
-        systemPrompt.put("content", systemPromptTemplate);
-
-        List<Map<String, String>> slidingWindow = new ArrayList<>();
-
-        slidingWindow.addAll(history);
-
-        slidingWindow.add(systemPrompt);
-        return slidingWindow;
+        this(
+                aiChatPort,
+                sessionStorePort,
+                speechToTextPort,
+                personaRepositoryPort,
+                textToSpeechServicePort,
+                speakingSessionRepositoryPort,
+                fileRepositoryPort,
+                uploadFileInputPort,
+                sessionValidator,
+                new SpeakingSessionHelper(sessionStorePort, speakingSessionRepositoryPort, textToSpeechServicePort)
+        );
     }
 
     @Override
@@ -245,13 +109,13 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         String sessionId = command.sessionId();
         sessionValidator.validateSessionNotCompleted(sessionId);
         sessionValidator.validateSessionTurnLimit(sessionId, null);
-        ensureSessionLoadedInMemory(sessionId);
+        speakingSessionHelper.ensureSessionLoadedInMemory(sessionId);
         String userMessage = command.userMessage();
         sessionStorePort.addMessage(sessionId, "user", userMessage);
 
-        List<Map<String, String>> messages = getSlidingWindowMessages(sessionId);
+        List<Map<String, String>> messages = speakingSessionHelper.getSlidingWindowMessages(sessionId);
         String rawReply = aiChatPort.chatWithContext(messages);
-        ParsedAiReply parsed = parseAiResponse(rawReply);
+        ParsedAiReply parsed = speakingSessionHelper.parseAiResponse(rawReply);
 
         sessionStorePort.addMessage(sessionId, "assistant", parsed.reply());
         sessionStorePort.appendTranscript(sessionId,
@@ -282,7 +146,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             }
         });
 
-        String aiAudio = toAudioBase64(sessionId, parsed.reply());
+        String aiAudio = speakingSessionHelper.toAudioBase64(sessionId, parsed.reply());
 
         return new ChatResult(
                 parsed.reply(),
@@ -298,11 +162,11 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         String sessionId = command.sessionId();
         sessionValidator.validateSessionNotCompleted(sessionId);
         sessionValidator.validateSessionTurnLimit(sessionId, null);
-        ensureSessionLoadedInMemory(sessionId);
+        speakingSessionHelper.ensureSessionLoadedInMemory(sessionId);
         String userMessage = command.userMessage();
         sessionStorePort.addMessage(sessionId, "user", userMessage);
 
-        List<Map<String, String>> messages = getSlidingWindowMessages(sessionId);
+        List<Map<String, String>> messages = speakingSessionHelper.getSlidingWindowMessages(sessionId);
         StringBuilder fullReply = new StringBuilder();
         aiChatPort.chatStreamWithContext(messages, token -> {
             fullReply.append(token);
@@ -310,7 +174,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         });
 
         String rawReply = fullReply.toString();
-        ParsedAiReply parsed = parseAiResponse(rawReply);
+        ParsedAiReply parsed = speakingSessionHelper.parseAiResponse(rawReply);
 
         sessionStorePort.addMessage(sessionId, "assistant", parsed.reply());
         sessionStorePort.appendTranscript(sessionId,
@@ -322,7 +186,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     public StartConversationResult startConversationWithAISession(
             StartSpeakingConversationWithAICommand command
     ) {
-        // kiểm tra xem người dùng đã tới giới hạn lượt tạo session trong ngày chưa
+        // Kiểm tra xem người dùng đã tới giới hạn lượt tạo session trong ngày chưa
         sessionValidator.validateSessionStartLimit(command.userId());
 
         String sessionId = UUID.randomUUID().toString();
@@ -369,7 +233,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         }
         sessionStorePort.setPersonaContext(sessionId, personaCtx.toString());
 
-        StringBuilder customInstruction = new StringBuilder(PERSONA_INSTRUCTION);
+        StringBuilder customInstruction = new StringBuilder(SpeakingSessionHelper.PERSONA_INSTRUCTION);
         customInstruction.append("\n- Your persona role & prompt: ").append(persona.getPrompt());
         if (persona.getConversationStyle() != null) {
             if (persona.getConversationStyle().getDescription() != null) {
@@ -398,13 +262,13 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             sessionStorePort.setFormalityLevel(sessionId, effectiveFormality.name());
         }
 
-        String prompt = SYSTEM_PROMPT_TEMPLATE.formatted(customInstruction.toString());
+        String prompt = SpeakingSessionHelper.SYSTEM_PROMPT_TEMPLATE.formatted(customInstruction.toString());
         sessionStorePort.addMessage(sessionId, "system", prompt);
         sessionStorePort.addMessage(sessionId, "user", "こんにちは、話しましょう！");
 
         List<Map<String, String>> messages = sessionStorePort.getConversationHistory(sessionId);
         String rawReply = aiChatPort.chatWithContext(messages);
-        ParsedAiReply parsed = parseAiResponse(rawReply);
+        ParsedAiReply parsed = speakingSessionHelper.parseAiResponse(rawReply);
 
         sessionStorePort.addMessage(sessionId, "assistant", parsed.reply());
         sessionStorePort.appendTranscript(sessionId,
@@ -426,7 +290,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                     .println("[SpeakingSessionUseCase] Failed to create IN_PROGRESS session in DB: " + e.getMessage());
         }
 
-        String audioBase64 = toAudioBase64(sessionId, parsed.reply());
+        String audioBase64 = speakingSessionHelper.toAudioBase64(sessionId, parsed.reply());
 
         return new StartConversationResult(
                 sessionId,
@@ -441,7 +305,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         String sessionId = command.sessionId();
         sessionValidator.validateSessionNotCompleted(sessionId);
         sessionValidator.validateSessionTurnLimit(sessionId, command.userId());
-        ensureSessionLoadedInMemory(sessionId);
+        speakingSessionHelper.ensureSessionLoadedInMemory(sessionId);
 
         SpeechToTextResult sttResult = speechToTextPort.transcribeAndAssess(
                 command.audioBytes(), command.referenceText());
@@ -451,14 +315,14 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
 
         sessionStorePort.addMessage(sessionId, "user", transcribedText);
 
-        List<Map<String, String>> messages = getSlidingWindowMessages(sessionId);
+        List<Map<String, String>> messages = speakingSessionHelper.getSlidingWindowMessages(sessionId);
         String rawReply = aiChatPort.chatWithContext(messages);
 
         for (Map<String, String> m : messages) {
             System.out.println("[SpeakingSession] Message: " + m.get("content"));
         }
 
-        ParsedAiReply parsed = parseAiResponse(rawReply);
+        ParsedAiReply parsed = speakingSessionHelper.parseAiResponse(rawReply);
 
         sessionStorePort.addMessage(sessionId, "assistant", parsed.reply());
         sessionStorePort.appendTranscript(sessionId,
@@ -500,7 +364,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             }
         });
 
-        String aiAudio = toAudioBase64(sessionId, parsed.reply());
+        String aiAudio = speakingSessionHelper.toAudioBase64(sessionId, parsed.reply());
 
         return new AudioChatResult(
                 transcribedText,
@@ -513,7 +377,8 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                 sttResult.accuracyScore(),
                 sttResult.fluencyScore(),
                 sttResult.completenessScore(),
-                sttResult.pronunciationScore());
+                sttResult.pronunciationScore(),
+                parsed.suggestedReplies());
     }
 
     @Override
@@ -531,13 +396,14 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
 
     @Override
     public ActiveSpeakingSessionResult getActiveSession(Long userId, Integer personaId) {
-        if (userId == null)
+        if (userId == null) {
             return null;
+        }
         Long pId = (personaId != null && personaId > 0) ? personaId.longValue() : null;
         ActiveSpeakingSessionResult activeSession = speakingSessionRepositoryPort.findActiveSession(userId, pId)
                 .orElse(null);
         if (activeSession != null) {
-            ensureSessionLoadedInMemory(activeSession.sessionCode());
+            speakingSessionHelper.ensureSessionLoadedInMemory(activeSession.sessionCode());
         }
         return activeSession;
     }
@@ -560,11 +426,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                     break;
                 }
             }
-            // lastAssistantReply đã là plain Japanese text (parsed.reply() khi lưu vào
-            // memory)
-            // Không re-parse qua parseAiResponse() vì sẽ fail JSON →
-            // replyTranslation/grammarNote trống
-            String audioBase64 = toAudioBase64(sessionCode, lastAssistantReply);
+            String audioBase64 = speakingSessionHelper.toAudioBase64(sessionCode, lastAssistantReply);
             return new StartConversationResult(
                     sessionCode,
                     audioBase64,
@@ -612,9 +474,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                 activeSession.startedAt(),
                 historyMessages);
 
-        // lastAssistantReply đã là plain Japanese text (parsed.reply() khi lưu vào DB)
-        // Không re-parse vì sẽ fail JSON → replyTranslation/grammarNote trống
-        String audioBase64 = toAudioBase64(sessionCode, lastAssistantReply);
+        String audioBase64 = speakingSessionHelper.toAudioBase64(sessionCode, lastAssistantReply);
 
         return new StartConversationResult(
                 sessionCode,
@@ -622,70 +482,5 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                 lastAssistantReply,
                 "",
                 "");
-    }
-
-    private String toAudioBase64(String sessionId, String text) {
-        try {
-            String voiceName = sessionStorePort.getVoiceName(sessionId);
-            byte[] audioBytes = textToSpeechServicePort.textToSpeech(text, voiceName, "ja-JP").audioData();
-            return Base64.getEncoder().encodeToString(audioBytes);
-        } catch (Exception e) {
-            System.out.println("[SpeakingSession] TTS failed for session " + sessionId + ": " + e.getMessage());
-            return null;
-        }
-    }
-
-    private void ensureSessionLoadedInMemory(String sessionCode) {
-        if (sessionCode == null || sessionCode.isBlank()) {
-            throw new ApplicationException(
-                    LlmApplicationError.LLM_SESSION_ID_INVALID,
-                    LlmDetailMessageKey.LLM_SESSION_ID_INVALID);
-        }
-
-        if (sessionStorePort.hasSession(sessionCode)) {
-            return;
-        }
-
-        ActiveSpeakingSessionResult activeSession = speakingSessionRepositoryPort
-                .findActiveSessionByCode(sessionCode, null)
-                .orElseThrow(() -> new ApplicationException(
-                        LlmApplicationError.LLM_SESSION_NOT_FOUND,
-                        LlmDetailMessageKey.LLM_SESSION_NOT_FOUND));
-
-        List<Map<String, String>> historyMessages = new ArrayList<>();
-        if (activeSession.messages() != null) {
-            for (var msg : activeSession.messages()) {
-                historyMessages.add(Map.of("role", msg.senderType(), "content", msg.content()));
-            }
-        }
-
-        StringBuilder fullTranscript = new StringBuilder();
-        if (activeSession.messages() != null) {
-            for (var msg : activeSession.messages()) {
-                fullTranscript.append("[Turn]\n").append(msg.senderType()).append(": ").append(msg.content())
-                        .append("\n");
-            }
-        }
-
-        sessionStorePort.restoreSession(
-                sessionCode,
-                null,
-                activeSession.personaId(),
-                activeSession.topic(),
-                activeSession.marugotoLevel(),
-                activeSession.formalityLevel(),
-                fullTranscript.toString(),
-                activeSession.totalTurns(),
-                activeSession.startedAt(),
-                historyMessages);
-    }
-
-    private record ParsedAiReply(
-            String reply,
-            String replyTranslation,
-            String grammarNote,
-            String correctedUserText,
-            String correctionExplanation,
-            String hintForLearner) {
     }
 }
