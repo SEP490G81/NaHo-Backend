@@ -1,6 +1,7 @@
 package org.naho.speech.llm.repository;
 
 import org.naho.speech.llm.entity.SpeakingSessionEntity;
+import org.naho.speech.llm.type.SpeakingSessionStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,12 +17,15 @@ public interface SpeakingSessionJpaRepository
 
     Optional<SpeakingSessionEntity> findBySessionCodeAndUserId(String sessionCode, Long userId);
 
-    Optional<SpeakingSessionEntity> findBySessionCodeAndStatus(String sessionCode, String status);
+    Optional<SpeakingSessionEntity> findBySessionCodeAndStatus(String sessionCode, SpeakingSessionStatus status);
 
-    Optional<SpeakingSessionEntity> findFirstByUserIdAndStatusOrderByStartedAtDesc(Long userId, String status);
+    Optional<SpeakingSessionEntity> findFirstByUserIdAndStatusOrderByStartedAtDesc(Long userId, SpeakingSessionStatus status);
 
-    Optional<SpeakingSessionEntity> findFirstByUserIdAndPersonaIdAndStatusOrderByStartedAtDesc(Long userId,
-                                                                                               Long personaId, String status);
+    Optional<SpeakingSessionEntity> findFirstByUserIdAndPersonaIdAndStatusOrderByStartedAtDesc(
+            Long userId,
+            Long personaId,
+            SpeakingSessionStatus status
+    );
 
-    int countByUserIdAndStatus(Long userId, String status);
+    int countByUserIdAndStatus(Long userId, SpeakingSessionStatus status);
 }

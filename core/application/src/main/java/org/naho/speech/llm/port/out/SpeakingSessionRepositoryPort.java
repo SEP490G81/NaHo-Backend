@@ -77,4 +77,8 @@ public interface SpeakingSessionRepositoryPort {
      * Đếm số phiên đang ở trạng thái IN_PROGRESS của người dùng.
      */
     int countActiveSessionsByUserId(Long userId);
+
+    void deleteSessionBySessionCode(String sessionCode);
+
+    boolean isSessionBelongToUser(String sessionCode, Long userId);
 }

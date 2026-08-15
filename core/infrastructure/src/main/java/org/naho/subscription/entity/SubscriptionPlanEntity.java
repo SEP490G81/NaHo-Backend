@@ -55,6 +55,9 @@ public class SubscriptionPlanEntity extends BaseEntity {
     @Column(name = "max_ai_turn_speaking_seconds", nullable = false)
     Integer maxAiTurnSpeakingSeconds;
 
+    @Column(name = "max_in_progress_session_count", nullable = false)
+    Integer maxInProgressSessionCount;
+
     @Column(name = "sample_answer_enabled", nullable = false)
     Boolean sampleAnswerEnabled;
 

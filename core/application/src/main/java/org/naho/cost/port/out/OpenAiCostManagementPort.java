@@ -1,4 +1,4 @@
-package org.naho.speech.llm.port.out;
+package org.naho.cost.port.out;
 
 import org.naho.cost.model.OpenAiDailyCost;
 

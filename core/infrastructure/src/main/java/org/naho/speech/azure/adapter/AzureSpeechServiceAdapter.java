@@ -13,8 +13,8 @@ import org.naho.speech.azure.command.SpeechAssessmentCommand;
 import org.naho.speech.azure.constant.AzureSpeechConfigProperties;
 import org.naho.speech.azure.exception.AzureSpeechErrorCode;
 import org.naho.speech.azure.helper.AzureSpeechServiceHelper;
+import org.naho.speech.azure.model.SpeechAssessment;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
-import org.naho.speech.model.SpeechAssessment;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Files;

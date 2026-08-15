@@ -35,10 +35,10 @@ public class SessionValidator {
      * Method check xem session đã được completed chưa
      * nếu đã complete thì sẽ throw exception (do complete rồi thì không được học nữa)
      *
-     * @param sessionId id của phiên chat
+     * @param sessionCode mã phiên chat
      */
-    public void validateSessionNotCompleted(String sessionId) {
-        if (speakingSessionRepositoryPort.isSessionCompleted(sessionId)) {
+    public void validateSessionNotCompleted(String sessionCode) {
+        if (speakingSessionRepositoryPort.isSessionCompleted(sessionCode)) {
             throw new ApplicationException(
                     LlmApplicationError.LLM_SESSION_ALREADY_COMPLETED,
                     LlmDetailMessageKey.LLM_SESSION_ALREADY_COMPLETED);
@@ -49,11 +49,11 @@ public class SessionValidator {
      * Kiểm tra số lượt nói của người dùng trong session
      * Lấy ra gói đăng kí của người dùng và kiểm tra giới hạn
      *
-     * @param sessionId id của session
-     * @param userId    id của user
+     * @param sessionCode mã session
+     * @param userId      id của user
      */
-    public void validateSessionTurnLimit(String sessionId, Long userId) {
-        Long targetUserId = userId != null ? userId : sessionStorePort.getUserId(sessionId);
+    public void validateSessionTurnLimit(String sessionCode, Long userId) {
+        Long targetUserId = userId != null ? userId : sessionStorePort.getUserId(sessionCode);
         if (targetUserId == null) {
             return;
         }
@@ -61,7 +61,7 @@ public class SessionValidator {
         SubscriptionPlanResult plan = getActiveSubscriptionInputPort
                 .getUserActiveSubscriptionPlan(targetUserId);
 
-        int currentTurnCount = sessionStorePort.getTurnCount(sessionId);
+        int currentTurnCount = sessionStorePort.getTurnCount(sessionCode);
 
         if (currentTurnCount >= plan.maxTurnsPerAiSession()) {
             throw new ApplicationException(
@@ -99,5 +99,46 @@ public class SessionValidator {
         // Tăng số lần AI 1:1 trong ngày của người dùng và lưu lại
         userDailyAiUsage.increaseAiSessionStartCount();
         userDailyAiUsageRepositoryPort.save(userDailyAiUsage);
+    }
+
+    /**
+     * Kiểm tra số session đang trong trạng thái IN_PROGRESS hiện tại của người dùng
+     * Có vượt quá giới hạn session trong trạng thái IN_PROGRESS hay không
+     *
+     * @param userId user id
+     */
+    public void validateMaxInProgressSession(Long userId) {
+        // lấy ra gói đăng kí của người dùng hiện tại
+        SubscriptionPlanResult subscriptionPlanResult = getActiveSubscriptionInputPort
+                .getUserActiveSubscriptionPlan(userId);
+
+        int currentUserInProgressSessionCount = speakingSessionRepositoryPort
+                .countActiveSessionsByUserId(userId);
+
+        // nếu số session đang trong trạng thái IN_PROGRESS
+        // lớn hơn giới hạn số IN_PROGRESS session đang có
+        // thì ném ra lỗi
+        if (currentUserInProgressSessionCount >= subscriptionPlanResult.maxInProgressSessionCount()) {
+            throw new ApplicationException(
+                    LlmApplicationError.LLM_SESSION_CONCURRENT_LIMIT_EXCEEDED,
+                    LlmDetailMessageKey.LLM_SESSION_CONCURRENT_LIMIT_EXCEEDED
+            );
+        }
+    }
+
+    /**
+     * Kiểm tra xem session có thuộc về user không
+     * Nếu không thuộc về user thì ném ra lỗi
+     *
+     * @param sessionCode mã phiên
+     * @param userId      id người dùng
+     */
+    public void validateSessionIsBelongToUser(String sessionCode, Long userId) {
+        if (!speakingSessionRepositoryPort.isSessionBelongToUser(sessionCode, userId)) {
+            throw new ApplicationException(
+                    LlmApplicationError.LLM_SESSION_NOT_FOUND,
+                    LlmDetailMessageKey.LLM_SESSION_NOT_FOUND
+            );
+        }
     }
 }

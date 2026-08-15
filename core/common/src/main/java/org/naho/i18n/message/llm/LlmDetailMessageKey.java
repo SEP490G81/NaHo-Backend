@@ -8,6 +8,7 @@ public final class LlmDetailMessageKey {
 
     public static final String LLM_SESSION_NOT_FOUND = "ai.application.session.not.found";
     public static final String LLM_SESSION_ID_INVALID = "ai.application.session.id.invalid";
+    public static final String LLM_SESSION_CODE_INVALID = "ai.application.session.code.invalid";
     public static final String LLM_SESSION_ALREADY_COMPLETED = "ai.application.session.already.completed";
     public static final String LLM_SESSION_TURN_LIMIT_EXCEEDED = "ai.application.session.turn.limit.exceeded";
     public static final String LLM_SESSION_CONCURRENT_LIMIT_EXCEEDED = "ai.application.session.concurrent.limit.exceeded";

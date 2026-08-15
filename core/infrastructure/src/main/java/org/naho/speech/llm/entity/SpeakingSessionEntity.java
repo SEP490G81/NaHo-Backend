@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.shared.persistence.BaseEntity;
+import org.naho.speech.llm.type.SpeakingSessionStatus;
 
 import java.time.Instant;
 import java.util.List;
@@ -18,7 +19,6 @@ import java.util.List;
 @Table(name = "speaking_sessions")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SpeakingSessionEntity extends BaseEntity {
-
     @Column(name = "session_code", nullable = false, unique = true, length = 36)
     String sessionCode;
 
@@ -49,8 +49,9 @@ public class SpeakingSessionEntity extends BaseEntity {
     @Column(name = "full_transcript", columnDefinition = "LONGTEXT")
     String fullTranscript;
 
-    @Column(name = "status", nullable = false, length = 20)
-    String status;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    SpeakingSessionStatus status;
 
     @Column(name = "started_at", nullable = false)
     Instant startedAt;
@@ -58,9 +59,9 @@ public class SpeakingSessionEntity extends BaseEntity {
     @Column(name = "ended_at")
     Instant endedAt;
 
-    @OneToOne(mappedBy = "session", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
     SpeakingSessionAssessmentEntity assessment;
 
-    @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     List<SpeakingSessionMessageEntity> messages;
 }

@@ -1,4 +1,4 @@
-package org.naho.speech.type;
+package org.naho.speech.azure.type;
 
 public enum SpeechAssessmentErrorType {
     OMISSION,

@@ -34,6 +34,9 @@ public record UpdateSubscriptionPlanRequest(
         @Min(value = 0, message = "Speaking seconds must be greater than or equal to 0")
         Integer maxAiTurnSpeakingSeconds,
 
+        @Min(value = 0, message = "Limit must be greater than or equal to 0")
+        Integer maxInProgressSessionCount,
+
         Boolean sampleAnswerEnabled,
 
         PlanStatus status

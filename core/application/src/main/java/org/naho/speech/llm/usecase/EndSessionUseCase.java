@@ -8,8 +8,6 @@ import org.naho.speech.llm.port.out.AiScoringPort;
 import org.naho.speech.llm.port.out.SessionStorePort;
 import org.naho.speech.llm.port.out.SpeakingSessionRepositoryPort;
 import org.naho.speech.llm.result.ScoringResult;
-import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
-import org.naho.subscription.port.out.UserDailyAiUsageRepositoryPort;
 
 import java.time.Instant;
 
@@ -17,27 +15,21 @@ public class EndSessionUseCase implements EndSessionInputPort {
     private final SessionStorePort sessionStorePort;
     private final AiScoringPort aiScoringPort;
     private final SpeakingSessionRepositoryPort speakingSessionRepositoryPort;
-    private final UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort;
-    private final GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
 
     public EndSessionUseCase(
             SessionStorePort sessionStorePort,
             AiScoringPort aiScoringPort,
-            SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
-            UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort,
-            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort
+            SpeakingSessionRepositoryPort speakingSessionRepositoryPort
     ) {
         this.sessionStorePort = sessionStorePort;
         this.aiScoringPort = aiScoringPort;
         this.speakingSessionRepositoryPort = speakingSessionRepositoryPort;
-        this.userDailyAiUsageRepositoryPort = userDailyAiUsageRepositoryPort;
-        this.getActiveSubscriptionInputPort = getActiveSubscriptionInputPort;
     }
 
     @Override
-    public ScoringResult endSession(Long requestUserId, String sessionId, String topic, String speechMetaData, String arsConfidence) {
+    public ScoringResult endSession(Long requestUserId, String sessionCode, String topic, String speechMetaData, String arsConfidence) {
         // Lấy user id của người sở hữu cái session này
-        Long userId = sessionStorePort.getUserId(sessionId);
+        Long userId = sessionStorePort.getUserId(sessionCode);
         if (userId == null) {
             userId = requestUserId;
         }
@@ -49,25 +41,25 @@ public class EndSessionUseCase implements EndSessionInputPort {
             );
         }
 
-        String fullTranscript = sessionStorePort.getFullTranscript(sessionId);
-        String personaContext = sessionStorePort.getPersonaContext(sessionId);
+        String fullTranscript = sessionStorePort.getFullTranscript(sessionCode);
+        String personaContext = sessionStorePort.getPersonaContext(sessionCode);
 
-        String effectiveTopic = (topic != null && !topic.isBlank()) ? topic : sessionStorePort.getTopic(sessionId);
+        String effectiveTopic = (topic != null && !topic.isBlank()) ? topic : sessionStorePort.getTopic(sessionCode);
 
         System.out.println("    Transcript length: " + fullTranscript.length() + " chars");
         System.out.println("    Persona context: " + (personaContext.isBlank() ? "(none)" : personaContext.substring(0, Math.min(80, personaContext.length()))));
 
-        ScoringResult result = aiScoringPort.score(sessionId, effectiveTopic, fullTranscript, speechMetaData, arsConfidence, personaContext);
+        ScoringResult result = aiScoringPort.score(sessionCode, effectiveTopic, fullTranscript, speechMetaData, arsConfidence, personaContext);
         System.out.println("    overallScore: " + result.overallScore() + "/100");
         System.out.println("    jlptEstimate: " + result.jlptEstimate());
 
         // Persist session result to DB
         try {
-            Long personaId = sessionStorePort.getPersonaId(sessionId);
-            String marugotoLevel = sessionStorePort.getMarugotoLevel(sessionId);
-            String formalityLevel = sessionStorePort.getFormalityLevel(sessionId);
-            int totalTurns = sessionStorePort.getTurnCount(sessionId);
-            Instant startedAt = sessionStorePort.getStartedAt(sessionId);
+            Long personaId = sessionStorePort.getPersonaId(sessionCode);
+            String marugotoLevel = sessionStorePort.getMarugotoLevel(sessionCode);
+            String formalityLevel = sessionStorePort.getFormalityLevel(sessionCode);
+            int totalTurns = sessionStorePort.getTurnCount(sessionCode);
+            Instant startedAt = sessionStorePort.getStartedAt(sessionCode);
 
             Double asrConfidenceDouble = null;
             if (arsConfidence != null && !arsConfidence.isBlank() && !arsConfidence.equals("N/A")) {
@@ -82,7 +74,7 @@ public class EndSessionUseCase implements EndSessionInputPort {
             }
 
             speakingSessionRepositoryPort.saveSpeakingSession(
-                    sessionId,
+                    sessionCode,
                     userId,
                     personaId,
                     effectiveTopic,
@@ -94,7 +86,7 @@ public class EndSessionUseCase implements EndSessionInputPort {
                     startedAt,
                     result
             );
-            System.out.println("[EndSessionUseCase] Successfully saved session " + sessionId + " to DB for userId: " + userId);
+            System.out.println("[EndSessionUseCase] Successfully saved session " + sessionCode + " to DB for userId: " + userId);
         } catch (Exception e) {
             System.err.println("[EndSessionUseCase] Failed to persist session to DB: " + e.getMessage());
             throw new ApplicationException(
@@ -103,7 +95,7 @@ public class EndSessionUseCase implements EndSessionInputPort {
             );
         }
 
-        sessionStorePort.clearSession(sessionId);
+        sessionStorePort.clearSession(sessionCode);
         return result;
     }
 }

@@ -23,6 +23,7 @@ public class SubscriptionPlanResultMapper {
                 plan.getMaxTurnsPerAiSession(),
                 plan.getDailyAiSessionStartLimit(),
                 plan.getMaxAiTurnSpeakingSeconds(),
+                plan.getMaxInProgressSessionCount(),
                 plan.isSampleAnswerEnabled(),
                 plan.getStatus());
     }

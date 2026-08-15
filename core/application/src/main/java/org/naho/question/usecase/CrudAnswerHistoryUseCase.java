@@ -26,11 +26,11 @@ import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.question.result.SpeakingHistoryDetailResult;
 import org.naho.question.result.SpeakingHistoryListItemResult;
 import org.naho.shared.exception.ApplicationException;
-import org.naho.speech.model.AnswerHistory;
-import org.naho.speech.model.ContentAssessment;
-import org.naho.speech.model.SpeechAssessment;
-import org.naho.speech.model.WordAssessment;
-import org.naho.speech.type.SpeechAssessmentErrorType;
+import org.naho.speech.azure.model.AnswerHistory;
+import org.naho.speech.azure.model.ContentAssessment;
+import org.naho.speech.azure.model.SpeechAssessment;
+import org.naho.speech.azure.model.WordAssessment;
+import org.naho.speech.azure.type.SpeechAssessmentErrorType;
 import org.naho.user.exception.UserErrorCode;
 
 import java.util.ArrayList;

@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.naho.cost.entity.OpenAiDailyCostEntity;
 import org.naho.cost.mapper.OpenAiDailyCostMapper;
 import org.naho.cost.model.OpenAiDailyCost;
+import org.naho.cost.port.out.OpenAiCostRepositoryPort;
 import org.naho.cost.repository.OpenAiDailyCostJpaRepository;
-import org.naho.speech.llm.port.out.OpenAiCostRepositoryPort;
-import org.naho.speech.llm.result.OpenAiCostPointResult;
+import org.naho.cost.result.OpenAiCostPointResult;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 

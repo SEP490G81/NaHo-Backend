@@ -91,6 +91,7 @@ public class UpdateSubscriptionPlanUseCase implements UpdateSubscriptionPlanInpu
                 command.maxTurnsPerAiSession(),
                 command.dailyAiSessionStartLimit(),
                 command.maxAiTurnSpeakingSeconds(),
+                command.maxInProgressSessionCount(),
                 command.sampleAnswerEnabled(),
                 command.status()
         );

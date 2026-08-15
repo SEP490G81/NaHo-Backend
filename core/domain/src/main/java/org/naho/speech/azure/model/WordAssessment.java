@@ -1,6 +1,6 @@
-package org.naho.speech.model;
+package org.naho.speech.azure.model;
 
-import org.naho.speech.type.SpeechAssessmentErrorType;
+import org.naho.speech.azure.type.SpeechAssessmentErrorType;
 
 public class WordAssessment {
     private final Long id;

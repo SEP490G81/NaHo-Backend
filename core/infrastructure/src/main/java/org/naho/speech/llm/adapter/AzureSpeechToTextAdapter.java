@@ -1,10 +1,10 @@
 package org.naho.speech.llm.adapter;
 
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
+import org.naho.speech.azure.model.SpeechAssessment;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
 import org.naho.speech.llm.port.out.SpeechToTextPort;
 import org.naho.speech.llm.result.SpeechToTextResult;
-import org.naho.speech.model.SpeechAssessment;
 
 /**
  * Bridge Adapter: Nối AI module với Speech module thông qua SpeechToTextPort.

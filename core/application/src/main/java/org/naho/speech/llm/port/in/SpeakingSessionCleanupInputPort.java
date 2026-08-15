@@ -1,5 +1,5 @@
 package org.naho.speech.llm.port.in;
 
 public interface SpeakingSessionCleanupInputPort {
-    int cleanupExpiredSessions(int expireAfterHours);
+    void deleteSession(String sessionCode, Long userId);
 }

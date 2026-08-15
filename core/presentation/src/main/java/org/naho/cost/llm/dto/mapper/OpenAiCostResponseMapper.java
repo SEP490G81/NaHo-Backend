@@ -4,9 +4,9 @@ import org.mapstruct.Mapper;
 import org.naho.cost.llm.dto.response.OpenAiCostChartResponse;
 import org.naho.cost.llm.dto.response.OpenAiCostPointResponse;
 import org.naho.cost.llm.dto.response.OpenAiCostSummaryResponse;
-import org.naho.speech.llm.result.OpenAiCostChartResult;
-import org.naho.speech.llm.result.OpenAiCostPointResult;
-import org.naho.speech.llm.result.OpenAiCostSummaryResult;
+import org.naho.cost.result.OpenAiCostChartResult;
+import org.naho.cost.result.OpenAiCostPointResult;
+import org.naho.cost.result.OpenAiCostSummaryResult;
 
 @Mapper(componentModel = "spring")
 public interface OpenAiCostResponseMapper {

@@ -8,13 +8,17 @@ import org.naho.file.mapper.FileEntityMapper;
 import org.naho.file.model.File;
 import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.file.repository.FileJpaRepository;
+import org.naho.i18n.message.llm.LlmDetailMessageKey;
+import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.pagination.PageData;
 import org.naho.pagination.PageMeta;
+import org.naho.shared.exception.InfrastructureException;
 import org.naho.speech.llm.command.SpeakingSessionFilterCommand;
 import org.naho.speech.llm.entity.SpeakingImprovedExpressionEntity;
 import org.naho.speech.llm.entity.SpeakingSessionAssessmentEntity;
 import org.naho.speech.llm.entity.SpeakingSessionEntity;
 import org.naho.speech.llm.entity.SpeakingSessionMessageEntity;
+import org.naho.speech.llm.exception.LlmApplicationError;
 import org.naho.speech.llm.port.out.SpeakingSessionRepositoryPort;
 import org.naho.speech.llm.repository.SpeakingSessionAssessmentJpaRepository;
 import org.naho.speech.llm.repository.SpeakingSessionJpaRepository;
@@ -24,6 +28,8 @@ import org.naho.speech.llm.result.ScoringResult;
 import org.naho.speech.llm.result.SpeakingSessionDetailResult;
 import org.naho.speech.llm.result.SpeakingSessionListItemResult;
 import org.naho.speech.llm.specification.SpeakingSessionSpecification;
+import org.naho.speech.llm.type.SpeakingSessionStatus;
+import org.naho.user.exception.UserErrorCode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -73,7 +79,7 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
         sessionEntity.setFullTranscript(fullTranscript);
         sessionEntity.setTotalTurns(totalTurns);
         sessionEntity.setAsrConfidence(asrConfidence);
-        sessionEntity.setStatus("COMPLETED");
+        sessionEntity.setStatus(SpeakingSessionStatus.COMPLETED);
         if (sessionEntity.getStartedAt() == null) {
             sessionEntity.setStartedAt(startedAt != null ? startedAt : Instant.now());
         }
@@ -356,7 +362,7 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
                 .marugotoLevel(marugotoLevel)
                 .formalityLevel(formalityLevel)
                 .totalTurns(0)
-                .status("IN_PROGRESS")
+                .status(SpeakingSessionStatus.IN_PROGRESS)
                 .startedAt(Instant.now())
                 .build();
         sessionJpaRepository.save(sessionEntity);
@@ -425,9 +431,9 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
         Optional<SpeakingSessionEntity> sessionOpt;
         if (personaId != null && personaId > 0) {
             sessionOpt = sessionJpaRepository.findFirstByUserIdAndPersonaIdAndStatusOrderByStartedAtDesc(userId,
-                    personaId, "IN_PROGRESS");
+                    personaId, SpeakingSessionStatus.IN_PROGRESS);
         } else {
-            sessionOpt = sessionJpaRepository.findFirstByUserIdAndStatusOrderByStartedAtDesc(userId, "IN_PROGRESS");
+            sessionOpt = sessionJpaRepository.findFirstByUserIdAndStatusOrderByStartedAtDesc(userId, SpeakingSessionStatus.IN_PROGRESS);
         }
         return sessionOpt.map(this::toActiveSessionResult);
     }
@@ -438,7 +444,9 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
         if (sessionCode == null || sessionCode.isBlank())
             return false;
         return sessionJpaRepository.findBySessionCode(sessionCode)
-                .map(s -> "COMPLETED".equalsIgnoreCase(s.getStatus()))
+                .map(s ->
+                        SpeakingSessionStatus.COMPLETED.equals(s.getStatus())
+                )
                 .orElse(false);
     }
 
@@ -452,7 +460,7 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
         // restore COMPLETED/EXPIRED
         Optional<SpeakingSessionEntity> sessionOpt = (userId != null)
                 ? sessionJpaRepository.findBySessionCodeAndUserId(sessionCode, userId)
-                : sessionJpaRepository.findBySessionCodeAndStatus(sessionCode, "IN_PROGRESS");
+                : sessionJpaRepository.findBySessionCodeAndStatus(sessionCode, SpeakingSessionStatus.IN_PROGRESS);
         return sessionOpt.map(this::toActiveSessionResult);
     }
 
@@ -509,6 +517,67 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
         if (userId == null) {
             return 0;
         }
-        return sessionJpaRepository.countByUserIdAndStatus(userId, "IN_PROGRESS");
+        return sessionJpaRepository.countByUserIdAndStatus(userId, SpeakingSessionStatus.IN_PROGRESS);
+    }
+
+    /**
+     * Xóa session bằng session code
+     *
+     * @param sessionCode session code, dùng để định danh session trong redis
+     */
+    @Override
+    @Transactional
+    public void deleteSessionBySessionCode(String sessionCode) {
+        if (sessionCode == null || sessionCode.isBlank()) {
+            throw new InfrastructureException(
+                    LlmApplicationError.LLM_SESSION_CODE_INVALID,
+                    LlmDetailMessageKey.LLM_SESSION_CODE_INVALID
+            );
+        }
+
+        SpeakingSessionEntity entity = sessionJpaRepository
+                .findBySessionCode(sessionCode)
+                .orElseThrow(() -> new InfrastructureException(
+                        LlmApplicationError.LLM_SESSION_NOT_FOUND,
+                        LlmDetailMessageKey.LLM_SESSION_NOT_FOUND,
+                        sessionCode
+                ));
+
+        sessionJpaRepository.delete(entity);
+    }
+
+    /**
+     * Kiểm tra xem 1 session có thuộc về user không
+     *
+     * @param sessionCode session code để tìm
+     * @param userId      chủ sở hữu
+     * @return true nếu đúng là session của user
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public boolean isSessionBelongToUser(String sessionCode, Long userId) {
+        if (userId == null) {
+            throw new InfrastructureException(
+                    UserErrorCode.USER_NOT_FOUND,
+                    UserDetailMessageKey.USER_ID_NULL
+            );
+        }
+        
+        if (sessionCode == null || sessionCode.isBlank()) {
+            throw new InfrastructureException(
+                    LlmApplicationError.LLM_SESSION_CODE_INVALID,
+                    LlmDetailMessageKey.LLM_SESSION_CODE_INVALID
+            );
+        }
+
+        SpeakingSessionEntity entity = sessionJpaRepository
+                .findBySessionCode(sessionCode)
+                .orElseThrow(() -> new InfrastructureException(
+                        LlmApplicationError.LLM_SESSION_NOT_FOUND,
+                        LlmDetailMessageKey.LLM_SESSION_NOT_FOUND,
+                        sessionCode
+                ));
+
+        return entity.getUserId() != null && entity.getUserId().equals(userId);
     }
 }

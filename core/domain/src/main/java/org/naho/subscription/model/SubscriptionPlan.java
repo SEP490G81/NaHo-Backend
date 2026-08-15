@@ -20,6 +20,7 @@ public class SubscriptionPlan {
     private Integer maxTurnsPerAiSession;
     private Integer dailyAiSessionStartLimit;
     private Integer maxAiTurnSpeakingSeconds;
+    private Integer maxInProgressSessionCount;
     private Boolean sampleAnswerEnabled;
     private PlanStatus status;
 
@@ -35,6 +36,7 @@ public class SubscriptionPlan {
         this.maxTurnsPerAiSession = builder.maxTurnsPerAiSession;
         this.dailyAiSessionStartLimit = builder.dailyAiSessionStartLimit;
         this.maxAiTurnSpeakingSeconds = builder.maxAiTurnSpeakingSeconds;
+        this.maxInProgressSessionCount = builder.maxInProgressSessionCount;
         this.sampleAnswerEnabled = builder.sampleAnswerEnabled;
         this.status = builder.status;
     }
@@ -54,6 +56,7 @@ public class SubscriptionPlan {
             Integer maxTurnsPerAiSession,
             Integer dailyAiSessionStartLimit,
             Integer maxAiTurnSpeakingSeconds,
+            Integer maxInProgressSessionCount,
             Boolean sampleAnswerEnabled) {
         return builder()
                 .code(code)
@@ -66,6 +69,7 @@ public class SubscriptionPlan {
                 .maxTurnsPerAiSession(maxTurnsPerAiSession)
                 .dailyAiSessionStartLimit(dailyAiSessionStartLimit)
                 .maxAiTurnSpeakingSeconds(maxAiTurnSpeakingSeconds)
+                .maxInProgressSessionCount(maxInProgressSessionCount)
                 .sampleAnswerEnabled(sampleAnswerEnabled)
                 .status(PlanStatus.ACTIVE)
                 .build();
@@ -89,6 +93,7 @@ public class SubscriptionPlan {
             Integer maxTurnsPerAiSession,
             Integer dailyAiSessionStartLimit,
             Integer maxAiTurnSpeakingSeconds,
+            Integer maxInProgressSessionCount,
             Boolean sampleAnswerEnabled,
             PlanStatus status) {
         if (description != null) {
@@ -124,6 +129,9 @@ public class SubscriptionPlan {
         }
         if (maxAiTurnSpeakingSeconds != null) {
             this.maxAiTurnSpeakingSeconds = maxAiTurnSpeakingSeconds;
+        }
+        if (maxInProgressSessionCount != null) {
+            this.maxInProgressSessionCount = maxInProgressSessionCount;
         }
         if (sampleAnswerEnabled != null) {
             this.sampleAnswerEnabled = sampleAnswerEnabled;
@@ -178,6 +186,10 @@ public class SubscriptionPlan {
         return maxAiTurnSpeakingSeconds;
     }
 
+    public Integer getMaxInProgressSessionCount() {
+        return maxInProgressSessionCount;
+    }
+
     public Boolean isSampleAnswerEnabled() {
         return sampleAnswerEnabled;
     }
@@ -198,6 +210,7 @@ public class SubscriptionPlan {
         private Integer maxTurnsPerAiSession;
         private Integer dailyAiSessionStartLimit;
         private Integer maxAiTurnSpeakingSeconds;
+        private Integer maxInProgressSessionCount;
         private Boolean sampleAnswerEnabled;
         private PlanStatus status;
 
@@ -256,6 +269,11 @@ public class SubscriptionPlan {
 
         public Builder maxAiTurnSpeakingSeconds(Integer maxAiTurnSpeakingSeconds) {
             this.maxAiTurnSpeakingSeconds = maxAiTurnSpeakingSeconds;
+            return this;
+        }
+
+        public Builder maxInProgressSessionCount(Integer maxInProgressSessionCount) {
+            this.maxInProgressSessionCount = maxInProgressSessionCount;
             return this;
         }
 

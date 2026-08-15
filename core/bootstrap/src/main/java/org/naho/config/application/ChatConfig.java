@@ -19,6 +19,7 @@ import org.naho.speech.azure.port.out.AzureSpeechServicePort;
 import org.naho.speech.azure.port.out.TextToSpeechServicePort;
 import org.naho.speech.llm.adapter.*;
 import org.naho.speech.llm.constant.OpenAiConfigProperties;
+import org.naho.speech.llm.helper.SpeakingSessionHelper;
 import org.naho.speech.llm.port.in.*;
 import org.naho.speech.llm.port.out.*;
 import org.naho.speech.llm.usecase.*;
@@ -82,6 +83,19 @@ public class ChatConfig {
         );
     }
 
+    @Bean
+    public SpeakingSessionHelper speakingSessionHelper(
+            SessionStorePort sessionStorePort,
+            SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
+            TextToSpeechServicePort textToSpeechServicePort
+    ) {
+        return new SpeakingSessionHelper(
+                sessionStorePort,
+                speakingSessionRepositoryPort,
+                textToSpeechServicePort
+        );
+    }
+    
     // ─── Input Port UseCases ─────────────────────────────────────
 
     @Bean
@@ -90,22 +104,24 @@ public class ChatConfig {
             SessionStorePort sessionStorePort,
             SpeechToTextPort speechToTextPort,
             PersonaRepositoryPort personaRepositoryPort,
-            TextToSpeechServicePort textToSpeechServicePort,
             SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
             FileRepositoryPort fileRepositoryPort,
             UploadFileInputPort uploadFileInputPort,
-            SessionValidator sessionValidator
+            SessionValidator sessionValidator,
+            SpeakingSessionHelper speakingSessionHelper,
+            TransactionPort transactionPort
     ) {
         return new SpeakingSessionUseCase(
                 aiChatPort,
                 sessionStorePort,
                 speechToTextPort,
                 personaRepositoryPort,
-                textToSpeechServicePort,
                 speakingSessionRepositoryPort,
                 fileRepositoryPort,
                 uploadFileInputPort,
-                sessionValidator
+                sessionValidator,
+                speakingSessionHelper,
+                transactionPort
         );
     }
 
@@ -113,16 +129,12 @@ public class ChatConfig {
     public EndSessionInputPort endSessionInputPort(
             SessionStorePort sessionStorePort,
             AiScoringPort aiScoringPort,
-            SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
-            UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort,
-            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort
+            SpeakingSessionRepositoryPort speakingSessionRepositoryPort
     ) {
         return new EndSessionUseCase(
                 sessionStorePort,
                 aiScoringPort,
-                speakingSessionRepositoryPort,
-                userDailyAiUsageRepositoryPort,
-                getActiveSubscriptionInputPort
+                speakingSessionRepositoryPort
         );
     }
 
@@ -182,11 +194,15 @@ public class ChatConfig {
 
     @Bean
     public SpeakingSessionCleanupInputPort speakingSessionCleanupInputPort(
+            SessionStorePort sessionStorePort,
             SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
-            TransactionPort transactionPort,
-            SessionStorePort sessionStorePort
+            SessionValidator sessionValidator
     ) {
-        return new SpeakingSessionCleanupUseCase(speakingSessionRepositoryPort, transactionPort, sessionStorePort);
+        return new SpeakingSessionCleanupUseCase(
+                sessionStorePort,
+                speakingSessionRepositoryPort,
+                sessionValidator
+        );
     }
 }
 

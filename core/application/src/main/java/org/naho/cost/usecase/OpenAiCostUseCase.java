@@ -1,12 +1,13 @@
 package org.naho.cost.usecase;
 
 import org.naho.cost.model.OpenAiDailyCost;
+import org.naho.cost.port.out.OpenAiCostRepositoryPort;
+import org.naho.cost.result.OpenAiCostChartResult;
+import org.naho.cost.result.OpenAiCostPointResult;
+import org.naho.cost.result.OpenAiCostSummaryResult;
+import org.naho.shared.constant.SystemZoneId;
 import org.naho.speech.llm.command.OpenAiCostQueryCommand;
 import org.naho.speech.llm.port.in.GetOpenAiCostInputPort;
-import org.naho.speech.llm.port.out.OpenAiCostRepositoryPort;
-import org.naho.speech.llm.result.OpenAiCostChartResult;
-import org.naho.speech.llm.result.OpenAiCostPointResult;
-import org.naho.speech.llm.result.OpenAiCostSummaryResult;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -25,8 +26,8 @@ public class OpenAiCostUseCase implements GetOpenAiCostInputPort {
 
     @Override
     public OpenAiCostSummaryResult getSummary() {
-        LocalDate startDate = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
-        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID).with(TemporalAdjusters.firstDayOfMonth());
+        LocalDate endDate = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID);
 
         BigDecimal totalCost = openAiCostRepositoryPort.sumCostBetween(startDate, endDate)
                 .orElse(BigDecimal.ZERO);
@@ -52,8 +53,8 @@ public class OpenAiCostUseCase implements GetOpenAiCostInputPort {
                 fromDate = command.getFromDate().toLocalDate();
                 toDate = command.getToDate().toLocalDate();
             } else {
-                fromDate = LocalDate.now().minusDays(30);
-                toDate = LocalDate.now();
+                fromDate = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID).minusDays(30);
+                toDate = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID);
             }
 
             List<OpenAiDailyCost> dailyCosts = openAiCostRepositoryPort.findDailyCostsBetween(fromDate, toDate);
@@ -74,14 +75,14 @@ public class OpenAiCostUseCase implements GetOpenAiCostInputPort {
             // Default: Monthly
             LocalDate startDate;
             if ("Last3Months".equalsIgnoreCase(timeframe)) {
-                startDate = LocalDate.now().minusMonths(2).with(TemporalAdjusters.firstDayOfMonth());
+                startDate = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID).minusMonths(2).with(TemporalAdjusters.firstDayOfMonth());
             } else if ("Last12Months".equalsIgnoreCase(timeframe)) {
-                startDate = LocalDate.now().minusMonths(11).with(TemporalAdjusters.firstDayOfMonth());
+                startDate = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID).minusMonths(11).with(TemporalAdjusters.firstDayOfMonth());
             } else if ("Custom".equalsIgnoreCase(timeframe) && command != null && command.getFromDate() != null) {
                 startDate = command.getFromDate().toLocalDate().with(TemporalAdjusters.firstDayOfMonth());
             } else {
                 // Last6Months default
-                startDate = LocalDate.now().minusMonths(5).with(TemporalAdjusters.firstDayOfMonth());
+                startDate = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID).minusMonths(5).with(TemporalAdjusters.firstDayOfMonth());
             }
 
             List<OpenAiCostPointResult> points = openAiCostRepositoryPort.findMonthlyCostsSummary(startDate);

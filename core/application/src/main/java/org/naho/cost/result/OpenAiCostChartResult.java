@@ -1,4 +1,4 @@
-package org.naho.speech.llm.result;
+package org.naho.cost.result;
 
 import java.math.BigDecimal;
 import java.util.List;

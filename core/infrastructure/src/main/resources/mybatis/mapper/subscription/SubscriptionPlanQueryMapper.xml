@@ -14,6 +14,7 @@
         <result property="maxTurnsPerAiSession" column="max_turns_per_ai_session"/>
         <result property="dailyAiSessionStartLimit" column="daily_ai_session_start_limit"/>
         <result property="maxAiTurnSpeakingSeconds" column="max_ai_turn_speaking_seconds"/>
+        <result property="maxInProgressSessionCount" column="max_in_progress_session_count"/>
         <result property="sampleAnswerEnabled" column="sample_answer_enabled"/>
         <result property="status" column="status"/>
         <result property="createdTime" column="created_time"/>

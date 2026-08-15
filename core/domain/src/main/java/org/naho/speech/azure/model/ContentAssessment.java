@@ -1,4 +1,4 @@
-package org.naho.speech.model;
+package org.naho.speech.azure.model;
 
 public class ContentAssessment {
     private Long id;

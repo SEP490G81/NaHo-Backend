@@ -1,4 +1,4 @@
-package org.naho.speech.model;
+package org.naho.speech.azure.model;
 
 import java.util.List;
 
@@ -61,7 +61,7 @@ public class SpeechAssessment {
         return pronunciationScore;
     }
 
-    public List<WordAssessment> getWords() {
+    public List<org.naho.speech.azure.model.WordAssessment> getWords() {
         return words;
     }
 
@@ -74,7 +74,7 @@ public class SpeechAssessment {
         private Double fluencyScore;
         private Double completenessScore;
         private Double pronunciationScore;
-        private List<WordAssessment> words;
+        private List<org.naho.speech.azure.model.WordAssessment> words;
 
         public Builder id(Long id) {
             this.id = id;
@@ -111,7 +111,7 @@ public class SpeechAssessment {
             return this;
         }
 
-        public Builder words(List<WordAssessment> words) {
+        public Builder words(List<org.naho.speech.azure.model.WordAssessment> words) {
             this.words = words;
             return this;
         }

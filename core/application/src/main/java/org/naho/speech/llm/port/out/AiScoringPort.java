@@ -4,7 +4,7 @@ import org.naho.speech.llm.result.ScoringResult;
 
 public interface AiScoringPort {
     ScoringResult score(
-            String sessionId,
+            String sessionCode,
             String topic,
             String fullTranscript,
             String speechMetadata,

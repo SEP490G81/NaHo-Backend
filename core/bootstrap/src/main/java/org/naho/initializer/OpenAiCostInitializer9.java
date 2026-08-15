@@ -2,7 +2,7 @@ package org.naho.initializer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.naho.speech.llm.port.in.SyncOpenAiCostInputPort;
+import org.naho.cost.port.in.SyncOpenAiCostInputPort;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;

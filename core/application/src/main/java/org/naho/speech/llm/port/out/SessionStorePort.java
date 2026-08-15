@@ -5,63 +5,63 @@ import java.util.List;
 import java.util.Map;
 
 public interface SessionStorePort {
-    void initSession(String sessionId);
+    void initSession(String sessionCode);
 
-    boolean hasSession(String sessionId);
+    boolean hasSession(String sessionCode);
 
-    void clearSession(String sessionId);
+    void clearSession(String sessionCode);
 
-    void restoreSession(String sessionId, Long userId, Long personaId, String topic, String marugotoLevel, String formalityLevel, String fullTranscript, int totalTurns, Instant startedAt, List<Map<String, String>> historyMessages);
+    void restoreSession(String sessionCode, Long userId, Long personaId, String topic, String marugotoLevel, String formalityLevel, String fullTranscript, int totalTurns, Instant startedAt, List<Map<String, String>> historyMessages);
 
     //Topic Management
-    void setTopic(String sessionId, String topic);
+    void setTopic(String sessionCode, String topic);
 
-    String getTopic(String sessionId);
+    String getTopic(String sessionCode);
 
     //Conversation History
-    void addMessage(String sessionId, String role, String content);
+    void addMessage(String sessionCode, String role, String content);
 
-    List<Map<String, String>> getConversationHistory(String sessionId);
+    List<Map<String, String>> getConversationHistory(String sessionCode);
 
     //Transcript
-    void appendTranscript(String sessionId, String turn);
+    void appendTranscript(String sessionCode, String turn);
 
-    String getFullTranscript(String sessionId);
+    String getFullTranscript(String sessionCode);
 
     // Persona / Conversation Style context for scoring
-    void setPersonaContext(String sessionId, String personaContext);
+    void setPersonaContext(String sessionCode, String personaContext);
 
-    String getPersonaContext(String sessionId);
+    String getPersonaContext(String sessionCode);
 
     // Voice name for TTS replies
-    void setVoiceName(String sessionId, String voiceName);
+    void setVoiceName(String sessionCode, String voiceName);
 
-    String getVoiceName(String sessionId);
+    String getVoiceName(String sessionCode);
 
     // Session metadata for DB persistence
-    void setUserId(String sessionId, Long userId);
+    void setUserId(String sessionCode, Long userId);
 
-    Long getUserId(String sessionId);
+    Long getUserId(String sessionCode);
 
-    void setPersonaId(String sessionId, Long personaId);
+    void setPersonaId(String sessionCode, Long personaId);
 
-    Long getPersonaId(String sessionId);
+    Long getPersonaId(String sessionCode);
 
-    void setStartedAt(String sessionId, Instant startedAt);
+    void setStartedAt(String sessionCode, Instant startedAt);
 
-    Instant getStartedAt(String sessionId);
+    Instant getStartedAt(String sessionCode);
 
-    void setMarugotoLevel(String sessionId, String marugotoLevel);
+    void setMarugotoLevel(String sessionCode, String marugotoLevel);
 
-    String getMarugotoLevel(String sessionId);
+    String getMarugotoLevel(String sessionCode);
 
-    void setFormalityLevel(String sessionId, String formalityLevel);
+    void setFormalityLevel(String sessionCode, String formalityLevel);
 
-    String getFormalityLevel(String sessionId);
+    String getFormalityLevel(String sessionCode);
 
-    int incrementTurnCount(String sessionId);
+    int incrementTurnCount(String sessionCode);
 
-    int getTurnCount(String sessionId);
+    int getTurnCount(String sessionCode);
 
     /**
      * Xóa các session không hoạt động khỏi memory.

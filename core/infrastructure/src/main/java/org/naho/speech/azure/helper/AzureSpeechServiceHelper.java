@@ -12,9 +12,9 @@ import org.naho.i18n.message.speech.SpeechDetailMessageKey;
 import org.naho.shared.exception.InfrastructureException;
 import org.naho.speech.azure.constant.AzurePronunciationScoreKey;
 import org.naho.speech.azure.exception.AzureSpeechErrorCode;
-import org.naho.speech.model.SpeechAssessment;
-import org.naho.speech.model.WordAssessment;
-import org.naho.speech.type.SpeechAssessmentErrorType;
+import org.naho.speech.azure.model.SpeechAssessment;
+import org.naho.speech.azure.model.WordAssessment;
+import org.naho.speech.azure.type.SpeechAssessmentErrorType;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;

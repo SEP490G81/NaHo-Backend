@@ -1,4 +1,4 @@
-package org.naho.speech.llm.port.in;
+package org.naho.cost.port.in;
 
 import org.naho.cost.result.OpenAiCostChartResult;
 import org.naho.cost.result.OpenAiCostSummaryResult;

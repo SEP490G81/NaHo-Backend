@@ -23,6 +23,7 @@ import org.naho.speech.llm.dto.request.SpeakingSessionQueryRequest;
 import org.naho.speech.llm.dto.request.StartConversationRequest;
 import org.naho.speech.llm.dto.response.*;
 import org.naho.speech.llm.port.in.EndSessionInputPort;
+import org.naho.speech.llm.port.in.SpeakingSessionCleanupInputPort;
 import org.naho.speech.llm.port.in.SpeakingSessionInputPort;
 import org.naho.speech.llm.port.in.SuggestedTopicsInputPort;
 import org.naho.speech.llm.result.*;
@@ -45,10 +46,10 @@ import java.io.IOException;
  * GET  /topics              → Danh sách chủ đề gợi ý
  * POST /session/start-topic → Bắt đầu session theo chủ đề
  * POST /session/start-free  → Bắt đầu free conversation
- * POST /session/{id}/message        → Gửi text message
- * POST /session/{id}/message/stream → Gửi text message (SSE streaming)
- * POST /session/{id}/audio          → Gửi audio → STT + Assessment + AI reply
- * POST /session/{id}/end            → Kết thúc session + scoring
+ * POST /session/{sessionCode}/message        → Gửi text message
+ * POST /session/{sessionCode}/message/stream → Gửi text message (SSE streaming)
+ * POST /session/{sessionCode}/audio          → Gửi audio → STT + Assessment + AI reply
+ * POST /session/{sessionCode}/end            → Kết thúc session + scoring
  */
 @RestController
 @RequestMapping("/api/v1/speaking")
@@ -66,6 +67,7 @@ public class SpeakingController {
     private final FileStorageServicePort fileStorageServicePort;
     private final FileValidatorPort fileValidatorPort;
     private final GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
+    private final SpeakingSessionCleanupInputPort speakingSessionCleanupInputPort;
 
     // ─── Topics ─────────────────────────────────────────────────
 
@@ -78,10 +80,9 @@ public class SpeakingController {
 
     // ─── Session Management ─────────────────────────────────────
 
-
     //TẠO SESSION SPEAKING 1-1 VỚI PERSONAS
     @PostMapping(
-            value = "/session/{personaId}",
+            value = "/session/persona/{personaId}",
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.ALL_VALUE},
             produces = MediaType.APPLICATION_JSON_VALUE
     )
@@ -92,7 +93,6 @@ public class SpeakingController {
             @AuthenticationPrincipal AccessTokenPayload payload,
             @RequestBody(required = false) StartConversationRequest request //bao gồm thuộc tính
     ) {
-
         Long userId = payload != null ? payload.userId() : null;
         var formalityOverride = request != null ? request.formalityLevel() : null;
         var marugotoOverride = request != null ? request.marugotoLevel() : null;
@@ -149,32 +149,32 @@ public class SpeakingController {
     //  Text Message
 
     @PostMapping(
-            value = "/session/{sessionId}/message",
+            value = "/session/{sessionCode}/message",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_MESSAGE_SEND_SUCCESS)
     public ResponseEntity<ChatResponse> sendMessage(
-            @PathVariable("sessionId") String sessionId,
+            @PathVariable("sessionCode") String sessionCode,
             @Valid @RequestBody ChatSessionMessageRequest request
     ) {
-        var command = new SendMessageWithSessionCommand(sessionId, request.transcript());
+        var command = new SendMessageWithSessionCommand(sessionCode, request.transcript());
         ChatResult result = speakingSessionInputPort.sendMessage(command);
         return ResponseEntity.ok(chatResponseMapper.resultToResponse(result));
     }
 
     @PostMapping(
-            value = "/session/{sessionId}/message/stream",
+            value = "/session/{sessionCode}/message/stream",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.TEXT_EVENT_STREAM_VALUE
     )
     public SseEmitter sendMessageStream(
-            @PathVariable("sessionId") String sessionId,
+            @PathVariable("sessionCode") String sessionCode,
             @Valid @RequestBody ChatSessionMessageRequest request
     ) {
         SseEmitter emitter = new SseEmitter(120_000L);
 
-        var command = new SendMessageWithSessionCommand(sessionId, request.transcript());
+        var command = new SendMessageWithSessionCommand(sessionCode, request.transcript());
 
         Thread.ofVirtual().start(() -> {
             try {
@@ -200,13 +200,13 @@ public class SpeakingController {
     // ─── Audio Message (Azure Speech + AI) ──────────────────────
 
     @PostMapping(
-            value = "/session/{sessionId}/audio",
+            value = "/session/{sessionCode}/audio",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_AUDIO_MESSAGE_PROCESS_SUCCESS)
     public ResponseEntity<AudioChatResponse> sendAudioMessage(
-            @PathVariable("sessionId") String sessionId,
+            @PathVariable("sessionCode") String sessionCode,
             @RequestPart("file") MultipartFile file,
             @RequestParam(value = "reference-text", required = false) String referenceText,
             @AuthenticationPrincipal AccessTokenPayload payload
@@ -229,7 +229,7 @@ public class SpeakingController {
             }
 
             var command = SendAudioMessageCommand.builder()
-                    .sessionId(sessionId)
+                    .sessionCode(sessionCode)
                     .audioBytes(audioBytes)
                     .referenceText(referenceText)
                     .storedFile(storedFile)
@@ -250,13 +250,13 @@ public class SpeakingController {
     // ─── End Session + Scoring ───────────────────────────────────
 
     @PostMapping(
-            value = "/session/{sessionId}/end",
+            value = "/session/{sessionCode}/end",
             consumes = {MediaType.APPLICATION_JSON_VALUE, "application/json;charset=UTF-8"},
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_SESSION_END_SUCCESS)
     public ResponseEntity<ScoringResponse> endSession(
-            @PathVariable("sessionId") String sessionId,
+            @PathVariable("sessionCode") String sessionCode,
             @AuthenticationPrincipal AccessTokenPayload payload,
             @RequestBody(required = false) EndSessionRequest req
     ) {
@@ -265,7 +265,7 @@ public class SpeakingController {
         String speechMetadata = (req != null && req.speechMetadata() != null) ? req.speechMetadata() : "";
         String asrConfidence = (req != null && req.asrConfidence() != null) ? req.asrConfidence() : "";
 
-        ScoringResult r = endSessionInputPort.endSession(userId, sessionId, topic, speechMetadata, asrConfidence);
+        ScoringResult r = endSessionInputPort.endSession(userId, sessionCode, topic, speechMetadata, asrConfidence);
         return ResponseEntity.ok(scoringResponseMapper.resultToResponse(r));
     }
 
@@ -323,6 +323,22 @@ public class SpeakingController {
         Long userId = payload != null ? payload.userId() : null;
         SpeakingSessionDetailResult result = speakingSessionInputPort.getSessionHistoryDetail(sessionCode, userId);
         return ResponseEntity.ok(result);
+    }
+
+    /**
+     * Delete a session by session code.
+     *
+     * @param sessionCode session code
+     * @param payload     chứa user id
+     * @return ResponseEntity<Void>
+     */
+    @DeleteMapping("/session/{sessionCode}")
+    public ResponseEntity<Void> deleteSession(
+            @PathVariable("sessionCode") String sessionCode,
+            @AuthenticationPrincipal AccessTokenPayload payload
+    ) {
+        speakingSessionCleanupInputPort.deleteSession(sessionCode, payload.userId());
+        return ResponseEntity.noContent().build();
     }
 }
 

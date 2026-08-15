@@ -14,6 +14,10 @@ public enum LlmApplicationError implements ErrorCode {
             "LLM_A002",
             LlmTitleMessageKey.LLM_SESSION_ID_INVALID_TITLE,
             400),
+    LLM_SESSION_CODE_INVALID(
+            "LLM_A002",
+            LlmTitleMessageKey.LLM_SESSION_CODE_INVALID_TITLE,
+            400),
     LLM_USER_MESSAGE_INVALID(
             "LLM_A003",
             LlmTitleMessageKey.LLM_USER_MESSAGE_INVALID_TITLE,

@@ -1,5 +1,7 @@
 package org.naho.speech.llm.dto.response;
 
+import org.naho.speech.llm.type.SpeakingSessionStatus;
+
 import java.time.Instant;
 
 public record SpeakingSessionListItemResponse(
@@ -15,6 +17,6 @@ public record SpeakingSessionListItemResponse(
         int durationSeconds,
         Instant startedAt,
         Instant endedAt,
-        String status
+        SpeakingSessionStatus status
 ) {
 }

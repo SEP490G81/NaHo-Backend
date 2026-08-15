@@ -19,6 +19,7 @@ public record SubscriptionPlanResponse(
         Integer maxTurnsPerAiSession,
         Integer dailyAiSessionStartLimit,
         Integer maxAiTurnSpeakingSeconds,
+        Integer maxInProgressSessionCount,
         Boolean sampleAnswerEnabled,
         PlanStatus status
 ) {

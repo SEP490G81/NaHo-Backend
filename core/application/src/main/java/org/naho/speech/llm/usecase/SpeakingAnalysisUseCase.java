@@ -40,6 +40,10 @@ import org.naho.shared.constant.SystemZoneId;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
+import org.naho.speech.azure.model.AnswerHistory;
+import org.naho.speech.azure.model.ContentAssessment;
+import org.naho.speech.azure.model.SpeechAssessment;
+import org.naho.speech.azure.model.WordAssessment;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
 import org.naho.speech.llm.command.SpeakingAnalysisCommand;
 import org.naho.speech.llm.port.in.SpeakingAnalysisInputPort;
@@ -47,10 +51,6 @@ import org.naho.speech.llm.port.out.AiAnalysisPort;
 import org.naho.speech.llm.result.SpeakingAnalysisReportResult;
 import org.naho.speech.llm.result.SpeakingAnalysisResult;
 import org.naho.speech.llm.result.WordPronunciationResult;
-import org.naho.speech.model.AnswerHistory;
-import org.naho.speech.model.ContentAssessment;
-import org.naho.speech.model.SpeechAssessment;
-import org.naho.speech.model.WordAssessment;
 import org.naho.subscription.model.UserDailyAiUsage;
 import org.naho.subscription.port.out.UserDailyAiUsageRepositoryPort;
 import org.naho.user.exception.UserErrorCode;
@@ -588,7 +588,6 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         }
         answerHistoryRepositoryPort.saveAllWordAssessment(wordList);
     }
-
 
     private record AnalysisContext(
             LearningPathNode learningPathNode,

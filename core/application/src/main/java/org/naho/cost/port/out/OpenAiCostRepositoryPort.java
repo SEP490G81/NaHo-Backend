@@ -1,7 +1,7 @@
-package org.naho.speech.llm.port.out;
+package org.naho.cost.port.out;
 
 import org.naho.cost.model.OpenAiDailyCost;
-import org.naho.speech.llm.result.OpenAiCostPointResult;
+import org.naho.cost.result.OpenAiCostPointResult;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface OpenAiCostRepositoryPort {
-
     OpenAiDailyCost saveOrUpdate(OpenAiDailyCost dailyCost);
 
     void saveAll(List<OpenAiDailyCost> dailyCosts);
