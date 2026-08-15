@@ -6,9 +6,9 @@ import org.naho.i18n.message.llm.LlmDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.speech.azure.port.out.TextToSpeechServicePort;
 import org.naho.speech.llm.exception.LlmApplicationError;
+import org.naho.speech.llm.model.SpeakingSession;
 import org.naho.speech.llm.port.out.SessionStorePort;
 import org.naho.speech.llm.port.out.SpeakingSessionRepositoryPort;
-import org.naho.speech.llm.result.ActiveSpeakingSessionResult;
 
 import java.util.*;
 
@@ -83,7 +83,8 @@ public class SpeakingSessionHelper {
             String correctedUserText,
             String correctionExplanation,
             String hintForLearner,
-            List<String> suggestedReplies) {
+            List<String> suggestedReplies
+    ) {
     }
 
     public ParsedAiReply parseAiResponse(String rawResponse) {
@@ -124,11 +125,14 @@ public class SpeakingSessionHelper {
                     correctedUserText,
                     correctionExplanation,
                     hintForLearner,
-                    suggestedReplies);
+                    suggestedReplies
+            );
         } catch (Exception e) {
-            System.out.println("[SpeakingSessionHelper] Fallback raw text parsing: " + e.getMessage());
-            System.out.println("[SpeakingSessionHelper] Raw response: " + rawResponse);
-            return new ParsedAiReply(rawResponse, "", "", "", "", "", List.of());
+            throw new ApplicationException(
+                    LlmApplicationError.LLM_PARSE_ERROR,
+                    LlmDetailMessageKey.LLM_PARSE_ERROR,
+                    e.getMessage()
+            );
         }
     }
 
@@ -162,62 +166,65 @@ public class SpeakingSessionHelper {
         return slidingWindow;
     }
 
-    public String toAudioBase64(String sessionCode, String text) {
+    public String toAudioBase64(Long sessionId, String text) {
         try {
-            String voiceName = sessionStorePort.getVoiceName(sessionCode);
+            SpeakingSession speakingSession = speakingSessionRepositoryPort.findBySessionId(sessionId);
+            String voiceName = speakingSession.getVoiceName();
             byte[] audioBytes = textToSpeechServicePort.textToSpeech(text, voiceName, "ja-JP").audioData();
             return Base64.getEncoder().encodeToString(audioBytes);
         } catch (Exception e) {
-            System.out.println("[SpeakingSessionHelper] TTS failed for session " + sessionCode + ": " + e.getMessage());
+            System.out.println("[SpeakingSessionHelper] TTS failed for session: " + e.getMessage());
             return null;
         }
     }
 
-    public void ensureSessionLoadedInMemory(String sessionCode) {
-        if (sessionCode == null || sessionCode.isBlank()) {
-            throw new ApplicationException(
-                    LlmApplicationError.LLM_SESSION_CODE_INVALID,
-                    LlmDetailMessageKey.LLM_SESSION_CODE_INVALID);
-        }
-
-        if (sessionStorePort.hasSession(sessionCode)) {
-            return;
-        }
-
-        ActiveSpeakingSessionResult activeSession = speakingSessionRepositoryPort
-                .findActiveSessionByCode(sessionCode, null)
-                .orElseThrow(() -> new ApplicationException(
-                        LlmApplicationError.LLM_SESSION_NOT_FOUND,
-                        LlmDetailMessageKey.LLM_SESSION_NOT_FOUND));
-
-        List<Map<String, String>> historyMessages = new ArrayList<>();
-        if (activeSession.messages() != null) {
-            for (var msg : activeSession.messages()) {
-                historyMessages.add(Map.of("role", msg.senderType(), "content", msg.content()));
-            }
-        }
-
-        StringBuilder fullTranscript = new StringBuilder();
-        if (activeSession.messages() != null) {
-            for (var msg : activeSession.messages()) {
-                fullTranscript.append("[Turn]\n")
-                        .append(msg.senderType())
-                        .append(": ")
-                        .append(msg.content())
-                        .append("\n");
-            }
-        }
-
-        sessionStorePort.restoreSession(
-                sessionCode,
-                null,
-                activeSession.personaId(),
-                activeSession.topic(),
-                activeSession.marugotoLevel(),
-                activeSession.formalityLevel(),
-                fullTranscript.toString(),
-                activeSession.totalTurns(),
-                activeSession.startedAt(),
-                historyMessages);
-    }
+//    public void ensureSessionLoadedInMemory(String sessionCode) {
+//        if (sessionCode == null || sessionCode.isBlank()) {
+//            throw new ApplicationException(
+//                    LlmApplicationError.LLM_SESSION_CODE_INVALID,
+//                    LlmDetailMessageKey.LLM_SESSION_CODE_INVALID);
+//        }
+//
+//        if (sessionStorePort.hasSession(sessionCode)) {
+//            return;
+//        }
+//
+//        SpeakingSessionResult activeSession = speakingSessionRepositoryPort
+//                .findActiveSessionByCode(sessionCode, null)
+//                .orElseThrow(() -> new ApplicationException(
+//                        LlmApplicationError.LLM_SESSION_NOT_FOUND,
+//                        LlmDetailMessageKey.LLM_SESSION_NOT_FOUND));
+//
+//        List<Map<String, String>> historyMessages = new ArrayList<>();
+//        if (activeSession.messages() != null) {
+//            for (var msg : activeSession.messages()) {
+//                String role = msg.senderType() != null ? msg.senderType().toLowerCase() : "user";
+//                historyMessages.add(Map.of("role", role, "content", msg.content()));
+//            }
+//        }
+//
+//        StringBuilder fullTranscript = new StringBuilder();
+//        if (activeSession.messages() != null) {
+//            for (var msg : activeSession.messages()) {
+//                String role = msg.senderType() != null ? msg.senderType().toLowerCase() : "user";
+//                fullTranscript.append("[Turn]\n")
+//                        .append(role)
+//                        .append(": ")
+//                        .append(msg.content())
+//                        .append("\n");
+//            }
+//        }
+//
+//        sessionStorePort.restoreSession(
+//                sessionCode,
+//                null,
+//                activeSession.personaId(),
+//                activeSession.topic(),
+//                activeSession.marugotoLevel(),
+//                activeSession.formalityLevel(),
+//                fullTranscript.toString(),
+//                activeSession.totalTurns(),
+//                activeSession.startedAt(),
+//                historyMessages);
+//    }
 }

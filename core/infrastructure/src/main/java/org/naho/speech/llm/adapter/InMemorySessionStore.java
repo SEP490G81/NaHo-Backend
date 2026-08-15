@@ -1,5 +1,7 @@
 package org.naho.speech.llm.adapter;
 
+import org.naho.persona.type.FormalityLevel;
+import org.naho.persona.type.MarugotoLevel;
 import org.naho.speech.llm.port.out.SessionStorePort;
 
 import java.time.Instant;
@@ -23,8 +25,8 @@ public class InMemorySessionStore implements SessionStorePort {
     private final ConcurrentHashMap<String, Long> userIds = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Long> personaIds = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Instant> startedAts = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, String> marugotoLevels = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, String> formalityLevels = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, MarugotoLevel> marugotoLevels = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, FormalityLevel> formalityLevels = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, AtomicInteger> turnCounts = new ConcurrentHashMap<>();
 
     // Track last activity time per session — dùng cho eviction
@@ -47,7 +49,7 @@ public class InMemorySessionStore implements SessionStorePort {
     }
 
     @Override
-    public void restoreSession(String sessionCode, Long userId, Long personaId, String topic, String marugotoLevel, String formalityLevel, String fullTranscript, int totalTurns, Instant startedAt, List<Map<String, String>> historyMessages) {
+    public void restoreSession(String sessionCode, Long userId, Long personaId, String topic, MarugotoLevel marugotoLevel, FormalityLevel formalityLevel, String fullTranscript, int totalTurns, Instant startedAt, List<Map<String, String>> historyMessages) {
         transcripts.put(sessionCode, new StringBuilder(fullTranscript != null ? fullTranscript : ""));
         histories.put(sessionCode, Collections.synchronizedList(new ArrayList<>(historyMessages != null ? historyMessages : List.of())));
         turnCounts.put(sessionCode, new AtomicInteger(totalTurns));
@@ -183,24 +185,24 @@ public class InMemorySessionStore implements SessionStorePort {
     }
 
     @Override
-    public void setMarugotoLevel(String sessionCode, String marugotoLevel) {
+    public void setMarugotoLevel(String sessionCode, MarugotoLevel marugotoLevel) {
         if (marugotoLevel != null)
             marugotoLevels.put(sessionCode, marugotoLevel);
     }
 
     @Override
-    public String getMarugotoLevel(String sessionCode) {
+    public MarugotoLevel getMarugotoLevel(String sessionCode) {
         return marugotoLevels.get(sessionCode);
     }
 
     @Override
-    public void setFormalityLevel(String sessionCode, String formalityLevel) {
+    public void setFormalityLevel(String sessionCode, FormalityLevel formalityLevel) {
         if (formalityLevel != null)
             formalityLevels.put(sessionCode, formalityLevel);
     }
 
     @Override
-    public String getFormalityLevel(String sessionCode) {
+    public FormalityLevel getFormalityLevel(String sessionCode) {
         return formalityLevels.get(sessionCode);
     }
 

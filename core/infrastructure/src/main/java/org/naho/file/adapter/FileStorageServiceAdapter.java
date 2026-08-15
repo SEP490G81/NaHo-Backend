@@ -205,6 +205,17 @@ public class FileStorageServiceAdapter implements FileStorageServicePort {
     }
 
     @Override
+    public String generatePresignedUrl(Long fileId) {
+        FileEntity entity = fileJpaRepository.findById(fileId)
+                .orElseThrow(() -> new InfrastructureException(
+                        FileErrorCode.FILE_NOT_FOUND,
+                        FileDetailMessageKey.FILE_NOT_FOUND,
+                        fileId
+                ));
+        return this.generatePresignedUrl(fileEntityMapper.entityToDomain(entity));
+    }
+
+    @Override
     public DownloadedFile downloadFileFromCloud(File file) {
         if (file == null || file.getObjectKey() == null || file.getObjectKey().isBlank()) {
             throw new InfrastructureException(

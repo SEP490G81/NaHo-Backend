@@ -7,6 +7,7 @@ import org.naho.book.port.out.TopicRepositoryPort;
 import org.naho.file.port.in.UploadFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileResultMapperPort;
+import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.furigana.port.out.FuriganaGenerationPort;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
@@ -20,6 +21,8 @@ import org.naho.speech.azure.port.out.TextToSpeechServicePort;
 import org.naho.speech.llm.adapter.*;
 import org.naho.speech.llm.constant.OpenAiConfigProperties;
 import org.naho.speech.llm.helper.SpeakingSessionHelper;
+import org.naho.speech.llm.mapper.SpeakingSessionMessageResultMapper;
+import org.naho.speech.llm.mapper.SpeakingSessionResultMapper;
 import org.naho.speech.llm.port.in.*;
 import org.naho.speech.llm.port.out.*;
 import org.naho.speech.llm.usecase.*;
@@ -95,7 +98,26 @@ public class ChatConfig {
                 textToSpeechServicePort
         );
     }
-    
+
+    @Bean
+    public SpeakingSessionMessageResultMapper speakingSessionMessageResultMapper(
+            SpeakingSessionHelper speakingSessionHelper,
+            FileStorageServicePort fileStorageServicePort
+    ) {
+        return new SpeakingSessionMessageResultMapper(speakingSessionHelper, fileStorageServicePort);
+    }
+
+    @Bean
+    public SpeakingSessionResultMapper speakingSessionResultMapper(
+            SpeakingSessionMessageRepositoryPort speakingSessionMessageRepositoryPort,
+            SpeakingSessionMessageResultMapper speakingSessionMessageResultMapper
+    ) {
+        return new SpeakingSessionResultMapper(
+                speakingSessionMessageRepositoryPort,
+                speakingSessionMessageResultMapper
+        );
+    }
+
     // ─── Input Port UseCases ─────────────────────────────────────
 
     @Bean
@@ -109,6 +131,7 @@ public class ChatConfig {
             UploadFileInputPort uploadFileInputPort,
             SessionValidator sessionValidator,
             SpeakingSessionHelper speakingSessionHelper,
+            SpeakingSessionResultMapper speakingSessionResultMapper,
             TransactionPort transactionPort
     ) {
         return new SpeakingSessionUseCase(
@@ -121,6 +144,7 @@ public class ChatConfig {
                 uploadFileInputPort,
                 sessionValidator,
                 speakingSessionHelper,
+                speakingSessionResultMapper,
                 transactionPort
         );
     }

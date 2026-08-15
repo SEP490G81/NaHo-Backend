@@ -5,20 +5,25 @@ import org.naho.persona.type.MarugotoLevel;
 import org.naho.speech.llm.type.SpeakingSessionStatus;
 
 import java.time.Instant;
+import java.util.List;
 
-public record SpeakingSessionListItemResponse(
+public record SpeakingSessionResponse(
         Long id,
         String sessionCode,
-        String topic,
+        Long userId,
         Long personaId,
+
+        String topic,
+        String voiceName,
         MarugotoLevel marugotoLevel,
         FormalityLevel formalityLevel,
-        int overallScore,
-        String jlptEstimate,
+        Integer durationSeconds,
         int totalTurns,
-        int durationSeconds,
+        Double asrConfidence,
+        String fullTranscript,
+        SpeakingSessionStatus status,
         Instant startedAt,
         Instant endedAt,
-        SpeakingSessionStatus status
+        List<SpeakingSessionMessageResponse> messages
 ) {
 }

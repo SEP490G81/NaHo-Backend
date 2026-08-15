@@ -1,5 +1,8 @@
 package org.naho.speech.llm.port.out;
 
+import org.naho.persona.type.FormalityLevel;
+import org.naho.persona.type.MarugotoLevel;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +14,7 @@ public interface SessionStorePort {
 
     void clearSession(String sessionCode);
 
-    void restoreSession(String sessionCode, Long userId, Long personaId, String topic, String marugotoLevel, String formalityLevel, String fullTranscript, int totalTurns, Instant startedAt, List<Map<String, String>> historyMessages);
+    void restoreSession(String sessionCode, Long userId, Long personaId, String topic, MarugotoLevel marugotoLevel, FormalityLevel formalityLevel, String fullTranscript, int totalTurns, Instant startedAt, List<Map<String, String>> historyMessages);
 
     //Topic Management
     void setTopic(String sessionCode, String topic);
@@ -51,13 +54,13 @@ public interface SessionStorePort {
 
     Instant getStartedAt(String sessionCode);
 
-    void setMarugotoLevel(String sessionCode, String marugotoLevel);
+    void setMarugotoLevel(String sessionCode, MarugotoLevel marugotoLevel);
 
-    String getMarugotoLevel(String sessionCode);
+    MarugotoLevel getMarugotoLevel(String sessionCode);
 
-    void setFormalityLevel(String sessionCode, String formalityLevel);
+    void setFormalityLevel(String sessionCode, FormalityLevel formalityLevel);
 
-    String getFormalityLevel(String sessionCode);
+    FormalityLevel getFormalityLevel(String sessionCode);
 
     int incrementTurnCount(String sessionCode);
 

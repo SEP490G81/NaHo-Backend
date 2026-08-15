@@ -141,4 +141,19 @@ public class SessionValidator {
             );
         }
     }
+
+    /**
+     * Kiểm tra xem session đã bắt đầu chưa (đã có tin nhắn khởi tạo lời chào đầu tiên chưa).
+     * Nếu đã bắt đầu rồi thì ném ra lỗi không cho init lại.
+     *
+     * @param sessionCode mã phiên
+     */
+    public void validateSessionIsNotStarted(String sessionCode) {
+        if (speakingSessionRepositoryPort.isSessionStarted(sessionCode)) {
+            throw new ApplicationException(
+                    LlmApplicationError.LLM_SESSION_ALREADY_STARTED,
+                    LlmDetailMessageKey.LLM_SESSION_ALREADY_STARTED
+            );
+        }
+    }
 }

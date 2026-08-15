@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.file.entity.FileEntity;
 import org.naho.shared.persistence.BaseEntity;
+import org.naho.speech.llm.type.MessageType;
 
 @SuperBuilder
 @Getter
@@ -27,8 +28,15 @@ public class SpeakingSessionMessageEntity extends BaseEntity {
     @Column(name = "sender_type", nullable = false, length = 20)
     String senderType;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "message_type", length = 20)
+    MessageType messageType;
+
     @Column(name = "content", nullable = false, columnDefinition = "LONGTEXT")
     String content;
+
+    @Column(name = "content_translation", nullable = false, columnDefinition = "LONGTEXT")
+    String contentTranslation;
 
     @Column(name = "corrected_text", columnDefinition = "TEXT")
     String correctedText;

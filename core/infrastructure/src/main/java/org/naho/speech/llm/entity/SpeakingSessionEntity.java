@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import org.naho.persona.type.FormalityLevel;
+import org.naho.persona.type.MarugotoLevel;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.speech.llm.type.SpeakingSessionStatus;
 
@@ -31,11 +33,16 @@ public class SpeakingSessionEntity extends BaseEntity {
     @Column(name = "topic", length = 500)
     String topic;
 
-    @Column(name = "marugoto_level", length = 30)
-    String marugotoLevel;
+    @Column(name = "voice_name", length = 100)
+    String voiceName;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "marugoto_level", length = 30)
+    MarugotoLevel marugotoLevel;
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "formality_level", length = 20)
-    String formalityLevel;
+    FormalityLevel formalityLevel;
 
     @Column(name = "duration_seconds")
     Integer durationSeconds;

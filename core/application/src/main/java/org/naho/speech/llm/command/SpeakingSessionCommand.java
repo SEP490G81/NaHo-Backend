@@ -1,4 +1,4 @@
-package org.naho.speech.llm.dto.response;
+package org.naho.speech.llm.command;
 
 import org.naho.persona.type.FormalityLevel;
 import org.naho.persona.type.MarugotoLevel;
@@ -6,19 +6,22 @@ import org.naho.speech.llm.type.SpeakingSessionStatus;
 
 import java.time.Instant;
 
-public record SpeakingSessionListItemResponse(
+public record SpeakingSessionCommand(
         Long id,
         String sessionCode,
-        String topic,
+        Long userId,
         Long personaId,
+
+        String topic,
+        String voiceName,
         MarugotoLevel marugotoLevel,
         FormalityLevel formalityLevel,
-        int overallScore,
-        String jlptEstimate,
+        Integer durationSeconds,
         int totalTurns,
-        int durationSeconds,
+        Double asrConfidence,
+        String fullTranscript,
+        SpeakingSessionStatus status,
         Instant startedAt,
-        Instant endedAt,
-        SpeakingSessionStatus status
+        Instant endedAt
 ) {
 }

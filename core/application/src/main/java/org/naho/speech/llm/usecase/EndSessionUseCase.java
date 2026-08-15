@@ -1,6 +1,8 @@
 package org.naho.speech.llm.usecase;
 
 import org.naho.i18n.message.llm.LlmDetailMessageKey;
+import org.naho.persona.type.FormalityLevel;
+import org.naho.persona.type.MarugotoLevel;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.speech.llm.exception.LlmApplicationError;
 import org.naho.speech.llm.port.in.EndSessionInputPort;
@@ -56,8 +58,8 @@ public class EndSessionUseCase implements EndSessionInputPort {
         // Persist session result to DB
         try {
             Long personaId = sessionStorePort.getPersonaId(sessionCode);
-            String marugotoLevel = sessionStorePort.getMarugotoLevel(sessionCode);
-            String formalityLevel = sessionStorePort.getFormalityLevel(sessionCode);
+            MarugotoLevel marugotoLevel = sessionStorePort.getMarugotoLevel(sessionCode);
+            FormalityLevel formalityLevel = sessionStorePort.getFormalityLevel(sessionCode);
             int totalTurns = sessionStorePort.getTurnCount(sessionCode);
             Instant startedAt = sessionStorePort.getStartedAt(sessionCode);
 

@@ -4,17 +4,17 @@ import org.naho.pagination.PageData;
 import org.naho.speech.llm.command.SendAudioMessageCommand;
 import org.naho.speech.llm.command.SendMessageWithSessionCommand;
 import org.naho.speech.llm.command.SpeakingSessionFilterCommand;
-import org.naho.speech.llm.command.StartSpeakingConversationWithAICommand;
+import org.naho.speech.llm.command.StartSpeakingConversationCommand;
 import org.naho.speech.llm.result.*;
-
-import java.util.function.Consumer;
 
 public interface SpeakingSessionInputPort {
     ChatResult sendMessage(SendMessageWithSessionCommand command);
 
-    void sendMessageStream(SendMessageWithSessionCommand command, Consumer<String> onToken);
+//    void sendMessageStream(SendMessageWithSessionCommand command, Consumer<String> onToken);
 
-    StartConversationResult startConversationWithAISession(StartSpeakingConversationWithAICommand startSpeakingConversationWithAICommand);
+    String startConversation(StartSpeakingConversationCommand command);
+
+    StartConversationResult initFirstGreeting(String sessionCode, Long userId);
 
     /**
      * Gửi audio message: Azure STT + Pronunciation Assessment → AI reply.
@@ -31,13 +31,5 @@ public interface SpeakingSessionInputPort {
      */
     SpeakingSessionDetailResult getSessionHistoryDetail(String sessionCode, Long userId);
 
-    /**
-     * Lấy thông tin phiên nói chuyện đang ở trạng thái IN_PROGRESS của người dùng.
-     */
-    ActiveSpeakingSessionResult getActiveSession(Long userId, Integer personaId);
-
-    /**
-     * Khôi phục phiên nói chuyện dở dang từ CSDL/Memory để người dùng tiếp tục hội thoại.
-     */
-    StartConversationResult resumeSession(String sessionCode, Long userId);
+    SpeakingSessionResult getInProgressSessionDetails(String sessionCode, Long userId);
 }

@@ -2,11 +2,15 @@ package org.naho.speech.llm.port.out;
 
 import org.naho.file.model.File;
 import org.naho.pagination.PageData;
+import org.naho.persona.type.FormalityLevel;
+import org.naho.persona.type.MarugotoLevel;
 import org.naho.speech.llm.command.SpeakingSessionFilterCommand;
-import org.naho.speech.llm.result.ActiveSpeakingSessionResult;
+import org.naho.speech.llm.model.SpeakingSession;
 import org.naho.speech.llm.result.ScoringResult;
 import org.naho.speech.llm.result.SpeakingSessionDetailResult;
 import org.naho.speech.llm.result.SpeakingSessionListItemResult;
+import org.naho.speech.llm.type.MessageType;
+import org.naho.speech.llm.type.SpeakingSessionStatus;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -18,8 +22,8 @@ public interface SpeakingSessionRepositoryPort {
             Long userId,
             Long personaId,
             String topic,
-            String marugotoLevel,
-            String formalityLevel,
+            MarugotoLevel marugotoLevel,
+            FormalityLevel formalityLevel,
             String fullTranscript,
             int totalTurns,
             Double asrConfidence,
@@ -30,40 +34,44 @@ public interface SpeakingSessionRepositoryPort {
 
     Optional<SpeakingSessionDetailResult> findSessionDetailByCode(String sessionCode, Long userId);
 
-    void createInProgressSession(
+    SpeakingSession createInProgressSession(
             String sessionCode,
             Long userId,
             Long personaId,
             String topic,
-            String marugotoLevel,
-            String formalityLevel);
+            String voiceName,
+            MarugotoLevel marugotoLevel,
+            FormalityLevel formalityLevel
+    );
 
     void saveSessionMessage(
             String sessionCode,
             int turnIndex,
             String senderType,
+            MessageType messageType,
             String content,
+            String contentTranslation,
             String correctedText,
             String correctionExplanation,
             String grammarNote,
             String hintForLearner,
-            Double pronunciationScore);
+            Double pronunciationScore
+    );
 
     void saveSessionMessage(
             String sessionCode,
             int turnIndex,
             String senderType,
+            MessageType messageType,
             String content,
+            String contentTranslation,
             String correctedText,
             String correctionExplanation,
             String grammarNote,
             String hintForLearner,
             Double pronunciationScore,
-            File audioFile);
-
-    Optional<ActiveSpeakingSessionResult> findActiveSession(Long userId, Long personaId);
-
-    Optional<ActiveSpeakingSessionResult> findActiveSessionByCode(String sessionCode, Long userId);
+            File audioFile
+    );
 
     void updateSessionTurnAndTranscript(String sessionCode, int totalTurns, String fullTranscript);
 
@@ -81,4 +89,12 @@ public interface SpeakingSessionRepositoryPort {
     void deleteSessionBySessionCode(String sessionCode);
 
     boolean isSessionBelongToUser(String sessionCode, Long userId);
+
+    boolean isSessionStarted(String sessionCode);
+
+    SpeakingSession findBySessionCode(String sessionCode);
+
+    SpeakingSession findBySessionCodeAndStatus(String sessionCode, SpeakingSessionStatus status);
+
+    SpeakingSession findBySessionId(Long sessionId);
 }

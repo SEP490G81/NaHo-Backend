@@ -1,92 +1,25 @@
-package org.naho.speech.llm.model;
+package org.naho.speech.llm.result;
 
 import org.naho.speech.llm.type.MessageType;
 
-public class SpeakingSessionMessage {
+public record SpeakingSessionMessageResult(
+        Long id,
+        Long sessionId,
+        Long audioFileId,
 
-    private Long id;
-    private Long sessionId;
-    private Long audioFileId;
-
-    private int turnIndex;
-    private String senderType;
-    private MessageType messageType;
-    private String content;
-    private String contentTranslation;
-    private String correctedText;
-    private String correctionExplanation;
-    private String grammarNote;
-    private String hintForLearner;
-    private Double pronunciationScore;
-
-    private SpeakingSessionMessage(Builder builder) {
-        this.id = builder.id;
-        this.sessionId = builder.sessionId;
-        this.audioFileId = builder.audioFileId;
-
-        this.turnIndex = builder.turnIndex;
-        this.senderType = builder.senderType;
-        this.messageType = builder.messageType;
-        this.content = builder.content;
-        this.contentTranslation = builder.contentTranslation;
-        this.correctedText = builder.correctedText;
-        this.correctionExplanation = builder.correctionExplanation;
-        this.grammarNote = builder.grammarNote;
-        this.hintForLearner = builder.hintForLearner;
-        this.pronunciationScore = builder.pronunciationScore;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getSessionId() {
-        return sessionId;
-    }
-
-    public Long getAudioFileId() {
-        return audioFileId;
-    }
-
-    public int getTurnIndex() {
-        return turnIndex;
-    }
-
-    public String getSenderType() {
-        return senderType;
-    }
-
-    public MessageType getMessageType() {
-        return messageType;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public String getContentTranslation() {
-        return contentTranslation;
-    }
-
-    public String getCorrectedText() {
-        return correctedText;
-    }
-
-    public String getCorrectionExplanation() {
-        return correctionExplanation;
-    }
-
-    public String getGrammarNote() {
-        return grammarNote;
-    }
-
-    public String getHintForLearner() {
-        return hintForLearner;
-    }
-
-    public Double getPronunciationScore() {
-        return pronunciationScore;
-    }
+        int turnIndex,
+        String senderType,
+        MessageType messageType,
+        String content,
+        String contentTranslation,
+        String correctedText,
+        String correctionExplanation,
+        String grammarNote,
+        String hintForLearner,
+        Double pronunciationScore,
+        String aiReplyAudio,
+        String userRecordAudio
+) {
 
     public static Builder builder() {
         return new Builder();
@@ -108,6 +41,8 @@ public class SpeakingSessionMessage {
         private String grammarNote;
         private String hintForLearner;
         private Double pronunciationScore;
+        private String aiReplyAudio;
+        private String userRecordAudio;
 
         public Builder id(Long id) {
             this.id = id;
@@ -174,8 +109,34 @@ public class SpeakingSessionMessage {
             return this;
         }
 
-        public SpeakingSessionMessage build() {
-            return new SpeakingSessionMessage(this);
+        public Builder aiReplyAudio(String aiReplyAudio) {
+            this.aiReplyAudio = aiReplyAudio;
+            return this;
+        }
+
+        public Builder userRecordAudio(String userRecordAudio) {
+            this.userRecordAudio = userRecordAudio;
+            return this;
+        }
+
+        public SpeakingSessionMessageResult build() {
+            return new SpeakingSessionMessageResult(
+                    id,
+                    sessionId,
+                    audioFileId,
+                    turnIndex,
+                    senderType,
+                    messageType,
+                    content,
+                    contentTranslation,
+                    correctedText,
+                    correctionExplanation,
+                    grammarNote,
+                    hintForLearner,
+                    pronunciationScore,
+                    aiReplyAudio,
+                    userRecordAudio
+            );
         }
     }
 }
