@@ -1,14 +1,14 @@
 package org.naho.config.application;
 
-import org.naho.book.port.in.GetBookDetailInputPort;
-import org.naho.book.port.in.ImportBookInputPort;
-import org.naho.book.port.in.ListBooksInputPort;
+import org.naho.book.port.in.*;
 import org.naho.book.port.out.BookRepositoryPort;
 import org.naho.book.port.out.ImportBookPort;
-import org.naho.book.usecase.GetBookDetailUseCase;
-import org.naho.book.usecase.ImportBookUseCase;
-import org.naho.book.usecase.ListBooksUseCase;
+import org.naho.book.usecase.*;
+import org.naho.file.port.in.AsyncCrudFileInputPort;
 import org.naho.file.port.in.CrudFileInputPort;
+import org.naho.file.port.in.UploadFileInputPort;
+import org.naho.file.port.out.FileRepositoryPort;
+import org.naho.shared.port.out.TransactionPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -35,5 +35,35 @@ public class BookConfig {
             ImportBookPort importBookPort
     ) {
         return new ImportBookUseCase(importBookPort);
+    }
+
+    @Bean
+    public UpdateBookInputPort updateBookInputPort(
+            BookRepositoryPort bookRepositoryPort,
+            TransactionPort transactionPort,
+            CrudFileInputPort crudFileInputPort,
+            FileRepositoryPort fileRepositoryPort,
+            AsyncCrudFileInputPort asyncCrudFileInputPort
+    ) {
+        return new UpdateBookUseCase(
+                bookRepositoryPort,
+                transactionPort,
+                crudFileInputPort,
+                fileRepositoryPort,
+                asyncCrudFileInputPort
+        );
+    }
+
+    @Bean
+    public UploadBookCoverImageInputPort uploadBookCoverImageInputPort(
+            FileRepositoryPort fileRepositoryPort,
+            UploadFileInputPort uploadFileInputPort,
+            TransactionPort transactionPort
+    ) {
+        return new UploadBookCoverImageUseCase(
+                fileRepositoryPort,
+                uploadFileInputPort,
+                transactionPort
+        );
     }
 }

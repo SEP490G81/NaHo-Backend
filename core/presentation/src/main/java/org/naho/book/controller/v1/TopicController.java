@@ -4,13 +4,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.naho.book.dto.mapper.TopicRequestMapper;
 import org.naho.book.dto.mapper.TopicResponseMapper;
-import org.naho.book.dto.request.CreateTopicRequest;
 import org.naho.book.dto.request.UpdateTopicRequest;
-import org.naho.book.dto.response.CreateTopicResponse;
 import org.naho.book.dto.response.TopicDetailResponse;
 import org.naho.book.dto.response.TopicResponse;
-import org.naho.book.port.in.*;
-import org.naho.book.result.CreateTopicResult;
+import org.naho.book.port.in.GetTopicDetailInputPort;
+import org.naho.book.port.in.ListTopicInputPort;
+import org.naho.book.port.in.UpdateTopicInputPort;
 import org.naho.book.result.TopicResult;
 import org.naho.i18n.message.book.TopicDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
@@ -28,31 +27,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TopicController {
 
-    private final CreateTopicInputPort createTopicInputPort;
+    private final ListTopicInputPort listTopicInputPort;
+    private final GetTopicDetailInputPort getTopicDetailInputPort;
+    private final UpdateTopicInputPort updateTopicInputPort;
     private final TopicRequestMapper topicRequestMapper;
     private final TopicResponseMapper topicResponseMapper;
     private final RoleRepositoryPort roleRepositoryPort;
 
-    private final ListTopicInputPort listTopicInputPort;
-    private final GetTopicDetailInputPort getTopicDetailInputPort;
-    private final UpdateTopicInputPort updateTopicInputPort;
-    private final DeleteTopicInputPort deleteTopicInputPort;
-
-    // CREATE TOPIC
-    @PostMapping
-    @ApiResponseMessage(message = TopicDetailMessageKey.TOPIC_CREATION_SUCCESS)
-    public ResponseEntity<CreateTopicResponse> createTopic(
-            @RequestBody CreateTopicRequest request,
-            @AuthenticationPrincipal AccessTokenPayload payload
-    ) {
-        Long userId = payload.userId();
-
-        var command = topicRequestMapper.toCreateCommand(request, userId);
-        CreateTopicResult result = createTopicInputPort.createTopic(command);
-        CreateTopicResponse response = topicResponseMapper.createResultToResponse(result);
-
-        return ResponseEntity.ok(response);
-    }
 
     // FIND ALL TOPICS BY BOOK
     @GetMapping("/books/{bookId}")
@@ -98,20 +79,4 @@ public class TopicController {
         return ResponseEntity.ok(response);
     }
 
-    // DELETE TOPIC
-    @DeleteMapping("/{id}")
-    @ApiResponseMessage(message = TopicDetailMessageKey.TOPIC_DELETE_SUCCESS)
-    public ResponseEntity<Void> deleteTopic(
-            @PathVariable Long id,
-            @AuthenticationPrincipal AccessTokenPayload payload
-    ) {
-        List<String> roleSet = roleRepositoryPort.findRoleNamesByUserId(payload.userId());
-        boolean isAdminOrManager =
-                roleSet.contains(RoleName.ADMIN.name()) ||
-                        roleSet.contains(RoleName.CONTENT_MANAGER.name());
-
-        var command = topicRequestMapper.toDeleteCommand(id, isAdminOrManager);
-        deleteTopicInputPort.deleteTopic(command);
-        return ResponseEntity.noContent().build();
-    }
 }

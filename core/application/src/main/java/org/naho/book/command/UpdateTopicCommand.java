@@ -6,12 +6,11 @@ public record UpdateTopicCommand(
         Long id,
         Long requestUserId,
         boolean isAdminOrManager,
+        String japaneseName,
+        String japaneseDescription,
         String vietnameseDescription,
         String englishDescription,
-        String japaneseNameMarkup,
-        String japaneseDescriptionMarkup,
         TopicStatus status,
-        Double orderIndex,
         Long coverImageFileId
 ) {
 }

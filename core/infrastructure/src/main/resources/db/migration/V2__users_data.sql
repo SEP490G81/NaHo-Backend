@@ -70,3 +70,26 @@ VALUES (102,
         (SELECT id
          FROM roles
          WHERE role_name = 'LEARNER'));
+-- Content Manager
+INSERT INTO users (created_time,
+                   username,
+                   email,
+                   full_name,
+                   is_email_verified,
+                   failed_login_attempt_count,
+                   hash_password,
+                   status,
+                   gender,
+                   role_id)
+VALUES (NOW(),
+        'tphong2004',
+        'tphong610198@gmail.com',
+        'Trần Phong',
+        b'1',
+        0,
+        '{bcrypt}$2b$10$Bj3gWgyWePuE.2J8TPDrPOJNxVUjxJfl0Uecd7k5ecspFuHrP7tvG',
+        'ACTIVE',
+        'MALE',
+        (SELECT id
+         FROM roles
+         WHERE role_name = 'CONTENT_MANAGER'));

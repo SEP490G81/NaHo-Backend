@@ -2,8 +2,10 @@ package org.naho.book.dto.mapper;
 
 import org.mapstruct.Mapper;
 import org.naho.book.dto.response.LessonDetailResponse;
+import org.naho.book.dto.response.LessonResponse;
 import org.naho.book.dto.response.ObjectiveResponse;
 import org.naho.book.result.LessonDetailResult;
+import org.naho.book.result.LessonListItemResult;
 import org.naho.book.result.ObjectiveListItemResult;
 
 import java.util.List;
@@ -12,6 +14,8 @@ import java.util.List;
 public interface LessonResponseMapper {
 
     LessonDetailResponse detailResultToResponse(LessonDetailResult result);
+
+    LessonResponse listItemResultToResponse(LessonListItemResult result);
 
     ObjectiveResponse objectiveResultToResponse(ObjectiveListItemResult result);
 

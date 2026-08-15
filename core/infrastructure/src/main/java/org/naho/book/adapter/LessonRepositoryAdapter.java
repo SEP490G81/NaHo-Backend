@@ -1,6 +1,7 @@
 package org.naho.book.adapter;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.book.entity.LessonEntity;
 import org.naho.book.mapper.LessonEntityMapper;
 import org.naho.book.model.Lesson;
 import org.naho.book.mybatis.LessonQueryMapper;
@@ -35,5 +36,17 @@ public class LessonRepositoryAdapter implements LessonRepositoryPort {
         return lessonQueryMapper
                 .findBySpeakingQuestionId(speakingQuestionId)
                 .map(lessonEntityMapper::entityToDomain);
+    }
+
+    @Override
+    public void save(Lesson lesson) {
+        LessonEntity entity;
+        if (lesson.getId() != null) {
+            entity = lessonJpaRepository.findById(lesson.getId()).orElse(new LessonEntity());
+            lessonEntityMapper.updateEntityFromDomain(lesson, entity);
+        } else {
+            entity = lessonEntityMapper.domainToEntity(lesson);
+        }
+        lessonJpaRepository.save(entity);
     }
 }

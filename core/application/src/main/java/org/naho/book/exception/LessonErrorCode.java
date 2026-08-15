@@ -4,7 +4,8 @@ import org.naho.i18n.message.book.LessonTitleMessageKey;
 import org.naho.shared.exception.ErrorCode;
 
 public enum LessonErrorCode implements ErrorCode {
-    LESSON_NOT_FOUND("LESSON_A001", LessonTitleMessageKey.LESSON_GET_FAIL_TITLE, 404);
+    LESSON_NOT_FOUND("LESSON_A001", LessonTitleMessageKey.LESSON_GET_FAIL_TITLE, 404),
+    LESSON_UPDATE_FORBIDDEN("LESSON_A003", LessonTitleMessageKey.LESSON_UPDATE_FAILED_TITLE, 403);
 
     private final String code;
     private final String titleKey;

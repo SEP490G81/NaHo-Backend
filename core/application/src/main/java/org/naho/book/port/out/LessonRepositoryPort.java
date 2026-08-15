@@ -11,4 +11,6 @@ public interface LessonRepositoryPort {
     Optional<Lesson> findById(Long id);
 
     Optional<Lesson> findBySpeakingQuestionId(Long speakingQuestionId);
+
+    void save(Lesson lesson);
 }

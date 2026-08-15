@@ -40,10 +40,11 @@ public class TopicRepositoryAdapter implements TopicRepositoryPort {
 
     @Override
     public Topic save(Topic topic) {
-        TopicEntity entity = new TopicEntity();
-
+        TopicEntity entity;
         if (topic.getId() != null) {
-            entity.setId(topic.getId());
+            entity = topicJpaRepository.findById(topic.getId()).orElse(new TopicEntity());
+        } else {
+            entity = new TopicEntity();
         }
 
         entity.setJapaneseName(topic.getJapaneseName());

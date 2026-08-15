@@ -4,10 +4,12 @@ import org.naho.book.adapter.LessonRepositoryAdapter;
 import org.naho.book.adapter.TopicListRepositoryAdapter;
 import org.naho.book.adapter.TopicRepositoryAdapter;
 import org.naho.book.mapper.TopicResultMapper;
-import org.naho.book.port.in.*;
-import org.naho.book.usecase.*;
-import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
-import org.naho.shared.port.out.TransactionPort;
+import org.naho.book.port.in.GetTopicDetailInputPort;
+import org.naho.book.port.in.ListTopicInputPort;
+import org.naho.book.port.in.UpdateTopicInputPort;
+import org.naho.book.usecase.GetTopicDetailUseCase;
+import org.naho.book.usecase.ListTopicUseCase;
+import org.naho.book.usecase.UpdateTopicUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -19,10 +21,6 @@ public class TopicConfig {
         return new TopicResultMapper();
     }
 
-    @Bean
-    public CreateTopicInputPort createTopicInputPort(TopicRepositoryAdapter topicRepositoryAdapter) {
-        return new CreateTopicUseCase(topicRepositoryAdapter);
-    }
 
     @Bean
     public ListTopicInputPort listTopicUseCasePort(
@@ -38,14 +36,9 @@ public class TopicConfig {
     }
 
     @Bean
-    public UpdateTopicInputPort updateTopicInputPort(TopicRepositoryAdapter topicRepositoryAdapter) {
-        return new UpdateTopicUseCase(topicRepositoryAdapter);
+    public UpdateTopicInputPort updateTopicInputPort(TopicRepositoryAdapter topicRepositoryAdapter, org.naho.furigana.port.out.FuriganaGenerationPort furiganaGenerationPort) {
+        return new UpdateTopicUseCase(topicRepositoryAdapter, furiganaGenerationPort);
     }
 
-    @Bean
-    public DeleteTopicInputPort deleteTopicInputPort(TopicRepositoryAdapter topicRepositoryAdapter,
-                                                     SpeakingQuestionRepositoryPort questionRepositoryPort,
-                                                     TransactionPort transactionPort) {
-        return new DeleteTopicUseCase(topicRepositoryAdapter, questionRepositoryPort, transactionPort);
-    }
+
 }
