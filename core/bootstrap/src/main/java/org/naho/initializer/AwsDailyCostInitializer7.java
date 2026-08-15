@@ -45,7 +45,7 @@ public class AwsDailyCostInitializer7 implements ApplicationRunner {
 
         log.info("Initializing AWS daily cost to {}...", to);
 
-        awsDailyCostSyncServicePort.sync(from, to);
+//        awsDailyCostSyncServicePort.sync(from, to);
 
         log.info("AWS daily cost to {} initialized!", to);
     }
