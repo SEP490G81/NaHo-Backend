@@ -78,17 +78,21 @@ public class SpeakingController {
 
     // ─── Session Management ─────────────────────────────────────
 
+
+    //TẠO SESSION SPEAKING 1-1 VỚI PERSONAS
     @PostMapping(
             value = "/session/{personaId}",
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.ALL_VALUE},
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    //Bọc API response với message báo thành công tạo speaking conversation
     @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_CONVERSATION_START_SUCCESS)
     public ResponseEntity<StartConversationResponse> startConversationWithAISession(
             @PathVariable("personaId") int personaId,
             @AuthenticationPrincipal AccessTokenPayload payload,
-            @RequestBody(required = false) StartConversationRequest request
+            @RequestBody(required = false) StartConversationRequest request //bao gồm thuộc tính
     ) {
+
         Long userId = payload != null ? payload.userId() : null;
         var formalityOverride = request != null ? request.formalityLevel() : null;
         var marugotoOverride = request != null ? request.marugotoLevel() : null;
