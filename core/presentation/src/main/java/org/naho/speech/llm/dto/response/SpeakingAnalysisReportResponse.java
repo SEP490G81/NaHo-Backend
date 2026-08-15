@@ -5,6 +5,7 @@ import java.util.List;
 public record SpeakingAnalysisReportResponse(
         Double overallScore,
         Scores scores,
+        String fullTranscript,
         List<WordPronunciationResponse> wordPronunciations,
         String enrichedFeedbackJson
 ) {

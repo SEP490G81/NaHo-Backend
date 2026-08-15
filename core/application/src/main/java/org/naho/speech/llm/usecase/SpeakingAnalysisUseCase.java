@@ -403,6 +403,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
 
         objectNode.put("durationSec", durationSec);
         objectNode.put("overallScore", overallScore);
+        objectNode.put("fullTranscript", azureResult.getTranscriptText() != null ? azureResult.getTranscriptText() : "");
 
         ObjectNode scoresNode = objectMapper.createObjectNode();
         scoresNode.put("vocabulary", vocabScore);
@@ -535,6 +536,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
 
         // Gắn report đầy đủ bao gồm tô màu phát âm từng từ vào result
         List<WordPronunciationResult> wordPronunciations = buildWordPronunciations(azureAssessment.getWords());
+        String fullTranscript = azureAssessment.getTranscriptText() != null ? azureAssessment.getTranscriptText() : "";
 
         SpeakingAnalysisReportResult report = new SpeakingAnalysisReportResult(
                 parsedScores.overallScore(),
@@ -545,6 +547,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                         parsedScores.grammarScore(),
                         parsedScores.naturalnessScore()
                 ),
+                fullTranscript,
                 wordPronunciations,
                 parsedScores.enrichedFeedbackJson()
         );
