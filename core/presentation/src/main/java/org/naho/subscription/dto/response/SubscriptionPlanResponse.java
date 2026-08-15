@@ -16,9 +16,8 @@ public record SubscriptionPlanResponse(
         Integer durationDays,
         Integer dailySpeakingQuestionEvaluationLimit,
         Integer maxSpeakingQuestionRecordingSeconds,
-        Integer maxConcurrentAiSessionCount,
         Integer maxTurnsPerAiSession,
-        Integer dailyAiSessionEvaluationLimit,
+        Integer dailyAiSessionStartLimit,
         Integer maxAiTurnSpeakingSeconds,
         Boolean sampleAnswerEnabled,
         PlanStatus status

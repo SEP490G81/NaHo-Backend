@@ -9,7 +9,6 @@ import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.result.StoredFile;
 import org.naho.i18n.message.llm.LlmDetailMessageKey;
 import org.naho.i18n.message.persona.PersonaDetailMessageKey;
-import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.pagination.PageData;
 import org.naho.persona.exception.PersonaErrorCode;
 import org.naho.persona.model.Persona;
@@ -29,9 +28,7 @@ import org.naho.speech.llm.port.out.SessionStorePort;
 import org.naho.speech.llm.port.out.SpeakingSessionRepositoryPort;
 import org.naho.speech.llm.port.out.SpeechToTextPort;
 import org.naho.speech.llm.result.*;
-import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
-import org.naho.subscription.result.SubscriptionPlanResult;
-import org.naho.user.exception.UserErrorCode;
+import org.naho.speech.llm.validator.SessionValidator;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -39,7 +36,6 @@ import java.util.function.Consumer;
 public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
     private static final String SYSTEM_PROMPT_TEMPLATE = """
             You are a Japanese conversation partner on the NaHo language learning platform.
             %s
@@ -86,7 +82,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     private final SpeakingSessionRepositoryPort speakingSessionRepositoryPort;
     private final FileRepositoryPort fileRepositoryPort;
     private final UploadFileInputPort uploadFileInputPort;
-    private final GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
+    private final SessionValidator sessionValidator;
 
     public SpeakingSessionUseCase(
             AiChatPort aiChatPort,
@@ -97,7 +93,8 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
             FileRepositoryPort fileRepositoryPort,
             UploadFileInputPort uploadFileInputPort,
-            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort) {
+            SessionValidator sessionValidator
+    ) {
         this.aiChatPort = aiChatPort;
         this.sessionStorePort = sessionStorePort;
         this.speechToTextPort = speechToTextPort;
@@ -106,7 +103,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         this.speakingSessionRepositoryPort = speakingSessionRepositoryPort;
         this.fileRepositoryPort = fileRepositoryPort;
         this.uploadFileInputPort = uploadFileInputPort;
-        this.getActiveSubscriptionInputPort = getActiveSubscriptionInputPort;
+        this.sessionValidator = sessionValidator;
     }
 
     private ParsedAiReply parseAiResponse(String rawResponse) {
@@ -139,49 +136,6 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             System.out.println("[SpeakingSessionUseCase] Fallback raw text parsing: " + e.getMessage());
             System.out.println("[SpeakingSessionUseCase] Raw response: " + rawResponse);
             return new ParsedAiReply(rawResponse, "", "", "", "", "");
-        }
-    }
-
-    private void validateSessionNotCompleted(String sessionId) {
-        if (speakingSessionRepositoryPort.isSessionCompleted(sessionId)) {
-            throw new ApplicationException(
-                    LlmApplicationError.LLM_SESSION_ALREADY_COMPLETED,
-                    LlmDetailMessageKey.LLM_SESSION_ALREADY_COMPLETED);
-        }
-    }
-
-    private void validateSessionTurnLimit(String sessionId, Long userId) {
-        Long targetUserId = userId != null ? userId : sessionStorePort.getUserId(sessionId);
-        if (targetUserId == null) {
-            return;
-        }
-
-        SubscriptionPlanResult plan = getActiveSubscriptionInputPort.getUserActiveSubscriptionPlan(targetUserId);
-        if (plan != null && plan.maxTurnsPerAiSession() != null) {
-            int currentTurnCount = sessionStorePort.getTurnCount(sessionId);
-            if (currentTurnCount >= plan.maxTurnsPerAiSession()) {
-                throw new ApplicationException(
-                        LlmApplicationError.LLM_SESSION_TURN_LIMIT_EXCEEDED,
-                        LlmDetailMessageKey.LLM_SESSION_TURN_LIMIT_EXCEEDED);
-            }
-        }
-    }
-
-    private void validateConcurrentSessionLimit(Long userId) {
-        if (userId == null) {
-            throw new ApplicationException(
-                    UserErrorCode.USER_UNAUTHORIZED,
-                    UserDetailMessageKey.USER_UNAUTHORIZED);
-        }
-
-        SubscriptionPlanResult plan = getActiveSubscriptionInputPort.getUserActiveSubscriptionPlan(userId);
-        if (plan != null && plan.maxConcurrentAiSessionCount() != null) {
-            int activeSessionCount = speakingSessionRepositoryPort.countActiveSessionsByUserId(userId);
-            if (activeSessionCount >= plan.maxConcurrentAiSessionCount()) {
-                throw new ApplicationException(
-                        LlmApplicationError.LLM_SESSION_CONCURRENT_LIMIT_EXCEEDED,
-                        LlmDetailMessageKey.LLM_SESSION_CONCURRENT_LIMIT_EXCEEDED);
-            }
         }
     }
 
@@ -289,8 +243,8 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     @Override
     public ChatResult sendMessage(SendMessageWithSessionCommand command) {
         String sessionId = command.sessionId();
-        validateSessionNotCompleted(sessionId);
-        validateSessionTurnLimit(sessionId, null);
+        sessionValidator.validateSessionNotCompleted(sessionId);
+        sessionValidator.validateSessionTurnLimit(sessionId, null);
         ensureSessionLoadedInMemory(sessionId);
         String userMessage = command.userMessage();
         sessionStorePort.addMessage(sessionId, "user", userMessage);
@@ -342,8 +296,8 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     @Override
     public void sendMessageStream(SendMessageWithSessionCommand command, Consumer<String> onToken) {
         String sessionId = command.sessionId();
-        validateSessionNotCompleted(sessionId);
-        validateSessionTurnLimit(sessionId, null);
+        sessionValidator.validateSessionNotCompleted(sessionId);
+        sessionValidator.validateSessionTurnLimit(sessionId, null);
         ensureSessionLoadedInMemory(sessionId);
         String userMessage = command.userMessage();
         sessionStorePort.addMessage(sessionId, "user", userMessage);
@@ -366,25 +320,28 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
 
     @Override
     public StartConversationResult startConversationWithAISession(
-            StartSpeakingConversationWithAICommand startSpeakingConversationWithAICommand) {
-//        validateConcurrentSessionLimit(startSpeakingConversationWithAICommand.userId());
+            StartSpeakingConversationWithAICommand command
+    ) {
+        // kiểm tra xem người dùng đã tới giới hạn lượt tạo session trong ngày chưa
+        sessionValidator.validateSessionStartLimit(command.userId());
+
         String sessionId = UUID.randomUUID().toString();
-        Persona persona = personaRepositoryPort.findById((long) startSpeakingConversationWithAICommand.personaId())
+        Persona persona = personaRepositoryPort.findById((long) command.personaId())
                 .orElseThrow(() -> new ApplicationException(
                         PersonaErrorCode.PERSONA_NOT_FOUND,
                         PersonaDetailMessageKey.PERSONA_NOT_FOUND,
-                        startSpeakingConversationWithAICommand.personaId()));
+                        command.personaId()));
 
         sessionStorePort.initSession(sessionId);
         sessionStorePort.setTopic(sessionId, "Conversation with " + persona.getName());
         sessionStorePort.setVoiceName(sessionId, "ja-JP-NanamiNeural");
 
-        FormalityLevel effectiveFormality = startSpeakingConversationWithAICommand.formalityLevelOverride();
+        FormalityLevel effectiveFormality = command.formalityLevelOverride();
         if (effectiveFormality == null && persona.getConversationStyle() != null) {
             effectiveFormality = persona.getConversationStyle().getFormalityLevel();
         }
 
-        MarugotoLevel effectiveMarugoto = startSpeakingConversationWithAICommand.marugotoLevelOverride();
+        MarugotoLevel effectiveMarugoto = command.marugotoLevelOverride();
         if (effectiveMarugoto == null && persona.getConversationStyle() != null) {
             effectiveMarugoto = persona.getConversationStyle().getMarugotoLevel();
         }
@@ -432,8 +389,8 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         }
 
         // Store session metadata for DB persistence
-        sessionStorePort.setUserId(sessionId, startSpeakingConversationWithAICommand.userId());
-        sessionStorePort.setPersonaId(sessionId, (long) startSpeakingConversationWithAICommand.personaId());
+        sessionStorePort.setUserId(sessionId, command.userId());
+        sessionStorePort.setPersonaId(sessionId, (long) command.personaId());
         if (effectiveMarugoto != null) {
             sessionStorePort.setMarugotoLevel(sessionId, effectiveMarugoto.name());
         }
@@ -457,8 +414,8 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         try {
             speakingSessionRepositoryPort.createInProgressSession(
                     sessionId,
-                    startSpeakingConversationWithAICommand.userId(),
-                    (long) startSpeakingConversationWithAICommand.personaId(),
+                    command.userId(),
+                    (long) command.personaId(),
                     "Conversation with " + persona.getName(),
                     effectiveMarugoto != null ? effectiveMarugoto.name() : null,
                     effectiveFormality != null ? effectiveFormality.name() : null);
@@ -482,8 +439,8 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     @Override
     public AudioChatResult sendAudioMessage(SendAudioMessageCommand command) {
         String sessionId = command.sessionId();
-        validateSessionNotCompleted(sessionId);
-        validateSessionTurnLimit(sessionId, command.userId());
+        sessionValidator.validateSessionNotCompleted(sessionId);
+        sessionValidator.validateSessionTurnLimit(sessionId, command.userId());
         ensureSessionLoadedInMemory(sessionId);
 
         SpeechToTextResult sttResult = speechToTextPort.transcribeAndAssess(

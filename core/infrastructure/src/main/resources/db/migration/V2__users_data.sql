@@ -16,7 +16,7 @@ VALUES (NOW(), NULL, 'ADMIN', ''),
 -- =========================================================
 
 ALTER TABLE users
-    MODIFY COLUMN is_email_verified BIT(1) NOT NULL DEFAULT b'0';
+    MODIFY COLUMN is_email_verified BIT (1) NOT NULL DEFAULT b'0';
 
 
 -- =========================================================

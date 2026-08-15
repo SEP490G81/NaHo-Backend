@@ -14,7 +14,7 @@ public class UserDailyAiUsageResultMapper {
                 .userId(domain.getUserId())
                 .usageDate(domain.getUsageDate())
                 .speakingEvaluationCount(domain.getSpeakingEvaluationCount())
-                .aiSessionEvaluationCount(domain.getAiSessionEvaluationCount())
+                .aiSessionStartCount(domain.getAiSessionStartCount())
                 .build();
     }
 }

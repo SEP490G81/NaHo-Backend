@@ -17,9 +17,8 @@ public class SubscriptionPlan {
     private Integer durationDays;
     private Integer dailySpeakingQuestionEvaluationLimit;
     private Integer maxSpeakingQuestionRecordingSeconds;
-    private Integer maxConcurrentAiSessionCount;
     private Integer maxTurnsPerAiSession;
-    private Integer dailyAiSessionEvaluationLimit;
+    private Integer dailyAiSessionStartLimit;
     private Integer maxAiTurnSpeakingSeconds;
     private Boolean sampleAnswerEnabled;
     private PlanStatus status;
@@ -33,9 +32,8 @@ public class SubscriptionPlan {
         this.durationDays = builder.durationDays;
         this.dailySpeakingQuestionEvaluationLimit = builder.dailySpeakingQuestionEvaluationLimit;
         this.maxSpeakingQuestionRecordingSeconds = builder.maxSpeakingQuestionRecordingSeconds;
-        this.maxConcurrentAiSessionCount = builder.maxConcurrentAiSessionCount;
         this.maxTurnsPerAiSession = builder.maxTurnsPerAiSession;
-        this.dailyAiSessionEvaluationLimit = builder.dailyAiSessionEvaluationLimit;
+        this.dailyAiSessionStartLimit = builder.dailyAiSessionStartLimit;
         this.maxAiTurnSpeakingSeconds = builder.maxAiTurnSpeakingSeconds;
         this.sampleAnswerEnabled = builder.sampleAnswerEnabled;
         this.status = builder.status;
@@ -53,9 +51,8 @@ public class SubscriptionPlan {
             Integer durationDays,
             Integer dailySpeakingQuestionEvaluationLimit,
             Integer maxSpeakingQuestionRecordingSeconds,
-            Integer maxConcurrentAiSessionCount,
             Integer maxTurnsPerAiSession,
-            Integer dailyAiSessionEvaluationLimit,
+            Integer dailyAiSessionStartLimit,
             Integer maxAiTurnSpeakingSeconds,
             Boolean sampleAnswerEnabled) {
         return builder()
@@ -66,9 +63,8 @@ public class SubscriptionPlan {
                 .durationDays(durationDays)
                 .dailySpeakingQuestionEvaluationLimit(dailySpeakingQuestionEvaluationLimit)
                 .maxSpeakingQuestionRecordingSeconds(maxSpeakingQuestionRecordingSeconds)
-                .maxConcurrentAiSessionCount(maxConcurrentAiSessionCount)
                 .maxTurnsPerAiSession(maxTurnsPerAiSession)
-                .dailyAiSessionEvaluationLimit(dailyAiSessionEvaluationLimit)
+                .dailyAiSessionStartLimit(dailyAiSessionStartLimit)
                 .maxAiTurnSpeakingSeconds(maxAiTurnSpeakingSeconds)
                 .sampleAnswerEnabled(sampleAnswerEnabled)
                 .status(PlanStatus.ACTIVE)
@@ -90,9 +86,8 @@ public class SubscriptionPlan {
             Integer durationDays,
             Integer dailySpeakingQuestionEvaluationLimit,
             Integer maxSpeakingQuestionRecordingSeconds,
-            Integer maxConcurrentAiSessionCount,
             Integer maxTurnsPerAiSession,
-            Integer dailyAiSessionEvaluationLimit,
+            Integer dailyAiSessionStartLimit,
             Integer maxAiTurnSpeakingSeconds,
             Boolean sampleAnswerEnabled,
             PlanStatus status) {
@@ -121,14 +116,11 @@ public class SubscriptionPlan {
         if (maxSpeakingQuestionRecordingSeconds != null) {
             this.maxSpeakingQuestionRecordingSeconds = maxSpeakingQuestionRecordingSeconds;
         }
-        if (maxConcurrentAiSessionCount != null) {
-            this.maxConcurrentAiSessionCount = maxConcurrentAiSessionCount;
-        }
         if (maxTurnsPerAiSession != null) {
             this.maxTurnsPerAiSession = maxTurnsPerAiSession;
         }
-        if (dailyAiSessionEvaluationLimit != null) {
-            this.dailyAiSessionEvaluationLimit = dailyAiSessionEvaluationLimit;
+        if (dailyAiSessionStartLimit != null) {
+            this.dailyAiSessionStartLimit = dailyAiSessionStartLimit;
         }
         if (maxAiTurnSpeakingSeconds != null) {
             this.maxAiTurnSpeakingSeconds = maxAiTurnSpeakingSeconds;
@@ -174,16 +166,12 @@ public class SubscriptionPlan {
         return maxSpeakingQuestionRecordingSeconds;
     }
 
-    public Integer getMaxConcurrentAiSessionCount() {
-        return maxConcurrentAiSessionCount;
-    }
-
     public Integer getMaxTurnsPerAiSession() {
         return maxTurnsPerAiSession;
     }
 
-    public Integer getDailyAiSessionEvaluationLimit() {
-        return dailyAiSessionEvaluationLimit;
+    public Integer getDailyAiSessionStartLimit() {
+        return dailyAiSessionStartLimit;
     }
 
     public Integer getMaxAiTurnSpeakingSeconds() {
@@ -207,9 +195,8 @@ public class SubscriptionPlan {
         private Integer durationDays;
         private Integer dailySpeakingQuestionEvaluationLimit;
         private Integer maxSpeakingQuestionRecordingSeconds;
-        private Integer maxConcurrentAiSessionCount;
         private Integer maxTurnsPerAiSession;
-        private Integer dailyAiSessionEvaluationLimit;
+        private Integer dailyAiSessionStartLimit;
         private Integer maxAiTurnSpeakingSeconds;
         private Boolean sampleAnswerEnabled;
         private PlanStatus status;
@@ -257,18 +244,13 @@ public class SubscriptionPlan {
             return this;
         }
 
-        public Builder maxConcurrentAiSessionCount(Integer maxConcurrentAiSessionCount) {
-            this.maxConcurrentAiSessionCount = maxConcurrentAiSessionCount;
-            return this;
-        }
-
         public Builder maxTurnsPerAiSession(Integer maxTurnsPerAiSession) {
             this.maxTurnsPerAiSession = maxTurnsPerAiSession;
             return this;
         }
 
-        public Builder dailyAiSessionEvaluationLimit(Integer dailyAiSessionEvaluationLimit) {
-            this.dailyAiSessionEvaluationLimit = dailyAiSessionEvaluationLimit;
+        public Builder dailyAiSessionStartLimit(Integer dailyAiSessionStartLimit) {
+            this.dailyAiSessionStartLimit = dailyAiSessionStartLimit;
             return this;
         }
 

@@ -22,6 +22,7 @@ import org.naho.speech.llm.constant.OpenAiConfigProperties;
 import org.naho.speech.llm.port.in.*;
 import org.naho.speech.llm.port.out.*;
 import org.naho.speech.llm.usecase.*;
+import org.naho.speech.llm.validator.SessionValidator;
 import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
 import org.naho.subscription.port.out.UserDailyAiUsageRepositoryPort;
 import org.naho.user.port.out.UserRepositoryPort;
@@ -66,6 +67,21 @@ public class ChatConfig {
         return new AzureSpeechToTextAdapter(azureSpeechServicePort);
     }
 
+    @Bean
+    public SessionValidator sessionValidator(
+            SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
+            SessionStorePort sessionStorePort,
+            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort,
+            UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort
+    ) {
+        return new SessionValidator(
+                speakingSessionRepositoryPort,
+                sessionStorePort,
+                getActiveSubscriptionInputPort,
+                userDailyAiUsageRepositoryPort
+        );
+    }
+
     // ─── Input Port UseCases ─────────────────────────────────────
 
     @Bean
@@ -78,7 +94,7 @@ public class ChatConfig {
             SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
             FileRepositoryPort fileRepositoryPort,
             UploadFileInputPort uploadFileInputPort,
-            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort
+            SessionValidator sessionValidator
     ) {
         return new SpeakingSessionUseCase(
                 aiChatPort,
@@ -89,7 +105,7 @@ public class ChatConfig {
                 speakingSessionRepositoryPort,
                 fileRepositoryPort,
                 uploadFileInputPort,
-                getActiveSubscriptionInputPort
+                sessionValidator
         );
     }
 

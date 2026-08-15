@@ -1,4 +1,4 @@
-package org.naho.speech.llm.usecase;
+package org.naho.cost.usecase;
 
 import org.naho.cost.model.OpenAiDailyCost;
 import org.naho.speech.llm.command.OpenAiCostQueryCommand;

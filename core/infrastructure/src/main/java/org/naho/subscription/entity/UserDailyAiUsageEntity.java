@@ -25,9 +25,9 @@ public class UserDailyAiUsageEntity extends BaseEntity {
     @Column(name = "speaking_evaluation_count", nullable = false)
     Integer speakingEvaluationCount;
 
-    // Số lượt được AI chấm điểm trong AI 1:1
-    @Column(name = "ai_session_evaluation_count", nullable = false)
-    Integer aiSessionEvaluationCount;
+    // Số lượt bắt đầu AI 1:1
+    @Column(name = "ai_session_start_count", nullable = false)
+    Integer aiSessionStartCount;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

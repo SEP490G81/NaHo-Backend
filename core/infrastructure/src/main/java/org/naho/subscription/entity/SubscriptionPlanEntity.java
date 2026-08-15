@@ -46,14 +46,11 @@ public class SubscriptionPlanEntity extends BaseEntity {
     @Column(name = "max_speaking_question_recording_seconds", nullable = false)
     Integer maxSpeakingQuestionRecordingSeconds;
 
-    @Column(name = "max_concurrent_ai_session_count", nullable = false)
-    Integer maxConcurrentAiSessionCount;
-
     @Column(name = "max_turns_per_ai_session", nullable = false)
     Integer maxTurnsPerAiSession;
 
-    @Column(name = "daily_ai_session_evaluation_limit", nullable = false)
-    Integer dailyAiSessionEvaluationLimit;
+    @Column(name = "daily_ai_session_start_limit", nullable = false)
+    Integer dailyAiSessionStartLimit;
 
     @Column(name = "max_ai_turn_speaking_seconds", nullable = false)
     Integer maxAiTurnSpeakingSeconds;
