@@ -7,6 +7,8 @@ import org.naho.speech.llm.command.SpeakingSessionFilterCommand;
 import org.naho.speech.llm.command.StartSpeakingConversationCommand;
 import org.naho.speech.llm.result.*;
 
+import java.util.List;
+
 public interface SpeakingSessionInputPort {
     ChatResult sendMessage(SendMessageWithSessionCommand command);
 
@@ -32,4 +34,6 @@ public interface SpeakingSessionInputPort {
     SpeakingSessionDetailResult getSessionHistoryDetail(String sessionCode, Long userId);
 
     SpeakingSessionResult getInProgressSessionDetails(String sessionCode, Long userId);
+
+    List<SpeakingSessionResult> findAllInProgressSessionsByUserId(Long userId);
 }

@@ -648,4 +648,13 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
 
         return speakingSessionEntityMapper.entityToDomain(entity);
     }
+
+    @Override
+    public List<SpeakingSession> findAllInProgressSessionsByUserId(Long userId) {
+        return sessionJpaRepository
+                .findALlByStatusAndUserId(SpeakingSessionStatus.IN_PROGRESS, userId)
+                .stream()
+                .map(speakingSessionEntityMapper::entityToDomain)
+                .toList();
+    }
 }

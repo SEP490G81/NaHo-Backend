@@ -457,7 +457,22 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         return speakingSessionResultMapper.domainToResult(inProgressSession);
     }
 
-//    @Override
+    @Override
+    public List<SpeakingSessionResult> findAllInProgressSessionsByUserId(Long userId) {
+        if (userId == null) {
+            throw new ApplicationException(
+                    UserErrorCode.USER_NOT_FOUND,
+                    UserDetailMessageKey.USER_ID_NULL
+            );
+        }
+
+        List<SpeakingSession> inProgressSessions = speakingSessionRepositoryPort.findAllInProgressSessionsByUserId(userId);
+        return inProgressSessions.stream()
+                .map(speakingSessionResultMapper::domainToResult)
+                .toList();
+    }
+
+    //    @Override
 //    public StartConversationResult resumeSession(String sessionCode, Long userId) {
 //        if (sessionCode == null || sessionCode.isBlank()) {
 //            throw new ApplicationException(

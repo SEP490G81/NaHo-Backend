@@ -1,9 +1,20 @@
 package org.naho.speech.llm.usecase;
 
+import org.naho.daily.command.CompleteDailyMissionCommand;
+import org.naho.daily.port.in.CrudUserDailyMissionInputPort;
+import org.naho.daily.type.MissionType;
+import org.naho.i18n.message.learning.UserLearningProgressDetailMessageKey;
 import org.naho.i18n.message.llm.LlmDetailMessageKey;
+import org.naho.learning.command.UpdateUserStreakCommand;
+import org.naho.learning.exception.UserLearningProgressErrorCode;
+import org.naho.learning.model.UserLearningProgress;
+import org.naho.learning.port.in.UserLearningStreakInputPort;
+import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
 import org.naho.persona.type.FormalityLevel;
 import org.naho.persona.type.MarugotoLevel;
+import org.naho.shared.constant.SystemZoneId;
 import org.naho.shared.exception.ApplicationException;
+import org.naho.shared.port.out.TransactionPort;
 import org.naho.speech.llm.exception.LlmApplicationError;
 import org.naho.speech.llm.port.in.EndSessionInputPort;
 import org.naho.speech.llm.port.out.AiScoringPort;
@@ -17,19 +28,35 @@ public class EndSessionUseCase implements EndSessionInputPort {
     private final SessionStorePort sessionStorePort;
     private final AiScoringPort aiScoringPort;
     private final SpeakingSessionRepositoryPort speakingSessionRepositoryPort;
+    private final CrudUserDailyMissionInputPort crudUserDailyMissionInputPort;
+    private final UserLearningStreakInputPort userLearningStreakInputPort;
+    private final UserLearningProgressRepositoryPort userLearningProgressRepositoryPort;
+    private final TransactionPort transactionPort;
 
     public EndSessionUseCase(
             SessionStorePort sessionStorePort,
             AiScoringPort aiScoringPort,
-            SpeakingSessionRepositoryPort speakingSessionRepositoryPort
+            SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
+            CrudUserDailyMissionInputPort crudUserDailyMissionInputPort,
+            UserLearningStreakInputPort userLearningStreakInputPort,
+            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
+            TransactionPort transactionPort
     ) {
         this.sessionStorePort = sessionStorePort;
         this.aiScoringPort = aiScoringPort;
         this.speakingSessionRepositoryPort = speakingSessionRepositoryPort;
+        this.crudUserDailyMissionInputPort = crudUserDailyMissionInputPort;
+        this.userLearningStreakInputPort = userLearningStreakInputPort;
+        this.userLearningProgressRepositoryPort = userLearningProgressRepositoryPort;
+        this.transactionPort = transactionPort;
     }
 
     @Override
     public ScoringResult endSession(Long requestUserId, String sessionCode, String topic, String speechMetaData, String arsConfidence) {
+        return transactionPort.execute(() -> doEndSession(requestUserId, sessionCode, topic, speechMetaData, arsConfidence));
+    }
+
+    private ScoringResult doEndSession(Long requestUserId, String sessionCode, String topic, String speechMetaData, String arsConfidence) {
         // Lấy user id của người sở hữu cái session này
         Long userId = sessionStorePort.getUserId(sessionCode);
         if (userId == null) {
@@ -88,6 +115,33 @@ public class EndSessionUseCase implements EndSessionInputPort {
                     startedAt,
                     result
             );
+
+            crudUserDailyMissionInputPort.completeMission(
+                    new CompleteDailyMissionCommand(
+                            userId,
+                            MissionType.TALK_WITH_AI
+                    )
+            );
+
+            // Lấy thông tin về thành tích học tập của người dùng
+            UserLearningProgress progress = userLearningProgressRepositoryPort
+                    .findByUserId(userId)
+                    .orElseThrow(() -> new ApplicationException(
+                            UserLearningProgressErrorCode.USER_LEARNING_PROGRESS_NOT_FOUND,
+                            UserLearningProgressDetailMessageKey.USER_LEARNING_PROGRESS_NOT_FOUND_BY_USER_ID
+                    ));
+
+            progress = userLearningStreakInputPort.updateUserLearningStreak(
+                    UpdateUserStreakCommand.builder()
+                            .userLearningProgress(progress)
+                            .userId(userId)
+                            .now(Instant.now())
+                            .zoneId(SystemZoneId.HO_CHI_MINH_ZONE_ID)
+                            .build()
+            );
+
+            userLearningProgressRepositoryPort.save(progress);
+
             System.out.println("[EndSessionUseCase] Successfully saved session " + sessionCode + " to DB for userId: " + userId);
         } catch (Exception e) {
             System.err.println("[EndSessionUseCase] Failed to persist session to DB: " + e.getMessage());

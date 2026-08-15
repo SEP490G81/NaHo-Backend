@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserLearningProgressInitializer4 implements ApplicationRunner {
     private static final Long ADMIN_USER_ID = 1L;
     private static final Long DEFAULT_LEARNER_USER_ID = 102L;
+    private static final Long DEFAULT_CONTENT_MANAGER_USER_ID = 103L;
     private final UserLearningProgressRepositoryPort userLearningProgressRepositoryPort;
     private final CrudUserLearningProgressInputPort crudUserLearningProgressInputPort;
 
@@ -30,6 +31,7 @@ public class UserLearningProgressInitializer4 implements ApplicationRunner {
             log.info("Initializing UserLearningProgress Data...");
             crudUserLearningProgressInputPort.initUserLearningProgress(ADMIN_USER_ID);
             crudUserLearningProgressInputPort.initUserLearningProgress(DEFAULT_LEARNER_USER_ID);
+            crudUserLearningProgressInputPort.initUserLearningProgress(DEFAULT_CONTENT_MANAGER_USER_ID);
             log.info("UserLearningProgress Data initialized!");
         }
     }

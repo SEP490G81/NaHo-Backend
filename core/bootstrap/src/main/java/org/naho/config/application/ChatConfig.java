@@ -4,11 +4,13 @@ import org.naho.book.port.out.BookRepositoryPort;
 import org.naho.book.port.out.LessonRepositoryPort;
 import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.book.port.out.TopicRepositoryPort;
+import org.naho.daily.port.in.CrudUserDailyMissionInputPort;
 import org.naho.file.port.in.UploadFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileResultMapperPort;
 import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.furigana.port.out.FuriganaGenerationPort;
+import org.naho.learning.port.in.UserLearningStreakInputPort;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
 import org.naho.persona.port.out.PersonaRepositoryPort;
@@ -153,12 +155,20 @@ public class ChatConfig {
     public EndSessionInputPort endSessionInputPort(
             SessionStorePort sessionStorePort,
             AiScoringPort aiScoringPort,
-            SpeakingSessionRepositoryPort speakingSessionRepositoryPort
+            SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
+            CrudUserDailyMissionInputPort crudUserDailyMissionInputPort,
+            UserLearningStreakInputPort userLearningStreakInputPort,
+            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
+            TransactionPort transactionPort
     ) {
         return new EndSessionUseCase(
                 sessionStorePort,
                 aiScoringPort,
-                speakingSessionRepositoryPort
+                speakingSessionRepositoryPort,
+                crudUserDailyMissionInputPort,
+                userLearningStreakInputPort,
+                userLearningProgressRepositoryPort,
+                transactionPort
         );
     }
 

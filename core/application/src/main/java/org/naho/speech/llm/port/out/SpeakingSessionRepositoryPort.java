@@ -13,6 +13,7 @@ import org.naho.speech.llm.type.MessageType;
 import org.naho.speech.llm.type.SpeakingSessionStatus;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 public interface SpeakingSessionRepositoryPort {
@@ -97,4 +98,6 @@ public interface SpeakingSessionRepositoryPort {
     SpeakingSession findBySessionCodeAndStatus(String sessionCode, SpeakingSessionStatus status);
 
     SpeakingSession findBySessionId(Long sessionId);
+
+    List<SpeakingSession> findAllInProgressSessionsByUserId(Long userId);
 }

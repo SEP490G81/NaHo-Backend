@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/speaking")
@@ -279,6 +280,21 @@ public class SpeakingController {
     ) {
         speakingSessionCleanupInputPort.deleteSession(sessionCode, payload.userId());
         return ResponseEntity.noContent().build();
+    }
+
+    @ApiResponseMessage
+    @GetMapping("/session/in-progress/all")
+    public ResponseEntity<List<SpeakingSessionResponse>> findAllInProgressSessionsByUserId(
+            @AuthenticationPrincipal AccessTokenPayload payload
+    ) {
+        List<SpeakingSessionResult> results = speakingSessionInputPort
+                .findAllInProgressSessionsByUserId(payload.userId());
+
+        List<SpeakingSessionResponse> responses = results
+                .stream().map(speakingSessionResponseMapper::resultToResponse)
+                .toList();
+
+        return ResponseEntity.ok(responses);
     }
 }
 
