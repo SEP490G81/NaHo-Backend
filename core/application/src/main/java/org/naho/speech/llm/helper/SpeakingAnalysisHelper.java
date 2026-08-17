@@ -36,18 +36,19 @@ import org.naho.question.port.out.AnswerHistoryRepositoryPort;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
+import org.naho.speech.azure.mapper.WordAssessmentMapper;
 import org.naho.speech.azure.model.AnswerHistory;
 import org.naho.speech.azure.model.ContentAssessment;
 import org.naho.speech.azure.model.SpeechAssessment;
 import org.naho.speech.azure.model.WordAssessment;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
+import org.naho.speech.azure.result.WordAssessmentResult;
+import org.naho.speech.llm.command.ContextCommand;
 import org.naho.speech.llm.command.SpeakingAnalysisCommand;
 import org.naho.speech.llm.internal.AnalysisContext;
 import org.naho.speech.llm.internal.ParsedScores;
-import org.naho.speech.llm.port.out.AiAnalysisPort;
 import org.naho.speech.llm.result.SpeakingAnalysisReportResult;
 import org.naho.speech.llm.result.SpeakingAnalysisResult;
-import org.naho.speech.llm.result.WordPronunciationResult;
 import org.naho.user.exception.UserErrorCode;
 import org.naho.user.model.User;
 import org.naho.user.port.out.UserRepositoryPort;
@@ -70,6 +71,7 @@ public class SpeakingAnalysisHelper {
     private final UserLearningProgressRepositoryPort userLearningProgressRepositoryPort;
     private final FileResultMapperPort fileResultMapperPort;
     private final FuriganaGenerationPort furiganaGenerationPort;
+    private final WordAssessmentMapper wordAssessmentMapper;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public SpeakingAnalysisHelper(
@@ -86,6 +88,7 @@ public class SpeakingAnalysisHelper {
             CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort,
             UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
             FileResultMapperPort fileResultMapperPort,
+            WordAssessmentMapper wordAssessmentMapper,
             FuriganaGenerationPort furiganaGenerationPort
     ) {
         this.userRepositoryPort = userRepositoryPort;
@@ -101,6 +104,7 @@ public class SpeakingAnalysisHelper {
         this.completeSpeakingQuestionInputPort = completeSpeakingQuestionInputPort;
         this.userLearningProgressRepositoryPort = userLearningProgressRepositoryPort;
         this.fileResultMapperPort = fileResultMapperPort;
+        this.wordAssessmentMapper = wordAssessmentMapper;
         this.furiganaGenerationPort = furiganaGenerationPort;
     }
 
@@ -153,7 +157,7 @@ public class SpeakingAnalysisHelper {
         return azureSpeechServicePort.assessAudio(new SpeechAssessmentCommand(audioBytes, null, userId));
     }
 
-    public AiAnalysisPort.Context buildEvaluationContext(AnalysisContext ctx, SpeechAssessment azureResult) {
+    public ContextCommand buildEvaluationContext(AnalysisContext ctx, SpeechAssessment azureResult) {
         // CALC - Tính toán thuần
         double accuracy = azureResult.getAccuracyScore() != null ? azureResult.getAccuracyScore() : 0.0;
         double fluency = azureResult.getFluencyScore() != null ? azureResult.getFluencyScore() : 0.0;
@@ -161,7 +165,7 @@ public class SpeakingAnalysisHelper {
         double pronunciation = azureResult.getPronunciationScore() != null ? azureResult.getPronunciationScore() : 0.0;
         String transcript = azureResult.getTranscriptText() != null ? azureResult.getTranscriptText() : "";
 
-        return new AiAnalysisPort.Context(
+        return new ContextCommand(
                 ctx.curriculumVal(), ctx.levelVal(), ctx.sttVal(),
                 ctx.topicVal(), ctx.lessonVal(), ctx.canDoObjectiveVal(),
                 ctx.grammarFocusVal(), ctx.vocabFocusVal(),
@@ -273,17 +277,11 @@ public class SpeakingAnalysisHelper {
         return objectMapper.writeValueAsString(objectNode);
     }
 
-    public List<WordPronunciationResult> buildWordPronunciations(List<WordAssessment> words) {
+    public List<WordAssessmentResult> buildWordPronunciations(List<WordAssessment> words) {
         if (words == null || words.isEmpty()) {
             return List.of();
         }
-        return words.stream()
-                .map(w -> WordPronunciationResult.from(
-                        w.getWord(),
-                        w.getAccuracyScore(),
-                        w.getErrorType() != null ? w.getErrorType().name() : "None"
-                ))
-                .toList();
+        return words.stream().map(wordAssessmentMapper::domainToResult).toList();
     }
 
     public SpeakingAnalysisResult persistResults(SpeakingAnalysisCommand command,
@@ -326,7 +324,7 @@ public class SpeakingAnalysisHelper {
                         .build());
 
         // Gắn report đầy đủ bao gồm tô màu phát âm từng từ vào result
-        List<WordPronunciationResult> wordPronunciations = buildWordPronunciations(azureAssessment.getWords());
+        List<WordAssessmentResult> wordPronunciations = buildWordPronunciations(azureAssessment.getWords());
         String fullTranscript = azureAssessment.getTranscriptText() != null ? azureAssessment.getTranscriptText() : "";
 
         SpeakingAnalysisReportResult report = new SpeakingAnalysisReportResult(

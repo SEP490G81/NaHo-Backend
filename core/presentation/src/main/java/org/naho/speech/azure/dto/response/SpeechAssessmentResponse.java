@@ -1,7 +1,5 @@
 package org.naho.speech.azure.dto.response;
 
-import org.naho.speech.azure.result.WordAssessmentResult;
-
 import java.util.List;
 
 public record SpeechAssessmentResponse(
@@ -12,6 +10,6 @@ public record SpeechAssessmentResponse(
         Double completenessScore,
         Double pronunciationScore,
         Double averageScore,
-        List<WordAssessmentResult> words
+        List<WordAssessmentResponse> words
 ) {
 }

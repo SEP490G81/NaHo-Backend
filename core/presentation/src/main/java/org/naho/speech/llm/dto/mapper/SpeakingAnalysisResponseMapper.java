@@ -3,11 +3,13 @@ package org.naho.speech.llm.dto.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.naho.file.dto.mapper.FileResponseMapper;
+import org.naho.speech.azure.dto.mapper.WordAssessmentResponseMapper;
 import org.naho.speech.llm.dto.response.SpeakingAnalysisResponse;
 import org.naho.speech.llm.result.SpeakingAnalysisResult;
 
 @Mapper(componentModel = "spring", uses = {
-        FileResponseMapper.class
+        FileResponseMapper.class,
+        WordAssessmentResponseMapper.class
 })
 public interface SpeakingAnalysisResponseMapper {
 

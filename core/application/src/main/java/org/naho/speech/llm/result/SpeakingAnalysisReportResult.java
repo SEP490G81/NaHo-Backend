@@ -1,15 +1,17 @@
 package org.naho.speech.llm.result;
 
+import org.naho.speech.azure.result.WordAssessmentResult;
+
 import java.util.List;
 
 public record SpeakingAnalysisReportResult(
         Double overallScore,
         Scores scores,
         String fullTranscript,
-        List<WordPronunciationResult> wordPronunciations,
+        List<WordAssessmentResult> wordPronunciations,
         String enrichedFeedbackJson
 ) {
-    public List<WordPronunciationResult> wordPronunciationResultList() {
+    public List<WordAssessmentResult> wordPronunciationResultList() {
         return wordPronunciations;
     }
 

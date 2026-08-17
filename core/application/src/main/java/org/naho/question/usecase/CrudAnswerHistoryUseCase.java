@@ -30,8 +30,8 @@ import org.naho.speech.azure.model.AnswerHistory;
 import org.naho.speech.azure.model.ContentAssessment;
 import org.naho.speech.azure.model.SpeechAssessment;
 import org.naho.speech.azure.model.WordAssessment;
+import org.naho.speech.azure.result.WordAssessmentResult;
 import org.naho.speech.azure.type.SpeechAssessmentErrorType;
-import org.naho.speech.llm.result.WordPronunciationResult;
 import org.naho.user.exception.UserErrorCode;
 
 import java.util.ArrayList;
@@ -239,9 +239,11 @@ public class CrudAnswerHistoryUseCase implements CrudAnswerHistoryInputPort {
                     severity = "warn";
                 }
 
-                WordPronunciationResult wordPron = WordPronunciationResult.from(
-                        wordText, accScore, errType != null ? errType.name() : "None"
-                );
+                WordAssessmentResult wordPron = WordAssessmentResult.builder()
+                        .word(wordText)
+                        .accuracyScore(accScore)
+                        .errorType(errType != null ? errType : SpeechAssessmentErrorType.NONE)
+                        .build();
 
                 String furigana = wordEntity.getWordMarkup();
                 if (furigana == null || furigana.isBlank()) {
@@ -268,9 +270,7 @@ public class CrudAnswerHistoryUseCase implements CrudAnswerHistoryInputPort {
                         furigana,
                         severity,
                         note,
-                        wordPron.accuracyScore(),
-                        wordPron.colorCategory(),
-                        wordPron.hexColor()
+                        wordPron.accuracyScore()
                 ));
             }
         }

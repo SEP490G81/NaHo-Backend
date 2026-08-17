@@ -8,6 +8,7 @@ import org.naho.shared.constant.SystemZoneId;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.speech.azure.model.SpeechAssessment;
+import org.naho.speech.llm.command.ContextCommand;
 import org.naho.speech.llm.command.SpeakingAnalysisCommand;
 import org.naho.speech.llm.helper.SpeakingAnalysisHelper;
 import org.naho.speech.llm.internal.AnalysisContext;
@@ -73,7 +74,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         SpeechAssessment azureAssessment = speakingAnalysisHelper.assessSpeech(command.audioBytes(), command.userId());
 
         // CALC: Tính toán thuần chuẩn bị context cho AI
-        AiAnalysisPort.Context evalContext = speakingAnalysisHelper.buildEvaluationContext(ctx, azureAssessment);
+        ContextCommand evalContext = speakingAnalysisHelper.buildEvaluationContext(ctx, azureAssessment);
 
         // EXT: Gọi mạng ngoài OpenAI LLM (Không giữ DB Transaction)
         String rawLlmFeedback = aiAnalysisPort.analyzeSpeaking(evalContext);

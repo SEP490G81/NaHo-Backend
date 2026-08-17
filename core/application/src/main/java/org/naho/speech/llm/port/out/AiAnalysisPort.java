@@ -1,25 +1,8 @@
 package org.naho.speech.llm.port.out;
 
-public interface AiAnalysisPort {
-    String analyzeSpeaking(Context context);
+import org.naho.speech.llm.command.ContextCommand;
 
-    record Context(
-            String curriculum,
-            String level,
-            String stt,
-            String topic,
-            String lesson,
-            String canDoObjective,
-            String grammarFocus,
-            String vocabularyFocus,
-            String questionTitle,
-            String questionDescription,
-            double accuracy,
-            double fluency,
-            double completeness,
-            double overallPronunciation,
-            String studentTranscript
-    ) {
-    }
+public interface AiAnalysisPort {
+    String analyzeSpeaking(ContextCommand context);
 }
 

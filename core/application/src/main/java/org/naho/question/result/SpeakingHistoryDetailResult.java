@@ -63,9 +63,7 @@ public record SpeakingHistoryDetailResult(
             String furigana,
             String severity,
             String note,
-            Double accuracyScore,
-            String colorCategory,
-            String hexColor
+            Double accuracyScore
     ) {
     }
 
