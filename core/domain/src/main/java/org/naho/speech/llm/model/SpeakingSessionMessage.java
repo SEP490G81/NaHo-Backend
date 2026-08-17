@@ -36,6 +36,10 @@ public class SpeakingSessionMessage {
         this.pronunciationScore = builder.pronunciationScore;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public Long getId() {
         return id;
     }
@@ -86,10 +90,6 @@ public class SpeakingSessionMessage {
 
     public Double getPronunciationScore() {
         return pronunciationScore;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     public static class Builder {

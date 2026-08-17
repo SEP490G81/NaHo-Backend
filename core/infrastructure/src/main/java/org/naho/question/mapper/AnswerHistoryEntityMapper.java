@@ -39,6 +39,7 @@ public interface AnswerHistoryEntityMapper {
 
 
     @Mapping(target = "answerHistoryId", source = "answerHistory.id")
+    @Mapping(target = "averageScore", ignore = true)
     SpeechAssessment toDomain(SpeechAssessmentEntity entity);
 
     @Mapping(target = "id", source = "domain.id")

@@ -15,7 +15,6 @@ import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.naho.persona.type.FormalityLevel;
 import org.naho.persona.type.MarugotoLevel;
 import org.naho.shared.exception.ApplicationException;
-import org.naho.shared.port.out.TransactionPort;
 import org.naho.speech.llm.command.SendAudioMessageCommand;
 import org.naho.speech.llm.command.SendMessageWithSessionCommand;
 import org.naho.speech.llm.command.SpeakingSessionFilterCommand;
@@ -52,7 +51,6 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     private final SessionValidator sessionValidator;
     private final SpeakingSessionHelper speakingSessionHelper;
     private final SpeakingSessionResultMapper speakingSessionResultMapper;
-    private final TransactionPort transactionPort;
 
     public SpeakingSessionUseCase(
             AiChatPort aiChatPort,
@@ -64,8 +62,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             UploadFileInputPort uploadFileInputPort,
             SessionValidator sessionValidator,
             SpeakingSessionHelper speakingSessionHelper,
-            SpeakingSessionResultMapper speakingSessionResultMapper,
-            TransactionPort transactionPort
+            SpeakingSessionResultMapper speakingSessionResultMapper
     ) {
         this.aiChatPort = aiChatPort;
         this.sessionStorePort = sessionStorePort;
@@ -77,7 +74,6 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         this.sessionValidator = sessionValidator;
         this.speakingSessionHelper = speakingSessionHelper;
         this.speakingSessionResultMapper = speakingSessionResultMapper;
-        this.transactionPort = transactionPort;
     }
 
     @Override
@@ -305,31 +301,6 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         );
     }
 
-//    @Override
-//    public void sendMessageStream(SendMessageWithSessionCommand command, Consumer<String> onToken) {
-//        String sessionCode = command.sessionCode();
-//        sessionValidator.validateSessionNotCompleted(sessionCode);
-//        sessionValidator.validateSessionTurnLimit(sessionCode, null);
-//        speakingSessionHelper.ensureSessionLoadedInMemory(sessionCode);
-//        String userMessage = command.userMessage();
-//        sessionStorePort.addMessage(sessionCode, "user", userMessage);
-//
-//        List<Map<String, String>> messages = speakingSessionHelper.getSlidingWindowMessages(sessionCode);
-//        StringBuilder fullReply = new StringBuilder();
-//        aiChatPort.chatStreamWithContext(messages, token -> {
-//            fullReply.append(token);
-//            onToken.accept(token);
-//        });
-//
-//        String rawReply = fullReply.toString();
-//        ParsedAiReply parsed = speakingSessionHelper.parseAiResponse(rawReply);
-//
-//        sessionStorePort.addMessage(sessionCode, "assistant", parsed.reply());
-//        sessionStorePort.appendTranscript(sessionCode,
-//                "[Turn]\nUser: " + userMessage + "\nAssistant: " + parsed.reply() + "\n");
-//        sessionStorePort.incrementTurnCount(sessionCode);
-//    }
-
     @Override
     public AudioChatResult sendAudioMessage(SendAudioMessageCommand command) {
         String sessionCode = command.sessionCode();
@@ -340,7 +311,10 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
 //        speakingSessionHelper.ensureSessionLoadedInMemory(sessionCode);
 
         SpeechToTextResult sttResult = speechToTextPort.transcribeAndAssess(
-                command.audioBytes(), command.referenceText());
+                command.audioBytes(),
+                command.referenceText(),
+                command.userId()
+        );
 
         String transcribedText = sttResult.transcribedText();
         System.out.println("[SpeakingSession] STT result: " + transcribedText);
@@ -471,82 +445,4 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                 .map(speakingSessionResultMapper::domainToResult)
                 .toList();
     }
-
-    //    @Override
-//    public StartConversationResult resumeSession(String sessionCode, Long userId) {
-//        if (sessionCode == null || sessionCode.isBlank()) {
-//            throw new ApplicationException(
-//                    LlmApplicationError.LLM_SESSION_CODE_INVALID,
-//                    LlmDetailMessageKey.LLM_SESSION_CODE_INVALID);
-//        }
-//
-//        // 1. Nếu session đang còn trong memory
-//        if (sessionStorePort.hasSession(sessionCode)) {
-//            List<Map<String, String>> history = sessionStorePort.getConversationHistory(sessionCode);
-//            String lastAssistantReply = "";
-//            for (int i = history.size() - 1; i >= 0; i--) {
-//                if ("assistant".equals(history.get(i).get("role"))) {
-//                    lastAssistantReply = history.get(i).get("content");
-//                    break;
-//                }
-//            }
-//            String audioBase64 = speakingSessionHelper.toAudioBase64(sessionCode, lastAssistantReply);
-//            return new StartConversationResult(
-//                    sessionCode,
-//                    audioBase64,
-//                    lastAssistantReply,
-//                    "",
-//                    "");
-//        }
-//
-//        // 2. Khôi phục từ DB nếu session bị mất trong memory
-//        SpeakingSessionResult activeSession = speakingSessionRepositoryPort
-//                .findActiveSessionByCode(sessionCode, userId)
-//                .orElseThrow(() -> new ApplicationException(
-//                        LlmApplicationError.LLM_SESSION_NOT_FOUND,
-//                        LlmDetailMessageKey.LLM_SESSION_NOT_FOUND));
-//
-//        List<Map<String, String>> historyMessages = new ArrayList<>();
-//        String lastAssistantReply = "";
-//
-//        if (activeSession.messages() != null) {
-//            for (var msg : activeSession.messages()) {
-//                String role = msg.senderType() != null ? msg.senderType().toLowerCase() : "user";
-//                historyMessages.add(Map.of("role", role, "content", msg.content()));
-//                if ("assistant".equalsIgnoreCase(msg.senderType())) {
-//                    lastAssistantReply = msg.content();
-//                }
-//            }
-//        }
-//
-//        StringBuilder fullTranscript = new StringBuilder();
-//        if (activeSession.messages() != null) {
-//            for (var msg : activeSession.messages()) {
-//                String role = msg.senderType() != null ? msg.senderType().toLowerCase() : "user";
-//                fullTranscript.append("[Turn]\n").append(role).append(": ").append(msg.content())
-//                        .append("\n");
-//            }
-//        }
-//
-//        sessionStorePort.restoreSession(
-//                sessionCode,
-//                userId,
-//                activeSession.personaId(),
-//                activeSession.topic(),
-//                activeSession.marugotoLevel(),
-//                activeSession.formalityLevel(),
-//                fullTranscript.toString(),
-//                activeSession.totalTurns(),
-//                activeSession.startedAt(),
-//                historyMessages);
-//
-//        String audioBase64 = speakingSessionHelper.toAudioBase64(sessionCode, lastAssistantReply);
-//
-//        return new StartConversationResult(
-//                sessionCode,
-//                audioBase64,
-//                lastAssistantReply,
-//                "",
-//                "");
-//    }
 }

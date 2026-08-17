@@ -1,8 +1,10 @@
-package org.naho.speech.azure.result;
+package org.naho.speech.azure.dto.response;
+
+import org.naho.speech.azure.result.WordAssessmentResult;
 
 import java.util.List;
 
-public record SpeechAssessmentResult(
+public record SpeechAssessmentResponse(
         Long id,
         String transcriptText,
         Double accuracyScore,

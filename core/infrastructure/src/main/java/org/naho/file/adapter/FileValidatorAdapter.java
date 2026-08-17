@@ -14,10 +14,6 @@ import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.shared.exception.InfrastructureException;
 import org.springframework.stereotype.Component;
 
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -113,23 +109,23 @@ public class FileValidatorAdapter implements FileValidatorPort {
         }
     }
 
-    @Override
-    public double calculateWavDurationSeconds(byte[] audioBytes) {
-        if (audioBytes == null || audioBytes.length == 0) {
-            return 0.0;
-        }
-        try (ByteArrayInputStream bais = new ByteArrayInputStream(audioBytes);
-             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(bais)) {
-            AudioFormat format = audioInputStream.getFormat();
-            long frames = audioInputStream.getFrameLength();
-            if (frames <= 0 || format.getFrameRate() <= 0) {
-                return 0.0;
-            }
-            return (double) frames / format.getFrameRate();
-        } catch (Exception e) {
-            return 0.0;
-        }
-    }
+//    @Override
+//    public double calculateWavDurationSeconds(byte[] audioBytes) {
+//        if (audioBytes == null || audioBytes.length == 0) {
+//            return 0.0;
+//        }
+//        try (ByteArrayInputStream bais = new ByteArrayInputStream(audioBytes);
+//             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(bais)) {
+//            AudioFormat format = audioInputStream.getFormat();
+//            long frames = audioInputStream.getFrameLength();
+//            if (frames <= 0 || format.getFrameRate() <= 0) {
+//                return 0.0;
+//            }
+//            return (double) frames / format.getFrameRate();
+//        } catch (Exception e) {
+//            return 0.0;
+//        }
+//    }
 }
 
 

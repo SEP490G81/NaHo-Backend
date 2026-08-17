@@ -21,7 +21,7 @@ public class SpeakingSessionMessageRepositoryAdapter implements SpeakingSessionM
         if (sessionId == null) {
             return List.of();
         }
-        
+
         List<SpeakingSessionMessageEntity> entities = speakingSessionMessageJpaRepository
                 .findBySessionIdOrderByTurnIndexAscIdAsc(sessionId);
 

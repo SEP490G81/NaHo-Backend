@@ -44,6 +44,10 @@ public class SpeakingSession {
         this.endedAt = builder.endedAt;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public Long getId() {
         return id;
     }
@@ -102,10 +106,6 @@ public class SpeakingSession {
 
     public Instant getEndedAt() {
         return endedAt;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     public static class Builder {

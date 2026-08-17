@@ -7,6 +7,7 @@ import com.microsoft.cognitiveservices.speech.audio.AudioStreamFormat;
 import com.microsoft.cognitiveservices.speech.audio.PushAudioInputStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.naho.file.port.out.FileValidatorPort;
 import org.naho.i18n.message.speech.SpeechDetailMessageKey;
 import org.naho.shared.exception.InfrastructureException;
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
@@ -15,6 +16,8 @@ import org.naho.speech.azure.exception.AzureSpeechErrorCode;
 import org.naho.speech.azure.helper.AzureSpeechServiceHelper;
 import org.naho.speech.azure.model.SpeechAssessment;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
+import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
+import org.naho.subscription.result.SubscriptionPlanResult;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Files;
@@ -31,9 +34,11 @@ public class AzureSpeechServiceAdapter implements AzureSpeechServicePort {
 
     private final AzureSpeechConfigProperties properties;
     private final AzureSpeechServiceHelper azureSpeechServiceHelper;
+    private final FileValidatorPort fileValidatorPort;
+    private final GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
 
     @Override
-    public SpeechAssessment assess(SpeechAssessmentCommand command) {
+    public SpeechAssessment assessAudio(SpeechAssessmentCommand command) {
         byte[] rawAudioBytes = command.audioBytes();
         String referenceText = command.referenceText();
 
@@ -65,18 +70,13 @@ public class AzureSpeechServiceAdapter implements AzureSpeechServicePort {
         CompletableFuture<Void> ffmpegStreamingFuture = null;
 
         try {
-            /*
-             * Dùng ffprobe để lấy duration từ file gốc.
-             * Không tính duration từ PCM byte[] nữa vì bản streaming không tạo PCM byte[] hoàn chỉnh.
-             */
-            double durationSeconds =
-                    azureSpeechServiceHelper.probeAudioDurationSeconds(inputFile);
+            SubscriptionPlanResult subscriptionPlanResult = getActiveSubscriptionInputPort
+                    .getUserActiveSubscriptionPlan(command.userId());
 
-            /*
-             * Validate thời lượng audio.
-             * Ví dụ: không cho vượt quá 120 giây.
-             */
-//            azureSpeechServiceHelper.validateAudioDuration(durationSeconds);
+            double durationSeconds = fileValidatorPort.validateWavFileAndDuration(
+                    command.audioBytes(),
+                    (double) subscriptionPlanResult.maxSpeakingQuestionRecordingSeconds()
+            );
 
             /*
              * Tính timeout động theo duration.
@@ -307,7 +307,8 @@ public class AzureSpeechServiceAdapter implements AzureSpeechServicePort {
 
             throw new InfrastructureException(
                     AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR,
-                    SpeechDetailMessageKey.SPEECH_AZURE_EXECUTION_FAILED
+                    SpeechDetailMessageKey.SPEECH_AZURE_EXECUTION_FAILED,
+                    cause != null ? cause.getMessage() : e.getMessage()
             );
 
         } catch (TimeoutException e) {
@@ -333,7 +334,8 @@ public class AzureSpeechServiceAdapter implements AzureSpeechServicePort {
 
             throw new InfrastructureException(
                     AzureSpeechErrorCode.SPEECH_AZURE_SERVICE_ERROR,
-                    SpeechDetailMessageKey.SPEECH_AZURE_SERVICE_UNKNOWN_ERROR_OCCUR
+                    SpeechDetailMessageKey.SPEECH_AZURE_SERVICE_UNKNOWN_ERROR_OCCUR,
+                    e.getMessage()
             );
 
         } finally {
@@ -349,7 +351,8 @@ public class AzureSpeechServiceAdapter implements AzureSpeechServicePort {
              */
             try {
                 pushStream.close();
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                log.warn("Failed to close Azure pushStream", e);
             }
 
             /*
@@ -364,7 +367,8 @@ public class AzureSpeechServiceAdapter implements AzureSpeechServicePort {
              */
             try {
                 Files.deleteIfExists(inputFile);
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                log.warn("Failed to delete temp input audio file: {}", inputFile, e);
             }
         }
     }

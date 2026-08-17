@@ -76,17 +76,6 @@ public class SpeakingSessionHelper {
         this.textToSpeechServicePort = textToSpeechServicePort;
     }
 
-    public record ParsedAiReply(
-            String reply,
-            String replyTranslation,
-            String grammarNote,
-            String correctedUserText,
-            String correctionExplanation,
-            String hintForLearner,
-            List<String> suggestedReplies
-    ) {
-    }
-
     public ParsedAiReply parseAiResponse(String rawResponse) {
         if (rawResponse == null || rawResponse.isBlank()) {
             return new ParsedAiReply("", "", "", "", "", "", List.of());
@@ -176,6 +165,17 @@ public class SpeakingSessionHelper {
             System.out.println("[SpeakingSessionHelper] TTS failed for session: " + e.getMessage());
             return null;
         }
+    }
+
+    public record ParsedAiReply(
+            String reply,
+            String replyTranslation,
+            String grammarNote,
+            String correctedUserText,
+            String correctionExplanation,
+            String hintForLearner,
+            List<String> suggestedReplies
+    ) {
     }
 
 //    public void ensureSessionLoadedInMemory(String sessionCode) {

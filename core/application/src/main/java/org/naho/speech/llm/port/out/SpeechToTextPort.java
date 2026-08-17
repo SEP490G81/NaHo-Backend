@@ -17,5 +17,5 @@ public interface SpeechToTextPort {
      * @param referenceText text chuẩn để so sánh phát âm (nullable, dùng cho unscripted mode)
      * @return kết quả gồm transcript text và điểm phát âm
      */
-    SpeechToTextResult transcribeAndAssess(byte[] audioBytes, String referenceText);
+    SpeechToTextResult transcribeAndAssess(byte[] audioBytes, String referenceText, Long userId);
 }

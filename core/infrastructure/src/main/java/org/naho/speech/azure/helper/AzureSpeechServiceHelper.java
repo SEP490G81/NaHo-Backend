@@ -239,6 +239,8 @@ public class AzureSpeechServiceHelper {
                 double completenessScore = pronNode.path(AzurePronunciationScoreKey.COMPLETENESS_SCORE).asDouble(0.0);
                 double pronScore = pronNode.path(AzurePronunciationScoreKey.PRON_SCORE).asDouble(0.0);
 
+                double averageScore = (accuracyScore + fluencyScore + completenessScore + pronScore) / 4.0;
+
                 List<WordAssessment> wordList = new ArrayList<>();
                 JsonNode wordsNode = nBestNode.path(AzurePronunciationScoreKey.WORDS);
                 if (wordsNode.isArray()) {
@@ -264,6 +266,7 @@ public class AzureSpeechServiceHelper {
                         .fluencyScore(fluencyScore)
                         .completenessScore(completenessScore)
                         .pronunciationScore(pronScore)
+                        .averageScore(averageScore)
                         .words(wordList)
                         .build();
 
@@ -310,6 +313,7 @@ public class AzureSpeechServiceHelper {
         double totalFluency = 0.0;
         double totalCompleteness = 0.0;
         double totalPronScore = 0.0;
+        double totalAverageScore = 0.0;
         int totalWordCount = 0;
 
         for (SpeechAssessment segment : assessments) {
@@ -330,12 +334,14 @@ public class AzureSpeechServiceHelper {
                 totalFluency += segment.getFluencyScore() * wordCount;
                 totalCompleteness += segment.getCompletenessScore() * wordCount;
                 totalPronScore += segment.getPronunciationScore() * wordCount;
+                totalAverageScore += segment.getAverageScore() * wordCount;
                 totalWordCount += wordCount;
             } else {
                 totalAccuracy += segment.getAccuracyScore();
                 totalFluency += segment.getFluencyScore();
                 totalCompleteness += segment.getCompletenessScore();
                 totalPronScore += segment.getPronunciationScore();
+                totalAverageScore += segment.getAverageScore();
                 totalWordCount += 1;
             }
         }
@@ -344,6 +350,7 @@ public class AzureSpeechServiceHelper {
         double finalFluency = totalWordCount > 0 ? totalFluency / totalWordCount : 0.0;
         double finalCompleteness = totalWordCount > 0 ? totalCompleteness / totalWordCount : 0.0;
         double finalPronScore = totalWordCount > 0 ? totalPronScore / totalWordCount : 0.0;
+        double finalAverageScore = totalWordCount > 0 ? totalAverageScore / totalWordCount : 0.0;
 
         return SpeechAssessment.builder()
                 .transcriptText(fullTranscript.toString())
@@ -351,6 +358,7 @@ public class AzureSpeechServiceHelper {
                 .fluencyScore(finalFluency)
                 .completenessScore(finalCompleteness)
                 .pronunciationScore(finalPronScore)
+                .averageScore(finalAverageScore)
                 .words(allWords)
                 .build();
     }

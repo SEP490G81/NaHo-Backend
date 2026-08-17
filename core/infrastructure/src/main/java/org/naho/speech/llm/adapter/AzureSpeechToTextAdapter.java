@@ -24,10 +24,10 @@ public class AzureSpeechToTextAdapter implements SpeechToTextPort {
     }
 
     @Override
-    public SpeechToTextResult transcribeAndAssess(byte[] audioBytes, String referenceText) {
+    public SpeechToTextResult transcribeAndAssess(byte[] audioBytes, String referenceText, Long userId) {
         // Gọi Azure Speech Service để nhận dạng giọng nói + đánh giá phát âm
-        SpeechAssessmentCommand command = new SpeechAssessmentCommand(audioBytes, referenceText);
-        SpeechAssessment assessment = azureSpeechServicePort.assess(command);
+        SpeechAssessmentCommand command = new SpeechAssessmentCommand(audioBytes, referenceText, userId);
+        SpeechAssessment assessment = azureSpeechServicePort.assessAudio(command);
 
         // Map domain model → application result DTO
         return new SpeechToTextResult(

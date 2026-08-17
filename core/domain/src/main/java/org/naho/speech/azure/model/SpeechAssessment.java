@@ -9,7 +9,8 @@ public class SpeechAssessment {
     private Double accuracyScore;               // Điểm độ chuẩn xác phát âm
     private Double fluencyScore;                // Điểm độ trôi chảy
     private Double completenessScore;           // Điểm độ hoàn thành
-    private Double pronunciationScore;          // Điểm phát âm tổng thể
+    private Double pronunciationScore; // Điểm phát âm tổng thể
+    private Double averageScore; // Điểm trung bình 4 phần
     private List<WordAssessment> words;         // Đánh giá từng từ
 
     // Private constructor dùng cho Builder
@@ -21,6 +22,7 @@ public class SpeechAssessment {
         this.fluencyScore = builder.fluencyScore;
         this.completenessScore = builder.completenessScore;
         this.pronunciationScore = builder.pronunciationScore;
+        this.averageScore = builder.averageScore;
         this.words = builder.words;
     }
 
@@ -61,7 +63,11 @@ public class SpeechAssessment {
         return pronunciationScore;
     }
 
-    public List<org.naho.speech.azure.model.WordAssessment> getWords() {
+    public Double getAverageScore() {
+        return averageScore;
+    }
+
+    public List<WordAssessment> getWords() {
         return words;
     }
 
@@ -74,7 +80,8 @@ public class SpeechAssessment {
         private Double fluencyScore;
         private Double completenessScore;
         private Double pronunciationScore;
-        private List<org.naho.speech.azure.model.WordAssessment> words;
+        private Double averageScore;
+        private List<WordAssessment> words;
 
         public Builder id(Long id) {
             this.id = id;
@@ -111,7 +118,12 @@ public class SpeechAssessment {
             return this;
         }
 
-        public Builder words(List<org.naho.speech.azure.model.WordAssessment> words) {
+        public Builder averageScore(Double averageScore) {
+            this.averageScore = averageScore;
+            return this;
+        }
+
+        public Builder words(List<WordAssessment> words) {
             this.words = words;
             return this;
         }
