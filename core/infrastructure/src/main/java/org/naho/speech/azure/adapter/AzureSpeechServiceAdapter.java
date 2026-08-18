@@ -184,7 +184,7 @@ public class AzureSpeechServiceAdapter implements AzureSpeechServicePort {
                 pushStream.close();
             } catch (Exception ignored) {
             }
-            
+
             if (recognizer != null) {
                 recognizer.close();
             }
