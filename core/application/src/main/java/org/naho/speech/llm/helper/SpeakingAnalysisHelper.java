@@ -204,6 +204,7 @@ public class SpeakingAnalysisHelper {
                     root, azureResult, vocabScore, grammarScore, naturalnessScore, overallScore, duration);
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println(">>> check parse JSON: " + rawLlmFeedback);
             throw new ApplicationException(
                     SpeakingQuestionErrorCode.SPEAKING_QUESTION_EVALUATION_FAILED,
                     SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_EVALUATION_FAILED
