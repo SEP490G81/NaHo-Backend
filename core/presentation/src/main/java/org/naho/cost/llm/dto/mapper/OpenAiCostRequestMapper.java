@@ -3,7 +3,7 @@ package org.naho.cost.llm.dto.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.naho.cost.llm.dto.request.OpenAiCostChartRequest;
-import org.naho.speech.llm.command.OpenAiCostQueryCommand;
+import org.naho.speech.llm.conversation.command.OpenAiCostQueryCommand;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

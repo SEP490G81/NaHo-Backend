@@ -8,7 +8,7 @@ import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
 import org.naho.speech.azure.dto.mapper.SpeechAssessmentResponseMapper;
 import org.naho.speech.azure.dto.response.SpeechAssessmentResponse;
-import org.naho.speech.azure.port.in.SpeakingAssessmentInputPort;
+import org.naho.speech.azure.port.in.SpeechAssessmentInputPort;
 import org.naho.speech.azure.result.SpeechAssessmentResult;
 import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
 import org.naho.user.result.AccessTokenPayload;
@@ -23,7 +23,7 @@ import java.io.IOException;
 @RequestMapping("/api/v1/speaking/assessment")
 @RequiredArgsConstructor
 public class SpeechAssessmentController {
-    private final SpeakingAssessmentInputPort speakingAssessmentInputPort;
+    private final SpeechAssessmentInputPort speechAssessmentInputPort;
     private final SpeechAssessmentResponseMapper speechAssessmentResponseMapper;
     private final FileAudioConvertPort fileAudioConvertPort;
     private final FileValidatorPort fileValidatorPort;
@@ -68,7 +68,7 @@ public class SpeechAssessmentController {
                 payload.userId()
         );
 
-        SpeechAssessmentResult result = speakingAssessmentInputPort.assessAudio(command);
+        SpeechAssessmentResult result = speechAssessmentInputPort.assessAudio(command);
         return ResponseEntity.ok(speechAssessmentResponseMapper.resultToResponse(result));
     }
 }

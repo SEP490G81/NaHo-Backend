@@ -2,8 +2,8 @@ package org.naho.speech.llm.dto.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.naho.speech.llm.conversation.result.ScoringResult;
 import org.naho.speech.llm.dto.response.ScoringResponse;
-import org.naho.speech.llm.result.ScoringResult;
 
 @Mapper(componentModel = "spring")
 public interface ScoringResponseMapper {

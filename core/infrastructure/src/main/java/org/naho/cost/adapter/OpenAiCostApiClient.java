@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.naho.i18n.message.llm.LlmDetailMessageKey;
 import org.naho.shared.exception.InfrastructureException;
-import org.naho.speech.llm.exception.LlmApplicationError;
+import org.naho.speech.llm.conversation.exception.LlmApplicationError;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;

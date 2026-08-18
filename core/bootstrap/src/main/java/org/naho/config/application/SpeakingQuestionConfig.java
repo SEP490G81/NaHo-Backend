@@ -20,7 +20,7 @@ import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.question.usecase.*;
 import org.naho.shared.port.out.EventPublisherPort;
 import org.naho.shared.port.out.TransactionPort;
-import org.naho.speech.llm.port.out.AiChatPort;
+import org.naho.speech.llm.conversation.port.out.AiChatPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

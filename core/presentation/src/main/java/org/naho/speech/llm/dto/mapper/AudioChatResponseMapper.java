@@ -1,8 +1,8 @@
 package org.naho.speech.llm.dto.mapper;
 
 import org.mapstruct.Mapper;
+import org.naho.speech.llm.conversation.result.AudioChatResult;
 import org.naho.speech.llm.dto.response.AudioChatResponse;
-import org.naho.speech.llm.result.AudioChatResult;
 
 @Mapper(componentModel = "spring")
 public interface AudioChatResponseMapper {

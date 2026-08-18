@@ -4,7 +4,7 @@ package org.naho.question.usecase;
 import org.naho.question.command.SuggestCustomSpeakingQuestionCommand;
 import org.naho.question.port.in.SuggestCustomSpeakingQuestionInputPort;
 import org.naho.question.result.SuggestCustomSpeakingQuestionResult;
-import org.naho.speech.llm.port.out.AiChatPort;
+import org.naho.speech.llm.conversation.port.out.AiChatPort;
 
 import java.util.List;
 import java.util.Map;
