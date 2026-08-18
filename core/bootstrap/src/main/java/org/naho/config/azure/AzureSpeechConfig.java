@@ -1,8 +1,8 @@
 package org.naho.config.azure;
 
 import org.naho.speech.azure.constant.AzureSpeechConfigProperties;
-import org.naho.speech.azure.mapper.PronunciationAssessmentMapper;
-import org.naho.speech.azure.mapper.WordAssessmentMapper;
+import org.naho.speech.azure.mapper.SpeechAssessmentResultMapper;
+import org.naho.speech.azure.mapper.WordAssessmentResultMapper;
 import org.naho.speech.azure.port.in.SpeakingAssessmentInputPort;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
 import org.naho.speech.azure.usecase.SpeakingAssessmentUseCase;
@@ -15,20 +15,20 @@ import org.springframework.context.annotation.Configuration;
 public class AzureSpeechConfig {
 
     @Bean
-    public WordAssessmentMapper wordAssessmentMapper() {
-        return new WordAssessmentMapper();
+    public WordAssessmentResultMapper wordAssessmentMapper() {
+        return new WordAssessmentResultMapper();
     }
 
     @Bean
-    public PronunciationAssessmentMapper pronunciationAssessmentMapper(WordAssessmentMapper wordAssessmentMapper) {
-        return new PronunciationAssessmentMapper(wordAssessmentMapper);
+    public SpeechAssessmentResultMapper pronunciationAssessmentMapper(WordAssessmentResultMapper wordAssessmentResultMapper) {
+        return new SpeechAssessmentResultMapper(wordAssessmentResultMapper);
     }
 
     @Bean
     public SpeakingAssessmentInputPort speakingAssessmentInputPort(
             AzureSpeechServicePort azureSpeechServicePort,
-            PronunciationAssessmentMapper pronunciationAssessmentMapper
+            SpeechAssessmentResultMapper speechAssessmentResultMapper
     ) {
-        return new SpeakingAssessmentUseCase(azureSpeechServicePort, pronunciationAssessmentMapper);
+        return new SpeakingAssessmentUseCase(azureSpeechServicePort, speechAssessmentResultMapper);
     }
 }

@@ -6,18 +6,18 @@ import org.naho.speech.azure.result.WordAssessmentResult;
 
 import java.util.List;
 
-public class PronunciationAssessmentMapper {
-    private final WordAssessmentMapper wordAssessmentMapper;
+public class SpeechAssessmentResultMapper {
+    private final WordAssessmentResultMapper wordAssessmentResultMapper;
 
-    public PronunciationAssessmentMapper(WordAssessmentMapper wordAssessmentMapper) {
-        this.wordAssessmentMapper = wordAssessmentMapper;
+    public SpeechAssessmentResultMapper(WordAssessmentResultMapper wordAssessmentResultMapper) {
+        this.wordAssessmentResultMapper = wordAssessmentResultMapper;
     }
 
     public SpeechAssessmentResult modelToResult(SpeechAssessment domain) {
-        List<WordAssessmentResult> wordAssessmentResults =
-                domain.getWords().stream()
-                        .map(wordAssessmentMapper::domainToResult)
-                        .toList();
+        List<WordAssessmentResult> wordAssessmentResults = domain
+                .getWords().stream()
+                .map(wordAssessmentResultMapper::domainToResult)
+                .toList();
 
         return new SpeechAssessmentResult(
                 domain.getId(),

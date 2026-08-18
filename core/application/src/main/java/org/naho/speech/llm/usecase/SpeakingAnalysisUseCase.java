@@ -71,7 +71,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         AnalysisContext ctx = speakingAnalysisHelper.prepareAnalysis(command);
 
         // EXT: Gọi mạng ngoài Azure Speech Assessment (Không giữ DB Transaction)
-        SpeechAssessment azureAssessment = speakingAnalysisHelper.assessSpeech(command.audioBytes(), command.userId());
+        SpeechAssessment azureAssessment = speakingAnalysisHelper.assessSpeech(command.audioBytes(), command.duration(), command.userId());
 
         // CALC: Tính toán thuần chuẩn bị context cho AI
         ContextCommand evalContext = speakingAnalysisHelper.buildEvaluationContext(ctx, azureAssessment);
@@ -80,7 +80,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         String rawLlmFeedback = aiAnalysisPort.analyzeSpeaking(evalContext);
 
         // CALC: Parse JSON và tính điểm
-        ParsedScores parsedScores = speakingAnalysisHelper.parseLlmFeedback(rawLlmFeedback, azureAssessment, command.durationSec());
+        ParsedScores parsedScores = speakingAnalysisHelper.parseLlmFeedback(rawLlmFeedback, azureAssessment, command.duration());
 
         // Tăng số lần đánh giá AI với speaking question của người dùng trong ngày hôm nay lên 1
         userDailyAiUsage.increaseSpeakingEvaluationCount();

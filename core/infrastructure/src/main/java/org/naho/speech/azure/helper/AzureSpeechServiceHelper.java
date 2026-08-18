@@ -103,6 +103,9 @@ public class AzureSpeechServiceHelper {
     }
 
     public long calculateProcessingTimeoutSeconds(double durationSeconds) {
+        if (durationSeconds <= 0 || Double.isNaN(durationSeconds) || Double.isInfinite(durationSeconds)) {
+            return 60L;
+        }
         return Math.min(
                 (long) Math.ceil(durationSeconds) + EXTRA_PROCESSING_TIMEOUT_SECONDS,
                 MAX_PROCESSING_TIMEOUT_SECONDS);

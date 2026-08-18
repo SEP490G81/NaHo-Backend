@@ -4,7 +4,7 @@ import org.naho.i18n.message.speech.SpeechDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
 import org.naho.speech.azure.exception.AzureSpeechErrorCode;
-import org.naho.speech.azure.mapper.PronunciationAssessmentMapper;
+import org.naho.speech.azure.mapper.SpeechAssessmentResultMapper;
 import org.naho.speech.azure.model.SpeechAssessment;
 import org.naho.speech.azure.port.in.SpeakingAssessmentInputPort;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
@@ -12,14 +12,14 @@ import org.naho.speech.azure.result.SpeechAssessmentResult;
 
 public class SpeakingAssessmentUseCase implements SpeakingAssessmentInputPort {
     private final AzureSpeechServicePort azureSpeechServicePort;
-    private final PronunciationAssessmentMapper pronunciationAssessmentMapper;
+    private final SpeechAssessmentResultMapper speechAssessmentResultMapper;
 
     public SpeakingAssessmentUseCase(
             AzureSpeechServicePort azureSpeechServicePort,
-            PronunciationAssessmentMapper pronunciationAssessmentMapper
+            SpeechAssessmentResultMapper speechAssessmentResultMapper
     ) {
         this.azureSpeechServicePort = azureSpeechServicePort;
-        this.pronunciationAssessmentMapper = pronunciationAssessmentMapper;
+        this.speechAssessmentResultMapper = speechAssessmentResultMapper;
     }
 
     @Override
@@ -33,6 +33,6 @@ public class SpeakingAssessmentUseCase implements SpeakingAssessmentInputPort {
 
         SpeechAssessment speechAssessment = azureSpeechServicePort.assessAudio(command);
 
-        return pronunciationAssessmentMapper.modelToResult(speechAssessment);
+        return speechAssessmentResultMapper.modelToResult(speechAssessment);
     }
 }

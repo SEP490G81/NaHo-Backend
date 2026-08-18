@@ -18,7 +18,7 @@ import org.naho.question.port.in.CompleteSpeakingQuestionInputPort;
 import org.naho.question.port.out.AnswerHistoryRepositoryPort;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.shared.port.out.TransactionPort;
-import org.naho.speech.azure.mapper.WordAssessmentMapper;
+import org.naho.speech.azure.mapper.WordAssessmentResultMapper;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
 import org.naho.speech.azure.port.out.TextToSpeechServicePort;
 import org.naho.speech.llm.adapter.*;
@@ -198,7 +198,7 @@ public class ChatConfig {
             CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort,
             UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
             FileResultMapperPort fileResultMapperPort,
-            WordAssessmentMapper wordAssessmentMapper,
+            WordAssessmentResultMapper wordAssessmentResultMapper,
             FuriganaGenerationPort furiganaGenerationPort
     ) {
         return new SpeakingAnalysisHelper(
@@ -215,7 +215,7 @@ public class ChatConfig {
                 completeSpeakingQuestionInputPort,
                 userLearningProgressRepositoryPort,
                 fileResultMapperPort,
-                wordAssessmentMapper,
+                wordAssessmentResultMapper,
                 furiganaGenerationPort
         );
     }

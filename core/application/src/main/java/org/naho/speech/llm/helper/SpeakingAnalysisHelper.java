@@ -36,7 +36,7 @@ import org.naho.question.port.out.AnswerHistoryRepositoryPort;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
-import org.naho.speech.azure.mapper.WordAssessmentMapper;
+import org.naho.speech.azure.mapper.WordAssessmentResultMapper;
 import org.naho.speech.azure.model.AnswerHistory;
 import org.naho.speech.azure.model.ContentAssessment;
 import org.naho.speech.azure.model.SpeechAssessment;
@@ -71,7 +71,7 @@ public class SpeakingAnalysisHelper {
     private final UserLearningProgressRepositoryPort userLearningProgressRepositoryPort;
     private final FileResultMapperPort fileResultMapperPort;
     private final FuriganaGenerationPort furiganaGenerationPort;
-    private final WordAssessmentMapper wordAssessmentMapper;
+    private final WordAssessmentResultMapper wordAssessmentResultMapper;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public SpeakingAnalysisHelper(
@@ -88,7 +88,7 @@ public class SpeakingAnalysisHelper {
             CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort,
             UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
             FileResultMapperPort fileResultMapperPort,
-            WordAssessmentMapper wordAssessmentMapper,
+            WordAssessmentResultMapper wordAssessmentResultMapper,
             FuriganaGenerationPort furiganaGenerationPort
     ) {
         this.userRepositoryPort = userRepositoryPort;
@@ -104,7 +104,7 @@ public class SpeakingAnalysisHelper {
         this.completeSpeakingQuestionInputPort = completeSpeakingQuestionInputPort;
         this.userLearningProgressRepositoryPort = userLearningProgressRepositoryPort;
         this.fileResultMapperPort = fileResultMapperPort;
-        this.wordAssessmentMapper = wordAssessmentMapper;
+        this.wordAssessmentResultMapper = wordAssessmentResultMapper;
         this.furiganaGenerationPort = furiganaGenerationPort;
     }
 
@@ -152,9 +152,15 @@ public class SpeakingAnalysisHelper {
         return sb.isEmpty() ? "N/A (no specific vocabulary focus for this lesson)" : sb.toString();
     }
 
-    public SpeechAssessment assessSpeech(byte[] audioBytes, Long userId) {
+    public SpeechAssessment assessSpeech(byte[] audioBytes, double duration, Long userId) {
         // EXT - Gọi Azure Speech Assessment
-        return azureSpeechServicePort.assessAudio(new SpeechAssessmentCommand(audioBytes, null, userId));
+        return azureSpeechServicePort.assessAudio(
+                new SpeechAssessmentCommand(
+                        audioBytes,
+                        duration,
+                        null,
+                        userId
+                ));
     }
 
     public ContextCommand buildEvaluationContext(AnalysisContext ctx, SpeechAssessment azureResult) {
@@ -173,7 +179,7 @@ public class SpeakingAnalysisHelper {
                 accuracy, fluency, completeness, pronunciation, transcript);
     }
 
-    public ParsedScores parseLlmFeedback(String rawLlmFeedback, SpeechAssessment azureResult, Integer durationSec) {
+    public ParsedScores parseLlmFeedback(String rawLlmFeedback, SpeechAssessment azureResult, Double duration) {
         // CALC - Tính toán thuần & parse response AI
         double pronScore10 = azureResult.getPronunciationScore() != null
                 ? azureResult.getPronunciationScore() / 10.0 : 0.0;
@@ -195,7 +201,7 @@ public class SpeakingAnalysisHelper {
                     ((pronScore10 + fluencyScore10 + vocabScore + grammarScore + naturalnessScore) / 5.0) * 10.0
             ) / 10.0;
             enrichedFeedbackJson = enrichFeedbackJson(
-                    root, azureResult, vocabScore, grammarScore, naturalnessScore, overallScore, durationSec);
+                    root, azureResult, vocabScore, grammarScore, naturalnessScore, overallScore, duration);
         } catch (Exception e) {
             e.printStackTrace();
             throw new ApplicationException(
@@ -219,12 +225,12 @@ public class SpeakingAnalysisHelper {
 
     public String enrichFeedbackJson(JsonNode root, SpeechAssessment azureResult,
                                      double vocabScore, double grammarScore, double naturalnessScore,
-                                     double overallScore, Integer durationSec) throws Exception {
+                                     double overallScore, Double duration) throws Exception {
         if (!(root instanceof ObjectNode objectNode)) {
             return objectMapper.writeValueAsString(root);
         }
 
-        objectNode.put("durationSec", durationSec);
+        objectNode.put("durationSec", duration != null ? (int) Math.ceil(duration) : 0);
         objectNode.put("overallScore", overallScore);
         objectNode.put("fullTranscript", azureResult.getTranscriptText() != null ? azureResult.getTranscriptText() : "");
 
@@ -281,7 +287,7 @@ public class SpeakingAnalysisHelper {
         if (words == null || words.isEmpty()) {
             return List.of();
         }
-        return words.stream().map(wordAssessmentMapper::domainToResult).toList();
+        return words.stream().map(wordAssessmentResultMapper::domainToResult).toList();
     }
 
     public SpeakingAnalysisResult persistResults(SpeakingAnalysisCommand command,
@@ -295,7 +301,7 @@ public class SpeakingAnalysisHelper {
         );
 
         // DB-W => Lưu lịch sử trả lời Speaking Question
-        AnswerHistory savedAnswerHistory = createAnswerHistory(ctx.user(), ctx.speakingQuestion(), audioFile, command.durationSec());
+        AnswerHistory savedAnswerHistory = createAnswerHistory(ctx.user(), ctx.speakingQuestion(), audioFile, command.duration());
 
         // DB-W => Lưu đánh giá phát âm tổng quan của azure speech
         SpeechAssessment savedSpeechAssessment = persistSpeechAssessment(
@@ -382,11 +388,11 @@ public class SpeakingAnalysisHelper {
         answerHistoryRepositoryPort.saveAllWordAssessment(wordList);
     }
 
-    public AnswerHistory createAnswerHistory(User user, SpeakingQuestion speakingQuestion, File audioFile, Integer durationSec) {
+    public AnswerHistory createAnswerHistory(User user, SpeakingQuestion speakingQuestion, File audioFile, Double duration) {
         AnswerHistory answerHistory = AnswerHistory.builder()
                 .userId(user.getId())
                 .speakingQuestionId(speakingQuestion.getId())
-                .durationSec(durationSec)
+                .durationSec(duration != null ? (int) Math.ceil(duration) : null)
                 .build();
         answerHistory.setAudioFileId(audioFile.getId());
         return answerHistoryRepositoryPort.save(answerHistory);

@@ -27,11 +27,27 @@ public class FileValidatorAdapter implements FileValidatorPort {
     private static final Set<String> ALLOWED_IMAGE_MIME_TYPES = Set.of(
             FileContentType.IMAGE_PNG,
             FileContentType.IMAGE_JPEG,
-            FileContentType.IMAGE_WEBP);
+            FileContentType.IMAGE_WEBP
+    );
+
     private static final Set<String> ALLOWED_WAV_MIME_TYPES = Set.of(
             FileContentType.AUDIO_WAV,
             FileContentType.AUDIO_X_WAV,
-            FileContentType.AUDIO_VND_WAVE);
+            FileContentType.AUDIO_VND_WAVE
+    );
+
+    private static final Set<String> ALLOWED_AUDIO_MIME_TYPES = Set.of(
+            FileContentType.AUDIO_MPEG,
+            FileContentType.AUDIO_WAV,
+            FileContentType.AUDIO_X_WAV,
+            FileContentType.AUDIO_VND_WAVE,
+            FileContentType.AUDIO_MP4,
+            FileContentType.AUDIO_X_M4A,
+            FileContentType.AUDIO_OGG,
+            FileContentType.AUDIO_WEBM,
+            FileContentType.AUDIO_FLAC
+    );
+
     private final Tika tika;
     private final FFprobe ffprobe;
     private final StaticResourceProperties staticResourceProperties;
@@ -109,23 +125,79 @@ public class FileValidatorAdapter implements FileValidatorPort {
         }
     }
 
-//    @Override
-//    public double calculateWavDurationSeconds(byte[] audioBytes) {
-//        if (audioBytes == null || audioBytes.length == 0) {
-//            return 0.0;
-//        }
-//        try (ByteArrayInputStream bais = new ByteArrayInputStream(audioBytes);
-//             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(bais)) {
-//            AudioFormat format = audioInputStream.getFormat();
-//            long frames = audioInputStream.getFrameLength();
-//            if (frames <= 0 || format.getFrameRate() <= 0) {
-//                return 0.0;
-//            }
-//            return (double) frames / format.getFrameRate();
-//        } catch (Exception e) {
-//            return 0.0;
-//        }
-//    }
+    @Override
+    public double validateAudioFileAndDuration(byte[] audioBytes, Double maxDuration) {
+        if (audioBytes == null || audioBytes.length == 0) {
+            throw new InfrastructureException(
+                    FileErrorCode.FILE_NOT_VALID,
+                    FileDetailMessageKey.FILE_EMPTY);
+        }
+
+        Path tempFile = null;
+
+        try {
+            String detectedMimeType = tika.detect(audioBytes);
+
+            if (!ALLOWED_AUDIO_MIME_TYPES.contains(detectedMimeType)) {
+                throw new InfrastructureException(
+                        FileErrorCode.FILE_NOT_VALID,
+                        FileDetailMessageKey.FILE_NOT_VALID,
+                        detectedMimeType);
+            }
+
+            Path tempDirectory = Path.of(
+                    staticResourceProperties.getLocalPath(),
+                    FileFolderConstant.TEMP);
+
+            Files.createDirectories(tempDirectory);
+
+            tempFile = Files.createTempFile(tempDirectory, "audio-", getFileExtension(detectedMimeType));
+            Files.write(tempFile, audioBytes);
+
+            FFmpegProbeResult probeResult = ffprobe.probe(tempFile.toString());
+
+            double duration = probeResult.getFormat().duration;
+
+            if (maxDuration != null && duration > maxDuration) {
+                throw new InfrastructureException(
+                        FileErrorCode.FILE_NOT_VALID,
+                        FileDetailMessageKey.FILE_AUDIO_DURATION_EXCEEDED,
+                        duration,
+                        maxDuration);
+            }
+
+            return duration;
+
+        } catch (IOException e) {
+            throw new InfrastructureException(
+                    FileErrorCode.FILE_NOT_VALID,
+                    FileDetailMessageKey.FILE_NOT_VALID,
+                    e.getMessage());
+        } finally {
+            if (tempFile != null) {
+                try {
+                    Files.deleteIfExists(tempFile);
+                } catch (IOException e) {
+                    // sẽ xóa qua cron job sau vì mục đích của method này
+                    // chỉ là validate file
+                    log.warn(e.getMessage());
+                }
+            }
+        }
+    }
+
+    private String getFileExtension(String mimeType) {
+        return switch (mimeType) {
+            case FileContentType.AUDIO_MPEG -> ".mp3";
+            case FileContentType.AUDIO_WAV, FileContentType.AUDIO_X_WAV, FileContentType.AUDIO_VND_WAVE -> ".wav";
+            case FileContentType.AUDIO_MP4 -> ".mp4";
+            case FileContentType.AUDIO_X_M4A -> ".m4a";
+            case FileContentType.AUDIO_OGG -> ".ogg";
+            case FileContentType.AUDIO_WEBM -> ".webm";
+            case FileContentType.AUDIO_FLAC -> ".flac";
+            default -> ".tmp";
+        };
+    }
 }
 
 
