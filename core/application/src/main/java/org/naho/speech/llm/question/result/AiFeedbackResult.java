@@ -12,8 +12,7 @@ public record AiFeedbackResult(
         String suggestJapaneseAnswer,
         String suggestAnswerTranslation,
         List<UsedVocabularyAndGrammarResult> usedVocabulariesAndGrammars,
-        List<UserAnswerErrorResult> userAnswerErrors
-) {
+        List<UserAnswerErrorResult> userAnswerErrors) {
     public static Builder builder() {
         return new Builder();
     }
@@ -94,8 +93,7 @@ public record AiFeedbackResult(
                     suggestJapaneseAnswer,
                     suggestAnswerTranslation,
                     usedVocabulariesAndGrammars,
-                    userAnswerErrors
-            );
+                    userAnswerErrors);
         }
     }
 }
