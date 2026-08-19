@@ -13,6 +13,11 @@ public enum GrammarErrorCode implements ErrorCode {
             "GRAMMAR_E002",
             "grammar.import.failed.title",
             400
+    ),
+    GRAMMAR_NOT_FOUND(
+            "GRAMMAR_E003",
+            "grammar.not.found.title",
+            404
     );
 
     private final String code;

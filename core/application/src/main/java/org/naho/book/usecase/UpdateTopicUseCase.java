@@ -6,15 +6,17 @@ import org.naho.book.model.Topic;
 import org.naho.book.port.in.UpdateTopicInputPort;
 import org.naho.book.port.out.TopicRepositoryPort;
 import org.naho.book.result.TopicDetailResult;
-import org.naho.book.util.MarkupParserUtil;
+import org.naho.furigana.port.out.FuriganaGenerationPort;
 import org.naho.i18n.message.book.TopicDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
 
 public class UpdateTopicUseCase implements UpdateTopicInputPort {
     private final TopicRepositoryPort topicRepositoryPort;
+    private final FuriganaGenerationPort furiganaGenerationPort;
 
-    public UpdateTopicUseCase(TopicRepositoryPort topicRepositoryPort) {
+    public UpdateTopicUseCase(TopicRepositoryPort topicRepositoryPort, FuriganaGenerationPort furiganaGenerationPort) {
         this.topicRepositoryPort = topicRepositoryPort;
+        this.furiganaGenerationPort = furiganaGenerationPort;
     }
 
     @Override
@@ -26,43 +28,34 @@ public class UpdateTopicUseCase implements UpdateTopicInputPort {
                         command.id()
                 ));
 
-        if (!command.isAdminOrManager() && !topic.getUserId().equals(command.requestUserId())) {
+        if (!command.isAdminOrManager()) {
             throw new ApplicationException(
                     TopicErrorCode.TOPIC_UPDATE_FORBIDDEN,
                     TopicDetailMessageKey.TOPIC_USER_NOT_HAVE_PERMISSION
             );
         }
 
-        // Extract raw text from markup
-        String rawName = MarkupParserUtil.extractRawTextFromMarkup(command.japaneseNameMarkup());
-        String rawDescription = MarkupParserUtil.extractRawTextFromMarkup(command.japaneseDescriptionMarkup());
-
-        if (topicRepositoryPort.existsByJapaneseNameAndBookIdExcludeId(rawName, topic.getBookId(), command.id())) {
+        if (topicRepositoryPort.existsByJapaneseNameAndBookIdExcludeId(command.japaneseName(), topic.getBookId(), command.id())) {
             throw new ApplicationException(
                     TopicErrorCode.TOPIC_ALREADY_EXISTS,
                     TopicDetailMessageKey.TOPIC_ALREADY_EXISTS_IN_LEVEL
             );
         }
 
-        Double orderIndex = command.orderIndex();
-        if (orderIndex == null) {
-            orderIndex = topic.getOrderIndex(); // Keep old if null
-        } else if (orderIndex < 0) {
-            throw new ApplicationException(
-                    TopicErrorCode.TOPIC_ORDER_INDEX_INVALID,
-                    TopicDetailMessageKey.TOPIC_ORDER_INDEX_INVALID
-            );
-        }
+        String japaneseNameMarkup = furiganaGenerationPort.generateFuriganaMarkup(command.japaneseName());
+        String japaneseDescriptionMarkup = command.japaneseDescription() != null 
+                ? furiganaGenerationPort.generateFuriganaMarkup(command.japaneseDescription()) 
+                : null;
 
         topic.update(
-                rawName,
-                rawDescription,
+                command.japaneseName(),
+                command.japaneseDescription(),
                 command.vietnameseDescription(),
                 command.englishDescription(),
-                command.japaneseNameMarkup(),
-                command.japaneseDescriptionMarkup(),
+                japaneseNameMarkup,
+                japaneseDescriptionMarkup,
                 command.status(),
-                orderIndex,
+                topic.getOrderIndex(),
                 command.coverImageFileId()
         );
 

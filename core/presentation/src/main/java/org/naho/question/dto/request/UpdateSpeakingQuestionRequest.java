@@ -4,17 +4,38 @@ import jakarta.validation.constraints.NotBlank;
 
 public record UpdateSpeakingQuestionRequest(
         @NotBlank(message = "Japanese name is required")
-        String japaneseNameMarkup,
+        String japaneseName,
 
         String vietnameseName,
 
         @NotBlank(message = "Description is required")
-        String descriptionMarkup,
+        String description,
 
-        String japaneseSampleAnswerMarkup,
+        String japaneseSampleAnswer,
 
         String vietnameseSampleAnswer,
 
-        String englishSampleAnswer
+        String englishSampleAnswer,
+
+        java.util.List<NestedVocabularyRequest> vocabularies,
+
+        java.util.List<NestedGrammarRequest> grammars
 ) {
+    public record NestedVocabularyRequest(
+            Long id,
+            String reading,
+            String japanese,
+            String vietnameseMeaningText,
+            String englishMeaningText
+    ) {
+    }
+
+    public record NestedGrammarRequest(
+            Long id,
+            String reading,
+            String japanese,
+            String vietnameseMeaningText,
+            String englishMeaningText
+    ) {
+    }
 }

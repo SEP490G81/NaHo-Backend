@@ -14,6 +14,12 @@ public interface BookEntityMapper {
     @Mapping(target = "modifiedTime", ignore = true)
     BookEntity domainToEntity(Book domain);
 
+    @Mapping(target = "coverImageFile", ignore = true)
+    @Mapping(target = "topics", ignore = true)
+    @Mapping(target = "createdTime", ignore = true)
+    @Mapping(target = "modifiedTime", ignore = true)
+    void updateEntityFromDomain(Book domain, @org.mapstruct.MappingTarget BookEntity entity);
+
     @Mapping(target = "coverImageFileId", source = "coverImageFile.id")
     Book entityToDomain(BookEntity entity);
 }

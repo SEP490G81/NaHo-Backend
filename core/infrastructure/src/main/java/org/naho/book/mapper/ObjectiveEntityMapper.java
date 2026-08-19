@@ -10,4 +10,16 @@ public interface ObjectiveEntityMapper {
 
     @Mapping(target = "lessonId", source = "lesson.id")
     Objective entityToDomain(ObjectiveEntity entity);
+
+    @Mapping(target = "lesson", ignore = true)
+    @Mapping(target = "learningPathNodes", ignore = true)
+    @Mapping(target = "createdTime", ignore = true)
+    @Mapping(target = "modifiedTime", ignore = true)
+    ObjectiveEntity domainToEntity(Objective domain);
+
+    @Mapping(target = "lesson", ignore = true)
+    @Mapping(target = "learningPathNodes", ignore = true)
+    @Mapping(target = "createdTime", ignore = true)
+    @Mapping(target = "modifiedTime", ignore = true)
+    void updateEntityFromDomain(Objective domain, @org.mapstruct.MappingTarget ObjectiveEntity entity);
 }

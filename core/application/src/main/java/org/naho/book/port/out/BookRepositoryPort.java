@@ -11,4 +11,6 @@ public interface BookRepositoryPort {
     Optional<Book> findById(Long bookId);
 
     Optional<Book> findBySpeakingQuestionId(Long speakingQuestionId);
+
+    void save(Book book);
 }

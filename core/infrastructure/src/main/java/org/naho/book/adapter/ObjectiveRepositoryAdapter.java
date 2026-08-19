@@ -1,6 +1,7 @@
 package org.naho.book.adapter;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.book.entity.ObjectiveEntity;
 import org.naho.book.mapper.ObjectiveEntityMapper;
 import org.naho.book.model.Objective;
 import org.naho.book.mybatis.ObjectiveQueryMapper;
@@ -45,4 +46,15 @@ public class ObjectiveRepositoryAdapter implements ObjectiveRepositoryPort {
                 .toList();
     }
 
+    @Override
+    public void save(Objective objective) {
+        ObjectiveEntity entity;
+        if (objective.getId() != null) {
+            entity = objectiveJpaRepository.findById(objective.getId()).orElse(new ObjectiveEntity());
+            objectiveEntityMapper.updateEntityFromDomain(objective, entity);
+        } else {
+            entity = objectiveEntityMapper.domainToEntity(objective);
+        }
+        objectiveJpaRepository.save(entity);
+    }
 }

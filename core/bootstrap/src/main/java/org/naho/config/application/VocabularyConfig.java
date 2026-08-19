@@ -59,11 +59,11 @@ public class VocabularyConfig {
 
     @Bean
     public ExportVocabularyInputPort exportVocabularyInputPort(
-            VocabularyPort vocabularyPort,
+            VocabularyRepositoryPort vocabularyRepositoryPort,
             VocabulariesQuestionPort vocabulariesQuestionPort,
             ExcelWriterPort excelWriterPort
     ) {
-        return new ExportVocabularyUseCase(vocabularyPort, vocabulariesQuestionPort, excelWriterPort);
+        return new ExportVocabularyUseCase(vocabularyRepositoryPort, vocabulariesQuestionPort, excelWriterPort);
     }
 
     @Bean
@@ -85,6 +85,44 @@ public class VocabularyConfig {
                 crudUserLearningProgressInputPort,
                 learningPathNodeRepositoryPort
         );
+    }
+
+    @Bean
+    public org.naho.question.port.in.UpdateVocabularyQuestionInputPort updateVocabularyQuestionInputPort(
+            org.naho.question.port.out.VocabularyQuestionRepositoryPort vocabularyQuestionRepositoryPort,
+            VocabularyRepositoryPort vocabularyRepositoryPort,
+            TransactionPort transactionPort
+    ) {
+        return new org.naho.question.usecase.UpdateVocabularyQuestionUseCase(
+                vocabularyQuestionRepositoryPort,
+                vocabularyRepositoryPort,
+                transactionPort
+        );
+    }
+
+    @Bean
+    public CreateVocabularyInputPort createVocabularyInputPort(VocabularyRepositoryPort port) {
+        return new CreateVocabularyUseCase(port);
+    }
+
+    @Bean
+    public UpdateVocabularyInputPort updateVocabularyInputPort(VocabularyRepositoryPort port) {
+        return new UpdateVocabularyUseCase(port);
+    }
+
+    @Bean
+    public DeleteVocabularyInputPort deleteVocabularyInputPort(VocabularyRepositoryPort port) {
+        return new DeleteVocabularyUseCase(port);
+    }
+
+    @Bean
+    public GetVocabularyDetailInputPort getVocabularyDetailInputPort(VocabularyRepositoryPort port) {
+        return new GetVocabularyDetailUseCase(port);
+    }
+
+    @Bean
+    public SearchVocabularyInputPort searchVocabularyInputPort(VocabularyRepositoryPort port) {
+        return new SearchVocabularyUseCase(port);
     }
 }
 

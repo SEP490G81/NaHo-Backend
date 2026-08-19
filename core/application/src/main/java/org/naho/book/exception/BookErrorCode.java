@@ -5,7 +5,8 @@ import org.naho.shared.exception.ErrorCode;
 
 public enum BookErrorCode implements ErrorCode {
     BOOK_NOT_FOUND("BOOK_A001", BookTitleMessageKey.BOOK_GET_FAIL_TITLE, 404),
-    BOOK_IMPORT_FAILED("BOOK_A002", BookTitleMessageKey.BOOK_CREATION_FAILED_TITLE, 400);
+    BOOK_IMPORT_FAILED("BOOK_A002", BookTitleMessageKey.BOOK_CREATION_FAILED_TITLE, 400),
+    BOOK_UPDATE_FORBIDDEN("BOOK_A003", BookTitleMessageKey.BOOK_UPDATE_FAILED_TITLE, 403);
 
     private final String code;
     private final String titleKey;

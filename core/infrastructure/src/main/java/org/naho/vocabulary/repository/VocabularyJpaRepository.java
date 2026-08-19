@@ -2,6 +2,8 @@ package org.naho.vocabulary.repository;
 
 import org.naho.shared.persistence.BaseJpaRepository;
 import org.naho.vocabulary.entity.VocabularyEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -20,4 +22,10 @@ public interface VocabularyJpaRepository extends BaseJpaRepository<VocabularyEnt
 
     @Query(value = "SELECT DISTINCT vietnamese_meaning_text FROM vocabularies WHERE id != :targetId AND (:targetMeaning IS NULL OR vietnamese_meaning_text != :targetMeaning) AND vietnamese_meaning_text IS NOT NULL AND vietnamese_meaning_text != '' ORDER BY RAND() LIMIT :limit", nativeQuery = true)
     List<String> findRandomDistractorMeanings(@Param("targetId") Long targetId, @Param("targetMeaning") String targetMeaning, @Param("limit") int limit);
+
+    @Query("SELECT v FROM VocabularyEntity v WHERE " +
+            "LOWER(v.japanese) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(v.reading) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(v.vietnameseMeaningText) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    Page<VocabularyEntity> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
 }

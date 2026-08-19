@@ -22,6 +22,8 @@ public class SpeakingQuestionRepositoryAdapter implements SpeakingQuestionReposi
     private final UserJpaRepository userJpaRepository;
     private final FileJpaRepository fileJpaRepository;
     private final SpeakingQuestionEntityMapper speakingQuestionEntityMapper;
+    private final org.naho.vocabulary.repository.VocabularyJpaRepository vocabularyJpaRepository;
+    private final org.naho.question.repository.GrammarJpaRepository grammarJpaRepository;
 
     @Override
     public void deleteSpeakingQuestionsByTopicId(Long topicId) {
@@ -75,6 +77,18 @@ public class SpeakingQuestionRepositoryAdapter implements SpeakingQuestionReposi
 
         if (speakingQuestion.getSpeakingQuestionAudioFileId() != null) {
             entity.setSpeakingQuestionAudioFile(fileJpaRepository.getReferenceById(speakingQuestion.getSpeakingQuestionAudioFileId()));
+        }
+
+        if (speakingQuestion.getVocabularies() != null) {
+            entity.setVocabularies(speakingQuestion.getVocabularies().stream()
+                    .map(v -> vocabularyJpaRepository.getReferenceById(v.getId()))
+                    .toList());
+        }
+
+        if (speakingQuestion.getGrammars() != null) {
+            entity.setGrammars(speakingQuestion.getGrammars().stream()
+                    .map(g -> grammarJpaRepository.getReferenceById(g.getId()))
+                    .toList());
         }
 
         SpeakingQuestionEntity savedEntity = speakingQuestionJpaRepository.save(entity);

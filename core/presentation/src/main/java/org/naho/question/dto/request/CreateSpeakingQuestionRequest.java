@@ -4,14 +4,14 @@ import jakarta.validation.constraints.NotBlank;
 
 public record CreateSpeakingQuestionRequest(
         @NotBlank(message = "Japanese name is required")
-        String japaneseNameMarkup,
+        String japaneseName,
 
         String vietnameseName,
 
         @NotBlank(message = "Description is required")
-        String descriptionMarkup,
+        String description,
 
-        String japaneseSampleAnswerMarkup,
+        String japaneseSampleAnswer,
 
         String vietnameseSampleAnswer,
 

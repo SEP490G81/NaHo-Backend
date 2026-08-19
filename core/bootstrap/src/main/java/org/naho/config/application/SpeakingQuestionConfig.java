@@ -7,6 +7,7 @@ import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.furigana.port.out.FuriganaGenerationPort;
 import org.naho.grammar.mapper.GrammarResultMapper;
+import org.naho.grammar.port.out.GrammarRepositoryPort;
 import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
 import org.naho.learning.port.in.UserLearningStreakInputPort;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
@@ -14,7 +15,6 @@ import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
 import org.naho.learning.port.out.UserNodeProgressRepositoryPort;
 import org.naho.point.port.in.CrudPointHistoryInputPort;
 import org.naho.question.adapter.SpeakingQuestionListRepositoryAdapter;
-import org.naho.question.adapter.SpeakingQuestionRepositoryAdapter;
 import org.naho.question.mapper.SpeakingQuestionResultMapper;
 import org.naho.question.port.in.*;
 import org.naho.question.port.out.AnswerHistoryRepositoryPort;
@@ -23,6 +23,7 @@ import org.naho.question.usecase.*;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
 import org.naho.vocabulary.mapper.VocabularyResultMapper;
+import org.naho.vocabulary.port.out.VocabularyRepositoryPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -54,8 +55,19 @@ public class SpeakingQuestionConfig {
 
     @Bean
     public UpdateSpeakingQuestionInputPort updateSpeakingQuestionInputPort(
-            SpeakingQuestionRepositoryAdapter speakingQuestionRepositoryAdapter) {
-        return new UpdateSpeakingQuestionUseCase(speakingQuestionRepositoryAdapter);
+            SpeakingQuestionRepositoryPort speakingQuestionRepositoryPort,
+            VocabularyRepositoryPort vocabularyRepositoryPort,
+            GrammarRepositoryPort grammarRepositoryPort,
+            TransactionPort transactionPort,
+            FuriganaGenerationPort furiganaGenerationPort
+    ) {
+        return new UpdateSpeakingQuestionUseCase(
+                speakingQuestionRepositoryPort,
+                vocabularyRepositoryPort,
+                grammarRepositoryPort,
+                transactionPort,
+                furiganaGenerationPort
+        );
     }
 
     @Bean

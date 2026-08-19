@@ -1,10 +1,14 @@
 package org.naho.vocabulary.dto.response;
 
-public record VocabularyResponse(
-        Long id,
-        String reading,
-        String japanese,
-        String vietnameseMeaningText,
-        String englishMeaningText
-) {
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class VocabularyResponse {
+    private Long id;
+    private String reading;
+    private String japanese;
+    private String vietnameseMeaningText;
+    private String englishMeaningText;
 }

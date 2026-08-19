@@ -1,5 +1,6 @@
 package org.naho.book.adapter;
 
+import org.naho.book.entity.BookEntity;
 import org.naho.book.mapper.BookEntityMapper;
 import org.naho.book.model.Book;
 import org.naho.book.mybatis.BookQueryMapper;
@@ -44,5 +45,26 @@ public class BookRepositoryAdapter implements BookRepositoryPort {
         return bookQueryMapper
                 .findBySpeakingQuestionId(speakingQuestionId)
                 .map(bookEntityMapper::entityToDomain);
+    }
+
+    @Override
+    public void save(Book book) {
+        BookEntity entity;
+        if (book.getId() != null) {
+            entity = bookJpaRepository.findById(book.getId()).orElse(new BookEntity());
+            bookEntityMapper.updateEntityFromDomain(book, entity);
+        } else {
+            entity = bookEntityMapper.domainToEntity(book);
+        }
+        
+        if (book.getCoverImageFileId() != null) {
+            org.naho.file.entity.FileEntity fileEntity = new org.naho.file.entity.FileEntity();
+            fileEntity.setId(book.getCoverImageFileId());
+            entity.setCoverImageFile(fileEntity);
+        } else {
+            entity.setCoverImageFile(null);
+        }
+        
+        bookJpaRepository.save(entity);
     }
 }

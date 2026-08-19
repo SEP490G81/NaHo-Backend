@@ -64,16 +64,20 @@ public class SpeakingQuestion {
         // }
     }
 
-    public void update(String japaneseName,
-                       String japaneseNameMarkup,
-                       String vietnameseName,
-                       String description,
-                       String descriptionMarkup,
-                       String japaneseSampleAnswer,
-                       String japaneseSampleAnswerMarkup,
-                       String vietnameseSampleAnswer,
-                       String englishSampleAnswer,
-                       Long speakingQuestionAudioFileId) {
+    public void update(
+            String japaneseName,
+            String japaneseNameMarkup,
+            String vietnameseName,
+            String description,
+            String descriptionMarkup,
+            String japaneseSampleAnswer,
+            String japaneseSampleAnswerMarkup,
+            String vietnameseSampleAnswer,
+            String englishSampleAnswer,
+            Long speakingQuestionAudioFileId,
+            List<Vocabulary> vocabularies,
+            List<Grammar> grammars
+    ) {
         validateJapaneseName(japaneseName);
         validateDescription(description);
 
@@ -87,6 +91,16 @@ public class SpeakingQuestion {
         this.vietnameseSampleAnswer = vietnameseSampleAnswer;
         this.englishSampleAnswer = englishSampleAnswer;
         this.speakingQuestionAudioFileId = speakingQuestionAudioFileId;
+
+        if (vocabularies != null) {
+            this.vocabularies.clear();
+            this.vocabularies.addAll(vocabularies);
+        }
+
+        if (grammars != null) {
+            this.grammars.clear();
+            this.grammars.addAll(grammars);
+        }
     }
 
     public void changeStatus(QuestionStatus status) {
@@ -254,4 +268,4 @@ public class SpeakingQuestion {
             return speakingQuestion;
         }
     }
-}
+}
