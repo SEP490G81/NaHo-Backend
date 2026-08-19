@@ -11,7 +11,9 @@ import org.naho.question.port.in.CompleteVocabularyQuestionInputPort;
 import org.naho.question.port.in.SearchVocabulariesOfQuestionInputPort;
 import org.naho.question.result.VocabulariesOfQuestionResult;
 import org.naho.shared.annotation.ApiResponseMessage;
+import org.naho.user.port.out.RoleRepositoryPort;
 import org.naho.user.result.AccessTokenPayload;
+import org.naho.user.type.RoleName;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -21,9 +23,18 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class VocabularyQuestionController {
 
+    private final RoleRepositoryPort roleRepositoryPort;
     private final SearchVocabulariesOfQuestionInputPort searchVocabulariesOfQuestionInputPort;
     private final VocabularyQuestionResponseMapper vocabularyQuestionResponseMapper;
     private final CompleteVocabularyQuestionInputPort completeVocabularyQuestionInputPort;
+    private final org.naho.question.port.in.UpdateVocabularyQuestionInputPort updateVocabularyQuestionInputPort;
+
+    private void verifyAdminOrManager(Long userId) {
+        java.util.List<String> roleSet = roleRepositoryPort.findRoleNamesByUserId(userId);
+        if (!roleSet.contains(RoleName.ADMIN.name()) && !roleSet.contains(RoleName.CONTENT_MANAGER.name())) {
+            throw new org.springframework.security.access.AccessDeniedException("Access Denied");
+        }
+    }
 
     @GetMapping
     @ApiResponseMessage(message = VocabularyQuestionDetailMessageKey.VOCABULARY_QUESTION_GET_SUCCESS)
@@ -59,5 +70,25 @@ public class VocabularyQuestionController {
         completeVocabularyQuestionInputPort.completeVocabularyQuestion(command);
 
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<org.naho.question.result.UpdateVocabularyQuestionResult> updateVocabularyQuestion(
+            @PathVariable Long id,
+            @AuthenticationPrincipal AccessTokenPayload payload,
+            @RequestBody @jakarta.validation.Valid org.naho.question.dto.request.UpdateVocabularyQuestionRequest request
+    ) {
+        verifyAdminOrManager(payload.userId());
+        java.util.List<org.naho.question.command.UpdateVocabularyQuestionCommand.NestedVocabularyCommand> vocabularies = new java.util.ArrayList<>();
+        if (request.vocabularies() != null) {
+            for (var v : request.vocabularies()) {
+                vocabularies.add(new org.naho.question.command.UpdateVocabularyQuestionCommand.NestedVocabularyCommand(
+                        v.id(), v.reading(), v.japanese(), v.vietnameseMeaningText(), v.englishMeaningText()
+                ));
+            }
+        }
+        var command = new org.naho.question.command.UpdateVocabularyQuestionCommand(id, vocabularies);
+        var result = updateVocabularyQuestionInputPort.updateVocabularyQuestion(command);
+        return ResponseEntity.ok(result);
     }
 }

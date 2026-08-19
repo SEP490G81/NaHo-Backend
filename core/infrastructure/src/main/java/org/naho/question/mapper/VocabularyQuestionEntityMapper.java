@@ -8,4 +8,6 @@ import org.naho.question.model.VocabularyQuestion;
 public interface VocabularyQuestionEntityMapper {
 
     VocabularyQuestion entityToDomain(VocabularyQuestionEntity entity);
+
+    VocabularyQuestionEntity domainToEntity(VocabularyQuestion domain);
 }

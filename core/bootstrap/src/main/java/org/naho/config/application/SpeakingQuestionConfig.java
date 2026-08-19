@@ -58,14 +58,20 @@ public class SpeakingQuestionConfig {
 
     @Bean
     public CreateSpeakingQuestionInputPort createSpeakingQuestionInputPort(
-            SpeakingQuestionRepositoryAdapter speakingQuestionRepositoryAdapter) {
-        return new CreateSpeakingQuestionUseCase(speakingQuestionRepositoryAdapter);
+            SpeakingQuestionRepositoryAdapter speakingQuestionRepositoryAdapter,
+            FuriganaGenerationPort furiganaGenerationPort) {
+        return new CreateSpeakingQuestionUseCase(speakingQuestionRepositoryAdapter, furiganaGenerationPort);
     }
 
     @Bean
     public UpdateSpeakingQuestionInputPort updateSpeakingQuestionInputPort(
-            SpeakingQuestionRepositoryAdapter speakingQuestionRepositoryAdapter) {
-        return new UpdateSpeakingQuestionUseCase(speakingQuestionRepositoryAdapter);
+            SpeakingQuestionRepositoryAdapter speakingQuestionRepositoryAdapter,
+            org.naho.vocabulary.port.out.VocabularyRepositoryPort vocabularyRepositoryPort,
+            org.naho.grammar.port.out.GrammarRepositoryPort grammarRepositoryPort,
+            TransactionPort transactionPort,
+            FuriganaGenerationPort furiganaGenerationPort
+    ) {
+        return new UpdateSpeakingQuestionUseCase(speakingQuestionRepositoryAdapter, vocabularyRepositoryPort, grammarRepositoryPort, transactionPort, furiganaGenerationPort);
     }
 
     @Bean

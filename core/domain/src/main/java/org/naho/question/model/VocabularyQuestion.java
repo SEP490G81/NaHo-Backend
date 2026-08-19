@@ -12,7 +12,7 @@ public class VocabularyQuestion {
 
     private VocabularyQuestion(Builder builder) {
         this.id = builder.id;
-        this.vocabularies = builder.vocabularies != null ? builder.vocabularies : new ArrayList<>();
+        this.vocabularies = builder.vocabularies != null ? new ArrayList<>(builder.vocabularies) : new ArrayList<>();
     }
 
     public static Builder builder() {
@@ -25,6 +25,13 @@ public class VocabularyQuestion {
 
     public List<Vocabulary> getVocabularies() {
         return vocabularies;
+    }
+
+    public void update(List<Vocabulary> vocabularies) {
+        if (vocabularies != null) {
+            this.vocabularies.clear();
+            this.vocabularies.addAll(vocabularies);
+        }
     }
 
     public static final class Builder {

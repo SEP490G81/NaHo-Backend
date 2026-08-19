@@ -56,4 +56,11 @@ public class VocabularyQuestionRepositoryAdapter implements VocabulariesQuestion
         return vocabularyQuestionJpaRepository.findById(id)
                 .map(vocabularyQuestionEntityMapper::entityToDomain);
     }
+
+    @Override
+    public VocabularyQuestion save(VocabularyQuestion vocabularyQuestion) {
+        var entity = vocabularyQuestionEntityMapper.domainToEntity(vocabularyQuestion);
+        var savedEntity = vocabularyQuestionJpaRepository.save(entity);
+        return vocabularyQuestionEntityMapper.entityToDomain(savedEntity);
+    }
 }

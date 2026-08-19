@@ -40,8 +40,8 @@ public class SpeakingQuestion {
         this.vietnameseSampleAnswer = builder.vietnameseSampleAnswer;
         this.englishSampleAnswer = builder.englishSampleAnswer;
         this.status = builder.status;
-        this.grammars = builder.grammars;
-        this.vocabularies = builder.vocabularies;
+        this.grammars = builder.grammars != null ? new java.util.ArrayList<>(builder.grammars) : new java.util.ArrayList<>();
+        this.vocabularies = builder.vocabularies != null ? new java.util.ArrayList<>(builder.vocabularies) : new java.util.ArrayList<>();
     }
 
     public static Builder builder() {
@@ -74,7 +74,9 @@ public class SpeakingQuestion {
                        String japaneseSampleAnswerMarkup,
                        String vietnameseSampleAnswer,
                        String englishSampleAnswer,
-                       Long speakingQuestionAudioFileId) {
+                       Long speakingQuestionAudioFileId,
+                       List<Vocabulary> vocabularies,
+                       List<Grammar> grammars) {
         validateJapaneseName(japaneseName);
         validateDescription(description);
 
@@ -88,6 +90,17 @@ public class SpeakingQuestion {
         this.vietnameseSampleAnswer = vietnameseSampleAnswer;
         this.englishSampleAnswer = englishSampleAnswer;
         this.speakingQuestionAudioFileId = speakingQuestionAudioFileId;
+
+        // Update associations
+        if (vocabularies != null) {
+            this.vocabularies.clear();
+            this.vocabularies.addAll(vocabularies);
+        }
+
+        if (grammars != null) {
+            this.grammars.clear();
+            this.grammars.addAll(grammars);
+        }
     }
 
     public void changeStatus(QuestionStatus newStatus) {
