@@ -1,8 +1,8 @@
 package org.naho.vocabulary.usecase;
 
+import org.naho.question.model.Vocabulary;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.vocabulary.exception.VocabularyErrorCode;
-import org.naho.vocabulary.model.Vocabulary;
 import org.naho.vocabulary.port.in.GetVocabularyDetailInputPort;
 import org.naho.vocabulary.port.out.VocabularyRepositoryPort;
 import org.naho.vocabulary.result.VocabularyResult;

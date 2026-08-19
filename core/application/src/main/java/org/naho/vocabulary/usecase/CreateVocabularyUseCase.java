@@ -1,7 +1,7 @@
 package org.naho.vocabulary.usecase;
 
+import org.naho.question.model.Vocabulary;
 import org.naho.vocabulary.command.CreateVocabularyCommand;
-import org.naho.vocabulary.model.Vocabulary;
 import org.naho.vocabulary.port.in.CreateVocabularyInputPort;
 import org.naho.vocabulary.port.out.VocabularyRepositoryPort;
 import org.naho.vocabulary.result.VocabularyResult;

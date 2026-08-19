@@ -1,10 +1,10 @@
 package org.naho.grammar.adapter;
 
 import lombok.RequiredArgsConstructor;
+import org.naho.grammar.entity.GrammarEntity;
 import org.naho.grammar.port.out.GrammarRepositoryPort;
 import org.naho.pagination.PageData;
 import org.naho.pagination.PageMeta;
-import org.naho.question.entity.GrammarEntity;
 import org.naho.question.model.Grammar;
 import org.naho.question.repository.GrammarJpaRepository;
 import org.springframework.data.domain.Page;

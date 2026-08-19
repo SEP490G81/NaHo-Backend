@@ -3,13 +3,13 @@ package org.naho.question.usecase;
 import org.naho.i18n.message.question.VocabularyQuestionDetailMessageKey;
 import org.naho.question.command.UpdateVocabularyQuestionCommand;
 import org.naho.question.exception.VocabularyQuestionErrorCode;
+import org.naho.question.model.Vocabulary;
 import org.naho.question.model.VocabularyQuestion;
 import org.naho.question.port.in.UpdateVocabularyQuestionInputPort;
 import org.naho.question.port.out.VocabularyQuestionRepositoryPort;
 import org.naho.question.result.UpdateVocabularyQuestionResult;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.TransactionPort;
-import org.naho.vocabulary.model.Vocabulary;
 import org.naho.vocabulary.port.out.VocabularyRepositoryPort;
 import org.naho.vocabulary.result.VocabularyResult;
 

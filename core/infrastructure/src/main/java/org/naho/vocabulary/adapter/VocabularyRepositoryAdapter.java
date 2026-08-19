@@ -4,11 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.naho.pagination.PageData;
 import org.naho.pagination.PageMeta;
 import org.naho.question.entity.VocabularyQuestionEntity;
+import org.naho.question.mapper.VocabularyEntityMapper;
 import org.naho.question.model.Vocabulary;
 import org.naho.question.repository.VocabularyQuestionJpaRepository;
 import org.naho.vocabulary.entity.VocabularyEntity;
-import org.naho.vocabulary.model.Vocabulary;
-import org.naho.vocabulary.port.out.VocabularyPort;
+import org.naho.vocabulary.port.out.VocabularyRepositoryPort;
+import org.naho.vocabulary.repository.VocabularyJpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,9 +21,11 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class VocabularyRepositoryAdapter implements VocabularyPort {
+public class VocabularyRepositoryAdapter implements VocabularyRepositoryPort {
 
     private final VocabularyQuestionJpaRepository vocabularyQuestionJpaRepository;
+    private final VocabularyJpaRepository vocabularyJpaRepository;
+    private final VocabularyEntityMapper vocabularyEntityMapper;
 
     @Override
     public List<Vocabulary> findVocabularyList(Long vocabularyQuestionId) {
@@ -52,12 +55,14 @@ public class VocabularyRepositoryAdapter implements VocabularyPort {
         entity.setEnglishMeaningText(vocabulary.getEnglishMeaningText());
 
         VocabularyEntity saved = vocabularyJpaRepository.save(entity);
-        return mapToDomain(saved);
+        return vocabularyEntityMapper.entityToDomain(saved);
     }
 
     @Override
     public Optional<Vocabulary> findById(Long id) {
-        return vocabularyJpaRepository.findById(id).map(this::mapToDomain);
+        return vocabularyJpaRepository
+                .findById(id)
+                .map(vocabularyEntityMapper::entityToDomain);
     }
 
     @Override
@@ -71,7 +76,7 @@ public class VocabularyRepositoryAdapter implements VocabularyPort {
         Page<VocabularyEntity> entityPage = vocabularyJpaRepository.searchByKeyword(keyword, pageable);
 
         List<Vocabulary> vocabularies = entityPage.getContent().stream()
-                .map(this::mapToDomain)
+                .map(vocabularyEntityMapper::entityToDomain)
                 .toList();
 
         PageMeta pageMeta = PageMeta.builder()

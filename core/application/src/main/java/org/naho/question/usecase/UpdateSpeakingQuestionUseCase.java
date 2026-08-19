@@ -7,12 +7,12 @@ import org.naho.question.command.UpdateSpeakingQuestionCommand;
 import org.naho.question.exception.SpeakingQuestionErrorCode;
 import org.naho.question.model.Grammar;
 import org.naho.question.model.SpeakingQuestion;
+import org.naho.question.model.Vocabulary;
 import org.naho.question.port.in.UpdateSpeakingQuestionInputPort;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.question.result.UpdateSpeakingQuestionResult;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.TransactionPort;
-import org.naho.vocabulary.model.Vocabulary;
 import org.naho.vocabulary.port.out.VocabularyRepositoryPort;
 
 import java.util.ArrayList;

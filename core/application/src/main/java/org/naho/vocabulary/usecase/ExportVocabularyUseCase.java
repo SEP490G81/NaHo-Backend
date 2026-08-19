@@ -6,28 +6,30 @@ import org.naho.shared.exception.ApplicationException;
 import org.naho.vocabulary.exception.VocabularyErrorCode;
 import org.naho.vocabulary.port.in.ExportVocabularyInputPort;
 import org.naho.vocabulary.port.out.ExcelWriterPort;
-import org.naho.vocabulary.port.out.VocabularyPort;
+import org.naho.vocabulary.port.out.VocabularyRepositoryPort;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
 
 public class ExportVocabularyUseCase implements ExportVocabularyInputPort {
 
-    private final VocabularyPort vocabularyPort;
+    private final VocabularyRepositoryPort vocabularyRepositoryPort;
     private final VocabulariesQuestionPort vocabulariesQuestionPort;
     private final ExcelWriterPort excelWriterPort;
 
-    public ExportVocabularyUseCase(VocabularyPort vocabularyPort,
-                                   VocabulariesQuestionPort vocabulariesQuestionPort,
-                                   ExcelWriterPort excelWriterPort) {
-        this.vocabularyPort = vocabularyPort;
+    public ExportVocabularyUseCase(
+            VocabularyRepositoryPort vocabularyRepositoryPort,
+            VocabulariesQuestionPort vocabulariesQuestionPort,
+            ExcelWriterPort excelWriterPort
+    ) {
+        this.vocabularyRepositoryPort = vocabularyRepositoryPort;
         this.vocabulariesQuestionPort = vocabulariesQuestionPort;
         this.excelWriterPort = excelWriterPort;
     }
 
     @Override
     public ByteArrayInputStream exportByQuestion(Long questionId) {
-        List<Vocabulary> list = vocabularyPort.findVocabularyList(questionId);
+        List<Vocabulary> list = vocabularyRepositoryPort.findVocabularyList(questionId);
         if (list == null || list.isEmpty()) {
             throw new ApplicationException(VocabularyErrorCode.VOCABULARY_EXPORT_NOT_FOUND, "vocabulary.export.not_found", questionId, "-");
         }

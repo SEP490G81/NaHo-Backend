@@ -59,11 +59,11 @@ public class VocabularyConfig {
 
     @Bean
     public ExportVocabularyInputPort exportVocabularyInputPort(
-            VocabularyPort vocabularyPort,
+            VocabularyRepositoryPort vocabularyRepositoryPort,
             VocabulariesQuestionPort vocabulariesQuestionPort,
             ExcelWriterPort excelWriterPort
     ) {
-        return new ExportVocabularyUseCase(vocabularyPort, vocabulariesQuestionPort, excelWriterPort);
+        return new ExportVocabularyUseCase(vocabularyRepositoryPort, vocabulariesQuestionPort, excelWriterPort);
     }
 
     @Bean
