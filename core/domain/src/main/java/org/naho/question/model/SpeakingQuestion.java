@@ -4,7 +4,6 @@ import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
 import org.naho.question.exception.SpeakingQuestionDomainErrorCode;
 import org.naho.question.type.QuestionStatus;
 import org.naho.shared.exception.DomainException;
-import org.naho.vocabulary.model.Vocabulary;
 
 import java.util.List;
 
@@ -40,8 +39,8 @@ public class SpeakingQuestion {
         this.vietnameseSampleAnswer = builder.vietnameseSampleAnswer;
         this.englishSampleAnswer = builder.englishSampleAnswer;
         this.status = builder.status;
-        this.grammars = builder.grammars != null ? new java.util.ArrayList<>(builder.grammars) : new java.util.ArrayList<>();
-        this.vocabularies = builder.vocabularies != null ? new java.util.ArrayList<>(builder.vocabularies) : new java.util.ArrayList<>();
+        this.grammars = builder.grammars;
+        this.vocabularies = builder.vocabularies;
     }
 
     public static Builder builder() {
@@ -74,9 +73,7 @@ public class SpeakingQuestion {
                        String japaneseSampleAnswerMarkup,
                        String vietnameseSampleAnswer,
                        String englishSampleAnswer,
-                       Long speakingQuestionAudioFileId,
-                       List<Vocabulary> vocabularies,
-                       List<Grammar> grammars) {
+                       Long speakingQuestionAudioFileId) {
         validateJapaneseName(japaneseName);
         validateDescription(description);
 
@@ -90,21 +87,10 @@ public class SpeakingQuestion {
         this.vietnameseSampleAnswer = vietnameseSampleAnswer;
         this.englishSampleAnswer = englishSampleAnswer;
         this.speakingQuestionAudioFileId = speakingQuestionAudioFileId;
-
-        // Update associations
-        if (vocabularies != null) {
-            this.vocabularies.clear();
-            this.vocabularies.addAll(vocabularies);
-        }
-
-        if (grammars != null) {
-            this.grammars.clear();
-            this.grammars.addAll(grammars);
-        }
     }
 
-    public void changeStatus(QuestionStatus newStatus) {
-        this.status = newStatus;
+    public void changeStatus(QuestionStatus status) {
+        this.status = status;
     }
 
     // Getters

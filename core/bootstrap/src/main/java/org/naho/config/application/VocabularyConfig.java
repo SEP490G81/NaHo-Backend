@@ -7,11 +7,10 @@ import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
 import org.naho.learning.port.out.UserNodeProgressRepositoryPort;
 import org.naho.point.port.in.CrudPointHistoryInputPort;
 import org.naho.question.port.in.CompleteVocabularyQuestionInputPort;
-import org.naho.question.port.in.SearchVocabulariesOfQuestionInputPort;
 import org.naho.question.port.out.VocabulariesQuestionPort;
 import org.naho.question.usecase.CompleteVocabularyQuestionUseCase;
-import org.naho.question.usecase.SearchVocabulariesOfQuestionUsecase;
 import org.naho.shared.port.out.TransactionPort;
+import org.naho.vocabulary.mapper.VocabularyResultMapper;
 import org.naho.vocabulary.port.in.*;
 import org.naho.vocabulary.port.out.*;
 import org.naho.vocabulary.usecase.*;
@@ -39,10 +38,16 @@ public class VocabularyConfig {
 
 
     @Bean
+    public VocabularyResultMapper vocabularyResultMapper() {
+        return new VocabularyResultMapper();
+    }
+
+    @Bean
     public GetVocabulariesOfObjectiveInputPort getVocabulariesOfObjectiveInputPort(
-            VocabulariesQuestionPort vocabulariesQuestionPort
+            VocabulariesQuestionPort vocabulariesQuestionPort,
+            VocabularyResultMapper vocabularyResultMapper
     ) {
-        return new GetVocabulariesOfObjectiveUseCase(vocabulariesQuestionPort);
+        return new GetVocabulariesOfObjectiveUseCase(vocabulariesQuestionPort, vocabularyResultMapper);
     }
 
     @Bean
@@ -50,13 +55,6 @@ public class VocabularyConfig {
             VocabulariesQuestionPort vocabulariesQuestionPort
     ) {
         return new GetVocabulariesOfTopicUseCase(vocabulariesQuestionPort);
-    }
-
-    @Bean
-    public SearchVocabulariesOfQuestionInputPort searchVocabulariesOfQuestionInputPort(
-            VocabularyPort vocabularyPort
-    ) {
-        return new SearchVocabulariesOfQuestionUsecase(vocabularyPort);
     }
 
     @Bean

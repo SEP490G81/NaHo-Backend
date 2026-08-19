@@ -7,33 +7,35 @@ import org.naho.book.port.out.TopicRepositoryPort;
 import org.naho.daily.port.in.CrudUserDailyMissionInputPort;
 import org.naho.file.port.in.UploadFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
-import org.naho.file.port.out.FileResultMapperPort;
 import org.naho.file.port.out.FileStorageServicePort;
-import org.naho.furigana.port.out.FuriganaGenerationPort;
 import org.naho.learning.port.in.UserLearningStreakInputPort;
-import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
 import org.naho.persona.port.out.PersonaRepositoryPort;
-import org.naho.question.port.in.CompleteSpeakingQuestionInputPort;
-import org.naho.question.port.out.AnswerHistoryRepositoryPort;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.shared.port.out.TransactionPort;
-import org.naho.speech.azure.mapper.WordAssessmentResultMapper;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
 import org.naho.speech.azure.port.out.TextToSpeechServicePort;
-import org.naho.speech.llm.adapter.*;
-import org.naho.speech.llm.constant.OpenAiConfigProperties;
-import org.naho.speech.llm.helper.SpeakingAnalysisHelper;
-import org.naho.speech.llm.helper.SpeakingSessionHelper;
-import org.naho.speech.llm.mapper.SpeakingSessionMessageResultMapper;
-import org.naho.speech.llm.mapper.SpeakingSessionResultMapper;
-import org.naho.speech.llm.port.in.*;
-import org.naho.speech.llm.port.out.*;
-import org.naho.speech.llm.usecase.*;
-import org.naho.speech.llm.validator.SessionValidator;
+import org.naho.speech.llm.conversation.adapter.AzureSpeechToTextAdapter;
+import org.naho.speech.llm.conversation.adapter.InMemorySessionStore;
+import org.naho.speech.llm.conversation.adapter.OpenAiChatAdapter;
+import org.naho.speech.llm.conversation.adapter.OpenAiScoringAdapter;
+import org.naho.speech.llm.conversation.constant.OpenAiConfigProperties;
+import org.naho.speech.llm.conversation.helper.SpeakingSessionHelper;
+import org.naho.speech.llm.conversation.mapper.SpeakingSessionMessageResultMapper;
+import org.naho.speech.llm.conversation.mapper.SpeakingSessionResultMapper;
+import org.naho.speech.llm.conversation.port.in.EndSessionInputPort;
+import org.naho.speech.llm.conversation.port.in.SpeakingSessionCleanupInputPort;
+import org.naho.speech.llm.conversation.port.in.SpeakingSessionInputPort;
+import org.naho.speech.llm.conversation.port.in.SuggestedTopicsInputPort;
+import org.naho.speech.llm.conversation.port.out.*;
+import org.naho.speech.llm.conversation.usecase.EndSessionUseCase;
+import org.naho.speech.llm.conversation.usecase.SpeakingSessionCleanupUseCase;
+import org.naho.speech.llm.conversation.usecase.SpeakingSessionUseCase;
+import org.naho.speech.llm.conversation.usecase.SuggestedTopicsUseCase;
+import org.naho.speech.llm.conversation.validator.SessionValidator;
+import org.naho.speech.llm.question.usecase.SpeakingAnalysisUseCase;
 import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
 import org.naho.subscription.port.out.UserDailyAiUsageRepositoryPort;
-import org.naho.user.port.out.UserRepositoryPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -178,62 +180,42 @@ public class ChatConfig {
     }
 
     @Bean
-    public AiAnalysisPort aiAnalysisPort(OpenAiConfigProperties openAiConfigProperties) {
-        return new OpenAiAnalysisAdapter(openAiConfigProperties);
-    }
-
-
-    @Bean
-    public SpeakingAnalysisHelper speakingAnalysisHelper(
-            UserRepositoryPort userRepositoryPort,
+    public org.naho.speech.llm.question.helper.SpeakingAnalysisHelper questionSpeakingAnalysisHelper(
             SpeakingQuestionRepositoryPort speakingQuestionRepositoryPort,
-            FileRepositoryPort fileRepositoryPort,
-            AnswerHistoryRepositoryPort answerHistoryRepositoryPort,
-            AzureSpeechServicePort azureSpeechServicePort,
+            BookRepositoryPort bookRepositoryPort,
             TopicRepositoryPort topicRepositoryPort,
             LessonRepositoryPort lessonRepositoryPort,
-            ObjectiveRepositoryPort objectiveRepositoryPort,
-            BookRepositoryPort bookRepositoryPort,
-            LearningPathNodeRepositoryPort learningPathNodeRepositoryPort,
-            CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort,
-            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
-            FileResultMapperPort fileResultMapperPort,
-            WordAssessmentResultMapper wordAssessmentResultMapper,
-            FuriganaGenerationPort furiganaGenerationPort
+            ObjectiveRepositoryPort objectiveRepositoryPort
     ) {
-        return new SpeakingAnalysisHelper(
-                userRepositoryPort,
+        return new org.naho.speech.llm.question.helper.SpeakingAnalysisHelper(
                 speakingQuestionRepositoryPort,
-                fileRepositoryPort,
-                answerHistoryRepositoryPort,
-                azureSpeechServicePort,
+                bookRepositoryPort,
                 topicRepositoryPort,
                 lessonRepositoryPort,
-                objectiveRepositoryPort,
-                bookRepositoryPort,
-                learningPathNodeRepositoryPort,
-                completeSpeakingQuestionInputPort,
-                userLearningProgressRepositoryPort,
-                fileResultMapperPort,
-                wordAssessmentResultMapper,
-                furiganaGenerationPort
+                objectiveRepositoryPort
         );
     }
 
     @Bean
-    public SpeakingAnalysisInputPort speakingAnalysisInputPort(
-            AiAnalysisPort aiAnalysisPort,
-            TransactionPort transactionPort,
-            UploadFileInputPort uploadFileInputPort,
+    public org.naho.speech.llm.question.port.in.SpeakingAnalysisInputPort speakingAnalysisInputPort(
             UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort,
-            SpeakingAnalysisHelper speakingAnalysisHelper
+            UploadFileInputPort uploadFileInputPort,
+            TransactionPort transactionPort,
+            AzureSpeechServicePort azureSpeechServicePort,
+            org.naho.speech.llm.question.port.out.AiFeedbackRepositoryPort aiFeedbackRepositoryPort,
+            org.naho.speech.llm.question.port.out.AiQuestionAnalysisPort aiQuestionAnalysisPort,
+            org.naho.speech.llm.question.helper.SpeakingAnalysisHelper questionSpeakingAnalysisHelper,
+            org.naho.speech.azure.port.out.SpeechAssessmentRepositoryPort speechAssessmentRepositoryPort
     ) {
         return new SpeakingAnalysisUseCase(
-                aiAnalysisPort,
-                transactionPort,
-                uploadFileInputPort,
                 userDailyAiUsageRepositoryPort,
-                speakingAnalysisHelper
+                uploadFileInputPort,
+                transactionPort,
+                azureSpeechServicePort,
+                aiFeedbackRepositoryPort,
+                aiQuestionAnalysisPort,
+                questionSpeakingAnalysisHelper,
+                speechAssessmentRepositoryPort
         );
     }
 

@@ -6,6 +6,7 @@ import org.naho.learning.command.GetLearningPathNodeDetailCommand;
 import org.naho.learning.dto.mapper.LearningPathNodeResponseMapper;
 import org.naho.learning.dto.response.LearningPathNodeDetailResponse;
 import org.naho.learning.port.in.GetLearningPathNodeDetailInputPort;
+import org.naho.learning.result.LearningPathNodeDetailResult;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +31,8 @@ public class LearningPathNodeController {
             @AuthenticationPrincipal AccessTokenPayload payload
     ) {
         var command = new GetLearningPathNodeDetailCommand(id, payload.userId());
-        var result = getLearningPathNodeDetailInputPort.getLearningPathNodeDetail(command);
-        var response = learningPathNodeResponseMapper.detailResultToResponse(result);
+        LearningPathNodeDetailResult result = getLearningPathNodeDetailInputPort.getLearningPathNodeDetail(command);
+        LearningPathNodeDetailResponse response = learningPathNodeResponseMapper.resultToResponse(result);
         return ResponseEntity.ok(response);
     }
 }

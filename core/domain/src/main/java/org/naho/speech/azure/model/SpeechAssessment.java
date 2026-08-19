@@ -4,7 +4,6 @@ import java.util.List;
 
 public class SpeechAssessment {
     private Long id;
-    private Long answerHistoryId;
     private String transcriptText;              // Đoạn text nhận diện được (Speech To Text)
     private Double accuracyScore;               // Điểm độ chuẩn xác phát âm
     private Double fluencyScore;                // Điểm độ trôi chảy
@@ -16,7 +15,6 @@ public class SpeechAssessment {
     // Private constructor dùng cho Builder
     private SpeechAssessment(Builder builder) {
         this.id = builder.id;
-        this.answerHistoryId = builder.answerHistoryId;
         this.transcriptText = builder.transcriptText;
         this.accuracyScore = builder.accuracyScore;
         this.fluencyScore = builder.fluencyScore;
@@ -33,14 +31,6 @@ public class SpeechAssessment {
     // Getter
     public Long getId() {
         return id;
-    }
-
-    public Long getAnswerHistoryId() {
-        return answerHistoryId;
-    }
-
-    public void setAnswerHistoryId(Long answerHistoryId) {
-        this.answerHistoryId = answerHistoryId;
     }
 
     public String getTranscriptText() {
@@ -74,7 +64,6 @@ public class SpeechAssessment {
     // Builder
     public static class Builder {
         private Long id;
-        private Long answerHistoryId;
         private String transcriptText;
         private Double accuracyScore;
         private Double fluencyScore;
@@ -85,11 +74,6 @@ public class SpeechAssessment {
 
         public Builder id(Long id) {
             this.id = id;
-            return this;
-        }
-
-        public Builder answerHistoryId(Long answerHistoryId) {
-            this.answerHistoryId = answerHistoryId;
             return this;
         }
 
@@ -132,4 +116,4 @@ public class SpeechAssessment {
             return new SpeechAssessment(this);
         }
     }
-}
+}

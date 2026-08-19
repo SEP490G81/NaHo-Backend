@@ -1,44 +1,33 @@
 package org.naho.vocabulary.usecase;
 
-import org.naho.i18n.message.question.VocabularyQuestionDetailMessageKey;
 import org.naho.question.port.out.VocabulariesQuestionPort;
-import org.naho.shared.exception.ApplicationException;
-import org.naho.vocabulary.exception.VocabularyErrorCode;
-import org.naho.vocabulary.model.Vocabulary;
+import org.naho.vocabulary.mapper.VocabularyResultMapper;
 import org.naho.vocabulary.port.in.GetVocabulariesOfObjectiveInputPort;
 import org.naho.vocabulary.result.VocabulariesOfObjectiveResult;
+import org.naho.vocabulary.result.VocabularyResult;
 
 import java.util.List;
 
 public class GetVocabulariesOfObjectiveUseCase implements GetVocabulariesOfObjectiveInputPort {
 
     private final VocabulariesQuestionPort vocabulariesQuestionPort;
+    private final VocabularyResultMapper vocabularyResultMapper;
 
-    public GetVocabulariesOfObjectiveUseCase(VocabulariesQuestionPort vocabulariesQuestionPort) {
+    public GetVocabulariesOfObjectiveUseCase(
+            VocabulariesQuestionPort vocabulariesQuestionPort,
+            VocabularyResultMapper vocabularyResultMapper
+    ) {
         this.vocabulariesQuestionPort = vocabulariesQuestionPort;
+        this.vocabularyResultMapper = vocabularyResultMapper;
     }
 
     @Override
-    public VocabulariesOfObjectiveResult getVocabularyListOfObjective(int objectiveId) {
-        List<Vocabulary> listVocabulary = vocabulariesQuestionPort.findVocabularyListOfObjective(objectiveId);
-        if (listVocabulary.isEmpty()) {
-            throw new ApplicationException(
-                    VocabularyErrorCode.VOCABULARY_NOT_FOUND,
-                    VocabularyQuestionDetailMessageKey.VOCABULARY_OBJECTIVE_NOT_FOUND,
-                    objectiveId
-            );
-        }
-
-        List<VocabulariesOfObjectiveResult.VocabularyDetailResult> detailResults = listVocabulary.stream()
-                .map(vocab -> new VocabulariesOfObjectiveResult.VocabularyDetailResult(
-                        vocab.getId(),
-                        vocab.getReading(),
-                        vocab.getJapanese(),
-                        vocab.getVietnameseMeaningText(),
-                        vocab.getEnglishMeaningText()
-                ))
+    public VocabulariesOfObjectiveResult getVocabularyListOfObjective(Long objectiveId) {
+        List<VocabularyResult> vocabularies = vocabulariesQuestionPort
+                .findVocabularyListOfObjective(objectiveId)
+                .stream().map(vocabularyResultMapper::domainToResult)
                 .toList();
 
-        return new VocabulariesOfObjectiveResult(objectiveId, detailResults);
+        return new VocabulariesOfObjectiveResult(objectiveId, vocabularies);
     }
 }

@@ -1,23 +1,15 @@
 package org.naho.speech.azure.model;
 
-import java.time.Instant;
-
 public class AnswerHistory {
+
     private Long id;
     private Long userId;
     private Long speakingQuestionId;
+    private Long speechAssessmentId;
+    private Long aiFeedbackId;
     private Long audioFileId;
-    private Integer durationSec;
-    private Instant createdTime;
-
-    private AnswerHistory(Builder builder) {
-        this.id = builder.id;
-        this.userId = builder.userId;
-        this.speakingQuestionId = builder.speakingQuestionId;
-        this.audioFileId = builder.audioFileId;
-        this.durationSec = builder.durationSec;
-        this.createdTime = builder.createdTime;
-    }
+    private Double duration;
+    private Double overallScore;
 
     public static Builder builder() {
         return new Builder();
@@ -27,12 +19,40 @@ public class AnswerHistory {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public Long getUserId() {
         return userId;
     }
 
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
     public Long getSpeakingQuestionId() {
         return speakingQuestionId;
+    }
+
+    public void setSpeakingQuestionId(Long speakingQuestionId) {
+        this.speakingQuestionId = speakingQuestionId;
+    }
+
+    public Long getSpeechAssessmentId() {
+        return speechAssessmentId;
+    }
+
+    public void setSpeechAssessmentId(Long speechAssessmentId) {
+        this.speechAssessmentId = speechAssessmentId;
+    }
+
+    public Long getAiFeedbackId() {
+        return aiFeedbackId;
+    }
+
+    public void setAiFeedbackId(Long aiFeedbackId) {
+        this.aiFeedbackId = aiFeedbackId;
     }
 
     public Long getAudioFileId() {
@@ -43,25 +63,32 @@ public class AnswerHistory {
         this.audioFileId = audioFileId;
     }
 
-    public Integer getDurationSec() {
-        return durationSec;
+    public Double getDuration() {
+        return duration;
     }
 
-    public void setDurationSec(Integer durationSec) {
-        this.durationSec = durationSec;
+    public void setDuration(Double duration) {
+        this.duration = duration;
     }
 
-    public Instant getCreatedTime() {
-        return createdTime;
+    public Double getOverallScore() {
+        return overallScore;
+    }
+
+    public void setOverallScore(Double overallScore) {
+        this.overallScore = overallScore;
     }
 
     public static class Builder {
+
         private Long id;
         private Long userId;
         private Long speakingQuestionId;
+        private Long speechAssessmentId;
+        private Long aiFeedbackId;
         private Long audioFileId;
-        private Integer durationSec;
-        private Instant createdTime;
+        private Double duration;
+        private Double overallScore;
 
         public Builder id(Long id) {
             this.id = id;
@@ -78,23 +105,44 @@ public class AnswerHistory {
             return this;
         }
 
+        public Builder speechAssessmentId(Long speechAssessmentId) {
+            this.speechAssessmentId = speechAssessmentId;
+            return this;
+        }
+
+        public Builder aiFeedbackId(Long aiFeedbackId) {
+            this.aiFeedbackId = aiFeedbackId;
+            return this;
+        }
+
         public Builder audioFileId(Long audioFileId) {
             this.audioFileId = audioFileId;
             return this;
         }
 
-        public Builder durationSec(Integer durationSec) {
-            this.durationSec = durationSec;
+        public Builder duration(Double duration) {
+            this.duration = duration;
             return this;
         }
 
-        public Builder createdTime(Instant createdTime) {
-            this.createdTime = createdTime;
+        public Builder overallScore(Double overallScore) {
+            this.overallScore = overallScore;
             return this;
         }
 
         public AnswerHistory build() {
-            return new AnswerHistory(this);
+            AnswerHistory answerHistory = new AnswerHistory();
+
+            answerHistory.id = this.id;
+            answerHistory.userId = this.userId;
+            answerHistory.speakingQuestionId = this.speakingQuestionId;
+            answerHistory.speechAssessmentId = this.speechAssessmentId;
+            answerHistory.aiFeedbackId = this.aiFeedbackId;
+            answerHistory.audioFileId = this.audioFileId;
+            answerHistory.duration = this.duration;
+            answerHistory.overallScore = this.overallScore;
+
+            return answerHistory;
         }
     }
 }

@@ -1,10 +1,10 @@
 package org.naho.vocabulary.usecase;
 
 import org.naho.i18n.message.question.VocabularyQuestionDetailMessageKey;
+import org.naho.question.model.Vocabulary;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.vocabulary.exception.VocabularyErrorCode;
-import org.naho.vocabulary.model.Vocabulary;
 import org.naho.vocabulary.port.in.ImportVocabularyPort;
 import org.naho.vocabulary.port.out.SaveVocabularyPort;
 import org.naho.vocabulary.port.out.VocabularyExcelParserPort;

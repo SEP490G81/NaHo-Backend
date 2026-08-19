@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.file.entity.FileEntity;
+import org.naho.grammar.entity.GrammarEntity;
 import org.naho.learning.entity.LearningPathNodeEntity;
 import org.naho.question.type.QuestionStatus;
 import org.naho.shared.persistence.BaseEntity;
@@ -52,7 +53,7 @@ public class SpeakingQuestionEntity extends BaseEntity {
     @Column(name = "english_sample_answer", columnDefinition = "TEXT")
     String englishSampleAnswer;
 
-    @Column(length = 50)
+    @Column(name = "status", length = 50)
     @Enumerated(EnumType.STRING)
     QuestionStatus status;
 

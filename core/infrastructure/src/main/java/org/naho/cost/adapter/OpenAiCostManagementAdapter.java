@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.naho.cost.model.OpenAiDailyCost;
 import org.naho.cost.port.out.OpenAiCostManagementPort;
-import org.naho.speech.llm.constant.OpenAiConfigProperties;
+import org.naho.speech.llm.conversation.constant.OpenAiConfigProperties;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;

@@ -5,11 +5,11 @@ import org.naho.learning.entity.LearningPathNodeEntity;
 import org.naho.learning.repository.LearningPathNodeJpaRepository;
 import org.naho.question.mapper.VocabularyEntityMapper;
 import org.naho.question.mapper.VocabularyQuestionEntityMapper;
+import org.naho.question.model.Vocabulary;
 import org.naho.question.model.VocabularyQuestion;
 import org.naho.question.port.out.VocabulariesQuestionPort;
 import org.naho.question.port.out.VocabularyQuestionRepositoryPort;
 import org.naho.question.repository.VocabularyQuestionJpaRepository;
-import org.naho.vocabulary.model.Vocabulary;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -24,9 +24,9 @@ public class VocabularyQuestionRepositoryAdapter implements VocabulariesQuestion
     private final VocabularyQuestionEntityMapper vocabularyQuestionEntityMapper;
 
     @Override
-    public List<Vocabulary> findVocabularyListOfObjective(int objectiveId) {
+    public List<Vocabulary> findVocabularyListOfObjective(Long objectiveId) {
         List<LearningPathNodeEntity> nodes = learningPathNodeJpaRepository
-                .findAllByObjectiveId((long) objectiveId);
+                .findAllByObjectiveId(objectiveId);
         return nodes.stream()
                 .map(LearningPathNodeEntity::getVocabularyQuestion)
                 .filter(Objects::nonNull)

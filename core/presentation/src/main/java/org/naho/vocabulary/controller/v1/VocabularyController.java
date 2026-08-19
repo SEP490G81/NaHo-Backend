@@ -58,7 +58,7 @@ public class VocabularyController {
     @GetMapping("/objective/{objectiveId}")
     @ApiResponseMessage(message = VocabularyQuestionDetailMessageKey.VOCABULARY_OBJECTIVE_GET_SUCCESS)
     public ResponseEntity<VocabulariesOfObjectiveResponse> getVocabulariesOfObjective(
-            @PathVariable("objectiveId") int objectiveId
+            @PathVariable("objectiveId") Long objectiveId
     ) {
         VocabulariesOfObjectiveResult result = getVocabulariesOfObjectiveInputPort.getVocabularyListOfObjective(objectiveId);
         VocabulariesOfObjectiveResponse response = vocabularyObjectiveResponseMapper.toResponse(result);
@@ -86,7 +86,9 @@ public class VocabularyController {
     }
 
     @GetMapping("/export/question/{questionId}")
-    public ResponseEntity<byte[]> exportByQuestion(@PathVariable("questionId") int questionId) {
+    public ResponseEntity<byte[]> exportByQuestion(
+            @PathVariable("questionId") Long questionId
+    ) {
         try {
             ByteArrayInputStream in = exportVocabularyInputPort.exportByQuestion(questionId);
             byte[] data = in.readAllBytes();
@@ -104,7 +106,7 @@ public class VocabularyController {
     }
 
     @GetMapping("/export/objective/{objectiveId}")
-    public ResponseEntity<byte[]> exportByObjective(@PathVariable("objectiveId") int objectiveId) {
+    public ResponseEntity<byte[]> exportByObjective(@PathVariable("objectiveId") Long objectiveId) {
         try {
             ByteArrayInputStream in = exportVocabularyInputPort.exportByObjective(objectiveId);
             byte[] data = in.readAllBytes();

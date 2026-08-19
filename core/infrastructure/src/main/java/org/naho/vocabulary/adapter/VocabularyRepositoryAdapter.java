@@ -4,12 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.naho.pagination.PageData;
 import org.naho.pagination.PageMeta;
 import org.naho.question.entity.VocabularyQuestionEntity;
+import org.naho.question.model.Vocabulary;
 import org.naho.question.repository.VocabularyQuestionJpaRepository;
 import org.naho.vocabulary.entity.VocabularyEntity;
 import org.naho.vocabulary.model.Vocabulary;
 import org.naho.vocabulary.port.out.VocabularyPort;
-import org.naho.vocabulary.port.out.VocabularyRepositoryPort;
-import org.naho.vocabulary.repository.VocabularyJpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,17 +20,22 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class VocabularyRepositoryAdapter implements VocabularyPort, VocabularyRepositoryPort {
+public class VocabularyRepositoryAdapter implements VocabularyPort {
 
     private final VocabularyQuestionJpaRepository vocabularyQuestionJpaRepository;
-    private final VocabularyJpaRepository vocabularyJpaRepository;
 
     @Override
-    public List<Vocabulary> findVocabularyList(int vocabularyQuestionId) {
-        return vocabularyQuestionJpaRepository.findById((long) vocabularyQuestionId)
+    public List<Vocabulary> findVocabularyList(Long vocabularyQuestionId) {
+        return vocabularyQuestionJpaRepository.findById(vocabularyQuestionId)
                 .map(VocabularyQuestionEntity::getVocabularies)
                 .map(entities -> entities.stream()
-                        .map(this::mapToDomain)
+                        .map(entity -> Vocabulary.builder()
+                                .id(entity.getId())
+                                .reading(entity.getReading())
+                                .japanese(entity.getJapanese())
+                                .vietnameseMeaningText(entity.getVietnameseMeaningText())
+                                .englishMeaningText(entity.getEnglishMeaningText())
+                                .build())
                         .toList())
                 .orElse(Collections.emptyList());
     }
@@ -80,15 +84,5 @@ public class VocabularyRepositoryAdapter implements VocabularyPort, VocabularyRe
                 .build();
 
         return new PageData<>(vocabularies, pageMeta);
-    }
-
-    private Vocabulary mapToDomain(VocabularyEntity entity) {
-        return Vocabulary.builder()
-                .id(entity.getId())
-                .reading(entity.getReading())
-                .japanese(entity.getJapanese())
-                .vietnameseMeaningText(entity.getVietnameseMeaningText())
-                .englishMeaningText(entity.getEnglishMeaningText())
-                .build();
     }
 }

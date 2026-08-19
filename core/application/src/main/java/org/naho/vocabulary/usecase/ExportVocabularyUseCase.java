@@ -1,9 +1,9 @@
 package org.naho.vocabulary.usecase;
 
+import org.naho.question.model.Vocabulary;
 import org.naho.question.port.out.VocabulariesQuestionPort;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.vocabulary.exception.VocabularyErrorCode;
-import org.naho.vocabulary.model.Vocabulary;
 import org.naho.vocabulary.port.in.ExportVocabularyInputPort;
 import org.naho.vocabulary.port.out.ExcelWriterPort;
 import org.naho.vocabulary.port.out.VocabularyPort;
@@ -26,7 +26,7 @@ public class ExportVocabularyUseCase implements ExportVocabularyInputPort {
     }
 
     @Override
-    public ByteArrayInputStream exportByQuestion(int questionId) {
+    public ByteArrayInputStream exportByQuestion(Long questionId) {
         List<Vocabulary> list = vocabularyPort.findVocabularyList(questionId);
         if (list == null || list.isEmpty()) {
             throw new ApplicationException(VocabularyErrorCode.VOCABULARY_EXPORT_NOT_FOUND, "vocabulary.export.not_found", questionId, "-");
@@ -35,7 +35,7 @@ public class ExportVocabularyUseCase implements ExportVocabularyInputPort {
     }
 
     @Override
-    public ByteArrayInputStream exportByObjective(int objectiveId) {
+    public ByteArrayInputStream exportByObjective(Long objectiveId) {
         List<Vocabulary> list = vocabulariesQuestionPort.findVocabularyListOfObjective(objectiveId);
         if (list == null || list.isEmpty()) {
             throw new ApplicationException(VocabularyErrorCode.VOCABULARY_EXPORT_NOT_FOUND, "vocabulary.export.not_found", "-", objectiveId);

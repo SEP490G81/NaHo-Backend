@@ -171,9 +171,9 @@ public class CrudAnswerHistoryUseCase implements CrudAnswerHistoryInputPort {
                     "Corrupted AI feedback data");
         }
 
-        Integer durationSec = (answerHistory.getDurationSec() != null && answerHistory.getDurationSec() > 0)
-                ? answerHistory.getDurationSec()
-                : root.path("durationSec").asInt(0);
+        Double duration = (answerHistory.getDuration() != null && answerHistory.getDuration() > 0)
+                ? answerHistory.getDuration()
+                : root.path("duration").asInt(0);
 
         Double overallScore = root.path("overallScore").asDouble(0.0);
 
@@ -340,8 +340,7 @@ public class CrudAnswerHistoryUseCase implements CrudAnswerHistoryInputPort {
                 topicName,
                 learningPathNodeId,
                 bookId,
-                answerHistory.getCreatedTime(),
-                durationSec,
+                duration,
                 overallScore,
                 report,
                 audioUrl

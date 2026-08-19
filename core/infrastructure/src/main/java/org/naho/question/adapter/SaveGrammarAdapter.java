@@ -1,7 +1,7 @@
 package org.naho.question.adapter;
 
 import lombok.RequiredArgsConstructor;
-import org.naho.question.entity.GrammarEntity;
+import org.naho.grammar.entity.GrammarEntity;
 import org.naho.question.model.Grammar;
 import org.naho.question.port.out.SaveGrammarPort;
 import org.naho.question.repository.GrammarJpaRepository;

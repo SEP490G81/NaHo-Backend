@@ -1,3 +1,18 @@
+CREATE TABLE ai_feedbacks
+(
+    id                         BIGINT AUTO_INCREMENT NOT NULL,
+    created_time               datetime(6)           NOT NULL,
+    modified_time              datetime(6)           NULL,
+    grammar_score              DOUBLE                NOT NULL,
+    vocabulary_score           DOUBLE                NOT NULL,
+    naturalness_score          DOUBLE                NOT NULL,
+    content_relevant_score     DOUBLE                NOT NULL,
+    average_score              DOUBLE                NOT NULL,
+    suggest_japanese_answer    TEXT                  NOT NULL,
+    suggest_answer_translation TEXT                  NOT NULL,
+    CONSTRAINT pk_ai_feedbacks PRIMARY KEY (id)
+);
+
 CREATE TABLE answer_histories
 (
     id                   BIGINT AUTO_INCREMENT NOT NULL,
@@ -5,8 +20,11 @@ CREATE TABLE answer_histories
     modified_time        datetime(6)           NULL,
     user_id              BIGINT                NOT NULL,
     speaking_question_id BIGINT                NOT NULL,
-    audio_file_id        BIGINT                NULL,
-    duration_sec         INT                   NULL,
+    speech_assessment_id BIGINT                NOT NULL,
+    ai_feedback_id       BIGINT                NOT NULL,
+    audio_file_id        BIGINT                NOT NULL,
+    duration             DOUBLE                NULL,
+    overall_score        DOUBLE                NOT NULL,
     CONSTRAINT pk_answer_histories PRIMARY KEY (id)
 );
 
@@ -82,19 +100,6 @@ CREATE TABLE comments
     speaking_question_id BIGINT                NOT NULL,
     parent_id            BIGINT                NULL,
     CONSTRAINT pk_comments PRIMARY KEY (id)
-);
-
-CREATE TABLE content_assessments
-(
-    id                BIGINT AUTO_INCREMENT NOT NULL,
-    created_time      datetime(6)           NOT NULL,
-    modified_time     datetime(6)           NULL,
-    vocabulary_score  DOUBLE                NOT NULL,
-    grammar_score     DOUBLE                NOT NULL,
-    ai_feedback       TEXT                  NOT NULL,
-    translation_text  TEXT                  NULL,
-    answer_history_id BIGINT                NOT NULL,
-    CONSTRAINT pk_content_assessments PRIMARY KEY (id)
 );
 
 CREATE TABLE conversation_styles
@@ -518,7 +523,7 @@ CREATE TABLE speech_assessments
     fluency_score       DOUBLE                NOT NULL,
     completeness_score  DOUBLE                NOT NULL,
     pronunciation_score DOUBLE                NOT NULL,
-    answer_history_id   BIGINT                NOT NULL,
+    average_score       DOUBLE                NOT NULL,
     CONSTRAINT pk_speech_assessments PRIMARY KEY (id)
 );
 
@@ -563,6 +568,28 @@ CREATE TABLE topics
     user_id                       BIGINT                NULL,
     book_id                       BIGINT                NULL,
     CONSTRAINT pk_topics PRIMARY KEY (id)
+);
+
+CREATE TABLE used_vocabularies_and_grammars
+(
+    id             BIGINT AUTO_INCREMENT NOT NULL,
+    created_time   datetime(6)           NOT NULL,
+    modified_time  datetime(6)           NULL,
+    ai_feedback_id BIGINT                NOT NULL,
+    expression     TEXT                  NOT NULL,
+    category       VARCHAR(255)          NOT NULL,
+    CONSTRAINT pk_used_vocabularies_and_grammars PRIMARY KEY (id)
+);
+
+CREATE TABLE user_answer_errors
+(
+    id             BIGINT AUTO_INCREMENT NOT NULL,
+    created_time   datetime(6)           NOT NULL,
+    modified_time  datetime(6)           NULL,
+    ai_feedback_id BIGINT                NOT NULL,
+    incorrect      TEXT                  NOT NULL,
+    correction     TEXT                  NOT NULL,
+    CONSTRAINT pk_user_answer_errors PRIMARY KEY (id)
 );
 
 CREATE TABLE user_daily_ai_usages
@@ -724,7 +751,13 @@ CREATE TABLE word_assessments
 );
 
 ALTER TABLE answer_histories
+    ADD CONSTRAINT uc_answer_histories_ai_feedback UNIQUE (ai_feedback_id);
+
+ALTER TABLE answer_histories
     ADD CONSTRAINT uc_answer_histories_audio_file UNIQUE (audio_file_id);
+
+ALTER TABLE answer_histories
+    ADD CONSTRAINT uc_answer_histories_speech_assessment UNIQUE (speech_assessment_id);
 
 ALTER TABLE aws_daily_costs
     ADD CONSTRAINT uc_aws_daily_costs_record_date UNIQUE (record_date);
@@ -734,9 +767,6 @@ ALTER TABLE azure_daily_costs
 
 ALTER TABLE books
     ADD CONSTRAINT uc_books_cover_image_file UNIQUE (cover_image_file_id);
-
-ALTER TABLE content_assessments
-    ADD CONSTRAINT uc_content_assessments_answer_history UNIQUE (answer_history_id);
 
 ALTER TABLE files
     ADD CONSTRAINT uc_files_object_key UNIQUE (object_key);
@@ -780,9 +810,6 @@ ALTER TABLE speaking_session_messages
 ALTER TABLE speaking_sessions
     ADD CONSTRAINT uc_speaking_sessions_session_code UNIQUE (session_code);
 
-ALTER TABLE speech_assessments
-    ADD CONSTRAINT uc_speech_assessments_answer_history UNIQUE (answer_history_id);
-
 ALTER TABLE subscription_plans
     ADD CONSTRAINT uc_subscription_plans_code UNIQUE (code);
 
@@ -808,10 +835,16 @@ ALTER TABLE payment_idempotencies
     ADD CONSTRAINT uk_payment_idempotency_user_key UNIQUE (user_id, idempotency_key);
 
 ALTER TABLE answer_histories
+    ADD CONSTRAINT FK_ANSWER_HISTORIES_ON_AI_FEEDBACK FOREIGN KEY (ai_feedback_id) REFERENCES ai_feedbacks (id);
+
+ALTER TABLE answer_histories
     ADD CONSTRAINT FK_ANSWER_HISTORIES_ON_AUDIO_FILE FOREIGN KEY (audio_file_id) REFERENCES files (id);
 
 ALTER TABLE answer_histories
     ADD CONSTRAINT FK_ANSWER_HISTORIES_ON_SPEAKING_QUESTION FOREIGN KEY (speaking_question_id) REFERENCES speaking_questions (id);
+
+ALTER TABLE answer_histories
+    ADD CONSTRAINT FK_ANSWER_HISTORIES_ON_SPEECH_ASSESSMENT FOREIGN KEY (speech_assessment_id) REFERENCES speech_assessments (id);
 
 ALTER TABLE answer_histories
     ADD CONSTRAINT FK_ANSWER_HISTORIES_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
@@ -830,9 +863,6 @@ ALTER TABLE comments
 
 ALTER TABLE comments
     ADD CONSTRAINT FK_COMMENTS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
-
-ALTER TABLE content_assessments
-    ADD CONSTRAINT FK_CONTENT_ASSESSMENTS_ON_ANSWER_HISTORY FOREIGN KEY (answer_history_id) REFERENCES answer_histories (id);
 
 ALTER TABLE daily_rewards
     ADD CONSTRAINT FK_DAILY_REWARDS_ON_CHEST FOREIGN KEY (chest_id) REFERENCES chests (id);
@@ -921,9 +951,6 @@ ALTER TABLE speaking_session_messages
 ALTER TABLE speaking_session_messages
     ADD CONSTRAINT FK_SPEAKING_SESSION_MESSAGES_ON_SESSION FOREIGN KEY (session_id) REFERENCES speaking_sessions (id);
 
-ALTER TABLE speech_assessments
-    ADD CONSTRAINT FK_SPEECH_ASSESSMENTS_ON_ANSWER_HISTORY FOREIGN KEY (answer_history_id) REFERENCES answer_histories (id);
-
 ALTER TABLE topics
     ADD CONSTRAINT FK_TOPICS_ON_BOOK FOREIGN KEY (book_id) REFERENCES books (id);
 
@@ -933,6 +960,9 @@ ALTER TABLE topics
 ALTER TABLE topics
     ADD CONSTRAINT FK_TOPICS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
+ALTER TABLE used_vocabularies_and_grammars
+    ADD CONSTRAINT FK_USED_VOCABULARIES_AND_GRAMMARS_ON_AI_FEEDBACK FOREIGN KEY (ai_feedback_id) REFERENCES ai_feedbacks (id);
+
 ALTER TABLE users
     ADD CONSTRAINT FK_USERS_ON_AVATAR_FILE FOREIGN KEY (avatar_file_id) REFERENCES files (id);
 
@@ -941,6 +971,9 @@ ALTER TABLE users
 
 ALTER TABLE users
     ADD CONSTRAINT FK_USERS_ON_USER_LEARNING_PROGRESS FOREIGN KEY (user_learning_progress_id) REFERENCES user_learning_progresses (id);
+
+ALTER TABLE user_answer_errors
+    ADD CONSTRAINT FK_USER_ANSWER_ERRORS_ON_AI_FEEDBACK FOREIGN KEY (ai_feedback_id) REFERENCES ai_feedbacks (id);
 
 ALTER TABLE user_daily_ai_usages
     ADD CONSTRAINT FK_USER_DAILY_AI_USAGES_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);

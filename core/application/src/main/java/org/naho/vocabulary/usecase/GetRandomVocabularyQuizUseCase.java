@@ -1,9 +1,9 @@
 package org.naho.vocabulary.usecase;
 
 import org.naho.i18n.message.question.VocabularyQuestionDetailMessageKey;
+import org.naho.question.model.Vocabulary;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.vocabulary.exception.VocabularyErrorCode;
-import org.naho.vocabulary.model.Vocabulary;
 import org.naho.vocabulary.port.in.GetRandomVocabularyQuizInputPort;
 import org.naho.vocabulary.port.out.RandomVocabularyPort;
 import org.naho.vocabulary.result.VocabularyQuizResult;
