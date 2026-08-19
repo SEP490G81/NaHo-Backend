@@ -2,7 +2,7 @@ package org.naho.scheduler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.naho.speech.llm.port.in.SyncOpenAiCostInputPort;
+import org.naho.cost.port.in.SyncOpenAiCostInputPort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 

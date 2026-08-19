@@ -7,6 +7,6 @@ public record UserDailyAiUsageResponse(
         Long userId,
         LocalDate usageDate,
         Integer speakingEvaluationCount,
-        Integer aiSessionEvaluationCount
+        Integer aiSessionStartCount
 ) {
 }

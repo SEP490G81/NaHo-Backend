@@ -1,49 +1,64 @@
 package org.naho.speech.llm.usecase;
 
+import org.naho.daily.command.CompleteDailyMissionCommand;
+import org.naho.daily.port.in.CrudUserDailyMissionInputPort;
+import org.naho.daily.type.MissionType;
+import org.naho.i18n.message.learning.UserLearningProgressDetailMessageKey;
 import org.naho.i18n.message.llm.LlmDetailMessageKey;
+import org.naho.learning.command.UpdateUserStreakCommand;
+import org.naho.learning.exception.UserLearningProgressErrorCode;
+import org.naho.learning.model.UserLearningProgress;
+import org.naho.learning.port.in.UserLearningStreakInputPort;
+import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
+import org.naho.persona.type.FormalityLevel;
+import org.naho.persona.type.MarugotoLevel;
 import org.naho.shared.constant.SystemZoneId;
 import org.naho.shared.exception.ApplicationException;
+import org.naho.shared.port.out.TransactionPort;
 import org.naho.speech.llm.exception.LlmApplicationError;
 import org.naho.speech.llm.port.in.EndSessionInputPort;
 import org.naho.speech.llm.port.out.AiScoringPort;
 import org.naho.speech.llm.port.out.SessionStorePort;
 import org.naho.speech.llm.port.out.SpeakingSessionRepositoryPort;
 import org.naho.speech.llm.result.ScoringResult;
-import org.naho.subscription.model.UserDailyAiUsage;
-import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
-import org.naho.subscription.port.out.UserDailyAiUsageRepositoryPort;
-import org.naho.subscription.result.SubscriptionPlanResult;
 
 import java.time.Instant;
-import java.time.LocalDate;
 
 public class EndSessionUseCase implements EndSessionInputPort {
     private final SessionStorePort sessionStorePort;
     private final AiScoringPort aiScoringPort;
     private final SpeakingSessionRepositoryPort speakingSessionRepositoryPort;
-    private final UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort;
-    private final GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
+    private final CrudUserDailyMissionInputPort crudUserDailyMissionInputPort;
+    private final UserLearningStreakInputPort userLearningStreakInputPort;
+    private final UserLearningProgressRepositoryPort userLearningProgressRepositoryPort;
+    private final TransactionPort transactionPort;
 
     public EndSessionUseCase(
             SessionStorePort sessionStorePort,
             AiScoringPort aiScoringPort,
             SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
-            UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort,
-            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort
+            CrudUserDailyMissionInputPort crudUserDailyMissionInputPort,
+            UserLearningStreakInputPort userLearningStreakInputPort,
+            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
+            TransactionPort transactionPort
     ) {
         this.sessionStorePort = sessionStorePort;
         this.aiScoringPort = aiScoringPort;
         this.speakingSessionRepositoryPort = speakingSessionRepositoryPort;
-        this.userDailyAiUsageRepositoryPort = userDailyAiUsageRepositoryPort;
-        this.getActiveSubscriptionInputPort = getActiveSubscriptionInputPort;
+        this.crudUserDailyMissionInputPort = crudUserDailyMissionInputPort;
+        this.userLearningStreakInputPort = userLearningStreakInputPort;
+        this.userLearningProgressRepositoryPort = userLearningProgressRepositoryPort;
+        this.transactionPort = transactionPort;
     }
 
     @Override
-    public ScoringResult endSession(Long requestUserId, String sessionId, String topic, String speechMetaData, String arsConfidence) {
+    public ScoringResult endSession(Long requestUserId, String sessionCode, String topic, String speechMetaData, String arsConfidence) {
+        return transactionPort.execute(() -> doEndSession(requestUserId, sessionCode, topic, speechMetaData, arsConfidence));
+    }
 
-        // cần check lại logic chỗ này
+    private ScoringResult doEndSession(Long requestUserId, String sessionCode, String topic, String speechMetaData, String arsConfidence) {
         // Lấy user id của người sở hữu cái session này
-        Long userId = sessionStorePort.getUserId(sessionId);
+        Long userId = sessionStorePort.getUserId(sessionCode);
         if (userId == null) {
             userId = requestUserId;
         }
@@ -55,46 +70,25 @@ public class EndSessionUseCase implements EndSessionInputPort {
             );
         }
 
-        LocalDate today = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID);
+        String fullTranscript = sessionStorePort.getFullTranscript(sessionCode);
+        String personaContext = sessionStorePort.getPersonaContext(sessionCode);
 
-        // lấy số lượt dùng của người dùng trong hôm nay
-        UserDailyAiUsage userDailyAiUsage = userDailyAiUsageRepositoryPort
-                .findByUserIdAndUsageDateCreateIfNotExists(userId, today);
-
-        // lấy ra gói đăng kí của người dùng hiện tại
-        SubscriptionPlanResult subscriptionPlanResult = getActiveSubscriptionInputPort.getUserActiveSubscriptionPlan(userId);
-
-        // kiểm tra nếu nguời dùng đã dùng hết lượt đánh giá session trong ngày hôm nay rồi thì ném ra lỗi
-        if (userDailyAiUsage.getAiSessionEvaluationCount() >= subscriptionPlanResult.dailyAiSessionEvaluationLimit()) {
-            throw new ApplicationException(
-                    LlmApplicationError.LLM_DAILY_LIMIT_EXCEEDED,
-                    LlmDetailMessageKey.LLM_DAILY_LIMIT_EXCEEDED
-            );
-        }
-
-        // Tăng số lần đánh giá AI 1:1 trong ngày của người dùng và lưu lại
-        userDailyAiUsage.increaseAiSessionEvaluationCount();
-        userDailyAiUsageRepositoryPort.save(userDailyAiUsage);
-
-        String fullTranscript = sessionStorePort.getFullTranscript(sessionId);
-        String personaContext = sessionStorePort.getPersonaContext(sessionId);
-
-        String effectiveTopic = (topic != null && !topic.isBlank()) ? topic : sessionStorePort.getTopic(sessionId);
+        String effectiveTopic = (topic != null && !topic.isBlank()) ? topic : sessionStorePort.getTopic(sessionCode);
 
         System.out.println("    Transcript length: " + fullTranscript.length() + " chars");
         System.out.println("    Persona context: " + (personaContext.isBlank() ? "(none)" : personaContext.substring(0, Math.min(80, personaContext.length()))));
 
-        ScoringResult result = aiScoringPort.score(sessionId, effectiveTopic, fullTranscript, speechMetaData, arsConfidence, personaContext);
+        ScoringResult result = aiScoringPort.score(sessionCode, effectiveTopic, fullTranscript, speechMetaData, arsConfidence, personaContext);
         System.out.println("    overallScore: " + result.overallScore() + "/100");
         System.out.println("    jlptEstimate: " + result.jlptEstimate());
 
         // Persist session result to DB
         try {
-            Long personaId = sessionStorePort.getPersonaId(sessionId);
-            String marugotoLevel = sessionStorePort.getMarugotoLevel(sessionId);
-            String formalityLevel = sessionStorePort.getFormalityLevel(sessionId);
-            int totalTurns = sessionStorePort.getTurnCount(sessionId);
-            Instant startedAt = sessionStorePort.getStartedAt(sessionId);
+            Long personaId = sessionStorePort.getPersonaId(sessionCode);
+            MarugotoLevel marugotoLevel = sessionStorePort.getMarugotoLevel(sessionCode);
+            FormalityLevel formalityLevel = sessionStorePort.getFormalityLevel(sessionCode);
+            int totalTurns = sessionStorePort.getTurnCount(sessionCode);
+            Instant startedAt = sessionStorePort.getStartedAt(sessionCode);
 
             Double asrConfidenceDouble = null;
             if (arsConfidence != null && !arsConfidence.isBlank() && !arsConfidence.equals("N/A")) {
@@ -109,7 +103,7 @@ public class EndSessionUseCase implements EndSessionInputPort {
             }
 
             speakingSessionRepositoryPort.saveSpeakingSession(
-                    sessionId,
+                    sessionCode,
                     userId,
                     personaId,
                     effectiveTopic,
@@ -121,7 +115,34 @@ public class EndSessionUseCase implements EndSessionInputPort {
                     startedAt,
                     result
             );
-            System.out.println("[EndSessionUseCase] Successfully saved session " + sessionId + " to DB for userId: " + userId);
+
+            crudUserDailyMissionInputPort.completeMission(
+                    new CompleteDailyMissionCommand(
+                            userId,
+                            MissionType.TALK_WITH_AI
+                    )
+            );
+
+            // Lấy thông tin về thành tích học tập của người dùng
+            UserLearningProgress progress = userLearningProgressRepositoryPort
+                    .findByUserId(userId)
+                    .orElseThrow(() -> new ApplicationException(
+                            UserLearningProgressErrorCode.USER_LEARNING_PROGRESS_NOT_FOUND,
+                            UserLearningProgressDetailMessageKey.USER_LEARNING_PROGRESS_NOT_FOUND_BY_USER_ID
+                    ));
+
+            progress = userLearningStreakInputPort.updateUserLearningStreak(
+                    UpdateUserStreakCommand.builder()
+                            .userLearningProgress(progress)
+                            .userId(userId)
+                            .now(Instant.now())
+                            .zoneId(SystemZoneId.HO_CHI_MINH_ZONE_ID)
+                            .build()
+            );
+
+            userLearningProgressRepositoryPort.save(progress);
+
+            System.out.println("[EndSessionUseCase] Successfully saved session " + sessionCode + " to DB for userId: " + userId);
         } catch (Exception e) {
             System.err.println("[EndSessionUseCase] Failed to persist session to DB: " + e.getMessage());
             throw new ApplicationException(
@@ -130,7 +151,7 @@ public class EndSessionUseCase implements EndSessionInputPort {
             );
         }
 
-        sessionStorePort.clearSession(sessionId);
+        sessionStorePort.clearSession(sessionCode);
         return result;
     }
 }

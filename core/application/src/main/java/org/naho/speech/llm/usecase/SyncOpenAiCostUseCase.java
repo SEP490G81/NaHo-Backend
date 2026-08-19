@@ -1,9 +1,9 @@
 package org.naho.speech.llm.usecase;
 
 import org.naho.cost.model.OpenAiDailyCost;
-import org.naho.speech.llm.port.in.SyncOpenAiCostInputPort;
-import org.naho.speech.llm.port.out.OpenAiCostManagementPort;
-import org.naho.speech.llm.port.out.OpenAiCostRepositoryPort;
+import org.naho.cost.port.in.SyncOpenAiCostInputPort;
+import org.naho.cost.port.out.OpenAiCostManagementPort;
+import org.naho.cost.port.out.OpenAiCostRepositoryPort;
 
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;

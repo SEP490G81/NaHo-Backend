@@ -25,17 +25,17 @@ public record UpdateSubscriptionPlanRequest(
         @Min(value = 0, message = "Recording seconds must be greater than or equal to 0")
         Integer maxSpeakingQuestionRecordingSeconds,
 
-        @Min(value = 0, message = "Session count must be greater than or equal to 0")
-        Integer maxConcurrentAiSessionCount,
-
         @Min(value = 0, message = "Turns must be greater than or equal to 0")
         Integer maxTurnsPerAiSession,
 
         @Min(value = 0, message = "Limit must be greater than or equal to 0")
-        Integer dailyAiSessionEvaluationLimit,
+        Integer dailyAiSessionStartLimit,
 
         @Min(value = 0, message = "Speaking seconds must be greater than or equal to 0")
         Integer maxAiTurnSpeakingSeconds,
+
+        @Min(value = 0, message = "Limit must be greater than or equal to 0")
+        Integer maxInProgressSessionCount,
 
         Boolean sampleAnswerEnabled,
 

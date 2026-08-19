@@ -3,6 +3,7 @@ package org.naho.speech.llm.controller.v1;
 import lombok.RequiredArgsConstructor;
 import org.naho.file.constant.FileAccessStatus;
 import org.naho.file.constant.FileFolderConstant;
+import org.naho.file.port.out.FileAudioConvertPort;
 import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.file.port.out.FileValidatorPort;
 import org.naho.file.result.StoredFile;
@@ -19,7 +20,6 @@ import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
 import org.naho.subscription.result.SubscriptionPlanResult;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/speaking/analysis")
 @RequiredArgsConstructor
 public class SpeakingAnalysisController {
 
@@ -37,9 +37,10 @@ public class SpeakingAnalysisController {
     private final FileStorageServicePort fileStorageServicePort;
     private final FileValidatorPort fileValidatorPort;
     private final GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
+    private final FileAudioConvertPort fileAudioConvertPort;
 
     @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_ANALYSIS_SUCCESS)
-    @PostMapping(value = "/analysis", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping
     public ResponseEntity<SpeakingAnalysisResponse> uploadAudioAndAnalyzeSpeaking(
             @RequestPart("file") MultipartFile file,
             @RequestParam("speakingQuestionId") Long speakingQuestionId,
@@ -50,16 +51,18 @@ public class SpeakingAnalysisController {
                 .getUserActiveSubscriptionPlan(payload.userId());
 
         try {
-            byte[] audioBytes = file.getBytes();
-
             // validate xem có phải file .wav không?
             // và validate xem thời lượng có hợp lệ không?
             // thời lượng tối đa được phép tùy thuộc vào Subscription plan
             // method cũng trả về thời lượng của file record
-            double duration = fileValidatorPort.validateWavFileAndDuration(
-                    audioBytes,
+            double duration = fileValidatorPort.validateAudioFileAndDuration(
+                    file.getBytes(),
                     subscriptionPlan.maxSpeakingQuestionRecordingSeconds().doubleValue()
             );
+
+            // chuyển file âm thanh thành dạng wav để Azure chấm
+            // định dạng PCM mono 16-bit ở 8 kHz hoặc 16 kHz
+            byte[] audioBytes = fileAudioConvertPort.convertToWav(file.getBytes());
 
             // Step 1: Lưu file vào local
             StoredFile storedFile = fileStorageServicePort.saveFileToLocal(file, FileFolderConstant.RECORDINGS, FileAccessStatus.PRIVATE);
@@ -69,7 +72,7 @@ public class SpeakingAnalysisController {
             SpeakingAnalysisCommand command = SpeakingAnalysisCommand.builder()
                     .userId(payload.userId())
                     .speakingQuestionId(speakingQuestionId)
-                    .durationSec((int) Math.ceil(duration))
+                    .duration(duration)
                     .storedFile(storedFile)
                     .audioBytes(audioBytes)
                     .dailySpeakingQuestionEvaluationLimit(subscriptionPlan.dailySpeakingQuestionEvaluationLimit())

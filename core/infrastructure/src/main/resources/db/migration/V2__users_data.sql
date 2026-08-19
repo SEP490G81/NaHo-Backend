@@ -70,8 +70,9 @@ VALUES (102,
         (SELECT id
          FROM roles
          WHERE role_name = 'LEARNER'));
+
 -- Content Manager
-INSERT INTO users (created_time,
+INSERT INTO users (id, created_time,
                    username,
                    email,
                    full_name,
@@ -81,7 +82,7 @@ INSERT INTO users (created_time,
                    status,
                    gender,
                    role_id)
-VALUES (NOW(),
+VALUES (103, NOW(),
         'tphong2004',
         'tphong610198@gmail.com',
         'Trần Phong',

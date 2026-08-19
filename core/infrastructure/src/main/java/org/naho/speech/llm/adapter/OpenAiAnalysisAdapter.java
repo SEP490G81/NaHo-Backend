@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.naho.i18n.message.llm.LlmDetailMessageKey;
 import org.naho.shared.exception.InfrastructureException;
+import org.naho.speech.llm.command.ContextCommand;
 import org.naho.speech.llm.constant.OpenAiConfigProperties;
 import org.naho.speech.llm.exception.LlmApplicationError;
 import org.naho.speech.llm.port.out.AiAnalysisPort;
@@ -28,7 +29,7 @@ public class OpenAiAnalysisAdapter implements AiAnalysisPort {
     }
 
     @Override
-    public String analyzeSpeaking(AiAnalysisPort.Context context) {
+    public String analyzeSpeaking(ContextCommand context) {
         String systemPromptTemplate = loadPromptTemplate("/prompt_template/speaking_question_evaluation.prompt");
 
         String systemPrompt = String.format(

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 public record ScoringResult(
-        String sessionId,
+        String sessionCode,
         int overallScore,
         String jlptEstimate,
         int fluencyScore,

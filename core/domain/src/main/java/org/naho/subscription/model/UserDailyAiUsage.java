@@ -11,15 +11,15 @@ public class UserDailyAiUsage {
     // Số lượt được AI chấm điểm trong Speaking Question
     private Integer speakingEvaluationCount;
 
-    // Số lượt được AI chấm điểm trong AI 1:1
-    private Integer aiSessionEvaluationCount;
+    // Số lượt bắt đầu AI 1:1
+    private Integer aiSessionStartCount;
 
     private UserDailyAiUsage(Builder builder) {
         this.id = builder.id;
         this.userId = builder.userId;
         this.usageDate = builder.usageDate;
         this.speakingEvaluationCount = builder.speakingEvaluationCount;
-        this.aiSessionEvaluationCount = builder.aiSessionEvaluationCount;
+        this.aiSessionStartCount = builder.aiSessionStartCount;
     }
 
     public static UserDailyAiUsage init(Long userId, LocalDate usageDate) {
@@ -27,7 +27,7 @@ public class UserDailyAiUsage {
                 .userId(userId)
                 .usageDate(usageDate)
                 .speakingEvaluationCount(0)
-                .aiSessionEvaluationCount(0)
+                .aiSessionStartCount(0)
                 .build();
     }
 
@@ -39,8 +39,8 @@ public class UserDailyAiUsage {
         this.speakingEvaluationCount++;
     }
 
-    public void increaseAiSessionEvaluationCount() {
-        this.aiSessionEvaluationCount++;
+    public void increaseAiSessionStartCount() {
+        this.aiSessionStartCount++;
     }
 
     public Long getId() {
@@ -59,8 +59,8 @@ public class UserDailyAiUsage {
         return speakingEvaluationCount;
     }
 
-    public Integer getAiSessionEvaluationCount() {
-        return aiSessionEvaluationCount;
+    public Integer getAiSessionStartCount() {
+        return aiSessionStartCount;
     }
 
     public static class Builder {
@@ -69,7 +69,7 @@ public class UserDailyAiUsage {
         private Long userId;
         private LocalDate usageDate;
         private Integer speakingEvaluationCount;
-        private Integer aiSessionEvaluationCount;
+        private Integer aiSessionStartCount;
 
         public Builder id(Long id) {
             this.id = id;
@@ -91,8 +91,8 @@ public class UserDailyAiUsage {
             return this;
         }
 
-        public Builder aiSessionEvaluationCount(Integer aiSessionEvaluationCount) {
-            this.aiSessionEvaluationCount = aiSessionEvaluationCount;
+        public Builder aiSessionStartCount(Integer aiSessionStartCount) {
+            this.aiSessionStartCount = aiSessionStartCount;
             return this;
         }
 

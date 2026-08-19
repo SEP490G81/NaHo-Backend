@@ -1,5 +1,8 @@
 package org.naho.speech.llm.result;
 
+import org.naho.persona.type.FormalityLevel;
+import org.naho.persona.type.MarugotoLevel;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -12,8 +15,8 @@ public record SpeakingSessionDetailResult(
         String sessionCode,
         String topic,
         Long personaId,
-        String marugotoLevel,
-        String formalityLevel,
+        MarugotoLevel marugotoLevel,
+        FormalityLevel formalityLevel,
         int totalTurns,
         int durationSeconds,
         Double asrConfidence,

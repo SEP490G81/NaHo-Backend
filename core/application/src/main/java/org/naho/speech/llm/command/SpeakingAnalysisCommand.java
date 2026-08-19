@@ -5,11 +5,10 @@ import org.naho.file.result.StoredFile;
 public record SpeakingAnalysisCommand(
         Long userId,
         Long speakingQuestionId,
-        Integer durationSec,
+        Double duration,
         StoredFile storedFile,
         byte[] audioBytes,
-        Integer dailySpeakingQuestionEvaluationLimit
-) {
+        Integer dailySpeakingQuestionEvaluationLimit) {
 
     public static Builder builder() {
         return new Builder();
@@ -18,7 +17,7 @@ public record SpeakingAnalysisCommand(
     public static final class Builder {
         private Long userId;
         private Long speakingQuestionId;
-        private Integer durationSec;
+        private Double duration;
         private StoredFile storedFile;
         private byte[] audioBytes;
         private Integer dailySpeakingQuestionEvaluationLimit;
@@ -33,8 +32,8 @@ public record SpeakingAnalysisCommand(
             return this;
         }
 
-        public Builder durationSec(Integer durationSec) {
-            this.durationSec = durationSec;
+        public Builder duration(Double duration) {
+            this.duration = duration;
             return this;
         }
 
@@ -57,11 +56,10 @@ public record SpeakingAnalysisCommand(
             return new SpeakingAnalysisCommand(
                     userId,
                     speakingQuestionId,
-                    durationSec,
+                    duration,
                     storedFile,
                     audioBytes,
-                    dailySpeakingQuestionEvaluationLimit
-            );
+                    dailySpeakingQuestionEvaluationLimit);
         }
     }
 }

@@ -1,12 +1,13 @@
 package org.naho.speech.llm.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
+import org.naho.i18n.message.llm.LlmTitleMessageKey;
 
 /**
  * HTTP Request DTO: Gửi text message trong speaking session.
  */
 public record ChatSessionMessageRequest(
-        @NotBlank(message = "transcript không được để trống")
+        @NotBlank(message = LlmTitleMessageKey.LLM_TRANSCRIPT_BLANK_TITLE)
         String transcript
 ) {
 }

@@ -7,7 +7,7 @@ import java.util.Map;
  * HTTP Response DTO: Kết quả chấm điểm speaking session.
  */
 public record ScoringResponse(
-        String sessionId,
+        String sessionCode,
         int overallScore,
         String jlptEstimate,
         Scores scores,

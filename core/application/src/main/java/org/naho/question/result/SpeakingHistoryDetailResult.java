@@ -20,6 +20,7 @@ public record SpeakingHistoryDetailResult(
     public record Report(
             Double average,
             Scores scores,
+            String fullTranscript,
             List<UserTranscriptItem> userTranscript,
             AiSuggestion aiSuggestion,
             List<PronunciationItem> pronunciation,
@@ -61,7 +62,8 @@ public record SpeakingHistoryDetailResult(
             String text,
             String furigana,
             String severity,
-            String note
+            String note,
+            Double accuracyScore
     ) {
     }
 

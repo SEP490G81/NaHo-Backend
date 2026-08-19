@@ -14,6 +14,10 @@ public enum LlmApplicationError implements ErrorCode {
             "LLM_A002",
             LlmTitleMessageKey.LLM_SESSION_ID_INVALID_TITLE,
             400),
+    LLM_SESSION_CODE_INVALID(
+            "LLM_A002",
+            LlmTitleMessageKey.LLM_SESSION_CODE_INVALID_TITLE,
+            400),
     LLM_USER_MESSAGE_INVALID(
             "LLM_A003",
             LlmTitleMessageKey.LLM_USER_MESSAGE_INVALID_TITLE,
@@ -21,6 +25,10 @@ public enum LlmApplicationError implements ErrorCode {
     LLM_SESSION_ALREADY_COMPLETED(
             "LLM_A004",
             LlmTitleMessageKey.LLM_SESSION_ALREADY_COMPLETED_TITLE,
+            400),
+    LLM_SESSION_ALREADY_STARTED(
+            "LLM_A008",
+            LlmTitleMessageKey.LLM_SESSION_ALREADY_STARTED_TITLE,
             400),
     LLM_SESSION_NOT_FOUND(
             "LLM_A005",
@@ -40,7 +48,7 @@ public enum LlmApplicationError implements ErrorCode {
             429),
     LLM_SAVE_SESSION_FAILED(
             "LLM_I005",
-            LlmDetailMessageKey.LLM_SAVE_SESSION_FAILED,
+            LlmTitleMessageKey.LLM_SAVE_SESSION_FAILED_TITLE,
             500),
     LLM_API_ERROR(
             "LLM_I001",

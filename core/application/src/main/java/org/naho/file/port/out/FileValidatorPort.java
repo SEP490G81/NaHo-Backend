@@ -5,6 +5,6 @@ public interface FileValidatorPort {
 
     double validateWavFileAndDuration(byte[] audioBytes, Double maxDuration);
 
-    double calculateWavDurationSeconds(byte[] audioBytes);
+    double validateAudioFileAndDuration(byte[] audioBytes, Double maxDuration);
 }
 

@@ -474,7 +474,9 @@ CREATE TABLE speaking_session_messages
     session_id             BIGINT                NOT NULL,
     turn_index             INT                   NOT NULL,
     sender_type            VARCHAR(20)           NOT NULL,
+    message_type           VARCHAR(20)           NULL,
     content                LONGTEXT              NOT NULL,
+    content_translation    LONGTEXT              NOT NULL,
     corrected_text         TEXT                  NULL,
     correction_explanation TEXT                  NULL,
     grammar_note           TEXT                  NULL,
@@ -493,6 +495,7 @@ CREATE TABLE speaking_sessions
     user_id          BIGINT                NOT NULL,
     persona_id       BIGINT                NULL,
     topic            VARCHAR(500)          NULL,
+    voice_name       VARCHAR(100)          NULL,
     marugoto_level   VARCHAR(30)           NULL,
     formality_level  VARCHAR(20)           NULL,
     duration_seconds INT                   NULL,
@@ -532,10 +535,10 @@ CREATE TABLE subscription_plans
     duration_days                            INT                   NULL,
     daily_speaking_question_evaluation_limit INT                   NOT NULL,
     max_speaking_question_recording_seconds  INT                   NOT NULL,
-    max_concurrent_ai_session_count          INT                   NOT NULL,
     max_turns_per_ai_session                 INT                   NOT NULL,
-    daily_ai_session_evaluation_limit        INT                   NOT NULL,
+    daily_ai_session_start_limit             INT                   NOT NULL,
     max_ai_turn_speaking_seconds             INT                   NOT NULL,
+    max_in_progress_session_count            INT                   NOT NULL,
     sample_answer_enabled                    BIT(1)                NOT NULL,
     status                                   VARCHAR(255)          NOT NULL,
     CONSTRAINT pk_subscription_plans PRIMARY KEY (id)
@@ -564,13 +567,13 @@ CREATE TABLE topics
 
 CREATE TABLE user_daily_ai_usages
 (
-    id                          BIGINT AUTO_INCREMENT NOT NULL,
-    created_time                datetime(6)           NOT NULL,
-    modified_time               datetime(6)           NULL,
-    usage_date                  date                  NOT NULL,
-    speaking_evaluation_count   INT                   NOT NULL,
-    ai_session_evaluation_count INT                   NOT NULL,
-    user_id                     BIGINT                NOT NULL,
+    id                        BIGINT AUTO_INCREMENT NOT NULL,
+    created_time              datetime(6)           NOT NULL,
+    modified_time             datetime(6)           NULL,
+    usage_date                date                  NOT NULL,
+    speaking_evaluation_count INT                   NOT NULL,
+    ai_session_start_count    INT                   NOT NULL,
+    user_id                   BIGINT                NOT NULL,
     CONSTRAINT pk_user_daily_ai_usages PRIMARY KEY (id)
 );
 

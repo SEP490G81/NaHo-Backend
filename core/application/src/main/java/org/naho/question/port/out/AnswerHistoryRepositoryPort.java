@@ -3,10 +3,10 @@ package org.naho.question.port.out;
 import org.naho.pagination.PageData;
 import org.naho.question.command.SpeakingHistoryFilterCommand;
 import org.naho.question.result.SpeakingHistoryListItemResult;
-import org.naho.speech.model.AnswerHistory;
-import org.naho.speech.model.ContentAssessment;
-import org.naho.speech.model.SpeechAssessment;
-import org.naho.speech.model.WordAssessment;
+import org.naho.speech.azure.model.AnswerHistory;
+import org.naho.speech.azure.model.ContentAssessment;
+import org.naho.speech.azure.model.SpeechAssessment;
+import org.naho.speech.azure.model.WordAssessment;
 
 import java.util.List;
 import java.util.Optional;

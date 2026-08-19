@@ -9,10 +9,10 @@ import org.naho.question.result.SpeakingHistoryListItemResult;
 import org.naho.speech.azure.entity.ContentAssessmentEntity;
 import org.naho.speech.azure.entity.SpeechAssessmentEntity;
 import org.naho.speech.azure.entity.WordAssessmentEntity;
-import org.naho.speech.model.AnswerHistory;
-import org.naho.speech.model.ContentAssessment;
-import org.naho.speech.model.SpeechAssessment;
-import org.naho.speech.model.WordAssessment;
+import org.naho.speech.azure.model.AnswerHistory;
+import org.naho.speech.azure.model.ContentAssessment;
+import org.naho.speech.azure.model.SpeechAssessment;
+import org.naho.speech.azure.model.WordAssessment;
 import org.naho.user.entity.UserEntity;
 
 import java.util.List;
@@ -39,6 +39,7 @@ public interface AnswerHistoryEntityMapper {
 
 
     @Mapping(target = "answerHistoryId", source = "answerHistory.id")
+    @Mapping(target = "averageScore", ignore = true)
     SpeechAssessment toDomain(SpeechAssessmentEntity entity);
 
     @Mapping(target = "id", source = "domain.id")

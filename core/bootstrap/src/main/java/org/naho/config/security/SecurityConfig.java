@@ -24,6 +24,11 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private static final String[] API_WHITELIST = {
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/swagger-resources/**",
+            "/webjars/**",
             "/oauth2/**",
             "/login/oauth2/code/**",
             "/api/v1/auth/login",

@@ -5,14 +5,14 @@ import org.naho.shared.exception.ApplicationException;
 import org.naho.speech.llm.exception.LlmApplicationError;
 
 public record SendMessageWithSessionCommand(
-        String sessionId,
+        String sessionCode,
         String userMessage
 ) {
     public SendMessageWithSessionCommand {
-        if (sessionId == null || sessionId.isBlank()) {
+        if (sessionCode == null || sessionCode.isBlank()) {
             throw new ApplicationException(
-                    LlmApplicationError.LLM_SESSION_ID_INVALID,
-                    LlmTitleMessageKey.LLM_SESSION_ID_INVALID_TITLE
+                    LlmApplicationError.LLM_SESSION_CODE_INVALID,
+                    LlmTitleMessageKey.LLM_SESSION_CODE_INVALID_TITLE
             );
         }
         if (userMessage == null || userMessage.isBlank()) {

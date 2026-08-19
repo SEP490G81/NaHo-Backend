@@ -5,7 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.shared.persistence.BaseEntity;
-import org.naho.speech.type.SpeechAssessmentErrorType;
+import org.naho.speech.azure.type.SpeechAssessmentErrorType;
 
 @SuperBuilder
 @Getter

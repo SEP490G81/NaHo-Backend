@@ -224,6 +224,7 @@ public class AuthUseCase implements AuthInputPort {
                         .fullName(command.getFullName())
                         .status(UserStatus.ACTIVE)
                         .isEmailVerified(true)
+                        .failedLoginAttemptCount(0)
                         .roleId(learnerRole.getId())
                         .build();
 

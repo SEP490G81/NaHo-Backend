@@ -3,8 +3,8 @@ package org.naho.cost.adapter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.naho.cost.model.OpenAiDailyCost;
+import org.naho.cost.port.out.OpenAiCostManagementPort;
 import org.naho.speech.llm.constant.OpenAiConfigProperties;
-import org.naho.speech.llm.port.out.OpenAiCostManagementPort;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;

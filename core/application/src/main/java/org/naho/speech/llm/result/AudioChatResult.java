@@ -1,5 +1,7 @@
 package org.naho.speech.llm.result;
 
+import java.util.List;
+
 public record AudioChatResult(
         String transcribedText,
         String assistantReply,
@@ -11,6 +13,7 @@ public record AudioChatResult(
         Double accuracyScore,
         Double fluencyScore,
         Double completenessScore,
-        Double pronunciationScore
+        Double pronunciationScore,
+        List<String> suggestedReplies
 ) {
 }

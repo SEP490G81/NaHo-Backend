@@ -65,6 +65,12 @@ public final class SpeechDetailMessageKey {
             "speech.audio.duration.exceeded";
     public static final String SPEECH_AZURE_EXECUTION_FAILED =
             "speech.azure.execution.failed";
+    public static final String SPEECH_STREAM_CLOSE_FAILED =
+            "speech.stream.close.failed";
+    public static final String SPEECH_TEMP_FILE_DELETE_FAILED =
+            "speech.temp.file.delete.failed";
+    public static final String SPEECH_SCORE_NULL =
+            "speech.score.null";
 
     // Azure Cost Management
     public static final String AZURE_COST_SUMMARY_GET_SUCCESS =

@@ -26,11 +26,12 @@ import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.question.result.SpeakingHistoryDetailResult;
 import org.naho.question.result.SpeakingHistoryListItemResult;
 import org.naho.shared.exception.ApplicationException;
-import org.naho.speech.model.AnswerHistory;
-import org.naho.speech.model.ContentAssessment;
-import org.naho.speech.model.SpeechAssessment;
-import org.naho.speech.model.WordAssessment;
-import org.naho.speech.type.SpeechAssessmentErrorType;
+import org.naho.speech.azure.model.AnswerHistory;
+import org.naho.speech.azure.model.ContentAssessment;
+import org.naho.speech.azure.model.SpeechAssessment;
+import org.naho.speech.azure.model.WordAssessment;
+import org.naho.speech.azure.result.WordAssessmentResult;
+import org.naho.speech.azure.type.SpeechAssessmentErrorType;
 import org.naho.user.exception.UserErrorCode;
 
 import java.util.ArrayList;
@@ -188,6 +189,8 @@ public class CrudAnswerHistoryUseCase implements CrudAnswerHistoryInputPort {
                 grammarScore,
                 naturalnessScore);
 
+        String fullTranscript = speech.getTranscriptText() != null ? speech.getTranscriptText() : "";
+
         List<SpeakingHistoryDetailResult.UserTranscriptItem> userTranscript = new ArrayList<>();
         JsonNode utNode = root.path("userTranscript");
         if (utNode.isArray()) {
@@ -203,6 +206,9 @@ public class CrudAnswerHistoryUseCase implements CrudAnswerHistoryInputPort {
                 }
                 userTranscript.add(new SpeakingHistoryDetailResult.UserTranscriptItem(text, error));
             }
+        }
+        if (userTranscript.isEmpty() && !fullTranscript.isBlank()) {
+            userTranscript.add(new SpeakingHistoryDetailResult.UserTranscriptItem(fullTranscript, null));
         }
 
         JsonNode sugNode = root.path("aiSuggestion");
@@ -233,21 +239,20 @@ public class CrudAnswerHistoryUseCase implements CrudAnswerHistoryInputPort {
                     severity = "warn";
                 }
 
-                String furigana = "";
-//                try {
-//                    var furiganaText = furiganaGenerationPort.generateFurigana(wordText);
-//                    if (furiganaText != null && furiganaText.getTokens() != null) {
-//                        StringBuilder sb = new StringBuilder();
-//                        for (var token : furiganaText.getTokens()) {
-//                            sb.append(
-//                                    token.getFurigana() != null && !token.getFurigana().isBlank() ? token.getFurigana()
-//                                            : token.getKanji());
-//                        }
-//                        furigana = sb.toString();
-//                    }
-//                } catch (Exception e) {
-//                    furigana = wordText;
-//                }
+                WordAssessmentResult wordPron = WordAssessmentResult.builder()
+                        .word(wordText)
+                        .accuracyScore(accScore)
+                        .errorType(errType != null ? errType : SpeechAssessmentErrorType.NONE)
+                        .build();
+
+                String furigana = wordEntity.getWordMarkup();
+                if (furigana == null || furigana.isBlank()) {
+                    try {
+                        furigana = furiganaGenerationPort.generateFuriganaMarkup(wordText);
+                    } catch (Exception e) {
+                        furigana = wordText;
+                    }
+                }
 
                 String note = wordNotes.get(wordText.toLowerCase());
                 if (note == null || note.isBlank()) {
@@ -264,7 +269,9 @@ public class CrudAnswerHistoryUseCase implements CrudAnswerHistoryInputPort {
                         wordText,
                         furigana,
                         severity,
-                        note));
+                        note,
+                        wordPron.accuracyScore()
+                ));
             }
         }
 
@@ -296,6 +303,7 @@ public class CrudAnswerHistoryUseCase implements CrudAnswerHistoryInputPort {
         SpeakingHistoryDetailResult.Report report = new SpeakingHistoryDetailResult.Report(
                 overallScore,
                 scores,
+                fullTranscript,
                 userTranscript,
                 aiSuggestion,
                 pronunciation,

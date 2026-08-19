@@ -1,10 +1,10 @@
 package org.naho.speech.llm.adapter;
 
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
+import org.naho.speech.azure.model.SpeechAssessment;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
 import org.naho.speech.llm.port.out.SpeechToTextPort;
 import org.naho.speech.llm.result.SpeechToTextResult;
-import org.naho.speech.model.SpeechAssessment;
 
 /**
  * Bridge Adapter: Nối AI module với Speech module thông qua SpeechToTextPort.
@@ -24,10 +24,10 @@ public class AzureSpeechToTextAdapter implements SpeechToTextPort {
     }
 
     @Override
-    public SpeechToTextResult transcribeAndAssess(byte[] audioBytes, String referenceText) {
+    public SpeechToTextResult transcribeAndAssess(byte[] audioBytes, String referenceText, Long userId) {
         // Gọi Azure Speech Service để nhận dạng giọng nói + đánh giá phát âm
-        SpeechAssessmentCommand command = new SpeechAssessmentCommand(audioBytes, referenceText);
-        SpeechAssessment assessment = azureSpeechServicePort.assess(command);
+        SpeechAssessmentCommand command = new SpeechAssessmentCommand(audioBytes, referenceText, userId);
+        SpeechAssessment assessment = azureSpeechServicePort.assessAudio(command);
 
         // Map domain model → application result DTO
         return new SpeechToTextResult(

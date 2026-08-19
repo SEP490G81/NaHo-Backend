@@ -20,10 +20,10 @@ public class SubscriptionPlanResultMapper {
                 plan.getDurationDays(),
                 plan.getDailySpeakingQuestionEvaluationLimit(),
                 plan.getMaxSpeakingQuestionRecordingSeconds(),
-                plan.getMaxConcurrentAiSessionCount(),
                 plan.getMaxTurnsPerAiSession(),
-                plan.getDailyAiSessionEvaluationLimit(),
+                plan.getDailyAiSessionStartLimit(),
                 plan.getMaxAiTurnSpeakingSeconds(),
+                plan.getMaxInProgressSessionCount(),
                 plan.isSampleAnswerEnabled(),
                 plan.getStatus());
     }

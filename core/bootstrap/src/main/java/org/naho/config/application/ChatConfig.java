@@ -4,10 +4,13 @@ import org.naho.book.port.out.BookRepositoryPort;
 import org.naho.book.port.out.LessonRepositoryPort;
 import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.book.port.out.TopicRepositoryPort;
+import org.naho.daily.port.in.CrudUserDailyMissionInputPort;
 import org.naho.file.port.in.UploadFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileResultMapperPort;
+import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.furigana.port.out.FuriganaGenerationPort;
+import org.naho.learning.port.in.UserLearningStreakInputPort;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
 import org.naho.persona.port.out.PersonaRepositoryPort;
@@ -15,13 +18,19 @@ import org.naho.question.port.in.CompleteSpeakingQuestionInputPort;
 import org.naho.question.port.out.AnswerHistoryRepositoryPort;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.shared.port.out.TransactionPort;
+import org.naho.speech.azure.mapper.WordAssessmentResultMapper;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
 import org.naho.speech.azure.port.out.TextToSpeechServicePort;
 import org.naho.speech.llm.adapter.*;
 import org.naho.speech.llm.constant.OpenAiConfigProperties;
+import org.naho.speech.llm.helper.SpeakingAnalysisHelper;
+import org.naho.speech.llm.helper.SpeakingSessionHelper;
+import org.naho.speech.llm.mapper.SpeakingSessionMessageResultMapper;
+import org.naho.speech.llm.mapper.SpeakingSessionResultMapper;
 import org.naho.speech.llm.port.in.*;
 import org.naho.speech.llm.port.out.*;
 import org.naho.speech.llm.usecase.*;
+import org.naho.speech.llm.validator.SessionValidator;
 import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
 import org.naho.subscription.port.out.UserDailyAiUsageRepositoryPort;
 import org.naho.user.port.out.UserRepositoryPort;
@@ -66,6 +75,53 @@ public class ChatConfig {
         return new AzureSpeechToTextAdapter(azureSpeechServicePort);
     }
 
+    @Bean
+    public SessionValidator sessionValidator(
+            SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
+            SessionStorePort sessionStorePort,
+            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort,
+            UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort
+    ) {
+        return new SessionValidator(
+                speakingSessionRepositoryPort,
+                sessionStorePort,
+                getActiveSubscriptionInputPort,
+                userDailyAiUsageRepositoryPort
+        );
+    }
+
+    @Bean
+    public SpeakingSessionHelper speakingSessionHelper(
+            SessionStorePort sessionStorePort,
+            SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
+            TextToSpeechServicePort textToSpeechServicePort
+    ) {
+        return new SpeakingSessionHelper(
+                sessionStorePort,
+                speakingSessionRepositoryPort,
+                textToSpeechServicePort
+        );
+    }
+
+    @Bean
+    public SpeakingSessionMessageResultMapper speakingSessionMessageResultMapper(
+            SpeakingSessionHelper speakingSessionHelper,
+            FileStorageServicePort fileStorageServicePort
+    ) {
+        return new SpeakingSessionMessageResultMapper(speakingSessionHelper, fileStorageServicePort);
+    }
+
+    @Bean
+    public SpeakingSessionResultMapper speakingSessionResultMapper(
+            SpeakingSessionMessageRepositoryPort speakingSessionMessageRepositoryPort,
+            SpeakingSessionMessageResultMapper speakingSessionMessageResultMapper
+    ) {
+        return new SpeakingSessionResultMapper(
+                speakingSessionMessageRepositoryPort,
+                speakingSessionMessageResultMapper
+        );
+    }
+
     // ─── Input Port UseCases ─────────────────────────────────────
 
     @Bean
@@ -74,22 +130,24 @@ public class ChatConfig {
             SessionStorePort sessionStorePort,
             SpeechToTextPort speechToTextPort,
             PersonaRepositoryPort personaRepositoryPort,
-            TextToSpeechServicePort textToSpeechServicePort,
             SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
             FileRepositoryPort fileRepositoryPort,
             UploadFileInputPort uploadFileInputPort,
-            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort
+            SessionValidator sessionValidator,
+            SpeakingSessionHelper speakingSessionHelper,
+            SpeakingSessionResultMapper speakingSessionResultMapper
     ) {
         return new SpeakingSessionUseCase(
                 aiChatPort,
                 sessionStorePort,
                 speechToTextPort,
                 personaRepositoryPort,
-                textToSpeechServicePort,
                 speakingSessionRepositoryPort,
                 fileRepositoryPort,
                 uploadFileInputPort,
-                getActiveSubscriptionInputPort
+                sessionValidator,
+                speakingSessionHelper,
+                speakingSessionResultMapper
         );
     }
 
@@ -98,15 +156,19 @@ public class ChatConfig {
             SessionStorePort sessionStorePort,
             AiScoringPort aiScoringPort,
             SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
-            UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort,
-            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort
+            CrudUserDailyMissionInputPort crudUserDailyMissionInputPort,
+            UserLearningStreakInputPort userLearningStreakInputPort,
+            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
+            TransactionPort transactionPort
     ) {
         return new EndSessionUseCase(
                 sessionStorePort,
                 aiScoringPort,
                 speakingSessionRepositoryPort,
-                userDailyAiUsageRepositoryPort,
-                getActiveSubscriptionInputPort
+                crudUserDailyMissionInputPort,
+                userLearningStreakInputPort,
+                userLearningProgressRepositoryPort,
+                transactionPort
         );
     }
 
@@ -122,9 +184,9 @@ public class ChatConfig {
 
 
     @Bean
-    public SpeakingAnalysisInputPort speakingAnalysisInputPort(
+    public SpeakingAnalysisHelper speakingAnalysisHelper(
             UserRepositoryPort userRepositoryPort,
-            SpeakingQuestionRepositoryPort questionRepositoryPort,
+            SpeakingQuestionRepositoryPort speakingQuestionRepositoryPort,
             FileRepositoryPort fileRepositoryPort,
             AnswerHistoryRepositoryPort answerHistoryRepositoryPort,
             AzureSpeechServicePort azureSpeechServicePort,
@@ -133,18 +195,15 @@ public class ChatConfig {
             ObjectiveRepositoryPort objectiveRepositoryPort,
             BookRepositoryPort bookRepositoryPort,
             LearningPathNodeRepositoryPort learningPathNodeRepositoryPort,
-            AiAnalysisPort aiAnalysisPort,
-            TransactionPort transactionPort,
             CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort,
             UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
             FileResultMapperPort fileResultMapperPort,
-            UploadFileInputPort uploadFileInputPort,
-            UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort,
+            WordAssessmentResultMapper wordAssessmentResultMapper,
             FuriganaGenerationPort furiganaGenerationPort
     ) {
-        return new SpeakingAnalysisUseCase(
+        return new SpeakingAnalysisHelper(
                 userRepositoryPort,
-                questionRepositoryPort,
+                speakingQuestionRepositoryPort,
                 fileRepositoryPort,
                 answerHistoryRepositoryPort,
                 azureSpeechServicePort,
@@ -153,24 +212,42 @@ public class ChatConfig {
                 objectiveRepositoryPort,
                 bookRepositoryPort,
                 learningPathNodeRepositoryPort,
-                aiAnalysisPort,
-                transactionPort,
                 completeSpeakingQuestionInputPort,
                 userLearningProgressRepositoryPort,
                 fileResultMapperPort,
-                uploadFileInputPort,
-                userDailyAiUsageRepositoryPort,
+                wordAssessmentResultMapper,
                 furiganaGenerationPort
         );
     }
 
     @Bean
-    public SpeakingSessionCleanupInputPort speakingSessionCleanupInputPort(
-            SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
+    public SpeakingAnalysisInputPort speakingAnalysisInputPort(
+            AiAnalysisPort aiAnalysisPort,
             TransactionPort transactionPort,
-            SessionStorePort sessionStorePort
+            UploadFileInputPort uploadFileInputPort,
+            UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort,
+            SpeakingAnalysisHelper speakingAnalysisHelper
     ) {
-        return new SpeakingSessionCleanupUseCase(speakingSessionRepositoryPort, transactionPort, sessionStorePort);
+        return new SpeakingAnalysisUseCase(
+                aiAnalysisPort,
+                transactionPort,
+                uploadFileInputPort,
+                userDailyAiUsageRepositoryPort,
+                speakingAnalysisHelper
+        );
+    }
+
+    @Bean
+    public SpeakingSessionCleanupInputPort speakingSessionCleanupInputPort(
+            SessionStorePort sessionStorePort,
+            SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
+            SessionValidator sessionValidator
+    ) {
+        return new SpeakingSessionCleanupUseCase(
+                sessionStorePort,
+                speakingSessionRepositoryPort,
+                sessionValidator
+        );
     }
 }
 

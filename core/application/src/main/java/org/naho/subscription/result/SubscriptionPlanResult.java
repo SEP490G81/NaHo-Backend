@@ -16,10 +16,10 @@ public record SubscriptionPlanResult(
         Integer durationDays,
         Integer dailySpeakingQuestionEvaluationLimit,
         Integer maxSpeakingQuestionRecordingSeconds,
-        Integer maxConcurrentAiSessionCount,
         Integer maxTurnsPerAiSession,
-        Integer dailyAiSessionEvaluationLimit,
+        Integer dailyAiSessionStartLimit,
         Integer maxAiTurnSpeakingSeconds,
+        Integer maxInProgressSessionCount,
         Boolean sampleAnswerEnabled,
         PlanStatus status
 ) {

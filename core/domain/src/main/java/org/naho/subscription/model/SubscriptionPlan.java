@@ -17,10 +17,10 @@ public class SubscriptionPlan {
     private Integer durationDays;
     private Integer dailySpeakingQuestionEvaluationLimit;
     private Integer maxSpeakingQuestionRecordingSeconds;
-    private Integer maxConcurrentAiSessionCount;
     private Integer maxTurnsPerAiSession;
-    private Integer dailyAiSessionEvaluationLimit;
+    private Integer dailyAiSessionStartLimit;
     private Integer maxAiTurnSpeakingSeconds;
+    private Integer maxInProgressSessionCount;
     private Boolean sampleAnswerEnabled;
     private PlanStatus status;
 
@@ -33,10 +33,10 @@ public class SubscriptionPlan {
         this.durationDays = builder.durationDays;
         this.dailySpeakingQuestionEvaluationLimit = builder.dailySpeakingQuestionEvaluationLimit;
         this.maxSpeakingQuestionRecordingSeconds = builder.maxSpeakingQuestionRecordingSeconds;
-        this.maxConcurrentAiSessionCount = builder.maxConcurrentAiSessionCount;
         this.maxTurnsPerAiSession = builder.maxTurnsPerAiSession;
-        this.dailyAiSessionEvaluationLimit = builder.dailyAiSessionEvaluationLimit;
+        this.dailyAiSessionStartLimit = builder.dailyAiSessionStartLimit;
         this.maxAiTurnSpeakingSeconds = builder.maxAiTurnSpeakingSeconds;
+        this.maxInProgressSessionCount = builder.maxInProgressSessionCount;
         this.sampleAnswerEnabled = builder.sampleAnswerEnabled;
         this.status = builder.status;
     }
@@ -53,10 +53,10 @@ public class SubscriptionPlan {
             Integer durationDays,
             Integer dailySpeakingQuestionEvaluationLimit,
             Integer maxSpeakingQuestionRecordingSeconds,
-            Integer maxConcurrentAiSessionCount,
             Integer maxTurnsPerAiSession,
-            Integer dailyAiSessionEvaluationLimit,
+            Integer dailyAiSessionStartLimit,
             Integer maxAiTurnSpeakingSeconds,
+            Integer maxInProgressSessionCount,
             Boolean sampleAnswerEnabled) {
         return builder()
                 .code(code)
@@ -66,10 +66,10 @@ public class SubscriptionPlan {
                 .durationDays(durationDays)
                 .dailySpeakingQuestionEvaluationLimit(dailySpeakingQuestionEvaluationLimit)
                 .maxSpeakingQuestionRecordingSeconds(maxSpeakingQuestionRecordingSeconds)
-                .maxConcurrentAiSessionCount(maxConcurrentAiSessionCount)
                 .maxTurnsPerAiSession(maxTurnsPerAiSession)
-                .dailyAiSessionEvaluationLimit(dailyAiSessionEvaluationLimit)
+                .dailyAiSessionStartLimit(dailyAiSessionStartLimit)
                 .maxAiTurnSpeakingSeconds(maxAiTurnSpeakingSeconds)
+                .maxInProgressSessionCount(maxInProgressSessionCount)
                 .sampleAnswerEnabled(sampleAnswerEnabled)
                 .status(PlanStatus.ACTIVE)
                 .build();
@@ -90,10 +90,10 @@ public class SubscriptionPlan {
             Integer durationDays,
             Integer dailySpeakingQuestionEvaluationLimit,
             Integer maxSpeakingQuestionRecordingSeconds,
-            Integer maxConcurrentAiSessionCount,
             Integer maxTurnsPerAiSession,
-            Integer dailyAiSessionEvaluationLimit,
+            Integer dailyAiSessionStartLimit,
             Integer maxAiTurnSpeakingSeconds,
+            Integer maxInProgressSessionCount,
             Boolean sampleAnswerEnabled,
             PlanStatus status) {
         if (description != null) {
@@ -121,17 +121,17 @@ public class SubscriptionPlan {
         if (maxSpeakingQuestionRecordingSeconds != null) {
             this.maxSpeakingQuestionRecordingSeconds = maxSpeakingQuestionRecordingSeconds;
         }
-        if (maxConcurrentAiSessionCount != null) {
-            this.maxConcurrentAiSessionCount = maxConcurrentAiSessionCount;
-        }
         if (maxTurnsPerAiSession != null) {
             this.maxTurnsPerAiSession = maxTurnsPerAiSession;
         }
-        if (dailyAiSessionEvaluationLimit != null) {
-            this.dailyAiSessionEvaluationLimit = dailyAiSessionEvaluationLimit;
+        if (dailyAiSessionStartLimit != null) {
+            this.dailyAiSessionStartLimit = dailyAiSessionStartLimit;
         }
         if (maxAiTurnSpeakingSeconds != null) {
             this.maxAiTurnSpeakingSeconds = maxAiTurnSpeakingSeconds;
+        }
+        if (maxInProgressSessionCount != null) {
+            this.maxInProgressSessionCount = maxInProgressSessionCount;
         }
         if (sampleAnswerEnabled != null) {
             this.sampleAnswerEnabled = sampleAnswerEnabled;
@@ -174,20 +174,20 @@ public class SubscriptionPlan {
         return maxSpeakingQuestionRecordingSeconds;
     }
 
-    public Integer getMaxConcurrentAiSessionCount() {
-        return maxConcurrentAiSessionCount;
-    }
-
     public Integer getMaxTurnsPerAiSession() {
         return maxTurnsPerAiSession;
     }
 
-    public Integer getDailyAiSessionEvaluationLimit() {
-        return dailyAiSessionEvaluationLimit;
+    public Integer getDailyAiSessionStartLimit() {
+        return dailyAiSessionStartLimit;
     }
 
     public Integer getMaxAiTurnSpeakingSeconds() {
         return maxAiTurnSpeakingSeconds;
+    }
+
+    public Integer getMaxInProgressSessionCount() {
+        return maxInProgressSessionCount;
     }
 
     public Boolean isSampleAnswerEnabled() {
@@ -207,10 +207,10 @@ public class SubscriptionPlan {
         private Integer durationDays;
         private Integer dailySpeakingQuestionEvaluationLimit;
         private Integer maxSpeakingQuestionRecordingSeconds;
-        private Integer maxConcurrentAiSessionCount;
         private Integer maxTurnsPerAiSession;
-        private Integer dailyAiSessionEvaluationLimit;
+        private Integer dailyAiSessionStartLimit;
         private Integer maxAiTurnSpeakingSeconds;
+        private Integer maxInProgressSessionCount;
         private Boolean sampleAnswerEnabled;
         private PlanStatus status;
 
@@ -257,23 +257,23 @@ public class SubscriptionPlan {
             return this;
         }
 
-        public Builder maxConcurrentAiSessionCount(Integer maxConcurrentAiSessionCount) {
-            this.maxConcurrentAiSessionCount = maxConcurrentAiSessionCount;
-            return this;
-        }
-
         public Builder maxTurnsPerAiSession(Integer maxTurnsPerAiSession) {
             this.maxTurnsPerAiSession = maxTurnsPerAiSession;
             return this;
         }
 
-        public Builder dailyAiSessionEvaluationLimit(Integer dailyAiSessionEvaluationLimit) {
-            this.dailyAiSessionEvaluationLimit = dailyAiSessionEvaluationLimit;
+        public Builder dailyAiSessionStartLimit(Integer dailyAiSessionStartLimit) {
+            this.dailyAiSessionStartLimit = dailyAiSessionStartLimit;
             return this;
         }
 
         public Builder maxAiTurnSpeakingSeconds(Integer maxAiTurnSpeakingSeconds) {
             this.maxAiTurnSpeakingSeconds = maxAiTurnSpeakingSeconds;
+            return this;
+        }
+
+        public Builder maxInProgressSessionCount(Integer maxInProgressSessionCount) {
+            this.maxInProgressSessionCount = maxInProgressSessionCount;
             return this;
         }
 

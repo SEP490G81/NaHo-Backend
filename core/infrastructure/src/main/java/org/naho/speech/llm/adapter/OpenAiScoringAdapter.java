@@ -36,7 +36,7 @@ public class OpenAiScoringAdapter implements AiScoringPort {
     }
 
     @Override
-    public ScoringResult score(String sessionId,
+    public ScoringResult score(String sessionCode,
                                String topic,
                                String fullTranscript,
                                String speechMetadata,
@@ -66,7 +66,7 @@ public class OpenAiScoringAdapter implements AiScoringPort {
             }
             String rawContent = extractContent(response.body());
             System.out.println("[OpenAiScoringAdapter] Raw JSON: " + rawContent);
-            return parseScoringResult(sessionId, rawContent);
+            return parseScoringResult(sessionCode, rawContent);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new InfrastructureException(
@@ -145,7 +145,7 @@ public class OpenAiScoringAdapter implements AiScoringPort {
     }
 
 
-    private ScoringResult parseScoringResult(String sessionId, String json) {
+    private ScoringResult parseScoringResult(String sessionCode, String json) {
         String cleaned = extractJsonBlock(json);
         try {
             JsonNode root = OBJECT_MAPPER.readTree(cleaned);
@@ -212,7 +212,7 @@ public class OpenAiScoringAdapter implements AiScoringPort {
             }
 
             return new ScoringResult(
-                    sessionId,
+                    sessionCode,
                     overallScore,
                     jlptEstimate,
                     fluency,

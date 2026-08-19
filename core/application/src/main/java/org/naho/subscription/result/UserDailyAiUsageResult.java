@@ -7,7 +7,7 @@ public record UserDailyAiUsageResult(
         Long userId,
         LocalDate usageDate,
         Integer speakingEvaluationCount,
-        Integer aiSessionEvaluationCount
+        Integer aiSessionStartCount
 ) {
 
     public static Builder builder() {
@@ -20,7 +20,7 @@ public record UserDailyAiUsageResult(
         private Long userId;
         private LocalDate usageDate;
         private Integer speakingEvaluationCount;
-        private Integer aiSessionEvaluationCount;
+        private Integer aiSessionStartCount;
 
         public Builder id(Long id) {
             this.id = id;
@@ -42,8 +42,8 @@ public record UserDailyAiUsageResult(
             return this;
         }
 
-        public Builder aiSessionEvaluationCount(Integer aiSessionEvaluationCount) {
-            this.aiSessionEvaluationCount = aiSessionEvaluationCount;
+        public Builder aiSessionStartCount(Integer aiSessionStartCount) {
+            this.aiSessionStartCount = aiSessionStartCount;
             return this;
         }
 
@@ -53,7 +53,7 @@ public record UserDailyAiUsageResult(
                     userId,
                     usageDate,
                     speakingEvaluationCount,
-                    aiSessionEvaluationCount
+                    aiSessionStartCount
             );
         }
     }

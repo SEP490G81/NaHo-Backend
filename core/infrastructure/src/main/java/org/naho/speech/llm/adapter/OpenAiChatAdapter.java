@@ -148,19 +148,17 @@ public class OpenAiChatAdapter implements AiChatPort {
 
             return String.format(
                     Locale.US,
-                    "{\"model\":\"%s\",\"messages\":%s,\"max_tokens\":%d,\"temperature\":%.1f,\"response_format\":{\"type\":\"json_object\"}%s}",
+                    "{\"model\":\"%s\",\"messages\":%s,\"max_tokens\":%d,\"temperature\":%.1f%s}",
                     properties.getChatModel(),
                     messagesJson,
                     properties.getMaxTokens(),
                     properties.getTemperature(),
-                    streamField
-            );
+                    streamField);
         } catch (Exception e) {
             throw new InfrastructureException(
                     LlmApplicationError.LLM_PARSE_ERROR,
                     LlmDetailMessageKey.LLM_PARSE_ERROR,
-                    e.getMessage()
-            );
+                    e.getMessage());
         }
     }
 
@@ -177,8 +175,7 @@ public class OpenAiChatAdapter implements AiChatPort {
                     }
                   ],
                   "max_tokens": %d,
-                  "temperature": %.1f,
-                  "response_format": { "type": "json_object" }%s
+                  "temperature": %.1f%s
                 }
                 """.formatted(
                 properties.getChatModel(),
