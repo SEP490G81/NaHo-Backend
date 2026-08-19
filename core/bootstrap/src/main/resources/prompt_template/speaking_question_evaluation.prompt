@@ -20,7 +20,7 @@ All evaluation must be **anchored to the specific lesson context** provided belo
 # CURRICULUM CONTEXT
 Curriculum: %s
 Level: %s
-Lesson Order (STT): %s
+Lesson Order: %s
 Topic: %s
 Lesson: %s
 Can-do Objective: %s
@@ -35,7 +35,7 @@ Can-do Objective: %s
 
 # SPEAKING TASK
 Question Title: %s
-Question Detail: %s
+Question Description: %s
 → The learner's answer MUST be evaluated against this specific question. An answer that is off-topic or ignores the question detail should score LOW on contentRelevantScore.
 
 # LEARNER TRANSCRIPT

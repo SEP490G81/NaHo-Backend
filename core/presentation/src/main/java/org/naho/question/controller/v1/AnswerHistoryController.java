@@ -4,13 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.i18n.message.speech.SpeechDetailMessageKey;
 import org.naho.pagination.PageData;
-import org.naho.question.command.SpeakingHistoryFilterCommand;
 import org.naho.question.dto.mapper.AnswerHistoryResponseMapper;
 import org.naho.question.dto.request.SpeakingHistoryQueryRequest;
-import org.naho.question.dto.response.SpeakingHistoryDetailResponse;
 import org.naho.question.dto.response.SpeakingHistoryListItemResponse;
 import org.naho.question.port.in.CrudAnswerHistoryInputPort;
-import org.naho.question.result.SpeakingHistoryListItemResult;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.HttpStatus;
@@ -48,33 +45,6 @@ public class AnswerHistoryController {
             @AuthenticationPrincipal AccessTokenPayload payload,
             @RequestBody(required = false) SpeakingHistoryQueryRequest request
     ) {
-        if (request == null) {
-            request = new SpeakingHistoryQueryRequest();
-        }
-        SpeakingHistoryFilterCommand command = answerHistoryResponseMapper.requestToCommand(request, payload.userId());
-
-        PageData<SpeakingHistoryListItemResult> result = crudAnswerHistoryInputPort.getUserHistoryList(command);
-
-        PageData<SpeakingHistoryListItemResponse> response = PageData.<SpeakingHistoryListItemResponse>builder()
-                .pageMeta(result.getPageMeta())
-                .data(result.getData()
-                        .stream()
-                        .map(answerHistoryResponseMapper::toListItemResponse)
-                        .toList()
-                )
-                .build();
-
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping(value = "/{answerHistoryId}/speaking-question")
-    @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_HISTORY_GET_DETAIL_SUCCESS)
-    public ResponseEntity<SpeakingHistoryDetailResponse> getSpeakingHistoryDetail(
-            @PathVariable Long answerHistoryId,
-            @AuthenticationPrincipal AccessTokenPayload payload
-    ) {
-        Long userId = payload != null ? payload.userId() : null;
-        var result = crudAnswerHistoryInputPort.getSpeakingQuestionAnswerHistoryById(answerHistoryId, userId);
-        return ResponseEntity.ok(answerHistoryResponseMapper.toDetailResponse(result));
+        return null;
     }
 }

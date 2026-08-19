@@ -31,6 +31,46 @@ public class AiFeedback {
         return new Builder();
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public Double getGrammarScore() {
+        return grammarScore;
+    }
+
+    public Double getVocabularyScore() {
+        return vocabularyScore;
+    }
+
+    public Double getNaturalnessScore() {
+        return naturalnessScore;
+    }
+
+    public Double getContentRelevantScore() {
+        return contentRelevantScore;
+    }
+
+    public Double getAverageScore() {
+        return averageScore;
+    }
+
+    public String getSuggestJapaneseAnswer() {
+        return suggestJapaneseAnswer;
+    }
+
+    public String getSuggestAnswerTranslation() {
+        return suggestAnswerTranslation;
+    }
+
+    public List<UsedVocabularyAndGrammar> getUsedVocabulariesAndGrammars() {
+        return usedVocabulariesAndGrammars;
+    }
+
+    public List<UserAnswerError> getUserAnswerErrors() {
+        return userAnswerErrors;
+    }
+
     public static class Builder {
         private Long id;
         private Double grammarScore;
@@ -98,45 +138,5 @@ public class AiFeedback {
         public AiFeedback build() {
             return new AiFeedback(this);
         }
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Double getGrammarScore() {
-        return grammarScore;
-    }
-
-    public Double getVocabularyScore() {
-        return vocabularyScore;
-    }
-
-    public Double getNaturalnessScore() {
-        return naturalnessScore;
-    }
-
-    public Double getContentRelevantScore() {
-        return contentRelevantScore;
-    }
-
-    public Double getAverageScore() {
-        return averageScore;
-    }
-
-    public String getSuggestJapaneseAnswer() {
-        return suggestJapaneseAnswer;
-    }
-
-    public String getSuggestAnswerTranslation() {
-        return suggestAnswerTranslation;
-    }
-
-    public List<UsedVocabularyAndGrammar> getUsedVocabulariesAndGrammars() {
-        return usedVocabulariesAndGrammars;
-    }
-
-    public List<UserAnswerError> getUserAnswerErrors() {
-        return userAnswerErrors;
     }
 }

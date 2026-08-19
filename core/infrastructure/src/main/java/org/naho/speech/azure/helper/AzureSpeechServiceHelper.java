@@ -3,11 +3,8 @@ package org.naho.speech.azure.helper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.cognitiveservices.speech.*;
-import com.microsoft.cognitiveservices.speech.audio.PushAudioInputStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.bramp.ffmpeg.FFprobe;
-import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import org.naho.i18n.message.speech.SpeechDetailMessageKey;
 import org.naho.shared.exception.InfrastructureException;
 import org.naho.speech.azure.constant.AzurePronunciationScoreKey;
@@ -17,90 +14,17 @@ import org.naho.speech.azure.model.WordAssessment;
 import org.naho.speech.azure.type.SpeechAssessmentErrorType;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class AzureSpeechServiceHelper {
-    private static final int MAX_AUDIO_SIZE_BYTES = 20 * 1024 * 1024; // 20MB
-    private static final double MAX_AUDIO_DURATION_SECONDS = 150.0;
     private static final long EXTRA_PROCESSING_TIMEOUT_SECONDS = 30L;
     private static final long MAX_PROCESSING_TIMEOUT_SECONDS = 180L;
-    private static final int FFMPEG_MAX_CONCURRENT_PROCESS = 10;
-    private static final int FFMPEG_BUFFER_SIZE = 4096;
-    private static final Semaphore FFMPEG_SEMAPHORE = new Semaphore(FFMPEG_MAX_CONCURRENT_PROCESS);
     private final ObjectMapper objectMapper;
-    private final FFprobe ffprobe;
-
-    public Path createTempInputAudioFile(byte[] audioBytes) {
-        try {
-            Path inputFile = Files.createTempFile("input_audio_", ".audio");
-            Files.write(inputFile, audioBytes);
-            return inputFile;
-        } catch (IOException e) {
-            throw new InfrastructureException(
-                    AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
-                    SpeechDetailMessageKey.SPEECH_AUDIO_FILE_EMPTY);
-        }
-    }
-
-    public void validateAudioSize(byte[] rawAudioBytes) {
-        if (rawAudioBytes == null || rawAudioBytes.length == 0) {
-            throw new InfrastructureException(
-                    AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
-                    SpeechDetailMessageKey.SPEECH_AUDIO_FILE_EMPTY);
-        }
-
-        if (rawAudioBytes.length > MAX_AUDIO_SIZE_BYTES) {
-            throw new InfrastructureException(
-                    AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
-                    SpeechDetailMessageKey.SPEECH_AUDIO_FILE_TOO_LARGE);
-        }
-    }
-
-    public double probeAudioDurationSeconds(Path inputFile) {
-        try {
-            FFmpegProbeResult probeResult = ffprobe.probe(inputFile.toString());
-            if (probeResult == null || probeResult.getFormat() == null) {
-                throw new InfrastructureException(
-                        AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
-                        SpeechDetailMessageKey.SPEECH_AUDIO_DURATION_INVALID);
-            }
-            return probeResult.getFormat().duration;
-        } catch (InfrastructureException e) {
-            throw e;
-        } catch (Exception e) {
-            log.error("Cannot determine audio duration using FFprobe", e);
-            throw new InfrastructureException(
-                    AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
-                    SpeechDetailMessageKey.SPEECH_AUDIO_DURATION_INVALID);
-        }
-    }
-
-    public void validateAudioDuration(double durationSeconds) {
-        if (durationSeconds <= 0 || Double.isNaN(durationSeconds) || Double.isInfinite(durationSeconds)) {
-            throw new InfrastructureException(
-                    AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
-                    SpeechDetailMessageKey.SPEECH_AUDIO_DURATION_INVALID);
-        }
-
-        if (durationSeconds > MAX_AUDIO_DURATION_SECONDS) {
-            throw new InfrastructureException(
-                    AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
-                    SpeechDetailMessageKey.SPEECH_AUDIO_DURATION_EXCEEDED);
-        }
-    }
 
     public long calculateProcessingTimeoutSeconds(double durationSeconds) {
         if (durationSeconds <= 0 || Double.isNaN(durationSeconds) || Double.isInfinite(durationSeconds)) {
@@ -109,102 +33,6 @@ public class AzureSpeechServiceHelper {
         return Math.min(
                 (long) Math.ceil(durationSeconds) + EXTRA_PROCESSING_TIMEOUT_SECONDS,
                 MAX_PROCESSING_TIMEOUT_SECONDS);
-    }
-
-    public CompletableFuture<Void> streamAzurePcmByFfmpegAsync(Path inputFile, PushAudioInputStream pushStream) {
-        return CompletableFuture.runAsync(() -> {
-            boolean acquired = false;
-            Process process = null;
-
-            try {
-                FFMPEG_SEMAPHORE.acquire();
-                acquired = true;
-
-                ProcessBuilder processBuilder = new ProcessBuilder(
-                        "ffmpeg",
-                        "-hide_banner",
-                        "-loglevel", "error",
-                        "-y",
-                        "-i", inputFile.toString(),
-                        "-vn",
-                        // Tạm thời bỏ bộ lọc silenceremove để tránh bị mất đoạn ghi âm sau khi lặng im
-                        // "-af",
-                        // "silenceremove=start_periods=1:start_duration=0.2:start_threshold=-45dB:stop_periods=1:stop_duration=0.2:stop_threshold=-45dB",
-                        "-acodec", "pcm_s16le",
-                        "-ac", "1",
-                        "-ar", "16000",
-                        "-f", "s16le",
-                        "pipe:1");
-
-                process = processBuilder.start();
-                Process ffmpegProcess = process;
-
-                CompletableFuture<String> errorFuture = CompletableFuture
-                        .supplyAsync(() -> readStreamAsString(ffmpegProcess.getErrorStream()));
-
-                byte[] buffer = new byte[FFMPEG_BUFFER_SIZE];
-                try (InputStream inputStream = process.getInputStream()) {
-                    int bytesRead;
-                    while ((bytesRead = inputStream.read(buffer)) != -1) {
-                        byte[] chunk = new byte[bytesRead];
-                        System.arraycopy(buffer, 0, chunk, 0, bytesRead);
-                        pushStream.write(chunk);
-                    }
-                }
-
-                int exitCode = process.waitFor();
-                String ffmpegError = errorFuture.get(3, TimeUnit.SECONDS);
-
-                if (exitCode != 0) {
-                    log.error("FFmpeg streaming failed: {}", ffmpegError);
-                    throw new InfrastructureException(
-                            AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
-                            SpeechDetailMessageKey.SPEECH_AUDIO_CONVERT_FAILED,
-                            ffmpegError);
-                }
-
-            } catch (InfrastructureException e) {
-                throw e;
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new InfrastructureException(
-                        AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
-                        SpeechDetailMessageKey.SPEECH_AUDIO_CONVERT_INTERRUPTED);
-            } catch (IOException e) {
-                log.error("FFmpeg is not available or cannot start", e);
-                throw new InfrastructureException(
-                        AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
-                        SpeechDetailMessageKey.SPEECH_AUDIO_FFMPEG_NOT_AVAILABLE);
-            } catch (Exception e) {
-                log.error("Unexpected FFmpeg streaming error", e);
-                throw new InfrastructureException(
-                        AzureSpeechErrorCode.SPEECH_AUDIO_NOT_VALID,
-                        SpeechDetailMessageKey.SPEECH_AUDIO_CONVERT_FAILED,
-                        e.getMessage());
-            } finally {
-                try {
-                    pushStream.close();
-                } catch (Exception ignored) {
-                }
-
-                if (process != null && process.isAlive()) {
-                    process.destroyForcibly();
-                }
-
-                if (acquired) {
-                    FFMPEG_SEMAPHORE.release();
-                }
-            }
-        });
-    }
-
-    private String readStreamAsString(InputStream inputStream) {
-        try (InputStream is = inputStream; ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            is.transferTo(baos);
-            return baos.toString(StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            return "";
-        }
     }
 
     public PronunciationAssessmentConfig createPronunciationAssessmentConfig(String referenceText) {

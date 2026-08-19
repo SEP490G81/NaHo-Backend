@@ -4,12 +4,14 @@ import org.naho.file.port.in.UploadFileInputPort;
 import org.naho.file.result.FileResult;
 import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
 import org.naho.question.exception.SpeakingQuestionErrorCode;
+import org.naho.question.result.AnswerHistoryResult;
 import org.naho.shared.constant.SystemZoneId;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
-import org.naho.speech.azure.port.in.SpeechAssessmentInputPort;
-import org.naho.speech.azure.result.SpeechAssessmentResult;
+import org.naho.speech.azure.model.SpeechAssessment;
+import org.naho.speech.azure.port.out.AzureSpeechServicePort;
+import org.naho.speech.azure.port.out.SpeechAssessmentRepositoryPort;
 import org.naho.speech.llm.model.question.AiFeedback;
 import org.naho.speech.llm.question.command.QuestionContextCommand;
 import org.naho.speech.llm.question.command.SpeakingAnalysisCommand;
@@ -17,8 +19,6 @@ import org.naho.speech.llm.question.helper.SpeakingAnalysisHelper;
 import org.naho.speech.llm.question.port.in.SpeakingAnalysisInputPort;
 import org.naho.speech.llm.question.port.out.AiFeedbackRepositoryPort;
 import org.naho.speech.llm.question.port.out.AiQuestionAnalysisPort;
-import org.naho.speech.llm.question.result.AiFeedbackResult;
-import org.naho.speech.llm.question.result.SpeakingAnalysisResult;
 import org.naho.subscription.model.UserDailyAiUsage;
 import org.naho.subscription.port.out.UserDailyAiUsageRepositoryPort;
 
@@ -28,41 +28,44 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     private final UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort;
     private final UploadFileInputPort uploadFileInputPort;
     private final TransactionPort transactionPort;
-    private final SpeechAssessmentInputPort speechAssessmentInputPort;
+    private final AzureSpeechServicePort azureSpeechServicePort;
     private final AiFeedbackRepositoryPort aiFeedbackRepositoryPort;
     private final AiQuestionAnalysisPort aiQuestionAnalysisPort;
     private final SpeakingAnalysisHelper speakingAnalysisHelper;
+    private final SpeechAssessmentRepositoryPort speechAssessmentRepositoryPort;
 
     public SpeakingAnalysisUseCase(
             UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort,
             UploadFileInputPort uploadFileInputPort,
             TransactionPort transactionPort,
-            SpeechAssessmentInputPort speechAssessmentInputPort,
+            AzureSpeechServicePort azureSpeechServicePort,
             AiFeedbackRepositoryPort aiFeedbackRepositoryPort,
             AiQuestionAnalysisPort aiQuestionAnalysisPort,
-            SpeakingAnalysisHelper speakingAnalysisHelper
+            SpeakingAnalysisHelper speakingAnalysisHelper,
+            SpeechAssessmentRepositoryPort speechAssessmentRepositoryPort
     ) {
         this.userDailyAiUsageRepositoryPort = userDailyAiUsageRepositoryPort;
         this.uploadFileInputPort = uploadFileInputPort;
         this.transactionPort = transactionPort;
-        this.speechAssessmentInputPort = speechAssessmentInputPort;
+        this.azureSpeechServicePort = azureSpeechServicePort;
         this.aiFeedbackRepositoryPort = aiFeedbackRepositoryPort;
         this.aiQuestionAnalysisPort = aiQuestionAnalysisPort;
         this.speakingAnalysisHelper = speakingAnalysisHelper;
+        this.speechAssessmentRepositoryPort = speechAssessmentRepositoryPort;
     }
 
     @Override
-    public SpeakingAnalysisResult analyzeSpeaking(SpeakingAnalysisCommand command) {
-        SpeakingAnalysisResult result = transactionPort.execute(() -> doAnalyzeSpeaking(command));
+    public AnswerHistoryResult analyzeSpeaking(SpeakingAnalysisCommand command) {
+        AnswerHistoryResult result = transactionPort.execute(() -> doAnalyzeSpeaking(command));
 
         // Upload file audio lên cloud
         FileResult uploadedFile = uploadFileInputPort.uploadFileToCloud(command.storedFile());
-        result.setAudioFileResult(uploadedFile);
+        result.setAudioFile(uploadedFile);
 
         return result;
     }
 
-    private SpeakingAnalysisResult doAnalyzeSpeaking(SpeakingAnalysisCommand command) {
+    private AnswerHistoryResult doAnalyzeSpeaking(SpeakingAnalysisCommand command) {
         LocalDate today = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID);
 
         UserDailyAiUsage userDailyAiUsage = userDailyAiUsageRepositoryPort
@@ -77,32 +80,35 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         }
 
         // Lấy đánh giá từ Azure Speech AI
-        SpeechAssessmentResult speechAssessmentResult =
-                speechAssessmentInputPort.assessAudio(SpeechAssessmentCommand.builder()
+        SpeechAssessment speechAssessment =
+                azureSpeechServicePort.assessAudio(SpeechAssessmentCommand.builder()
                         .audioBytes(command.audioBytes())
-                        .duration(command.duration() != null ? command.duration() : 0.0)
+                        .duration(command.duration())
                         .userId(command.userId())
                         .build()
                 );
 
+        // Lưu vào db
+        SpeechAssessment savedSpeechAssessment = speechAssessmentRepositoryPort.createNew(speechAssessment);
+
         // DB-R: Lấy SpeakingQuestion và context curriculum để build prompt
         QuestionContextCommand contextCommand = speakingAnalysisHelper.buildContextCommand(
                 command.speakingQuestionId(),
-                speechAssessmentResult.transcriptText()
+                speechAssessment.getTranscriptText()
         );
 
         // EXT: Gọi OpenAI LLM (ngoài DB transaction)
         String rawLlmResponse = aiQuestionAnalysisPort.analyzeSpeaking(contextCommand);
 
-        // Parse OpenAI
-        AiFeedback aiFeedback = speakingAnalysisHelper.parseLlmResponse(rawLlmResponse, speechAssessmentResult);
-        System.out.println("ai feed back: " + aiFeedback);
+        // Parse OpenAI Response
+        AiFeedback aiFeedback = speakingAnalysisHelper.parseLlmResponse(rawLlmResponse);
+
+        // Lưu vào db
+        AiFeedback savedAiFeedback = aiFeedbackRepositoryPort.createNew(aiFeedback);
+
         // tăng số lần đánh giá AI với speaking question của người dùng lên 1 (today)
         userDailyAiUsage.increaseSpeakingEvaluationCount();
         userDailyAiUsageRepositoryPort.save(userDailyAiUsage);
-
-        AiFeedback savedAiFeedback = aiFeedbackRepositoryPort.createNew(aiFeedback);
-
 
         return null;
     }

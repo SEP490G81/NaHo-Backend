@@ -14,7 +14,6 @@ import org.naho.payment.result.PaymentOrderResult;
 import org.naho.payment.type.PaymentStatus;
 import org.naho.shared.port.out.TransactionPort;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;

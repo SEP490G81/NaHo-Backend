@@ -1,6 +1,6 @@
 package org.naho.question.repository;
 
-import org.naho.question.entity.GrammarEntity;
+import org.naho.grammar.entity.GrammarEntity;
 import org.naho.shared.persistence.BaseJpaRepository;
 
 import java.util.Collection;

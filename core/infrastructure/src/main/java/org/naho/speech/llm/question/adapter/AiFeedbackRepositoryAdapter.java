@@ -8,6 +8,8 @@ import org.naho.speech.llm.question.port.out.AiFeedbackRepositoryPort;
 import org.naho.speech.llm.question.repository.AiFeedbackJpaRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 @RequiredArgsConstructor
 public class AiFeedbackRepositoryAdapter implements AiFeedbackRepositoryPort {
@@ -20,5 +22,12 @@ public class AiFeedbackRepositoryAdapter implements AiFeedbackRepositoryPort {
         AiFeedbackEntity entity = aiFeedbackEntityMapper.domainToEntity(feedback);
         AiFeedbackEntity savedEntity = aiFeedbackJpaRepository.save(entity);
         return aiFeedbackEntityMapper.entityToDomain(savedEntity);
+    }
+
+    @Override
+    public Optional<AiFeedback> findById(Long id) {
+        return aiFeedbackJpaRepository
+                .findById(id)
+                .map(aiFeedbackEntityMapper::entityToDomain);
     }
 }

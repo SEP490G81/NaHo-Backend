@@ -19,6 +19,22 @@ public class UsedVocabularyAndGrammar {
         return new Builder();
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public Long getAiFeedbackId() {
+        return aiFeedbackId;
+    }
+
+    public String getExpression() {
+        return expression;
+    }
+
+    public LanguageCategory getCategory() {
+        return category;
+    }
+
     public static class Builder {
         private Long id;
         private Long aiFeedbackId;
@@ -48,21 +64,5 @@ public class UsedVocabularyAndGrammar {
         public UsedVocabularyAndGrammar build() {
             return new UsedVocabularyAndGrammar(this);
         }
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getAiFeedbackId() {
-        return aiFeedbackId;
-    }
-
-    public String getExpression() {
-        return expression;
-    }
-
-    public LanguageCategory getCategory() {
-        return category;
     }
 }

@@ -3,7 +3,7 @@ package org.naho.speech.llm.question.command;
 public record QuestionContextCommand(
         String curriculum,
         String level,
-        String stt,
+        String lessonOrder,
         String topic,
         String lesson,
         String canDoObjective,
@@ -11,6 +11,6 @@ public record QuestionContextCommand(
         String vocabularyFocus,
         String questionTitle,
         String questionDescription,
-        String studentTranscript
+        String learnerTranscript
 ) {
 }

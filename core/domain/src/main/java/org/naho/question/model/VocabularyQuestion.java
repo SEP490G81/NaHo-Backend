@@ -1,7 +1,5 @@
 package org.naho.question.model;
 
-import org.naho.vocabulary.model.Vocabulary;
-
 import java.util.ArrayList;
 import java.util.List;
 

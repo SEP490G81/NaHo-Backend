@@ -14,15 +14,14 @@ import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
 import org.naho.question.exception.SpeakingQuestionErrorCode;
 import org.naho.question.model.Grammar;
 import org.naho.question.model.SpeakingQuestion;
+import org.naho.question.model.Vocabulary;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.shared.exception.ApplicationException;
-import org.naho.speech.azure.result.SpeechAssessmentResult;
 import org.naho.speech.llm.model.question.AiFeedback;
 import org.naho.speech.llm.model.question.UsedVocabularyAndGrammar;
 import org.naho.speech.llm.model.question.UserAnswerError;
 import org.naho.speech.llm.question.command.QuestionContextCommand;
 import org.naho.speech.llm.type.LanguageCategory;
-import org.naho.vocabulary.model.Vocabulary;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,7 +97,7 @@ public class SpeakingAnalysisHelper {
         );
     }
 
-    public AiFeedback parseLlmResponse(String rawJson, SpeechAssessmentResult speechAssessmentResult) {
+    public AiFeedback parseLlmResponse(String rawJson) {
         try {
             JsonNode root = objectMapper.readTree(rawJson);
 
@@ -159,9 +158,6 @@ public class SpeakingAnalysisHelper {
             );
         }
     }
-
-
-
 
     public LanguageCategory parseLanguageCategory(String rawCategory) {
         if (rawCategory == null) return LanguageCategory.VOCABULARY;

@@ -5,10 +5,10 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.naho.i18n.message.question.VocabularyQuestionDetailMessageKey;
+import org.naho.question.model.Vocabulary;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.util.ExcelUtil;
 import org.naho.vocabulary.exception.VocabularyErrorCode;
-import org.naho.vocabulary.model.Vocabulary;
 import org.naho.vocabulary.port.out.VocabularyExcelParserPort;
 import org.springframework.stereotype.Component;
 

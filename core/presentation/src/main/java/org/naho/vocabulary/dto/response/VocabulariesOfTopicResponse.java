@@ -4,6 +4,6 @@ import java.util.List;
 
 public record VocabulariesOfTopicResponse(
         Long topicId,
-        List<VocabularyDetailResponse> vocabularyDetailResults
+        List<VocabularyResponse> vocabularies
 ) {
 }

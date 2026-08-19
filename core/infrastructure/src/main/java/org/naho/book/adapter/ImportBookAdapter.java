@@ -13,12 +13,12 @@ import org.naho.book.type.TopicStatus;
 import org.naho.chest.entity.ChestEntity;
 import org.naho.chest.exception.ChestErrorCode;
 import org.naho.chest.repository.ChestJpaRepository;
+import org.naho.grammar.entity.GrammarEntity;
 import org.naho.i18n.message.book.BookDetailMessageKey;
 import org.naho.i18n.message.chest.ChestDetailMessageKey;
 import org.naho.i18n.message.question.VocabularyQuestionDetailMessageKey;
 import org.naho.learning.entity.LearningPathNodeEntity;
 import org.naho.learning.type.NodeType;
-import org.naho.question.entity.GrammarEntity;
 import org.naho.question.entity.SpeakingQuestionEntity;
 import org.naho.question.entity.VocabularyQuestionEntity;
 import org.naho.question.exception.VocabularyQuestionErrorCode;
@@ -288,7 +288,7 @@ public class ImportBookAdapter implements ImportBookPort {
                                     .japaneseName(japaneseName)
                                     .japaneseNameMarkup(japaneseMarkup)
                                     .vietnameseName(vietnameseName)
-                                    .status(QuestionStatus.PUBLISHED)
+                                    .status(QuestionStatus.ACTIVE)
                                     .learningPathNode(learningPathNodeEntity)
                                     .japaneseSampleAnswer(japaneseSampleAnswer)
                                     .japaneseSampleAnswerMarkup(japaneseSampleAnswerMarkup)

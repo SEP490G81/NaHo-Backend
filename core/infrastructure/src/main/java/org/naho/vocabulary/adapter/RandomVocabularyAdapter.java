@@ -1,7 +1,7 @@
 package org.naho.vocabulary.adapter;
 
 import lombok.RequiredArgsConstructor;
-import org.naho.vocabulary.model.Vocabulary;
+import org.naho.question.model.Vocabulary;
 import org.naho.vocabulary.port.out.RandomVocabularyPort;
 import org.naho.vocabulary.repository.VocabularyJpaRepository;
 import org.springframework.stereotype.Component;

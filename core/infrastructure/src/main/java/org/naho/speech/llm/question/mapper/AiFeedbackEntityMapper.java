@@ -1,6 +1,7 @@
 package org.naho.speech.llm.question.mapper;
 
 import org.mapstruct.*;
+import org.naho.question.mapper.AnswerHistoryIdMapper;
 import org.naho.speech.llm.model.question.AiFeedback;
 import org.naho.speech.llm.question.entity.AiFeedbackEntity;
 
@@ -9,7 +10,8 @@ import org.naho.speech.llm.question.entity.AiFeedbackEntity;
         nullValueIterableMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT,
         uses = {
                 UsedVocabularyAndGrammarEntityMapper.class,
-                UserAnswerErrorEntityMapper.class
+                UserAnswerErrorEntityMapper.class,
+                AnswerHistoryIdMapper.class
         }
 )
 public interface AiFeedbackEntityMapper {

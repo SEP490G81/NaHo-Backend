@@ -31,4 +31,15 @@ public class AzureSpeechConfig {
     ) {
         return new SpeechAssessmentUseCase(azureSpeechServicePort, speechAssessmentResultMapper);
     }
+
+    @Bean
+    public org.naho.speech.azure.port.in.CrudSpeechAssessmentInputPort crudSpeechAssessmentInputPort(
+            SpeechAssessmentResultMapper speechAssessmentResultMapper,
+            org.naho.speech.azure.port.out.SpeechAssessmentRepositoryPort speechAssessmentRepositoryPort
+    ) {
+        return new org.naho.speech.azure.usecase.CrudSpeechAssessmentUseCase(
+                speechAssessmentResultMapper,
+                speechAssessmentRepositoryPort
+        );
+    }
 }

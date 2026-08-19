@@ -17,7 +17,6 @@ import org.naho.payment.type.PaymentStatus;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.TransactionPort;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.function.Supplier;

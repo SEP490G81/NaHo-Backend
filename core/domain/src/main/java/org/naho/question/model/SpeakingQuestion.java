@@ -4,7 +4,6 @@ import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
 import org.naho.question.exception.SpeakingQuestionDomainErrorCode;
 import org.naho.question.type.QuestionStatus;
 import org.naho.shared.exception.DomainException;
-import org.naho.vocabulary.model.Vocabulary;
 
 import java.util.List;
 
@@ -90,8 +89,8 @@ public class SpeakingQuestion {
         this.speakingQuestionAudioFileId = speakingQuestionAudioFileId;
     }
 
-    public void changeStatus(QuestionStatus newStatus) {
-        this.status = newStatus;
+    public void changeStatus(QuestionStatus status) {
+        this.status = status;
     }
 
     // Getters
@@ -255,4 +254,4 @@ public class SpeakingQuestion {
             return speakingQuestion;
         }
     }
-}
+}

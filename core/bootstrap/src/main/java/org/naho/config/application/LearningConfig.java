@@ -29,14 +29,22 @@ public class LearningConfig {
             SpeakingQuestionRepositoryAdapter speakingQuestionRepositoryAdapter,
             VocabularyQuestionRepositoryAdapter vocabularyQuestionRepositoryAdapter,
             ChestRepositoryAdapter chestRepositoryAdapter,
-            org.naho.subscription.port.in.GetActiveSubscriptionInputPort getActiveSubscriptionInputPort
+            org.naho.subscription.port.in.GetActiveSubscriptionInputPort getActiveSubscriptionInputPort,
+            org.naho.question.mapper.SpeakingQuestionResultMapper speakingQuestionResultMapper,
+            org.naho.vocabulary.mapper.VocabularyResultMapper vocabularyResultMapper,
+            org.naho.chest.mapper.ChestResultMapper chestResultMapper,
+            org.naho.question.port.in.GetSpeakingQuestionInputPort getSpeakingQuestionInputPort
     ) {
         return new GetLearningPathNodeDetailUseCase(
                 learningPathNodeRepositoryAdapter,
                 speakingQuestionRepositoryAdapter,
                 vocabularyQuestionRepositoryAdapter,
                 chestRepositoryAdapter,
-                getActiveSubscriptionInputPort
+                getActiveSubscriptionInputPort,
+                speakingQuestionResultMapper,
+                vocabularyResultMapper,
+                chestResultMapper,
+                getSpeakingQuestionInputPort
         );
     }
 

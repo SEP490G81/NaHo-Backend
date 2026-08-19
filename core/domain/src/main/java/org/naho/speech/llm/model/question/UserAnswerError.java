@@ -17,6 +17,22 @@ public class UserAnswerError {
         return new Builder();
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public Long getAiFeedbackId() {
+        return aiFeedbackId;
+    }
+
+    public String getIncorrect() {
+        return incorrect;
+    }
+
+    public String getCorrection() {
+        return correction;
+    }
+
     public static class Builder {
         private Long id;
         private Long aiFeedbackId;
@@ -46,21 +62,5 @@ public class UserAnswerError {
         public UserAnswerError build() {
             return new UserAnswerError(this);
         }
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getAiFeedbackId() {
-        return aiFeedbackId;
-    }
-
-    public String getIncorrect() {
-        return incorrect;
-    }
-
-    public String getCorrection() {
-        return correction;
     }
 }

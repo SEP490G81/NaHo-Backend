@@ -1,13 +1,13 @@
 package org.naho.vocabulary.usecase;
 
 import org.naho.i18n.message.question.VocabularyQuestionDetailMessageKey;
+import org.naho.question.model.Vocabulary;
 import org.naho.question.port.out.VocabulariesQuestionPort;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.vocabulary.exception.VocabularyErrorCode;
-import org.naho.vocabulary.model.Vocabulary;
 import org.naho.vocabulary.port.in.GetVocabulariesOfTopicInputPort;
 import org.naho.vocabulary.result.VocabulariesOfTopicResult;
-import org.naho.vocabulary.result.VocabularyDetailResult;
+import org.naho.vocabulary.result.VocabularyResult;
 
 import java.util.List;
 
@@ -30,8 +30,8 @@ public class GetVocabulariesOfTopicUseCase implements GetVocabulariesOfTopicInpu
             );
         }
 
-        List<VocabularyDetailResult> detailResults = listVocabulary.stream()
-                .map(vocab -> new VocabularyDetailResult(
+        List<VocabularyResult> detailResults = listVocabulary.stream()
+                .map(vocab -> new VocabularyResult(
                         vocab.getId(),
                         vocab.getReading(),
                         vocab.getJapanese(),

@@ -4,6 +4,6 @@ import java.util.List;
 
 public record VocabulariesOfTopicResult(
         Long topicId,
-        List<VocabularyDetailResult> vocabularyDetailResults
+        List<VocabularyResult> vocabularies
 ) {
 }

@@ -6,8 +6,8 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.file.entity.FileEntity;
 import org.naho.shared.persistence.BaseEntity;
-import org.naho.speech.azure.entity.ContentAssessmentEntity;
 import org.naho.speech.azure.entity.SpeechAssessmentEntity;
+import org.naho.speech.llm.question.entity.AiFeedbackEntity;
 import org.naho.user.entity.UserEntity;
 
 @SuperBuilder
@@ -28,16 +28,20 @@ public class AnswerHistoryEntity extends BaseEntity {
     SpeakingQuestionEntity speakingQuestion;
 
     @OneToOne
-    @JoinColumn(name = "audio_file_id")
+    @JoinColumn(name = "speech_assessment_id", nullable = false)
+    SpeechAssessmentEntity speechAssessment;
+
+    @OneToOne
+    @JoinColumn(name = "ai_feedback_id", nullable = false)
+    AiFeedbackEntity aiFeedback;
+
+    @OneToOne
+    @JoinColumn(name = "audio_file_id", nullable = false)
     FileEntity audioFile;
 
-    @Column(name = "duration_sec")
-    Integer durationSec;
+    @Column(name = "duration")
+    Double duration;
 
-    @OneToOne(mappedBy = "answerHistory")
-    ContentAssessmentEntity contentAssessment;
-
-
-    @OneToOne(mappedBy = "answerHistory")
-    SpeechAssessmentEntity speechAssessment;
+    @Column(name = "overall_score", nullable = false)
+    Double overallScore;
 }

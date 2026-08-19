@@ -1,7 +1,7 @@
 package org.naho.question.mapper;
 
 import org.mapstruct.Mapper;
-import org.naho.question.entity.GrammarEntity;
+import org.naho.grammar.entity.GrammarEntity;
 import org.naho.question.model.Grammar;
 
 @Mapper(componentModel = "spring")

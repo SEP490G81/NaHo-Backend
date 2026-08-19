@@ -7,9 +7,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.naho.chest.exception.ChestErrorCode;
+import org.naho.chest.mapper.ChestResultMapper;
 import org.naho.chest.model.Chest;
 import org.naho.chest.port.out.ChestRepositoryPort;
-import org.naho.chest.type.ChestType;
+import org.naho.chest.result.ChestResult;
 import org.naho.i18n.message.chest.ChestDetailMessageKey;
 import org.naho.i18n.message.learning.LearningPathNodeDetailMessageKey;
 import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
@@ -20,15 +21,18 @@ import org.naho.learning.model.LearningPathNode;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.learning.result.LearningPathNodeDetailResult;
 import org.naho.learning.type.NodeType;
+import org.naho.question.command.FindSpeakingQuestionCommand;
 import org.naho.question.exception.SpeakingQuestionErrorCode;
 import org.naho.question.exception.VocabularyQuestionErrorCode;
-import org.naho.question.model.SpeakingQuestion;
+import org.naho.question.mapper.SpeakingQuestionResultMapper;
 import org.naho.question.model.VocabularyQuestion;
+import org.naho.question.port.in.GetSpeakingQuestionInputPort;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.question.port.out.VocabularyQuestionRepositoryPort;
+import org.naho.question.result.SpeakingQuestionResult;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
-import org.naho.subscription.result.SubscriptionPlanResult;
+import org.naho.vocabulary.mapper.VocabularyResultMapper;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -54,6 +58,18 @@ class GetLearningPathNodeDetailTest {
     @Mock
     private GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
 
+    @Mock
+    private SpeakingQuestionResultMapper speakingQuestionResultMapper;
+
+    @Mock
+    private VocabularyResultMapper vocabularyResultMapper;
+
+    @Mock
+    private ChestResultMapper chestResultMapper;
+
+    @Mock
+    private GetSpeakingQuestionInputPort getSpeakingQuestionInputPort;
+
     @InjectMocks
     private GetLearningPathNodeDetailUseCase getLearningPathNodeDetailUseCase;
 
@@ -63,6 +79,7 @@ class GetLearningPathNodeDetailTest {
         // Arrange
         Long nodeId = 1L;
         Long sqId = 10L;
+        Long userId = 1L;
         LearningPathNode node = mock(LearningPathNode.class);
         when(node.getId()).thenReturn(nodeId);
         when(node.getNodeType()).thenReturn(NodeType.SPEAKING_QUESTION);
@@ -71,19 +88,12 @@ class GetLearningPathNodeDetailTest {
         when(node.getGlobalOrderIndex()).thenReturn(1.0);
         when(node.getOrderIndex()).thenReturn(1.0);
 
-        SpeakingQuestion sq = mock(SpeakingQuestion.class);
-        when(sq.getId()).thenReturn(sqId);
-        when(sq.getVocabularies()).thenReturn(Collections.emptyList());
-        when(sq.getGrammars()).thenReturn(Collections.emptyList());
+        SpeakingQuestionResult sqResult = mock(SpeakingQuestionResult.class);
 
         when(learningPathNodeRepositoryPort.findById(nodeId)).thenReturn(Optional.of(node));
-        when(speakingQuestionRepositoryPort.findById(sqId)).thenReturn(Optional.of(sq));
+        when(getSpeakingQuestionInputPort.findById(any(FindSpeakingQuestionCommand.class))).thenReturn(sqResult);
 
-        SubscriptionPlanResult plan = mock(SubscriptionPlanResult.class);
-        when(plan.sampleAnswerEnabled()).thenReturn(true);
-        when(getActiveSubscriptionInputPort.getUserActiveSubscriptionPlan(any())).thenReturn(plan);
-
-        GetLearningPathNodeDetailCommand command = new GetLearningPathNodeDetailCommand(nodeId, 1L);
+        GetLearningPathNodeDetailCommand command = new GetLearningPathNodeDetailCommand(nodeId, userId);
 
         // Act
         LearningPathNodeDetailResult result = getLearningPathNodeDetailUseCase.getLearningPathNodeDetail(command);
@@ -94,7 +104,7 @@ class GetLearningPathNodeDetailTest {
         assertEquals(NodeType.SPEAKING_QUESTION, result.nodeType());
         assertNotNull(result.speakingQuestion());
         verify(learningPathNodeRepositoryPort, times(1)).findById(nodeId);
-        verify(speakingQuestionRepositoryPort, times(1)).findById(sqId);
+        verify(getSpeakingQuestionInputPort, times(1)).findById(any(FindSpeakingQuestionCommand.class));
     }
 
     @Test
@@ -141,13 +151,11 @@ class GetLearningPathNodeDetailTest {
         when(node.getChestId()).thenReturn(chestId);
 
         Chest chest = mock(Chest.class);
-        when(chest.getId()).thenReturn(chestId);
-        when(chest.getChestType()).thenReturn(ChestType.SILVER);
-        when(chest.getMinPoint()).thenReturn(10);
-        when(chest.getMaxPoint()).thenReturn(50);
+        ChestResult chestResult = mock(ChestResult.class);
 
         when(learningPathNodeRepositoryPort.findById(nodeId)).thenReturn(Optional.of(node));
         when(chestRepositoryPort.findById(chestId)).thenReturn(Optional.of(chest));
+        when(chestResultMapper.domainToResult(chest)).thenReturn(chestResult);
 
         GetLearningPathNodeDetailCommand command = new GetLearningPathNodeDetailCommand(nodeId, 1L);
 
@@ -161,6 +169,7 @@ class GetLearningPathNodeDetailTest {
         assertNotNull(result.chest());
         verify(learningPathNodeRepositoryPort, times(1)).findById(nodeId);
         verify(chestRepositoryPort, times(1)).findById(chestId);
+        verify(chestResultMapper, times(1)).domainToResult(chest);
     }
 
     @Test
@@ -194,7 +203,11 @@ class GetLearningPathNodeDetailTest {
         when(node.getSpeakingQuestionId()).thenReturn(sqId);
 
         when(learningPathNodeRepositoryPort.findById(nodeId)).thenReturn(Optional.of(node));
-        when(speakingQuestionRepositoryPort.findById(sqId)).thenReturn(Optional.empty());
+        when(getSpeakingQuestionInputPort.findById(any(FindSpeakingQuestionCommand.class)))
+                .thenThrow(new ApplicationException(
+                        SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
+                        SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_NOT_FOUND
+                ));
 
         GetLearningPathNodeDetailCommand command = new GetLearningPathNodeDetailCommand(nodeId, 1L);
 
@@ -206,7 +219,7 @@ class GetLearningPathNodeDetailTest {
 
         assertEquals(SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND, exception.getErrorCode());
         assertEquals(SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_NOT_FOUND, exception.getMessage());
-        verify(speakingQuestionRepositoryPort, times(1)).findById(sqId);
+        verify(getSpeakingQuestionInputPort, times(1)).findById(any(FindSpeakingQuestionCommand.class));
     }
 
     @Test
@@ -261,3 +274,4 @@ class GetLearningPathNodeDetailTest {
         verify(chestRepositoryPort, times(1)).findById(chestId);
     }
 }
+

@@ -1,6 +1,5 @@
 package org.naho.question.result;
 
-import java.time.Instant;
 import java.util.List;
 
 public record SpeakingHistoryDetailResult(
@@ -11,8 +10,7 @@ public record SpeakingHistoryDetailResult(
         String topicName,
         Long learningPathNodeId,
         Long bookId,
-        Instant practicedAt,
-        Integer durationSec,
+        Double duration,
         Double score,
         Report report,
         String audioUrl

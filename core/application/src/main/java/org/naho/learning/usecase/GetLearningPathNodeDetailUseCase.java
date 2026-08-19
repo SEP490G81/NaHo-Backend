@@ -2,12 +2,12 @@ package org.naho.learning.usecase;
 
 
 import org.naho.chest.exception.ChestErrorCode;
+import org.naho.chest.mapper.ChestResultMapper;
+import org.naho.chest.model.Chest;
 import org.naho.chest.port.out.ChestRepositoryPort;
 import org.naho.chest.result.ChestResult;
-import org.naho.grammar.result.GrammarDetailResult;
 import org.naho.i18n.message.chest.ChestDetailMessageKey;
 import org.naho.i18n.message.learning.LearningPathNodeDetailMessageKey;
-import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
 import org.naho.i18n.message.question.VocabularyQuestionDetailMessageKey;
 import org.naho.learning.command.GetLearningPathNodeDetailCommand;
 import org.naho.learning.exception.LearningPathNodeErrorCode;
@@ -16,18 +16,17 @@ import org.naho.learning.port.in.GetLearningPathNodeDetailInputPort;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.learning.result.LearningPathNodeDetailResult;
 import org.naho.learning.type.NodeType;
-import org.naho.question.exception.SpeakingQuestionErrorCode;
+import org.naho.question.command.FindSpeakingQuestionCommand;
 import org.naho.question.exception.VocabularyQuestionErrorCode;
+import org.naho.question.mapper.SpeakingQuestionResultMapper;
+import org.naho.question.port.in.GetSpeakingQuestionInputPort;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.question.port.out.VocabularyQuestionRepositoryPort;
-import org.naho.question.result.SpeakingQuestionDetailResult;
+import org.naho.question.result.SpeakingQuestionResult;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
-import org.naho.subscription.result.SubscriptionPlanResult;
-import org.naho.vocabulary.result.VocabularyDetailResult;
-import org.naho.vocabulary.result.VocabularyQuestionDetailResult;
-
-import java.util.List;
+import org.naho.vocabulary.mapper.VocabularyResultMapper;
+import org.naho.vocabulary.result.VocabularyQuestionResult;
 
 public class GetLearningPathNodeDetailUseCase implements GetLearningPathNodeDetailInputPort {
     private final LearningPathNodeRepositoryPort learningPathNodeRepositoryPort;
@@ -35,19 +34,31 @@ public class GetLearningPathNodeDetailUseCase implements GetLearningPathNodeDeta
     private final VocabularyQuestionRepositoryPort vocabularyQuestionRepositoryPort;
     private final ChestRepositoryPort chestRepositoryPort;
     private final GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
+    private final SpeakingQuestionResultMapper speakingQuestionResultMapper;
+    private final VocabularyResultMapper vocabularyResultMapper;
+    private final ChestResultMapper chestResultMapper;
+    private final GetSpeakingQuestionInputPort getSpeakingQuestionInputPort;
 
     public GetLearningPathNodeDetailUseCase(
             LearningPathNodeRepositoryPort learningPathNodeRepositoryPort,
             SpeakingQuestionRepositoryPort speakingQuestionRepositoryPort,
             VocabularyQuestionRepositoryPort vocabularyQuestionRepositoryPort,
             ChestRepositoryPort chestRepositoryPort,
-            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort
+            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort,
+            SpeakingQuestionResultMapper speakingQuestionResultMapper,
+            VocabularyResultMapper vocabularyResultMapper,
+            ChestResultMapper chestResultMapper,
+            GetSpeakingQuestionInputPort getSpeakingQuestionInputPort
     ) {
         this.learningPathNodeRepositoryPort = learningPathNodeRepositoryPort;
         this.speakingQuestionRepositoryPort = speakingQuestionRepositoryPort;
         this.vocabularyQuestionRepositoryPort = vocabularyQuestionRepositoryPort;
         this.chestRepositoryPort = chestRepositoryPort;
         this.getActiveSubscriptionInputPort = getActiveSubscriptionInputPort;
+        this.speakingQuestionResultMapper = speakingQuestionResultMapper;
+        this.vocabularyResultMapper = vocabularyResultMapper;
+        this.chestResultMapper = chestResultMapper;
+        this.getSpeakingQuestionInputPort = getSpeakingQuestionInputPort;
     }
 
     @Override
@@ -59,57 +70,20 @@ public class GetLearningPathNodeDetailUseCase implements GetLearningPathNodeDeta
                         command.id()
                 ));
 
-        SpeakingQuestionDetailResult speakingQuestionResult = null;
-        VocabularyQuestionDetailResult vocabularyQuestionResult = null;
+        SpeakingQuestionResult speakingQuestionResult = null;
+        VocabularyQuestionResult vocabularyQuestionResult = null;
         ChestResult chestResult = null;
 
         NodeType nodeType = node.getNodeType();
 
         if (nodeType.equals(NodeType.SPEAKING_QUESTION)
                 && node.getSpeakingQuestionId() != null) {
-            var sq = speakingQuestionRepositoryPort.findById(node.getSpeakingQuestionId())
-                    .orElseThrow(() -> new ApplicationException(
-                            SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
-                            SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_NOT_FOUND,
-                            node.getSpeakingQuestionId())
-                    );
+            speakingQuestionResult = getSpeakingQuestionInputPort
+                    .findById(new FindSpeakingQuestionCommand(
+                            node.getSpeakingQuestionId(),
+                            command.userId()
+                    ));
 
-            var vocabList = sq.getVocabularies() == null ? List.<VocabularyDetailResult>of() : sq.getVocabularies().stream()
-                    .map(v -> new VocabularyDetailResult(
-                            v.getId(),
-                            v.getReading(),
-                            v.getJapanese(),
-                            v.getVietnameseMeaningText(),
-                            v.getEnglishMeaningText()))
-                    .toList();
-            var grammarList = sq.getGrammars() == null ? List.<GrammarDetailResult>of() : sq.getGrammars().stream()
-                    .map(g -> new GrammarDetailResult(
-                            g.getId(),
-                            g.getReading(),
-                            g.getJapanese(),
-                            g.getVietnameseMeaningText(),
-                            g.getEnglishMeaningText()))
-                    .toList();
-
-            SubscriptionPlanResult plan = getActiveSubscriptionInputPort.getUserActiveSubscriptionPlan(command.userId());
-            boolean canViewSampleAnswer = plan != null && plan.sampleAnswerEnabled() != null && plan.sampleAnswerEnabled();
-
-            speakingQuestionResult = new SpeakingQuestionDetailResult(
-                    sq.getId(),
-                    sq.getUserId(),
-                    sq.getJapaneseName(),
-                    sq.getJapaneseNameMarkup(),
-                    sq.getVietnameseName(),
-                    sq.getDescription(),
-                    sq.getDescriptionMarkup(),
-                    canViewSampleAnswer ? sq.getJapaneseSampleAnswer() : null,
-                    canViewSampleAnswer ? sq.getJapaneseSampleAnswerMarkup() : null,
-                    canViewSampleAnswer ? sq.getVietnameseSampleAnswer() : null,
-                    canViewSampleAnswer ? sq.getEnglishSampleAnswer() : null,
-                    sq.getStatus(),
-                    vocabList,
-                    grammarList
-            );
         } else if (nodeType.equals(NodeType.VOCABULARY_QUESTION)
                 && node.getVocabularyQuestionId() != null) {
             var vq = vocabularyQuestionRepositoryPort
@@ -117,34 +91,28 @@ public class GetLearningPathNodeDetailUseCase implements GetLearningPathNodeDeta
                     .orElseThrow(() -> new ApplicationException(
                             VocabularyQuestionErrorCode.VOCABULARY_QUESTION_NOT_FOUND,
                             VocabularyQuestionDetailMessageKey.VOCABULARY_QUESTION_NOT_FOUND,
-                            node.getVocabularyQuestionId()));
+                            node.getVocabularyQuestionId()
+                    ));
+
             var vocabList = vq.getVocabularies().stream()
-                    .map(v -> new VocabularyDetailResult(
-                            v.getId(),
-                            v.getReading(),
-                            v.getJapanese(),
-                            v.getVietnameseMeaningText(),
-                            v.getEnglishMeaningText()))
+                    .map(vocabularyResultMapper::domainToResult)
                     .toList();
-            vocabularyQuestionResult = new VocabularyQuestionDetailResult(
+
+            vocabularyQuestionResult = new VocabularyQuestionResult(
                     vq.getId(),
                     vocabList
             );
+
         } else if (nodeType.equals(NodeType.CHEST)
                 && node.getChestId() != null) {
-            var chest = chestRepositoryPort.findById(node.getChestId())
+            Chest chest = chestRepositoryPort.findById(node.getChestId())
                     .orElseThrow(() -> new ApplicationException(
                             ChestErrorCode.CHEST_NOT_FOUND,
                             ChestDetailMessageKey.CHEST_NOT_FOUND,
-                            node.getChestId()));
+                            node.getChestId()
+                    ));
 
-            chestResult = new ChestResult(
-                    chest.getId(),
-                    chest.getChestType(),
-                    chest.getDescription(),
-                    chest.getMinPoint(),
-                    chest.getMaxPoint()
-            );
+            chestResult = chestResultMapper.domainToResult(chest);
         }
 
         return new LearningPathNodeDetailResult(

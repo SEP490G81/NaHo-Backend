@@ -2,9 +2,8 @@ package org.naho.learning.dto.response;
 
 import org.naho.chest.dto.response.ChestResponse;
 import org.naho.learning.type.NodeType;
-import org.naho.question.type.QuestionStatus;
-
-import java.util.List;
+import org.naho.question.dto.response.SpeakingQuestionResponse;
+import org.naho.question.dto.response.VocabularyQuestionResponse;
 
 public record LearningPathNodeDetailResponse(
         Long id,
@@ -12,56 +11,8 @@ public record LearningPathNodeDetailResponse(
         NodeType nodeType,
         Double globalOrderIndex,
         Double orderIndex,
-        SpeakingQuestionDetailResponse speakingQuestion,
-        VocabularyQuestionDetailResponse vocabularyQuestion,
+        SpeakingQuestionResponse speakingQuestion,
+        VocabularyQuestionResponse vocabularyQuestion,
         ChestResponse chest
 ) {
-    public record SpeakingQuestionDetailResponse(
-            Long id,
-            Long userId,
-            String japaneseName,
-            String japaneseNameMarkup,
-            String vietnameseName,
-            String description,
-            String descriptionMarkup,
-            String japaneseSampleAnswer,
-            String japaneseSampleAnswerMarkup,
-            String vietnameseSampleAnswer,
-            String englishSampleAnswer,
-            QuestionStatus status,
-            List<VocabularyDetailResponse> vocabularies,
-            List<GrammarDetailResponse> grammars
-    ) {
-        public record VocabularyDetailResponse(
-                Long id,
-                String reading,
-                String japanese,
-                String vietnameseMeaningText,
-                String englishMeaningText
-        ) {
-        }
-
-        public record GrammarDetailResponse(
-                Long id,
-                String reading,
-                String japanese,
-                String vietnameseMeaningText,
-                String englishMeaningText
-        ) {
-        }
-    }
-
-    public record VocabularyQuestionDetailResponse(
-            Long id,
-            List<VocabularyDetailResponse> vocabularies
-    ) {
-        public record VocabularyDetailResponse(
-                Long id,
-                String reading,
-                String japanese,
-                String vietnameseMeaningText,
-                String englishMeaningText
-        ) {
-        }
-    }
 }

@@ -2,7 +2,7 @@ package org.naho.vocabulary.adapter;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.naho.vocabulary.model.Vocabulary;
+import org.naho.question.model.Vocabulary;
 import org.naho.vocabulary.port.out.ExcelWriterPort;
 import org.springframework.stereotype.Component;
 
