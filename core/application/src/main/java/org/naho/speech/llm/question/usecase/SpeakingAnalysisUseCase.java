@@ -11,9 +11,13 @@ import org.naho.speech.azure.command.SpeechAssessmentCommand;
 import org.naho.speech.azure.port.in.SpeechAssessmentInputPort;
 import org.naho.speech.azure.result.SpeechAssessmentResult;
 import org.naho.speech.llm.model.question.AiFeedback;
+import org.naho.speech.llm.question.command.QuestionContextCommand;
 import org.naho.speech.llm.question.command.SpeakingAnalysisCommand;
+import org.naho.speech.llm.question.helper.SpeakingAnalysisHelper;
 import org.naho.speech.llm.question.port.in.SpeakingAnalysisInputPort;
 import org.naho.speech.llm.question.port.out.AiFeedbackRepositoryPort;
+import org.naho.speech.llm.question.port.out.AiQuestionAnalysisPort;
+import org.naho.speech.llm.question.result.AiFeedbackResult;
 import org.naho.speech.llm.question.result.SpeakingAnalysisResult;
 import org.naho.subscription.model.UserDailyAiUsage;
 import org.naho.subscription.port.out.UserDailyAiUsageRepositoryPort;
@@ -26,19 +30,25 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     private final TransactionPort transactionPort;
     private final SpeechAssessmentInputPort speechAssessmentInputPort;
     private final AiFeedbackRepositoryPort aiFeedbackRepositoryPort;
+    private final AiQuestionAnalysisPort aiQuestionAnalysisPort;
+    private final SpeakingAnalysisHelper speakingAnalysisHelper;
 
     public SpeakingAnalysisUseCase(
             UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort,
             UploadFileInputPort uploadFileInputPort,
             TransactionPort transactionPort,
             SpeechAssessmentInputPort speechAssessmentInputPort,
-            AiFeedbackRepositoryPort aiFeedbackRepositoryPort
+            AiFeedbackRepositoryPort aiFeedbackRepositoryPort,
+            AiQuestionAnalysisPort aiQuestionAnalysisPort,
+            SpeakingAnalysisHelper speakingAnalysisHelper
     ) {
         this.userDailyAiUsageRepositoryPort = userDailyAiUsageRepositoryPort;
         this.uploadFileInputPort = uploadFileInputPort;
         this.transactionPort = transactionPort;
         this.speechAssessmentInputPort = speechAssessmentInputPort;
         this.aiFeedbackRepositoryPort = aiFeedbackRepositoryPort;
+        this.aiQuestionAnalysisPort = aiQuestionAnalysisPort;
+        this.speakingAnalysisHelper = speakingAnalysisHelper;
     }
 
     @Override
@@ -70,19 +80,30 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         SpeechAssessmentResult speechAssessmentResult =
                 speechAssessmentInputPort.assessAudio(SpeechAssessmentCommand.builder()
                         .audioBytes(command.audioBytes())
-                        .duration(command.duration())
+                        .duration(command.duration() != null ? command.duration() : 0.0)
                         .userId(command.userId())
                         .build()
                 );
 
-        // Parse OpenAI ở đây
-        AiFeedback aiFeedback = null;
+        // DB-R: Lấy SpeakingQuestion và context curriculum để build prompt
+        QuestionContextCommand contextCommand = speakingAnalysisHelper.buildContextCommand(
+                command.speakingQuestionId(),
+                speechAssessmentResult.transcriptText()
+        );
 
+        // EXT: Gọi OpenAI LLM (ngoài DB transaction)
+        String rawLlmResponse = aiQuestionAnalysisPort.analyzeSpeaking(contextCommand);
+
+        // Parse OpenAI
+        AiFeedback aiFeedback = speakingAnalysisHelper.parseLlmResponse(rawLlmResponse, speechAssessmentResult);
+        System.out.println("ai feed back: " + aiFeedback);
         // tăng số lần đánh giá AI với speaking question của người dùng lên 1 (today)
         userDailyAiUsage.increaseSpeakingEvaluationCount();
         userDailyAiUsageRepositoryPort.save(userDailyAiUsage);
 
         AiFeedback savedAiFeedback = aiFeedbackRepositoryPort.createNew(aiFeedback);
+
+
         return null;
     }
 }
