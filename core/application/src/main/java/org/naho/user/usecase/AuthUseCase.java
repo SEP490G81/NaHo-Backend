@@ -256,10 +256,15 @@ public class AuthUseCase implements AuthInputPort {
 
         String hashRefreshToken = encoderPort.hashRefreshToken(refreshToken.value());
 
+        String deviceId = command.getDeviceId();
+        if (deviceId == null || deviceId.isBlank()) {
+            deviceId = "google-oauth2-" + providerUserId;
+        }
+
         UserSession userSession = UserSession.builder()
                 .userId(currentUser.getId())
                 .hashRefreshToken(hashRefreshToken)
-                .deviceId(command.getDeviceId())
+                .deviceId(deviceId)
                 .userAgent(command.getUserAgent())
                 .ipAddress(command.getIpAddress())
                 .issuedAt(now)

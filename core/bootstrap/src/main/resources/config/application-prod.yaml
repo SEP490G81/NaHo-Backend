@@ -34,3 +34,4 @@ logging:
 app:
   cookie:
     secure: true
+    domain: ${COOKIE_DOMAIN:naho.io.vn}

@@ -51,9 +51,14 @@ public class OpenAiCostManagementAdapter implements OpenAiCostManagementPort {
     }
 
     private String getEffectiveApiKey() {
-        if (configProperties.getAdminApiKey() != null && !configProperties.getAdminApiKey().isBlank()) {
-            return configProperties.getAdminApiKey();
+        String adminKey = configProperties.getAdminApiKey();
+        if (adminKey != null && !adminKey.isBlank() && !adminKey.startsWith("${")) {
+            return adminKey;
         }
-        return configProperties.getApiKey();
+        String apiKey = configProperties.getApiKey();
+        if (apiKey != null && !apiKey.startsWith("${")) {
+            return apiKey;
+        }
+        return apiKey;
     }
 }

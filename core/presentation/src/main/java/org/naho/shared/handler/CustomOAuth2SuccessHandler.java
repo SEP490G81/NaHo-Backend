@@ -4,6 +4,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.naho.user.command.GoogleLoginCommand;
 import org.naho.user.helper.CookieFactory;
 import org.naho.user.helper.LoginRequestResolver;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler {
@@ -34,32 +36,42 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
             HttpServletResponse response,
             Authentication authentication
     ) throws IOException, ServletException {
-        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-        String sub = oAuth2User.getAttribute("sub");
-        String email = oAuth2User.getAttribute("email");
-        String name = oAuth2User.getAttribute("name");
-        String picture = oAuth2User.getAttribute("picture");
+        try {
+            OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+            String sub = oAuth2User.getAttribute("sub");
+            String email = oAuth2User.getAttribute("email");
+            String name = oAuth2User.getAttribute("name");
+            String picture = oAuth2User.getAttribute("picture");
 
-        GoogleLoginCommand command = GoogleLoginCommand.builder()
-                .sub(sub)
-                .email(email)
-                .fullName(name)
-                .pictureUrl(picture)
-                .deviceId(loginRequestResolver.getDeviceId(request))
-                .userAgent(loginRequestResolver.getUserAgent(request))
-                .ipAddress(loginRequestResolver.getIpAddress(request))
-                .build();
+            String deviceId = loginRequestResolver.getDeviceId(request);
+            if (deviceId == null || deviceId.isBlank()) {
+                deviceId = "google-oauth2-" + sub;
+            }
 
-        LoginResult result = authInputPort.googleLogin(command);
+            GoogleLoginCommand command = GoogleLoginCommand.builder()
+                    .sub(sub)
+                    .email(email)
+                    .fullName(name)
+                    .pictureUrl(picture)
+                    .deviceId(deviceId)
+                    .userAgent(loginRequestResolver.getUserAgent(request))
+                    .ipAddress(loginRequestResolver.getIpAddress(request))
+                    .build();
 
-        ResponseCookie accessTokenCookie =
-                cookieFactory.createCookieForJWTToken(result.accessToken());
-        ResponseCookie refreshTokenCookie =
-                cookieFactory.createCookieForJWTToken(result.refreshToken());
+            LoginResult result = authInputPort.googleLogin(command);
 
-        response.addHeader("Set-Cookie", accessTokenCookie.toString());
-        response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+            ResponseCookie accessTokenCookie =
+                    cookieFactory.createCookieForJWTToken(result.accessToken());
+            ResponseCookie refreshTokenCookie =
+                    cookieFactory.createCookieForJWTToken(result.refreshToken());
 
-        response.sendRedirect(frontendUrl);
+            response.addHeader("Set-Cookie", accessTokenCookie.toString());
+            response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+
+            response.sendRedirect(frontendUrl);
+        } catch (Exception e) {
+            log.error("Google OAuth2 login failed: ", e);
+            response.sendRedirect(frontendUrl + "/login?error=oauth2_failed");
+        }
     }
 }

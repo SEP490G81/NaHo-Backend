@@ -49,6 +49,10 @@ public class AzureCostManagementService implements AzureCostManagementPort {
 
     @Override
     public List<AzureDailyCost> fetchDailyCostsFromAzure(LocalDate fromDate, LocalDate toDate) {
+        if (configProperties.getTenantId() == null || configProperties.getTenantId().isBlank() || configProperties.getTenantId().startsWith("${")) {
+            log.warn("Azure Cost API disabled: AZURE_TENANT_ID is not configured.");
+            return java.util.Collections.emptyList();
+        }
         String token = getAccessToken();
         String url = String.format(configProperties.getQueryUrlTemplate(), configProperties.getSubscriptionId());
 

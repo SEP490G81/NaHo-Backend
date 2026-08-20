@@ -57,7 +57,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
             JwtAuthenticationFilter jwtAuthenticationFilter,
-            CustomOAuth2SuccessHandler customOAuth2SuccessHandler
+            CustomOAuth2SuccessHandler customOAuth2SuccessHandler,
+            HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository
     ) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -73,6 +74,8 @@ public class SecurityConfig {
                         UsernamePasswordAuthenticationFilter.class
                 )
                 .oauth2Login(oauth2 -> oauth2
+                        .authorizationEndpoint(authorization -> authorization
+                                .authorizationRequestRepository(cookieAuthorizationRequestRepository))
                         .successHandler(customOAuth2SuccessHandler))
                 .build();
     }
