@@ -10,4 +10,7 @@ public class PersonaDetailMessageKey {
     public static final String PERSONA_GET_CONVERSATION_STYLE_SUCCESS = "persona.get_conversation_style.success.detail";
     public static final String PERSONA_CREATE_SUCCESS = "persona.create.success.detail";
     public static final String PERSONA_UPDATE_SUCCESS = "persona.update.success.detail";
+    public static final String PERSONA_UPDATE_STATUS_SUCCESS = "persona.update_status.success.detail";
+    public static final String PERSONA_UPDATE_STATUS_FAILED = "persona.update_status.failed";
+    public static final String PERSONA_AVATAR_UPLOAD_SUCCESS = "persona.avatar_upload.success.detail";
 }

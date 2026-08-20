@@ -8,6 +8,7 @@ import org.naho.persona.model.Persona;
 import org.naho.persona.port.in.UpdatePersonaInputPort;
 import org.naho.persona.port.out.ConversationStyleRepositoryPort;
 import org.naho.persona.port.out.PersonaRepositoryPort;
+import org.naho.persona.type.PersonaStatus;
 import org.naho.shared.exception.ApplicationException;
 
 public class UpdatePersonaUseCase implements UpdatePersonaInputPort {
@@ -34,6 +35,8 @@ public class UpdatePersonaUseCase implements UpdatePersonaInputPort {
                 ? command.suggestedConversationStyleId()
                 : existing.getSuggestedConversationStyleId();
 
+        ConversationStyle savedStyle = existing.getConversationStyle();
+
         if (command.conversationStyleCommand() != null && conversationStyleRepositoryPort != null) {
             Long styleToUpdateId = command.conversationStyleCommand().id() != null
                     ? command.conversationStyleCommand().id()
@@ -47,7 +50,7 @@ public class UpdatePersonaUseCase implements UpdatePersonaInputPort {
                     .marugotoLevel(command.conversationStyleCommand().marugotoLevel())
                     .build();
 
-            ConversationStyle savedStyle = conversationStyleRepositoryPort.save(styleToSave);
+            savedStyle = conversationStyleRepositoryPort.save(styleToSave);
             styleId = savedStyle.getId();
         }
 
@@ -57,8 +60,47 @@ public class UpdatePersonaUseCase implements UpdatePersonaInputPort {
                 .prompt(command.prompt())
                 .avatarFileId(command.avatarFileId())
                 .suggestedConversationStyleId(styleId)
+                .conversationStyle(savedStyle)
+                .status(existing.getStatus())
                 .build();
 
         return personaRepositoryPort.save(updated);
     }
+
+    @Override
+    public PersonaStatus updateStatus(Long id) {
+        Persona persona = personaRepositoryPort.findById(id)
+                .orElseThrow(() -> new ApplicationException(
+                        PersonaErrorCode.PERSONA_NOT_FOUND,
+                        PersonaDetailMessageKey.PERSONA_NOT_FOUND,
+                        id
+                ));
+
+        PersonaStatus newStatus = getNewStatus(persona);
+        personaRepositoryPort.updatePersonaStatus(id, newStatus);
+        return newStatus;
+    }
+
+    /**
+     * Lấy trạng thái mới của nhân vật dựa trên trạng thái hiện tại
+     * ACTIVE => UNACTIVE
+     * UNACTIVE => ACTIVE
+     *
+     * @param persona nhân vật bị chỉnh sửa trạng thái
+     * @return new PersonaStatus
+     */
+    private PersonaStatus getNewStatus(Persona persona) {
+        if (PersonaStatus.ACTIVE.equals(persona.getStatus())) {
+            return PersonaStatus.UNACTIVE;
+        } else if (PersonaStatus.UNACTIVE.equals(persona.getStatus())) {
+            return PersonaStatus.ACTIVE;
+        } else {
+            throw new ApplicationException(
+                    PersonaErrorCode.PERSONA_PERSIST_FAILED,
+                    PersonaDetailMessageKey.PERSONA_UPDATE_STATUS_FAILED
+            );
+        }
+    }
 }
+
+

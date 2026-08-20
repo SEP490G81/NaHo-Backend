@@ -6,6 +6,7 @@ import org.naho.persona.model.Persona;
 import org.naho.persona.port.in.CreatePersonaInputPort;
 import org.naho.persona.port.out.ConversationStyleRepositoryPort;
 import org.naho.persona.port.out.PersonaRepositoryPort;
+import org.naho.persona.type.PersonaStatus;
 
 public class CreatePersonaUseCase implements CreatePersonaInputPort {
 
@@ -21,6 +22,7 @@ public class CreatePersonaUseCase implements CreatePersonaInputPort {
     @Override
     public Persona createPersona(CreatePersonaCommand command) {
         Long styleId = command.suggestedConversationStyleId();
+        ConversationStyle savedStyle = null;
 
         if (command.conversationStyleCommand() != null && conversationStyleRepositoryPort != null) {
             ConversationStyle newStyle = ConversationStyle.builder()
@@ -29,7 +31,7 @@ public class CreatePersonaUseCase implements CreatePersonaInputPort {
                     .formalityLevel(command.conversationStyleCommand().formalityLevel())
                     .marugotoLevel(command.conversationStyleCommand().marugotoLevel())
                     .build();
-            ConversationStyle savedStyle = conversationStyleRepositoryPort.save(newStyle);
+            savedStyle = conversationStyleRepositoryPort.save(newStyle);
             styleId = savedStyle.getId();
         }
 
@@ -38,8 +40,12 @@ public class CreatePersonaUseCase implements CreatePersonaInputPort {
                 .prompt(command.prompt())
                 .avatarFileId(command.avatarFileId())
                 .suggestedConversationStyleId(styleId)
+                .conversationStyle(savedStyle)
+                .status(PersonaStatus.ACTIVE)
                 .build();
 
         return personaRepositoryPort.save(persona);
     }
 }
+
+

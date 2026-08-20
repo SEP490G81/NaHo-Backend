@@ -323,8 +323,10 @@ CREATE TABLE personas
     prompt                          TEXT         NOT NULL,
     avatar_file_id                  BIGINT NULL,
     suggested_conversation_style_id BIGINT       NOT NULL,
+    status                          VARCHAR(20)  NOT NULL DEFAULT 'ACTIVE',
     CONSTRAINT pk_personas PRIMARY KEY (id)
 );
+
 
 CREATE TABLE point_histories
 (

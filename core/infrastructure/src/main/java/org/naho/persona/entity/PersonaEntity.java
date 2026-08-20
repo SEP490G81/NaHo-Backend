@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.file.entity.FileEntity;
+import org.naho.persona.type.PersonaStatus;
 import org.naho.shared.persistence.BaseEntity;
 
 @SuperBuilder
@@ -29,4 +30,8 @@ public class PersonaEntity extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "suggested_conversation_style_id", nullable = false)
     ConversationStyleEntity suggestedConversationStyle;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    PersonaStatus status;
 }

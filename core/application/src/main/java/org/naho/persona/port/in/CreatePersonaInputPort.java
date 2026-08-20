@@ -6,3 +6,5 @@ import org.naho.persona.model.Persona;
 public interface CreatePersonaInputPort {
     Persona createPersona(CreatePersonaCommand command);
 }
+
+

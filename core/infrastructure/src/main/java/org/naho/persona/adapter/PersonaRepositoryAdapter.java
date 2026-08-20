@@ -3,12 +3,16 @@ package org.naho.persona.adapter;
 import lombok.RequiredArgsConstructor;
 import org.naho.file.entity.FileEntity;
 import org.naho.file.repository.FileJpaRepository;
+import org.naho.i18n.message.persona.PersonaDetailMessageKey;
 import org.naho.persona.entity.ConversationStyleEntity;
 import org.naho.persona.entity.PersonaEntity;
+import org.naho.persona.exception.PersonaErrorCode;
 import org.naho.persona.model.Persona;
 import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.naho.persona.repository.ConversationStyleJpaRepository;
 import org.naho.persona.repository.PersonaJpaRepository;
+import org.naho.persona.type.PersonaStatus;
+import org.naho.shared.exception.InfrastructureException;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -42,6 +46,20 @@ public class PersonaRepositoryAdapter implements PersonaRepositoryPort {
         return entityToDomain(saved);
     }
 
+    @Override
+    public PersonaStatus updatePersonaStatus(Long id, PersonaStatus status) {
+        PersonaEntity entity = personaJpaRepository.findById(id)
+                .orElseThrow(() -> new InfrastructureException(
+                        PersonaErrorCode.PERSONA_NOT_FOUND,
+                        PersonaDetailMessageKey.PERSONA_NOT_FOUND,
+                        id
+                ));
+
+        entity.setStatus(status);
+        personaJpaRepository.save(entity);
+        return status;
+    }
+
     private Persona entityToDomain(PersonaEntity entity) {
         org.naho.persona.model.ConversationStyle conversationStyle = null;
         if (entity.getSuggestedConversationStyle() != null) {
@@ -61,6 +79,7 @@ public class PersonaRepositoryAdapter implements PersonaRepositoryPort {
                 .avatarFileId(entity.getAvatarFile() != null ? entity.getAvatarFile().getId() : null)
                 .suggestedConversationStyleId(entity.getSuggestedConversationStyle() != null ? entity.getSuggestedConversationStyle().getId() : null)
                 .conversationStyle(conversationStyle)
+                .status(entity.getStatus() != null ? entity.getStatus() : PersonaStatus.ACTIVE)
                 .build();
     }
 
@@ -78,7 +97,8 @@ public class PersonaRepositoryAdapter implements PersonaRepositoryPort {
                 .name(domain.getName())
                 .prompt(domain.getPrompt())
                 .avatarFile(avatar)
-                .suggestedConversationStyle(style);
+                .suggestedConversationStyle(style)
+                .status(domain.getStatus() != null ? domain.getStatus() : PersonaStatus.ACTIVE);
 
         if (domain.getId() != null) {
             builder.id(domain.getId());
@@ -87,3 +107,4 @@ public class PersonaRepositoryAdapter implements PersonaRepositoryPort {
         return builder.build();
     }
 }
+

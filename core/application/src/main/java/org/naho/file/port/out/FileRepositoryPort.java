@@ -16,6 +16,8 @@ public interface FileRepositoryPort {
 
     List<File> findAllByBookIds(List<Long> ids);
 
+    List<File> findAllByIds(List<Long> ids);
+
     File findByObjectKey(String objectKey);
 
     File createNewForUpload(StoredFile storedFile, boolean isPublic);

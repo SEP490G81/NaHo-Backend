@@ -146,6 +146,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
                         .build()
                 );
 
+        System.out.println("thằng azure trả: [" + speechAssessment.getTranscriptText() + "]");
+
         // Lưu vào db
         SpeechAssessment savedSpeechAssessment = speechAssessmentRepositoryPort.createNew(speechAssessment);
 
@@ -157,6 +159,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
 
         // EXT: Gọi OpenAI LLM (ngoài DB transaction)
         String rawLlmResponse = aiQuestionAnalysisPort.analyzeSpeaking(contextCommand);
+        System.out.println("AI RAW RESPONSE: " + rawLlmResponse);
 
         // Parse OpenAI Response
         AiFeedback aiFeedback = speakingAnalysisHelper.parseLlmResponse(rawLlmResponse);

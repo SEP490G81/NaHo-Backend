@@ -2,6 +2,7 @@ package org.naho.persona.model;
 
 import org.naho.i18n.message.persona.PersonaDetailMessageKey;
 import org.naho.persona.exception.PersonaDomainErrorCode;
+import org.naho.persona.type.PersonaStatus;
 import org.naho.shared.exception.DomainException;
 
 public class Persona {
@@ -12,6 +13,7 @@ public class Persona {
     private final ConversationStyle conversationStyle;
     private final String name;
     private final String prompt;
+    private final PersonaStatus status;
 
     private Persona(Builder builder) {
         this.id = builder.id;
@@ -20,6 +22,7 @@ public class Persona {
         this.conversationStyle = builder.conversationStyle;
         this.name = builder.name;
         this.prompt = builder.prompt;
+        this.status = builder.status;
     }
 
     public static Builder builder() {
@@ -50,6 +53,10 @@ public class Persona {
         return prompt;
     }
 
+    public PersonaStatus getStatus() {
+        return status;
+    }
+
     public static class Builder {
 
         private Long id;
@@ -58,6 +65,7 @@ public class Persona {
         private ConversationStyle conversationStyle;
         private String name;
         private String prompt;
+        private PersonaStatus status = PersonaStatus.ACTIVE;
 
         public Builder id(Long id) {
             this.id = id;
@@ -89,6 +97,11 @@ public class Persona {
             return this;
         }
 
+        public Builder status(PersonaStatus status) {
+            this.status = status;
+            return this;
+        }
+
         public Persona build() {
 
             if (name == null || name.isBlank()) {
@@ -103,6 +116,10 @@ public class Persona {
                         PersonaDomainErrorCode.PERSONA_PROMPT_NOT_VALID,
                         PersonaDetailMessageKey.PERSONA_PROMPT_BLANK
                 );
+            }
+
+            if (status == null) {
+                status = PersonaStatus.ACTIVE;
             }
 
             return new Persona(this);
