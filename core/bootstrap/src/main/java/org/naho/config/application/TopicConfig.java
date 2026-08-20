@@ -1,19 +1,11 @@
 package org.naho.config.application;
 
 import org.naho.book.mapper.TopicResultMapper;
-import org.naho.book.port.in.CreateTopicInputPort;
-import org.naho.book.port.in.DeleteTopicInputPort;
-import org.naho.book.port.in.GetTopicDetailInputPort;
-import org.naho.book.port.in.ListTopicInputPort;
-import org.naho.book.port.in.UpdateTopicInputPort;
+import org.naho.book.port.in.*;
 import org.naho.book.port.out.LessonRepositoryPort;
 import org.naho.book.port.out.TopicListRepositoryPort;
 import org.naho.book.port.out.TopicRepositoryPort;
-import org.naho.book.usecase.CreateTopicUseCase;
-import org.naho.book.usecase.DeleteTopicUseCase;
-import org.naho.book.usecase.GetTopicDetailUseCase;
-import org.naho.book.usecase.ListTopicUseCase;
-import org.naho.book.usecase.UpdateTopicUseCase;
+import org.naho.book.usecase.*;
 import org.naho.furigana.port.out.FuriganaGenerationPort;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.shared.port.out.TransactionPort;

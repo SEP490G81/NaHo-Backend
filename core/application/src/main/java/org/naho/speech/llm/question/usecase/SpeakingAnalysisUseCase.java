@@ -5,7 +5,15 @@ import org.naho.file.model.File;
 import org.naho.file.port.in.UploadFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.result.FileResult;
+import org.naho.i18n.message.learning.LearningPathNodeDetailMessageKey;
+import org.naho.i18n.message.learning.UserLearningProgressDetailMessageKey;
 import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
+import org.naho.learning.exception.LearningPathNodeErrorCode;
+import org.naho.learning.exception.UserLearningProgressErrorCode;
+import org.naho.learning.model.LearningPathNode;
+import org.naho.learning.model.UserLearningProgress;
+import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
+import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
 import org.naho.question.exception.SpeakingQuestionErrorCode;
 import org.naho.question.port.out.AnswerHistoryRepositoryPort;
 import org.naho.question.port.out.AnswerHistoryResultMapper;
@@ -42,6 +50,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     private final AnswerHistoryRepositoryPort answerHistoryRepositoryPort;
     private final AnswerHistoryResultMapper answerHistoryResultMapper;
     private final FileRepositoryPort fileRepositoryPort;
+    private final LearningPathNodeRepositoryPort learningPathNodeRepositoryPort;
+    private final UserLearningProgressRepositoryPort userLearningProgressRepositoryPort;
 
     public SpeakingAnalysisUseCase(
             UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort,
@@ -54,7 +64,9 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             SpeechAssessmentRepositoryPort speechAssessmentRepositoryPort,
             AnswerHistoryRepositoryPort answerHistoryRepositoryPort,
             AnswerHistoryResultMapper answerHistoryResultMapper,
-            FileRepositoryPort fileRepositoryPort
+            FileRepositoryPort fileRepositoryPort,
+            LearningPathNodeRepositoryPort learningPathNodeRepositoryPort,
+            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort
     ) {
         this.userDailyAiUsageRepositoryPort = userDailyAiUsageRepositoryPort;
         this.uploadFileInputPort = uploadFileInputPort;
@@ -67,6 +79,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         this.answerHistoryRepositoryPort = answerHistoryRepositoryPort;
         this.answerHistoryResultMapper = answerHistoryResultMapper;
         this.fileRepositoryPort = fileRepositoryPort;
+        this.learningPathNodeRepositoryPort = learningPathNodeRepositoryPort;
+        this.userLearningProgressRepositoryPort = userLearningProgressRepositoryPort;
     }
 
     @Override
@@ -81,11 +95,40 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     }
 
     private AnswerHistoryResult doAnalyzeSpeaking(SpeakingAnalysisCommand command) {
+        // DB-R (Database Reading) Lấy learning path node hiện tại của user
+        LearningPathNode learningPathNode = learningPathNodeRepositoryPort
+                .findBySpeakingQuestionId(command.speakingQuestionId())
+                .orElseThrow(() -> new ApplicationException(
+                        LearningPathNodeErrorCode.LEARNING_PATH_NODE_NOT_FOUND,
+                        LearningPathNodeDetailMessageKey.LEARNING_PATH_NODE_ID_NOT_FOUND,
+                        command.speakingQuestionId()
+                ));
+
+        // DB-R (Database Reading) - Lấy tiến trình học của user
+        UserLearningProgress progress = userLearningProgressRepositoryPort
+                .findByUserId(command.userId())
+                .orElseThrow(() -> new ApplicationException(
+                        UserLearningProgressErrorCode.USER_LEARNING_PROGRESS_NOT_FOUND,
+                        UserLearningProgressDetailMessageKey.USER_LEARNING_PROGRESS_NOT_FOUND_BY_USER_ID,
+                        command.userId()
+                ));
+
+        // VALIDATE LOGIC
+        // nếu node xa nhất người dùng có thể học chưa tới
+        // thì ném ra lỗi
+        if (progress.getFarthestAvailableNodeGlobalOrderIndex() < learningPathNode.getGlobalOrderIndex()) {
+            throw new ApplicationException(
+                    SpeakingQuestionErrorCode.SPEAKING_QUESTION_LOCKED,
+                    SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_LOCKED
+            );
+        }
+
         LocalDate today = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID);
 
         UserDailyAiUsage userDailyAiUsage = userDailyAiUsageRepositoryPort
                 .findByUserIdAndUsageDateCreateIfNotExists(command.userId(), today);
 
+        // VALIDATE LOGIC
         // nếu người dùng đã sử dụng hết lượt đánh giá trong ngày hôm nay
         if (userDailyAiUsage.getSpeakingEvaluationCount() >= command.dailySpeakingQuestionEvaluationLimit()) {
             throw new ApplicationException(

@@ -21,16 +21,16 @@
         select *
         from files
         where operation_type = #{operationType}
-        and operation_status = #{operationStatus}
-        and #{maxRetryCount} > retry_count
-        and (next_retry_at is null or #{now} >= next_retry_at)
+          and operation_status = #{operationStatus}
+          and #{maxRetryCount} > retry_count
+          and (next_retry_at is null or #{now} >= next_retry_at)
         order by created_time limit 100
     </select>
 
     <select id="findAvatarFileByUserId" resultMap="FileEntityResultMap">
         select f.*
         from users u
-        join files f on u.avatar_file_id = f.id
+                 join files f on u.avatar_file_id = f.id
         where u.id = #{userId}
     </select>
 </mapper>
