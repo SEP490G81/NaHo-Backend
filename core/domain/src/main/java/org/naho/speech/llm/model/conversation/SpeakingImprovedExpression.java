@@ -3,7 +3,7 @@ package org.naho.speech.llm.model.conversation;
 public class SpeakingImprovedExpression {
 
     private Long id;
-    private Long assessmentId;
+    private Long speakingSessionAssessmentId;
     private Integer turnIndex;
     private String originalText;
     private String improvedText;
@@ -11,7 +11,7 @@ public class SpeakingImprovedExpression {
 
     private SpeakingImprovedExpression(Builder builder) {
         this.id = builder.id;
-        this.assessmentId = builder.assessmentId;
+        this.speakingSessionAssessmentId = builder.speakingSessionAssessmentId;
         this.turnIndex = builder.turnIndex;
         this.originalText = builder.originalText;
         this.improvedText = builder.improvedText;
@@ -24,7 +24,7 @@ public class SpeakingImprovedExpression {
 
     public static class Builder {
         private Long id;
-        private Long assessmentId;
+        private Long speakingSessionAssessmentId;
         private Integer turnIndex;
         private String originalText;
         private String improvedText;
@@ -35,8 +35,8 @@ public class SpeakingImprovedExpression {
             return this;
         }
 
-        public Builder assessmentId(Long assessmentId) {
-            this.assessmentId = assessmentId;
+        public Builder speakingSessionAssessmentId(Long speakingSessionAssessmentId) {
+            this.speakingSessionAssessmentId = speakingSessionAssessmentId;
             return this;
         }
 

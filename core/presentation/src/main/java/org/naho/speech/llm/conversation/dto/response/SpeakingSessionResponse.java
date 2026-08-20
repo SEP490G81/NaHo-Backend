@@ -24,6 +24,8 @@ public record SpeakingSessionResponse(
         SpeakingSessionStatus status,
         Instant startedAt,
         Instant endedAt,
-        List<SpeakingSessionMessageResponse> messages
+
+        SpeakingSessionAssessmentResponse speakingSessionAssessment,
+        List<SpeakingSessionMessageResponse> speakingSessionMessages
 ) {
 }

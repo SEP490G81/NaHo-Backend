@@ -6,7 +6,6 @@ import org.naho.i18n.message.llm.LlmDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.speech.azure.port.out.TextToSpeechServicePort;
 import org.naho.speech.llm.conversation.exception.LlmApplicationError;
-import org.naho.speech.llm.conversation.port.out.SessionStorePort;
 import org.naho.speech.llm.conversation.port.out.SpeakingSessionRepositoryPort;
 import org.naho.speech.llm.model.conversation.SpeakingSession;
 
@@ -62,16 +61,13 @@ public class SpeakingSessionHelper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    private final SessionStorePort sessionStorePort;
     private final SpeakingSessionRepositoryPort speakingSessionRepositoryPort;
     private final TextToSpeechServicePort textToSpeechServicePort;
 
     public SpeakingSessionHelper(
-            SessionStorePort sessionStorePort,
             SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
             TextToSpeechServicePort textToSpeechServicePort
     ) {
-        this.sessionStorePort = sessionStorePort;
         this.speakingSessionRepositoryPort = speakingSessionRepositoryPort;
         this.textToSpeechServicePort = textToSpeechServicePort;
     }
@@ -125,24 +121,87 @@ public class SpeakingSessionHelper {
         }
     }
 
-    public List<Map<String, String>> getSlidingWindowMessages(String sessionCode) {
-        List<Map<String, String>> history = sessionStorePort.getConversationHistory(sessionCode);
-        if (history == null || history.isEmpty()) {
-            return List.of();
+    public String buildPersonaContext(org.naho.persona.model.Persona persona, org.naho.persona.type.FormalityLevel formalityLevel, org.naho.persona.type.MarugotoLevel marugotoLevel) {
+        if (persona == null) {
+            return "";
+        }
+        StringBuilder personaContext = new StringBuilder();
+        personaContext.append("Persona name: ").append(persona.getName()).append("\n");
+        if (persona.getPrompt() != null) {
+            personaContext.append("Persona role: ").append(persona.getPrompt()).append("\n");
+        }
+        if (persona.getConversationStyle() != null) {
+            if (persona.getConversationStyle().getDescription() != null) {
+                personaContext.append("Style description: ").append(persona.getConversationStyle().getDescription())
+                        .append("\n");
+            }
+            if (persona.getConversationStyle().getPrompt() != null) {
+                personaContext.append("Style instructions: ").append(persona.getConversationStyle().getPrompt())
+                        .append("\n");
+            }
         }
 
-        List<Map<String, String>> recentHistory;
-        if (history.size() > MAX_SLIDING_WINDOW_MESSAGES) {
-            recentHistory = history.subList(history.size() - MAX_SLIDING_WINDOW_MESSAGES, history.size());
-        } else {
-            recentHistory = history;
+        if (formalityLevel != null) {
+            personaContext.append("formalityLevel: ").append(formalityLevel.name()).append("\n");
         }
 
-        String personaContext = sessionStorePort.getPersonaContext(sessionCode);
-        String customInstruction = (personaContext != null && !personaContext.isBlank())
-                ? personaContext
-                : PERSONA_INSTRUCTION;
+        if (marugotoLevel != null) {
+            personaContext.append("marugotoLevel: ").append(marugotoLevel.name()).append("\n");
+        }
+        return personaContext.toString();
+    }
 
+    public String buildCustomInstruction(org.naho.persona.model.Persona persona, org.naho.persona.type.FormalityLevel formalityLevel, org.naho.persona.type.MarugotoLevel marugotoLevel) {
+        StringBuilder customInstruction = new StringBuilder(PERSONA_INSTRUCTION);
+        if (persona != null) {
+            if (persona.getPrompt() != null) {
+                customInstruction.append("\n- Your persona role & prompt: ").append(persona.getPrompt());
+            }
+            if (persona.getConversationStyle() != null) {
+                if (persona.getConversationStyle().getDescription() != null) {
+                    customInstruction.append("\n- Conversation style description: ")
+                            .append(persona.getConversationStyle().getDescription());
+                }
+                if (persona.getConversationStyle().getPrompt() != null) {
+                    customInstruction.append("\n- Conversation style prompt: ")
+                            .append(persona.getConversationStyle().getPrompt());
+                }
+            }
+        }
+
+        if (formalityLevel != null) {
+            customInstruction.append("\n- Formality level (Keigo/Style): ").append(formalityLevel.name());
+        }
+
+        if (marugotoLevel != null) {
+            customInstruction.append("\n- Marugoto course level: ").append(marugotoLevel.name());
+        }
+        return customInstruction.toString();
+    }
+
+    public List<Map<String, String>> getSlidingWindowMessages(
+            SpeakingSession speakingSession,
+            org.naho.persona.model.Persona persona,
+            List<org.naho.speech.llm.model.conversation.SpeakingSessionMessage> messages
+    ) {
+        List<Map<String, String>> history = new ArrayList<>();
+        if (messages != null && !messages.isEmpty()) {
+            List<org.naho.speech.llm.model.conversation.SpeakingSessionMessage> recentMessages;
+            if (messages.size() > MAX_SLIDING_WINDOW_MESSAGES) {
+                recentMessages = messages.subList(messages.size() - MAX_SLIDING_WINDOW_MESSAGES, messages.size());
+            } else {
+                recentMessages = messages;
+            }
+            for (org.naho.speech.llm.model.conversation.SpeakingSessionMessage msg : recentMessages) {
+                String role = msg.getSenderType() != null ? msg.getSenderType().toLowerCase() : "user";
+                history.add(Map.of("role", role, "content", msg.getContent() != null ? msg.getContent() : ""));
+            }
+        }
+
+        org.naho.persona.type.FormalityLevel formality = speakingSession != null ? speakingSession.getFormalityLevel() : null;
+        org.naho.persona.type.MarugotoLevel marugoto = speakingSession != null ? speakingSession.getMarugotoLevel() : null;
+
+        String customInstruction = buildCustomInstruction(persona, formality, marugoto);
         String formattedSystemPrompt = SYSTEM_PROMPT_TEMPLATE.formatted(customInstruction);
 
         Map<String, String> systemPrompt = new HashMap<>();
@@ -150,8 +209,8 @@ public class SpeakingSessionHelper {
         systemPrompt.put("content", formattedSystemPrompt);
 
         List<Map<String, String>> slidingWindow = new ArrayList<>();
-        slidingWindow.addAll(recentHistory);
         slidingWindow.add(systemPrompt);
+        slidingWindow.addAll(history);
         return slidingWindow;
     }
 

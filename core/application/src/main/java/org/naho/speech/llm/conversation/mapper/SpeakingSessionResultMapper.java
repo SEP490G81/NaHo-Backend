@@ -1,6 +1,7 @@
 package org.naho.speech.llm.conversation.mapper;
 
 import org.naho.speech.llm.conversation.port.out.SpeakingSessionMessageRepositoryPort;
+import org.naho.speech.llm.conversation.result.SpeakingSessionListItemResult;
 import org.naho.speech.llm.conversation.result.SpeakingSessionMessageResult;
 import org.naho.speech.llm.conversation.result.SpeakingSessionResult;
 import org.naho.speech.llm.model.conversation.SpeakingSession;
@@ -47,7 +48,31 @@ public class SpeakingSessionResultMapper {
                 .status(domain.getStatus())
                 .startedAt(domain.getStartedAt())
                 .endedAt(domain.getEndedAt())
-                .messages(messageResults)
+                .speakingSessionMessages(messageResults)
+                .build();
+    }
+
+    public SpeakingSessionListItemResult domainToListItemResult(SpeakingSession domain) {
+        if (domain == null) {
+            return null;
+        }
+
+        return SpeakingSessionListItemResult.builder()
+                .id(domain.getId())
+                .sessionCode(domain.getSessionCode())
+                .userId(domain.getUserId())
+                .personaId(domain.getPersonaId())
+                .topic(domain.getTopic())
+                .voiceName(domain.getVoiceName())
+                .marugotoLevel(domain.getMarugotoLevel())
+                .formalityLevel(domain.getFormalityLevel())
+                .durationSeconds(domain.getDurationSeconds())
+                .totalTurns(domain.getTotalTurns())
+                .asrConfidence(domain.getAsrConfidence())
+                .fullTranscript(domain.getFullTranscript())
+                .status(domain.getStatus())
+                .startedAt(domain.getStartedAt())
+                .endedAt(domain.getEndedAt())
                 .build();
     }
 }

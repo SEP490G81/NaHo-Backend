@@ -44,6 +44,66 @@ public class SpeakingSession {
         this.endedAt = builder.endedAt;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setSessionCode(String sessionCode) {
+        this.sessionCode = sessionCode;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public void setPersonaId(Long personaId) {
+        this.personaId = personaId;
+    }
+
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
+
+    public void setVoiceName(String voiceName) {
+        this.voiceName = voiceName;
+    }
+
+    public void setMarugotoLevel(MarugotoLevel marugotoLevel) {
+        this.marugotoLevel = marugotoLevel;
+    }
+
+    public void setFormalityLevel(FormalityLevel formalityLevel) {
+        this.formalityLevel = formalityLevel;
+    }
+
+    public void setDurationSeconds(Integer durationSeconds) {
+        this.durationSeconds = durationSeconds;
+    }
+
+    public void setTotalTurns(int totalTurns) {
+        this.totalTurns = totalTurns;
+    }
+
+    public void setAsrConfidence(Double asrConfidence) {
+        this.asrConfidence = asrConfidence;
+    }
+
+    public void setFullTranscript(String fullTranscript) {
+        this.fullTranscript = fullTranscript;
+    }
+
+    public void setStatus(SpeakingSessionStatus status) {
+        this.status = status;
+    }
+
+    public void setStartedAt(Instant startedAt) {
+        this.startedAt = startedAt;
+    }
+
+    public void setEndedAt(Instant endedAt) {
+        this.endedAt = endedAt;
+    }
+
     public static Builder builder() {
         return new Builder();
     }

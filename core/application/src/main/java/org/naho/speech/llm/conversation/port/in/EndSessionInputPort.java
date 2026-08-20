@@ -1,9 +1,9 @@
 package org.naho.speech.llm.conversation.port.in;
 
-import org.naho.speech.llm.conversation.result.ScoringResult;
+import org.naho.speech.llm.conversation.result.SpeakingSessionResult;
 
 public interface EndSessionInputPort {
-    ScoringResult endSession(
+    SpeakingSessionResult endSession(
             Long userId,
             String sessionCode,
             String topic,

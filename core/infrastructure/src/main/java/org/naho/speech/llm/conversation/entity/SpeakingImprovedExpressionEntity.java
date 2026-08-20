@@ -17,8 +17,8 @@ import org.naho.shared.persistence.BaseEntity;
 public class SpeakingImprovedExpressionEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "assessment_id", nullable = false)
-    SpeakingSessionAssessmentEntity assessment;
+    @JoinColumn(name = "speaking_session_assessment_id", nullable = false)
+    SpeakingSessionAssessmentEntity speakingSessionAssessment;
 
     @Column(name = "turn_index")
     Integer turnIndex;
@@ -29,6 +29,6 @@ public class SpeakingImprovedExpressionEntity extends BaseEntity {
     @Column(name = "improved_text", nullable = false, columnDefinition = "TEXT")
     String improvedText;
 
-    @Column(name = "explanation_vi", columnDefinition = "TEXT")
-    String explanationVi;
+    @Column(name = "explanation_vietnamese", columnDefinition = "TEXT")
+    String explanationVietnamese;
 }

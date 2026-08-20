@@ -9,16 +9,18 @@ import java.time.Instant;
 public record SpeakingSessionListItemResponse(
         Long id,
         String sessionCode,
-        String topic,
+        Long userId,
         Long personaId,
+        String topic,
+        String voiceName,
         MarugotoLevel marugotoLevel,
         FormalityLevel formalityLevel,
-        int overallScore,
-        String jlptEstimate,
+        Integer durationSeconds,
         int totalTurns,
-        int durationSeconds,
+        Double asrConfidence,
+        String fullTranscript,
+        SpeakingSessionStatus status,
         Instant startedAt,
-        Instant endedAt,
-        SpeakingSessionStatus status
+        Instant endedAt
 ) {
 }

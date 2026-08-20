@@ -24,7 +24,9 @@ public record SpeakingSessionResult(
         SpeakingSessionStatus status,
         Instant startedAt,
         Instant endedAt,
-        List<SpeakingSessionMessageResult> messages
+
+        SpeakingSessionAssessmentResult speakingSessionAssessment,
+        List<SpeakingSessionMessageResult> speakingSessionMessages
 ) {
 
     public static Builder builder() {
@@ -49,7 +51,8 @@ public record SpeakingSessionResult(
         private SpeakingSessionStatus status;
         private Instant startedAt;
         private Instant endedAt;
-        private List<SpeakingSessionMessageResult> messages;
+        private SpeakingSessionAssessmentResult speakingSessionAssessment;
+        private List<SpeakingSessionMessageResult> speakingSessionMessages;
 
         public Builder id(Long id) {
             this.id = id;
@@ -126,8 +129,13 @@ public record SpeakingSessionResult(
             return this;
         }
 
-        public Builder messages(List<SpeakingSessionMessageResult> messages) {
-            this.messages = messages;
+        public Builder speakingSessionAssessment(SpeakingSessionAssessmentResult speakingSessionAssessment) {
+            this.speakingSessionAssessment = speakingSessionAssessment;
+            return this;
+        }
+
+        public Builder speakingSessionMessages(List<SpeakingSessionMessageResult> speakingSessionMessages) {
+            this.speakingSessionMessages = speakingSessionMessages;
             return this;
         }
 
@@ -148,7 +156,8 @@ public record SpeakingSessionResult(
                     status,
                     startedAt,
                     endedAt,
-                    messages
+                    speakingSessionAssessment,
+                    speakingSessionMessages
             );
         }
     }

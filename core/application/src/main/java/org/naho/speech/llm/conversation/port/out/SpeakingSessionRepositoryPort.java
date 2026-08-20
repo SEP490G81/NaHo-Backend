@@ -1,24 +1,19 @@
 package org.naho.speech.llm.conversation.port.out;
 
 import org.naho.file.model.File;
-import org.naho.pagination.PageData;
 import org.naho.persona.type.FormalityLevel;
 import org.naho.persona.type.MarugotoLevel;
-import org.naho.speech.llm.conversation.command.SpeakingSessionFilterCommand;
-import org.naho.speech.llm.conversation.result.ScoringResult;
-import org.naho.speech.llm.conversation.result.SpeakingSessionDetailResult;
-import org.naho.speech.llm.conversation.result.SpeakingSessionListItemResult;
+import org.naho.speech.llm.conversation.result.SpeakingSessionAssessmentResult;
 import org.naho.speech.llm.model.conversation.SpeakingSession;
 import org.naho.speech.llm.type.MessageType;
 import org.naho.speech.llm.type.SpeakingSessionStatus;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 
 public interface SpeakingSessionRepositoryPort {
 
-    void saveSpeakingSession(
+    SpeakingSession saveSpeakingSession(
             String sessionCode,
             Long userId,
             Long personaId,
@@ -29,13 +24,10 @@ public interface SpeakingSessionRepositoryPort {
             int totalTurns,
             Double asrConfidence,
             Instant startedAt,
-            ScoringResult scoringResult);
+            SpeakingSessionAssessmentResult speakingSessionAssessmentResult
+    );
 
-    PageData<SpeakingSessionListItemResult> findUserSessions(SpeakingSessionFilterCommand command);
-
-    Optional<SpeakingSessionDetailResult> findSessionDetailByCode(String sessionCode, Long userId);
-
-    SpeakingSession createInProgressSession(
+    SpeakingSession initSpeakingSession(
             String sessionCode,
             Long userId,
             Long personaId,
@@ -74,7 +66,18 @@ public interface SpeakingSessionRepositoryPort {
             File audioFile
     );
 
-    void updateSessionTurnAndTranscript(String sessionCode, int totalTurns, String fullTranscript);
+    void updateSessionTurnAndTranscript(
+            String sessionCode,
+            int totalTurns,
+            String fullTranscript
+    );
+
+    void updateSessionTurnAndTranscriptAndStatus(
+            String sessionCode,
+            int totalTurns,
+            String fullTranscript,
+            SpeakingSessionStatus status
+    );
 
     /**
      * Kiểm tra phiên đã hoàn thành và chấm điểm (status == COMPLETED) chưa.
@@ -90,9 +93,7 @@ public interface SpeakingSessionRepositoryPort {
     void deleteSessionBySessionCode(String sessionCode);
 
     boolean isSessionBelongToUser(String sessionCode, Long userId);
-
-    boolean isSessionStarted(String sessionCode);
-
+    
     SpeakingSession findBySessionCode(String sessionCode);
 
     SpeakingSession findBySessionCodeAndStatus(String sessionCode, SpeakingSessionStatus status);
