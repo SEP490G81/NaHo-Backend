@@ -25,5 +25,30 @@ public class GrammarConfig {
     ) {
         return new ImportGrammarUseCase(grammarExcelParserPort, saveGrammarPort, transactionPort);
     }
+
+    @Bean
+    public org.naho.grammar.port.in.CreateGrammarInputPort createGrammarInputPort(org.naho.grammar.port.out.GrammarRepositoryPort port) {
+        return new org.naho.grammar.usecase.CreateGrammarUseCase(port);
+    }
+
+    @Bean
+    public org.naho.grammar.port.in.UpdateGrammarInputPort updateGrammarInputPort(org.naho.grammar.port.out.GrammarRepositoryPort port) {
+        return new org.naho.grammar.usecase.UpdateGrammarUseCase(port);
+    }
+
+    @Bean
+    public org.naho.grammar.port.in.DeleteGrammarInputPort deleteGrammarInputPort(org.naho.grammar.port.out.GrammarRepositoryPort port) {
+        return new org.naho.grammar.usecase.DeleteGrammarUseCase(port);
+    }
+
+    @Bean
+    public org.naho.grammar.port.in.GetGrammarDetailInputPort getGrammarDetailInputPort(org.naho.grammar.port.out.GrammarRepositoryPort port) {
+        return new org.naho.grammar.usecase.GetGrammarDetailUseCase(port);
+    }
+
+    @Bean
+    public org.naho.grammar.port.in.SearchGrammarInputPort searchGrammarInputPort(org.naho.grammar.port.out.GrammarRepositoryPort port) {
+        return new org.naho.grammar.usecase.SearchGrammarUseCase(port);
+    }
 }
 
