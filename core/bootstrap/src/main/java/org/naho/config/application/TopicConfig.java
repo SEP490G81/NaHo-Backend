@@ -1,15 +1,22 @@
 package org.naho.config.application;
 
-import org.naho.book.adapter.LessonRepositoryAdapter;
-import org.naho.book.adapter.TopicListRepositoryAdapter;
-import org.naho.book.adapter.TopicRepositoryAdapter;
 import org.naho.book.mapper.TopicResultMapper;
+import org.naho.book.port.in.CreateTopicInputPort;
+import org.naho.book.port.in.DeleteTopicInputPort;
 import org.naho.book.port.in.GetTopicDetailInputPort;
 import org.naho.book.port.in.ListTopicInputPort;
 import org.naho.book.port.in.UpdateTopicInputPort;
+import org.naho.book.port.out.LessonRepositoryPort;
+import org.naho.book.port.out.TopicListRepositoryPort;
+import org.naho.book.port.out.TopicRepositoryPort;
+import org.naho.book.usecase.CreateTopicUseCase;
+import org.naho.book.usecase.DeleteTopicUseCase;
 import org.naho.book.usecase.GetTopicDetailUseCase;
 import org.naho.book.usecase.ListTopicUseCase;
 import org.naho.book.usecase.UpdateTopicUseCase;
+import org.naho.furigana.port.out.FuriganaGenerationPort;
+import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
+import org.naho.shared.port.out.TransactionPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,24 +28,43 @@ public class TopicConfig {
         return new TopicResultMapper();
     }
 
-
     @Bean
     public ListTopicInputPort listTopicUseCasePort(
-            TopicListRepositoryAdapter topicListRepositoryAdapter,
+            TopicListRepositoryPort topicListRepositoryPort,
             TopicResultMapper topicResultMapper
     ) {
-        return new ListTopicUseCase(topicListRepositoryAdapter, topicResultMapper);
+        return new ListTopicUseCase(topicListRepositoryPort, topicResultMapper);
     }
 
     @Bean
-    public GetTopicDetailInputPort getTopicDetailInputPort(TopicRepositoryAdapter topicRepositoryAdapter, LessonRepositoryAdapter lessonRepositoryAdapter) {
-        return new GetTopicDetailUseCase(topicRepositoryAdapter, lessonRepositoryAdapter);
+    public GetTopicDetailInputPort getTopicDetailInputPort(
+            TopicRepositoryPort topicRepositoryPort,
+            LessonRepositoryPort lessonRepositoryPort
+    ) {
+        return new GetTopicDetailUseCase(topicRepositoryPort, lessonRepositoryPort);
     }
 
     @Bean
-    public UpdateTopicInputPort updateTopicInputPort(TopicRepositoryAdapter topicRepositoryAdapter, org.naho.furigana.port.out.FuriganaGenerationPort furiganaGenerationPort) {
-        return new UpdateTopicUseCase(topicRepositoryAdapter, furiganaGenerationPort);
+    public UpdateTopicInputPort updateTopicInputPort(
+            TopicRepositoryPort topicRepositoryPort,
+            FuriganaGenerationPort furiganaGenerationPort
+    ) {
+        return new UpdateTopicUseCase(topicRepositoryPort, furiganaGenerationPort);
     }
 
+    @Bean
+    public CreateTopicInputPort createTopicInputPort(
+            TopicRepositoryPort topicRepositoryPort
+    ) {
+        return new CreateTopicUseCase(topicRepositoryPort);
+    }
 
+    @Bean
+    public DeleteTopicInputPort deleteTopicInputPort(
+            TopicRepositoryPort topicRepositoryPort,
+            SpeakingQuestionRepositoryPort speakingQuestionRepositoryPort,
+            TransactionPort transactionPort
+    ) {
+        return new DeleteTopicUseCase(topicRepositoryPort, speakingQuestionRepositoryPort, transactionPort);
+    }
 }

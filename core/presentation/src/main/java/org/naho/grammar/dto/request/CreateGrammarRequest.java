@@ -9,12 +9,12 @@ import lombok.Setter;
 public class CreateGrammarRequest {
     @NotBlank(message = "reading.must.not.be.blank")
     private String reading;
-    
+
     @NotBlank(message = "japanese.must.not.be.blank")
     private String japanese;
-    
+
     @NotBlank(message = "vietnameseMeaningText.must.not.be.blank")
     private String vietnameseMeaningText;
-    
+
     private String englishMeaningText;
 }

@@ -14,8 +14,9 @@ public final class SpeakingQuestionDetailMessageKey {
             "speaking_question.delete.forbidden";
     public static final String SPEAKING_QUESTION_TITLE_EMPTY =
             "speaking_question.title.empty";
-    public static final String SPEAKING_QUESTION_DESCRIPTION_EMPTY =
-            "speaking_question.description.empty";
+    public static final String SPEAKING_QUESTION_ID_NULL = "speaking_question.id.null";
+    public static final String SPEECH_ASSESSMENT_ID_NULL = "speech_assessment.id.null";
+    public static final String AI_FEEDBACK_ID_NULL = "ai_feedback.id.null";
     public static final String ANSWER_HISTORY_NOT_FOUND = "answer_history.not_found";
     public static final String ANSWER_HISTORY_ID_NULL = "answer_history.id.null";
     public static final String SPEECH_ASSESSMENT_NOT_FOUND = "speech_assessment.not_found";

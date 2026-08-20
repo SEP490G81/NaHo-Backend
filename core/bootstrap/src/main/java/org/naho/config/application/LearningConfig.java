@@ -1,22 +1,27 @@
 package org.naho.config.application;
 
-import org.naho.chest.adapter.ChestRepositoryAdapter;
-import org.naho.learning.adapter.LearningPathNodeRepositoryAdapter;
-import org.naho.learning.adapter.UserLearningProgressRepositoryAdapter;
+import org.naho.chest.mapper.ChestResultMapper;
+import org.naho.chest.port.out.ChestRepositoryPort;
 import org.naho.learning.mapper.UserLearningProgressResultMapper;
 import org.naho.learning.mapper.UserNodeProgressResultMapper;
 import org.naho.learning.port.in.CrudUserLearningProgressInputPort;
 import org.naho.learning.port.in.CrudUserNodeProgressPort;
 import org.naho.learning.port.in.GetLearningPathNodeDetailInputPort;
 import org.naho.learning.port.in.UserLearningStreakInputPort;
+import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
+import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
 import org.naho.learning.port.out.UserNodeProgressRepositoryPort;
 import org.naho.learning.usecase.CrudUserLearningProgressUseCase;
 import org.naho.learning.usecase.CrudUserNodeProgressUseCase;
 import org.naho.learning.usecase.GetLearningPathNodeDetailUseCase;
 import org.naho.learning.usecase.UserLearningStreakUseCase;
-import org.naho.question.adapter.SpeakingQuestionRepositoryAdapter;
-import org.naho.question.adapter.VocabularyQuestionRepositoryAdapter;
+import org.naho.question.mapper.SpeakingQuestionResultMapper;
+import org.naho.question.port.in.GetSpeakingQuestionInputPort;
+import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
+import org.naho.question.port.out.VocabularyQuestionRepositoryPort;
+import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
 import org.naho.user.port.out.UserRepositoryPort;
+import org.naho.vocabulary.mapper.VocabularyResultMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -25,21 +30,21 @@ public class LearningConfig {
 
     @Bean
     public GetLearningPathNodeDetailInputPort getLearningPathNodeDetailInputPort(
-            LearningPathNodeRepositoryAdapter learningPathNodeRepositoryAdapter,
-            SpeakingQuestionRepositoryAdapter speakingQuestionRepositoryAdapter,
-            VocabularyQuestionRepositoryAdapter vocabularyQuestionRepositoryAdapter,
-            ChestRepositoryAdapter chestRepositoryAdapter,
-            org.naho.subscription.port.in.GetActiveSubscriptionInputPort getActiveSubscriptionInputPort,
-            org.naho.question.mapper.SpeakingQuestionResultMapper speakingQuestionResultMapper,
-            org.naho.vocabulary.mapper.VocabularyResultMapper vocabularyResultMapper,
-            org.naho.chest.mapper.ChestResultMapper chestResultMapper,
-            org.naho.question.port.in.GetSpeakingQuestionInputPort getSpeakingQuestionInputPort
+            LearningPathNodeRepositoryPort learningPathNodeRepositoryPort,
+            SpeakingQuestionRepositoryPort speakingQuestionRepositoryPort,
+            VocabularyQuestionRepositoryPort vocabularyQuestionRepositoryPort,
+            ChestRepositoryPort chestRepositoryPort,
+            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort,
+            SpeakingQuestionResultMapper speakingQuestionResultMapper,
+            VocabularyResultMapper vocabularyResultMapper,
+            ChestResultMapper chestResultMapper,
+            GetSpeakingQuestionInputPort getSpeakingQuestionInputPort
     ) {
         return new GetLearningPathNodeDetailUseCase(
-                learningPathNodeRepositoryAdapter,
-                speakingQuestionRepositoryAdapter,
-                vocabularyQuestionRepositoryAdapter,
-                chestRepositoryAdapter,
+                learningPathNodeRepositoryPort,
+                speakingQuestionRepositoryPort,
+                vocabularyQuestionRepositoryPort,
+                chestRepositoryPort,
                 getActiveSubscriptionInputPort,
                 speakingQuestionResultMapper,
                 vocabularyResultMapper,
@@ -59,13 +64,13 @@ public class LearningConfig {
 
     @Bean
     public CrudUserLearningProgressInputPort crudUserLearningProgressInputPort(
-            UserLearningProgressRepositoryAdapter userLearningProgressRepositoryAdapter,
-            LearningPathNodeRepositoryAdapter learningPathNodeRepositoryAdapter,
+            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
+            LearningPathNodeRepositoryPort learningPathNodeRepositoryPort,
             UserLearningProgressResultMapper userLearningProgressResultMapper
     ) {
         return new CrudUserLearningProgressUseCase(
-                userLearningProgressRepositoryAdapter,
-                learningPathNodeRepositoryAdapter,
+                userLearningProgressRepositoryPort,
+                learningPathNodeRepositoryPort,
                 userLearningProgressResultMapper
         );
     }

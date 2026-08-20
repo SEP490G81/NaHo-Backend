@@ -16,12 +16,16 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
 public class AiQuestionAnalysisAdapter implements AiQuestionAnalysisPort {
     private static final String PROMPT_TEMPLATE_PATH = "/prompt_template/speaking_question_evaluation.prompt";
     private static final String LLM_URL = "https://api.openai.com/v1/chat/completions";
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
     private final OpenAiConfigProperties properties;
     private final HttpClient httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(30))
@@ -29,23 +33,7 @@ public class AiQuestionAnalysisAdapter implements AiQuestionAnalysisPort {
 
     @Override
     public String analyzeSpeaking(QuestionContextCommand command) {
-        String systemPromptTemplate = loadPromptTemplate();
-
-        String systemPrompt = String.format(
-                systemPromptTemplate,
-                command.curriculum(),
-                command.level(),
-                command.lessonOrder(),
-                command.topic(),
-                command.lesson(),
-                command.canDoObjective(),
-                command.grammarFocus(),
-                command.vocabularyFocus(),
-                command.questionTitle(),
-                command.questionDescription(),
-                command.learnerTranscript()
-        );
-
+        String systemPrompt = buildSystemPrompt(command);
         String userContent = "Please evaluate the learner's transcript based on the system prompt instruction.";
         String requestBody = buildRequestBody(systemPrompt, userContent);
 
@@ -74,6 +62,8 @@ public class AiQuestionAnalysisAdapter implements AiQuestionAnalysisPort {
                     LlmDetailMessageKey.LLM_CONNECTION_TIMEOUT,
                     e.getMessage()
             );
+        } catch (InfrastructureException e) {
+            throw e;
         } catch (Exception e) {
             throw new InfrastructureException(
                     LlmApplicationError.LLM_API_ERROR,
@@ -83,23 +73,55 @@ public class AiQuestionAnalysisAdapter implements AiQuestionAnalysisPort {
         }
     }
 
+    private String buildSystemPrompt(QuestionContextCommand command) {
+        String template = loadPromptTemplate();
+        return template
+                .replace("{{curriculum}}", safeString(command.curriculum()))
+                .replace("{{level}}", safeString(command.level()))
+                .replace("{{lessonOrder}}", safeString(command.lessonOrder()))
+                .replace("{{topic}}", safeString(command.topic()))
+                .replace("{{lesson}}", safeString(command.lesson()))
+                .replace("{{canDoObjective}}", safeString(command.canDoObjective()))
+                .replace("{{grammarFocus}}", safeString(command.grammarFocus()))
+                .replace("{{vocabularyFocus}}", safeString(command.vocabularyFocus()))
+                .replace("{{questionTitle}}", safeString(command.questionTitle()))
+                .replace("{{questionDescription}}", safeString(command.questionDescription()))
+                .replace("{{learnerTranscript}}", safeString(command.learnerTranscript()));
+    }
+
+    private String safeString(String value) {
+        return value != null ? value : "";
+    }
+
     private String buildRequestBody(String systemPrompt, String userContent) {
         String model = properties.getScoringModel();
         if (model == null || model.isBlank()) {
             model = "gpt-4o";
         }
-        return String.format(
-                "{\"model\":\"%s\",\"messages\":[{\"role\":\"system\",\"content\":%s},{\"role\":\"user\",\"content\":%s}],\"temperature\":0.2}",
-                model,
-                escapeJson(systemPrompt),
-                escapeJson(userContent)
+
+        Map<String, Object> requestPayload = Map.of(
+                "model", model,
+                "messages", List.of(
+                        Map.of("role", "system", "content", systemPrompt != null ? systemPrompt : ""),
+                        Map.of("role", "user", "content", userContent != null ? userContent : "")
+                ),
+                "temperature", 0.2
         );
+
+        try {
+            return OBJECT_MAPPER.writeValueAsString(requestPayload);
+        } catch (Exception e) {
+            throw new InfrastructureException(
+                    LlmApplicationError.LLM_PARSE_ERROR,
+                    LlmDetailMessageKey.LLM_PARSE_ERROR,
+                    "Failed to serialize request body: " + e.getMessage()
+            );
+        }
     }
 
     private String extractContent(String responseJson) {
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode root = mapper.readTree(responseJson);
+            JsonNode root = OBJECT_MAPPER.readTree(responseJson);
 
             String rawContent = root.path("choices").path(0).path("message").path("content").asText("");
             String trimmed = rawContent.trim();
@@ -118,11 +140,6 @@ public class AiQuestionAnalysisAdapter implements AiQuestionAnalysisPort {
                     e.getMessage()
             );
         }
-    }
-
-    private String escapeJson(String input) {
-        if (input == null) return "\"\"";
-        return new ObjectMapper().valueToTree(input).toString();
     }
 
     private String loadPromptTemplate() {

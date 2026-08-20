@@ -18,34 +18,34 @@ All evaluation must be **anchored to the specific lesson context** provided belo
 
 
 # CURRICULUM CONTEXT
-Curriculum: %s
-Level: %s
-Lesson Order: %s
-Topic: %s
-Lesson: %s
-Can-do Objective: %s
+Curriculum: {{curriculum}}
+Level: {{level}}
+Lesson Order: {{lessonOrder}}
+Topic: {{topic}}
+Lesson: {{lesson}}
+Can-do Objective: {{canDoObjective}}
 
 # GRAMMAR FOCUS (required patterns for this lesson)
-%s
+{{grammarFocus}}
 → If the learner correctly uses any of these patterns, record each one in usedVocabulariesAndGrammars with category "GRAMMAR".
 
 # VOCABULARY FOCUS (target words for this lesson)
-%s
+{{vocabularyFocus}}
 → If the learner uses any of these words appropriately, record each one in usedVocabulariesAndGrammars with category "VOCABULARY".
 
 # SPEAKING TASK
-Question Title: %s
-Question Description: %s
+Question Title: {{questionTitle}}
+Question Description: {{questionDescription}}
 → The learner's answer MUST be evaluated against this specific question. An answer that is off-topic or ignores the question detail should score LOW on contentRelevantScore.
 
 # LEARNER TRANSCRIPT
-%s
+{{learnerTranscript}}
 
 ---
 # EVALUATION RUBRIC
 
 ## [1] grammarScore (0–100)
-Evaluate: verb conjugation, particles, sentence structure, grammar pattern usage, and JLPT level (%s) appropriateness.
+Evaluate: verb conjugation, particles, sentence structure, grammar pattern usage, and JLPT level ({{level}}) appropriateness.
 - 90–100: Near-perfect. No notable errors. Natural and accurate throughout.
 - 75–89: Minor errors that don't affect meaning or comprehension.
 - 55–74: Noticeable errors affecting clarity; some patterns misused.
@@ -53,7 +53,7 @@ Evaluate: verb conjugation, particles, sentence structure, grammar pattern usage
 - 0–34: Cannot communicate basic ideas; pervasive errors.
 
 ## [2] vocabularyScore (0–100)
-Evaluate: appropriateness for Topic/Lesson, variety, use of target vocabulary, level (%s) suitability.
+Evaluate: appropriateness for Topic/Lesson, variety, use of target vocabulary, level ({{level}}) suitability.
 - 90–100: Appropriate, varied, and uses target vocabulary naturally.
 - 75–89: Mostly appropriate; minor gaps in target word usage.
 - 55–74: Limited; mostly basic words; few target words used.
@@ -69,7 +69,7 @@ Evaluate: direct response to the Question Detail, alignment with Topic, Lesson, 
 - 0–34: Off-topic or completely misses the Can-do Objective.
 
 ## [4] naturalnessScore (0–100)
-Evaluate: natural Japanese phrasing, smooth transitions, register appropriateness (formal/casual), and level (%s) suitability.
+Evaluate: natural Japanese phrasing, smooth transitions, register appropriateness (formal/casual), and level ({{level}}) suitability.
 - 90–100: Sounds natural; a native speaker would say it similarly.
 - 75–89: Mostly natural with minor awkward phrasing.
 - 55–74: Some unnatural expressions; feels translated from Vietnamese.

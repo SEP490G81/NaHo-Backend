@@ -11,6 +11,8 @@ import org.naho.grammar.result.GrammarResult;
 @Mapper(componentModel = "spring")
 public interface GrammarAdminMapper {
     CreateGrammarCommand toCommand(CreateGrammarRequest request);
+
     UpdateGrammarCommand toCommand(UpdateGrammarRequest request);
+
     GrammarResponse toResponse(GrammarResult result);
 }

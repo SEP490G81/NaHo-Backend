@@ -12,5 +12,6 @@ public record UpdateVocabularyQuestionCommand(
             String japanese,
             String vietnameseMeaningText,
             String englishMeaningText
-    ) {}
+    ) {
+    }
 }

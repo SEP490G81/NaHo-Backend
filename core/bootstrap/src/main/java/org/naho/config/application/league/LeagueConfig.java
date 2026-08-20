@@ -2,6 +2,7 @@ package org.naho.config.application.league;
 
 import org.naho.file.port.in.CrudFileInputPort;
 import org.naho.league.mapper.LeagueResultMapper;
+import org.naho.league.port.in.CrudLeagueInputPort;
 import org.naho.league.port.out.LeagueRepositoryPort;
 import org.naho.league.usecase.CrudLeagueUseCase;
 import org.naho.user.port.out.UserRepositoryPort;
@@ -16,7 +17,7 @@ public class LeagueConfig {
     }
 
     @Bean
-    public CrudLeagueUseCase crudLeagueUseCase(
+    public CrudLeagueInputPort crudLeagueInputPort(
             LeagueRepositoryPort leagueRepositoryPort,
             LeagueResultMapper leagueResultMapper,
             CrudFileInputPort crudFileInputPort,

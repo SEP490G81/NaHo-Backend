@@ -1,7 +1,6 @@
-package org.naho.question.dto.request;
+package org.naho.question.dto.response;
 
 import org.naho.file.result.FileResult;
-import org.naho.question.dto.response.SpeakingQuestionResponse;
 import org.naho.speech.azure.dto.response.SpeechAssessmentResponse;
 import org.naho.speech.llm.question.dto.response.AiFeedbackResponse;
 

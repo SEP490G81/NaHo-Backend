@@ -16,6 +16,8 @@ public interface AnswerHistoryRepositoryPort {
 
     AnswerHistory save(AnswerHistory answerHistory);
 
+    AnswerHistory createNew(AnswerHistory answerHistory);
+
     SpeechAssessment saveSpeechAssessment(SpeechAssessment speechAssessment);
 
     ContentAssessment saveContentAssessment(ContentAssessment contentAssessment);

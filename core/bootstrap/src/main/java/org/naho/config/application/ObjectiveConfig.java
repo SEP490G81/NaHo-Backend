@@ -1,12 +1,12 @@
 package org.naho.config.application;
 
-import org.naho.book.adapter.ObjectiveRepositoryAdapter;
 import org.naho.book.port.in.GetObjectiveDetailInputPort;
 import org.naho.book.port.in.UpdateObjectiveInputPort;
 import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.book.usecase.GetObjectiveDetailUseCase;
 import org.naho.book.usecase.UpdateObjectiveUseCase;
-import org.naho.learning.adapter.LearningPathNodeRepositoryAdapter;
+import org.naho.furigana.port.out.FuriganaGenerationPort;
+import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.shared.port.out.TransactionPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,17 +16,17 @@ public class ObjectiveConfig {
 
     @Bean
     public GetObjectiveDetailInputPort getObjectiveDetailInputPort(
-            ObjectiveRepositoryAdapter objectiveRepositoryAdapter,
-            LearningPathNodeRepositoryAdapter learningPathNodeRepositoryAdapter
+            ObjectiveRepositoryPort objectiveRepositoryPort,
+            LearningPathNodeRepositoryPort learningPathNodeRepositoryPort
     ) {
-        return new GetObjectiveDetailUseCase(objectiveRepositoryAdapter, learningPathNodeRepositoryAdapter);
+        return new GetObjectiveDetailUseCase(objectiveRepositoryPort, learningPathNodeRepositoryPort);
     }
 
     @Bean
     public UpdateObjectiveInputPort updateObjectiveInputPort(
             ObjectiveRepositoryPort objectiveRepositoryPort,
             TransactionPort transactionPort,
-            org.naho.furigana.port.out.FuriganaGenerationPort furiganaGenerationPort
+            FuriganaGenerationPort furiganaGenerationPort
     ) {
         return new UpdateObjectiveUseCase(
                 objectiveRepositoryPort,

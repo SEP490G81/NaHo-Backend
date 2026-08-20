@@ -56,7 +56,7 @@ public class BookRepositoryAdapter implements BookRepositoryPort {
         } else {
             entity = bookEntityMapper.domainToEntity(book);
         }
-        
+
         if (book.getCoverImageFileId() != null) {
             org.naho.file.entity.FileEntity fileEntity = new org.naho.file.entity.FileEntity();
             fileEntity.setId(book.getCoverImageFileId());
@@ -64,7 +64,7 @@ public class BookRepositoryAdapter implements BookRepositoryPort {
         } else {
             entity.setCoverImageFile(null);
         }
-        
+
         bookJpaRepository.save(entity);
     }
 }

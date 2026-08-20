@@ -51,6 +51,8 @@ public class AnswerHistoryResultMapperAdapter implements AnswerHistoryResultMapp
                 .speechAssessment(speechAssessmentResult)
                 .aiFeedback(aiFeedbackResult)
                 .audioFile(fileResult)
+                .duration(domain.getDuration())
+                .overallScore(domain.getOverallScore())
                 .build();
     }
 }

@@ -1,14 +1,20 @@
 package org.naho.speech.llm.question.usecase;
 
+import org.naho.file.constant.FileAccessStatus;
+import org.naho.file.model.File;
 import org.naho.file.port.in.UploadFileInputPort;
+import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.result.FileResult;
 import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
 import org.naho.question.exception.SpeakingQuestionErrorCode;
+import org.naho.question.port.out.AnswerHistoryRepositoryPort;
+import org.naho.question.port.out.AnswerHistoryResultMapper;
 import org.naho.question.result.AnswerHistoryResult;
 import org.naho.shared.constant.SystemZoneId;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.speech.azure.command.SpeechAssessmentCommand;
+import org.naho.speech.azure.model.AnswerHistory;
 import org.naho.speech.azure.model.SpeechAssessment;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
 import org.naho.speech.azure.port.out.SpeechAssessmentRepositoryPort;
@@ -33,6 +39,9 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     private final AiQuestionAnalysisPort aiQuestionAnalysisPort;
     private final SpeakingAnalysisHelper speakingAnalysisHelper;
     private final SpeechAssessmentRepositoryPort speechAssessmentRepositoryPort;
+    private final AnswerHistoryRepositoryPort answerHistoryRepositoryPort;
+    private final AnswerHistoryResultMapper answerHistoryResultMapper;
+    private final FileRepositoryPort fileRepositoryPort;
 
     public SpeakingAnalysisUseCase(
             UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort,
@@ -42,7 +51,10 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             AiFeedbackRepositoryPort aiFeedbackRepositoryPort,
             AiQuestionAnalysisPort aiQuestionAnalysisPort,
             SpeakingAnalysisHelper speakingAnalysisHelper,
-            SpeechAssessmentRepositoryPort speechAssessmentRepositoryPort
+            SpeechAssessmentRepositoryPort speechAssessmentRepositoryPort,
+            AnswerHistoryRepositoryPort answerHistoryRepositoryPort,
+            AnswerHistoryResultMapper answerHistoryResultMapper,
+            FileRepositoryPort fileRepositoryPort
     ) {
         this.userDailyAiUsageRepositoryPort = userDailyAiUsageRepositoryPort;
         this.uploadFileInputPort = uploadFileInputPort;
@@ -52,6 +64,9 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         this.aiQuestionAnalysisPort = aiQuestionAnalysisPort;
         this.speakingAnalysisHelper = speakingAnalysisHelper;
         this.speechAssessmentRepositoryPort = speechAssessmentRepositoryPort;
+        this.answerHistoryRepositoryPort = answerHistoryRepositoryPort;
+        this.answerHistoryResultMapper = answerHistoryResultMapper;
+        this.fileRepositoryPort = fileRepositoryPort;
     }
 
     @Override
@@ -106,10 +121,33 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         // Lưu vào db
         AiFeedback savedAiFeedback = aiFeedbackRepositoryPort.createNew(aiFeedback);
 
+        // Tính điểm tổng kết dựa trên điểm phát âm trung bình và điểm nội dung trung bình
+        double overallScore = (savedSpeechAssessment.getAverageScore()
+                + savedAiFeedback.getAverageScore()) / 2.0;
+
+        // Lưu file vào database để phục cho chức năng upload
+        File audioFile = fileRepositoryPort.createNewForUpload(
+                command.storedFile(),
+                FileAccessStatus.PRIVATE
+        );
+
+        AnswerHistory answerHistory = AnswerHistory.builder()
+                .userId(command.userId())
+                .speakingQuestionId(command.speakingQuestionId())
+                .speechAssessmentId(savedSpeechAssessment.getId())
+                .aiFeedbackId(savedAiFeedback.getId())
+                .audioFileId(audioFile.getId())
+                .duration(command.duration())
+                .overallScore(overallScore)
+                .build();
+
+        // Lưu answer history vào db
+        AnswerHistory savedAnswerHistory = answerHistoryRepositoryPort.createNew(answerHistory);
+
         // tăng số lần đánh giá AI với speaking question của người dùng lên 1 (today)
         userDailyAiUsage.increaseSpeakingEvaluationCount();
         userDailyAiUsageRepositoryPort.save(userDailyAiUsage);
 
-        return null;
+        return answerHistoryResultMapper.domainToResult(savedAnswerHistory);
     }
 }

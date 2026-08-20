@@ -11,6 +11,8 @@ import org.naho.vocabulary.result.VocabularyResult;
 @Mapper(componentModel = "spring")
 public interface VocabularyAdminMapper {
     CreateVocabularyCommand toCommand(CreateVocabularyRequest request);
+
     UpdateVocabularyCommand toCommand(UpdateVocabularyRequest request);
+
     VocabularyResponse toResponse(VocabularyResult result);
 }

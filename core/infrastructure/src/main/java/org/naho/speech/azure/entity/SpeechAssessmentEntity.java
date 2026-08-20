@@ -35,6 +35,6 @@ public class SpeechAssessmentEntity extends BaseEntity {
     @Column(name = "average_score", nullable = false)
     Double averageScore;
 
-    @OneToMany(mappedBy = "speechAssessment", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "speechAssessment", cascade = CascadeType.ALL, orphanRemoval = true)
     List<WordAssessmentEntity> words;
 }

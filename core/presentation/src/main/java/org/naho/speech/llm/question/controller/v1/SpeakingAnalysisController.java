@@ -9,7 +9,7 @@ import org.naho.file.port.out.FileValidatorPort;
 import org.naho.file.result.StoredFile;
 import org.naho.i18n.message.speech.SpeechDetailMessageKey;
 import org.naho.question.dto.mapper.AnswerHistoryResponseMapper;
-import org.naho.question.dto.request.AnswerHistoryResponse;
+import org.naho.question.dto.response.AnswerHistoryResponse;
 import org.naho.question.result.AnswerHistoryResult;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.shared.exception.PresentationException;

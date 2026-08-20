@@ -43,8 +43,8 @@ public class UpdateTopicUseCase implements UpdateTopicInputPort {
         }
 
         String japaneseNameMarkup = furiganaGenerationPort.generateFuriganaMarkup(command.japaneseName());
-        String japaneseDescriptionMarkup = command.japaneseDescription() != null 
-                ? furiganaGenerationPort.generateFuriganaMarkup(command.japaneseDescription()) 
+        String japaneseDescriptionMarkup = command.japaneseDescription() != null
+                ? furiganaGenerationPort.generateFuriganaMarkup(command.japaneseDescription())
                 : null;
 
         topic.update(

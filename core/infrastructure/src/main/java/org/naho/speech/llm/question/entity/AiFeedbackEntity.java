@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.shared.persistence.BaseEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @SuperBuilder
@@ -39,9 +40,11 @@ public class AiFeedbackEntity extends BaseEntity {
     @Column(name = "suggest_answer_translation", columnDefinition = "TEXT", nullable = false)
     String suggestAnswerTranslation;
 
+    @Builder.Default
     @OneToMany(mappedBy = "aiFeedback", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<UsedVocabularyAndGrammarEntity> usedVocabulariesAndGrammars;
+    List<UsedVocabularyAndGrammarEntity> usedVocabulariesAndGrammars = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "aiFeedback", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<UserAnswerErrorEntity> userAnswerErrors;
+    List<UserAnswerErrorEntity> userAnswerErrors = new ArrayList<>();
 }

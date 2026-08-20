@@ -11,9 +11,12 @@ import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.learning.port.in.UserLearningStreakInputPort;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
 import org.naho.persona.port.out.PersonaRepositoryPort;
+import org.naho.question.port.out.AnswerHistoryRepositoryPort;
+import org.naho.question.port.out.AnswerHistoryResultMapper;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.speech.azure.port.out.AzureSpeechServicePort;
+import org.naho.speech.azure.port.out.SpeechAssessmentRepositoryPort;
 import org.naho.speech.azure.port.out.TextToSpeechServicePort;
 import org.naho.speech.llm.conversation.adapter.AzureSpeechToTextAdapter;
 import org.naho.speech.llm.conversation.adapter.InMemorySessionStore;
@@ -33,6 +36,9 @@ import org.naho.speech.llm.conversation.usecase.SpeakingSessionCleanupUseCase;
 import org.naho.speech.llm.conversation.usecase.SpeakingSessionUseCase;
 import org.naho.speech.llm.conversation.usecase.SuggestedTopicsUseCase;
 import org.naho.speech.llm.conversation.validator.SessionValidator;
+import org.naho.speech.llm.question.helper.SpeakingAnalysisHelper;
+import org.naho.speech.llm.question.port.out.AiFeedbackRepositoryPort;
+import org.naho.speech.llm.question.port.out.AiQuestionAnalysisPort;
 import org.naho.speech.llm.question.usecase.SpeakingAnalysisUseCase;
 import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
 import org.naho.subscription.port.out.UserDailyAiUsageRepositoryPort;
@@ -202,10 +208,13 @@ public class ChatConfig {
             UploadFileInputPort uploadFileInputPort,
             TransactionPort transactionPort,
             AzureSpeechServicePort azureSpeechServicePort,
-            org.naho.speech.llm.question.port.out.AiFeedbackRepositoryPort aiFeedbackRepositoryPort,
-            org.naho.speech.llm.question.port.out.AiQuestionAnalysisPort aiQuestionAnalysisPort,
-            org.naho.speech.llm.question.helper.SpeakingAnalysisHelper questionSpeakingAnalysisHelper,
-            org.naho.speech.azure.port.out.SpeechAssessmentRepositoryPort speechAssessmentRepositoryPort
+            AiFeedbackRepositoryPort aiFeedbackRepositoryPort,
+            AiQuestionAnalysisPort aiQuestionAnalysisPort,
+            SpeakingAnalysisHelper speakingAnalysisHelper,
+            SpeechAssessmentRepositoryPort speechAssessmentRepositoryPort,
+            AnswerHistoryRepositoryPort answerHistoryRepositoryPort,
+            AnswerHistoryResultMapper answerHistoryResultMapper,
+            FileRepositoryPort fileRepositoryPort
     ) {
         return new SpeakingAnalysisUseCase(
                 userDailyAiUsageRepositoryPort,
@@ -214,8 +223,11 @@ public class ChatConfig {
                 azureSpeechServicePort,
                 aiFeedbackRepositoryPort,
                 aiQuestionAnalysisPort,
-                questionSpeakingAnalysisHelper,
-                speechAssessmentRepositoryPort
+                speakingAnalysisHelper,
+                speechAssessmentRepositoryPort,
+                answerHistoryRepositoryPort,
+                answerHistoryResultMapper,
+                fileRepositoryPort
         );
     }
 
