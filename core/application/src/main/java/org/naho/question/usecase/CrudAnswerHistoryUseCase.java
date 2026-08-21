@@ -1,21 +1,16 @@
 package org.naho.question.usecase;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.naho.book.port.out.BookRepositoryPort;
-import org.naho.book.port.out.TopicRepositoryPort;
 import org.naho.file.exception.FileErrorCode;
 import org.naho.file.model.File;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileStorageServicePort;
-import org.naho.furigana.port.out.FuriganaGenerationPort;
 import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
 import org.naho.i18n.message.user.UserDetailMessageKey;
-import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.question.exception.SpeakingQuestionErrorCode;
 import org.naho.question.port.in.CrudAnswerHistoryInputPort;
 import org.naho.question.port.out.AnswerHistoryRepositoryPort;
-import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
+import org.naho.question.port.out.AnswerHistoryResultMapper;
 import org.naho.question.result.AnswerHistoryListItemResult;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.speech.azure.model.AnswerHistory;
@@ -25,33 +20,20 @@ import java.util.List;
 
 public class CrudAnswerHistoryUseCase implements CrudAnswerHistoryInputPort {
     private final AnswerHistoryRepositoryPort answerHistoryRepositoryPort;
-    private final SpeakingQuestionRepositoryPort speakingQuestionRepositoryPort;
     private final FileRepositoryPort fileRepositoryPort;
     private final FileStorageServicePort fileStorageServicePort;
-    private final TopicRepositoryPort topicRepositoryPort;
-    private final BookRepositoryPort bookRepositoryPort;
-    private final LearningPathNodeRepositoryPort learningPathNodeRepositoryPort;
-    private final FuriganaGenerationPort furiganaGenerationPort;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final AnswerHistoryResultMapper answerHistoryResultMapper;
 
     public CrudAnswerHistoryUseCase(
             AnswerHistoryRepositoryPort answerHistoryRepositoryPort,
-            SpeakingQuestionRepositoryPort speakingQuestionRepositoryPort,
             FileRepositoryPort fileRepositoryPort,
             FileStorageServicePort fileStorageServicePort,
-            TopicRepositoryPort topicRepositoryPort,
-            BookRepositoryPort bookRepositoryPort,
-            LearningPathNodeRepositoryPort learningPathNodeRepositoryPort,
-            FuriganaGenerationPort furiganaGenerationPort
+            AnswerHistoryResultMapper answerHistoryResultMapper
     ) {
         this.answerHistoryRepositoryPort = answerHistoryRepositoryPort;
-        this.speakingQuestionRepositoryPort = speakingQuestionRepositoryPort;
         this.fileRepositoryPort = fileRepositoryPort;
         this.fileStorageServicePort = fileStorageServicePort;
-        this.topicRepositoryPort = topicRepositoryPort;
-        this.bookRepositoryPort = bookRepositoryPort;
-        this.learningPathNodeRepositoryPort = learningPathNodeRepositoryPort;
-        this.furiganaGenerationPort = furiganaGenerationPort;
+        this.answerHistoryResultMapper = answerHistoryResultMapper;
     }
 
     /**
@@ -103,9 +85,18 @@ public class CrudAnswerHistoryUseCase implements CrudAnswerHistoryInputPort {
         return fileStorageServicePort.generatePresignedUrl(file);
     }
 
-
+    /**
+     * Lấy ra lịch sử trò chuyện của người dùng trong speaking question id
+     *
+     * @param speakingQuestionId speaking question id
+     * @param userId             user id
+     * @return List<AnswerHistoryListItemResult>
+     */
     @Override
-    public List<AnswerHistoryListItemResult> findAllBySpeakingQuestionId(Long speakingQuestionId) {
-
+    public List<AnswerHistoryListItemResult> findAllBySpeakingQuestionIdAndUserId(Long speakingQuestionId, Long userId) {
+        List<AnswerHistory> answerHistories = answerHistoryRepositoryPort.findAllBySpeakingQuestionIdAndUserId(speakingQuestionId, userId);
+        return answerHistories.stream()
+                .map(answerHistoryResultMapper::domainToListItemResult)
+                .toList();
     }
 }

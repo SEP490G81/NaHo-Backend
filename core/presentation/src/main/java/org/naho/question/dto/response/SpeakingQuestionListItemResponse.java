@@ -1,8 +1,8 @@
-package org.naho.question.result;
+package org.naho.question.dto.response;
 
 import org.naho.question.type.QuestionStatus;
 
-public record SpeakingQuestionListItemResult(
+public record SpeakingQuestionListItemResponse(
         Long id,
         Long userId,
         Long speakingQuestionAudioFileId,
@@ -103,8 +103,8 @@ public record SpeakingQuestionListItemResult(
             return this;
         }
 
-        public SpeakingQuestionListItemResult build() {
-            return new SpeakingQuestionListItemResult(
+        public SpeakingQuestionListItemResponse build() {
+            return new SpeakingQuestionListItemResponse(
                     id,
                     userId,
                     speakingQuestionAudioFileId,

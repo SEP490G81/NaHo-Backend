@@ -4,8 +4,13 @@ import org.naho.question.entity.AnswerHistoryEntity;
 import org.naho.shared.persistence.BaseJpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface AnswerHistoryJpaRepository extends BaseJpaRepository<AnswerHistoryEntity> {
+    List<AnswerHistoryEntity> findAllBySpeakingQuestion_Id(Long speakingQuestionId);
+
+    List<AnswerHistoryEntity> findAllBySpeakingQuestion_IdAndUser_Id(Long speakingQuestionId, Long userId);
 
 //    @Query("""
 //                SELECT ah FROM AnswerHistoryEntity ah

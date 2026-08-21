@@ -7,5 +7,5 @@ import java.util.List;
 public interface CrudAnswerHistoryInputPort {
     String generateAudioFilePresignedUrl(Long id, Long userId);
 
-    List<AnswerHistoryListItemResult> findAllBySpeakingQuestionId(Long speakingQuestionId);
+    List<AnswerHistoryListItemResult> findAllBySpeakingQuestionIdAndUserId(Long speakingQuestionId, Long userId);
 }

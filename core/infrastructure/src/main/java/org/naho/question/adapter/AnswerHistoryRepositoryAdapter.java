@@ -25,6 +25,7 @@ import org.naho.user.entity.UserEntity;
 import org.naho.user.repository.UserJpaRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -137,5 +138,36 @@ public class AnswerHistoryRepositoryAdapter implements AnswerHistoryRepositoryPo
         return answerHistoryJpaRepository
                 .findById(id)
                 .map(answerHistoryEntityMapper::entityToDomain);
+    }
+
+    /**
+     * Lấy danh sách lịch sử nói chuyện speaking question id và user id
+     *
+     * @param speakingQuestionId speaking question id
+     * @param userId             user id
+     * @return List<AnswerHistory>
+     */
+    @Override
+    public List<AnswerHistory> findAllBySpeakingQuestionIdAndUserId(Long speakingQuestionId, Long userId) {
+        if (speakingQuestionId == null) {
+            throw new InfrastructureException(
+                    CommonErrorCode.COMMON_INVALID_REQUEST,
+                    SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_ID_NULL
+            );
+        }
+
+        if (userId == null) {
+            throw new InfrastructureException(
+                    CommonErrorCode.COMMON_INVALID_REQUEST,
+                    UserDetailMessageKey.USER_ID_NULL
+            );
+        }
+
+        List<AnswerHistoryEntity> entities = answerHistoryJpaRepository
+                .findAllBySpeakingQuestion_IdAndUser_Id(speakingQuestionId, userId);
+
+        return entities.stream()
+                .map(answerHistoryEntityMapper::entityToDomain)
+                .toList();
     }
 }

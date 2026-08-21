@@ -2,7 +2,9 @@ package org.naho.question.dto.mapper;
 
 import org.mapstruct.Mapper;
 import org.naho.file.dto.mapper.FileResponseMapper;
+import org.naho.question.dto.response.AnswerHistoryListItemResponse;
 import org.naho.question.dto.response.AnswerHistoryResponse;
+import org.naho.question.result.AnswerHistoryListItemResult;
 import org.naho.question.result.AnswerHistoryResult;
 import org.naho.speech.llm.question.dto.mapper.AiFeedbackResponseMapper;
 import org.naho.speech.llm.question.dto.mapper.UsedVocabularyAndGrammarResponseMapper;
@@ -16,4 +18,6 @@ import org.naho.speech.llm.question.dto.mapper.UserAnswerErrorResponseMapper;
 })
 public interface AnswerHistoryResponseMapper {
     AnswerHistoryResponse resultToResponse(AnswerHistoryResult result);
+
+    AnswerHistoryListItemResponse resultToResponse(AnswerHistoryListItemResult result);
 }

@@ -11,6 +11,54 @@ public class AnswerHistoryListItemResult {
     private Double duration;
     private Double overallScore;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public SpeakingQuestionListItemResult getSpeakingQuestion() {
+        return speakingQuestion;
+    }
+
+    public void setSpeakingQuestion(SpeakingQuestionListItemResult speakingQuestion) {
+        this.speakingQuestion = speakingQuestion;
+    }
+
+    public FileResult getAudioFile() {
+        return audioFile;
+    }
+
+    public void setAudioFile(FileResult audioFile) {
+        this.audioFile = audioFile;
+    }
+
+    public Double getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Double duration) {
+        this.duration = duration;
+    }
+
+    public Double getOverallScore() {
+        return overallScore;
+    }
+
+    public void setOverallScore(Double overallScore) {
+        this.overallScore = overallScore;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
