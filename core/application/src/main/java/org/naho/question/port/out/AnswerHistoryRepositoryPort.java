@@ -13,4 +13,6 @@ public interface AnswerHistoryRepositoryPort {
     Optional<AnswerHistory> findById(Long id);
 
     List<AnswerHistory> findAllBySpeakingQuestionIdAndUserId(Long speakingQuestionId, Long userId);
+
+    AnswerHistory findByAnswerHistoryIdAndUserId(Long answerHistoryId, Long userId);
 }

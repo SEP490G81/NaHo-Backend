@@ -11,6 +11,7 @@ import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
 import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.question.entity.AnswerHistoryEntity;
 import org.naho.question.entity.SpeakingQuestionEntity;
+import org.naho.question.exception.SpeakingQuestionErrorCode;
 import org.naho.question.mapper.AnswerHistoryEntityMapper;
 import org.naho.question.port.out.AnswerHistoryRepositoryPort;
 import org.naho.question.repository.AnswerHistoryJpaRepository;
@@ -169,5 +170,39 @@ public class AnswerHistoryRepositoryAdapter implements AnswerHistoryRepositoryPo
         return entities.stream()
                 .map(answerHistoryEntityMapper::entityToDomain)
                 .toList();
+    }
+
+    /**
+     * Method lấy 1 answer history theo answer history id và user id
+     *
+     * @param answerHistoryId answer history id
+     * @param userId          user id
+     * @return AnswerHistory
+     */
+    @Override
+    public AnswerHistory findByAnswerHistoryIdAndUserId(Long answerHistoryId, Long userId) {
+        if (answerHistoryId == null) {
+            throw new InfrastructureException(
+                    CommonErrorCode.COMMON_INVALID_REQUEST,
+                    SpeakingQuestionDetailMessageKey.ANSWER_HISTORY_ID_NULL
+            );
+        }
+
+        if (userId == null) {
+            throw new InfrastructureException(
+                    CommonErrorCode.COMMON_INVALID_REQUEST,
+                    UserDetailMessageKey.USER_ID_NULL
+            );
+        }
+
+        AnswerHistoryEntity entity = answerHistoryJpaRepository
+                .findByIdAndUser_Id(answerHistoryId, userId)
+                .orElseThrow(() -> new InfrastructureException(
+                        SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
+                        SpeakingQuestionDetailMessageKey.ANSWER_HISTORY_NOT_FOUND,
+                        answerHistoryId
+                ));
+
+        return answerHistoryEntityMapper.entityToDomain(entity);
     }
 }

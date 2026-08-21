@@ -5,8 +5,10 @@ import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
 import org.naho.question.dto.mapper.AnswerHistoryResponseMapper;
 import org.naho.question.dto.response.AnswerHistoryListItemResponse;
+import org.naho.question.dto.response.AnswerHistoryResponse;
 import org.naho.question.port.in.CrudAnswerHistoryInputPort;
 import org.naho.question.result.AnswerHistoryListItemResult;
+import org.naho.question.result.AnswerHistoryResult;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.HttpStatus;
@@ -56,5 +58,16 @@ public class AnswerHistoryController {
                 .toList();
 
         return ResponseEntity.ok(responses);
+    }
+
+    @ApiResponseMessage(message = SpeakingQuestionDetailMessageKey.ANSWER_HISTORY_GET_DETAIL_SUCCESS)
+    @GetMapping("/{answerHistoryId}")
+    public ResponseEntity<AnswerHistoryResponse> findByAnswerHistoryIdAndUserId(
+            @PathVariable Long answerHistoryId,
+            @AuthenticationPrincipal AccessTokenPayload payload
+    ) {
+        AnswerHistoryResult result = crudAnswerHistoryInputPort.findByAnswerHistoryIdAndUserId(answerHistoryId, payload.userId());
+        AnswerHistoryResponse response = answerHistoryResponseMapper.resultToResponse(result);
+        return ResponseEntity.ok(response);
     }
 }

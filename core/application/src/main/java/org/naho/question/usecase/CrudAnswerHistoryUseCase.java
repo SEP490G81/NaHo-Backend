@@ -12,6 +12,7 @@ import org.naho.question.port.in.CrudAnswerHistoryInputPort;
 import org.naho.question.port.out.AnswerHistoryRepositoryPort;
 import org.naho.question.port.out.AnswerHistoryResultMapper;
 import org.naho.question.result.AnswerHistoryListItemResult;
+import org.naho.question.result.AnswerHistoryResult;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.speech.azure.model.AnswerHistory;
 import org.naho.user.exception.UserErrorCode;
@@ -98,5 +99,19 @@ public class CrudAnswerHistoryUseCase implements CrudAnswerHistoryInputPort {
         return answerHistories.stream()
                 .map(answerHistoryResultMapper::domainToListItemResult)
                 .toList();
+    }
+
+
+    /**
+     * Method lấy 1 answer history theo answer history id và user id
+     *
+     * @param answerHistoryId answer history id
+     * @param userId          user id
+     * @return AnswerHistory
+     */
+    @Override
+    public AnswerHistoryResult findByAnswerHistoryIdAndUserId(Long answerHistoryId, Long userId) {
+        AnswerHistory answerHistory = answerHistoryRepositoryPort.findByAnswerHistoryIdAndUserId(answerHistoryId, userId);
+        return answerHistoryResultMapper.domainToResult(answerHistory);
     }
 }
