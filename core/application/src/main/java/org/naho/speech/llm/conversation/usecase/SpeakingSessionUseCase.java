@@ -94,14 +94,14 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                 );
 
         FormalityLevel effectiveFormality = command.formalityLevelOverride();
-        if (effectiveFormality == null && persona.getConversationStyle() != null) {
-            effectiveFormality = persona.getConversationStyle().getFormalityLevel();
-        }
+//        if (effectiveFormality == null && persona.getConversationStyle() != null) {
+//            effectiveFormality = persona.getConversationStyle().getFormalityLevel();
+//        }
 
         MarugotoLevel effectiveMarugoto = command.marugotoLevelOverride();
-        if (effectiveMarugoto == null && persona.getConversationStyle() != null) {
-            effectiveMarugoto = persona.getConversationStyle().getMarugotoLevel();
-        }
+//        if (effectiveMarugoto == null && persona.getConversationStyle() != null) {
+//            effectiveMarugoto = persona.getConversationStyle().getMarugotoLevel();
+//        }
 
         // tạo mới và lưu speaking session trong db
         // trạng thái sẽ là INIT (tức là chưa có đoạn chat nào)
@@ -110,7 +110,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                 command.userId(),
                 command.personaId(),
                 "Conversation with " + persona.getName(),
-                "ja-JP-NanamiNeural",
+                persona.getVoiceName() != null ? persona.getVoiceName() : "ja-JP-NanamiNeural",
                 effectiveMarugoto,
                 effectiveFormality
         );

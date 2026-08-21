@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.file.entity.FileEntity;
+import org.naho.persona.type.PersonaStatus;
 import org.naho.shared.persistence.BaseEntity;
 
 @SuperBuilder
@@ -21,6 +22,13 @@ public class PersonaEntity extends BaseEntity {
 
     @Column(columnDefinition = "TEXT", nullable = false)
     String prompt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 50)
+    PersonaStatus status;
+
+    @Column(name = "voice_name", length = 100)
+    String voiceName;
 
     @OneToOne
     @JoinColumn(name = "avatar_file_id")

@@ -38,6 +38,8 @@ public class CreatePersonaUseCase implements CreatePersonaInputPort {
                 .prompt(command.prompt())
                 .avatarFileId(command.avatarFileId())
                 .suggestedConversationStyleId(styleId)
+                .status(command.status())
+                .voiceName(command.voiceName())
                 .build();
 
         return personaRepositoryPort.save(persona);

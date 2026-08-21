@@ -57,6 +57,8 @@ public class UpdatePersonaUseCase implements UpdatePersonaInputPort {
                 .prompt(command.prompt())
                 .avatarFileId(command.avatarFileId())
                 .suggestedConversationStyleId(styleId)
+                .status(command.status() != null ? command.status() : existing.getStatus())
+                .voiceName(command.voiceName() != null ? command.voiceName() : existing.getVoiceName())
                 .build();
 
         return personaRepositoryPort.save(updated);

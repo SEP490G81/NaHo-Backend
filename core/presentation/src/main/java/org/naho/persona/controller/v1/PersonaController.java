@@ -18,6 +18,7 @@ import org.naho.persona.model.Persona;
 import org.naho.persona.port.in.CreatePersonaInputPort;
 import org.naho.persona.port.in.GetPersonaInputPort;
 import org.naho.persona.port.in.UpdatePersonaInputPort;
+import org.naho.persona.result.PersonaResult;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.shared.exception.ApplicationException;
 import org.springframework.http.ResponseEntity;
@@ -38,8 +39,13 @@ public class PersonaController {
     @GetMapping
     @ApiResponseMessage(message = "Get all personas successfully!")
     public ResponseEntity<List<PersonaResponse>> getAllPersonas() {
-        List<Persona> personas = getPersonaInputPort.getAllPersonas();
-        return ResponseEntity.ok(personaResponseMapper.toResponseList(personas));
+        List<PersonaResult> results = getPersonaInputPort.getAllPersonas();
+
+        List<PersonaResponse> responses = results.stream()
+                .map(personaResponseMapper::resultToResponse)
+                .toList();
+
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/{personaId}")
@@ -90,6 +96,8 @@ public class PersonaController {
                 request.prompt(),
                 request.avatarFileId(),
                 request.suggestedConversationStyleId(),
+                request.status(),
+                request.voiceName(),
                 styleCommand
         );
         Persona persona = createPersonaInputPort.createPersona(command);
@@ -119,6 +127,8 @@ public class PersonaController {
                 request.prompt(),
                 request.avatarFileId(),
                 request.suggestedConversationStyleId(),
+                request.status(),
+                request.voiceName(),
                 styleCommand
         );
         Persona persona = updatePersonaInputPort.updatePersona(command);

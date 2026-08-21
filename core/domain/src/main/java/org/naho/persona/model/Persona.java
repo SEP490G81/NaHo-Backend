@@ -2,6 +2,7 @@ package org.naho.persona.model;
 
 import org.naho.i18n.message.persona.PersonaDetailMessageKey;
 import org.naho.persona.exception.PersonaDomainErrorCode;
+import org.naho.persona.type.PersonaStatus;
 import org.naho.shared.exception.DomainException;
 
 public class Persona {
@@ -9,17 +10,19 @@ public class Persona {
     private final Long id;
     private final Long avatarFileId;
     private final Long suggestedConversationStyleId;
-    private final ConversationStyle conversationStyle;
     private final String name;
     private final String prompt;
+    private final PersonaStatus status;
+    private final String voiceName;
 
     private Persona(Builder builder) {
         this.id = builder.id;
         this.avatarFileId = builder.avatarFileId;
         this.suggestedConversationStyleId = builder.suggestedConversationStyleId;
-        this.conversationStyle = builder.conversationStyle;
         this.name = builder.name;
         this.prompt = builder.prompt;
+        this.status = builder.status != null ? builder.status : PersonaStatus.ACTIVE;
+        this.voiceName = builder.voiceName;
     }
 
     public static Builder builder() {
@@ -38,10 +41,6 @@ public class Persona {
         return suggestedConversationStyleId;
     }
 
-    public ConversationStyle getConversationStyle() {
-        return conversationStyle;
-    }
-
     public String getName() {
         return name;
     }
@@ -50,14 +49,23 @@ public class Persona {
         return prompt;
     }
 
+    public PersonaStatus getStatus() {
+        return status;
+    }
+
+    public String getVoiceName() {
+        return voiceName;
+    }
+
     public static class Builder {
 
         private Long id;
         private Long avatarFileId;
         private Long suggestedConversationStyleId;
-        private ConversationStyle conversationStyle;
         private String name;
         private String prompt;
+        private PersonaStatus status;
+        private String voiceName;
 
         public Builder id(Long id) {
             this.id = id;
@@ -74,11 +82,6 @@ public class Persona {
             return this;
         }
 
-        public Builder conversationStyle(ConversationStyle conversationStyle) {
-            this.conversationStyle = conversationStyle;
-            return this;
-        }
-
         public Builder name(String name) {
             this.name = name;
             return this;
@@ -89,20 +92,28 @@ public class Persona {
             return this;
         }
 
+        public Builder status(PersonaStatus status) {
+            this.status = status;
+            return this;
+        }
+
+        public Builder voiceName(String voiceName) {
+            this.voiceName = voiceName;
+            return this;
+        }
+
         public Persona build() {
 
             if (name == null || name.isBlank()) {
                 throw new DomainException(
                         PersonaDomainErrorCode.PERSONA_NAME_NOT_VALID,
-                        PersonaDetailMessageKey.PERSONA_NAME_BLANK
-                );
+                        PersonaDetailMessageKey.PERSONA_NAME_BLANK);
             }
 
             if (prompt == null || prompt.isBlank()) {
                 throw new DomainException(
                         PersonaDomainErrorCode.PERSONA_PROMPT_NOT_VALID,
-                        PersonaDetailMessageKey.PERSONA_PROMPT_BLANK
-                );
+                        PersonaDetailMessageKey.PERSONA_PROMPT_BLANK);
             }
 
             return new Persona(this);

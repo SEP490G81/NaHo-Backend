@@ -130,16 +130,16 @@ public class SpeakingSessionHelper {
         if (persona.getPrompt() != null) {
             personaContext.append("Persona role: ").append(persona.getPrompt()).append("\n");
         }
-        if (persona.getConversationStyle() != null) {
-            if (persona.getConversationStyle().getDescription() != null) {
-                personaContext.append("Style description: ").append(persona.getConversationStyle().getDescription())
-                        .append("\n");
-            }
-            if (persona.getConversationStyle().getPrompt() != null) {
-                personaContext.append("Style instructions: ").append(persona.getConversationStyle().getPrompt())
-                        .append("\n");
-            }
-        }
+//        if (persona.getConversationStyle() != null) {
+//            if (persona.getConversationStyle().getDescription() != null) {
+//                personaContext.append("Style description: ").append(persona.getConversationStyle().getDescription())
+//                        .append("\n");
+//            }
+//            if (persona.getConversationStyle().getPrompt() != null) {
+//                personaContext.append("Style instructions: ").append(persona.getConversationStyle().getPrompt())
+//                        .append("\n");
+//            }
+//        }
 
         if (formalityLevel != null) {
             personaContext.append("formalityLevel: ").append(formalityLevel.name()).append("\n");
@@ -157,16 +157,16 @@ public class SpeakingSessionHelper {
             if (persona.getPrompt() != null) {
                 customInstruction.append("\n- Your persona role & prompt: ").append(persona.getPrompt());
             }
-            if (persona.getConversationStyle() != null) {
-                if (persona.getConversationStyle().getDescription() != null) {
-                    customInstruction.append("\n- Conversation style description: ")
-                            .append(persona.getConversationStyle().getDescription());
-                }
-                if (persona.getConversationStyle().getPrompt() != null) {
-                    customInstruction.append("\n- Conversation style prompt: ")
-                            .append(persona.getConversationStyle().getPrompt());
-                }
-            }
+//            if (persona.getConversationStyle() != null) {
+//                if (persona.getConversationStyle().getDescription() != null) {
+//                    customInstruction.append("\n- Conversation style description: ")
+//                            .append(persona.getConversationStyle().getDescription());
+//                }
+//                if (persona.getConversationStyle().getPrompt() != null) {
+//                    customInstruction.append("\n- Conversation style prompt: ")
+//                            .append(persona.getConversationStyle().getPrompt());
+//                }
+//            }
         }
 
         if (formalityLevel != null) {

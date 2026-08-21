@@ -40,6 +40,8 @@ class CreatePersonaTest {
                 "You are a friendly Japanese teacher",
                 10L,
                 1L,
+                null,
+                null,
                 null
         );
 
@@ -84,6 +86,8 @@ class CreatePersonaTest {
                 "Energetic anime hero",
                 20L,
                 null,
+                null,
+                null,
                 styleCommand
         );
 
@@ -126,6 +130,8 @@ class CreatePersonaTest {
         CreatePersonaCommand command = new CreatePersonaCommand(
                 "Plain Persona",
                 "A plain assistant",
+                null,
+                null,
                 null,
                 null,
                 null
