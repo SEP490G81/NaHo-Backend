@@ -74,6 +74,7 @@ class OpenChestTest {
     private OpenChestUseCase openChestUseCase;
 
     @BeforeEach
+    @SuppressWarnings("unchecked")
     void setUp() {
         lenient().when(transactionPort.execute(any(Supplier.class))).thenAnswer(invocation -> {
             Supplier<?> supplier = invocation.getArgument(0);

@@ -44,7 +44,7 @@ public class CookieFactory {
                 .from(cookieName, "")
                 .httpOnly(true)
                 .secure(cookieProperty.isSecure())
-                .sameSite("Strict")
+                .sameSite("Lax")
                 .path("/")
                 .maxAge(Duration.ZERO);
 

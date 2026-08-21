@@ -73,6 +73,7 @@ class GoogleLoginTest {
     private AuthUseCase authUseCase;
 
     @BeforeEach
+    @SuppressWarnings("unchecked")
     void setUp() {
         lenient().when(transactionPort.execute(any(Supplier.class)))
                 .thenAnswer(invocation -> {
@@ -346,7 +347,7 @@ class GoogleLoginTest {
     }
 
     @Test
-    @DisplayName("UTCID06 - Đăng nhập thất bại với Google khi deviceId rỗng/null (Boundary Exception)")
+    @DisplayName("UTCID06 - Đăng nhập thành công với Google khi deviceId rỗng/null (Fallback deviceId)")
     void UTCID06_DeviceIdBlank() {
         // Arrange
         GoogleLoginCommand command = GoogleLoginCommand.builder()
@@ -370,19 +371,34 @@ class GoogleLoginTest {
 
         Instant now = Instant.now();
         TokenResult refreshToken = new TokenResult("refreshToken", "refresh_token", "refresh-token-value", now.plusSeconds(86400), 86400L);
+        TokenResult accessToken = new TokenResult("accessToken", "access_token", "access-token-value", now.plusSeconds(3600), 3600L);
+
+        UserSession savedSession = UserSession.builder()
+                .id(100L)
+                .userId(1L)
+                .hashRefreshToken("hashed-refresh-token")
+                .deviceId("google-oauth2-google-sub-12345")
+                .userAgent(command.getUserAgent())
+                .ipAddress(command.getIpAddress())
+                .issuedAt(now)
+                .refreshTokenExpiresAt(refreshToken.expiresAt())
+                .accessTokenExpiresAt(now.plusSeconds(3600))
+                .lastUsedAt(now)
+                .build();
 
         when(userRepositoryPort.findByProviderUserIdAndProviderName("google-sub-12345", AuthProviderName.GOOGLE))
                 .thenReturn(Optional.of(user));
         when(tokenServicePort.generateRefreshToken(any())).thenReturn(refreshToken);
         when(encoderPort.hashRefreshToken("refresh-token-value")).thenReturn("hashed-refresh-token");
+        when(userSessionRepositoryPort.save(any(UserSession.class))).thenReturn(savedSession);
+        when(tokenServicePort.generateAccessToken(savedSession)).thenReturn(accessToken);
 
-        // Act & Assert
-        DomainException exception = assertThrows(
-                DomainException.class,
-                () -> authUseCase.googleLogin(command)
-        );
+        // Act
+        LoginResult result = authUseCase.googleLogin(command);
 
-        assertEquals(UserSessionDomainErrorCode.USER_SESSION_DEVICE_ID_NOT_VALID, exception.getErrorCode());
-        assertEquals(UserSessionDetailMessageKey.USER_SESSION_DEVICE_ID_BLANK, exception.getMessage());
+        // Assert
+        assertNotNull(result);
+        assertEquals(accessToken, result.accessToken());
+        assertEquals(refreshToken, result.refreshToken());
     }
 }

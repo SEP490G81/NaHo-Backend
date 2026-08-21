@@ -1,16 +1,20 @@
 package org.naho.cost.adapter;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.naho.cost.constant.CostProperties;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.costexplorer.CostExplorerClient;
+import software.amazon.awssdk.services.costexplorer.model.CostExplorerException;
 import software.amazon.awssdk.services.costexplorer.model.Dimension;
 import software.amazon.awssdk.services.costexplorer.model.GetCostAndUsageRequest;
 import software.amazon.awssdk.services.costexplorer.model.GetCostAndUsageResponse;
 import software.amazon.awssdk.services.costexplorer.model.Granularity;
 
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class AwsCostExplorerClient {
@@ -24,10 +28,26 @@ public class AwsCostExplorerClient {
      * @return GetCostAndUsageResponse
      */
     public GetCostAndUsageResponse getDailyCost(LocalDate from, LocalDate to) {
+        LocalDate todayUtc = LocalDate.now(ZoneOffset.UTC);
+
+        LocalDate startDate = from;
+        LocalDate endDate = to.plusDays(1);
+
+        if (endDate.isAfter(todayUtc)) {
+            endDate = todayUtc;
+        }
+
+        if (!startDate.isBefore(endDate)) {
+            startDate = endDate.minusDays(1);
+        }
+
+        String startStr = startDate.toString();
+        String endStr = endDate.toString();
+
         GetCostAndUsageRequest request = GetCostAndUsageRequest.builder()
                 .timePeriod(interval -> interval
-                        .start(from.toString())
-                        .end(to.plusDays(1).toString())
+                        .start(startStr)
+                        .end(endStr)
                 )
                 // lấy dữ liệu theo ngày
                 .granularity(Granularity.DAILY)
@@ -41,6 +61,13 @@ public class AwsCostExplorerClient {
                 ))
                 .build();
 
-        return costExplorerClient.getCostAndUsage(request);
+        try {
+            return costExplorerClient.getCostAndUsage(request);
+        } catch (CostExplorerException e) {
+            log.error("AWS CostExplorer API Error [Code={}]: {}",
+                    e.awsErrorDetails() != null ? e.awsErrorDetails().errorCode() : "UNKNOWN",
+                    e.awsErrorDetails() != null ? e.awsErrorDetails().errorMessage() : e.getMessage());
+            throw e;
+        }
     }
 }

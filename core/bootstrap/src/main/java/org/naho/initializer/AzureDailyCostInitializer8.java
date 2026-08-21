@@ -26,17 +26,16 @@ public class AzureDailyCostInitializer8 implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        LocalDate to = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID);
-        LocalDate lastRecordDate = azureDailyCostJpaRepository.findMaxRecordDate();
-
-        LocalDate from = lastRecordDate != null ? lastRecordDate.minusDays(2) : appStartDate;
-
-        log.info("Initializing Azure daily cost from {} to {}...", from, to);
         try {
+            LocalDate to = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID);
+            LocalDate lastRecordDate = azureDailyCostJpaRepository.findMaxRecordDate();
+            LocalDate from = lastRecordDate != null ? lastRecordDate.minusDays(2) : appStartDate;
+
+            log.info("Initializing Azure daily cost from {} to {}...", from, to);
             syncAzureCostInputPort.syncCustomRange(from, to);
             log.info("Azure daily cost to {} initialized!", to);
-        } catch (Exception e) {
-            log.error("Failed to initialize Azure daily cost on startup: ", e);
+        } catch (Throwable t) {
+            log.error("Failed to initialize Azure daily cost on startup (non-fatal): ", t);
         }
     }
 }

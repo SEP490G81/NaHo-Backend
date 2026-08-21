@@ -51,11 +51,10 @@ public class AwsConfig {
 
     @Bean
     public CostExplorerClient costExplorerClient(
-            AwsCredentialsProvider credentialsProvider,
-            Region region) {
+            AwsCredentialsProvider credentialsProvider) {
         return CostExplorerClient.builder()
                 .credentialsProvider(credentialsProvider)
-                .region(region)
+                .region(Region.US_EAST_1)
                 .build();
     }
 

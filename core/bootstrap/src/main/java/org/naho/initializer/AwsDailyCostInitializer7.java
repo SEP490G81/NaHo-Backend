@@ -32,24 +32,17 @@ public class AwsDailyCostInitializer7 implements ApplicationRunner {
      * @throws Exception exception
      */
     @Override
-    public void run(ApplicationArguments args) throws Exception {
-        // hôm nay
-        LocalDate to = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID);
-
-        // lấy ra ngày cuối cùng trong db
-        LocalDate lastRecordDate = awsDailyCostJpaRepository.findMaxRecordDate();
-
-        LocalDate from = lastRecordDate != null ?
-                lastRecordDate.minusDays(2) :
-                appStartDate;
-
-        log.info("Initializing AWS daily cost to {}...", to);
-
+    public void run(ApplicationArguments args) {
         try {
+            LocalDate to = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID);
+            LocalDate lastRecordDate = awsDailyCostJpaRepository.findMaxRecordDate();
+            LocalDate from = lastRecordDate != null ? lastRecordDate.minusDays(2) : appStartDate;
+
+            log.info("Initializing AWS daily cost to {}...", to);
             awsDailyCostSyncServicePort.sync(from, to);
             log.info("AWS daily cost to {} initialized!", to);
-        } catch (Exception e) {
-            log.error("Failed to initialize AWS daily cost on startup: ", e);
+        } catch (Throwable t) {
+            log.error("Failed to initialize AWS daily cost on startup (non-fatal): ", t);
         }
     }
 }
