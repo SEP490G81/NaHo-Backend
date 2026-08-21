@@ -48,6 +48,7 @@ class UpdatePersonaTest {
                 1L,
                 null,
                 null,
+                null,
                 null
         );
 
@@ -75,6 +76,7 @@ class UpdatePersonaTest {
                 "Updated Tanaka",
                 "Updated prompt",
                 15L,
+                null,
                 null,
                 null,
                 null,
@@ -125,6 +127,7 @@ class UpdatePersonaTest {
                 "Prompt",
                 15L,
                 20L,
+                null,
                 null,
                 null,
                 null
@@ -178,6 +181,7 @@ class UpdatePersonaTest {
                 "Tanaka Sensei",
                 "Sensei prompt",
                 10L,
+                null,
                 null,
                 null,
                 null,

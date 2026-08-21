@@ -98,6 +98,7 @@ public class PersonaController {
                 request.suggestedConversationStyleId(),
                 request.status(),
                 request.voiceName(),
+                request.gender(),
                 styleCommand
         );
         Persona persona = createPersonaInputPort.createPersona(command);
@@ -129,6 +130,7 @@ public class PersonaController {
                 request.suggestedConversationStyleId(),
                 request.status(),
                 request.voiceName(),
+                request.gender(),
                 styleCommand
         );
         Persona persona = updatePersonaInputPort.updatePersona(command);

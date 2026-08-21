@@ -38,6 +38,7 @@ public class PersonaResultMapper {
                 .suggestedConversationStyle(conversationStyleResult)
                 .status(domain.getStatus())
                 .voiceName(domain.getVoiceName())
+                .gender(domain.getGender())
                 .build();
     }
 }

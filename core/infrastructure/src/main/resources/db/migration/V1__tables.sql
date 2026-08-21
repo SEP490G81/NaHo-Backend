@@ -323,6 +323,7 @@ CREATE TABLE personas
     prompt                          TEXT                  NOT NULL,
     status                          VARCHAR(50)           NOT NULL,
     voice_name                      VARCHAR(100)          NULL,
+    gender                          VARCHAR(20)           NOT NULL,
     avatar_file_id                  BIGINT                NULL,
     suggested_conversation_style_id BIGINT                NOT NULL,
     CONSTRAINT pk_personas PRIMARY KEY (id)

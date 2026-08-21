@@ -47,6 +47,7 @@ public class PersonaRepositoryAdapter implements PersonaRepositoryPort {
                 .suggestedConversationStyleId(entity.getSuggestedConversationStyle() != null ? entity.getSuggestedConversationStyle().getId() : null)
                 .status(entity.getStatus())
                 .voiceName(entity.getVoiceName())
+                .gender(entity.getGender())
                 .build();
     }
 }

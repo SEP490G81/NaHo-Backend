@@ -2,6 +2,7 @@ package org.naho.persona.result;
 
 import org.naho.file.result.FileResult;
 import org.naho.persona.type.PersonaStatus;
+import org.naho.user.type.Gender;
 
 public record PersonaResult(
         Long id,
@@ -10,7 +11,8 @@ public record PersonaResult(
         FileResult avatarFile,
         ConversationStyleResult suggestedConversationStyle,
         PersonaStatus status,
-        String voiceName
+        String voiceName,
+        Gender gender
 ) {
 
     public static Builder builder() {
@@ -26,6 +28,7 @@ public record PersonaResult(
         private ConversationStyleResult suggestedConversationStyle;
         private PersonaStatus status;
         private String voiceName;
+        private Gender gender;
 
         public Builder id(Long id) {
             this.id = id;
@@ -64,6 +67,11 @@ public record PersonaResult(
             return this;
         }
 
+        public Builder gender(Gender gender) {
+            this.gender = gender;
+            return this;
+        }
+
         public PersonaResult build() {
             return new PersonaResult(
                     id,
@@ -72,7 +80,8 @@ public record PersonaResult(
                     avatarFile,
                     suggestedConversationStyle,
                     status,
-                    voiceName
+                    voiceName,
+                    gender
             );
         }
     }

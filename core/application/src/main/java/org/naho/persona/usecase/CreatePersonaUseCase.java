@@ -40,6 +40,7 @@ public class CreatePersonaUseCase implements CreatePersonaInputPort {
                 .suggestedConversationStyleId(styleId)
                 .status(command.status())
                 .voiceName(command.voiceName())
+                .gender(command.gender())
                 .build();
 
         return personaRepositoryPort.save(persona);

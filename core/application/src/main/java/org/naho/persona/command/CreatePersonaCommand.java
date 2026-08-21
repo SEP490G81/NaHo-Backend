@@ -1,6 +1,7 @@
 package org.naho.persona.command;
 
 import org.naho.persona.type.PersonaStatus;
+import org.naho.user.type.Gender;
 
 public record CreatePersonaCommand(
         String name,
@@ -9,6 +10,7 @@ public record CreatePersonaCommand(
         Long suggestedConversationStyleId,
         PersonaStatus status,
         String voiceName,
+        Gender gender,
         CreateConversationStyleCommand conversationStyleCommand
 ) {
 }

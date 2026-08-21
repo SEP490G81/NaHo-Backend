@@ -4,6 +4,7 @@ import org.naho.i18n.message.persona.PersonaDetailMessageKey;
 import org.naho.persona.exception.PersonaDomainErrorCode;
 import org.naho.persona.type.PersonaStatus;
 import org.naho.shared.exception.DomainException;
+import org.naho.user.type.Gender;
 
 public class Persona {
 
@@ -14,6 +15,7 @@ public class Persona {
     private final String prompt;
     private final PersonaStatus status;
     private final String voiceName;
+    private final Gender gender;
 
     private Persona(Builder builder) {
         this.id = builder.id;
@@ -23,6 +25,7 @@ public class Persona {
         this.prompt = builder.prompt;
         this.status = builder.status != null ? builder.status : PersonaStatus.ACTIVE;
         this.voiceName = builder.voiceName;
+        this.gender = builder.gender;
     }
 
     public static Builder builder() {
@@ -57,6 +60,10 @@ public class Persona {
         return voiceName;
     }
 
+    public Gender getGender() {
+        return gender;
+    }
+
     public static class Builder {
 
         private Long id;
@@ -66,6 +73,7 @@ public class Persona {
         private String prompt;
         private PersonaStatus status;
         private String voiceName;
+        private Gender gender;
 
         public Builder id(Long id) {
             this.id = id;
@@ -99,6 +107,11 @@ public class Persona {
 
         public Builder voiceName(String voiceName) {
             this.voiceName = voiceName;
+            return this;
+        }
+
+        public Builder gender(Gender gender) {
+            this.gender = gender;
             return this;
         }
 

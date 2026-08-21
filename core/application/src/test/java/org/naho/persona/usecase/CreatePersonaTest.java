@@ -42,6 +42,7 @@ class CreatePersonaTest {
                 1L,
                 null,
                 null,
+                null,
                 null
         );
 
@@ -88,6 +89,7 @@ class CreatePersonaTest {
                 null,
                 null,
                 null,
+                null,
                 styleCommand
         );
 
@@ -130,6 +132,7 @@ class CreatePersonaTest {
         CreatePersonaCommand command = new CreatePersonaCommand(
                 "Plain Persona",
                 "A plain assistant",
+                null,
                 null,
                 null,
                 null,

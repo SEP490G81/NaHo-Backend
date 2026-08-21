@@ -1,9 +1,6 @@
 package org.naho.question.usecase;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.naho.book.model.Book;
-import org.naho.book.model.Topic;
 import org.naho.book.port.out.BookRepositoryPort;
 import org.naho.book.port.out.TopicRepositoryPort;
 import org.naho.file.exception.FileErrorCode;
@@ -14,30 +11,17 @@ import org.naho.furigana.port.out.FuriganaGenerationPort;
 import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
 import org.naho.i18n.message.user.UserDetailMessageKey;
-import org.naho.learning.model.LearningPathNode;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
-import org.naho.pagination.PageData;
-import org.naho.question.command.SpeakingHistoryFilterCommand;
 import org.naho.question.exception.SpeakingQuestionErrorCode;
-import org.naho.question.model.SpeakingQuestion;
 import org.naho.question.port.in.CrudAnswerHistoryInputPort;
 import org.naho.question.port.out.AnswerHistoryRepositoryPort;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
-import org.naho.question.result.SpeakingHistoryDetailResult;
-import org.naho.question.result.SpeakingHistoryListItemResult;
+import org.naho.question.result.AnswerHistoryListItemResult;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.speech.azure.model.AnswerHistory;
-import org.naho.speech.azure.model.ContentAssessment;
-import org.naho.speech.azure.model.SpeechAssessment;
-import org.naho.speech.azure.model.WordAssessment;
-import org.naho.speech.azure.result.WordAssessmentResult;
-import org.naho.speech.azure.type.SpeechAssessmentErrorType;
 import org.naho.user.exception.UserErrorCode;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class CrudAnswerHistoryUseCase implements CrudAnswerHistoryInputPort {
     private final AnswerHistoryRepositoryPort answerHistoryRepositoryPort;
@@ -119,236 +103,9 @@ public class CrudAnswerHistoryUseCase implements CrudAnswerHistoryInputPort {
         return fileStorageServicePort.generatePresignedUrl(file);
     }
 
-    @Override
-    public SpeakingHistoryDetailResult getSpeakingQuestionAnswerHistoryById(
-            Long answerHistoryId,
-            Long userId
-    ) {
-        AnswerHistory answerHistory = answerHistoryRepositoryPort.findById(answerHistoryId)
-                .orElseThrow(() -> new ApplicationException(
-                        SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
-                        SpeakingQuestionDetailMessageKey.ANSWER_HISTORY_NOT_FOUND,
-                        answerHistoryId
-                ));
-
-        if (userId == null || !userId.equals(answerHistory.getUserId())) {
-            throw new ApplicationException(
-                    UserErrorCode.USER_UNAUTHORIZED,
-                    UserDetailMessageKey.USER_UNAUTHORIZED
-            );
-        }
-
-        SpeakingQuestion speakingQuestion = speakingQuestionRepositoryPort
-                .findById(answerHistory.getSpeakingQuestionId())
-                .orElseThrow(() -> new ApplicationException(
-                        SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
-                        SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_NOT_FOUND,
-                        answerHistory.getSpeakingQuestionId()
-                ));
-
-        SpeechAssessment speech = answerHistoryRepositoryPort
-                .findSpeechAssessmentByAnswerHistoryId(answerHistoryId)
-                .orElseThrow(() -> new ApplicationException(
-                        SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
-                        SpeakingQuestionDetailMessageKey.SPEECH_ASSESSMENT_NOT_FOUND,
-                        answerHistoryId
-                ));
-
-        ContentAssessment content = answerHistoryRepositoryPort
-                .findContentAssessmentByAnswerHistoryId(answerHistoryId)
-                .orElseThrow(() -> new ApplicationException(
-                        SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
-                        SpeakingQuestionDetailMessageKey.CONTENT_ASSESSMENT_NOT_FOUND,
-                        answerHistoryId
-                ));
-
-        JsonNode root;
-        try {
-            root = objectMapper.readTree(content.getAiFeedback());
-        } catch (Exception e) {
-            throw new ApplicationException(
-                    SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
-                    "Corrupted AI feedback data");
-        }
-
-        Double duration = (answerHistory.getDuration() != null && answerHistory.getDuration() > 0)
-                ? answerHistory.getDuration()
-                : root.path("duration").asInt(0);
-
-        Double overallScore = root.path("overallScore").asDouble(0.0);
-
-        JsonNode scoresNode = root.path("scores");
-        Double vocabScore = scoresNode.path("vocabulary").asDouble(0.0);
-        Double grammarScore = scoresNode.path("grammar").asDouble(0.0);
-        Double naturalnessScore = scoresNode.path("naturalness").asDouble(0.0);
-        Double pronunciationScore = Math.round((speech.getPronunciationScore() / 10.0) * 10.0) / 10.0;
-
-        SpeakingHistoryDetailResult.Scores scores = new SpeakingHistoryDetailResult.Scores(
-                pronunciationScore,
-                vocabScore,
-                grammarScore,
-                naturalnessScore);
-
-        String fullTranscript = speech.getTranscriptText() != null ? speech.getTranscriptText() : "";
-
-        List<SpeakingHistoryDetailResult.UserTranscriptItem> userTranscript = new ArrayList<>();
-        JsonNode utNode = root.path("userTranscript");
-        if (utNode.isArray()) {
-            for (JsonNode item : utNode) {
-                String text = item.path("text").asText("");
-                SpeakingHistoryDetailResult.ErrorDetail error = null;
-                JsonNode errNode = item.path("error");
-                if (errNode.isObject()) {
-                    error = new SpeakingHistoryDetailResult.ErrorDetail(
-                            errNode.path("type").asText(""),
-                            errNode.path("explanation").asText(""),
-                            errNode.path("suggestion").asText(""));
-                }
-                userTranscript.add(new SpeakingHistoryDetailResult.UserTranscriptItem(text, error));
-            }
-        }
-        if (userTranscript.isEmpty() && !fullTranscript.isBlank()) {
-            userTranscript.add(new SpeakingHistoryDetailResult.UserTranscriptItem(fullTranscript, null));
-        }
-
-        JsonNode sugNode = root.path("aiSuggestion");
-        SpeakingHistoryDetailResult.AiSuggestion aiSuggestion = new SpeakingHistoryDetailResult.AiSuggestion(
-                sugNode.path("jp").asText(""),
-                sugNode.path("furigana").asText(""),
-                sugNode.path("vi").asText(""));
-
-        Map<String, String> wordNotes = new HashMap<>();
-        JsonNode wordNotesNode = root.path("wordNotes");
-        if (wordNotesNode.isObject()) {
-            wordNotesNode.fields().forEachRemaining(entry -> {
-                wordNotes.put(entry.getKey().toLowerCase(), entry.getValue().asText());
-            });
-        }
-
-        List<SpeakingHistoryDetailResult.PronunciationItem> pronunciation = new ArrayList<>();
-        if (speech.getWords() != null) {
-            for (WordAssessment wordEntity : speech.getWords()) {
-                String wordText = wordEntity.getWord();
-                double accScore = wordEntity.getAccuracyScore();
-                SpeechAssessmentErrorType errType = wordEntity.getErrorType();
-
-                String severity = "ok";
-                if (errType == SpeechAssessmentErrorType.MISPRONUNCIATION || accScore < 50) {
-                    severity = "error";
-                } else if (errType == SpeechAssessmentErrorType.OMISSION || accScore < 80) {
-                    severity = "warn";
-                }
-
-                WordAssessmentResult wordPron = WordAssessmentResult.builder()
-                        .word(wordText)
-                        .accuracyScore(accScore)
-                        .errorType(errType != null ? errType : SpeechAssessmentErrorType.NONE)
-                        .build();
-
-                String furigana = wordEntity.getWordMarkup();
-                if (furigana == null || furigana.isBlank()) {
-                    try {
-                        furigana = furiganaGenerationPort.generateFuriganaMarkup(wordText);
-                    } catch (Exception e) {
-                        furigana = wordText;
-                    }
-                }
-
-                String note = wordNotes.get(wordText.toLowerCase());
-                if (note == null || note.isBlank()) {
-                    if ("ok".equals(severity)) {
-                        note = "Phát âm tốt.";
-                    } else if ("warn".equals(severity)) {
-                        note = "Cần phát âm rõ ràng hơn.";
-                    } else {
-                        note = "Chú ý phát âm chuẩn âm tiết.";
-                    }
-                }
-
-                pronunciation.add(new SpeakingHistoryDetailResult.PronunciationItem(
-                        wordText,
-                        furigana,
-                        severity,
-                        note,
-                        wordPron.accuracyScore()
-                ));
-            }
-        }
-
-        String pronunciationNote = root.path("pronunciationNote").asText("Chú ý cải thiện phát âm theo hướng dẫn.");
-
-        List<SpeakingHistoryDetailResult.ExpressionItem> expressions = new ArrayList<>();
-        JsonNode exprsNode = root.path("expressions");
-        if (exprsNode.isArray()) {
-            for (JsonNode item : exprsNode) {
-                expressions.add(new SpeakingHistoryDetailResult.ExpressionItem(
-                        item.path("jp").asText(""),
-                        item.path("furigana").asText(""),
-                        item.path("vi").asText(""),
-                        item.path("note").asText("")));
-            }
-        }
-
-        List<SpeakingHistoryDetailResult.ItVocabItem> itVocab = new ArrayList<>();
-        JsonNode itNode = root.path("itVocab");
-        if (itNode.isArray()) {
-            for (JsonNode item : itNode) {
-                itVocab.add(new SpeakingHistoryDetailResult.ItVocabItem(
-                        item.path("term").asText(""),
-                        item.path("reading").asText(""),
-                        item.path("meaning").asText("")));
-            }
-        }
-
-        SpeakingHistoryDetailResult.Report report = new SpeakingHistoryDetailResult.Report(
-                overallScore,
-                scores,
-                fullTranscript,
-                userTranscript,
-                aiSuggestion,
-                pronunciation,
-                pronunciationNote,
-                expressions,
-                itVocab
-        );
-
-        String audioUrl = null;
-        Long audioFileId = answerHistory.getAudioFileId();
-        if (audioFileId != null) {
-            File audioFile = fileRepositoryPort.findById(audioFileId).orElse(null);
-            if (audioFile != null) {
-                audioUrl = fileStorageServicePort.generatePresignedUrl(audioFile);
-            }
-        }
-
-        Topic topic = topicRepositoryPort.findBySpeakingQuestionId(speakingQuestion.getId()).orElse(null);
-        Long topicId = topic != null ? topic.getId() : null;
-        String topicName = topic != null ? topic.getJapaneseName() : null;
-
-        Book book = bookRepositoryPort.findBySpeakingQuestionId(speakingQuestion.getId()).orElse(null);
-        Long bookId = book != null ? book.getId() : null;
-
-        LearningPathNode learningPathNode = learningPathNodeRepositoryPort
-                .findBySpeakingQuestionId(speakingQuestion.getId()).orElse(null);
-        Long learningPathNodeId = learningPathNode != null ? learningPathNode.getId() : null;
-
-        return new SpeakingHistoryDetailResult(
-                answerHistory.getId(),
-                topicId,
-                answerHistory.getSpeakingQuestionId(),
-                speakingQuestion.getJapaneseName(),
-                topicName,
-                learningPathNodeId,
-                bookId,
-                duration,
-                overallScore,
-                report,
-                audioUrl
-        );
-    }
 
     @Override
-    public PageData<SpeakingHistoryListItemResult> getUserHistoryList(SpeakingHistoryFilterCommand command) {
-        return answerHistoryRepositoryPort.findUserAnswerHistories(command);
+    public List<AnswerHistoryListItemResult> findAllBySpeakingQuestionId(Long speakingQuestionId) {
+
     }
 }

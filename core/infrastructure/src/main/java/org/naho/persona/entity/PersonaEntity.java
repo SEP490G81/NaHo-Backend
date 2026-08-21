@@ -7,6 +7,7 @@ import lombok.experimental.SuperBuilder;
 import org.naho.file.entity.FileEntity;
 import org.naho.persona.type.PersonaStatus;
 import org.naho.shared.persistence.BaseEntity;
+import org.naho.user.type.Gender;
 
 @SuperBuilder
 @Getter
@@ -29,6 +30,10 @@ public class PersonaEntity extends BaseEntity {
 
     @Column(name = "voice_name", length = 100)
     String voiceName;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    Gender gender;
 
     @OneToOne
     @JoinColumn(name = "avatar_file_id")

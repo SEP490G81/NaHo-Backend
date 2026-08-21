@@ -165,7 +165,7 @@ VALUES (17, NOW(), 'personas/ito.png', 'naho-public-bucket', 'ito.png', 'image/p
 -- =========================================================
 
 INSERT INTO personas
-(created_time, modified_time, name, prompt, avatar_file_id, suggested_conversation_style_id, status, voice_name)
+(created_time, modified_time, name, prompt, avatar_file_id, suggested_conversation_style_id, status, voice_name, gender)
 VALUES
 
 -- 田中先生 -> tanaka.png -> file 25
@@ -179,7 +179,8 @@ VALUES
     AND marugoto_level = 'ELEMENTARY_1_A2'
   LIMIT 1),
  'ACTIVE',
- 'ja-JP-DaichiNeural'),
+ 'ja-JP-MayuNeural',
+ 'FEMALE'),
 
 -- 佐藤さん -> sato.png -> file 22
 (NOW(), NULL,
@@ -192,7 +193,8 @@ VALUES
     AND marugoto_level = 'ELEMENTARY_2_A2'
   LIMIT 1),
  'ACTIVE',
- 'ja-JP-ShioriNeural'),
+ 'ja-JP-KeitaNeural',
+ 'MALE'),
 
 -- 鈴木さん -> suzuki.png -> file 23
 (NOW(), NULL,
@@ -205,7 +207,8 @@ VALUES
     AND marugoto_level = 'PRE_INTERMEDIATE_A2_B1'
   LIMIT 1),
  'ACTIVE',
- 'ja-JP-KeitaNeural'),
+ 'ja-JP-ShioriNeural',
+ 'FEMALE'),
 
 -- 山田店長 -> yamada.png -> file 26
 (NOW(), NULL,
@@ -218,7 +221,8 @@ VALUES
     AND marugoto_level = 'PRE_INTERMEDIATE_A2_B1'
   LIMIT 1),
  'ACTIVE',
- 'ja-JP-NaokiNeural'),
+ 'ja-JP-NaokiNeural',
+ 'MALE'),
 
 -- 美咲 -> misaki.png -> file 20
 (NOW(), NULL,
@@ -231,7 +235,8 @@ VALUES
     AND marugoto_level = 'INTERMEDIATE_1_B1'
   LIMIT 1),
  'ACTIVE',
- 'ja-JP-NanamiNeural'),
+ 'ja-JP-NanamiNeural',
+ 'FEMALE'),
 
 -- 高橋さん -> takahashi.png -> file 24
 (NOW(), NULL,
@@ -244,7 +249,8 @@ VALUES
     AND marugoto_level = 'INTERMEDIATE_1_B1'
   LIMIT 1),
  'ACTIVE',
- 'ja-JP-MasahiroNeural'),
+ 'ja-JP-MasahiroNeural',
+ 'MALE'),
 
 -- 中村さん -> nakamura.png -> file 21
 (NOW(), NULL,
@@ -257,7 +263,8 @@ VALUES
     AND marugoto_level = 'INTERMEDIATE_2_B1'
   LIMIT 1),
  'ACTIVE',
- 'ja-JP-MayuNeural'),
+ 'ja-JP-MayuNeural',
+ 'FEMALE'),
 
 -- 健太 -> kenta.png -> file 18
 (NOW(), NULL,
@@ -270,7 +277,8 @@ VALUES
     AND marugoto_level = 'INTERMEDIATE_2_B1'
   LIMIT 1),
  'ACTIVE',
- 'ja-JP-KeitaNeural'),
+ 'ja-JP-KeitaNeural',
+ 'MALE'),
 
 -- 伊藤先生 -> ito.png -> file 17
 (NOW(), NULL,
@@ -283,7 +291,8 @@ VALUES
     AND marugoto_level = 'INTERMEDIATE_2_B1'
   LIMIT 1),
  'ACTIVE',
- 'ja-JP-AoiNeural'),
+ 'ja-JP-NanamiNeural',
+ 'FEMALE'),
 
 -- 会社の先輩 -> learner.png -> file 19
 (NOW(), NULL,
@@ -296,4 +305,5 @@ VALUES
     AND marugoto_level = 'INTERMEDIATE_1_B1'
   LIMIT 1),
  'ACTIVE',
- 'ja-JP-DaichiNeural');
+ 'ja-JP-DaichiNeural',
+ 'MALE');
