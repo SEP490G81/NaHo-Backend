@@ -44,66 +44,6 @@ public class SpeakingSession {
         this.endedAt = builder.endedAt;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setSessionCode(String sessionCode) {
-        this.sessionCode = sessionCode;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public void setPersonaId(Long personaId) {
-        this.personaId = personaId;
-    }
-
-    public void setTopic(String topic) {
-        this.topic = topic;
-    }
-
-    public void setVoiceName(String voiceName) {
-        this.voiceName = voiceName;
-    }
-
-    public void setMarugotoLevel(MarugotoLevel marugotoLevel) {
-        this.marugotoLevel = marugotoLevel;
-    }
-
-    public void setFormalityLevel(FormalityLevel formalityLevel) {
-        this.formalityLevel = formalityLevel;
-    }
-
-    public void setDurationSeconds(Integer durationSeconds) {
-        this.durationSeconds = durationSeconds;
-    }
-
-    public void setTotalTurns(int totalTurns) {
-        this.totalTurns = totalTurns;
-    }
-
-    public void setAsrConfidence(Double asrConfidence) {
-        this.asrConfidence = asrConfidence;
-    }
-
-    public void setFullTranscript(String fullTranscript) {
-        this.fullTranscript = fullTranscript;
-    }
-
-    public void setStatus(SpeakingSessionStatus status) {
-        this.status = status;
-    }
-
-    public void setStartedAt(Instant startedAt) {
-        this.startedAt = startedAt;
-    }
-
-    public void setEndedAt(Instant endedAt) {
-        this.endedAt = endedAt;
-    }
-
     public static Builder builder() {
         return new Builder();
     }
@@ -112,60 +52,120 @@ public class SpeakingSession {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getSessionCode() {
         return sessionCode;
+    }
+
+    public void setSessionCode(String sessionCode) {
+        this.sessionCode = sessionCode;
     }
 
     public Long getUserId() {
         return userId;
     }
 
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
     public Long getPersonaId() {
         return personaId;
+    }
+
+    public void setPersonaId(Long personaId) {
+        this.personaId = personaId;
     }
 
     public String getTopic() {
         return topic;
     }
 
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
+
     public String getVoiceName() {
         return voiceName;
+    }
+
+    public void setVoiceName(String voiceName) {
+        this.voiceName = voiceName;
     }
 
     public MarugotoLevel getMarugotoLevel() {
         return marugotoLevel;
     }
 
+    public void setMarugotoLevel(MarugotoLevel marugotoLevel) {
+        this.marugotoLevel = marugotoLevel;
+    }
+
     public FormalityLevel getFormalityLevel() {
         return formalityLevel;
+    }
+
+    public void setFormalityLevel(FormalityLevel formalityLevel) {
+        this.formalityLevel = formalityLevel;
     }
 
     public Integer getDurationSeconds() {
         return durationSeconds;
     }
 
+    public void setDurationSeconds(Integer durationSeconds) {
+        this.durationSeconds = durationSeconds;
+    }
+
     public int getTotalTurns() {
         return totalTurns;
+    }
+
+    public void setTotalTurns(int totalTurns) {
+        this.totalTurns = totalTurns;
     }
 
     public Double getAsrConfidence() {
         return asrConfidence;
     }
 
+    public void setAsrConfidence(Double asrConfidence) {
+        this.asrConfidence = asrConfidence;
+    }
+
     public String getFullTranscript() {
         return fullTranscript;
+    }
+
+    public void setFullTranscript(String fullTranscript) {
+        this.fullTranscript = fullTranscript;
     }
 
     public SpeakingSessionStatus getStatus() {
         return status;
     }
 
+    public void setStatus(SpeakingSessionStatus status) {
+        this.status = status;
+    }
+
     public Instant getStartedAt() {
         return startedAt;
     }
 
+    public void setStartedAt(Instant startedAt) {
+        this.startedAt = startedAt;
+    }
+
     public Instant getEndedAt() {
         return endedAt;
+    }
+
+    public void setEndedAt(Instant endedAt) {
+        this.endedAt = endedAt;
     }
 
     public static class Builder {

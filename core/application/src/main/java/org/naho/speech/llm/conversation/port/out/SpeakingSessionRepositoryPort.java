@@ -93,12 +93,12 @@ public interface SpeakingSessionRepositoryPort {
     void deleteSessionBySessionCode(String sessionCode);
 
     boolean isSessionBelongToUser(String sessionCode, Long userId);
-    
+
     SpeakingSession findBySessionCode(String sessionCode);
 
     SpeakingSession findBySessionCodeAndStatus(String sessionCode, SpeakingSessionStatus status);
 
     SpeakingSession findBySessionId(Long sessionId);
 
-    List<SpeakingSession> findAllInProgressSessionsByUserId(Long userId);
+    List<SpeakingSession> findAllByUserIdAndSpeakingSessionStatus(Long userId, SpeakingSessionStatus status);
 }

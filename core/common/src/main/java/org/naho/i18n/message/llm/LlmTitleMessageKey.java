@@ -12,6 +12,7 @@ public final class LlmTitleMessageKey {
     public static final String LLM_SESSION_CONCURRENT_LIMIT_EXCEEDED_TITLE = "Concurrent session limit exceeded";
     public static final String LLM_DAILY_LIMIT_EXCEEDED_TITLE = "Daily AI speaking session limit reached";
     public static final String LLM_SESSION_ALREADY_STARTED_TITLE = "Speaking session already started";
+    public static final String LLM_SESSION_STATUS_INVALID_TITLE = "Session status invalid";
     public static final String LLM_SAVE_SESSION_FAILED_TITLE = "Failed to save speaking session history!";
 
     private LlmTitleMessageKey() {

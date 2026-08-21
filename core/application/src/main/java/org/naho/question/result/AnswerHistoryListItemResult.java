@@ -11,6 +11,10 @@ public class AnswerHistoryListItemResult {
     private Double duration;
     private Double overallScore;
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public Long getId() {
         return id;
     }
@@ -57,10 +61,6 @@ public class AnswerHistoryListItemResult {
 
     public void setOverallScore(Double overallScore) {
         this.overallScore = overallScore;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     public static class Builder {

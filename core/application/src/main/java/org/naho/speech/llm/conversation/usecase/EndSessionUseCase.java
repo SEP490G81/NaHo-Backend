@@ -87,7 +87,7 @@ public class EndSessionUseCase implements EndSessionInputPort {
         String effectiveTopic = (topic != null && !topic.isBlank())
                 ? topic
                 : (speakingSession.getTopic() != null ? speakingSession.getTopic() : "");
-        
+
         // LLM chấm điểm
         SpeakingSessionAssessmentResult speakingSessionAssessmentResult =
                 aiScoringPort.score(

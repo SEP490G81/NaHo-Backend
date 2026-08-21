@@ -27,6 +27,7 @@ import org.naho.speech.llm.conversation.port.in.EndSessionInputPort;
 import org.naho.speech.llm.conversation.port.in.SpeakingSessionCleanupInputPort;
 import org.naho.speech.llm.conversation.port.in.SpeakingSessionInputPort;
 import org.naho.speech.llm.conversation.result.*;
+import org.naho.speech.llm.type.SpeakingSessionStatus;
 import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
 import org.naho.subscription.result.SubscriptionPlanResult;
 import org.naho.user.result.AccessTokenPayload;
@@ -222,12 +223,16 @@ public class SpeakingSessionController {
      * @return List<SpeakingSessionListItemResponse>
      */
     @ApiResponseMessage
-    @GetMapping("/in-progress/all")
-    public ResponseEntity<List<SpeakingSessionListItemResponse>> findAllInProgressSessionsByUserId(
-            @AuthenticationPrincipal AccessTokenPayload payload
+    @GetMapping("/all")
+    public ResponseEntity<List<SpeakingSessionListItemResponse>> findAllByUserIdAndSpeakingSessionStatus(
+            @AuthenticationPrincipal AccessTokenPayload payload,
+            @RequestParam SpeakingSessionStatus status
     ) {
         List<SpeakingSessionListItemResult> results = crudSpeakingSessionInputPort
-                .findAllInProgressSessionsByUserId(payload.userId());
+                .findAllByUserIdAndSpeakingSessionStatus(
+                        payload.userId(),
+                        status
+                );
 
         List<SpeakingSessionListItemResponse> responses = results
                 .stream().map(speakingSessionResponseMapper::resultToResponse)

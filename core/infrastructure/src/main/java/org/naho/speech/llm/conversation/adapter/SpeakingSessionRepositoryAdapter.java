@@ -434,9 +434,12 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
     }
 
     @Override
-    public List<SpeakingSession> findAllInProgressSessionsByUserId(Long userId) {
+    public List<SpeakingSession> findAllByUserIdAndSpeakingSessionStatus(
+            Long userId,
+            SpeakingSessionStatus status
+    ) {
         return sessionJpaRepository
-                .findALlByStatusAndUserId(SpeakingSessionStatus.IN_PROGRESS, userId)
+                .findAllByUserIdAndStatus(userId, status)
                 .stream()
                 .map(speakingSessionEntityMapper::entityToDomain)
                 .toList();
