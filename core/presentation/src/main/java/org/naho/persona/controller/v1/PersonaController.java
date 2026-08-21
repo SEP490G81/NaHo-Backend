@@ -45,7 +45,7 @@ public class PersonaController {
     @GetMapping("/{personaId}")
     @ApiResponseMessage(message = "Get persona successfully!")
     public ResponseEntity<PersonaResponse> getPersonaById(
-            @PathVariable("personaId") Long personaId
+            @PathVariable Long personaId
     ) {
         Persona persona = getPersonaInputPort.getPersonaById(personaId)
                 .orElseThrow(() -> new ApplicationException(
@@ -59,7 +59,7 @@ public class PersonaController {
     @GetMapping("/{personaId}/conversation-style")
     @ApiResponseMessage(message = "Get conversation style of persona successfully!")
     public ResponseEntity<ConversationStyleResponse> getConversationStyleByPersonaId(
-            @PathVariable("personaId") Long personaId
+            @PathVariable Long personaId
     ) {
         ConversationStyle style = getPersonaInputPort.getConversationStyleByPersonaId(personaId)
                 .orElseThrow(() -> new ApplicationException(
@@ -99,7 +99,7 @@ public class PersonaController {
     @PutMapping("/{personaId}")
     @ApiResponseMessage(message = "Update persona successfully!")
     public ResponseEntity<PersonaResponse> updatePersona(
-            @PathVariable("personaId") Long personaId,
+            @PathVariable Long personaId,
             @Valid @RequestBody UpdatePersonaRequest request
     ) {
         UpdateConversationStyleCommand styleCommand = null;
