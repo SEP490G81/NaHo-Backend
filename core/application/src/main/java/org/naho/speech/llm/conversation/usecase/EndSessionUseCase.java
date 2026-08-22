@@ -5,11 +5,13 @@ import org.naho.daily.port.in.CrudUserDailyMissionInputPort;
 import org.naho.daily.type.MissionType;
 import org.naho.i18n.message.learning.UserLearningProgressDetailMessageKey;
 import org.naho.i18n.message.llm.LlmDetailMessageKey;
+import org.naho.i18n.message.persona.PersonaDetailMessageKey;
 import org.naho.learning.command.UpdateUserStreakCommand;
 import org.naho.learning.exception.UserLearningProgressErrorCode;
 import org.naho.learning.model.UserLearningProgress;
 import org.naho.learning.port.in.UserLearningStreakInputPort;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
+import org.naho.persona.exception.PersonaErrorCode;
 import org.naho.persona.model.Persona;
 import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.naho.persona.type.FormalityLevel;
@@ -87,7 +89,11 @@ public class EndSessionUseCase implements EndSessionInputPort {
 
         Persona persona = personaRepositoryPort
                 .findById(speakingSession.getPersonaId())
-                .orElse(() -> new ApplicationException());
+                .orElseThrow(() -> new ApplicationException(
+                        PersonaErrorCode.PERSONA_NOT_FOUND,
+                        PersonaDetailMessageKey.PERSONA_NOT_FOUND,
+                        speakingSession.getPersonaId()
+                ));
 
         String systemPromptContent = speakingSessionHelper.buildSystemPromptContent(
                 persona,
@@ -131,16 +137,16 @@ public class EndSessionUseCase implements EndSessionInputPort {
             Instant startedAt = speakingSession.getStartedAt();
 
             Double asrConfidenceDouble = null;
-            if (arsConfidence != null && !arsConfidence.isBlank() && !arsConfidence.equals("N/A")) {
-                try {
-                    asrConfidenceDouble = Double.parseDouble(arsConfidence.trim());
-                } catch (NumberFormatException ignored) {
-                    throw new ApplicationException(
-                            LlmApplicationError.LLM_PARSE_ERROR,
-                            LlmDetailMessageKey.LLM_PARSE_ERROR
-                    );
-                }
-            }
+//            if (arsConfidence != null && !arsConfidence.isBlank() && !arsConfidence.equals("N/A")) {
+//                try {
+//                    asrConfidenceDouble = Double.parseDouble(arsConfidence.trim());
+//                } catch (NumberFormatException ignored) {
+//                    throw new ApplicationException(
+//                            LlmApplicationError.LLM_PARSE_ERROR,
+//                            LlmDetailMessageKey.LLM_PARSE_ERROR
+//                    );
+//                }
+//            }
 
 //            savedSession = speakingSessionRepositoryPort.saveSpeakingSession(
 //                    sessionCode,

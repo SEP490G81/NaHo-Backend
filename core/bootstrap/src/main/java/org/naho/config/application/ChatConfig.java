@@ -164,7 +164,9 @@ public class ChatConfig {
             CrudUserDailyMissionInputPort crudUserDailyMissionInputPort,
             UserLearningStreakInputPort userLearningStreakInputPort,
             UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
-            TransactionPort transactionPort
+            TransactionPort transactionPort,
+            SpeakingSessionMessageRepositoryPort speakingSessionMessageRepositoryPort,
+            AiChatPort aiChatPort
     ) {
         return new EndSessionUseCase(
                 aiScoringPort,
@@ -175,7 +177,9 @@ public class ChatConfig {
                 crudUserDailyMissionInputPort,
                 userLearningStreakInputPort,
                 userLearningProgressRepositoryPort,
-                transactionPort
+                transactionPort,
+                speakingSessionMessageRepositoryPort,
+                aiChatPort
         );
     }
 

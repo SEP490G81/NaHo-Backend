@@ -10,10 +10,7 @@ import org.naho.speech.llm.conversation.port.out.AiScoringPort;
 import org.naho.speech.llm.conversation.result.SpeakingImprovedExpressionResult;
 import org.naho.speech.llm.conversation.result.SpeakingSessionAssessmentResult;
 
-import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,58 +36,59 @@ public class OpenAiScoringAdapter implements AiScoringPort {
     @Override
     public SpeakingSessionAssessmentResult score(String sessionCode, String topic, String systemPromptContent, String messagesJson) {
         String userContent = buildUserContent(topic, systemPromptContent);
-        String requestBody = buildScoringRequestBody()
+//        String requestBody = buildScoringRequestBody()
+        return null;
     }
 
-    @Override
-    public SpeakingSessionAssessmentResult score(
-            String sessionCode,
-            String topic,
-            String fullTranscript,
-            String speechMetadata,
-            String asrConfidence,
-            String personaContext
-    ) {
-        System.out.println("[OpenAiScoringAdapter] Calling model: " + properties.getScoringModel());
-
-        String requestBody = buildScoringRequestBody(userContent);
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(LLM_URL))
-                .timeout(Duration.ofMinutes(10))
-                .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + properties.getApiKey())
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                .build();
-
-        try {
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() != 200) {
-                throw new InfrastructureException(
-                        LlmApplicationError.LLM_API_ERROR,
-                        LlmDetailMessageKey.LLM_API_ERROR,
-                        "Status: " + response.statusCode() + " | " + response.body()
-                );
-            }
-            String rawContent = extractContent(response.body());
-            System.out.println("[OpenAiScoringAdapter] Raw JSON: " + rawContent);
-            return parseScoringResult(rawContent);
-
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new InfrastructureException(
-                    LlmApplicationError.LLM_CONNECTION_TIMEOUT,
-                    LlmDetailMessageKey.LLM_CONNECTION_TIMEOUT,
-                    e.getMessage()
-            );
-        } catch (Exception e) {
-            throw new InfrastructureException(
-                    LlmApplicationError.LLM_API_ERROR,
-                    LlmDetailMessageKey.LLM_API_ERROR,
-                    e.getMessage()
-            );
-        }
-    }
+//    @Override
+//    public SpeakingSessionAssessmentResult score(
+//            String sessionCode,
+//            String topic,
+//            String fullTranscript,
+//            String speechMetadata,
+//            String asrConfidence,
+//            String personaContext
+//    ) {
+//        System.out.println("[OpenAiScoringAdapter] Calling model: " + properties.getScoringModel());
+//
+//        String requestBody = buildScoringRequestBody(userContent);
+//
+//        HttpRequest request = HttpRequest.newBuilder()
+//                .uri(URI.create(LLM_URL))
+//                .timeout(Duration.ofMinutes(10))
+//                .header("Content-Type", "application/json")
+//                .header("Authorization", "Bearer " + properties.getApiKey())
+//                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+//                .build();
+//
+//        try {
+//            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+//            if (response.statusCode() != 200) {
+//                throw new InfrastructureException(
+//                        LlmApplicationError.LLM_API_ERROR,
+//                        LlmDetailMessageKey.LLM_API_ERROR,
+//                        "Status: " + response.statusCode() + " | " + response.body()
+//                );
+//            }
+//            String rawContent = extractContent(response.body());
+//            System.out.println("[OpenAiScoringAdapter] Raw JSON: " + rawContent);
+//            return parseScoringResult(rawContent);
+//
+//        } catch (InterruptedException e) {
+//            Thread.currentThread().interrupt();
+//            throw new InfrastructureException(
+//                    LlmApplicationError.LLM_CONNECTION_TIMEOUT,
+//                    LlmDetailMessageKey.LLM_CONNECTION_TIMEOUT,
+//                    e.getMessage()
+//            );
+//        } catch (Exception e) {
+//            throw new InfrastructureException(
+//                    LlmApplicationError.LLM_API_ERROR,
+//                    LlmDetailMessageKey.LLM_API_ERROR,
+//                    e.getMessage()
+//            );
+//        }
+//    }
 
     private String buildUserContent(
             String topic,
