@@ -48,41 +48,8 @@ class GetConversationStyleByPersonaIdTest {
     }
 
     @Test
-    @DisplayName("UTCID02 - Lấy phong cách hội thoại thành công từ đối tượng style liên kết trực tiếp trong persona")
-    void UTCID02_GetConversationStyleByPersonaId_EmbeddedStylePresent_Success() {
-        // Arrange
-        Long personaId = 1L;
-        ConversationStyle style = ConversationStyle.builder()
-                .id(10L)
-                .description("Polite style")
-                .prompt("Speak politely")
-                .formalityLevel(FormalityLevel.FORMAL)
-                .marugotoLevel(MarugotoLevel.ELEMENTARY_1_A2)
-                .build();
-
-        Persona persona = Persona.builder()
-                .id(personaId)
-                .name("Tanaka")
-                .prompt("Prompt Tanaka")
-                .conversationStyle(style)
-                .build();
-
-        when(personaRepositoryPort.findById(personaId)).thenReturn(Optional.of(persona));
-
-        // Act
-        Optional<ConversationStyle> result = getPersonaUseCase.getConversationStyleByPersonaId(personaId);
-
-        // Assert
-        assertTrue(result.isPresent());
-        assertEquals(10L, result.get().getId());
-        assertEquals("Polite style", result.get().getDescription());
-        verify(personaRepositoryPort, times(1)).findById(personaId);
-        verifyNoInteractions(conversationStyleRepositoryPort);
-    }
-
-    @Test
-    @DisplayName("UTCID03 - Lấy phong cách hội thoại thành công từ suggestedConversationStyleId qua repository")
-    void UTCID03_GetConversationStyleByPersonaId_FromSuggestedStyleId_Success() {
+    @DisplayName("UTCID02 - Lấy phong cách hội thoại thành công từ suggestedConversationStyleId qua repository")
+    void UTCID02_GetConversationStyleByPersonaId_FromSuggestedStyleId_Success() {
         // Arrange
         Long personaId = 1L;
         Long styleId = 5L;
@@ -92,7 +59,6 @@ class GetConversationStyleByPersonaIdTest {
                 .name("Tanaka")
                 .prompt("Prompt Tanaka")
                 .suggestedConversationStyleId(styleId)
-                .conversationStyle(null)
                 .build();
 
         ConversationStyle style = ConversationStyle.builder()
@@ -118,8 +84,8 @@ class GetConversationStyleByPersonaIdTest {
     }
 
     @Test
-    @DisplayName("UTCID04 - Lấy phong cách hội thoại trả về rỗng khi nhân vật không có cấu hình style")
-    void UTCID04_GetConversationStyleByPersonaId_NoStyleConfigured() {
+    @DisplayName("UTCID03 - Lấy phong cách hội thoại trả về rỗng khi nhân vật không có cấu hình style")
+    void UTCID03_GetConversationStyleByPersonaId_NoStyleConfigured() {
         // Arrange
         Long personaId = 1L;
         Persona persona = Persona.builder()
@@ -127,7 +93,6 @@ class GetConversationStyleByPersonaIdTest {
                 .name("Tanaka")
                 .prompt("Prompt Tanaka")
                 .suggestedConversationStyleId(null)
-                .conversationStyle(null)
                 .build();
 
         when(personaRepositoryPort.findById(personaId)).thenReturn(Optional.of(persona));
