@@ -4,14 +4,19 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.naho.i18n.message.question.SpeakingQuestionDetailMessageKey;
 import org.naho.question.command.UpdateSpeakingQuestionCommand;
+import org.naho.question.dto.mapper.SpeakingQuestionResponseMapper;
 import org.naho.question.dto.request.UpdateSpeakingQuestionRequest;
+import org.naho.question.dto.response.SpeakingQuestionResponse;
+import org.naho.question.port.in.GetSpeakingQuestionInputPort;
 import org.naho.question.port.in.UpdateSpeakingQuestionInputPort;
+import org.naho.question.result.SpeakingQuestionResult;
 import org.naho.question.result.UpdateSpeakingQuestionResult;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.user.port.out.RoleRepositoryPort;
 import org.naho.user.result.AccessTokenPayload;
 import org.naho.user.type.RoleName;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +29,8 @@ import java.util.List;
 public class SpeakingQuestionAdminController {
 
     private final UpdateSpeakingQuestionInputPort updateSpeakingQuestionInputPort;
+    private final GetSpeakingQuestionInputPort getSpeakingQuestionInputPort;
+    private final SpeakingQuestionResponseMapper speakingQuestionResponseMapper;
     private final RoleRepositoryPort roleRepositoryPort;
 
     @PutMapping("/{id}")
@@ -37,7 +44,7 @@ public class SpeakingQuestionAdminController {
         boolean isContentManager = roleSet.contains(RoleName.ADMIN.name()) || roleSet.contains(RoleName.CONTENT_MANAGER.name());
 
         if (!isContentManager) {
-            throw new org.springframework.security.access.AccessDeniedException("Access Denied");
+            throw new AccessDeniedException("Access Denied");
         }
 
         List<UpdateSpeakingQuestionCommand.NestedVocabularyCommand> vocabularies = new ArrayList<>();
@@ -74,5 +81,21 @@ public class SpeakingQuestionAdminController {
 
         UpdateSpeakingQuestionResult result = updateSpeakingQuestionInputPort.updateSpeakingQuestion(command);
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<SpeakingQuestionResponse> getSpeakingQuestionDetail(
+            @PathVariable("id") Long id,
+            @AuthenticationPrincipal AccessTokenPayload payload) {
+        Long currentUserId = payload.userId();
+        List<String> roleSet = roleRepositoryPort.findRoleNamesByUserId(currentUserId);
+        boolean isContentManager = roleSet.contains(RoleName.ADMIN.name()) || roleSet.contains(RoleName.CONTENT_MANAGER.name());
+
+        if (!isContentManager) {
+            throw new AccessDeniedException("Access Denied");
+        }
+
+        SpeakingQuestionResult result = getSpeakingQuestionInputPort.findSpeakingQuestionForAdmin(id);
+        return ResponseEntity.ok(speakingQuestionResponseMapper.resultToResponse(result));
     }
 }

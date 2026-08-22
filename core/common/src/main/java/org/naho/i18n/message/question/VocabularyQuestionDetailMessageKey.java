@@ -16,6 +16,7 @@ public final class VocabularyQuestionDetailMessageKey {
     public static final String VOCABULARY_QUESTION_LOCKED = "vocabulary_question.locked";
     public static final String VOCABULARY_TOPIC_GET_SUCCESS = "vocabulary_topic.get.success.detail";
     public static final String VOCABULARY_TOPIC_NOT_FOUND = "vocabulary.topic.not_found";
+    public static final String VOCABULARY_QUESTION_UPDATE_SUCCESS = "vocabulary_question.update.success.detail";
 
     private VocabularyQuestionDetailMessageKey() {
     }
