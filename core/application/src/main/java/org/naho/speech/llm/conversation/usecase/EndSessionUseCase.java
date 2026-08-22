@@ -84,7 +84,8 @@ public class EndSessionUseCase implements EndSessionInputPort {
         return null;
     }
 
-    private SpeakingSessionResult doEndSession(Long userId, String sessionCode) {
+    @Override
+    public SpeakingSessionResult doEndSession(Long userId, String sessionCode) {
         SpeakingSession speakingSession = speakingSessionRepositoryPort.findBySessionCode(sessionCode);
 
         Persona persona = personaRepositoryPort
@@ -126,6 +127,8 @@ public class EndSessionUseCase implements EndSessionInputPort {
                         systemPromptContent,
                         messagesJson
                 );
+
+
 
         // Persist session result to DB
         SpeakingSession savedSession;

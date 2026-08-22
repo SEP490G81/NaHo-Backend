@@ -202,7 +202,7 @@ public class SpeakingSessionController {
             @PathVariable("sessionCode") String sessionCode,
             @AuthenticationPrincipal AccessTokenPayload payload
     ) {
-        SpeakingSessionResult result = endSessionInputPort.endSession(payload.userId(), sessionCode);
+        SpeakingSessionResult result = endSessionInputPort.doEndSession(payload.userId(), sessionCode);
         return ResponseEntity.ok(speakingSessionResponseMapper.resultToResponse(result));
     }
 
