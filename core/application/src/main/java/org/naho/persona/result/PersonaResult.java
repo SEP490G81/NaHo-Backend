@@ -1,6 +1,8 @@
 package org.naho.persona.result;
 
 import org.naho.file.result.FileResult;
+import org.naho.persona.type.FormalityLevel;
+import org.naho.persona.type.MarugotoLevel;
 import org.naho.persona.type.PersonaStatus;
 import org.naho.user.type.Gender;
 
@@ -9,7 +11,8 @@ public record PersonaResult(
         String name,
         String prompt,
         FileResult avatarFile,
-        ConversationStyleResult suggestedConversationStyle,
+        MarugotoLevel defaultMarugotoLevel,
+        FormalityLevel defaultFormalityLevel,
         PersonaStatus status,
         String voiceName,
         Gender gender
@@ -25,7 +28,8 @@ public record PersonaResult(
         private String name;
         private String prompt;
         private FileResult avatarFile;
-        private ConversationStyleResult suggestedConversationStyle;
+        private MarugotoLevel defaultMarugotoLevel;
+        private FormalityLevel defaultFormalityLevel;
         private PersonaStatus status;
         private String voiceName;
         private Gender gender;
@@ -50,10 +54,13 @@ public record PersonaResult(
             return this;
         }
 
-        public Builder suggestedConversationStyle(
-                ConversationStyleResult suggestedConversationStyle
-        ) {
-            this.suggestedConversationStyle = suggestedConversationStyle;
+        public Builder defaultMarugotoLevel(MarugotoLevel defaultMarugotoLevel) {
+            this.defaultMarugotoLevel = defaultMarugotoLevel;
+            return this;
+        }
+
+        public Builder defaultFormalityLevel(FormalityLevel defaultFormalityLevel) {
+            this.defaultFormalityLevel = defaultFormalityLevel;
             return this;
         }
 
@@ -78,7 +85,8 @@ public record PersonaResult(
                     name,
                     prompt,
                     avatarFile,
-                    suggestedConversationStyle,
+                    defaultMarugotoLevel,
+                    defaultFormalityLevel,
                     status,
                     voiceName,
                     gender

@@ -9,7 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.naho.i18n.message.persona.PersonaDetailMessageKey;
 import org.naho.persona.exception.PersonaErrorCode;
 import org.naho.persona.model.Persona;
-import org.naho.persona.port.out.ConversationStyleRepositoryPort;
 import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.naho.persona.type.PersonaStatus;
 import org.naho.shared.exception.ApplicationException;
@@ -25,9 +24,6 @@ class UpdatePersonaStatusTest {
 
     @Mock
     private PersonaRepositoryPort personaRepositoryPort;
-
-    @Mock
-    private ConversationStyleRepositoryPort conversationStyleRepositoryPort;
 
     @InjectMocks
     private UpdatePersonaUseCase updatePersonaUseCase;

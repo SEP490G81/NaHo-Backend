@@ -40,7 +40,7 @@ public class PersonaRepositoryAdapter implements PersonaRepositoryPort {
     public Persona save(Persona persona) {
         PersonaEntity entity = personaEntityMapper.domainToEntity(persona);
         PersonaEntity saved = personaJpaRepository.save(entity);
-        return entityToDomain(saved);
+        return personaEntityMapper.entityToDomain(saved);
     }
 
     @Override
@@ -55,18 +55,5 @@ public class PersonaRepositoryAdapter implements PersonaRepositoryPort {
         entity.setStatus(status);
         personaJpaRepository.save(entity);
         return status;
-    }
-
-    private Persona entityToDomain(PersonaEntity entity) {
-        return Persona.builder()
-                .id(entity.getId())
-                .name(entity.getName())
-                .prompt(entity.getPrompt())
-                .avatarFileId(entity.getAvatarFile() != null ? entity.getAvatarFile().getId() : null)
-                .suggestedConversationStyleId(entity.getSuggestedConversationStyle() != null ? entity.getSuggestedConversationStyle().getId() : null)
-                .status(entity.getStatus())
-                .voiceName(entity.getVoiceName())
-                .gender(entity.getGender())
-                .build();
     }
 }

@@ -8,10 +8,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.naho.i18n.message.persona.PersonaDetailMessageKey;
 import org.naho.persona.exception.PersonaErrorCode;
-import org.naho.persona.mapper.ConversationStyleMapper;
 import org.naho.persona.mapper.PersonaResultMapper;
 import org.naho.persona.model.Persona;
-import org.naho.persona.port.out.ConversationStyleRepositoryPort;
 import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.naho.persona.result.PersonaResult;
 import org.naho.shared.exception.ApplicationException;
@@ -29,13 +27,9 @@ class GetPersonaByIdTest {
     private PersonaRepositoryPort personaRepositoryPort;
 
     @Mock
-    private ConversationStyleRepositoryPort conversationStyleRepositoryPort;
-
-    @Mock
     private PersonaResultMapper personaResultMapper;
 
-    @Mock
-    private ConversationStyleMapper conversationStyleMapper;
+
 
     @InjectMocks
     private GetPersonaUseCase getPersonaUseCase;

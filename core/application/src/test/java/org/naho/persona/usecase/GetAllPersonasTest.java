@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.naho.persona.mapper.PersonaResultMapper;
 import org.naho.persona.model.Persona;
-import org.naho.persona.port.out.ConversationStyleRepositoryPort;
 import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.naho.persona.result.PersonaResult;
 
@@ -23,9 +22,6 @@ class GetAllPersonasTest {
 
     @Mock
     private PersonaRepositoryPort personaRepositoryPort;
-
-    @Mock
-    private ConversationStyleRepositoryPort conversationStyleRepositoryPort;
 
     @Mock
     private PersonaResultMapper personaResultMapper;
