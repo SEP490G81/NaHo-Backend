@@ -67,7 +67,15 @@ public class VocabularyRepositoryAdapter implements VocabularyRepositoryPort {
 
     @Override
     public void deleteById(Long id) {
-        vocabularyJpaRepository.deleteById(id);
+        try {
+            vocabularyJpaRepository.deleteById(id);
+            vocabularyJpaRepository.flush();
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            throw new org.naho.shared.exception.ApplicationException(
+                    org.naho.vocabulary.exception.VocabularyErrorCode.VOCABULARY_IN_USE,
+                    "Cannot delete vocabulary because it is being used by one or more questions"
+            );
+        }
     }
 
     @Override
