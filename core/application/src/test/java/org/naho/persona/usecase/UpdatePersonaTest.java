@@ -6,14 +6,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.naho.file.result.FileResult;
 import org.naho.i18n.message.persona.PersonaDetailMessageKey;
 import org.naho.persona.command.UpdateConversationStyleCommand;
 import org.naho.persona.command.UpdatePersonaCommand;
 import org.naho.persona.exception.PersonaErrorCode;
+import org.naho.persona.mapper.PersonaResultMapper;
 import org.naho.persona.model.ConversationStyle;
 import org.naho.persona.model.Persona;
 import org.naho.persona.port.out.ConversationStyleRepositoryPort;
 import org.naho.persona.port.out.PersonaRepositoryPort;
+import org.naho.persona.result.ConversationStyleResult;
+import org.naho.persona.result.PersonaResult;
 import org.naho.persona.type.FormalityLevel;
 import org.naho.persona.type.MarugotoLevel;
 import org.naho.shared.exception.ApplicationException;
@@ -32,6 +36,9 @@ class UpdatePersonaTest {
 
     @Mock
     private ConversationStyleRepositoryPort conversationStyleRepositoryPort;
+
+    @Mock
+    private PersonaResultMapper personaResultMapper;
 
     @InjectMocks
     private UpdatePersonaUseCase updatePersonaUseCase;
@@ -65,6 +72,7 @@ class UpdatePersonaTest {
         verify(personaRepositoryPort, times(1)).findById(999L);
         verify(personaRepositoryPort, never()).save(any());
         verifyNoInteractions(conversationStyleRepositoryPort);
+        verifyNoInteractions(personaResultMapper);
     }
 
     @Test
@@ -99,21 +107,33 @@ class UpdatePersonaTest {
                 .suggestedConversationStyleId(10L)
                 .build();
 
+        PersonaResult expectedResult = PersonaResult.builder()
+                .id(1L)
+                .name("Updated Tanaka")
+                .prompt("Updated prompt")
+                .avatarFile(FileResult.builder().id(15L).build())
+                .suggestedConversationStyle(ConversationStyleResult.builder().id(10L).build())
+                .build();
+
         when(personaRepositoryPort.findById(1L)).thenReturn(Optional.of(existingPersona));
         when(personaRepositoryPort.save(any(Persona.class))).thenReturn(updatedPersona);
+        when(personaResultMapper.domainToResult(updatedPersona)).thenReturn(expectedResult);
 
         // Act
-        Persona result = updatePersonaUseCase.updatePersona(command);
+        PersonaResult result = updatePersonaUseCase.updatePersona(command);
 
         // Assert
         assertNotNull(result);
-        assertEquals("Updated Tanaka", result.getName());
-        assertEquals("Updated prompt", result.getPrompt());
-        assertEquals(15L, result.getAvatarFileId());
-        assertEquals(10L, result.getSuggestedConversationStyleId());
+        assertEquals("Updated Tanaka", result.name());
+        assertEquals("Updated prompt", result.prompt());
+        assertNotNull(result.avatarFile());
+        assertEquals(15L, result.avatarFile().id());
+        assertNotNull(result.suggestedConversationStyle());
+        assertEquals(10L, result.suggestedConversationStyle().id());
 
         verify(personaRepositoryPort, times(1)).findById(1L);
         verify(personaRepositoryPort, times(1)).save(any(Persona.class));
+        verify(personaResultMapper, times(1)).domainToResult(updatedPersona);
         verifyNoInteractions(conversationStyleRepositoryPort);
     }
 
@@ -149,18 +169,28 @@ class UpdatePersonaTest {
                 .suggestedConversationStyleId(20L)
                 .build();
 
+        PersonaResult expectedResult = PersonaResult.builder()
+                .id(1L)
+                .name("Tanaka")
+                .prompt("Prompt")
+                .suggestedConversationStyle(ConversationStyleResult.builder().id(20L).build())
+                .build();
+
         when(personaRepositoryPort.findById(1L)).thenReturn(Optional.of(existingPersona));
         when(personaRepositoryPort.save(any(Persona.class))).thenReturn(updatedPersona);
+        when(personaResultMapper.domainToResult(updatedPersona)).thenReturn(expectedResult);
 
         // Act
-        Persona result = updatePersonaUseCase.updatePersona(command);
+        PersonaResult result = updatePersonaUseCase.updatePersona(command);
 
         // Assert
         assertNotNull(result);
-        assertEquals(20L, result.getSuggestedConversationStyleId());
+        assertNotNull(result.suggestedConversationStyle());
+        assertEquals(20L, result.suggestedConversationStyle().id());
 
         verify(personaRepositoryPort, times(1)).findById(1L);
         verify(personaRepositoryPort, times(1)).save(any(Persona.class));
+        verify(personaResultMapper, times(1)).domainToResult(updatedPersona);
         verifyNoInteractions(conversationStyleRepositoryPort);
     }
 
@@ -211,20 +241,32 @@ class UpdatePersonaTest {
                 .suggestedConversationStyleId(5L)
                 .build();
 
+        PersonaResult expectedResult = PersonaResult.builder()
+                .id(1L)
+                .name("Tanaka Sensei")
+                .prompt("Sensei prompt")
+                .suggestedConversationStyle(ConversationStyleResult.builder().id(5L).build())
+                .build();
+
         when(personaRepositoryPort.findById(1L)).thenReturn(Optional.of(existingPersona));
         when(conversationStyleRepositoryPort.save(any(ConversationStyle.class))).thenReturn(savedStyle);
         when(personaRepositoryPort.save(any(Persona.class))).thenReturn(updatedPersona);
+        when(personaResultMapper.domainToResult(updatedPersona)).thenReturn(expectedResult);
 
         // Act
-        Persona result = updatePersonaUseCase.updatePersona(command);
+        PersonaResult result = updatePersonaUseCase.updatePersona(command);
 
         // Assert
         assertNotNull(result);
-        assertEquals("Tanaka Sensei", result.getName());
-        assertEquals(5L, result.getSuggestedConversationStyleId());
+        assertEquals("Tanaka Sensei", result.name());
+        assertNotNull(result.suggestedConversationStyle());
+        assertEquals(5L, result.suggestedConversationStyle().id());
 
         verify(personaRepositoryPort, times(1)).findById(1L);
         verify(conversationStyleRepositoryPort, times(1)).save(any(ConversationStyle.class));
         verify(personaRepositoryPort, times(1)).save(any(Persona.class));
+        verify(personaResultMapper, times(1)).domainToResult(updatedPersona);
     }
 }
+
+

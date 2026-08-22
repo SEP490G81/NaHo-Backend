@@ -177,10 +177,7 @@ VALUES
   FROM conversation_styles
   WHERE formality_level = 'NEUTRAL'
     AND marugoto_level = 'ELEMENTARY_1_A2'
-  LIMIT 1),
- 'ACTIVE',
- 'ja-JP-MayuNeural',
- 'FEMALE'),
+     LIMIT 1), 'ACTIVE', 'ja-JP-MayuNeural', 'FEMALE'),
 
 -- 佐藤さん -> sato.png -> file 22
 (NOW(), NULL,

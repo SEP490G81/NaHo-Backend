@@ -1,25 +1,32 @@
 package org.naho.persona.usecase;
 
 import org.naho.persona.command.CreatePersonaCommand;
+import org.naho.persona.mapper.PersonaResultMapper;
 import org.naho.persona.model.ConversationStyle;
 import org.naho.persona.model.Persona;
 import org.naho.persona.port.in.CreatePersonaInputPort;
 import org.naho.persona.port.out.ConversationStyleRepositoryPort;
 import org.naho.persona.port.out.PersonaRepositoryPort;
+import org.naho.persona.result.PersonaResult;
 
 public class CreatePersonaUseCase implements CreatePersonaInputPort {
 
     private final PersonaRepositoryPort personaRepositoryPort;
     private final ConversationStyleRepositoryPort conversationStyleRepositoryPort;
+    private final PersonaResultMapper personaResultMapper;
 
-    public CreatePersonaUseCase(PersonaRepositoryPort personaRepositoryPort,
-                                ConversationStyleRepositoryPort conversationStyleRepositoryPort) {
+    public CreatePersonaUseCase(
+            PersonaRepositoryPort personaRepositoryPort,
+            ConversationStyleRepositoryPort conversationStyleRepositoryPort,
+            PersonaResultMapper personaResultMapper
+    ) {
         this.personaRepositoryPort = personaRepositoryPort;
         this.conversationStyleRepositoryPort = conversationStyleRepositoryPort;
+        this.personaResultMapper = personaResultMapper;
     }
 
     @Override
-    public Persona createPersona(CreatePersonaCommand command) {
+    public PersonaResult createPersona(CreatePersonaCommand command) {
         Long styleId = command.suggestedConversationStyleId();
 
         if (command.conversationStyleCommand() != null && conversationStyleRepositoryPort != null) {
@@ -43,6 +50,7 @@ public class CreatePersonaUseCase implements CreatePersonaInputPort {
                 .gender(command.gender())
                 .build();
 
-        return personaRepositoryPort.save(persona);
+        Persona savedPersona = personaRepositoryPort.save(persona);
+        return personaResultMapper.domainToResult(savedPersona);
     }
 }

@@ -8,10 +8,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.naho.persona.command.CreateConversationStyleCommand;
 import org.naho.persona.command.CreatePersonaCommand;
+import org.naho.persona.mapper.PersonaResultMapper;
 import org.naho.persona.model.ConversationStyle;
 import org.naho.persona.model.Persona;
 import org.naho.persona.port.out.ConversationStyleRepositoryPort;
 import org.naho.persona.port.out.PersonaRepositoryPort;
+import org.naho.persona.result.ConversationStyleResult;
+import org.naho.persona.result.PersonaResult;
 import org.naho.persona.type.FormalityLevel;
 import org.naho.persona.type.MarugotoLevel;
 
@@ -27,6 +30,9 @@ class CreatePersonaTest {
 
     @Mock
     private ConversationStyleRepositoryPort conversationStyleRepositoryPort;
+
+    @Mock
+    private PersonaResultMapper personaResultMapper;
 
     @InjectMocks
     private CreatePersonaUseCase createPersonaUseCase;
@@ -54,20 +60,29 @@ class CreatePersonaTest {
                 .suggestedConversationStyleId(1L)
                 .build();
 
+        PersonaResult expectedResult = PersonaResult.builder()
+                .id(1L)
+                .name("Sensei Tanaka")
+                .prompt("You are a friendly Japanese teacher")
+                .suggestedConversationStyle(ConversationStyleResult.builder().id(1L).build())
+                .build();
+
         when(personaRepositoryPort.save(any(Persona.class))).thenReturn(savedPersona);
+        when(personaResultMapper.domainToResult(savedPersona)).thenReturn(expectedResult);
 
         // Act
-        Persona result = createPersonaUseCase.createPersona(command);
+        PersonaResult result = createPersonaUseCase.createPersona(command);
 
         // Assert
         assertNotNull(result);
-        assertEquals(1L, result.getId());
-        assertEquals("Sensei Tanaka", result.getName());
-        assertEquals("You are a friendly Japanese teacher", result.getPrompt());
-        assertEquals(10L, result.getAvatarFileId());
-        assertEquals(1L, result.getSuggestedConversationStyleId());
+        assertEquals(1L, result.id());
+        assertEquals("Sensei Tanaka", result.name());
+        assertEquals("You are a friendly Japanese teacher", result.prompt());
+        assertNotNull(result.suggestedConversationStyle());
+        assertEquals(1L, result.suggestedConversationStyle().id());
 
         verify(personaRepositoryPort, times(1)).save(any(Persona.class));
+        verify(personaResultMapper, times(1)).domainToResult(savedPersona);
         verifyNoInteractions(conversationStyleRepositoryPort);
     }
 
@@ -109,20 +124,29 @@ class CreatePersonaTest {
                 .suggestedConversationStyleId(2L)
                 .build();
 
+        PersonaResult expectedResult = PersonaResult.builder()
+                .id(2L)
+                .name("Anime Hero")
+                .suggestedConversationStyle(ConversationStyleResult.builder().id(2L).build())
+                .build();
+
         when(conversationStyleRepositoryPort.save(any(ConversationStyle.class))).thenReturn(savedStyle);
         when(personaRepositoryPort.save(any(Persona.class))).thenReturn(savedPersona);
+        when(personaResultMapper.domainToResult(savedPersona)).thenReturn(expectedResult);
 
         // Act
-        Persona result = createPersonaUseCase.createPersona(command);
+        PersonaResult result = createPersonaUseCase.createPersona(command);
 
         // Assert
         assertNotNull(result);
-        assertEquals(2L, result.getId());
-        assertEquals("Anime Hero", result.getName());
-        assertEquals(2L, result.getSuggestedConversationStyleId());
+        assertEquals(2L, result.id());
+        assertEquals("Anime Hero", result.name());
+        assertNotNull(result.suggestedConversationStyle());
+        assertEquals(2L, result.suggestedConversationStyle().id());
 
         verify(conversationStyleRepositoryPort, times(1)).save(any(ConversationStyle.class));
         verify(personaRepositoryPort, times(1)).save(any(Persona.class));
+        verify(personaResultMapper, times(1)).domainToResult(savedPersona);
     }
 
     @Test
@@ -148,18 +172,29 @@ class CreatePersonaTest {
                 .suggestedConversationStyleId(null)
                 .build();
 
+        PersonaResult expectedResult = PersonaResult.builder()
+                .id(3L)
+                .name("Plain Persona")
+                .prompt("A plain assistant")
+                .suggestedConversationStyle(null)
+                .build();
+
         when(personaRepositoryPort.save(any(Persona.class))).thenReturn(savedPersona);
+        when(personaResultMapper.domainToResult(savedPersona)).thenReturn(expectedResult);
 
         // Act
-        Persona result = createPersonaUseCase.createPersona(command);
+        PersonaResult result = createPersonaUseCase.createPersona(command);
 
         // Assert
         assertNotNull(result);
-        assertEquals(3L, result.getId());
-        assertEquals("Plain Persona", result.getName());
-        assertNull(result.getSuggestedConversationStyleId());
+        assertEquals(3L, result.id());
+        assertEquals("Plain Persona", result.name());
+        assertNull(result.suggestedConversationStyle());
 
         verify(personaRepositoryPort, times(1)).save(any(Persona.class));
+        verify(personaResultMapper, times(1)).domainToResult(savedPersona);
         verifyNoInteractions(conversationStyleRepositoryPort);
     }
 }
+
+

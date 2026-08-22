@@ -1,30 +1,39 @@
 package org.naho.persona.usecase;
 
+import org.naho.i18n.message.persona.ConversationStyleDetailMessageKey;
+import org.naho.i18n.message.persona.PersonaDetailMessageKey;
+import org.naho.persona.exception.PersonaErrorCode;
+import org.naho.persona.mapper.ConversationStyleMapper;
 import org.naho.persona.mapper.PersonaResultMapper;
 import org.naho.persona.model.ConversationStyle;
 import org.naho.persona.model.Persona;
 import org.naho.persona.port.in.GetPersonaInputPort;
 import org.naho.persona.port.out.ConversationStyleRepositoryPort;
 import org.naho.persona.port.out.PersonaRepositoryPort;
+import org.naho.persona.result.ConversationStyleResult;
 import org.naho.persona.result.PersonaResult;
+import org.naho.shared.exception.ApplicationException;
+import org.naho.shared.exception.CommonErrorCode;
 
 import java.util.List;
-import java.util.Optional;
 
 public class GetPersonaUseCase implements GetPersonaInputPort {
 
     private final PersonaRepositoryPort personaRepositoryPort;
     private final ConversationStyleRepositoryPort conversationStyleRepositoryPort;
     private final PersonaResultMapper personaResultMapper;
+    private final ConversationStyleMapper conversationStyleMapper;
 
     public GetPersonaUseCase(
             PersonaRepositoryPort personaRepositoryPort,
             ConversationStyleRepositoryPort conversationStyleRepositoryPort,
-            PersonaResultMapper personaResultMapper
+            PersonaResultMapper personaResultMapper,
+            ConversationStyleMapper conversationStyleMapper
     ) {
         this.personaRepositoryPort = personaRepositoryPort;
         this.conversationStyleRepositoryPort = conversationStyleRepositoryPort;
         this.personaResultMapper = personaResultMapper;
+        this.conversationStyleMapper = conversationStyleMapper;
     }
 
     @Override
@@ -36,23 +45,55 @@ public class GetPersonaUseCase implements GetPersonaInputPort {
     }
 
     @Override
-    public Optional<Persona> getPersonaById(Long id) {
-        return personaRepositoryPort.findById(id);
+    public PersonaResult getPersonaById(Long id) {
+        if (id == null) {
+            throw new ApplicationException(
+                    CommonErrorCode.COMMON_INVALID_REQUEST,
+                    PersonaDetailMessageKey.PERSONA_ID_NULL
+            );
+        }
+
+        Persona persona = personaRepositoryPort
+                .findById(id)
+                .orElseThrow(() -> new ApplicationException(
+                        PersonaErrorCode.PERSONA_NOT_FOUND,
+                        PersonaDetailMessageKey.PERSONA_NOT_FOUND,
+                        id
+                ));
+
+        return personaResultMapper.domainToResult(persona);
     }
 
     @Override
-    public Optional<ConversationStyle> getConversationStyleByPersonaId(Long id) {
-        Optional<Persona> personaOpt = personaRepositoryPort.findById(id);
-        if (personaOpt.isEmpty()) {
-            return Optional.empty();
+    public ConversationStyleResult getConversationStyleByPersonaId(Long personaId) {
+        if (personaId == null) {
+            throw new ApplicationException(
+                    CommonErrorCode.COMMON_INVALID_REQUEST,
+                    PersonaDetailMessageKey.PERSONA_ID_NULL
+            );
         }
-        Persona persona = personaOpt.get();
-//        if (persona.getConversationStyle() != null) {
-//            return Optional.of(persona.getConversationStyle());
-//        }
-        if (persona.getSuggestedConversationStyleId() != null && conversationStyleRepositoryPort != null) {
-            return conversationStyleRepositoryPort.findById(persona.getSuggestedConversationStyleId());
+
+        PersonaResult persona = getPersonaById(personaId);
+
+        if (persona.suggestedConversationStyle() == null || persona.suggestedConversationStyle().id() == null) {
+            throw new ApplicationException(
+                    CommonErrorCode.COMMON_INVALID_REQUEST,
+                    ConversationStyleDetailMessageKey.CONVERSATION_STYLE_ID_NULL
+            );
         }
-        return Optional.empty();
+
+        Long styleId = persona.suggestedConversationStyle().id();
+
+        ConversationStyle conversationStyle = conversationStyleRepositoryPort
+                .findById(styleId)
+                .orElseThrow(() -> new ApplicationException(
+                        PersonaErrorCode.PERSONA_NOT_FOUND,
+                        ConversationStyleDetailMessageKey.CONVERSATION_STYLE_NOT_FOUND,
+                        styleId
+                ));
+
+        return conversationStyleMapper.domainToResult(conversationStyle);
     }
 }
+
+

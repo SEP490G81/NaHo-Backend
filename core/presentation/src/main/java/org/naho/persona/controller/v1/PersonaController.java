@@ -12,15 +12,13 @@ import org.naho.persona.dto.request.CreatePersonaRequest;
 import org.naho.persona.dto.request.UpdatePersonaRequest;
 import org.naho.persona.dto.response.ConversationStyleResponse;
 import org.naho.persona.dto.response.PersonaResponse;
-import org.naho.persona.exception.PersonaErrorCode;
-import org.naho.persona.model.ConversationStyle;
-import org.naho.persona.model.Persona;
 import org.naho.persona.port.in.CreatePersonaInputPort;
 import org.naho.persona.port.in.GetPersonaInputPort;
 import org.naho.persona.port.in.UpdatePersonaInputPort;
+import org.naho.persona.result.ConversationStyleResult;
 import org.naho.persona.result.PersonaResult;
+import org.naho.persona.type.PersonaStatus;
 import org.naho.shared.annotation.ApiResponseMessage;
-import org.naho.shared.exception.ApplicationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,13 +51,8 @@ public class PersonaController {
     public ResponseEntity<PersonaResponse> getPersonaById(
             @PathVariable Long personaId
     ) {
-        Persona persona = getPersonaInputPort.getPersonaById(personaId)
-                .orElseThrow(() -> new ApplicationException(
-                        PersonaErrorCode.PERSONA_NOT_FOUND,
-                        PersonaDetailMessageKey.PERSONA_NOT_FOUND,
-                        personaId
-                ));
-        return ResponseEntity.ok(personaResponseMapper.toResponse(persona));
+        PersonaResult result = getPersonaInputPort.getPersonaById(personaId);
+        return ResponseEntity.ok(personaResponseMapper.resultToResponse(result));
     }
 
     @GetMapping("/{personaId}/conversation-style")
@@ -67,13 +60,8 @@ public class PersonaController {
     public ResponseEntity<ConversationStyleResponse> getConversationStyleByPersonaId(
             @PathVariable Long personaId
     ) {
-        ConversationStyle style = getPersonaInputPort.getConversationStyleByPersonaId(personaId)
-                .orElseThrow(() -> new ApplicationException(
-                        PersonaErrorCode.PERSONA_NOT_FOUND,
-                        PersonaDetailMessageKey.PERSONA_NOT_FOUND,
-                        personaId
-                ));
-        return ResponseEntity.ok(personaResponseMapper.toConversationStyleResponse(style));
+        ConversationStyleResult result = getPersonaInputPort.getConversationStyleByPersonaId(personaId);
+        return ResponseEntity.ok(personaResponseMapper.resultToResponse(result));
     }
 
     @PostMapping
@@ -101,8 +89,8 @@ public class PersonaController {
                 request.gender(),
                 styleCommand
         );
-        Persona persona = createPersonaInputPort.createPersona(command);
-        return ResponseEntity.ok(personaResponseMapper.toResponse(persona));
+        PersonaResult persona = createPersonaInputPort.createPersona(command);
+        return ResponseEntity.ok(personaResponseMapper.resultToResponse(persona));
     }
 
     @PutMapping("/{personaId}")
@@ -133,7 +121,14 @@ public class PersonaController {
                 request.gender(),
                 styleCommand
         );
-        Persona persona = updatePersonaInputPort.updatePersona(command);
-        return ResponseEntity.ok(personaResponseMapper.toResponse(persona));
+        PersonaResult persona = updatePersonaInputPort.updatePersona(command);
+        return ResponseEntity.ok(personaResponseMapper.resultToResponse(persona));
+    }
+
+    @PatchMapping("/{personaId}/status")
+    @ApiResponseMessage(message = PersonaDetailMessageKey.PERSONA_UPDATE_STATUS_SUCCESS)
+    public ResponseEntity<PersonaStatus> updatePersonaStatus(@PathVariable Long personaId) {
+        PersonaStatus status = updatePersonaInputPort.updateStatus(personaId);
+        return ResponseEntity.ok(status);
     }
 }

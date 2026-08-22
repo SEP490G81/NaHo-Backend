@@ -15,5 +15,9 @@ public interface PersonaEntityMapper {
     @Mapping(target = "suggestedConversationStyleId", source = "suggestedConversationStyle.id")
     Persona entityToDomain(PersonaEntity entity);
 
+    @Mapping(target = "createdTime", ignore = true)
+    @Mapping(target = "modifiedTime", ignore = true)
+    @Mapping(target = "avatarFile", source = "avatarFileId")
+    @Mapping(target = "suggestedConversationStyle", source = "suggestedConversationStyleId")
     PersonaEntity domainToEntity(Persona domain);
 }

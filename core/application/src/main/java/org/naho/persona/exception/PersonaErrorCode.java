@@ -8,6 +8,11 @@ public enum PersonaErrorCode implements ErrorCode {
             "PERSONA_E001",
             PersonaTitleMessageKey.PERSONA_NOT_FOUND_TITLE,
             404
+    ),
+    PERSONA_PERSIST_FAILED(
+            "PERSONA_E002",
+            PersonaTitleMessageKey.PERSONA_UPDATE_STATUS_FAILED_TITLE,
+            500
     );
 
     private final String code;

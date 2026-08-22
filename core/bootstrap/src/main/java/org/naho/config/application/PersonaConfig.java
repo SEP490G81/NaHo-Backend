@@ -47,24 +47,34 @@ public class PersonaConfig {
     public GetPersonaInputPort getPersonaInputPort(
             PersonaRepositoryPort personaRepositoryPort,
             ConversationStyleRepositoryPort conversationStyleRepositoryPort,
-            PersonaResultMapper personaResultMapper
+            PersonaResultMapper personaResultMapper,
+            ConversationStyleMapper conversationStyleMapper
     ) {
         return new GetPersonaUseCase(
                 personaRepositoryPort,
                 conversationStyleRepositoryPort,
-                personaResultMapper
+                personaResultMapper,
+                conversationStyleMapper
         );
     }
 
     @Bean
-    public CreatePersonaInputPort createPersonaInputPort(PersonaRepositoryPort personaRepositoryPort,
-                                                         ConversationStyleRepositoryPort conversationStyleRepositoryPort) {
-        return new CreatePersonaUseCase(personaRepositoryPort, conversationStyleRepositoryPort);
+    public CreatePersonaInputPort createPersonaInputPort(
+            PersonaRepositoryPort personaRepositoryPort,
+            ConversationStyleRepositoryPort conversationStyleRepositoryPort,
+            PersonaResultMapper personaResultMapper
+    ) {
+        return new CreatePersonaUseCase(personaRepositoryPort, conversationStyleRepositoryPort, personaResultMapper);
     }
 
     @Bean
-    public UpdatePersonaInputPort updatePersonaInputPort(PersonaRepositoryPort personaRepositoryPort,
-                                                         ConversationStyleRepositoryPort conversationStyleRepositoryPort) {
-        return new UpdatePersonaUseCase(personaRepositoryPort, conversationStyleRepositoryPort);
+    public UpdatePersonaInputPort updatePersonaInputPort(
+            PersonaRepositoryPort personaRepositoryPort,
+            ConversationStyleRepositoryPort conversationStyleRepositoryPort,
+            PersonaResultMapper personaResultMapper
+    ) {
+        return new UpdatePersonaUseCase(personaRepositoryPort, conversationStyleRepositoryPort, personaResultMapper);
     }
 }
+
+
