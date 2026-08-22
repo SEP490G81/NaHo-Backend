@@ -78,14 +78,12 @@ public class SpeakingQuestionConfig {
     public GetSpeakingQuestionInputPort getSpeakingQuestionInputPort(
             SpeakingQuestionRepositoryPort speakingQuestionRepositoryPort,
             SpeakingQuestionResultMapper speakingQuestionResultMapper,
-            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort,
-            org.naho.user.port.out.RoleRepositoryPort roleRepositoryPort
+            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort
     ) {
         return new GetSpeakingQuestionUseCase(
                 speakingQuestionRepositoryPort,
                 speakingQuestionResultMapper,
-                getActiveSubscriptionInputPort,
-                roleRepositoryPort
+                getActiveSubscriptionInputPort
         );
     }
 

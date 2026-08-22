@@ -23,7 +23,7 @@ public class SpeakingSessionMessageEntity extends BaseEntity {
     SpeakingSessionEntity session;
 
     @Column(name = "turn_index", nullable = false)
-    int turnIndex;
+    Integer turnIndex;
 
     @Column(name = "sender_type", nullable = false, length = 20)
     String senderType;

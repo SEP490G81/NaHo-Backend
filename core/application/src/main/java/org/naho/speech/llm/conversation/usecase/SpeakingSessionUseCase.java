@@ -11,8 +11,6 @@ import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.persona.exception.PersonaErrorCode;
 import org.naho.persona.model.Persona;
 import org.naho.persona.port.out.PersonaRepositoryPort;
-import org.naho.persona.type.FormalityLevel;
-import org.naho.persona.type.MarugotoLevel;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.speech.llm.conversation.command.SendAudioMessageCommand;
 import org.naho.speech.llm.conversation.command.SendMessageWithSessionCommand;
@@ -93,16 +91,6 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                         command.personaId())
                 );
 
-        FormalityLevel effectiveFormality = command.formalityLevelOverride();
-//        if (effectiveFormality == null && persona.getConversationStyle() != null) {
-//            effectiveFormality = persona.getConversationStyle().getFormalityLevel();
-//        }
-
-        MarugotoLevel effectiveMarugoto = command.marugotoLevelOverride();
-//        if (effectiveMarugoto == null && persona.getConversationStyle() != null) {
-//            effectiveMarugoto = persona.getConversationStyle().getMarugotoLevel();
-//        }
-
         // tạo mới và lưu speaking session trong db
         // trạng thái sẽ là INIT (tức là chưa có đoạn chat nào)
         speakingSessionRepositoryPort.initSpeakingSession(
@@ -111,8 +99,8 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                 command.personaId(),
                 "Conversation with " + persona.getName(),
                 persona.getVoiceName() != null ? persona.getVoiceName() : "ja-JP-NanamiNeural",
-                effectiveMarugoto,
-                effectiveFormality
+                command.formalityLevel(),
+                command.marugotoLevel()
         );
 
         return sessionCode;
@@ -196,7 +184,16 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
 
         SpeakingSession speakingSession = speakingSessionRepositoryPort.findBySessionCode(sessionCode);
 
+        // nếu session không phải IN PROGRESS thì ném ra lỗi
+        if (!SpeakingSessionStatus.IN_PROGRESS.equals(speakingSession.getStatus())) {
+            throw new ApplicationException(
+                    LlmApplicationError.LLM_SESSION_STATUS_INVALID,
+                    LlmDetailMessageKey.LLM_SESSION_STATUS_INVALID
+            );
+        }
+
         speakingSessionValidator.validateSessionNotCompleted(sessionCode);
+
         speakingSessionValidator.validateSessionTurnLimit(sessionCode, speakingSession.getUserId());
 
         Persona persona = personaRepositoryPort.findById(speakingSession.getPersonaId())
@@ -209,43 +206,42 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         List<SpeakingSessionMessage> previousMessages = speakingSessionMessageRepositoryPort
                 .findAllBySessionId(speakingSession.getId());
 
-        String userMessage = command.userMessage();
-
         List<Map<String, String>> contextMessages = speakingSessionHelper.getSlidingWindowMessages(
                 speakingSession,
                 persona,
                 previousMessages
         );
+
         List<Map<String, String>> messagesToSend = new ArrayList<>(contextMessages);
-        messagesToSend.add(Map.of("role", "user", "content", userMessage));
+//        messagesToSend.add(Map.of("role", "user", "content", userMessage));
 
         String rawReply = aiChatPort.chatWithContext(messagesToSend);
         ParsedAiReply parsed = speakingSessionHelper.parseAiResponse(rawReply);
 
         int currentTurn = speakingSession.getTotalTurns() + 1;
-        String appendTurn = "[Turn]\nUser: " + userMessage + "\nAssistant: " + parsed.reply() + "\n";
+//        String appendTurn = "[Turn]\nUser: " + userMessage + "\nAssistant: " + parsed.reply() + "\n";
         String currentTranscript = speakingSession.getFullTranscript() != null ? speakingSession.getFullTranscript() : "";
-        String updatedTranscript = currentTranscript + appendTurn;
+//        String updatedTranscript = currentTranscript + appendTurn;
 
         // Async persistence to DB via Virtual Threads to optimize turn latency
         final String sCode = sessionCode;
         final int sTurn = currentTurn;
-        final String uMsg = userMessage;
+//        final String uMsg = userMessage;
         final String aMsg = parsed.reply();
         final String aTrans = parsed.replyTranslation();
         final String cText = parsed.correctedUserText();
         final String cExp = parsed.correctionExplanation();
         final String gNote = parsed.grammarNote();
         final String hLearner = parsed.hintForLearner();
-        final String fTranscript = updatedTranscript;
+//        final String fTranscript = updatedTranscript;
 
         Thread.ofVirtual().start(() -> {
             try {
-                speakingSessionRepositoryPort.saveSessionMessage(sCode, sTurn, "user", MessageType.TEXT, uMsg, null,
-                        cText, cExp, null, hLearner, null);
+//                speakingSessionRepositoryPort.saveSessionMessage(sCode, sTurn, "user", MessageType.TEXT, uMsg, null,
+//                        cText, cExp, null, hLearner, null);
                 speakingSessionRepositoryPort.saveSessionMessage(sCode, sTurn, "assistant", MessageType.TEXT, aMsg, aTrans, null,
                         null, gNote, null, null);
-                speakingSessionRepositoryPort.updateSessionTurnAndTranscript(sCode, sTurn, fTranscript);
+//                speakingSessionRepositoryPort.updateSessionTurnAndTranscript(sCode, sTurn, fTranscript);
             } catch (Exception e) {
                 System.out.println("[SpeakingSession] Error saving session message: " + e.getMessage());
                 throw new ApplicationException(

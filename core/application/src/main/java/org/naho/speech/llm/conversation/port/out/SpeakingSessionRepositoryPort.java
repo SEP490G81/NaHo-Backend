@@ -33,8 +33,8 @@ public interface SpeakingSessionRepositoryPort {
             Long personaId,
             String topic,
             String voiceName,
-            MarugotoLevel marugotoLevel,
-            FormalityLevel formalityLevel
+            FormalityLevel formalityLevel,
+            MarugotoLevel marugotoLevel
     );
 
     void saveSessionMessage(

@@ -57,26 +57,25 @@ public class SpeakingSessionController {
     private final SpeakingSessionCleanupInputPort speakingSessionCleanupInputPort;
     private final CrudSpeakingSessionInputPort crudSpeakingSessionInputPort;
 
-    // ─── Session Management ─────────────────────────────────────
-
     /**
      * Khởi tạo 1 session mới và lưu vào ram và database
      *
-     * @param personaId persona id
-     * @param payload   chứa user id
-     * @param request   bao gồm: FormalityLevel và MarugotoLevel
+     * @param payload chứa user id
+     * @param request bao gồm: FormalityLevel và MarugotoLevel và persona id
      * @return trả về session code
      */
     @ApiResponseMessage
-    @PostMapping("/persona/{personaId}")
+    @PostMapping("/start")
     public ResponseEntity<String> startConversation(
-            @PathVariable("personaId") Long personaId,
             @AuthenticationPrincipal AccessTokenPayload payload,
-            @RequestBody(required = false) StartConversationRequest request
+            @RequestBody StartConversationRequest request
     ) {
-        var formalityOverride = request != null ? request.formalityLevel() : null;
-        var marugotoOverride = request != null ? request.marugotoLevel() : null;
-        var command = new StartSpeakingConversationCommand(payload.userId(), personaId, formalityOverride, marugotoOverride);
+        StartSpeakingConversationCommand command = new StartSpeakingConversationCommand(
+                payload.userId(),
+                request.personaId(),
+                request.formalityLevel(),
+                request.marugotoLevel()
+        );
         String sessionCode = speakingSessionInputPort.startConversation(command);
         return ResponseEntity.ok(sessionCode);
     }
@@ -122,13 +121,16 @@ public class SpeakingSessionController {
      * @param request     chứa transcript (đoạn nội dung người dùng gửi)
      * @return ChatResponse
      */
-    @PostMapping("/message/{sessionCode}")
+    @PostMapping("/message")
     @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_MESSAGE_SEND_SUCCESS)
     public ResponseEntity<ChatResponse> sendMessage(
-            @PathVariable("sessionCode") String sessionCode,
             @Valid @RequestBody ChatSessionMessageRequest request
     ) {
-        SendMessageWithSessionCommand command = new SendMessageWithSessionCommand(sessionCode, request.transcript());
+        SendMessageWithSessionCommand command = new SendMessageWithSessionCommand(
+                request.sessionCode(),
+                request.userMessage()
+        );
+
         ChatResult result = speakingSessionInputPort.sendMessage(command);
         return ResponseEntity.ok(chatResponseMapper.resultToResponse(result));
     }

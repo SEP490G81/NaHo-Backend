@@ -12,27 +12,20 @@ import org.naho.question.result.SpeakingQuestionResult;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
 import org.naho.subscription.result.SubscriptionPlanResult;
-import org.naho.user.port.out.RoleRepositoryPort;
-import org.naho.user.type.RoleName;
-
-import java.util.List;
 
 public class GetSpeakingQuestionUseCase implements GetSpeakingQuestionInputPort {
     private final SpeakingQuestionRepositoryPort speakingQuestionRepositoryPort;
     private final SpeakingQuestionResultMapper speakingQuestionResultMapper;
     private final GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
-    private final RoleRepositoryPort roleRepositoryPort;
 
     public GetSpeakingQuestionUseCase(
             SpeakingQuestionRepositoryPort speakingQuestionRepositoryPort,
             SpeakingQuestionResultMapper speakingQuestionResultMapper,
-            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort,
-            RoleRepositoryPort roleRepositoryPort
+            GetActiveSubscriptionInputPort getActiveSubscriptionInputPort
     ) {
         this.speakingQuestionRepositoryPort = speakingQuestionRepositoryPort;
         this.speakingQuestionResultMapper = speakingQuestionResultMapper;
         this.getActiveSubscriptionInputPort = getActiveSubscriptionInputPort;
-        this.roleRepositoryPort = roleRepositoryPort;
     }
 
     /**
@@ -62,11 +55,6 @@ public class GetSpeakingQuestionUseCase implements GetSpeakingQuestionInputPort 
         // lấy ra gói đăng kí của người dùng
         SubscriptionPlanResult subscriptionPlanResult = getActiveSubscriptionInputPort
                 .getUserActiveSubscriptionPlan(command.userId());
-        
-        // kiểm tra xem có phải là Admin hoặc Content Manager không
-        List<String> userRoles = roleRepositoryPort.findRoleNamesByUserId(command.userId());
-        boolean isContentManagerOrAdmin = userRoles.contains(RoleName.ADMIN.name())
-                || userRoles.contains(RoleName.CONTENT_MANAGER.name());
 
         return speakingQuestionResultMapper.domainToResult(
                 speakingQuestion,
@@ -104,7 +92,7 @@ public class GetSpeakingQuestionUseCase implements GetSpeakingQuestionInputPort 
 
         return speakingQuestionResultMapper.domainToListItemResult(
                 speakingQuestion,
-                subscriptionPlanResult.sampleAnswerEnabled() || isContentManagerOrAdmin
+                subscriptionPlanResult.sampleAnswerEnabled()
         );
     }
 }

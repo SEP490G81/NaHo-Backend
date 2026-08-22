@@ -23,7 +23,6 @@ import org.naho.speech.llm.conversation.mapper.SpeakingSessionResultMapper;
 import org.naho.speech.llm.conversation.port.in.EndSessionInputPort;
 import org.naho.speech.llm.conversation.port.out.AiScoringPort;
 import org.naho.speech.llm.conversation.port.out.SpeakingSessionRepositoryPort;
-import org.naho.speech.llm.conversation.result.SpeakingSessionAssessmentResult;
 import org.naho.speech.llm.conversation.result.SpeakingSessionResult;
 import org.naho.speech.llm.model.conversation.SpeakingSession;
 
@@ -79,25 +78,25 @@ public class EndSessionUseCase implements EndSessionInputPort {
         }
 
         Persona persona = personaRepositoryPort.findById(speakingSession.getPersonaId()).orElse(null);
-        String personaContext = persona != null
-                ? speakingSessionHelper.buildPersonaContext(persona, speakingSession.getFormalityLevel(), speakingSession.getMarugotoLevel())
-                : "";
+//        String personaContext = persona != null
+//                ? speakingSessionHelper.buildPersonaContext(persona, speakingSession.getFormalityLevel(), speakingSession.getMarugotoLevel())
+//                : "";
 
-        String fullTranscript = speakingSession.getFullTranscript() != null ? speakingSession.getFullTranscript() : "";
+//        String fullTranscript = speakingSession.getFullTranscript() != null ? speakingSession.getFullTranscript() : "";
         String effectiveTopic = (topic != null && !topic.isBlank())
                 ? topic
                 : (speakingSession.getTopic() != null ? speakingSession.getTopic() : "");
 
-        // LLM chấm điểm
-        SpeakingSessionAssessmentResult speakingSessionAssessmentResult =
-                aiScoringPort.score(
-                        sessionCode,
-                        effectiveTopic,
-                        fullTranscript,
-                        speechMetaData,
-                        arsConfidence,
-                        personaContext
-                );
+//        // LLM chấm điểm
+//        SpeakingSessionAssessmentResult speakingSessionAssessmentResult =
+//                aiScoringPort.score(
+//                        sessionCode,
+//                        effectiveTopic,
+//                        fullTranscript,
+//                        speechMetaData,
+//                        arsConfidence,
+//                        personaContext
+//                );
 
         // Persist session result to DB
         SpeakingSession savedSession;
@@ -120,19 +119,19 @@ public class EndSessionUseCase implements EndSessionInputPort {
                 }
             }
 
-            savedSession = speakingSessionRepositoryPort.saveSpeakingSession(
-                    sessionCode,
-                    userId,
-                    personaId,
-                    effectiveTopic,
-                    marugotoLevel,
-                    formalityLevel,
-                    fullTranscript,
-                    totalTurns,
-                    asrConfidenceDouble,
-                    startedAt,
-                    speakingSessionAssessmentResult
-            );
+//            savedSession = speakingSessionRepositoryPort.saveSpeakingSession(
+//                    sessionCode,
+//                    userId,
+//                    personaId,
+//                    effectiveTopic,
+//                    marugotoLevel,
+//                    formalityLevel,
+//                    fullTranscript,
+//                    totalTurns,
+//                    asrConfidenceDouble,
+//                    startedAt,
+//                    speakingSessionAssessmentResult
+//            );
 
             crudUserDailyMissionInputPort.completeMission(
                     new CompleteDailyMissionCommand(
@@ -160,8 +159,8 @@ public class EndSessionUseCase implements EndSessionInputPort {
 
             userLearningProgressRepositoryPort.save(progress);
 
-            return speakingSessionResultMapper.domainToResult(savedSession);
-
+//            return speakingSessionResultMapper.domainToResult(savedSession);
+            return null;
         } catch (Exception e) {
             throw new ApplicationException(
                     LlmApplicationError.LLM_SAVE_SESSION_FAILED,

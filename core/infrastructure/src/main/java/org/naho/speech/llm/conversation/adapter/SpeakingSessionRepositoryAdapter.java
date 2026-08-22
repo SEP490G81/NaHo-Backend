@@ -141,8 +141,8 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
             Long personaId,
             String topic,
             String voiceName,
-            MarugotoLevel marugotoLevel,
-            FormalityLevel formalityLevel
+            FormalityLevel formalityLevel,
+            MarugotoLevel marugotoLevel
     ) {
         if (userId == null) {
             throw new InfrastructureException(

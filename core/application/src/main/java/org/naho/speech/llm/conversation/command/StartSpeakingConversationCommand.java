@@ -6,7 +6,7 @@ import org.naho.persona.type.MarugotoLevel;
 public record StartSpeakingConversationCommand(
         Long userId,
         Long personaId,
-        FormalityLevel formalityLevelOverride,
-        MarugotoLevel marugotoLevelOverride
+        FormalityLevel formalityLevel,
+        MarugotoLevel marugotoLevel
 ) {
 }
