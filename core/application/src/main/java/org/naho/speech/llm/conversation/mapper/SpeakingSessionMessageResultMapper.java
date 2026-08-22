@@ -5,6 +5,7 @@ import org.naho.speech.llm.conversation.helper.SpeakingSessionHelper;
 import org.naho.speech.llm.conversation.result.SpeakingSessionMessageResult;
 import org.naho.speech.llm.model.conversation.SpeakingSessionMessage;
 import org.naho.speech.llm.type.MessageType;
+import org.naho.speech.llm.type.SenderType;
 
 public class SpeakingSessionMessageResultMapper {
     private final SpeakingSessionHelper speakingSessionHelper;
@@ -23,7 +24,7 @@ public class SpeakingSessionMessageResultMapper {
             return null;
         }
 
-        String aiReplyAudio = "assistant".equalsIgnoreCase(domain.getSenderType()) ?
+        String aiReplyAudio = SenderType.ASSISTANT.equals(domain.getSenderType()) ?
                 speakingSessionHelper.toAudioBase64(domain.getSessionId(), domain.getContent()) :
                 "";
 

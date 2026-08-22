@@ -53,9 +53,6 @@ public class SpeakingSessionEntity extends BaseEntity {
     @Column(name = "asr_confidence")
     Double asrConfidence;
 
-    @Column(name = "full_transcript", columnDefinition = "LONGTEXT")
-    String fullTranscript;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     SpeakingSessionStatus status;

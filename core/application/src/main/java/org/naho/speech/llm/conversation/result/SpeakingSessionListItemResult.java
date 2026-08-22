@@ -18,7 +18,6 @@ public record SpeakingSessionListItemResult(
         Integer durationSeconds,
         int totalTurns,
         Double asrConfidence,
-        String fullTranscript,
         SpeakingSessionStatus status,
         Instant startedAt,
         Instant endedAt
@@ -41,7 +40,6 @@ public record SpeakingSessionListItemResult(
         private Integer durationSeconds;
         private int totalTurns;
         private Double asrConfidence;
-        private String fullTranscript;
         private SpeakingSessionStatus status;
         private Instant startedAt;
         private Instant endedAt;
@@ -101,11 +99,6 @@ public record SpeakingSessionListItemResult(
             return this;
         }
 
-        public Builder fullTranscript(String fullTranscript) {
-            this.fullTranscript = fullTranscript;
-            return this;
-        }
-
         public Builder status(SpeakingSessionStatus status) {
             this.status = status;
             return this;
@@ -134,7 +127,6 @@ public record SpeakingSessionListItemResult(
                     durationSeconds,
                     totalTurns,
                     asrConfidence,
-                    fullTranscript,
                     status,
                     startedAt,
                     endedAt

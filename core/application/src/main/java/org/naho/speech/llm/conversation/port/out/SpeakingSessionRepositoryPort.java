@@ -1,32 +1,15 @@
 package org.naho.speech.llm.conversation.port.out;
 
-import org.naho.file.model.File;
 import org.naho.persona.type.FormalityLevel;
 import org.naho.persona.type.MarugotoLevel;
-import org.naho.speech.llm.conversation.result.SpeakingSessionAssessmentResult;
+import org.naho.speech.llm.conversation.command.SpeakingSessionMessageCommand;
 import org.naho.speech.llm.model.conversation.SpeakingSession;
-import org.naho.speech.llm.type.MessageType;
+import org.naho.speech.llm.model.conversation.SpeakingSessionMessage;
 import org.naho.speech.llm.type.SpeakingSessionStatus;
 
-import java.time.Instant;
 import java.util.List;
 
 public interface SpeakingSessionRepositoryPort {
-
-    SpeakingSession saveSpeakingSession(
-            String sessionCode,
-            Long userId,
-            Long personaId,
-            String topic,
-            MarugotoLevel marugotoLevel,
-            FormalityLevel formalityLevel,
-            String fullTranscript,
-            int totalTurns,
-            Double asrConfidence,
-            Instant startedAt,
-            SpeakingSessionAssessmentResult speakingSessionAssessmentResult
-    );
-
     SpeakingSession initSpeakingSession(
             String sessionCode,
             Long userId,
@@ -37,33 +20,8 @@ public interface SpeakingSessionRepositoryPort {
             MarugotoLevel marugotoLevel
     );
 
-    void saveSessionMessage(
-            String sessionCode,
-            int turnIndex,
-            String senderType,
-            MessageType messageType,
-            String content,
-            String contentTranslation,
-            String correctedText,
-            String correctionExplanation,
-            String grammarNote,
-            String hintForLearner,
-            Double pronunciationScore
-    );
-
-    void saveSessionMessage(
-            String sessionCode,
-            int turnIndex,
-            String senderType,
-            MessageType messageType,
-            String content,
-            String contentTranslation,
-            String correctedText,
-            String correctionExplanation,
-            String grammarNote,
-            String hintForLearner,
-            Double pronunciationScore,
-            File audioFile
+    SpeakingSessionMessage saveSpeakingSessionMessage(
+            SpeakingSessionMessageCommand command
     );
 
     void updateSessionTurnAndTranscript(
@@ -72,12 +30,7 @@ public interface SpeakingSessionRepositoryPort {
             String fullTranscript
     );
 
-    void updateSessionTurnAndTranscriptAndStatus(
-            String sessionCode,
-            int totalTurns,
-            String fullTranscript,
-            SpeakingSessionStatus status
-    );
+    void updateSpeakingSessionStatus(String sessionCode, SpeakingSessionStatus status);
 
     /**
      * Kiểm tra phiên đã hoàn thành và chấm điểm (status == COMPLETED) chưa.

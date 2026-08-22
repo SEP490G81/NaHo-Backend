@@ -1,13 +1,11 @@
-package org.naho.speech.llm.conversation.result;
+package org.naho.speech.llm.conversation.command;
 
+import org.naho.file.model.File;
 import org.naho.speech.llm.type.MessageType;
 import org.naho.speech.llm.type.SenderType;
 
-public record SpeakingSessionMessageResult(
-        Long id,
-        Long sessionId,
-        Long audioFileId,
-
+public record SpeakingSessionMessageCommand(
+        String sessionCode,
         Integer turnIndex,
         SenderType senderType,
         MessageType messageType,
@@ -18,8 +16,7 @@ public record SpeakingSessionMessageResult(
         String grammarNote,
         String hintForLearner,
         Double pronunciationScore,
-        String aiReplyAudio,
-        String userRecordAudio
+        File audioFile
 ) {
 
     public static Builder builder() {
@@ -28,10 +25,7 @@ public record SpeakingSessionMessageResult(
 
     public static class Builder {
 
-        private Long id;
-        private Long sessionId;
-        private Long audioFileId;
-
+        private String sessionCode;
         private Integer turnIndex;
         private SenderType senderType;
         private MessageType messageType;
@@ -42,21 +36,10 @@ public record SpeakingSessionMessageResult(
         private String grammarNote;
         private String hintForLearner;
         private Double pronunciationScore;
-        private String aiReplyAudio;
-        private String userRecordAudio;
+        private File audioFile;
 
-        public Builder id(Long id) {
-            this.id = id;
-            return this;
-        }
-
-        public Builder sessionId(Long sessionId) {
-            this.sessionId = sessionId;
-            return this;
-        }
-
-        public Builder audioFileId(Long audioFileId) {
-            this.audioFileId = audioFileId;
+        public Builder sessionCode(String sessionCode) {
+            this.sessionCode = sessionCode;
             return this;
         }
 
@@ -110,21 +93,14 @@ public record SpeakingSessionMessageResult(
             return this;
         }
 
-        public Builder aiReplyAudio(String aiReplyAudio) {
-            this.aiReplyAudio = aiReplyAudio;
+        public Builder audioFile(File audioFile) {
+            this.audioFile = audioFile;
             return this;
         }
 
-        public Builder userRecordAudio(String userRecordAudio) {
-            this.userRecordAudio = userRecordAudio;
-            return this;
-        }
-
-        public SpeakingSessionMessageResult build() {
-            return new SpeakingSessionMessageResult(
-                    id,
-                    sessionId,
-                    audioFileId,
+        public SpeakingSessionMessageCommand build() {
+            return new SpeakingSessionMessageCommand(
+                    sessionCode,
                     turnIndex,
                     senderType,
                     messageType,
@@ -135,8 +111,7 @@ public record SpeakingSessionMessageResult(
                     grammarNote,
                     hintForLearner,
                     pronunciationScore,
-                    aiReplyAudio,
-                    userRecordAudio
+                    audioFile
             );
         }
     }

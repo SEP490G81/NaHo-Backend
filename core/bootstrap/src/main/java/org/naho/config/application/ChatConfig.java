@@ -12,6 +12,7 @@ import org.naho.learning.port.in.UserLearningStreakInputPort;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
 import org.naho.persona.port.out.PersonaRepositoryPort;
+import org.naho.question.port.in.CompleteSpeakingQuestionInputPort;
 import org.naho.question.port.out.AnswerHistoryRepositoryPort;
 import org.naho.question.port.out.AnswerHistoryResultMapper;
 import org.naho.question.port.out.SpeakingQuestionRepositoryPort;
@@ -133,7 +134,8 @@ public class ChatConfig {
             UploadFileInputPort uploadFileInputPort,
             SpeakingSessionValidator speakingSessionValidator,
             SpeakingSessionHelper speakingSessionHelper,
-            SpeakingSessionResultMapper speakingSessionResultMapper
+            SpeakingSessionResultMapper speakingSessionResultMapper,
+            TransactionPort transactionPort
     ) {
         return new SpeakingSessionUseCase(
                 aiChatPort,
@@ -145,7 +147,8 @@ public class ChatConfig {
                 uploadFileInputPort,
                 speakingSessionValidator,
                 speakingSessionHelper,
-                speakingSessionResultMapper
+                speakingSessionResultMapper,
+                transactionPort
         );
     }
 
@@ -205,7 +208,8 @@ public class ChatConfig {
             AnswerHistoryResultMapper answerHistoryResultMapper,
             FileRepositoryPort fileRepositoryPort,
             LearningPathNodeRepositoryPort learningPathNodeRepositoryPort,
-            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort
+            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
+            CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort
     ) {
         return new SpeakingAnalysisUseCase(
                 userDailyAiUsageRepositoryPort,
@@ -220,7 +224,8 @@ public class ChatConfig {
                 answerHistoryResultMapper,
                 fileRepositoryPort,
                 learningPathNodeRepositoryPort,
-                userLearningProgressRepositoryPort
+                userLearningProgressRepositoryPort,
+                completeSpeakingQuestionInputPort
         );
     }
 

@@ -19,7 +19,6 @@ public record SpeakingSessionCommand(
         Integer durationSeconds,
         int totalTurns,
         Double asrConfidence,
-        String fullTranscript,
         SpeakingSessionStatus status,
         Instant startedAt,
         Instant endedAt

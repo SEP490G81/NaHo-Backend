@@ -65,10 +65,10 @@ public class AzureSpeechServiceHelper {
                 String displayResultText = nBestNode.path(AzurePronunciationScoreKey.DISPLAY).asText();
                 JsonNode pronNode = nBestNode.path(AzurePronunciationScoreKey.PRONUNCIATION_ASSESSMENT);
 
-                double accuracyScore = pronNode.path(AzurePronunciationScoreKey.ACCURACY_SCORE).asDouble(0.0);
-                double fluencyScore = pronNode.path(AzurePronunciationScoreKey.FLUENCY_SCORE).asDouble(0.0);
-                double completenessScore = pronNode.path(AzurePronunciationScoreKey.COMPLETENESS_SCORE).asDouble(0.0);
-                double pronScore = pronNode.path(AzurePronunciationScoreKey.PRON_SCORE).asDouble(0.0);
+                double accuracyScore = pronNode.path(AzurePronunciationScoreKey.ACCURACY_SCORE).asDouble(0.0) / 10.0;
+                double fluencyScore = pronNode.path(AzurePronunciationScoreKey.FLUENCY_SCORE).asDouble(0.0) / 10.0;
+                double completenessScore = pronNode.path(AzurePronunciationScoreKey.COMPLETENESS_SCORE).asDouble(0.0) / 10.0;
+                double pronScore = pronNode.path(AzurePronunciationScoreKey.PRON_SCORE).asDouble(0.0) / 10.0;
 
                 double averageScore = (accuracyScore + fluencyScore + completenessScore + pronScore) / 4.0;
 
@@ -79,7 +79,7 @@ public class AzureSpeechServiceHelper {
                         String wordStr = wordNode.path(AzurePronunciationScoreKey.WORD).asText();
                         JsonNode wordPronNode = wordNode.path(AzurePronunciationScoreKey.PRONUNCIATION_ASSESSMENT);
                         double wordAccuracy = wordPronNode.path(AzurePronunciationScoreKey.ACCURACY_SCORE)
-                                .asDouble(0.0);
+                                .asDouble(0.0) / 10.0;
                         String errorType = wordPronNode.path(AzurePronunciationScoreKey.ERROR_TYPE)
                                 .asText(AzurePronunciationScoreKey.NONE).toUpperCase();
 
@@ -177,11 +177,12 @@ public class AzureSpeechServiceHelper {
             }
         }
 
-        double finalAccuracy = totalWordCount > 0 ? totalAccuracy / totalWordCount : 0.0;
-        double finalFluency = totalWordCount > 0 ? totalFluency / totalWordCount : 0.0;
-        double finalCompleteness = totalWordCount > 0 ? totalCompleteness / totalWordCount : 0.0;
-        double finalPronScore = totalWordCount > 0 ? totalPronScore / totalWordCount : 0.0;
-        double finalAverageScore = totalWordCount > 0 ? totalAverageScore / totalWordCount : 0.0;
+        double finalAccuracy = (totalWordCount > 0 ? totalAccuracy / totalWordCount : 0.0);
+        double finalFluency = (totalWordCount > 0 ? totalFluency / totalWordCount : 0.0);
+        double finalCompleteness = (totalWordCount > 0 ? totalCompleteness / totalWordCount : 0.0);
+        double finalPronScore = (totalWordCount > 0 ? totalPronScore / totalWordCount : 0.0);
+
+        double finalAverageScore = (totalWordCount > 0 ? totalAverageScore / totalWordCount : 0.0);
 
         return SpeechAssessment.builder()
                 .transcriptText(fullTranscript.toString())

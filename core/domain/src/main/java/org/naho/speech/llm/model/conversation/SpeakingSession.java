@@ -20,7 +20,6 @@ public class SpeakingSession {
     private Integer durationSeconds;
     private int totalTurns;
     private Double asrConfidence;
-    private String fullTranscript;
     private SpeakingSessionStatus status;
     private Instant startedAt;
     private Instant endedAt;
@@ -38,7 +37,6 @@ public class SpeakingSession {
         this.durationSeconds = builder.durationSeconds;
         this.totalTurns = builder.totalTurns;
         this.asrConfidence = builder.asrConfidence;
-        this.fullTranscript = builder.fullTranscript;
         this.status = builder.status;
         this.startedAt = builder.startedAt;
         this.endedAt = builder.endedAt;
@@ -136,14 +134,6 @@ public class SpeakingSession {
         this.asrConfidence = asrConfidence;
     }
 
-    public String getFullTranscript() {
-        return fullTranscript;
-    }
-
-    public void setFullTranscript(String fullTranscript) {
-        this.fullTranscript = fullTranscript;
-    }
-
     public SpeakingSessionStatus getStatus() {
         return status;
     }
@@ -182,7 +172,6 @@ public class SpeakingSession {
         private Integer durationSeconds;
         private int totalTurns;
         private Double asrConfidence;
-        private String fullTranscript;
         private SpeakingSessionStatus status;
         private Instant startedAt;
         private Instant endedAt;
@@ -239,11 +228,6 @@ public class SpeakingSession {
 
         public Builder asrConfidence(Double asrConfidence) {
             this.asrConfidence = asrConfidence;
-            return this;
-        }
-
-        public Builder fullTranscript(String fullTranscript) {
-            this.fullTranscript = fullTranscript;
             return this;
         }
 

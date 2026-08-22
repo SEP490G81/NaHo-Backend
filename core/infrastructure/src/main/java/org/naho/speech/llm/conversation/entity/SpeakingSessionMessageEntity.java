@@ -7,6 +7,7 @@ import lombok.experimental.SuperBuilder;
 import org.naho.file.entity.FileEntity;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.speech.llm.type.MessageType;
+import org.naho.speech.llm.type.SenderType;
 
 @SuperBuilder
 @Getter
@@ -25,8 +26,9 @@ public class SpeakingSessionMessageEntity extends BaseEntity {
     @Column(name = "turn_index", nullable = false)
     Integer turnIndex;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "sender_type", nullable = false, length = 20)
-    String senderType;
+    SenderType senderType;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "message_type", length = 20)

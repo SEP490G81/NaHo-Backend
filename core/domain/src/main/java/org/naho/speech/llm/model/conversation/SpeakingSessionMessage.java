@@ -1,6 +1,7 @@
 package org.naho.speech.llm.model.conversation;
 
 import org.naho.speech.llm.type.MessageType;
+import org.naho.speech.llm.type.SenderType;
 
 public class SpeakingSessionMessage {
 
@@ -9,7 +10,7 @@ public class SpeakingSessionMessage {
     private Long audioFileId;
 
     private int turnIndex;
-    private String senderType;
+    private SenderType senderType;
     private MessageType messageType;
     private String content;
     private String contentTranslation;
@@ -56,7 +57,7 @@ public class SpeakingSessionMessage {
         return turnIndex;
     }
 
-    public String getSenderType() {
+    public SenderType getSenderType() {
         return senderType;
     }
 
@@ -99,7 +100,7 @@ public class SpeakingSessionMessage {
         private Long audioFileId;
 
         private int turnIndex;
-        private String senderType;
+        private SenderType senderType;
         private MessageType messageType;
         private String content;
         private String contentTranslation;
@@ -129,7 +130,7 @@ public class SpeakingSessionMessage {
             return this;
         }
 
-        public Builder senderType(String senderType) {
+        public Builder senderType(SenderType senderType) {
             this.senderType = senderType;
             return this;
         }

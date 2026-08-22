@@ -1,13 +1,14 @@
 package org.naho.speech.llm.conversation.dto.response;
 
 import org.naho.speech.llm.type.MessageType;
+import org.naho.speech.llm.type.SenderType;
 
 public record SpeakingSessionMessageResponse(
         Long id,
         Long sessionId,
         Long audioFileId,
         int turnIndex,
-        String senderType,
+        SenderType senderType,
         MessageType messageType,
         String content,
         String contentTranslation,
