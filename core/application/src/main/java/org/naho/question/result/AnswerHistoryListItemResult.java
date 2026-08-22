@@ -2,6 +2,8 @@ package org.naho.question.result;
 
 import org.naho.file.result.FileResult;
 
+import java.time.Instant;
+
 public class AnswerHistoryListItemResult {
 
     private Long id;
@@ -10,6 +12,8 @@ public class AnswerHistoryListItemResult {
     private FileResult audioFile;
     private Double duration;
     private Double overallScore;
+    private Instant createdTime;
+    private Instant modifiedTime;
 
     public static Builder builder() {
         return new Builder();
@@ -63,6 +67,22 @@ public class AnswerHistoryListItemResult {
         this.overallScore = overallScore;
     }
 
+    public Instant getCreatedTime() {
+        return createdTime;
+    }
+
+    public void setCreatedTime(Instant createdTime) {
+        this.createdTime = createdTime;
+    }
+
+    public Instant getModifiedTime() {
+        return modifiedTime;
+    }
+
+    public void setModifiedTime(Instant modifiedTime) {
+        this.modifiedTime = modifiedTime;
+    }
+
     public static class Builder {
 
         private Long id;
@@ -71,6 +91,8 @@ public class AnswerHistoryListItemResult {
         private FileResult audioFile;
         private Double duration;
         private Double overallScore;
+        private Instant createdTime;
+        private Instant modifiedTime;
 
         public Builder id(Long id) {
             this.id = id;
@@ -104,6 +126,16 @@ public class AnswerHistoryListItemResult {
             return this;
         }
 
+        public Builder createdTime(Instant createdTime) {
+            this.createdTime = createdTime;
+            return this;
+        }
+
+        public Builder modifiedTime(Instant modifiedTime) {
+            this.modifiedTime = modifiedTime;
+            return this;
+        }
+
         public AnswerHistoryListItemResult build() {
             AnswerHistoryListItemResult result = new AnswerHistoryListItemResult();
 
@@ -113,6 +145,8 @@ public class AnswerHistoryListItemResult {
             result.audioFile = audioFile;
             result.duration = duration;
             result.overallScore = overallScore;
+            result.createdTime = createdTime;
+            result.modifiedTime = modifiedTime;
 
             return result;
         }

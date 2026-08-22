@@ -4,6 +4,8 @@ import org.naho.file.result.FileResult;
 import org.naho.speech.azure.result.SpeechAssessmentResult;
 import org.naho.speech.llm.question.result.AiFeedbackResult;
 
+import java.time.Instant;
+
 public class AnswerHistoryResult {
 
     private Long id;
@@ -14,6 +16,8 @@ public class AnswerHistoryResult {
     private FileResult audioFile;
     private Double duration;
     private Double overallScore;
+    private Instant createdTime;
+    private Instant modifiedTime;
 
     private AnswerHistoryResult(Builder builder) {
         this.id = builder.id;
@@ -24,6 +28,8 @@ public class AnswerHistoryResult {
         this.audioFile = builder.audioFile;
         this.duration = builder.duration;
         this.overallScore = builder.overallScore;
+        this.createdTime = builder.createdTime;
+        this.modifiedTime = builder.modifiedTime;
     }
 
     public static Builder builder() {
@@ -94,6 +100,22 @@ public class AnswerHistoryResult {
         this.overallScore = overallScore;
     }
 
+    public Instant getCreatedTime() {
+        return createdTime;
+    }
+
+    public void setCreatedTime(Instant createdTime) {
+        this.createdTime = createdTime;
+    }
+
+    public Instant getModifiedTime() {
+        return modifiedTime;
+    }
+
+    public void setModifiedTime(Instant modifiedTime) {
+        this.modifiedTime = modifiedTime;
+    }
+
     public static class Builder {
 
         private Long id;
@@ -104,6 +126,8 @@ public class AnswerHistoryResult {
         private FileResult audioFile;
         private Double duration;
         private Double overallScore;
+        private Instant createdTime;
+        private Instant modifiedTime;
 
         public Builder id(Long id) {
             this.id = id;
@@ -148,6 +172,16 @@ public class AnswerHistoryResult {
 
         public Builder overallScore(Double overallScore) {
             this.overallScore = overallScore;
+            return this;
+        }
+
+        public Builder createdTime(Instant createdTime) {
+            this.createdTime = createdTime;
+            return this;
+        }
+
+        public Builder modifiedTime(Instant modifiedTime) {
+            this.modifiedTime = modifiedTime;
             return this;
         }
 

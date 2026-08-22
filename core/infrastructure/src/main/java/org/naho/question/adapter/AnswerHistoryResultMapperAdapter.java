@@ -55,6 +55,8 @@ public class AnswerHistoryResultMapperAdapter implements AnswerHistoryResultMapp
                 .audioFile(fileResult)
                 .duration(domain.getDuration())
                 .overallScore(domain.getOverallScore())
+                .createdTime(domain.getCreatedTime())
+                .modifiedTime(domain.getModifiedTime())
                 .build();
     }
 
@@ -80,6 +82,8 @@ public class AnswerHistoryResultMapperAdapter implements AnswerHistoryResultMapp
                 .audioFile(fileResult)
                 .duration(domain.getDuration())
                 .overallScore(domain.getOverallScore())
+                .createdTime(domain.getCreatedTime())
+                .modifiedTime(domain.getModifiedTime())
                 .build();
     }
 }
