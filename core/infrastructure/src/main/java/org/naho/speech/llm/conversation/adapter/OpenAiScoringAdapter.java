@@ -37,6 +37,12 @@ public class OpenAiScoringAdapter implements AiScoringPort {
     }
 
     @Override
+    public SpeakingSessionAssessmentResult score(String sessionCode, String topic, String systemPromptContent, String messagesJson) {
+        String userContent = buildUserContent(topic, systemPromptContent);
+        String requestBody = buildScoringRequestBody()
+    }
+
+    @Override
     public SpeakingSessionAssessmentResult score(
             String sessionCode,
             String topic,
@@ -47,7 +53,6 @@ public class OpenAiScoringAdapter implements AiScoringPort {
     ) {
         System.out.println("[OpenAiScoringAdapter] Calling model: " + properties.getScoringModel());
 
-        String userContent = buildUserContent(topic, fullTranscript, speechMetadata, asrConfidence, personaContext);
         String requestBody = buildScoringRequestBody(userContent);
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -89,27 +94,21 @@ public class OpenAiScoringAdapter implements AiScoringPort {
 
     private String buildUserContent(
             String topic,
-            String conversation,
-            String speechMetadata,
-            String asrConfidence,
-            String personaContext
+            String systemPromptContent
     ) {
-        String safeTopic = (topic != null && !topic.isBlank()) ? topic : "General conversation";
-        String safeMeta = (speechMetadata != null && !speechMetadata.isBlank()) ? speechMetadata : "N/A";
-        String safeAsr = (asrConfidence != null && !asrConfidence.isBlank()) ? asrConfidence : "N/A";
-        String safePersona = (personaContext != null && !personaContext.isBlank()) ? personaContext : "(No persona context — general evaluation)";
-
-        return "Persona Context:\n" + safePersona + "\n"
-                + "Topic: " + safeTopic + "\n\n"
-                + "Conversation:\n" + conversation + "\n\n"
-                + "Speech Metadata: " + safeMeta + "\n\n"
-                + "ASR Confidence: " + safeAsr;
+        return """
+                Persona Context:
+                {{personaContext}}
+                Topic: {{topic}}
+                """
+                .replace("{{personaContext}}", systemPromptContent)
+                .replace("{{topic}}", topic);
     }
 
-    private String buildScoringRequestBody(String userContent) {
+    private String buildScoringRequestBody(String messagesJson) {
         String systemPrompt = loadPromptTemplate();
         String escapedSystem = escapeJson(systemPrompt);
-        String escapedContent = escapeJson(userContent);
+        String escapedContent = escapeJson(messagesJson);
         return """
                 {
                 "model": "%s",
@@ -121,7 +120,6 @@ public class OpenAiScoringAdapter implements AiScoringPort {
                 }
                 """.formatted(properties.getScoringModel(), escapedSystem, escapedContent);
     }
-
 
     private String extractContent(String responseJson) {
         try {
@@ -259,7 +257,6 @@ public class OpenAiScoringAdapter implements AiScoringPort {
             );
         }
     }
-
 
     private String escapeJson(String input) {
         return input

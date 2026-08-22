@@ -17,16 +17,26 @@ import org.naho.persona.type.MarugotoLevel;
 import org.naho.shared.constant.SystemZoneId;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.TransactionPort;
+import org.naho.speech.llm.conversation.constant.AiMessageField;
 import org.naho.speech.llm.conversation.exception.LlmApplicationError;
 import org.naho.speech.llm.conversation.helper.SpeakingSessionHelper;
 import org.naho.speech.llm.conversation.mapper.SpeakingSessionResultMapper;
 import org.naho.speech.llm.conversation.port.in.EndSessionInputPort;
+import org.naho.speech.llm.conversation.port.out.AiChatPort;
 import org.naho.speech.llm.conversation.port.out.AiScoringPort;
+import org.naho.speech.llm.conversation.port.out.SpeakingSessionMessageRepositoryPort;
 import org.naho.speech.llm.conversation.port.out.SpeakingSessionRepositoryPort;
+import org.naho.speech.llm.conversation.result.SpeakingSessionAssessmentResult;
 import org.naho.speech.llm.conversation.result.SpeakingSessionResult;
 import org.naho.speech.llm.model.conversation.SpeakingSession;
+import org.naho.speech.llm.model.conversation.SpeakingSessionMessage;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static org.naho.speech.llm.conversation.helper.SpeakingSessionHelper.MAX_SLIDING_WINDOW_MESSAGES;
 
 public class EndSessionUseCase implements EndSessionInputPort {
     private final AiScoringPort aiScoringPort;
@@ -38,6 +48,8 @@ public class EndSessionUseCase implements EndSessionInputPort {
     private final UserLearningStreakInputPort userLearningStreakInputPort;
     private final UserLearningProgressRepositoryPort userLearningProgressRepositoryPort;
     private final TransactionPort transactionPort;
+    private final SpeakingSessionMessageRepositoryPort speakingSessionMessageRepositoryPort;
+    private final AiChatPort aiChatPort;
 
     public EndSessionUseCase(
             AiScoringPort aiScoringPort,
@@ -48,7 +60,9 @@ public class EndSessionUseCase implements EndSessionInputPort {
             CrudUserDailyMissionInputPort crudUserDailyMissionInputPort,
             UserLearningStreakInputPort userLearningStreakInputPort,
             UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
-            TransactionPort transactionPort
+            TransactionPort transactionPort,
+            SpeakingSessionMessageRepositoryPort speakingSessionMessageRepositoryPort,
+            AiChatPort aiChatPort
     ) {
         this.aiScoringPort = aiScoringPort;
         this.speakingSessionRepositoryPort = speakingSessionRepositoryPort;
@@ -59,44 +73,53 @@ public class EndSessionUseCase implements EndSessionInputPort {
         this.userLearningStreakInputPort = userLearningStreakInputPort;
         this.userLearningProgressRepositoryPort = userLearningProgressRepositoryPort;
         this.transactionPort = transactionPort;
+        this.speakingSessionMessageRepositoryPort = speakingSessionMessageRepositoryPort;
+        this.aiChatPort = aiChatPort;
     }
 
     @Override
-    public SpeakingSessionResult endSession(Long requestUserId, String sessionCode, String topic, String speechMetaData, String arsConfidence) {
-        return transactionPort.execute(() -> doEndSession(requestUserId, sessionCode, topic, speechMetaData, arsConfidence));
+    public SpeakingSessionResult endSession(Long userId, String sessionCode) {
+        return null;
     }
 
-    private SpeakingSessionResult doEndSession(Long requestUserId, String sessionCode, String topic, String speechMetaData, String arsConfidence) {
+    private SpeakingSessionResult doEndSession(Long userId, String sessionCode) {
         SpeakingSession speakingSession = speakingSessionRepositoryPort.findBySessionCode(sessionCode);
 
-        Long userId = speakingSession.getUserId() != null ? speakingSession.getUserId() : requestUserId;
-        if (userId == null) {
-            throw new ApplicationException(
-                    LlmApplicationError.LLM_SESSION_NOT_FOUND,
-                    LlmDetailMessageKey.LLM_SESSION_NOT_FOUND
-            );
+        Persona persona = personaRepositoryPort
+                .findById(speakingSession.getPersonaId())
+                .orElse(() -> new ApplicationException());
+
+        String systemPromptContent = speakingSessionHelper.buildSystemPromptContent(
+                persona,
+                speakingSession.getFormalityLevel(),
+                speakingSession.getMarugotoLevel()
+        );
+
+        List<SpeakingSessionMessage> previousMessages = speakingSessionMessageRepositoryPort
+                .findAllBySessionId(speakingSession.getId());
+
+        List<Map<String, String>> sessionHistories = new ArrayList<>();
+        if (previousMessages.size() > MAX_SLIDING_WINDOW_MESSAGES) {
+            previousMessages = previousMessages.subList(previousMessages.size() - MAX_SLIDING_WINDOW_MESSAGES, previousMessages.size());
         }
 
-        Persona persona = personaRepositoryPort.findById(speakingSession.getPersonaId()).orElse(null);
-//        String personaContext = persona != null
-//                ? speakingSessionHelper.buildPersonaContext(persona, speakingSession.getFormalityLevel(), speakingSession.getMarugotoLevel())
-//                : "";
+        for (SpeakingSessionMessage speakingSessionMessage : previousMessages) {
+            sessionHistories.add(Map.of(
+                    AiMessageField.ROLE, speakingSessionMessage.getSenderType().name().toLowerCase(),
+                    AiMessageField.CONTENT, speakingSessionMessage.getContent()
+            ));
+        }
 
-//        String fullTranscript = speakingSession.getFullTranscript() != null ? speakingSession.getFullTranscript() : "";
-        String effectiveTopic = (topic != null && !topic.isBlank())
-                ? topic
-                : (speakingSession.getTopic() != null ? speakingSession.getTopic() : "");
+        String messagesJson = aiChatPort.buildMessagesRequestBody(sessionHistories);
 
-//        // LLM chấm điểm
-//        SpeakingSessionAssessmentResult speakingSessionAssessmentResult =
-//                aiScoringPort.score(
-//                        sessionCode,
-//                        effectiveTopic,
-//                        fullTranscript,
-//                        speechMetaData,
-//                        arsConfidence,
-//                        personaContext
-//                );
+        // LLM chấm điểm
+        SpeakingSessionAssessmentResult speakingSessionAssessmentResult =
+                aiScoringPort.score(
+                        sessionCode,
+                        "Conversation with " + persona.getName(),
+                        systemPromptContent,
+                        messagesJson
+                );
 
         // Persist session result to DB
         SpeakingSession savedSession;

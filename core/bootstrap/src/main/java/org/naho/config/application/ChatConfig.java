@@ -135,7 +135,8 @@ public class ChatConfig {
             SpeakingSessionValidator speakingSessionValidator,
             SpeakingSessionHelper speakingSessionHelper,
             SpeakingSessionResultMapper speakingSessionResultMapper,
-            TransactionPort transactionPort
+            TransactionPort transactionPort,
+            SpeakingSessionMessageResultMapper speakingSessionMessageResultMapper
     ) {
         return new SpeakingSessionUseCase(
                 aiChatPort,
@@ -148,7 +149,8 @@ public class ChatConfig {
                 speakingSessionValidator,
                 speakingSessionHelper,
                 speakingSessionResultMapper,
-                transactionPort
+                transactionPort,
+                speakingSessionMessageResultMapper
         );
     }
 

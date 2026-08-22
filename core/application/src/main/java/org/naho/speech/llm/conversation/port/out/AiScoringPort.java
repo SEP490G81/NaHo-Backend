@@ -6,9 +6,7 @@ public interface AiScoringPort {
     SpeakingSessionAssessmentResult score(
             String sessionCode,
             String topic,
-            String fullTranscript,
-            String speechMetadata,
-            String asrConfidence,
-            String personaContext
+            String systemPromptContent,
+            String messagesJson
     );
 }

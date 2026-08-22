@@ -1,10 +1,12 @@
 package org.naho.speech.llm.conversation.usecase;
 
 import org.naho.file.constant.FileAccessStatus;
+import org.naho.file.exception.FileErrorCode;
 import org.naho.file.model.File;
 import org.naho.file.port.in.UploadFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.result.StoredFile;
+import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.i18n.message.llm.LlmDetailMessageKey;
 import org.naho.i18n.message.persona.PersonaDetailMessageKey;
 import org.naho.i18n.message.user.UserDetailMessageKey;
@@ -14,20 +16,24 @@ import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.speech.llm.conversation.command.SendAudioMessageCommand;
-import org.naho.speech.llm.conversation.command.SendMessageWithSessionCommand;
+import org.naho.speech.llm.conversation.command.SendTextMessageCommand;
 import org.naho.speech.llm.conversation.command.SpeakingSessionMessageCommand;
 import org.naho.speech.llm.conversation.command.StartSpeakingConversationCommand;
 import org.naho.speech.llm.conversation.constant.AiMessageField;
 import org.naho.speech.llm.conversation.exception.LlmApplicationError;
 import org.naho.speech.llm.conversation.helper.SpeakingSessionHelper;
 import org.naho.speech.llm.conversation.internal.ParsedAiReply;
+import org.naho.speech.llm.conversation.mapper.SpeakingSessionMessageResultMapper;
 import org.naho.speech.llm.conversation.mapper.SpeakingSessionResultMapper;
 import org.naho.speech.llm.conversation.port.in.SpeakingSessionInputPort;
 import org.naho.speech.llm.conversation.port.out.AiChatPort;
 import org.naho.speech.llm.conversation.port.out.SpeakingSessionMessageRepositoryPort;
 import org.naho.speech.llm.conversation.port.out.SpeakingSessionRepositoryPort;
 import org.naho.speech.llm.conversation.port.out.SpeechToTextPort;
-import org.naho.speech.llm.conversation.result.*;
+import org.naho.speech.llm.conversation.result.ChatResult;
+import org.naho.speech.llm.conversation.result.SpeakingSessionResult;
+import org.naho.speech.llm.conversation.result.SpeechToTextResult;
+import org.naho.speech.llm.conversation.result.StartConversationResult;
 import org.naho.speech.llm.conversation.validator.SpeakingSessionValidator;
 import org.naho.speech.llm.model.conversation.SpeakingSession;
 import org.naho.speech.llm.model.conversation.SpeakingSessionMessage;
@@ -36,7 +42,6 @@ import org.naho.speech.llm.type.SenderType;
 import org.naho.speech.llm.type.SpeakingSessionStatus;
 import org.naho.user.exception.UserErrorCode;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -54,6 +59,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     private final SpeakingSessionHelper speakingSessionHelper;
     private final SpeakingSessionResultMapper speakingSessionResultMapper;
     private final TransactionPort transactionPort;
+    private final SpeakingSessionMessageResultMapper speakingSessionMessageResultMapper;
 
     public SpeakingSessionUseCase(
             AiChatPort aiChatPort,
@@ -66,7 +72,8 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             SpeakingSessionValidator speakingSessionValidator,
             SpeakingSessionHelper speakingSessionHelper,
             SpeakingSessionResultMapper speakingSessionResultMapper,
-            TransactionPort transactionPort
+            TransactionPort transactionPort,
+            SpeakingSessionMessageResultMapper speakingSessionMessageResultMapper
     ) {
         this.aiChatPort = aiChatPort;
         this.speakingSessionMessageRepositoryPort = speakingSessionMessageRepositoryPort;
@@ -79,6 +86,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
         this.speakingSessionHelper = speakingSessionHelper;
         this.speakingSessionResultMapper = speakingSessionResultMapper;
         this.transactionPort = transactionPort;
+        this.speakingSessionMessageResultMapper = speakingSessionMessageResultMapper;
     }
 
     /**
@@ -197,7 +205,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
     }
 
     @Override
-    public ChatResult sendMessage(SendMessageWithSessionCommand command) {
+    public ChatResult sendMessage(SendTextMessageCommand command) {
         return transactionPort.execute(() -> {
             String sessionCode = command.sessionCode();
 
@@ -241,7 +249,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             int currentTurn = speakingSession.getTotalTurns() + 1;
 
             // lưu chat của người dùng
-            speakingSessionRepositoryPort.saveSpeakingSessionMessage(
+            SpeakingSessionMessage userMessage = speakingSessionRepositoryPort.saveSpeakingSessionMessage(
                     SpeakingSessionMessageCommand.builder()
                             .sessionCode(sessionCode)
                             .turnIndex(currentTurn)
@@ -255,7 +263,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             );
 
             // lưu phản hồi của AI
-            speakingSessionRepositoryPort.saveSpeakingSessionMessage(
+            SpeakingSessionMessage aiMessage = speakingSessionRepositoryPort.saveSpeakingSessionMessage(
                     SpeakingSessionMessageCommand.builder()
                             .sessionCode(sessionCode)
                             .turnIndex(currentTurn)
@@ -267,116 +275,115 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                             .build()
             );
 
-            String audioBase64 = speakingSessionHelper.toAudioBase64(speakingSession.getId(), parsed.reply());
-
             return new ChatResult(
-                    parsed.reply(),
-                    parsed.replyTranslation(),
-                    parsed.grammarNote(),
-                    parsed.correctedUserText(),
-                    parsed.correctionExplanation(),
-                    audioBase64
+                    speakingSessionMessageResultMapper.domainToResult(userMessage),
+                    speakingSessionMessageResultMapper.domainToResult(aiMessage)
             );
         });
     }
 
     @Override
-    public AudioChatResult sendAudioMessage(SendAudioMessageCommand command) {
-        String sessionCode = command.sessionCode();
-        speakingSessionValidator.validateSessionNotCompleted(sessionCode);
-        speakingSessionValidator.validateSessionTurnLimit(sessionCode, command.userId());
+    public ChatResult sendAudioMessage(SendAudioMessageCommand command) {
+        // transaction để xử lí record của người dùng gửi cho AI
+        return transactionPort.execute(() -> {
+            StoredFile storedFile = command.storedFile();
 
-        SpeakingSession speakingSession = speakingSessionRepositoryPort.findBySessionCode(sessionCode);
+            String sessionCode = command.sessionCode();
 
-        Persona persona = personaRepositoryPort.findById(speakingSession.getPersonaId())
-                .orElseThrow(() -> new ApplicationException(
-                        PersonaErrorCode.PERSONA_NOT_FOUND,
-                        PersonaDetailMessageKey.PERSONA_NOT_FOUND,
-                        speakingSession.getPersonaId())
-                );
+            SpeakingSession speakingSession = speakingSessionRepositoryPort.findBySessionCode(sessionCode);
 
-        SpeechToTextResult sttResult = speechToTextPort.transcribeAndAssess(
-                command.audioBytes(),
-                command.referenceText(),
-                command.userId()
-        );
-
-        String transcribedText = sttResult.transcribedText();
-        System.out.println("[SpeakingSession] STT result: " + transcribedText);
-
-        List<SpeakingSessionMessage> previousMessages = speakingSessionMessageRepositoryPort
-                .findAllBySessionId(speakingSession.getId());
-
-        List<Map<String, String>> contextMessages = speakingSessionHelper.getSlidingWindowMessages(
-                speakingSession,
-                persona,
-                previousMessages
-        );
-        List<Map<String, String>> messagesToSend = new ArrayList<>(contextMessages);
-        messagesToSend.add(Map.of("role", "user", "content", transcribedText));
-
-        String rawReply = aiChatPort.chatWithContext(messagesToSend);
-        ParsedAiReply parsed = speakingSessionHelper.parseAiResponse(rawReply);
-
-        int currentTurn = speakingSession.getTotalTurns() + 1;
-//        String appendTurn = "[Turn]\nUser: " + transcribedText + "\nAssistant: " + parsed.reply() + "\n";
-//        String currentTranscript = speakingSession.getFullTranscript() != null ? speakingSession.getFullTranscript() : "";
-//        String updatedTranscript = currentTranscript + appendTurn;
-
-        // Async persistence to DB via Virtual Threads to optimize turn latency
-        final String sCode = sessionCode;
-        final int sTurn = currentTurn;
-        final String uMsg = transcribedText;
-        final String aMsg = parsed.reply();
-        final String aTrans = parsed.replyTranslation();
-        final String cText = parsed.correctedUserText();
-        final String cExp = parsed.correctionExplanation();
-        final String gNote = parsed.grammarNote();
-        final String hLearner = parsed.hintForLearner();
-        final Double pronScore = sttResult.pronunciationScore();
-//        final String fTranscript = updatedTranscript;
-
-        final StoredFile storedFile = command.storedFile();
-
-        Thread.ofVirtual().start(() -> {
-            try {
-                File audioFile = null;
-                if (storedFile != null) {
-                    audioFile = fileRepositoryPort.createNewForUpload(storedFile, FileAccessStatus.PRIVATE);
-                }
-//                speakingSessionRepositoryPort.saveSessionMessage(sCode, sTurn, SenderType.USER, MessageType.AUDIO, uMsg, null,
-//                        cText, cExp, null, hLearner, pronScore, audioFile);
-//                speakingSessionRepositoryPort.saveSessionMessage(sCode, sTurn, SenderType.ASSISTANT, MessageType.AUDIO, aMsg, aTrans, null,
-//                        null, gNote, null, null);
-//                speakingSessionRepositoryPort.updateSessionTurnAndTranscript(sCode, sTurn, fTranscript);
-//
-//                if (storedFile != null) {
-//                    uploadFileInputPort.uploadFileToCloud(storedFile);
-//                }
-            } catch (Exception e) {
+            // nếu session không phải IN PROGRESS thì ném ra lỗi
+            if (!SpeakingSessionStatus.IN_PROGRESS.equals(speakingSession.getStatus())) {
                 throw new ApplicationException(
-                        LlmApplicationError.LLM_SAVE_SESSION_FAILED,
-                        LlmDetailMessageKey.LLM_SAVE_SESSION_FAILED,
-                        e.getMessage()
+                        LlmApplicationError.LLM_SESSION_STATUS_INVALID,
+                        LlmDetailMessageKey.LLM_SESSION_STATUS_INVALID
                 );
             }
+
+            // kiểm tra xem đã đạt tới giới hạn lượt chat trong session này chưa
+            speakingSessionValidator.validateSessionTurnLimit(sessionCode, speakingSession.getUserId());
+
+            Persona persona = personaRepositoryPort.findById(speakingSession.getPersonaId())
+                    .orElseThrow(() -> new ApplicationException(
+                            PersonaErrorCode.PERSONA_NOT_FOUND,
+                            PersonaDetailMessageKey.PERSONA_NOT_FOUND,
+                            speakingSession.getPersonaId())
+                    );
+
+            SpeechToTextResult speechToTextResult = speechToTextPort.transcribeAndAssess(
+                    command.audioBytes(),
+                    command.duration(),
+                    null,
+                    command.userId()
+            );
+
+            String transcribedText = speechToTextResult.transcribedText();
+
+            List<SpeakingSessionMessage> previousMessages = speakingSessionMessageRepositoryPort
+                    .findAllBySessionId(speakingSession.getId());
+
+            List<Map<String, String>> contextMessages = speakingSessionHelper.getSlidingWindowMessages(
+                    speakingSession,
+                    persona,
+                    previousMessages
+            );
+
+            contextMessages.add(Map.of(
+                    AiMessageField.ROLE, SenderType.USER.name().toLowerCase(),
+                    AiMessageField.CONTENT, transcribedText
+            ));
+
+            String rawReply = aiChatPort.chatWithContext(contextMessages);
+            ParsedAiReply parsed = speakingSessionHelper.parseAiResponse(rawReply);
+
+            int currentTurn = speakingSession.getTotalTurns() + 1;
+
+            if (storedFile == null) {
+                throw new ApplicationException(
+                        FileErrorCode.FILE_NOT_VALID,
+                        FileDetailMessageKey.FILE_EMPTY
+                );
+            }
+
+            File audioFile = fileRepositoryPort.createNewForUpload(storedFile, FileAccessStatus.PRIVATE);
+
+            // lưu chat của người dùng
+            SpeakingSessionMessage userMessage = speakingSessionRepositoryPort.saveSpeakingSessionMessage(
+                    SpeakingSessionMessageCommand.builder()
+                            .sessionCode(sessionCode)
+                            .turnIndex(currentTurn)
+                            .senderType(SenderType.USER)
+                            .messageType(MessageType.AUDIO)
+                            .content(transcribedText)
+                            .correctedText(parsed.correctedUserText())
+                            .correctionExplanation(parsed.correctionExplanation())
+                            .hintForLearner(parsed.hintForLearner())
+                            .pronunciationScore(speechToTextResult.pronunciationScore())
+                            .audioFile(audioFile)
+                            .build()
+            );
+
+            // lưu phản hồi của AI
+            SpeakingSessionMessage aiMessage = speakingSessionRepositoryPort.saveSpeakingSessionMessage(
+                    SpeakingSessionMessageCommand.builder()
+                            .sessionCode(sessionCode)
+                            .turnIndex(currentTurn)
+                            .senderType(SenderType.ASSISTANT)
+                            .messageType(MessageType.TEXT)
+                            .content(parsed.reply())
+                            .contentTranslation(parsed.replyTranslation())
+                            .grammarNote(parsed.grammarNote())
+                            .build()
+            );
+
+            // nếu transaction thành công thì mới upload file lên cloud
+            uploadFileInputPort.uploadFileToCloud(storedFile);
+
+            return new ChatResult(
+                    speakingSessionMessageResultMapper.domainToResult(userMessage),
+                    speakingSessionMessageResultMapper.domainToResult(aiMessage)
+            );
         });
-
-        String aiAudio = speakingSessionHelper.toAudioBase64(speakingSession.getId(), parsed.reply());
-
-        return new AudioChatResult(
-                transcribedText,
-                parsed.reply(),
-                parsed.replyTranslation(),
-                parsed.grammarNote(),
-                parsed.correctedUserText(),
-                parsed.correctionExplanation(),
-                aiAudio,
-                sttResult.accuracyScore(),
-                sttResult.fluencyScore(),
-                sttResult.completenessScore(),
-                sttResult.pronunciationScore(),
-                parsed.suggestedReplies());
     }
 
     @Override

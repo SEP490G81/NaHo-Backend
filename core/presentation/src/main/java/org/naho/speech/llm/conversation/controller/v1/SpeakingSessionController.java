@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.naho.file.constant.FileAccessStatus;
 import org.naho.file.constant.FileFolderConstant;
+import org.naho.file.port.out.FileAudioConvertPort;
 import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.file.port.out.FileValidatorPort;
 import org.naho.file.result.StoredFile;
@@ -12,21 +13,26 @@ import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.shared.exception.PresentationException;
 import org.naho.speech.azure.exception.AzureSpeechErrorCode;
 import org.naho.speech.llm.conversation.command.SendAudioMessageCommand;
-import org.naho.speech.llm.conversation.command.SendMessageWithSessionCommand;
+import org.naho.speech.llm.conversation.command.SendTextMessageCommand;
 import org.naho.speech.llm.conversation.command.StartSpeakingConversationCommand;
 import org.naho.speech.llm.conversation.dto.mapper.AudioChatResponseMapper;
 import org.naho.speech.llm.conversation.dto.mapper.ChatResponseMapper;
 import org.naho.speech.llm.conversation.dto.mapper.SpeakingSessionResponseMapper;
 import org.naho.speech.llm.conversation.dto.mapper.StartConversationResponseMapper;
 import org.naho.speech.llm.conversation.dto.request.ChatSessionMessageRequest;
-import org.naho.speech.llm.conversation.dto.request.EndSessionRequest;
 import org.naho.speech.llm.conversation.dto.request.StartConversationRequest;
-import org.naho.speech.llm.conversation.dto.response.*;
+import org.naho.speech.llm.conversation.dto.response.ChatResponse;
+import org.naho.speech.llm.conversation.dto.response.SpeakingSessionListItemResponse;
+import org.naho.speech.llm.conversation.dto.response.SpeakingSessionResponse;
+import org.naho.speech.llm.conversation.dto.response.StartConversationResponse;
 import org.naho.speech.llm.conversation.port.in.CrudSpeakingSessionInputPort;
 import org.naho.speech.llm.conversation.port.in.EndSessionInputPort;
 import org.naho.speech.llm.conversation.port.in.SpeakingSessionCleanupInputPort;
 import org.naho.speech.llm.conversation.port.in.SpeakingSessionInputPort;
-import org.naho.speech.llm.conversation.result.*;
+import org.naho.speech.llm.conversation.result.ChatResult;
+import org.naho.speech.llm.conversation.result.SpeakingSessionListItemResult;
+import org.naho.speech.llm.conversation.result.SpeakingSessionResult;
+import org.naho.speech.llm.conversation.result.StartConversationResult;
 import org.naho.speech.llm.type.SpeakingSessionStatus;
 import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
 import org.naho.subscription.result.SubscriptionPlanResult;
@@ -56,6 +62,7 @@ public class SpeakingSessionController {
     private final GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
     private final SpeakingSessionCleanupInputPort speakingSessionCleanupInputPort;
     private final CrudSpeakingSessionInputPort crudSpeakingSessionInputPort;
+    private final FileAudioConvertPort fileAudioConvertPort;
 
     /**
      * Khởi tạo 1 session mới và lưu vào ram và database
@@ -117,8 +124,7 @@ public class SpeakingSessionController {
     /**
      * Method gửi message để chat với AI
      *
-     * @param sessionCode session code
-     * @param request     chứa transcript (đoạn nội dung người dùng gửi)
+     * @param request chứa transcript (đoạn nội dung người dùng gửi), và session code
      * @return ChatResponse
      */
     @PostMapping("/message")
@@ -126,7 +132,7 @@ public class SpeakingSessionController {
     public ResponseEntity<ChatResponse> sendMessage(
             @Valid @RequestBody ChatSessionMessageRequest request
     ) {
-        SendMessageWithSessionCommand command = new SendMessageWithSessionCommand(
+        SendTextMessageCommand command = new SendTextMessageCommand(
                 request.sessionCode(),
                 request.userMessage()
         );
@@ -135,46 +141,50 @@ public class SpeakingSessionController {
         return ResponseEntity.ok(chatResponseMapper.resultToResponse(result));
     }
 
-    // ─── Audio Message (Azure Speech + AI) ──────────────────────
+    /**
+     * Method gửi audio để chat với AI
+     *
+     * @param sessionCode session code
+     * @param file        file âm thanh người dùng gửi cho AI
+     * @param payload     chứa user id
+     * @return ChatResponse
+     */
     @PostMapping(
             value = "/audio/{sessionCode}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_AUDIO_MESSAGE_PROCESS_SUCCESS)
-    public ResponseEntity<AudioChatResponse> sendAudioMessage(
+    public ResponseEntity<ChatResponse> sendAudioMessage(
             @PathVariable("sessionCode") String sessionCode,
             @RequestPart("file") MultipartFile file,
-            @RequestParam(value = "reference-text", required = false) String referenceText,
             @AuthenticationPrincipal AccessTokenPayload payload
     ) {
         try {
-            StoredFile storedFile = null;
-            Long userId = payload.userId();
-            byte[] audioBytes = file != null ? file.getBytes() : new byte[0];
+            SubscriptionPlanResult subscriptionPlan = getActiveSubscriptionInputPort.getUserActiveSubscriptionPlan(payload.userId());
+            // lấy ra thời gian record tối đa dựa vào gói đăng kí của người dùng
+            double durationLimit = subscriptionPlan.maxSpeakingQuestionRecordingSeconds();
 
-            if (userId != null) {
-                SubscriptionPlanResult subscriptionPlan = getActiveSubscriptionInputPort.getUserActiveSubscriptionPlan(userId);
-                if (subscriptionPlan != null) {
-                    double durationLimit = subscriptionPlan.maxSpeakingQuestionRecordingSeconds() != null
-                            ? subscriptionPlan.maxSpeakingQuestionRecordingSeconds().doubleValue()
-                            : 0.0;
-                    fileValidatorPort.validateWavFileAndDuration(audioBytes, durationLimit);
+            // kiểm tra thời lượng record và định dạng file
+            double duration = fileValidatorPort.validateAudioFileAndDuration(file.getBytes(), durationLimit);
 
-                    storedFile = fileStorageServicePort.saveFileToLocal(file, FileFolderConstant.RECORDINGS, FileAccessStatus.PRIVATE);
-                }
-            }
+            // chuyển file âm thanh thành dạng wav để Azure chấm
+            // định dạng PCM mono 16-bit ở 8 kHz hoặc 16 kHz
+            byte[] audioBytes = fileAudioConvertPort.convertToWav(file.getBytes());
 
-            var command = SendAudioMessageCommand.builder()
+            // Step 1: Lưu file vào local
+            StoredFile storedFile = fileStorageServicePort.saveFileToLocal(file, FileFolderConstant.RECORDINGS, FileAccessStatus.PRIVATE);
+
+            SendAudioMessageCommand command = SendAudioMessageCommand.builder()
                     .sessionCode(sessionCode)
                     .audioBytes(audioBytes)
-                    .referenceText(referenceText)
+                    .duration(duration)
                     .storedFile(storedFile)
-                    .userId(userId)
+                    .userId(payload.userId())
                     .build();
 
-            AudioChatResult result = speakingSessionInputPort.sendAudioMessage(command);
-            return ResponseEntity.ok(audioChatResponseMapper.resultToResponse(result));
+            ChatResult result = speakingSessionInputPort.sendAudioMessage(command);
+            return ResponseEntity.ok(chatResponseMapper.resultToResponse(result));
 
         } catch (IOException e) {
             throw new PresentationException(
@@ -190,16 +200,10 @@ public class SpeakingSessionController {
     @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_SESSION_END_SUCCESS)
     public ResponseEntity<SpeakingSessionResponse> endSession(
             @PathVariable("sessionCode") String sessionCode,
-            @AuthenticationPrincipal AccessTokenPayload payload,
-            @RequestBody(required = false) EndSessionRequest req
+            @AuthenticationPrincipal AccessTokenPayload payload
     ) {
-        Long userId = payload.userId();
-        String topic = (req != null && req.topic() != null) ? req.topic() : "";
-        String speechMetadata = (req != null && req.speechMetadata() != null) ? req.speechMetadata() : "";
-        String asrConfidence = (req != null && req.asrConfidence() != null) ? req.asrConfidence() : "";
-
-        SpeakingSessionResult r = endSessionInputPort.endSession(userId, sessionCode, topic, speechMetadata, asrConfidence);
-        return ResponseEntity.ok(speakingSessionResponseMapper.resultToResponse(r));
+        SpeakingSessionResult result = endSessionInputPort.endSession(payload.userId(), sessionCode);
+        return ResponseEntity.ok(speakingSessionResponseMapper.resultToResponse(result));
     }
 
     /**

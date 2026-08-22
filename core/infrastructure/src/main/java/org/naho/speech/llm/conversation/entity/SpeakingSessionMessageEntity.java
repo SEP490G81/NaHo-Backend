@@ -37,7 +37,7 @@ public class SpeakingSessionMessageEntity extends BaseEntity {
     @Column(name = "content", nullable = false, columnDefinition = "LONGTEXT")
     String content;
 
-    @Column(name = "content_translation", nullable = false, columnDefinition = "LONGTEXT")
+    @Column(name = "content_translation", columnDefinition = "LONGTEXT")
     String contentTranslation;
 
     @Column(name = "corrected_text", columnDefinition = "TEXT")

@@ -39,6 +39,36 @@ public class OpenAiChatAdapter implements AiChatPort {
         return executeRequest(requestBody, Duration.ofSeconds(60));
     }
 
+    @Override
+    public String buildMessagesRequestBody(List<Map<String, String>> messages) {
+        try {
+            StringBuilder messagesJson = new StringBuilder("[");
+
+            for (Map<String, String> map : messages) {
+                messagesJson.append(String.format(
+                        "{\"role\":\"%s\",\"content\":%s}",
+                        map.get(AiMessageField.ROLE),
+                        OBJECT_MAPPER.writeValueAsString(map.get(AiMessageField.CONTENT))
+                ));
+                messagesJson.append(",");
+            }
+
+            // xóa dấu phẩy thừa ở cuối
+            if (messagesJson.length() > 1) {
+                messagesJson.deleteCharAt(messagesJson.length() - 1);
+            }
+
+            messagesJson.append("]");
+
+            return messagesJson.toString();
+        } catch (Exception e) {
+            throw new InfrastructureException(
+                    LlmApplicationError.LLM_PARSE_ERROR,
+                    LlmDetailMessageKey.LLM_PARSE_ERROR,
+                    e.getMessage());
+        }
+    }
+
     private String executeRequest(String requestBody, Duration timeout) {
         HttpRequest request = buildHttpRequest(requestBody, timeout);
 
@@ -69,23 +99,7 @@ public class OpenAiChatAdapter implements AiChatPort {
 
     private String buildContextRequestBody(List<Map<String, String>> messages) {
         try {
-            StringBuilder messagesJson = new StringBuilder("[");
-
-            for (Map<String, String> map : messages) {
-                messagesJson.append(String.format(
-                        "{\"role\":\"%s\",\"content\":%s}",
-                        map.get(AiMessageField.ROLE),
-                        OBJECT_MAPPER.writeValueAsString(map.get(AiMessageField.CONTENT))
-                ));
-                messagesJson.append(",");
-            }
-            
-            // xóa dấu phẩy thừa ở cuối
-            if (messagesJson.length() > 1) {
-                messagesJson.deleteCharAt(messagesJson.length() - 1);
-            }
-
-            messagesJson.append("]");
+            String messagesJson = buildMessagesRequestBody(messages);
 
             return String.format(
                     Locale.US,

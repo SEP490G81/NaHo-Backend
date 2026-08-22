@@ -6,4 +6,6 @@ import java.util.Map;
 
 public interface AiChatPort {
     String chatWithContext(List<Map<String, String>> messages);
+
+    String buildMessagesRequestBody(List<Map<String, String>> messages);
 }

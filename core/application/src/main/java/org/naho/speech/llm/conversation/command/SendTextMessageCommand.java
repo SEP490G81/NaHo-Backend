@@ -4,11 +4,11 @@ import org.naho.i18n.message.llm.LlmTitleMessageKey;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.speech.llm.conversation.exception.LlmApplicationError;
 
-public record SendMessageWithSessionCommand(
+public record SendTextMessageCommand(
         String sessionCode,
         String userMessage
 ) {
-    public SendMessageWithSessionCommand {
+    public SendTextMessageCommand {
         if (sessionCode == null || sessionCode.isBlank()) {
             throw new ApplicationException(
                     LlmApplicationError.LLM_SESSION_CODE_INVALID,
