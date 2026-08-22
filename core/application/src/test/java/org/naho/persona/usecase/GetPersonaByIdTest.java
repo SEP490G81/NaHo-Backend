@@ -30,7 +30,6 @@ class GetPersonaByIdTest {
     private PersonaResultMapper personaResultMapper;
 
 
-
     @InjectMocks
     private GetPersonaUseCase getPersonaUseCase;
 
