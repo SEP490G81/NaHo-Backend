@@ -49,7 +49,7 @@ public class GrammarRepositoryAdapter implements GrammarRepositoryPort {
         } catch (org.springframework.dao.DataIntegrityViolationException e) {
             throw new org.naho.shared.exception.ApplicationException(
                     org.naho.grammar.exception.GrammarErrorCode.GRAMMAR_IN_USE,
-                    "Cannot delete grammar because it is being used by one or more questions"
+                    "grammar.in_use.detail"
             );
         }
     }
