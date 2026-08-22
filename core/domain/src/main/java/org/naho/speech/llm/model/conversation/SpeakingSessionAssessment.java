@@ -3,7 +3,7 @@ package org.naho.speech.llm.model.conversation;
 public class SpeakingSessionAssessment {
 
     private Long id;
-    private Long sessionId;
+    private Long speakingSessionId;
 
     private int overallScore;
     private String jlptEstimate;
@@ -33,7 +33,7 @@ public class SpeakingSessionAssessment {
 
     private SpeakingSessionAssessment(Builder builder) {
         this.id = builder.id;
-        this.sessionId = builder.sessionId;
+        this.speakingSessionId = builder.speakingSessionId;
 
         this.overallScore = builder.overallScore;
         this.jlptEstimate = builder.jlptEstimate;
@@ -69,7 +69,7 @@ public class SpeakingSessionAssessment {
     public static class Builder {
 
         private Long id;
-        private Long sessionId;
+        private Long speakingSessionId;
 
         private int overallScore;
         private String jlptEstimate;
@@ -102,8 +102,8 @@ public class SpeakingSessionAssessment {
             return this;
         }
 
-        public Builder sessionId(Long sessionId) {
-            this.sessionId = sessionId;
+        public Builder speakingSessionId(Long speakingSessionId) {
+            this.speakingSessionId = speakingSessionId;
             return this;
         }
 

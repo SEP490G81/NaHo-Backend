@@ -26,11 +26,11 @@ public class ConversationStyleEntity extends BaseEntity {
     String prompt;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "formality_level", nullable = false)
     FormalityLevel formalityLevel;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "marugoto_level")
+    @Column(name = "marugoto_level", nullable = false)
     MarugotoLevel marugotoLevel;
 
     @OneToMany(mappedBy = "suggestedConversationStyle")

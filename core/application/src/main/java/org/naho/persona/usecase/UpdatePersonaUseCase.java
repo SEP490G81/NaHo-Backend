@@ -3,11 +3,13 @@ package org.naho.persona.usecase;
 import org.naho.i18n.message.persona.PersonaDetailMessageKey;
 import org.naho.persona.command.UpdatePersonaCommand;
 import org.naho.persona.exception.PersonaErrorCode;
+import org.naho.persona.mapper.PersonaResultMapper;
 import org.naho.persona.model.ConversationStyle;
 import org.naho.persona.model.Persona;
 import org.naho.persona.port.in.UpdatePersonaInputPort;
 import org.naho.persona.port.out.ConversationStyleRepositoryPort;
 import org.naho.persona.port.out.PersonaRepositoryPort;
+import org.naho.persona.result.PersonaResult;
 import org.naho.persona.type.PersonaStatus;
 import org.naho.shared.exception.ApplicationException;
 
@@ -15,15 +17,20 @@ public class UpdatePersonaUseCase implements UpdatePersonaInputPort {
 
     private final PersonaRepositoryPort personaRepositoryPort;
     private final ConversationStyleRepositoryPort conversationStyleRepositoryPort;
+    private final PersonaResultMapper personaResultMapper;
 
-    public UpdatePersonaUseCase(PersonaRepositoryPort personaRepositoryPort,
-                                ConversationStyleRepositoryPort conversationStyleRepositoryPort) {
+    public UpdatePersonaUseCase(
+            PersonaRepositoryPort personaRepositoryPort,
+            ConversationStyleRepositoryPort conversationStyleRepositoryPort,
+            PersonaResultMapper personaResultMapper
+    ) {
         this.personaRepositoryPort = personaRepositoryPort;
         this.conversationStyleRepositoryPort = conversationStyleRepositoryPort;
+        this.personaResultMapper = personaResultMapper;
     }
 
     @Override
-    public Persona updatePersona(UpdatePersonaCommand command) {
+    public PersonaResult updatePersona(UpdatePersonaCommand command) {
         Persona existing = personaRepositoryPort.findById(command.id())
                 .orElseThrow(() -> new ApplicationException(
                         PersonaErrorCode.PERSONA_NOT_FOUND,
@@ -34,8 +41,6 @@ public class UpdatePersonaUseCase implements UpdatePersonaInputPort {
         Long styleId = command.suggestedConversationStyleId() != null
                 ? command.suggestedConversationStyleId()
                 : existing.getSuggestedConversationStyleId();
-
-        ConversationStyle savedStyle = existing.getConversationStyle();
 
         if (command.conversationStyleCommand() != null && conversationStyleRepositoryPort != null) {
             Long styleToUpdateId = command.conversationStyleCommand().id() != null
@@ -50,7 +55,7 @@ public class UpdatePersonaUseCase implements UpdatePersonaInputPort {
                     .marugotoLevel(command.conversationStyleCommand().marugotoLevel())
                     .build();
 
-            savedStyle = conversationStyleRepositoryPort.save(styleToSave);
+            ConversationStyle savedStyle = conversationStyleRepositoryPort.save(styleToSave);
             styleId = savedStyle.getId();
         }
 
@@ -60,11 +65,13 @@ public class UpdatePersonaUseCase implements UpdatePersonaInputPort {
                 .prompt(command.prompt())
                 .avatarFileId(command.avatarFileId())
                 .suggestedConversationStyleId(styleId)
-                .conversationStyle(savedStyle)
-                .status(existing.getStatus())
+                .status(command.status() != null ? command.status() : existing.getStatus())
+                .voiceName(command.voiceName() != null ? command.voiceName() : existing.getVoiceName())
+                .gender(command.gender() != null ? command.gender() : existing.getGender())
                 .build();
 
-        return personaRepositoryPort.save(updated);
+        Persona savedPersona = personaRepositoryPort.save(updated);
+        return personaResultMapper.domainToResult(savedPersona);
     }
 
     @Override
@@ -102,5 +109,3 @@ public class UpdatePersonaUseCase implements UpdatePersonaInputPort {
         }
     }
 }
-
-

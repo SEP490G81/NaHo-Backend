@@ -83,6 +83,12 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         this.userLearningProgressRepositoryPort = userLearningProgressRepositoryPort;
     }
 
+    /**
+     * Method đánh giá câu trả lời của người dùng (luồng duolingo)
+     *
+     * @param command SpeakingAnalysisCommand
+     * @return AnswerHistoryResult
+     */
     @Override
     public AnswerHistoryResult analyzeSpeaking(SpeakingAnalysisCommand command) {
         AnswerHistoryResult result = transactionPort.execute(() -> doAnalyzeSpeaking(command));

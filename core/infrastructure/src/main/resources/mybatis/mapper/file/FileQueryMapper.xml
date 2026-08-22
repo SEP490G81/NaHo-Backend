@@ -24,7 +24,8 @@
           and operation_status = #{operationStatus}
           and #{maxRetryCount} > retry_count
           and (next_retry_at is null or #{now} >= next_retry_at)
-        order by created_time limit 100
+        order by created_time
+        limit 100
     </select>
 
     <select id="findAvatarFileByUserId" resultMap="FileEntityResultMap">

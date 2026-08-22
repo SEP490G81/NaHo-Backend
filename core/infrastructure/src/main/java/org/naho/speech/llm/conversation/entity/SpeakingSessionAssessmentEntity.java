@@ -20,7 +20,7 @@ public class SpeakingSessionAssessmentEntity extends BaseEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "session_id", nullable = false, unique = true)
-    SpeakingSessionEntity session;
+    SpeakingSessionEntity speakingSession;
 
     @Column(name = "overall_score", nullable = false)
     int overallScore;
@@ -88,6 +88,6 @@ public class SpeakingSessionAssessmentEntity extends BaseEntity {
     @Column(name = "study_encouragement", columnDefinition = "TEXT")
     String studyEncouragement;
 
-    @OneToMany(mappedBy = "assessment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    List<SpeakingImprovedExpressionEntity> improvedExpressions;
+    @OneToMany(mappedBy = "speakingSessionAssessment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    List<SpeakingImprovedExpressionEntity> speakingImprovedExpressions;
 }

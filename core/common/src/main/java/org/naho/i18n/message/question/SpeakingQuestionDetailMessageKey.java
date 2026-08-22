@@ -19,6 +19,8 @@ public final class SpeakingQuestionDetailMessageKey {
     public static final String AI_FEEDBACK_ID_NULL = "ai_feedback.id.null";
     public static final String ANSWER_HISTORY_NOT_FOUND = "answer_history.not_found";
     public static final String ANSWER_HISTORY_ID_NULL = "answer_history.id.null";
+    public static final String ANSWER_HISTORY_GET_LIST_SUCCESS = "answer_history.get.list.success.detail";
+    public static final String ANSWER_HISTORY_GET_DETAIL_SUCCESS = "answer_history.get.detail.success.detail";
     public static final String SPEECH_ASSESSMENT_NOT_FOUND = "speech_assessment.not_found";
     public static final String CONTENT_ASSESSMENT_NOT_FOUND = "content_assessment.not_found";
     public static final String SPEAKING_QUESTION_LOCKED = "speaking_question.locked";

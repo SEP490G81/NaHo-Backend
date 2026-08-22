@@ -66,9 +66,9 @@ public class SpeakingSessionEntity extends BaseEntity {
     @Column(name = "ended_at")
     Instant endedAt;
 
-    @OneToOne(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
-    SpeakingSessionAssessmentEntity assessment;
+    @OneToOne(mappedBy = "speakingSession", cascade = CascadeType.ALL, orphanRemoval = true)
+    SpeakingSessionAssessmentEntity speakingSessionAssessment;
 
     @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    List<SpeakingSessionMessageEntity> messages;
+    List<SpeakingSessionMessageEntity> speakingSessionMessages;
 }

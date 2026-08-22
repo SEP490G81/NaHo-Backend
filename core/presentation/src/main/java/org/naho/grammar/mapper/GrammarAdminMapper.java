@@ -14,5 +14,5 @@ public interface GrammarAdminMapper {
 
     UpdateGrammarCommand toCommand(UpdateGrammarRequest request);
 
-    GrammarResponse toResponse(GrammarResult result);
+    GrammarResponse resultToResponse(GrammarResult result);
 }

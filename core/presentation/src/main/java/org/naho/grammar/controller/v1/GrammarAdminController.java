@@ -46,7 +46,7 @@ public class GrammarAdminController {
             @AuthenticationPrincipal AccessTokenPayload payload) {
         verifyAdminOrManager(payload);
         GrammarResult result = createGrammarInputPort.createGrammar(grammarAdminMapper.toCommand(request));
-        return ResponseEntity.ok(grammarAdminMapper.toResponse(result));
+        return ResponseEntity.ok(grammarAdminMapper.resultToResponse(result));
     }
 
     @PutMapping("/{id}")
@@ -57,7 +57,7 @@ public class GrammarAdminController {
         verifyAdminOrManager(payload);
         request.setId(id);
         GrammarResult result = updateGrammarInputPort.updateGrammar(grammarAdminMapper.toCommand(request));
-        return ResponseEntity.ok(grammarAdminMapper.toResponse(result));
+        return ResponseEntity.ok(grammarAdminMapper.resultToResponse(result));
     }
 
     @DeleteMapping("/{id}")
@@ -75,7 +75,7 @@ public class GrammarAdminController {
             @AuthenticationPrincipal AccessTokenPayload payload) {
         verifyAdminOrManager(payload);
         GrammarResult result = getGrammarDetailInputPort.getGrammarDetail(id);
-        return ResponseEntity.ok(grammarAdminMapper.toResponse(result));
+        return ResponseEntity.ok(grammarAdminMapper.resultToResponse(result));
     }
 
     @GetMapping("/search")
@@ -89,7 +89,7 @@ public class GrammarAdminController {
         PageData<GrammarResult> result = searchGrammarInputPort.searchGrammars(new SearchGrammarCommand(keyword, page, size));
 
         PageData<GrammarResponse> response = new PageData<>(
-                result.getData().stream().map(grammarAdminMapper::toResponse).toList(),
+                result.getData().stream().map(grammarAdminMapper::resultToResponse).toList(),
                 result.getPageMeta()
         );
 

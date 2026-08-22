@@ -1,9 +1,9 @@
 package org.naho.speech.llm.conversation.port.out;
 
-import org.naho.speech.llm.conversation.result.ScoringResult;
+import org.naho.speech.llm.conversation.result.SpeakingSessionAssessmentResult;
 
 public interface AiScoringPort {
-    ScoringResult score(
+    SpeakingSessionAssessmentResult score(
             String sessionCode,
             String topic,
             String fullTranscript,

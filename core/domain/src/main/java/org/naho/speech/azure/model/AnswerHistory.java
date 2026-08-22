@@ -1,5 +1,7 @@
 package org.naho.speech.azure.model;
 
+import java.time.Instant;
+
 public class AnswerHistory {
 
     private Long id;
@@ -10,6 +12,8 @@ public class AnswerHistory {
     private Long audioFileId;
     private Double duration;
     private Double overallScore;
+    private Instant createdTime;
+    private Instant modifiedTime;
 
     public static Builder builder() {
         return new Builder();
@@ -79,6 +83,22 @@ public class AnswerHistory {
         this.overallScore = overallScore;
     }
 
+    public Instant getCreatedTime() {
+        return createdTime;
+    }
+
+    public void setCreatedTime(Instant createdTime) {
+        this.createdTime = createdTime;
+    }
+
+    public Instant getModifiedTime() {
+        return modifiedTime;
+    }
+
+    public void setModifiedTime(Instant modifiedTime) {
+        this.modifiedTime = modifiedTime;
+    }
+
     public static class Builder {
 
         private Long id;
@@ -89,6 +109,8 @@ public class AnswerHistory {
         private Long audioFileId;
         private Double duration;
         private Double overallScore;
+        private Instant createdTime;
+        private Instant modifiedTime;
 
         public Builder id(Long id) {
             this.id = id;
@@ -130,6 +152,16 @@ public class AnswerHistory {
             return this;
         }
 
+        public Builder createdTime(Instant createdTime) {
+            this.createdTime = createdTime;
+            return this;
+        }
+
+        public Builder modifiedTime(Instant modifiedTime) {
+            this.modifiedTime = modifiedTime;
+            return this;
+        }
+
         public AnswerHistory build() {
             AnswerHistory answerHistory = new AnswerHistory();
 
@@ -141,6 +173,8 @@ public class AnswerHistory {
             answerHistory.audioFileId = this.audioFileId;
             answerHistory.duration = this.duration;
             answerHistory.overallScore = this.overallScore;
+            answerHistory.createdTime = this.createdTime;
+            answerHistory.modifiedTime = this.modifiedTime;
 
             return answerHistory;
         }

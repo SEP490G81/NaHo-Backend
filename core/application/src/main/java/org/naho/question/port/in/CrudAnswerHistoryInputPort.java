@@ -1,14 +1,14 @@
 package org.naho.question.port.in;
 
-import org.naho.pagination.PageData;
-import org.naho.question.command.SpeakingHistoryFilterCommand;
-import org.naho.question.result.SpeakingHistoryDetailResult;
-import org.naho.question.result.SpeakingHistoryListItemResult;
+import org.naho.question.result.AnswerHistoryListItemResult;
+import org.naho.question.result.AnswerHistoryResult;
+
+import java.util.List;
 
 public interface CrudAnswerHistoryInputPort {
     String generateAudioFilePresignedUrl(Long id, Long userId);
 
-    SpeakingHistoryDetailResult getSpeakingQuestionAnswerHistoryById(Long answerHistoryId, Long userId);
+    List<AnswerHistoryListItemResult> findAllBySpeakingQuestionIdAndUserId(Long speakingQuestionId, Long userId);
 
-    PageData<SpeakingHistoryListItemResult> getUserHistoryList(SpeakingHistoryFilterCommand command);
+    AnswerHistoryResult findByAnswerHistoryIdAndUserId(Long answerHistoryId, Long userId);
 }

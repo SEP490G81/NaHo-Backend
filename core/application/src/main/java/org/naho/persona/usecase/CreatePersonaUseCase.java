@@ -1,28 +1,33 @@
 package org.naho.persona.usecase;
 
 import org.naho.persona.command.CreatePersonaCommand;
+import org.naho.persona.mapper.PersonaResultMapper;
 import org.naho.persona.model.ConversationStyle;
 import org.naho.persona.model.Persona;
 import org.naho.persona.port.in.CreatePersonaInputPort;
 import org.naho.persona.port.out.ConversationStyleRepositoryPort;
 import org.naho.persona.port.out.PersonaRepositoryPort;
-import org.naho.persona.type.PersonaStatus;
+import org.naho.persona.result.PersonaResult;
 
 public class CreatePersonaUseCase implements CreatePersonaInputPort {
 
     private final PersonaRepositoryPort personaRepositoryPort;
     private final ConversationStyleRepositoryPort conversationStyleRepositoryPort;
+    private final PersonaResultMapper personaResultMapper;
 
-    public CreatePersonaUseCase(PersonaRepositoryPort personaRepositoryPort,
-                                ConversationStyleRepositoryPort conversationStyleRepositoryPort) {
+    public CreatePersonaUseCase(
+            PersonaRepositoryPort personaRepositoryPort,
+            ConversationStyleRepositoryPort conversationStyleRepositoryPort,
+            PersonaResultMapper personaResultMapper
+    ) {
         this.personaRepositoryPort = personaRepositoryPort;
         this.conversationStyleRepositoryPort = conversationStyleRepositoryPort;
+        this.personaResultMapper = personaResultMapper;
     }
 
     @Override
-    public Persona createPersona(CreatePersonaCommand command) {
+    public PersonaResult createPersona(CreatePersonaCommand command) {
         Long styleId = command.suggestedConversationStyleId();
-        ConversationStyle savedStyle = null;
 
         if (command.conversationStyleCommand() != null && conversationStyleRepositoryPort != null) {
             ConversationStyle newStyle = ConversationStyle.builder()
@@ -31,7 +36,7 @@ public class CreatePersonaUseCase implements CreatePersonaInputPort {
                     .formalityLevel(command.conversationStyleCommand().formalityLevel())
                     .marugotoLevel(command.conversationStyleCommand().marugotoLevel())
                     .build();
-            savedStyle = conversationStyleRepositoryPort.save(newStyle);
+            ConversationStyle savedStyle = conversationStyleRepositoryPort.save(newStyle);
             styleId = savedStyle.getId();
         }
 
@@ -40,12 +45,12 @@ public class CreatePersonaUseCase implements CreatePersonaInputPort {
                 .prompt(command.prompt())
                 .avatarFileId(command.avatarFileId())
                 .suggestedConversationStyleId(styleId)
-                .conversationStyle(savedStyle)
-                .status(PersonaStatus.ACTIVE)
+                .status(command.status())
+                .voiceName(command.voiceName())
+                .gender(command.gender())
                 .build();
 
-        return personaRepositoryPort.save(persona);
+        Persona savedPersona = personaRepositoryPort.save(persona);
+        return personaResultMapper.domainToResult(savedPersona);
     }
 }
-
-

@@ -30,5 +30,5 @@ public interface SpeakingSessionJpaRepository
 
     int countByUserIdAndStatus(Long userId, SpeakingSessionStatus status);
 
-    List<SpeakingSessionEntity> findALlByStatusAndUserId(SpeakingSessionStatus status, Long userId);
+    List<SpeakingSessionEntity> findAllByUserIdAndStatus(Long userId, SpeakingSessionStatus status);
 }

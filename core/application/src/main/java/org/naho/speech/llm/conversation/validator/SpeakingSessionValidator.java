@@ -4,7 +4,6 @@ import org.naho.i18n.message.llm.LlmDetailMessageKey;
 import org.naho.shared.constant.SystemZoneId;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.speech.llm.conversation.exception.LlmApplicationError;
-import org.naho.speech.llm.conversation.port.out.SessionStorePort;
 import org.naho.speech.llm.conversation.port.out.SpeakingSessionRepositoryPort;
 import org.naho.subscription.model.UserDailyAiUsage;
 import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
@@ -13,20 +12,17 @@ import org.naho.subscription.result.SubscriptionPlanResult;
 
 import java.time.LocalDate;
 
-public class SessionValidator {
+public class SpeakingSessionValidator {
     private final SpeakingSessionRepositoryPort speakingSessionRepositoryPort;
-    private final SessionStorePort sessionStorePort;
     private final GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
     private final UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort;
 
-    public SessionValidator(
+    public SpeakingSessionValidator(
             SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
-            SessionStorePort sessionStorePort,
             GetActiveSubscriptionInputPort getActiveSubscriptionInputPort,
             UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort
     ) {
         this.speakingSessionRepositoryPort = speakingSessionRepositoryPort;
-        this.sessionStorePort = sessionStorePort;
         this.getActiveSubscriptionInputPort = getActiveSubscriptionInputPort;
         this.userDailyAiUsageRepositoryPort = userDailyAiUsageRepositoryPort;
     }
@@ -53,7 +49,8 @@ public class SessionValidator {
      * @param userId      id của user
      */
     public void validateSessionTurnLimit(String sessionCode, Long userId) {
-        Long targetUserId = userId != null ? userId : sessionStorePort.getUserId(sessionCode);
+        org.naho.speech.llm.model.conversation.SpeakingSession session = speakingSessionRepositoryPort.findBySessionCode(sessionCode);
+        Long targetUserId = userId != null ? userId : session.getUserId();
         if (targetUserId == null) {
             return;
         }
@@ -61,7 +58,7 @@ public class SessionValidator {
         SubscriptionPlanResult plan = getActiveSubscriptionInputPort
                 .getUserActiveSubscriptionPlan(targetUserId);
 
-        int currentTurnCount = sessionStorePort.getTurnCount(sessionCode);
+        int currentTurnCount = session.getTotalTurns();
 
         if (currentTurnCount >= plan.maxTurnsPerAiSession()) {
             throw new ApplicationException(
@@ -138,21 +135,6 @@ public class SessionValidator {
             throw new ApplicationException(
                     LlmApplicationError.LLM_SESSION_NOT_FOUND,
                     LlmDetailMessageKey.LLM_SESSION_NOT_FOUND
-            );
-        }
-    }
-
-    /**
-     * Kiểm tra xem session đã bắt đầu chưa (đã có tin nhắn khởi tạo lời chào đầu tiên chưa).
-     * Nếu đã bắt đầu rồi thì ném ra lỗi không cho init lại.
-     *
-     * @param sessionCode mã phiên
-     */
-    public void validateSessionIsNotStarted(String sessionCode) {
-        if (speakingSessionRepositoryPort.isSessionStarted(sessionCode)) {
-            throw new ApplicationException(
-                    LlmApplicationError.LLM_SESSION_ALREADY_STARTED,
-                    LlmDetailMessageKey.LLM_SESSION_ALREADY_STARTED
             );
         }
     }

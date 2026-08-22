@@ -1,5 +1,5 @@
 package org.naho.speech.llm.type;
 
 public enum SpeakingSessionStatus {
-    IN_PROGRESS, COMPLETED
+    INIT, IN_PROGRESS, COMPLETED
 }
