@@ -7,6 +7,6 @@ import java.util.List;
 public interface GetPersonaInputPort {
     List<PersonaResult> getAllPersonas();
 
-    PersonaResult getPersonaById(Long id);
+    PersonaResult findById(Long id);
 }
 

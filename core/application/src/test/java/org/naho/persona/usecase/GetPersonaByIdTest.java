@@ -53,7 +53,7 @@ class GetPersonaByIdTest {
         when(personaResultMapper.domainToResult(persona)).thenReturn(personaResult);
 
         // Act
-        PersonaResult result = getPersonaUseCase.getPersonaById(personaId);
+        PersonaResult result = getPersonaUseCase.findById(personaId);
 
         // Assert
         assertNotNull(result);
@@ -69,7 +69,7 @@ class GetPersonaByIdTest {
         // Act & Assert
         ApplicationException exception = assertThrows(
                 ApplicationException.class,
-                () -> getPersonaUseCase.getPersonaById(null)
+                () -> getPersonaUseCase.findById(null)
         );
 
         assertEquals(CommonErrorCode.COMMON_INVALID_REQUEST, exception.getErrorCode());
@@ -87,7 +87,7 @@ class GetPersonaByIdTest {
         // Act & Assert
         ApplicationException exception = assertThrows(
                 ApplicationException.class,
-                () -> getPersonaUseCase.getPersonaById(personaId)
+                () -> getPersonaUseCase.findById(personaId)
         );
 
         assertEquals(PersonaErrorCode.PERSONA_NOT_FOUND, exception.getErrorCode());

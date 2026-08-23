@@ -8,6 +8,7 @@ import org.naho.speech.llm.conversation.mapper.SpeakingSessionResultMapper;
 import org.naho.speech.llm.conversation.port.in.CrudSpeakingSessionInputPort;
 import org.naho.speech.llm.conversation.port.out.SpeakingSessionRepositoryPort;
 import org.naho.speech.llm.conversation.result.SpeakingSessionListItemResult;
+import org.naho.speech.llm.conversation.result.SpeakingSessionResult;
 import org.naho.speech.llm.model.conversation.SpeakingSession;
 import org.naho.speech.llm.type.SpeakingSessionStatus;
 import org.naho.user.exception.UserErrorCode;
@@ -51,5 +52,34 @@ public class CrudSpeakingSessionUseCase implements CrudSpeakingSessionInputPort 
         return inProgressSessions.stream()
                 .map(speakingSessionResultMapper::domainToListItemResult)
                 .toList();
+    }
+
+    @Override
+    public SpeakingSessionResult findByUserIdAndSpeakingSessionCodeAndSpeakingSessionStatus(Long userId, String sessionCode, SpeakingSessionStatus status) {
+        if (userId == null) {
+            throw new ApplicationException(
+                    UserErrorCode.USER_NOT_FOUND,
+                    UserDetailMessageKey.USER_ID_NULL
+            );
+        }
+
+        if (status == null) {
+            throw new ApplicationException(
+                    LlmApplicationError.LLM_SESSION_STATUS_INVALID,
+                    LlmDetailMessageKey.LLM_SESSION_STATUS_INVALID
+            );
+        }
+
+        if (sessionCode == null || sessionCode.isBlank()) {
+            throw new ApplicationException(
+                    LlmApplicationError.LLM_SESSION_CODE_INVALID,
+                    LlmDetailMessageKey.LLM_SESSION_CODE_INVALID
+            );
+        }
+
+        SpeakingSession speakingSession = speakingSessionRepositoryPort
+                .findByUserIdAndSpeakingSessionCodeAndSpeakingSessionStatus(userId, sessionCode, status);
+
+        return speakingSessionResultMapper.domainToResult(speakingSession);
     }
 }

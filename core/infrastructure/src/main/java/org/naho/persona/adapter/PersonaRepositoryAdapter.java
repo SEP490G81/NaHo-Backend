@@ -31,6 +31,12 @@ public class PersonaRepositoryAdapter implements PersonaRepositoryPort {
 
     @Override
     public Optional<Persona> findById(Long id) {
+        if (id == null) {
+            throw new InfrastructureException(
+                    PersonaErrorCode.PERSONA_NOT_FOUND,
+                    PersonaDetailMessageKey.PERSONA_ID_NULL
+            );
+        }
         return personaJpaRepository
                 .findById(id)
                 .map(personaEntityMapper::entityToDomain);

@@ -11,6 +11,7 @@ import org.naho.file.port.out.FileStorageServicePort;
 import org.naho.learning.port.in.UserLearningStreakInputPort;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
+import org.naho.persona.port.in.GetPersonaInputPort;
 import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.naho.question.port.in.CompleteSpeakingQuestionInputPort;
 import org.naho.question.port.out.AnswerHistoryRepositoryPort;
@@ -113,11 +114,13 @@ public class ChatConfig {
     @Bean
     public SpeakingSessionResultMapper speakingSessionResultMapper(
             SpeakingSessionMessageRepositoryPort speakingSessionMessageRepositoryPort,
-            SpeakingSessionMessageResultMapper speakingSessionMessageResultMapper
+            SpeakingSessionMessageResultMapper speakingSessionMessageResultMapper,
+            GetPersonaInputPort getPersonaInputPort
     ) {
         return new SpeakingSessionResultMapper(
                 speakingSessionMessageRepositoryPort,
-                speakingSessionMessageResultMapper
+                speakingSessionMessageResultMapper,
+                getPersonaInputPort
         );
     }
 

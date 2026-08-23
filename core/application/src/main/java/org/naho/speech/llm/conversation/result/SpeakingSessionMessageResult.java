@@ -3,6 +3,8 @@ package org.naho.speech.llm.conversation.result;
 import org.naho.speech.llm.type.MessageType;
 import org.naho.speech.llm.type.SenderType;
 
+import java.util.List;
+
 public record SpeakingSessionMessageResult(
         Long id,
         Long sessionId,
@@ -19,7 +21,8 @@ public record SpeakingSessionMessageResult(
         String hintForLearner,
         Double pronunciationScore,
         String aiReplyAudio,
-        String userRecordAudio
+        String userRecordAudio,
+        List<String> suggestedReplies
 ) {
 
     public static Builder builder() {
@@ -44,6 +47,7 @@ public record SpeakingSessionMessageResult(
         private Double pronunciationScore;
         private String aiReplyAudio;
         private String userRecordAudio;
+        private List<String> suggestedReplies;
 
         public Builder id(Long id) {
             this.id = id;
@@ -120,6 +124,11 @@ public record SpeakingSessionMessageResult(
             return this;
         }
 
+        public Builder suggestedReplies(List<String> suggestedReplies) {
+            this.suggestedReplies = suggestedReplies;
+            return this;
+        }
+
         public SpeakingSessionMessageResult build() {
             return new SpeakingSessionMessageResult(
                     id,
@@ -136,7 +145,8 @@ public record SpeakingSessionMessageResult(
                     hintForLearner,
                     pronunciationScore,
                     aiReplyAudio,
-                    userRecordAudio
+                    userRecordAudio,
+                    suggestedReplies
             );
         }
     }

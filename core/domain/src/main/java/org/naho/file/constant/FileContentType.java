@@ -17,6 +17,7 @@ public final class FileContentType {
     public static final String AUDIO_OGG = "audio/ogg";
     public static final String AUDIO_WEBM = "audio/webm";
     public static final String AUDIO_FLAC = "audio/flac";
+    public static final String APPLICATION_X_MATROSKA = "application/x-matroska";
 
     // General / Binary
     public static final String APPLICATION_OCTET_STREAM = "application/octet-stream";

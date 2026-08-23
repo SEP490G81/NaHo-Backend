@@ -34,7 +34,7 @@ public class GetPersonaUseCase implements GetPersonaInputPort {
     }
 
     @Override
-    public PersonaResult getPersonaById(Long id) {
+    public PersonaResult findById(Long id) {
         if (id == null) {
             throw new ApplicationException(
                     CommonErrorCode.COMMON_INVALID_REQUEST,

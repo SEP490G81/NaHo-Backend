@@ -19,4 +19,6 @@ public interface SpeakingSessionJpaRepository
     List<SpeakingSessionEntity> findAllByUserIdAndStatus(Long userId, SpeakingSessionStatus status);
 
     Optional<SpeakingSessionEntity> findBySessionCodeAndUser_Id(String sessionCode, Long userId);
+
+    Optional<SpeakingSessionEntity> findByUser_IdAndSessionCodeAndStatus(Long userId, String sessionCode, SpeakingSessionStatus status);
 }

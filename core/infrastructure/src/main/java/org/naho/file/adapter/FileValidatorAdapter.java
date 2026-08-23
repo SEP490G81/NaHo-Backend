@@ -138,7 +138,8 @@ public class FileValidatorAdapter implements FileValidatorPort {
         try {
             String detectedMimeType = tika.detect(audioBytes);
 
-            if (!ALLOWED_AUDIO_MIME_TYPES.contains(detectedMimeType)) {
+            if (!ALLOWED_AUDIO_MIME_TYPES.contains(detectedMimeType)
+                    && !FileContentType.APPLICATION_X_MATROSKA.equals(detectedMimeType)) {
                 throw new InfrastructureException(
                         FileErrorCode.FILE_NOT_VALID,
                         FileDetailMessageKey.FILE_NOT_VALID,
@@ -147,7 +148,8 @@ public class FileValidatorAdapter implements FileValidatorPort {
 
             Path tempDirectory = Path.of(
                     staticResourceProperties.getLocalPath(),
-                    FileFolderConstant.TEMP);
+                    FileFolderConstant.TEMP
+            );
 
             Files.createDirectories(tempDirectory);
 
@@ -163,7 +165,8 @@ public class FileValidatorAdapter implements FileValidatorPort {
                         FileErrorCode.FILE_NOT_VALID,
                         FileDetailMessageKey.FILE_AUDIO_DURATION_EXCEEDED,
                         duration,
-                        maxDuration);
+                        maxDuration
+                );
             }
 
             return duration;

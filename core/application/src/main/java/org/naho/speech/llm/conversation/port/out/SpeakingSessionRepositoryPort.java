@@ -12,6 +12,8 @@ import java.util.List;
 public interface SpeakingSessionRepositoryPort {
     SpeakingSession save(SpeakingSession speakingSession);
 
+    SpeakingSession increaseTotalTurns(Long sessionId);
+
     SpeakingSession initSpeakingSession(
             String sessionCode,
             Long userId,
@@ -25,8 +27,6 @@ public interface SpeakingSessionRepositoryPort {
     SpeakingSessionMessage saveSpeakingSessionMessage(
             SpeakingSessionMessageCommand command
     );
-
-    void updateSpeakingSessionStatus(String sessionCode, SpeakingSessionStatus status);
 
     /**
      * Kiểm tra phiên đã hoàn thành và chấm điểm (status == COMPLETED) chưa.
@@ -45,11 +45,9 @@ public interface SpeakingSessionRepositoryPort {
 
     SpeakingSession findBySessionCode(String sessionCode);
 
-    SpeakingSession findBySessionCodeAndUserId(String sessionCode, Long userId);
-
-    SpeakingSession findBySessionCodeAndStatus(String sessionCode, SpeakingSessionStatus status);
-
     SpeakingSession findBySessionId(Long sessionId);
 
     List<SpeakingSession> findAllByUserIdAndSpeakingSessionStatus(Long userId, SpeakingSessionStatus status);
+
+    SpeakingSession findByUserIdAndSpeakingSessionCodeAndSpeakingSessionStatus(Long userId, String sessionCode, SpeakingSessionStatus status);
 }

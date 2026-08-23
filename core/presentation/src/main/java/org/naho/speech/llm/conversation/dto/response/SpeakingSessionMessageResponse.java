@@ -3,6 +3,8 @@ package org.naho.speech.llm.conversation.dto.response;
 import org.naho.speech.llm.type.MessageType;
 import org.naho.speech.llm.type.SenderType;
 
+import java.util.List;
+
 public record SpeakingSessionMessageResponse(
         Long id,
         Long sessionId,
@@ -18,6 +20,7 @@ public record SpeakingSessionMessageResponse(
         String hintForLearner,
         Double pronunciationScore,
         String aiReplyAudio,
-        String userRecordAudio
+        String userRecordAudio,
+        List<String> suggestedReplies
 ) {
 }

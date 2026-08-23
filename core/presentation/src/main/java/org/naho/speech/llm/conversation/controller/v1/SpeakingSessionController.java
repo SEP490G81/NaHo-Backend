@@ -18,15 +18,20 @@ import org.naho.speech.llm.conversation.command.StartSpeakingConversationCommand
 import org.naho.speech.llm.conversation.dto.mapper.ChatResponseMapper;
 import org.naho.speech.llm.conversation.dto.mapper.SpeakingSessionAssessmentResponseMapper;
 import org.naho.speech.llm.conversation.dto.mapper.SpeakingSessionResponseMapper;
-import org.naho.speech.llm.conversation.dto.mapper.StartConversationResponseMapper;
 import org.naho.speech.llm.conversation.dto.request.ChatSessionMessageRequest;
 import org.naho.speech.llm.conversation.dto.request.StartConversationRequest;
-import org.naho.speech.llm.conversation.dto.response.*;
+import org.naho.speech.llm.conversation.dto.response.ChatResponse;
+import org.naho.speech.llm.conversation.dto.response.SpeakingSessionAssessmentResponse;
+import org.naho.speech.llm.conversation.dto.response.SpeakingSessionListItemResponse;
+import org.naho.speech.llm.conversation.dto.response.SpeakingSessionResponse;
 import org.naho.speech.llm.conversation.port.in.CrudSpeakingSessionInputPort;
 import org.naho.speech.llm.conversation.port.in.EndSessionInputPort;
 import org.naho.speech.llm.conversation.port.in.SpeakingSessionCleanupInputPort;
 import org.naho.speech.llm.conversation.port.in.SpeakingSessionInputPort;
-import org.naho.speech.llm.conversation.result.*;
+import org.naho.speech.llm.conversation.result.ChatResult;
+import org.naho.speech.llm.conversation.result.SpeakingSessionAssessmentResult;
+import org.naho.speech.llm.conversation.result.SpeakingSessionListItemResult;
+import org.naho.speech.llm.conversation.result.SpeakingSessionResult;
 import org.naho.speech.llm.type.SpeakingSessionStatus;
 import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
 import org.naho.subscription.result.SubscriptionPlanResult;
@@ -44,11 +49,9 @@ import java.util.List;
 @RequestMapping("/api/v1/speaking/session")
 @RequiredArgsConstructor
 public class SpeakingSessionController {
-
     private final SpeakingSessionInputPort speakingSessionInputPort;
     private final EndSessionInputPort endSessionInputPort;
     private final ChatResponseMapper chatResponseMapper;
-    private final StartConversationResponseMapper startConversationResponseMapper;
     private final SpeakingSessionResponseMapper speakingSessionResponseMapper;
     private final SpeakingSessionAssessmentResponseMapper speakingSessionAssessmentResponseMapper;
     private final FileStorageServicePort fileStorageServicePort;
@@ -77,42 +80,10 @@ public class SpeakingSessionController {
                 request.formalityLevel(),
                 request.marugotoLevel()
         );
+
         String sessionCode = speakingSessionInputPort.startConversation(command);
+
         return ResponseEntity.ok(sessionCode);
-    }
-
-    /**
-     * Sau khi có được session code từ API `startConversation` thì bắt đầu vào phiên trò chuyện
-     *
-     * @param sessionCode session code
-     * @param payload     chứa user id
-     * @return StartConversationResponse
-     */
-    @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_CONVERSATION_START_SUCCESS)
-    @PostMapping("/init/{sessionCode}")
-    public ResponseEntity<StartConversationResponse> initFirstGreeting(
-            @PathVariable("sessionCode") String sessionCode,
-            @AuthenticationPrincipal AccessTokenPayload payload
-    ) {
-        StartConversationResult result = speakingSessionInputPort.initFirstGreeting(sessionCode, payload.userId());
-        return ResponseEntity.ok(startConversationResponseMapper.resultToResponse(result));
-    }
-
-    /**
-     * Lấy ra chi tiết 1 session (gồm các đoạn chat trong đó)
-     *
-     * @param payload     chứa user id
-     * @param sessionCode session code
-     * @return SpeakingSessionResponse
-     */
-    @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_HISTORY_GET_DETAIL_SUCCESS)
-    @GetMapping("/details/{sessionCode}")
-    public ResponseEntity<SpeakingSessionResponse> getInProgressSessionDetails(
-            @AuthenticationPrincipal AccessTokenPayload payload,
-            @PathVariable("sessionCode") String sessionCode
-    ) {
-        SpeakingSessionResult result = speakingSessionInputPort.getInProgressSessionDetails(sessionCode, payload.userId());
-        return ResponseEntity.ok(speakingSessionResponseMapper.resultToResponse(result));
     }
 
     /**
@@ -239,6 +210,32 @@ public class SpeakingSessionController {
                 .toList();
 
         return ResponseEntity.ok(responses);
+    }
+
+    /**
+     * Lấy ra chi tiết 1 session (gồm các đoạn chat trong đó)
+     *
+     * @param payload     chứa user id
+     * @param sessionCode session code
+     * @return SpeakingSessionResponse
+     */
+    @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_HISTORY_GET_DETAIL_SUCCESS)
+    @GetMapping("/details")
+    public ResponseEntity<SpeakingSessionResponse> findByUserIdAndSpeakingSessionCodeAndSpeakingSessionStatus(
+            @AuthenticationPrincipal AccessTokenPayload payload,
+            @RequestParam("sessionCode") String sessionCode,
+            @RequestParam("status") SpeakingSessionStatus status
+    ) {
+        SpeakingSessionResult result = crudSpeakingSessionInputPort
+                .findByUserIdAndSpeakingSessionCodeAndSpeakingSessionStatus(
+                        payload.userId(),
+                        sessionCode,
+                        status
+                );
+
+        SpeakingSessionResponse response = speakingSessionResponseMapper.resultToResponse(result);
+
+        return ResponseEntity.ok(response);
     }
 }
 

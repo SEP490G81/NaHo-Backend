@@ -5,6 +5,7 @@ import org.naho.shared.constant.SystemZoneId;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.speech.llm.conversation.exception.LlmApplicationError;
 import org.naho.speech.llm.conversation.port.out.SpeakingSessionRepositoryPort;
+import org.naho.speech.llm.model.conversation.SpeakingSession;
 import org.naho.subscription.model.UserDailyAiUsage;
 import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
 import org.naho.subscription.port.out.UserDailyAiUsageRepositoryPort;
@@ -49,14 +50,10 @@ public class SpeakingSessionValidator {
      * @param userId      id của user
      */
     public void validateSessionTurnLimit(String sessionCode, Long userId) {
-        org.naho.speech.llm.model.conversation.SpeakingSession session = speakingSessionRepositoryPort.findBySessionCode(sessionCode);
-        Long targetUserId = userId != null ? userId : session.getUserId();
-        if (targetUserId == null) {
-            return;
-        }
+        SpeakingSession session = speakingSessionRepositoryPort.findBySessionCode(sessionCode);
 
         SubscriptionPlanResult plan = getActiveSubscriptionInputPort
-                .getUserActiveSubscriptionPlan(targetUserId);
+                .getUserActiveSubscriptionPlan(userId);
 
         int currentTurnCount = session.getTotalTurns();
 

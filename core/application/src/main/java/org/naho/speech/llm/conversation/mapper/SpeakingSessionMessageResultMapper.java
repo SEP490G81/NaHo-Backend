@@ -7,6 +7,8 @@ import org.naho.speech.llm.model.conversation.SpeakingSessionMessage;
 import org.naho.speech.llm.type.MessageType;
 import org.naho.speech.llm.type.SenderType;
 
+import java.util.List;
+
 public class SpeakingSessionMessageResultMapper {
     private final SpeakingSessionHelper speakingSessionHelper;
     private final FileStorageServicePort fileStorageServicePort;
@@ -20,6 +22,10 @@ public class SpeakingSessionMessageResultMapper {
     }
 
     public SpeakingSessionMessageResult domainToResult(SpeakingSessionMessage domain) {
+        return domainToResult(domain, List.of());
+    }
+
+    public SpeakingSessionMessageResult domainToResult(SpeakingSessionMessage domain, List<String> suggestedReplies) {
         if (domain == null) {
             return null;
         }
@@ -48,6 +54,7 @@ public class SpeakingSessionMessageResultMapper {
                 .pronunciationScore(domain.getPronunciationScore())
                 .aiReplyAudio(aiReplyAudio)
                 .userRecordAudio(userRecordAudio)
+                .suggestedReplies(suggestedReplies)
                 .build();
     }
 }

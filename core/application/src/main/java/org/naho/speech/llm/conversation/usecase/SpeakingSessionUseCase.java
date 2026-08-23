@@ -9,7 +9,6 @@ import org.naho.file.result.StoredFile;
 import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.i18n.message.llm.LlmDetailMessageKey;
 import org.naho.i18n.message.persona.PersonaDetailMessageKey;
-import org.naho.i18n.message.user.UserDetailMessageKey;
 import org.naho.persona.exception.PersonaErrorCode;
 import org.naho.persona.model.Persona;
 import org.naho.persona.port.out.PersonaRepositoryPort;
@@ -31,16 +30,13 @@ import org.naho.speech.llm.conversation.port.out.SpeakingSessionMessageRepositor
 import org.naho.speech.llm.conversation.port.out.SpeakingSessionRepositoryPort;
 import org.naho.speech.llm.conversation.port.out.SpeechToTextPort;
 import org.naho.speech.llm.conversation.result.ChatResult;
-import org.naho.speech.llm.conversation.result.SpeakingSessionResult;
 import org.naho.speech.llm.conversation.result.SpeechToTextResult;
-import org.naho.speech.llm.conversation.result.StartConversationResult;
 import org.naho.speech.llm.conversation.validator.SpeakingSessionValidator;
 import org.naho.speech.llm.model.conversation.SpeakingSession;
 import org.naho.speech.llm.model.conversation.SpeakingSessionMessage;
 import org.naho.speech.llm.type.MessageType;
 import org.naho.speech.llm.type.SenderType;
 import org.naho.speech.llm.type.SpeakingSessionStatus;
-import org.naho.user.exception.UserErrorCode;
 
 import java.util.List;
 import java.util.Map;
@@ -113,7 +109,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                 );
 
         // tạo mới và lưu speaking session trong db
-        // trạng thái sẽ là INIT (tức là chưa có đoạn chat nào)
+        // trạng thái sẽ là IN_PROGRESS
         SpeakingSession savedSpeakingSession = speakingSessionRepositoryPort
                 .initSpeakingSession(
                         sessionCode,
@@ -125,83 +121,39 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                         command.marugotoLevel()
                 );
 
-        return savedSpeakingSession.getSessionCode();
-    }
+        String systemPromptContent = speakingSessionHelper.buildSystemPromptContent(
+                persona,
+                command.formalityLevel(),
+                command.marugotoLevel()
+        );
 
-    /**
-     * Lấy ra lời chào đầu tiêu của AI sau khi bắt đầu đoạn chat
-     *
-     * @param sessionCode mã của session
-     * @param userId      user id
-     * @return StartConversationResult
-     */
-    @Override
-    public StartConversationResult initFirstGreeting(String sessionCode, Long userId) {
-        return transactionPort.execute(() -> {
-            // kiểm tra xem session có thuộc về user không
-            speakingSessionValidator.validateSessionIsBelongToUser(sessionCode, userId);
+        List<Map<String, String>> messages = List.of(
+                Map.of(
+                        AiMessageField.ROLE, SenderType.SYSTEM.name().toLowerCase(),
+                        AiMessageField.CONTENT, systemPromptContent
+                ),
+                Map.of(
+                        AiMessageField.ROLE, SenderType.USER.name().toLowerCase(),
+                        AiMessageField.CONTENT, "こんにちは、話しましょう！"
+                )
+        );
 
-            SpeakingSession speakingSession = speakingSessionRepositoryPort.findBySessionCode(sessionCode);
+        String rawReply = aiChatPort.chatWithContext(messages);
+        ParsedAiReply parsed = speakingSessionHelper.parseAiResponse(rawReply);
 
-            // kiểm tra xem session đã start chưa, nếu đã start thì ném ra lỗi
-            if (!SpeakingSessionStatus.INIT.equals(speakingSession.getStatus())) {
-                throw new ApplicationException(
-                        LlmApplicationError.LLM_SESSION_ALREADY_STARTED,
-                        LlmDetailMessageKey.LLM_SESSION_ALREADY_STARTED
-                );
-            }
+        speakingSessionRepositoryPort.saveSpeakingSessionMessage(
+                SpeakingSessionMessageCommand.builder()
+                        .sessionId(savedSpeakingSession.getId())
+                        .turnIndex(0)
+                        .senderType(SenderType.ASSISTANT)
+                        .messageType(MessageType.TEXT)
+                        .content(parsed.reply())
+                        .contentTranslation(parsed.replyTranslation())
+                        .grammarNote(parsed.grammarNote())
+                        .build()
+        );
 
-            Persona persona = personaRepositoryPort.findById(speakingSession.getPersonaId())
-                    .orElseThrow(() -> new ApplicationException(
-                            PersonaErrorCode.PERSONA_NOT_FOUND,
-                            PersonaDetailMessageKey.PERSONA_NOT_FOUND,
-                            speakingSession.getPersonaId()
-                    ));
-
-            String systemPromptContent = speakingSessionHelper.buildSystemPromptContent(
-                    persona,
-                    speakingSession.getFormalityLevel(),
-                    speakingSession.getMarugotoLevel()
-            );
-
-            List<Map<String, String>> messages = List.of(
-                    Map.of(
-                            AiMessageField.ROLE, SenderType.SYSTEM.name().toLowerCase(),
-                            AiMessageField.CONTENT, systemPromptContent
-                    ),
-                    Map.of(
-                            AiMessageField.ROLE, SenderType.USER.name().toLowerCase(),
-                            AiMessageField.CONTENT, "こんにちは、話しましょう！"
-                    )
-            );
-
-            String rawReply = aiChatPort.chatWithContext(messages);
-            ParsedAiReply parsed = speakingSessionHelper.parseAiResponse(rawReply);
-
-            speakingSessionRepositoryPort.saveSpeakingSessionMessage(
-                    SpeakingSessionMessageCommand.builder()
-                            .sessionCode(sessionCode)
-                            .turnIndex(0)
-                            .senderType(SenderType.ASSISTANT)
-                            .messageType(MessageType.TEXT)
-                            .content(parsed.reply())
-                            .contentTranslation(parsed.replyTranslation())
-                            .grammarNote(parsed.grammarNote())
-                            .build()
-            );
-
-            speakingSessionRepositoryPort.updateSpeakingSessionStatus(sessionCode, SpeakingSessionStatus.IN_PROGRESS);
-
-            String audioBase64 = speakingSessionHelper.toAudioBase64(speakingSession.getId(), parsed.reply());
-
-            return new StartConversationResult(
-                    sessionCode,
-                    audioBase64,
-                    parsed.reply(),
-                    parsed.replyTranslation(),
-                    parsed.grammarNote()
-            );
-        });
+        return sessionCode;
     }
 
     @Override
@@ -246,11 +198,12 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             ParsedAiReply parsed = speakingSessionHelper.parseAiResponse(rawReply);
 
             int currentTurn = speakingSession.getTotalTurns() + 1;
+            speakingSessionRepositoryPort.increaseTotalTurns(speakingSession.getId());
 
             // lưu chat của người dùng
             SpeakingSessionMessage userMessage = speakingSessionRepositoryPort.saveSpeakingSessionMessage(
                     SpeakingSessionMessageCommand.builder()
-                            .sessionCode(sessionCode)
+                            .sessionId(speakingSession.getId())
                             .turnIndex(currentTurn)
                             .senderType(SenderType.USER)
                             .messageType(MessageType.TEXT)
@@ -264,7 +217,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             // lưu phản hồi của AI
             SpeakingSessionMessage aiMessage = speakingSessionRepositoryPort.saveSpeakingSessionMessage(
                     SpeakingSessionMessageCommand.builder()
-                            .sessionCode(sessionCode)
+                            .sessionId(speakingSession.getId())
                             .turnIndex(currentTurn)
                             .senderType(SenderType.ASSISTANT)
                             .messageType(MessageType.TEXT)
@@ -276,7 +229,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
 
             return new ChatResult(
                     speakingSessionMessageResultMapper.domainToResult(userMessage),
-                    speakingSessionMessageResultMapper.domainToResult(aiMessage)
+                    speakingSessionMessageResultMapper.domainToResult(aiMessage, parsed.suggestedReplies())
             );
         });
     }
@@ -335,6 +288,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             ParsedAiReply parsed = speakingSessionHelper.parseAiResponse(rawReply);
 
             int currentTurn = speakingSession.getTotalTurns() + 1;
+            speakingSessionRepositoryPort.increaseTotalTurns(speakingSession.getId());
 
             if (storedFile == null) {
                 throw new ApplicationException(
@@ -348,7 +302,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             // lưu chat của người dùng
             SpeakingSessionMessage userMessage = speakingSessionRepositoryPort.saveSpeakingSessionMessage(
                     SpeakingSessionMessageCommand.builder()
-                            .sessionCode(sessionCode)
+                            .sessionId(speakingSession.getId())
                             .turnIndex(currentTurn)
                             .senderType(SenderType.USER)
                             .messageType(MessageType.AUDIO)
@@ -364,7 +318,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             // lưu phản hồi của AI
             SpeakingSessionMessage aiMessage = speakingSessionRepositoryPort.saveSpeakingSessionMessage(
                     SpeakingSessionMessageCommand.builder()
-                            .sessionCode(sessionCode)
+                            .sessionId(speakingSession.getId())
                             .turnIndex(currentTurn)
                             .senderType(SenderType.ASSISTANT)
                             .messageType(MessageType.TEXT)
@@ -379,33 +333,8 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
 
             return new ChatResult(
                     speakingSessionMessageResultMapper.domainToResult(userMessage),
-                    speakingSessionMessageResultMapper.domainToResult(aiMessage)
+                    speakingSessionMessageResultMapper.domainToResult(aiMessage, parsed.suggestedReplies())
             );
         });
-    }
-
-    @Override
-    public SpeakingSessionResult getInProgressSessionDetails(String sessionCode, Long userId) {
-        if (userId == null) {
-            throw new ApplicationException(
-                    UserErrorCode.USER_NOT_FOUND,
-                    UserDetailMessageKey.USER_ID_NULL
-            );
-        }
-
-        if (sessionCode == null || sessionCode.isBlank()) {
-            throw new ApplicationException(
-                    LlmApplicationError.LLM_SESSION_CODE_INVALID,
-                    LlmDetailMessageKey.LLM_SESSION_CODE_INVALID
-            );
-        }
-
-        // Kiểm tra xem session có thuộc về user không
-        speakingSessionValidator.validateSessionIsBelongToUser(sessionCode, userId);
-
-        SpeakingSession inProgressSession = speakingSessionRepositoryPort
-                .findBySessionCodeAndStatus(sessionCode, SpeakingSessionStatus.IN_PROGRESS);
-
-        return speakingSessionResultMapper.domainToResult(inProgressSession);
     }
 }

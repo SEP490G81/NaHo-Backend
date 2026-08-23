@@ -5,7 +5,7 @@ import org.naho.speech.llm.type.MessageType;
 import org.naho.speech.llm.type.SenderType;
 
 public record SpeakingSessionMessageCommand(
-        String sessionCode,
+        Long sessionId,
         Integer turnIndex,
         SenderType senderType,
         MessageType messageType,
@@ -25,7 +25,7 @@ public record SpeakingSessionMessageCommand(
 
     public static class Builder {
 
-        private String sessionCode;
+        private Long sessionId;
         private Integer turnIndex;
         private SenderType senderType;
         private MessageType messageType;
@@ -38,8 +38,8 @@ public record SpeakingSessionMessageCommand(
         private Double pronunciationScore;
         private File audioFile;
 
-        public Builder sessionCode(String sessionCode) {
-            this.sessionCode = sessionCode;
+        public Builder sessionId(Long sessionId) {
+            this.sessionId = sessionId;
             return this;
         }
 
@@ -100,7 +100,7 @@ public record SpeakingSessionMessageCommand(
 
         public SpeakingSessionMessageCommand build() {
             return new SpeakingSessionMessageCommand(
-                    sessionCode,
+                    sessionId,
                     turnIndex,
                     senderType,
                     messageType,

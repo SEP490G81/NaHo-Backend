@@ -44,10 +44,10 @@ public class PersonaController {
 
     @GetMapping("/{personaId}")
     @ApiResponseMessage(message = "Get persona successfully!")
-    public ResponseEntity<PersonaResponse> getPersonaById(
+    public ResponseEntity<PersonaResponse> findById(
             @PathVariable Long personaId
     ) {
-        PersonaResult result = getPersonaInputPort.getPersonaById(personaId);
+        PersonaResult result = getPersonaInputPort.findById(personaId);
         return ResponseEntity.ok(personaResponseMapper.resultToResponse(result));
     }
 

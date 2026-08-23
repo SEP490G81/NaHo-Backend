@@ -1,5 +1,6 @@
 package org.naho.speech.llm.conversation.result;
 
+import org.naho.persona.result.PersonaResult;
 import org.naho.persona.type.FormalityLevel;
 import org.naho.persona.type.MarugotoLevel;
 import org.naho.speech.llm.type.SpeakingSessionStatus;
@@ -10,7 +11,7 @@ public record SpeakingSessionListItemResult(
         Long id,
         String sessionCode,
         Long userId,
-        Long personaId,
+        PersonaResult persona,
         String topic,
         String voiceName,
         MarugotoLevel marugotoLevel,
@@ -30,7 +31,7 @@ public record SpeakingSessionListItemResult(
         private Long id;
         private String sessionCode;
         private Long userId;
-        private Long personaId;
+        private PersonaResult persona;
         private String topic;
         private String voiceName;
         private MarugotoLevel marugotoLevel;
@@ -55,8 +56,8 @@ public record SpeakingSessionListItemResult(
             return this;
         }
 
-        public Builder personaId(Long personaId) {
-            this.personaId = personaId;
+        public Builder persona(PersonaResult persona) {
+            this.persona = persona;
             return this;
         }
 
@@ -105,7 +106,7 @@ public record SpeakingSessionListItemResult(
                     id,
                     sessionCode,
                     userId,
-                    personaId,
+                    persona,
                     topic,
                     voiceName,
                     marugotoLevel,

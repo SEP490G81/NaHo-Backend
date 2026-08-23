@@ -1,5 +1,6 @@
 package org.naho.speech.llm.conversation.dto.response;
 
+import org.naho.persona.dto.response.PersonaResponse;
 import org.naho.persona.type.FormalityLevel;
 import org.naho.persona.type.MarugotoLevel;
 import org.naho.speech.llm.type.SpeakingSessionStatus;
@@ -10,7 +11,7 @@ public record SpeakingSessionListItemResponse(
         Long id,
         String sessionCode,
         Long userId,
-        Long personaId,
+        PersonaResponse persona,
         String topic,
         String voiceName,
         MarugotoLevel marugotoLevel,
