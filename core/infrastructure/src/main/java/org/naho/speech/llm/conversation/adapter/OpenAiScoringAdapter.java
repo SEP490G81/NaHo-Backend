@@ -63,7 +63,8 @@ public class OpenAiScoringAdapter implements AiScoringPort {
             throw new InfrastructureException(
                     LlmApplicationError.LLM_CONNECTION_TIMEOUT,
                     LlmDetailMessageKey.LLM_CONNECTION_TIMEOUT,
-                    e.getMessage());
+                    e.getMessage()
+            );
         } catch (InfrastructureException e) {
             throw e;
         } catch (Exception e) {

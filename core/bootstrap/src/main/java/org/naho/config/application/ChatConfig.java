@@ -105,10 +105,8 @@ public class ChatConfig {
     }
 
     @Bean
-    public SpeakingSessionAssessmentResultMapper speakingSessionAssessmentResultMapper(
-            SpeakingImprovedExpressionResultMapper speakingImprovedExpressionResultMapper
-    ) {
-        return new SpeakingSessionAssessmentResultMapper(speakingImprovedExpressionResultMapper);
+    public SpeakingSessionAssessmentResultMapper speakingSessionAssessmentResultMapper() {
+        return new SpeakingSessionAssessmentResultMapper();
     }
 
     @Bean
@@ -254,9 +252,16 @@ public class ChatConfig {
     @Bean
     public CrudSpeakingSessionInputPort crudSpeakingSessionInputPort(
             SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
-            SpeakingSessionResultMapper speakingSessionResultMapper
+            SpeakingSessionResultMapper speakingSessionResultMapper,
+            SpeakingSessionAssessmentRepositoryPort speakingSessionAssessmentRepositoryPort,
+            SpeakingSessionAssessmentResultMapper speakingSessionAssessmentResultMapper
     ) {
-        return new CrudSpeakingSessionUseCase(speakingSessionRepositoryPort, speakingSessionResultMapper);
+        return new CrudSpeakingSessionUseCase(
+                speakingSessionRepositoryPort,
+                speakingSessionResultMapper,
+                speakingSessionAssessmentRepositoryPort,
+                speakingSessionAssessmentResultMapper
+        );
     }
 }
 

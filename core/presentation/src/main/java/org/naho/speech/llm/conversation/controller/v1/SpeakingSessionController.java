@@ -158,16 +158,42 @@ public class SpeakingSessionController {
                     e.getMessage());
         }
     }
-
-    // ─── End Session + Scoring ───────────────────────────────────
-
+    
+    /**
+     * Kết thúc phiên trò chuyện và nhận đánh giá
+     *
+     * @param sessionCode mã của phiên trò chuyện
+     * @param payload     chứa user id
+     * @return SpeakingSessionAssessmentResponse
+     */
     @PostMapping("/end/{sessionCode}")
     @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_SESSION_END_SUCCESS)
     public ResponseEntity<SpeakingSessionAssessmentResponse> endSession(
             @PathVariable("sessionCode") String sessionCode,
             @AuthenticationPrincipal AccessTokenPayload payload
     ) {
-        SpeakingSessionAssessmentResult result = endSessionInputPort.endSession(payload.userId(), sessionCode);
+        SpeakingSessionAssessmentResult result = endSessionInputPort.endSession(
+                payload.userId(),
+                sessionCode
+        );
+        return ResponseEntity.ok(speakingSessionAssessmentResponseMapper.resultToResponse(result));
+    }
+
+    /**
+     * Lấy chấm điểm của 1 session nếu đã completed
+     *
+     * @param sessionCode session code
+     * @param payload     chứa user id
+     * @return SpeakingSessionAssessmentResponse
+     */
+    @ApiResponseMessage
+    @GetMapping("/end/{sessionCode}")
+    public ResponseEntity<SpeakingSessionAssessmentResponse> findAssessmentBySessionCodeAndUserId(
+            @PathVariable("sessionCode") String sessionCode,
+            @AuthenticationPrincipal AccessTokenPayload payload
+    ) {
+        SpeakingSessionAssessmentResult result = crudSpeakingSessionInputPort
+                .findAssessmentBySessionCodeAndUserId(sessionCode, payload.userId());
         return ResponseEntity.ok(speakingSessionAssessmentResponseMapper.resultToResponse(result));
     }
 

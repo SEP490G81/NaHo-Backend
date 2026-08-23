@@ -8,7 +8,6 @@ import org.naho.shared.exception.InfrastructureException;
 import org.naho.speech.llm.conversation.constant.AiMessageField;
 import org.naho.speech.llm.conversation.constant.OpenAiConfigProperties;
 import org.naho.speech.llm.conversation.exception.LlmApplicationError;
-import org.naho.speech.llm.model.conversation.SpeakingImprovedExpression;
 import org.naho.speech.llm.model.conversation.SpeakingSessionAssessment;
 import org.naho.speech.llm.type.SenderType;
 import org.springframework.stereotype.Component;
@@ -127,18 +126,6 @@ public class OpenAiScoringHelper {
         try {
             JsonNode rootNode = OBJECT_MAPPER.readTree(cleanJson);
 
-            int overallScore = rootNode.path("overall_score").asInt(0);
-            String jlptEstimate = rootNode.path("jlpt_estimate").asText("N5");
-
-            JsonNode scoresNode = rootNode.path("scores");
-            int fluencyScore = scoresNode.path("fluency").asInt(0);
-            int pronunciationScore = scoresNode.path("pronunciation").asInt(0);
-            int grammarScore = scoresNode.path("grammar").asInt(0);
-            int vocabularyScore = scoresNode.path("vocabulary").asInt(0);
-            int interactionScore = scoresNode.path("interaction").asInt(0);
-            int naturalnessScore = scoresNode.path("naturalness").asInt(0);
-            int coherenceScore = scoresNode.path("coherence").asInt(0);
-
             String summary = rootNode.path("summary").asText("");
 
             List<String> strengths = new ArrayList<>();
@@ -165,11 +152,13 @@ public class OpenAiScoringHelper {
             }
 
             String studyFocusArea = null;
+            String studyReason = null;
             String studyRecommendation = null;
             String studyEncouragement = null;
             JsonNode studyNode = rootNode.path("studyRecommendation");
             if (!studyNode.isMissingNode() && studyNode.isObject()) {
                 studyFocusArea = studyNode.path("focusArea").asText("");
+                studyReason = studyNode.path("reason").asText("");
                 studyRecommendation = studyNode.path("suggestedPractice").asText("");
                 studyEncouragement = studyNode.path("encouragement").asText("");
             }
@@ -177,34 +166,7 @@ public class OpenAiScoringHelper {
             String strengthsJson = OBJECT_MAPPER.writeValueAsString(strengths);
             String weaknessesJson = OBJECT_MAPPER.writeValueAsString(weaknesses);
 
-            List<SpeakingImprovedExpression> speakingImprovedExpressions = new ArrayList<>();
-            JsonNode improvedNode = rootNode.path("improved_expressions");
-            if (improvedNode.isArray()) {
-                for (int i = 0; i < improvedNode.size(); i++) {
-                    JsonNode node = improvedNode.get(i);
-                    String original = node.path("original").asText("");
-                    String improved = node.path("improved").asText("");
-                    String explanationVi = node.path("explanationVi").asText("");
-                    speakingImprovedExpressions.add(
-                            SpeakingImprovedExpression.builder()
-                                    .originalText(original)
-                                    .improvedText(improved)
-                                    .explanationVietnamese(explanationVi)
-                                    .build()
-                    );
-                }
-            }
-
             return SpeakingSessionAssessment.builder()
-                    .overallScore(overallScore)
-                    .jlptEstimate(jlptEstimate)
-                    .fluencyScore(fluencyScore)
-                    .pronunciationScore(pronunciationScore)
-                    .grammarScore(grammarScore)
-                    .vocabularyScore(vocabularyScore)
-                    .interactionScore(interactionScore)
-                    .naturalnessScore(naturalnessScore)
-                    .coherenceScore(coherenceScore)
                     .summary(summary)
                     .strengths(strengthsJson)
                     .weaknesses(weaknessesJson)
@@ -216,9 +178,9 @@ public class OpenAiScoringHelper {
                     .feedbackNaturalness(feedbackMap.get("naturalness"))
                     .feedbackCoherence(feedbackMap.get("coherence"))
                     .studyFocusArea(studyFocusArea)
+                    .studyReason(studyReason)
                     .studyRecommendation(studyRecommendation)
                     .studyEncouragement(studyEncouragement)
-                    .speakingImprovedExpressions(speakingImprovedExpressions)
                     .build();
 
         } catch (Exception e) {

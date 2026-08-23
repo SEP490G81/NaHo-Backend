@@ -1,20 +1,8 @@
 package org.naho.speech.llm.conversation.result;
 
-import java.util.List;
-
 public record SpeakingSessionAssessmentResult(
         Long id,
         Long speakingSessionId,
-
-        Integer overallScore,
-        String jlptEstimate,
-        Integer fluencyScore,
-        Integer pronunciationScore,
-        Integer grammarScore,
-        Integer vocabularyScore,
-        Integer interactionScore,
-        Integer naturalnessScore,
-        Integer coherenceScore,
 
         String summary,
         String strengths,
@@ -29,10 +17,9 @@ public record SpeakingSessionAssessmentResult(
         String feedbackCoherence,
 
         String studyFocusArea,
+        String studyReason,
         String studyRecommendation,
-        String studyEncouragement,
-
-        List<SpeakingImprovedExpressionResult> speakingImprovedExpressions
+        String studyEncouragement
 ) {
 
     public static Builder builder() {
@@ -43,16 +30,6 @@ public record SpeakingSessionAssessmentResult(
 
         private Long id;
         private Long speakingSessionId;
-
-        private Integer overallScore;
-        private String jlptEstimate;
-        private Integer fluencyScore;
-        private Integer pronunciationScore;
-        private Integer grammarScore;
-        private Integer vocabularyScore;
-        private Integer interactionScore;
-        private Integer naturalnessScore;
-        private Integer coherenceScore;
 
         private String summary;
         private String strengths;
@@ -67,10 +44,9 @@ public record SpeakingSessionAssessmentResult(
         private String feedbackCoherence;
 
         private String studyFocusArea;
+        private String studyReason;
         private String studyRecommendation;
         private String studyEncouragement;
-
-        private List<SpeakingImprovedExpressionResult> speakingImprovedExpressions;
 
         public Builder id(Long id) {
             this.id = id;
@@ -79,51 +55,6 @@ public record SpeakingSessionAssessmentResult(
 
         public Builder speakingSessionId(Long speakingSessionId) {
             this.speakingSessionId = speakingSessionId;
-            return this;
-        }
-
-        public Builder overallScore(Integer overallScore) {
-            this.overallScore = overallScore;
-            return this;
-        }
-
-        public Builder jlptEstimate(String jlptEstimate) {
-            this.jlptEstimate = jlptEstimate;
-            return this;
-        }
-
-        public Builder fluencyScore(Integer fluencyScore) {
-            this.fluencyScore = fluencyScore;
-            return this;
-        }
-
-        public Builder pronunciationScore(Integer pronunciationScore) {
-            this.pronunciationScore = pronunciationScore;
-            return this;
-        }
-
-        public Builder grammarScore(Integer grammarScore) {
-            this.grammarScore = grammarScore;
-            return this;
-        }
-
-        public Builder vocabularyScore(Integer vocabularyScore) {
-            this.vocabularyScore = vocabularyScore;
-            return this;
-        }
-
-        public Builder interactionScore(Integer interactionScore) {
-            this.interactionScore = interactionScore;
-            return this;
-        }
-
-        public Builder naturalnessScore(Integer naturalnessScore) {
-            this.naturalnessScore = naturalnessScore;
-            return this;
-        }
-
-        public Builder coherenceScore(Integer coherenceScore) {
-            this.coherenceScore = coherenceScore;
             return this;
         }
 
@@ -182,6 +113,11 @@ public record SpeakingSessionAssessmentResult(
             return this;
         }
 
+        public Builder studyReason(String studyReason) {
+            this.studyReason = studyReason;
+            return this;
+        }
+
         public Builder studyRecommendation(String studyRecommendation) {
             this.studyRecommendation = studyRecommendation;
             return this;
@@ -192,24 +128,10 @@ public record SpeakingSessionAssessmentResult(
             return this;
         }
 
-        public Builder speakingImprovedExpressions(List<SpeakingImprovedExpressionResult> speakingImprovedExpressions) {
-            this.speakingImprovedExpressions = speakingImprovedExpressions;
-            return this;
-        }
-
         public SpeakingSessionAssessmentResult build() {
             return new SpeakingSessionAssessmentResult(
                     id,
                     speakingSessionId,
-                    overallScore,
-                    jlptEstimate,
-                    fluencyScore,
-                    pronunciationScore,
-                    grammarScore,
-                    vocabularyScore,
-                    interactionScore,
-                    naturalnessScore,
-                    coherenceScore,
                     summary,
                     strengths,
                     weaknesses,
@@ -221,9 +143,9 @@ public record SpeakingSessionAssessmentResult(
                     feedbackNaturalness,
                     feedbackCoherence,
                     studyFocusArea,
+                    studyReason,
                     studyRecommendation,
-                    studyEncouragement,
-                    speakingImprovedExpressions
+                    studyEncouragement
             );
         }
     }

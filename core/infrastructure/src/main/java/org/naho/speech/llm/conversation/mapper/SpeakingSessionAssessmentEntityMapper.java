@@ -10,8 +10,7 @@ import org.naho.speech.llm.model.conversation.SpeakingSessionAssessment;
         componentModel = "spring",
         nullValueIterableMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT,
         uses = {
-                SpeakingSessionIdMapper.class,
-                SpeakingImprovedExpressionEntityMapper.class
+                SpeakingSessionIdMapper.class
         }
 )
 public interface SpeakingSessionAssessmentEntityMapper {
