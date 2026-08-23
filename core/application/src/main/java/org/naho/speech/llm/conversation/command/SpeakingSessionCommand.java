@@ -16,9 +16,7 @@ public record SpeakingSessionCommand(
         String voiceName,
         MarugotoLevel marugotoLevel,
         FormalityLevel formalityLevel,
-        Integer durationSeconds,
-        int totalTurns,
-        Double asrConfidence,
+        Integer totalTurns,
         SpeakingSessionStatus status,
         Instant startedAt,
         Instant endedAt

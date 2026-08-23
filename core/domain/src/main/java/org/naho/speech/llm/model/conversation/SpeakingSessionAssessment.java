@@ -1,19 +1,21 @@
 package org.naho.speech.llm.model.conversation;
 
+import java.util.List;
+
 public class SpeakingSessionAssessment {
 
     private Long id;
     private Long speakingSessionId;
 
-    private int overallScore;
+    private Integer overallScore;
     private String jlptEstimate;
-    private int fluencyScore;
-    private int pronunciationScore;
-    private int grammarScore;
-    private int vocabularyScore;
-    private int interactionScore;
-    private int naturalnessScore;
-    private int coherenceScore;
+    private Integer fluencyScore;
+    private Integer pronunciationScore;
+    private Integer grammarScore;
+    private Integer vocabularyScore;
+    private Integer interactionScore;
+    private Integer naturalnessScore;
+    private Integer coherenceScore;
 
     private String summary;
     private String strengths;
@@ -30,6 +32,8 @@ public class SpeakingSessionAssessment {
     private String studyFocusArea;
     private String studyRecommendation;
     private String studyEncouragement;
+
+    private List<SpeakingImprovedExpression> speakingImprovedExpressions;
 
     private SpeakingSessionAssessment(Builder builder) {
         this.id = builder.id;
@@ -60,10 +64,211 @@ public class SpeakingSessionAssessment {
         this.studyFocusArea = builder.studyFocusArea;
         this.studyRecommendation = builder.studyRecommendation;
         this.studyEncouragement = builder.studyEncouragement;
+        this.speakingImprovedExpressions = builder.speakingImprovedExpressions;
     }
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getSpeakingSessionId() {
+        return speakingSessionId;
+    }
+
+    public void setSpeakingSessionId(Long speakingSessionId) {
+        this.speakingSessionId = speakingSessionId;
+    }
+
+    public Integer getOverallScore() {
+        return overallScore;
+    }
+
+    public void setOverallScore(Integer overallScore) {
+        this.overallScore = overallScore;
+    }
+
+    public String getJlptEstimate() {
+        return jlptEstimate;
+    }
+
+    public void setJlptEstimate(String jlptEstimate) {
+        this.jlptEstimate = jlptEstimate;
+    }
+
+    public Integer getFluencyScore() {
+        return fluencyScore;
+    }
+
+    public void setFluencyScore(Integer fluencyScore) {
+        this.fluencyScore = fluencyScore;
+    }
+
+    public Integer getPronunciationScore() {
+        return pronunciationScore;
+    }
+
+    public void setPronunciationScore(Integer pronunciationScore) {
+        this.pronunciationScore = pronunciationScore;
+    }
+
+    public Integer getGrammarScore() {
+        return grammarScore;
+    }
+
+    public void setGrammarScore(Integer grammarScore) {
+        this.grammarScore = grammarScore;
+    }
+
+    public Integer getVocabularyScore() {
+        return vocabularyScore;
+    }
+
+    public void setVocabularyScore(Integer vocabularyScore) {
+        this.vocabularyScore = vocabularyScore;
+    }
+
+    public Integer getInteractionScore() {
+        return interactionScore;
+    }
+
+    public void setInteractionScore(Integer interactionScore) {
+        this.interactionScore = interactionScore;
+    }
+
+    public Integer getNaturalnessScore() {
+        return naturalnessScore;
+    }
+
+    public void setNaturalnessScore(Integer naturalnessScore) {
+        this.naturalnessScore = naturalnessScore;
+    }
+
+    public Integer getCoherenceScore() {
+        return coherenceScore;
+    }
+
+    public void setCoherenceScore(Integer coherenceScore) {
+        this.coherenceScore = coherenceScore;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
+    public String getStrengths() {
+        return strengths;
+    }
+
+    public void setStrengths(String strengths) {
+        this.strengths = strengths;
+    }
+
+    public String getWeaknesses() {
+        return weaknesses;
+    }
+
+    public void setWeaknesses(String weaknesses) {
+        this.weaknesses = weaknesses;
+    }
+
+    public String getFeedbackFluency() {
+        return feedbackFluency;
+    }
+
+    public void setFeedbackFluency(String feedbackFluency) {
+        this.feedbackFluency = feedbackFluency;
+    }
+
+    public String getFeedbackPronunciation() {
+        return feedbackPronunciation;
+    }
+
+    public void setFeedbackPronunciation(String feedbackPronunciation) {
+        this.feedbackPronunciation = feedbackPronunciation;
+    }
+
+    public String getFeedbackGrammar() {
+        return feedbackGrammar;
+    }
+
+    public void setFeedbackGrammar(String feedbackGrammar) {
+        this.feedbackGrammar = feedbackGrammar;
+    }
+
+    public String getFeedbackVocabulary() {
+        return feedbackVocabulary;
+    }
+
+    public void setFeedbackVocabulary(String feedbackVocabulary) {
+        this.feedbackVocabulary = feedbackVocabulary;
+    }
+
+    public String getFeedbackInteraction() {
+        return feedbackInteraction;
+    }
+
+    public void setFeedbackInteraction(String feedbackInteraction) {
+        this.feedbackInteraction = feedbackInteraction;
+    }
+
+    public String getFeedbackNaturalness() {
+        return feedbackNaturalness;
+    }
+
+    public void setFeedbackNaturalness(String feedbackNaturalness) {
+        this.feedbackNaturalness = feedbackNaturalness;
+    }
+
+    public String getFeedbackCoherence() {
+        return feedbackCoherence;
+    }
+
+    public void setFeedbackCoherence(String feedbackCoherence) {
+        this.feedbackCoherence = feedbackCoherence;
+    }
+
+    public String getStudyFocusArea() {
+        return studyFocusArea;
+    }
+
+    public void setStudyFocusArea(String studyFocusArea) {
+        this.studyFocusArea = studyFocusArea;
+    }
+
+    public String getStudyRecommendation() {
+        return studyRecommendation;
+    }
+
+    public void setStudyRecommendation(String studyRecommendation) {
+        this.studyRecommendation = studyRecommendation;
+    }
+
+    public String getStudyEncouragement() {
+        return studyEncouragement;
+    }
+
+    public void setStudyEncouragement(String studyEncouragement) {
+        this.studyEncouragement = studyEncouragement;
+    }
+
+    public List<SpeakingImprovedExpression> getSpeakingImprovedExpressions() {
+        return speakingImprovedExpressions;
+    }
+
+    public void setSpeakingImprovedExpressions(List<SpeakingImprovedExpression> speakingImprovedExpressions) {
+        this.speakingImprovedExpressions = speakingImprovedExpressions;
     }
 
     public static class Builder {
@@ -71,15 +276,15 @@ public class SpeakingSessionAssessment {
         private Long id;
         private Long speakingSessionId;
 
-        private int overallScore;
+        private Integer overallScore;
         private String jlptEstimate;
-        private int fluencyScore;
-        private int pronunciationScore;
-        private int grammarScore;
-        private int vocabularyScore;
-        private int interactionScore;
-        private int naturalnessScore;
-        private int coherenceScore;
+        private Integer fluencyScore;
+        private Integer pronunciationScore;
+        private Integer grammarScore;
+        private Integer vocabularyScore;
+        private Integer interactionScore;
+        private Integer naturalnessScore;
+        private Integer coherenceScore;
 
         private String summary;
         private String strengths;
@@ -96,6 +301,7 @@ public class SpeakingSessionAssessment {
         private String studyFocusArea;
         private String studyRecommendation;
         private String studyEncouragement;
+        private List<SpeakingImprovedExpression> speakingImprovedExpressions;
 
         public Builder id(Long id) {
             this.id = id;
@@ -107,7 +313,7 @@ public class SpeakingSessionAssessment {
             return this;
         }
 
-        public Builder overallScore(int overallScore) {
+        public Builder overallScore(Integer overallScore) {
             this.overallScore = overallScore;
             return this;
         }
@@ -117,37 +323,37 @@ public class SpeakingSessionAssessment {
             return this;
         }
 
-        public Builder fluencyScore(int fluencyScore) {
+        public Builder fluencyScore(Integer fluencyScore) {
             this.fluencyScore = fluencyScore;
             return this;
         }
 
-        public Builder pronunciationScore(int pronunciationScore) {
+        public Builder pronunciationScore(Integer pronunciationScore) {
             this.pronunciationScore = pronunciationScore;
             return this;
         }
 
-        public Builder grammarScore(int grammarScore) {
+        public Builder grammarScore(Integer grammarScore) {
             this.grammarScore = grammarScore;
             return this;
         }
 
-        public Builder vocabularyScore(int vocabularyScore) {
+        public Builder vocabularyScore(Integer vocabularyScore) {
             this.vocabularyScore = vocabularyScore;
             return this;
         }
 
-        public Builder interactionScore(int interactionScore) {
+        public Builder interactionScore(Integer interactionScore) {
             this.interactionScore = interactionScore;
             return this;
         }
 
-        public Builder naturalnessScore(int naturalnessScore) {
+        public Builder naturalnessScore(Integer naturalnessScore) {
             this.naturalnessScore = naturalnessScore;
             return this;
         }
 
-        public Builder coherenceScore(int coherenceScore) {
+        public Builder coherenceScore(Integer coherenceScore) {
             this.coherenceScore = coherenceScore;
             return this;
         }
@@ -214,6 +420,11 @@ public class SpeakingSessionAssessment {
 
         public Builder studyEncouragement(String studyEncouragement) {
             this.studyEncouragement = studyEncouragement;
+            return this;
+        }
+
+        public Builder speakingImprovedExpressions(List<SpeakingImprovedExpression> speakingImprovedExpressions) {
+            this.speakingImprovedExpressions = speakingImprovedExpressions;
             return this;
         }
 

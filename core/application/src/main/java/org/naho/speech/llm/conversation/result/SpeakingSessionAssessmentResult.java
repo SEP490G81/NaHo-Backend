@@ -6,15 +6,15 @@ public record SpeakingSessionAssessmentResult(
         Long id,
         Long speakingSessionId,
 
-        int overallScore,
+        Integer overallScore,
         String jlptEstimate,
-        int fluencyScore,
-        int pronunciationScore,
-        int grammarScore,
-        int vocabularyScore,
-        int interactionScore,
-        int naturalnessScore,
-        int coherenceScore,
+        Integer fluencyScore,
+        Integer pronunciationScore,
+        Integer grammarScore,
+        Integer vocabularyScore,
+        Integer interactionScore,
+        Integer naturalnessScore,
+        Integer coherenceScore,
 
         String summary,
         String strengths,
@@ -44,15 +44,15 @@ public record SpeakingSessionAssessmentResult(
         private Long id;
         private Long speakingSessionId;
 
-        private int overallScore;
+        private Integer overallScore;
         private String jlptEstimate;
-        private int fluencyScore;
-        private int pronunciationScore;
-        private int grammarScore;
-        private int vocabularyScore;
-        private int interactionScore;
-        private int naturalnessScore;
-        private int coherenceScore;
+        private Integer fluencyScore;
+        private Integer pronunciationScore;
+        private Integer grammarScore;
+        private Integer vocabularyScore;
+        private Integer interactionScore;
+        private Integer naturalnessScore;
+        private Integer coherenceScore;
 
         private String summary;
         private String strengths;
@@ -82,7 +82,7 @@ public record SpeakingSessionAssessmentResult(
             return this;
         }
 
-        public Builder overallScore(int overallScore) {
+        public Builder overallScore(Integer overallScore) {
             this.overallScore = overallScore;
             return this;
         }
@@ -92,37 +92,37 @@ public record SpeakingSessionAssessmentResult(
             return this;
         }
 
-        public Builder fluencyScore(int fluencyScore) {
+        public Builder fluencyScore(Integer fluencyScore) {
             this.fluencyScore = fluencyScore;
             return this;
         }
 
-        public Builder pronunciationScore(int pronunciationScore) {
+        public Builder pronunciationScore(Integer pronunciationScore) {
             this.pronunciationScore = pronunciationScore;
             return this;
         }
 
-        public Builder grammarScore(int grammarScore) {
+        public Builder grammarScore(Integer grammarScore) {
             this.grammarScore = grammarScore;
             return this;
         }
 
-        public Builder vocabularyScore(int vocabularyScore) {
+        public Builder vocabularyScore(Integer vocabularyScore) {
             this.vocabularyScore = vocabularyScore;
             return this;
         }
 
-        public Builder interactionScore(int interactionScore) {
+        public Builder interactionScore(Integer interactionScore) {
             this.interactionScore = interactionScore;
             return this;
         }
 
-        public Builder naturalnessScore(int naturalnessScore) {
+        public Builder naturalnessScore(Integer naturalnessScore) {
             this.naturalnessScore = naturalnessScore;
             return this;
         }
 
-        public Builder coherenceScore(int coherenceScore) {
+        public Builder coherenceScore(Integer coherenceScore) {
             this.coherenceScore = coherenceScore;
             return this;
         }

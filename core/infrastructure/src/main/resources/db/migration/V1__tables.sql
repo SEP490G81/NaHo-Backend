@@ -393,7 +393,6 @@ CREATE TABLE speaking_improved_expressions
     created_time                   datetime(6)           NOT NULL,
     modified_time                  datetime(6)           NULL,
     speaking_session_assessment_id BIGINT                NOT NULL,
-    turn_index                     INT                   NULL,
     original_text                  TEXT                  NOT NULL,
     improved_text                  TEXT                  NOT NULL,
     explanation_vietnamese         TEXT                  NULL,
@@ -485,22 +484,20 @@ CREATE TABLE speaking_session_messages
 
 CREATE TABLE speaking_sessions
 (
-    id               BIGINT AUTO_INCREMENT NOT NULL,
-    created_time     datetime(6)           NOT NULL,
-    modified_time    datetime(6)           NULL,
-    session_code     VARCHAR(36)           NOT NULL,
-    user_id          BIGINT                NOT NULL,
-    persona_id       BIGINT                NULL,
-    topic            VARCHAR(500)          NULL,
-    voice_name       VARCHAR(100)          NULL,
-    marugoto_level   VARCHAR(30)           NULL,
-    formality_level  VARCHAR(20)           NULL,
-    duration_seconds INT                   NULL,
-    total_turns      INT                   NOT NULL,
-    asr_confidence   DOUBLE                NULL,
-    status           VARCHAR(20)           NOT NULL,
-    started_at       datetime(6)           NOT NULL,
-    ended_at         datetime(6)           NULL,
+    id              BIGINT AUTO_INCREMENT NOT NULL,
+    created_time    datetime(6)           NOT NULL,
+    modified_time   datetime(6)           NULL,
+    session_code    VARCHAR(36)           NOT NULL,
+    user_id         BIGINT                NOT NULL,
+    persona_id      BIGINT                NOT NULL,
+    topic           VARCHAR(500)          NULL,
+    voice_name      VARCHAR(100)          NULL,
+    marugoto_level  VARCHAR(30)           NULL,
+    formality_level VARCHAR(20)           NULL,
+    total_turns     INT                   NOT NULL,
+    status          VARCHAR(20)           NOT NULL,
+    started_at      datetime(6)           NOT NULL,
+    ended_at        datetime(6)           NULL,
     CONSTRAINT pk_speaking_sessions PRIMARY KEY (id)
 );
 
@@ -929,6 +926,12 @@ ALTER TABLE speaking_questions
 
 ALTER TABLE speaking_questions
     ADD CONSTRAINT FK_SPEAKING_QUESTIONS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+
+ALTER TABLE speaking_sessions
+    ADD CONSTRAINT FK_SPEAKING_SESSIONS_ON_PERSONA FOREIGN KEY (persona_id) REFERENCES personas (id);
+
+ALTER TABLE speaking_sessions
+    ADD CONSTRAINT FK_SPEAKING_SESSIONS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
 ALTER TABLE speaking_session_assessments
     ADD CONSTRAINT FK_SPEAKING_SESSION_ASSESSMENTS_ON_SESSION FOREIGN KEY (session_id) REFERENCES speaking_sessions (id);

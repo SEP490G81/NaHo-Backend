@@ -9,7 +9,7 @@ public class SpeakingSessionMessage {
     private Long sessionId;
     private Long audioFileId;
 
-    private int turnIndex;
+    private Integer turnIndex;
     private SenderType senderType;
     private MessageType messageType;
     private String content;
@@ -53,7 +53,7 @@ public class SpeakingSessionMessage {
         return audioFileId;
     }
 
-    public int getTurnIndex() {
+    public Integer getTurnIndex() {
         return turnIndex;
     }
 
@@ -99,7 +99,7 @@ public class SpeakingSessionMessage {
         private Long sessionId;
         private Long audioFileId;
 
-        private int turnIndex;
+        private Integer turnIndex;
         private SenderType senderType;
         private MessageType messageType;
         private String content;
@@ -125,7 +125,7 @@ public class SpeakingSessionMessage {
             return this;
         }
 
-        public Builder turnIndex(int turnIndex) {
+        public Builder turnIndex(Integer turnIndex) {
             this.turnIndex = turnIndex;
             return this;
         }

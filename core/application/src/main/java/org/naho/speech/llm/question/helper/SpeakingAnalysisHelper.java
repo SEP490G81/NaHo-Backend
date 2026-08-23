@@ -133,7 +133,7 @@ public class SpeakingAnalysisHelper {
             }
 
             List<UserAnswerError> errorList = new ArrayList<>();
-            
+
             JsonNode errorsNode = root.has("userAnswerErrors")
                     ? root.path("userAnswerErrors")
                     : root.path("errors");

@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.shared.persistence.BaseEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @SuperBuilder
@@ -18,36 +19,36 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SpeakingSessionAssessmentEntity extends BaseEntity {
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "session_id", nullable = false, unique = true)
     SpeakingSessionEntity speakingSession;
 
     @Column(name = "overall_score", nullable = false)
-    int overallScore;
+    Integer overallScore;
 
     @Column(name = "jlpt_estimate", nullable = false, length = 5)
     String jlptEstimate;
 
     @Column(name = "fluency_score", nullable = false)
-    int fluencyScore;
+    Integer fluencyScore;
 
     @Column(name = "pronunciation_score", nullable = false)
-    int pronunciationScore;
+    Integer pronunciationScore;
 
     @Column(name = "grammar_score", nullable = false)
-    int grammarScore;
+    Integer grammarScore;
 
     @Column(name = "vocabulary_score", nullable = false)
-    int vocabularyScore;
+    Integer vocabularyScore;
 
     @Column(name = "interaction_score", nullable = false)
-    int interactionScore;
+    Integer interactionScore;
 
     @Column(name = "naturalness_score", nullable = false)
-    int naturalnessScore;
+    Integer naturalnessScore;
 
     @Column(name = "coherence_score", nullable = false)
-    int coherenceScore;
+    Integer coherenceScore;
 
     @Column(name = "summary", nullable = false, columnDefinition = "TEXT")
     String summary;
@@ -88,6 +89,7 @@ public class SpeakingSessionAssessmentEntity extends BaseEntity {
     @Column(name = "study_encouragement", columnDefinition = "TEXT")
     String studyEncouragement;
 
-    @OneToMany(mappedBy = "speakingSessionAssessment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    List<SpeakingImprovedExpressionEntity> speakingImprovedExpressions;
+    @Builder.Default
+    @OneToMany(mappedBy = "speakingSessionAssessment", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<SpeakingImprovedExpressionEntity> speakingImprovedExpressions = new ArrayList<>();
 }

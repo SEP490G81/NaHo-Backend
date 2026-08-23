@@ -21,10 +21,9 @@ import org.naho.speech.azure.port.out.AzureSpeechServicePort;
 import org.naho.speech.azure.port.out.SpeechAssessmentRepositoryPort;
 import org.naho.speech.azure.port.out.TextToSpeechServicePort;
 import org.naho.speech.llm.conversation.adapter.AzureSpeechToTextAdapter;
-import org.naho.speech.llm.conversation.adapter.OpenAiChatAdapter;
-import org.naho.speech.llm.conversation.adapter.OpenAiScoringAdapter;
-import org.naho.speech.llm.conversation.constant.OpenAiConfigProperties;
 import org.naho.speech.llm.conversation.helper.SpeakingSessionHelper;
+import org.naho.speech.llm.conversation.mapper.SpeakingImprovedExpressionResultMapper;
+import org.naho.speech.llm.conversation.mapper.SpeakingSessionAssessmentResultMapper;
 import org.naho.speech.llm.conversation.mapper.SpeakingSessionMessageResultMapper;
 import org.naho.speech.llm.conversation.mapper.SpeakingSessionResultMapper;
 import org.naho.speech.llm.conversation.port.in.CrudSpeakingSessionInputPort;
@@ -62,17 +61,6 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class ChatConfig {
-    // ─── Output Port Adapters ────────────────────────────────────
-    @Bean
-    public AiChatPort aiChatPort(OpenAiConfigProperties openAiConfigProperties) {
-        return new OpenAiChatAdapter(openAiConfigProperties);
-    }
-
-    @Bean
-    public AiScoringPort aiScoringPort(OpenAiConfigProperties openAiConfigProperties) {
-        return new OpenAiScoringAdapter(openAiConfigProperties);
-    }
-
     @Bean
     public SpeechToTextPort speechToTextPort(AzureSpeechServicePort azureSpeechServicePort) {
         return new AzureSpeechToTextAdapter(azureSpeechServicePort);
@@ -108,6 +96,18 @@ public class ChatConfig {
             FileStorageServicePort fileStorageServicePort
     ) {
         return new SpeakingSessionMessageResultMapper(speakingSessionHelper, fileStorageServicePort);
+    }
+
+    @Bean
+    public SpeakingImprovedExpressionResultMapper speakingImprovedExpressionResultMapper() {
+        return new SpeakingImprovedExpressionResultMapper();
+    }
+
+    @Bean
+    public SpeakingSessionAssessmentResultMapper speakingSessionAssessmentResultMapper(
+            SpeakingImprovedExpressionResultMapper speakingImprovedExpressionResultMapper
+    ) {
+        return new SpeakingSessionAssessmentResultMapper(speakingImprovedExpressionResultMapper);
     }
 
     @Bean
@@ -160,26 +160,28 @@ public class ChatConfig {
             SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
             PersonaRepositoryPort personaRepositoryPort,
             SpeakingSessionHelper speakingSessionHelper,
-            SpeakingSessionResultMapper speakingSessionResultMapper,
+            SpeakingSessionAssessmentResultMapper speakingSessionAssessmentResultMapper,
             CrudUserDailyMissionInputPort crudUserDailyMissionInputPort,
             UserLearningStreakInputPort userLearningStreakInputPort,
             UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
             TransactionPort transactionPort,
             SpeakingSessionMessageRepositoryPort speakingSessionMessageRepositoryPort,
-            AiChatPort aiChatPort
+            AiChatPort aiChatPort,
+            SpeakingSessionAssessmentRepositoryPort speakingSessionAssessmentRepositoryPort
     ) {
         return new EndSessionUseCase(
                 aiScoringPort,
                 speakingSessionRepositoryPort,
                 personaRepositoryPort,
                 speakingSessionHelper,
-                speakingSessionResultMapper,
+                speakingSessionAssessmentResultMapper,
                 crudUserDailyMissionInputPort,
                 userLearningStreakInputPort,
                 userLearningProgressRepositoryPort,
                 transactionPort,
                 speakingSessionMessageRepositoryPort,
-                aiChatPort
+                aiChatPort,
+                speakingSessionAssessmentRepositoryPort
         );
     }
 

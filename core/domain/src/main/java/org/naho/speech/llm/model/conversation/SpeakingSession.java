@@ -5,6 +5,7 @@ import org.naho.persona.type.MarugotoLevel;
 import org.naho.speech.llm.type.SpeakingSessionStatus;
 
 import java.time.Instant;
+import java.util.List;
 
 public class SpeakingSession {
 
@@ -17,12 +18,13 @@ public class SpeakingSession {
     private String voiceName;
     private MarugotoLevel marugotoLevel;
     private FormalityLevel formalityLevel;
-    private Integer durationSeconds;
-    private int totalTurns;
-    private Double asrConfidence;
+    private Integer totalTurns;
     private SpeakingSessionStatus status;
     private Instant startedAt;
     private Instant endedAt;
+
+    private SpeakingSessionAssessment speakingSessionAssessment;
+    private List<SpeakingSessionMessage> speakingSessionMessages;
 
     private SpeakingSession(Builder builder) {
         this.id = builder.id;
@@ -34,12 +36,12 @@ public class SpeakingSession {
         this.voiceName = builder.voiceName;
         this.marugotoLevel = builder.marugotoLevel;
         this.formalityLevel = builder.formalityLevel;
-        this.durationSeconds = builder.durationSeconds;
         this.totalTurns = builder.totalTurns;
-        this.asrConfidence = builder.asrConfidence;
         this.status = builder.status;
         this.startedAt = builder.startedAt;
         this.endedAt = builder.endedAt;
+        this.speakingSessionAssessment = builder.speakingSessionAssessment;
+        this.speakingSessionMessages = builder.speakingSessionMessages;
     }
 
     public static Builder builder() {
@@ -110,28 +112,12 @@ public class SpeakingSession {
         this.formalityLevel = formalityLevel;
     }
 
-    public Integer getDurationSeconds() {
-        return durationSeconds;
-    }
-
-    public void setDurationSeconds(Integer durationSeconds) {
-        this.durationSeconds = durationSeconds;
-    }
-
-    public int getTotalTurns() {
+    public Integer getTotalTurns() {
         return totalTurns;
     }
 
-    public void setTotalTurns(int totalTurns) {
+    public void setTotalTurns(Integer totalTurns) {
         this.totalTurns = totalTurns;
-    }
-
-    public Double getAsrConfidence() {
-        return asrConfidence;
-    }
-
-    public void setAsrConfidence(Double asrConfidence) {
-        this.asrConfidence = asrConfidence;
     }
 
     public SpeakingSessionStatus getStatus() {
@@ -158,6 +144,22 @@ public class SpeakingSession {
         this.endedAt = endedAt;
     }
 
+    public SpeakingSessionAssessment getSpeakingSessionAssessment() {
+        return speakingSessionAssessment;
+    }
+
+    public void setSpeakingSessionAssessment(SpeakingSessionAssessment speakingSessionAssessment) {
+        this.speakingSessionAssessment = speakingSessionAssessment;
+    }
+
+    public List<SpeakingSessionMessage> getSpeakingSessionMessages() {
+        return speakingSessionMessages;
+    }
+
+    public void setSpeakingSessionMessages(List<SpeakingSessionMessage> speakingSessionMessages) {
+        this.speakingSessionMessages = speakingSessionMessages;
+    }
+
     public static class Builder {
 
         private Long id;
@@ -169,12 +171,12 @@ public class SpeakingSession {
         private String voiceName;
         private MarugotoLevel marugotoLevel;
         private FormalityLevel formalityLevel;
-        private Integer durationSeconds;
-        private int totalTurns;
-        private Double asrConfidence;
+        private Integer totalTurns;
         private SpeakingSessionStatus status;
         private Instant startedAt;
         private Instant endedAt;
+        private SpeakingSessionAssessment speakingSessionAssessment;
+        private List<SpeakingSessionMessage> speakingSessionMessages;
 
         public Builder id(Long id) {
             this.id = id;
@@ -216,18 +218,8 @@ public class SpeakingSession {
             return this;
         }
 
-        public Builder durationSeconds(Integer durationSeconds) {
-            this.durationSeconds = durationSeconds;
-            return this;
-        }
-
-        public Builder totalTurns(int totalTurns) {
+        public Builder totalTurns(Integer totalTurns) {
             this.totalTurns = totalTurns;
-            return this;
-        }
-
-        public Builder asrConfidence(Double asrConfidence) {
-            this.asrConfidence = asrConfidence;
             return this;
         }
 
@@ -243,6 +235,16 @@ public class SpeakingSession {
 
         public Builder endedAt(Instant endedAt) {
             this.endedAt = endedAt;
+            return this;
+        }
+
+        public Builder speakingSessionAssessment(SpeakingSessionAssessment speakingSessionAssessment) {
+            this.speakingSessionAssessment = speakingSessionAssessment;
+            return this;
+        }
+
+        public Builder speakingSessionMessages(List<SpeakingSessionMessage> speakingSessionMessages) {
+            this.speakingSessionMessages = speakingSessionMessages;
             return this;
         }
 

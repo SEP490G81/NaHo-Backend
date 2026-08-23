@@ -7,7 +7,7 @@ public record SpeakingSessionMessageResponse(
         Long id,
         Long sessionId,
         Long audioFileId,
-        int turnIndex,
+        Integer turnIndex,
         SenderType senderType,
         MessageType messageType,
         String content,

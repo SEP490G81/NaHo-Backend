@@ -10,6 +10,8 @@ import org.naho.speech.llm.type.SpeakingSessionStatus;
 import java.util.List;
 
 public interface SpeakingSessionRepositoryPort {
+    SpeakingSession save(SpeakingSession speakingSession);
+
     SpeakingSession initSpeakingSession(
             String sessionCode,
             Long userId,
@@ -22,12 +24,6 @@ public interface SpeakingSessionRepositoryPort {
 
     SpeakingSessionMessage saveSpeakingSessionMessage(
             SpeakingSessionMessageCommand command
-    );
-
-    void updateSessionTurnAndTranscript(
-            String sessionCode,
-            int totalTurns,
-            String fullTranscript
     );
 
     void updateSpeakingSessionStatus(String sessionCode, SpeakingSessionStatus status);
@@ -48,6 +44,8 @@ public interface SpeakingSessionRepositoryPort {
     boolean isSessionBelongToUser(String sessionCode, Long userId);
 
     SpeakingSession findBySessionCode(String sessionCode);
+
+    SpeakingSession findBySessionCodeAndUserId(String sessionCode, Long userId);
 
     SpeakingSession findBySessionCodeAndStatus(String sessionCode, SpeakingSessionStatus status);
 

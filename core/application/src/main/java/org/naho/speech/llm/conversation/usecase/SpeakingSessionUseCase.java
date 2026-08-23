@@ -235,13 +235,12 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             List<Map<String, String>> contextMessages = speakingSessionHelper.getSlidingWindowMessages(
                     speakingSession,
                     persona,
-                    previousMessages
+                    previousMessages,
+                    Map.of(
+                            AiMessageField.ROLE, SenderType.USER.name().toLowerCase(),
+                            AiMessageField.CONTENT, command.userMessage()
+                    )
             );
-
-            contextMessages.add(Map.of(
-                    AiMessageField.ROLE, SenderType.USER.name().toLowerCase(),
-                    AiMessageField.CONTENT, command.userMessage()
-            ));
 
             String rawReply = aiChatPort.chatWithContext(contextMessages);
             ParsedAiReply parsed = speakingSessionHelper.parseAiResponse(rawReply);
@@ -325,13 +324,12 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
             List<Map<String, String>> contextMessages = speakingSessionHelper.getSlidingWindowMessages(
                     speakingSession,
                     persona,
-                    previousMessages
+                    previousMessages,
+                    Map.of(
+                            AiMessageField.ROLE, SenderType.USER.name().toLowerCase(),
+                            AiMessageField.CONTENT, transcribedText
+                    )
             );
-
-            contextMessages.add(Map.of(
-                    AiMessageField.ROLE, SenderType.USER.name().toLowerCase(),
-                    AiMessageField.CONTENT, transcribedText
-            ));
 
             String rawReply = aiChatPort.chatWithContext(contextMessages);
             ParsedAiReply parsed = speakingSessionHelper.parseAiResponse(rawReply);

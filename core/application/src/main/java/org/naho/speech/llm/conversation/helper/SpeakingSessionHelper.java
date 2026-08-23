@@ -158,7 +158,8 @@ public class SpeakingSessionHelper {
     public List<Map<String, String>> getSlidingWindowMessages(
             SpeakingSession speakingSession,
             Persona persona,
-            List<SpeakingSessionMessage> previousMessages
+            List<SpeakingSessionMessage> previousMessages,
+            Map<String, String> userMessage
     ) {
         List<Map<String, String>> sessionHistories = new ArrayList<>();
         if (previousMessages.size() > MAX_SLIDING_WINDOW_MESSAGES) {
@@ -171,6 +172,8 @@ public class SpeakingSessionHelper {
                     AiMessageField.CONTENT, speakingSessionMessage.getContent()
             ));
         }
+
+        sessionHistories.add(userMessage);
 
         String systemPromptContent = buildSystemPromptContent(
                 persona,

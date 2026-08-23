@@ -7,6 +7,7 @@ import org.naho.file.repository.FileJpaRepository;
 import org.naho.i18n.message.file.FileDetailMessageKey;
 import org.naho.i18n.message.llm.LlmDetailMessageKey;
 import org.naho.i18n.message.user.UserDetailMessageKey;
+import org.naho.persona.mapper.PersonaIdMapper;
 import org.naho.persona.type.FormalityLevel;
 import org.naho.persona.type.MarugotoLevel;
 import org.naho.shared.exception.InfrastructureException;
@@ -17,7 +18,6 @@ import org.naho.speech.llm.conversation.exception.LlmApplicationError;
 import org.naho.speech.llm.conversation.mapper.SpeakingSessionEntityMapper;
 import org.naho.speech.llm.conversation.mapper.SpeakingSessionMessageEntityMapper;
 import org.naho.speech.llm.conversation.port.out.SpeakingSessionRepositoryPort;
-import org.naho.speech.llm.conversation.repository.SpeakingSessionAssessmentJpaRepository;
 import org.naho.speech.llm.conversation.repository.SpeakingSessionJpaRepository;
 import org.naho.speech.llm.conversation.repository.SpeakingSessionMessageJpaRepository;
 import org.naho.speech.llm.model.conversation.SpeakingSession;
@@ -25,6 +25,7 @@ import org.naho.speech.llm.model.conversation.SpeakingSessionMessage;
 import org.naho.speech.llm.type.MessageType;
 import org.naho.speech.llm.type.SpeakingSessionStatus;
 import org.naho.user.exception.UserErrorCode;
+import org.naho.user.mapper.UserIdMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,11 +37,20 @@ import java.util.List;
 public class SpeakingSessionRepositoryAdapter implements SpeakingSessionRepositoryPort {
 
     private final SpeakingSessionJpaRepository speakingSessionJpaRepository;
-    private final SpeakingSessionAssessmentJpaRepository assessmentJpaRepository;
     private final SpeakingSessionMessageJpaRepository speakingSessionMessageJpaRepository;
     private final FileJpaRepository fileJpaRepository;
     private final SpeakingSessionEntityMapper speakingSessionEntityMapper;
     private final SpeakingSessionMessageEntityMapper speakingSessionMessageEntityMapper;
+    private final UserIdMapper userIdMapper;
+    private final PersonaIdMapper personaIdMapper;
+
+    @Override
+    @Transactional
+    public SpeakingSession save(SpeakingSession speakingSession) {
+        SpeakingSessionEntity entity = speakingSessionEntityMapper.domainToEntity(speakingSession);
+        SpeakingSessionEntity savedEntity = speakingSessionJpaRepository.save(entity);
+        return speakingSessionEntityMapper.entityToDomain(savedEntity);
+    }
 
     @Override
     @Transactional
@@ -69,8 +79,8 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
 
         SpeakingSessionEntity sessionEntity = SpeakingSessionEntity.builder()
                 .sessionCode(sessionCode)
-                .userId(userId)
-                .personaId(personaId)
+                .user(userIdMapper.idToEntity(userId))
+                .persona(personaIdMapper.idToEntity(personaId))
                 .topic(topic)
                 .voiceName(voiceName)
                 .marugotoLevel(marugotoLevel)
@@ -141,33 +151,8 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
         if (sessionCode == null || sessionCode.isBlank())
             return false;
         return speakingSessionJpaRepository.findBySessionCode(sessionCode)
-                .map(s ->
-                        SpeakingSessionStatus.COMPLETED.equals(s.getStatus())
-                )
+                .map(s -> SpeakingSessionStatus.COMPLETED.equals(s.getStatus()))
                 .orElse(false);
-    }
-
-    @Override
-    @Transactional
-    public void updateSessionTurnAndTranscript(String sessionCode, int totalTurns, String fullTranscript) {
-        if (sessionCode == null || sessionCode.isBlank()) {
-            throw new InfrastructureException(
-                    LlmApplicationError.LLM_SESSION_CODE_INVALID,
-                    LlmDetailMessageKey.LLM_SESSION_CODE_INVALID
-            );
-        }
-
-        SpeakingSessionEntity entity = speakingSessionJpaRepository
-                .findBySessionCode(sessionCode)
-                .orElseThrow(() -> new InfrastructureException(
-                        LlmApplicationError.LLM_SESSION_NOT_FOUND,
-                        LlmDetailMessageKey.LLM_SESSION_NOT_FOUND,
-                        sessionCode
-                ));
-
-        entity.setTotalTurns(totalTurns);
-
-        speakingSessionJpaRepository.save(entity);
     }
 
     @Override
@@ -199,11 +184,6 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
         return speakingSessionJpaRepository.countByUserIdAndStatus(userId, SpeakingSessionStatus.IN_PROGRESS);
     }
 
-    /**
-     * Xóa session bằng session code
-     *
-     * @param sessionCode session code, dùng để định danh session trong redis
-     */
     @Override
     @Transactional
     public void deleteSessionBySessionCode(String sessionCode) {
@@ -225,13 +205,6 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
         speakingSessionJpaRepository.delete(entity);
     }
 
-    /**
-     * Kiểm tra xem 1 session có thuộc về user không
-     *
-     * @param sessionCode session code để tìm
-     * @param userId      chủ sở hữu
-     * @return true nếu đúng là session của user
-     */
     @Override
     @Transactional(readOnly = true)
     public boolean isSessionBelongToUser(String sessionCode, Long userId) {
@@ -257,7 +230,9 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
                         sessionCode
                 ));
 
-        return entity.getUserId() != null && entity.getUserId().equals(userId);
+        Long ownerId = entity.getUser() != null ? entity.getUser().getId() : null;
+
+        return ownerId != null && ownerId.equals(userId);
     }
 
     @Override
@@ -281,6 +256,33 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
     }
 
     @Override
+    public SpeakingSession findBySessionCodeAndUserId(String sessionCode, Long userId) {
+        if (sessionCode == null || sessionCode.isBlank()) {
+            throw new InfrastructureException(
+                    LlmApplicationError.LLM_SESSION_CODE_INVALID,
+                    LlmDetailMessageKey.LLM_SESSION_CODE_INVALID
+            );
+        }
+
+        if (userId == null) {
+            throw new InfrastructureException(
+                    UserErrorCode.USER_NOT_FOUND,
+                    UserDetailMessageKey.USER_ID_NULL
+            );
+        }
+
+        SpeakingSessionEntity entity = speakingSessionJpaRepository
+                .findBySessionCodeAndUser_Id(sessionCode, userId)
+                .orElseThrow(() -> new InfrastructureException(
+                        LlmApplicationError.LLM_SESSION_NOT_FOUND,
+                        LlmDetailMessageKey.LLM_SESSION_NOT_FOUND,
+                        sessionCode
+                ));
+
+        return speakingSessionEntityMapper.entityToDomain(entity);
+    }
+
+    @Override
     public SpeakingSession findBySessionCodeAndStatus(String sessionCode, SpeakingSessionStatus status) {
         if (sessionCode == null || sessionCode.isBlank()) {
             throw new InfrastructureException(
@@ -290,8 +292,8 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
         }
         if (status == null) {
             throw new InfrastructureException(
-                    LlmApplicationError.LLM_SESSION_CODE_INVALID,
-                    LlmDetailMessageKey.LLM_SESSION_CODE_INVALID
+                    LlmApplicationError.LLM_SESSION_STATUS_INVALID,
+                    LlmDetailMessageKey.LLM_SESSION_STATUS_INVALID
             );
         }
 
@@ -320,7 +322,7 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
                 .orElseThrow(() -> new InfrastructureException(
                         LlmApplicationError.LLM_SESSION_NOT_FOUND,
                         LlmDetailMessageKey.LLM_SESSION_NOT_FOUND,
-                        sessionId.toString()
+                        sessionId
                 ));
 
         return speakingSessionEntityMapper.entityToDomain(entity);
