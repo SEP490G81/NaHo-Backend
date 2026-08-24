@@ -2,6 +2,7 @@ package org.naho.speech.llm.conversation.usecase;
 
 import org.naho.i18n.message.llm.LlmDetailMessageKey;
 import org.naho.i18n.message.user.UserDetailMessageKey;
+import org.naho.persona.port.in.GetPersonaInputPort;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.speech.llm.conversation.exception.LlmApplicationError;
 import org.naho.speech.llm.conversation.mapper.SpeakingSessionAssessmentResultMapper;
@@ -24,17 +25,20 @@ public class CrudSpeakingSessionUseCase implements CrudSpeakingSessionInputPort 
     private final SpeakingSessionResultMapper speakingSessionResultMapper;
     private final SpeakingSessionAssessmentRepositoryPort speakingSessionAssessmentRepositoryPort;
     private final SpeakingSessionAssessmentResultMapper speakingSessionAssessmentResultMapper;
+    private final GetPersonaInputPort getPersonaInputPort;
 
     public CrudSpeakingSessionUseCase(
             SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
             SpeakingSessionResultMapper speakingSessionResultMapper,
             SpeakingSessionAssessmentRepositoryPort speakingSessionAssessmentRepositoryPort,
-            SpeakingSessionAssessmentResultMapper speakingSessionAssessmentResultMapper
+            SpeakingSessionAssessmentResultMapper speakingSessionAssessmentResultMapper,
+            GetPersonaInputPort getPersonaInputPort
     ) {
         this.speakingSessionRepositoryPort = speakingSessionRepositoryPort;
         this.speakingSessionResultMapper = speakingSessionResultMapper;
         this.speakingSessionAssessmentRepositoryPort = speakingSessionAssessmentRepositoryPort;
         this.speakingSessionAssessmentResultMapper = speakingSessionAssessmentResultMapper;
+        this.getPersonaInputPort = getPersonaInputPort;
     }
 
     @Override
@@ -94,7 +98,7 @@ public class CrudSpeakingSessionUseCase implements CrudSpeakingSessionInputPort 
     }
 
     @Override
-    public SpeakingSessionAssessmentResult findAssessmentBySessionCodeAndUserId(String sessionCode, Long userId) {
+    public SpeakingSessionResult findBySessionCodeAndUserId(String sessionCode, Long userId) {
         if (sessionCode == null || sessionCode.isBlank()) {
             throw new ApplicationException(
                     LlmApplicationError.LLM_SESSION_CODE_INVALID,
@@ -109,18 +113,23 @@ public class CrudSpeakingSessionUseCase implements CrudSpeakingSessionInputPort 
             );
         }
 
-        SpeakingSessionAssessment speakingSessionAssessment = speakingSessionAssessmentRepositoryPort
-                .findBySpeakingSession_SessionCodeAndSpeakingSession_StatusAndSpeakingSession_User_Id(
+        SpeakingSession speakingSession = speakingSessionRepositoryPort
+                .findByUserIdAndSpeakingSessionCodeAndSpeakingSessionStatus(
+                        userId,
                         sessionCode,
-                        SpeakingSessionStatus.COMPLETED,
-                        userId
-                )
+                        SpeakingSessionStatus.COMPLETED
+                );
+
+        SpeakingSessionAssessment speakingSessionAssessment = speakingSessionAssessmentRepositoryPort
+                .findBySpeakingSession_Id(speakingSession.getId())
                 .orElseThrow(() -> new ApplicationException(
                         LlmApplicationError.LLM_SESSION_NOT_FOUND,
                         LlmDetailMessageKey.LLM_SESSION_NOT_FOUND,
                         sessionCode
                 ));
 
-        return speakingSessionAssessmentResultMapper.domainToResult(speakingSessionAssessment);
+        SpeakingSessionAssessmentResult speakingSessionAssessmentResult = speakingSessionAssessmentResultMapper.domainToResult(speakingSessionAssessment);
+
+        return speakingSessionResultMapper.domainToResult(speakingSession, speakingSessionAssessmentResult);
     }
 }

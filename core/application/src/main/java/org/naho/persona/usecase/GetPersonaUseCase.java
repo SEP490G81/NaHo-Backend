@@ -1,5 +1,6 @@
 package org.naho.persona.usecase;
 
+import org.naho.i18n.message.llm.LlmDetailMessageKey;
 import org.naho.i18n.message.persona.PersonaDetailMessageKey;
 import org.naho.persona.exception.PersonaErrorCode;
 import org.naho.persona.mapper.PersonaResultMapper;
@@ -51,6 +52,25 @@ public class GetPersonaUseCase implements GetPersonaInputPort {
                 ));
 
         return personaResultMapper.domainToResult(persona);
+    }
+
+    @Override
+    public PersonaResult findBySessionCode(String sessionCode) {
+        if (sessionCode == null || sessionCode.isBlank()) {
+            throw new ApplicationException(
+                    CommonErrorCode.COMMON_INVALID_REQUEST,
+                    LlmDetailMessageKey.LLM_SESSION_CODE_INVALID
+            );
+        }
+
+        return personaRepositoryPort
+                .findBySessionCode(sessionCode)
+                .map(personaResultMapper::domainToResult)
+                .orElseThrow(() -> new ApplicationException(
+                        PersonaErrorCode.PERSONA_NOT_FOUND,
+                        PersonaDetailMessageKey.PERSONA_NOT_FOUND,
+                        sessionCode
+                ));
     }
 }
 

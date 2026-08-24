@@ -4,11 +4,9 @@ import org.naho.book.port.out.BookRepositoryPort;
 import org.naho.book.port.out.LessonRepositoryPort;
 import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.book.port.out.TopicRepositoryPort;
-import org.naho.daily.port.in.CrudUserDailyMissionInputPort;
 import org.naho.file.port.in.UploadFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileStorageServicePort;
-import org.naho.learning.port.in.UserLearningStreakInputPort;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
 import org.naho.persona.port.in.GetPersonaInputPort;
@@ -162,9 +160,6 @@ public class ChatConfig {
             PersonaRepositoryPort personaRepositoryPort,
             SpeakingSessionHelper speakingSessionHelper,
             SpeakingSessionAssessmentResultMapper speakingSessionAssessmentResultMapper,
-            CrudUserDailyMissionInputPort crudUserDailyMissionInputPort,
-            UserLearningStreakInputPort userLearningStreakInputPort,
-            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
             TransactionPort transactionPort,
             SpeakingSessionMessageRepositoryPort speakingSessionMessageRepositoryPort,
             AiChatPort aiChatPort,
@@ -176,9 +171,6 @@ public class ChatConfig {
                 personaRepositoryPort,
                 speakingSessionHelper,
                 speakingSessionAssessmentResultMapper,
-                crudUserDailyMissionInputPort,
-                userLearningStreakInputPort,
-                userLearningProgressRepositoryPort,
                 transactionPort,
                 speakingSessionMessageRepositoryPort,
                 aiChatPort,
@@ -254,13 +246,15 @@ public class ChatConfig {
             SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
             SpeakingSessionResultMapper speakingSessionResultMapper,
             SpeakingSessionAssessmentRepositoryPort speakingSessionAssessmentRepositoryPort,
-            SpeakingSessionAssessmentResultMapper speakingSessionAssessmentResultMapper
+            SpeakingSessionAssessmentResultMapper speakingSessionAssessmentResultMapper,
+            GetPersonaInputPort getPersonaInputPort
     ) {
         return new CrudSpeakingSessionUseCase(
                 speakingSessionRepositoryPort,
                 speakingSessionResultMapper,
                 speakingSessionAssessmentRepositoryPort,
-                speakingSessionAssessmentResultMapper
+                speakingSessionAssessmentResultMapper,
+                getPersonaInputPort
         );
     }
 }

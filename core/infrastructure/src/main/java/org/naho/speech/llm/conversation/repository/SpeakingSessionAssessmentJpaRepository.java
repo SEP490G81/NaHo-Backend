@@ -14,4 +14,6 @@ public interface SpeakingSessionAssessmentJpaRepository extends JpaRepository<Sp
             SpeakingSessionStatus speakingSessionStatus,
             Long speakingSessionUserId
     );
+
+    Optional<SpeakingSessionAssessmentEntity> findBySpeakingSession_Id(Long speakingSessionId);
 }

@@ -15,4 +15,6 @@ public interface SpeakingSessionAssessmentRepositoryPort {
             SpeakingSessionStatus speakingSessionStatus,
             Long speakingSessionUserId
     );
+
+    Optional<SpeakingSessionAssessment> findBySpeakingSession_Id(Long speakingSessionId);
 }

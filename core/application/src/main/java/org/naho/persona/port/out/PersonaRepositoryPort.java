@@ -14,4 +14,6 @@ public interface PersonaRepositoryPort {
     Persona save(Persona persona);
 
     PersonaStatus updatePersonaStatus(Long id, PersonaStatus status);
+
+    Optional<Persona> findBySessionCode(String sessionCode);
 }

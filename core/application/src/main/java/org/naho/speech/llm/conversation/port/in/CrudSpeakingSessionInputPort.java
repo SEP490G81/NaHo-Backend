@@ -1,6 +1,5 @@
 package org.naho.speech.llm.conversation.port.in;
 
-import org.naho.speech.llm.conversation.result.SpeakingSessionAssessmentResult;
 import org.naho.speech.llm.conversation.result.SpeakingSessionListItemResult;
 import org.naho.speech.llm.conversation.result.SpeakingSessionResult;
 import org.naho.speech.llm.type.SpeakingSessionStatus;
@@ -16,7 +15,7 @@ public interface CrudSpeakingSessionInputPort {
             SpeakingSessionStatus status
     );
 
-    SpeakingSessionAssessmentResult findAssessmentBySessionCodeAndUserId(
+    SpeakingSessionResult findBySessionCodeAndUserId(
             String sessionCode,
             Long userId
     );

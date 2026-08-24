@@ -43,4 +43,11 @@ public class SpeakingSessionAssessmentRepositoryAdapter implements SpeakingSessi
                 )
                 .map(speakingSessionAssessmentEntityMapper::entityToDomain);
     }
+
+    @Override
+    public Optional<SpeakingSessionAssessment> findBySpeakingSession_Id(Long speakingSessionId) {
+        return speakingSessionAssessmentJpaRepository
+                .findBySpeakingSession_Id(speakingSessionId)
+                .map(speakingSessionAssessmentEntityMapper::entityToDomain);
+    }
 }

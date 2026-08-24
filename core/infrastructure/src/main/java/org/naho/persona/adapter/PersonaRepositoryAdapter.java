@@ -6,6 +6,7 @@ import org.naho.persona.entity.PersonaEntity;
 import org.naho.persona.exception.PersonaErrorCode;
 import org.naho.persona.mapper.PersonaEntityMapper;
 import org.naho.persona.model.Persona;
+import org.naho.persona.mybatis.PersonaQueryMapper;
 import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.naho.persona.repository.PersonaJpaRepository;
 import org.naho.persona.type.PersonaStatus;
@@ -21,6 +22,7 @@ public class PersonaRepositoryAdapter implements PersonaRepositoryPort {
 
     private final PersonaJpaRepository personaJpaRepository;
     private final PersonaEntityMapper personaEntityMapper;
+    private final PersonaQueryMapper personaQueryMapper;
 
     @Override
     public List<Persona> findAll() {
@@ -61,5 +63,12 @@ public class PersonaRepositoryAdapter implements PersonaRepositoryPort {
         entity.setStatus(status);
         personaJpaRepository.save(entity);
         return status;
+    }
+
+    @Override
+    public Optional<Persona> findBySessionCode(String sessionCode) {
+        return personaQueryMapper
+                .findBySessionCode(sessionCode)
+                .map(personaEntityMapper::entityToDomain);
     }
 }

@@ -1,15 +1,14 @@
 package org.naho.speech.llm.conversation.usecase;
 
-import org.naho.daily.port.in.CrudUserDailyMissionInputPort;
+import org.naho.i18n.message.llm.LlmDetailMessageKey;
 import org.naho.i18n.message.persona.PersonaDetailMessageKey;
-import org.naho.learning.port.in.UserLearningStreakInputPort;
-import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
 import org.naho.persona.exception.PersonaErrorCode;
 import org.naho.persona.model.Persona;
 import org.naho.persona.port.out.PersonaRepositoryPort;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.speech.llm.conversation.constant.AiMessageField;
+import org.naho.speech.llm.conversation.exception.LlmApplicationError;
 import org.naho.speech.llm.conversation.helper.SpeakingSessionHelper;
 import org.naho.speech.llm.conversation.mapper.SpeakingSessionAssessmentResultMapper;
 import org.naho.speech.llm.conversation.port.in.EndSessionInputPort;
@@ -24,6 +23,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.naho.speech.llm.conversation.helper.SpeakingSessionHelper.MAX_SLIDING_WINDOW_MESSAGES;
 
@@ -33,9 +33,6 @@ public class EndSessionUseCase implements EndSessionInputPort {
     private final PersonaRepositoryPort personaRepositoryPort;
     private final SpeakingSessionHelper speakingSessionHelper;
     private final SpeakingSessionAssessmentResultMapper speakingSessionAssessmentResultMapper;
-    private final CrudUserDailyMissionInputPort crudUserDailyMissionInputPort;
-    private final UserLearningStreakInputPort userLearningStreakInputPort;
-    private final UserLearningProgressRepositoryPort userLearningProgressRepositoryPort;
     private final TransactionPort transactionPort;
     private final SpeakingSessionMessageRepositoryPort speakingSessionMessageRepositoryPort;
     private final AiChatPort aiChatPort;
@@ -47,9 +44,6 @@ public class EndSessionUseCase implements EndSessionInputPort {
             PersonaRepositoryPort personaRepositoryPort,
             SpeakingSessionHelper speakingSessionHelper,
             SpeakingSessionAssessmentResultMapper speakingSessionAssessmentResultMapper,
-            CrudUserDailyMissionInputPort crudUserDailyMissionInputPort,
-            UserLearningStreakInputPort userLearningStreakInputPort,
-            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
             TransactionPort transactionPort,
             SpeakingSessionMessageRepositoryPort speakingSessionMessageRepositoryPort,
             AiChatPort aiChatPort,
@@ -60,9 +54,6 @@ public class EndSessionUseCase implements EndSessionInputPort {
         this.personaRepositoryPort = personaRepositoryPort;
         this.speakingSessionHelper = speakingSessionHelper;
         this.speakingSessionAssessmentResultMapper = speakingSessionAssessmentResultMapper;
-        this.crudUserDailyMissionInputPort = crudUserDailyMissionInputPort;
-        this.userLearningStreakInputPort = userLearningStreakInputPort;
-        this.userLearningProgressRepositoryPort = userLearningProgressRepositoryPort;
         this.transactionPort = transactionPort;
         this.speakingSessionMessageRepositoryPort = speakingSessionMessageRepositoryPort;
         this.aiChatPort = aiChatPort;
@@ -77,6 +68,14 @@ public class EndSessionUseCase implements EndSessionInputPort {
     private SpeakingSessionAssessmentResult doEndSession(Long userId, String sessionCode) {
         SpeakingSession speakingSession = speakingSessionRepositoryPort
                 .findBySessionCode(sessionCode);
+
+        // nếu session không thuộc về user
+        if (!Objects.equals(speakingSession.getUserId(), userId)) {
+            throw new ApplicationException(
+                    LlmApplicationError.LLM_SESSION_NOT_FOUND,
+                    LlmDetailMessageKey.LLM_SESSION_NOT_FOUND
+            );
+        }
 
         Persona persona = personaRepositoryPort
                 .findById(speakingSession.getPersonaId())

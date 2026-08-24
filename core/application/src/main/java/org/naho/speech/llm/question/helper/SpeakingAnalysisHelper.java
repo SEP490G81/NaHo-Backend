@@ -70,7 +70,7 @@ public class SpeakingAnalysisHelper {
         String lessonName = (lesson != null) ? lesson.getJapaneseName() : "N/A";
         String canDoObjective = (objective != null)
                 ? (objective.getJapaneseDescription() != null && !objective.getJapaneseDescription().isBlank()
-                ? objective.getJapaneseDescription() : objective.getJapaneseName())
+                   ? objective.getJapaneseDescription() : objective.getJapaneseName())
                 : "N/A";
 
         String grammarFocus = buildGrammarFocusText(speakingQuestion);

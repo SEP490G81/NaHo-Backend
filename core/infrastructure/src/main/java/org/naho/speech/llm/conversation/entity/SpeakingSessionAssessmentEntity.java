@@ -6,6 +6,9 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.shared.persistence.BaseEntity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @SuperBuilder
 @Getter
 @Setter
@@ -61,4 +64,8 @@ public class SpeakingSessionAssessmentEntity extends BaseEntity {
 
     @Column(name = "study_encouragement", columnDefinition = "TEXT")
     String studyEncouragement;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "speakingSessionAssessment", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<SpeakingImprovedExpressionEntity> speakingImprovedExpressions = new ArrayList<>();
 }

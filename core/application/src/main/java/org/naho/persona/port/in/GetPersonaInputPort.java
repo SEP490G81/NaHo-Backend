@@ -8,5 +8,7 @@ public interface GetPersonaInputPort {
     List<PersonaResult> getAllPersonas();
 
     PersonaResult findById(Long id);
+
+    PersonaResult findBySessionCode(String sessionCode);
 }
 

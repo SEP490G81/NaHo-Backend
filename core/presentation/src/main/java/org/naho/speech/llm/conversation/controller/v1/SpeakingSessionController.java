@@ -158,7 +158,7 @@ public class SpeakingSessionController {
                     e.getMessage());
         }
     }
-    
+
     /**
      * Kết thúc phiên trò chuyện và nhận đánh giá
      *
@@ -169,7 +169,7 @@ public class SpeakingSessionController {
     @PostMapping("/end/{sessionCode}")
     @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_SESSION_END_SUCCESS)
     public ResponseEntity<SpeakingSessionAssessmentResponse> endSession(
-            @PathVariable("sessionCode") String sessionCode,
+            @PathVariable String sessionCode,
             @AuthenticationPrincipal AccessTokenPayload payload
     ) {
         SpeakingSessionAssessmentResult result = endSessionInputPort.endSession(
@@ -188,13 +188,13 @@ public class SpeakingSessionController {
      */
     @ApiResponseMessage
     @GetMapping("/end/{sessionCode}")
-    public ResponseEntity<SpeakingSessionAssessmentResponse> findAssessmentBySessionCodeAndUserId(
-            @PathVariable("sessionCode") String sessionCode,
+    public ResponseEntity<SpeakingSessionResponse> findAssessmentBySessionCodeAndUserId(
+            @PathVariable String sessionCode,
             @AuthenticationPrincipal AccessTokenPayload payload
     ) {
-        SpeakingSessionAssessmentResult result = crudSpeakingSessionInputPort
-                .findAssessmentBySessionCodeAndUserId(sessionCode, payload.userId());
-        return ResponseEntity.ok(speakingSessionAssessmentResponseMapper.resultToResponse(result));
+        SpeakingSessionResult result = crudSpeakingSessionInputPort
+                .findBySessionCodeAndUserId(sessionCode, payload.userId());
+        return ResponseEntity.ok(speakingSessionResponseMapper.resultToResponse(result));
     }
 
     /**
@@ -206,7 +206,7 @@ public class SpeakingSessionController {
      */
     @DeleteMapping("/{sessionCode}")
     public ResponseEntity<Void> deleteSession(
-            @PathVariable("sessionCode") String sessionCode,
+            @PathVariable String sessionCode,
             @AuthenticationPrincipal AccessTokenPayload payload
     ) {
         speakingSessionCleanupInputPort.deleteSession(sessionCode, payload.userId());

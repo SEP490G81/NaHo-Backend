@@ -3,6 +3,7 @@ package org.naho.speech.llm.conversation.mapper;
 import org.naho.persona.port.in.GetPersonaInputPort;
 import org.naho.persona.result.PersonaResult;
 import org.naho.speech.llm.conversation.port.out.SpeakingSessionMessageRepositoryPort;
+import org.naho.speech.llm.conversation.result.SpeakingSessionAssessmentResult;
 import org.naho.speech.llm.conversation.result.SpeakingSessionListItemResult;
 import org.naho.speech.llm.conversation.result.SpeakingSessionMessageResult;
 import org.naho.speech.llm.conversation.result.SpeakingSessionResult;
@@ -76,6 +77,33 @@ public class SpeakingSessionResultMapper {
                 .status(domain.getStatus())
                 .startedAt(domain.getStartedAt())
                 .endedAt(domain.getEndedAt())
+                .build();
+    }
+
+    public SpeakingSessionResult domainToResult(
+            SpeakingSession domain,
+            SpeakingSessionAssessmentResult speakingSessionAssessmentResult
+    ) {
+        if (domain == null) {
+            return null;
+        }
+
+        PersonaResult personaResult = getPersonaInputPort.findById(domain.getPersonaId());
+
+        return SpeakingSessionResult.builder()
+                .id(domain.getId())
+                .sessionCode(domain.getSessionCode())
+                .userId(domain.getUserId())
+                .persona(personaResult)
+                .topic(domain.getTopic())
+                .voiceName(domain.getVoiceName())
+                .marugotoLevel(domain.getMarugotoLevel())
+                .formalityLevel(domain.getFormalityLevel())
+                .totalTurns(domain.getTotalTurns())
+                .status(domain.getStatus())
+                .startedAt(domain.getStartedAt())
+                .endedAt(domain.getEndedAt())
+                .speakingSessionAssessment(speakingSessionAssessmentResult)
                 .build();
     }
 }
