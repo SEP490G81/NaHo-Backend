@@ -10,12 +10,14 @@ import org.naho.question.dto.request.CompleteVocabularyQuestionRequest;
 import org.naho.question.dto.request.UpdateVocabularyQuestionRequest;
 import org.naho.question.port.in.CompleteVocabularyQuestionInputPort;
 import org.naho.question.port.in.UpdateVocabularyQuestionInputPort;
+import org.naho.question.result.UpdateVocabularyQuestionResult;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.user.port.out.RoleRepositoryPort;
 import org.naho.user.result.AccessTokenPayload;
 import org.naho.user.type.RoleName;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,6 +53,8 @@ public class VocabularyQuestionController {
 //        return ResponseEntity.ok(response);
 //    }
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @ApiResponseMessage(message = VocabularyQuestionDetailMessageKey.VOCABULARY_QUESTION_COMPLETE_SUCCESS)
     @PostMapping("/completion")
     public ResponseEntity<Void> completeVocabularyQuestion(
@@ -67,9 +71,11 @@ public class VocabularyQuestionController {
         return ResponseEntity.ok().build();
     }
 
+    // ROLE: CONTENT_MANAGER
+    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
     @PutMapping("/{id}")
     @ApiResponseMessage(message = VocabularyQuestionDetailMessageKey.VOCABULARY_QUESTION_UPDATE_SUCCESS)
-    public ResponseEntity<org.naho.question.result.UpdateVocabularyQuestionResult> updateVocabularyQuestion(
+    public ResponseEntity<UpdateVocabularyQuestionResult> updateVocabularyQuestion(
             @PathVariable Long id,
             @AuthenticationPrincipal AccessTokenPayload payload,
             @RequestBody @Valid UpdateVocabularyQuestionRequest request

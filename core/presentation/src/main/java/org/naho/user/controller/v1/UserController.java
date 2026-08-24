@@ -17,7 +17,6 @@ import org.naho.user.command.UpdateUserAvatarCommand;
 import org.naho.user.command.UpdateUserInfoCommand;
 import org.naho.user.command.UserQueryCommand;
 import org.naho.user.dto.mapper.RegisterRequestMapper;
-import org.naho.user.dto.mapper.RegisterResponseMapper;
 import org.naho.user.dto.mapper.UserRequestMapper;
 import org.naho.user.dto.mapper.UserResponseMapper;
 import org.naho.user.dto.request.RegisterRequest;
@@ -32,6 +31,7 @@ import org.naho.user.result.AccessTokenPayload;
 import org.naho.user.result.UserResult;
 import org.naho.user.type.UserStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -48,11 +48,12 @@ public class UserController {
     private final CrudUserInputPort crudUserInputPort;
 
     private final RegisterInputPort registerInputPort;
-    private final RegisterResponseMapper registerResponseMapper;
     private final RegisterRequestMapper registerRequestMapper;
     private final FileValidatorPort fileValidatorPort;
     private final FileStorageServicePort fileStorageServicePort;
     private final UserRequestMapper userRequestMapper;
+
+    // ROLE: LEARNER, ADMIN, CONTENT_MANAGER
 
     /**
      * Lấy thông tin chi tiết của người dùng đang đăng nhập
@@ -60,6 +61,7 @@ public class UserController {
      * @param payload chứa user id của tài khoản đang đăng nhập thông qua JWT
      * @return UserResponse
      */
+    @PreAuthorize("hasAnyRole('LEARNER', 'ADMIN', 'CONTENT_MANAGER')")
     @ApiResponseMessage(message = UserDetailMessageKey.USER_GET_SUCCESSFULLY)
     @GetMapping("/me")
     public ResponseEntity<UserResponse> getCurrentLoggedUser(
@@ -71,6 +73,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    // PUBLIC RESOURCE
     @PostMapping("/register")
     @ApiResponseMessage(message = UserDetailMessageKey.USER_REGISTER_SUCCESSFULLY)
     public ResponseEntity<Void> register(@RequestBody RegisterRequest request) {
@@ -79,11 +82,15 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    // ROLE: ADMIN
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUser(@PathVariable Long id) {
         UserResult result = getUserInputPort.getUserById(id);
         return ResponseEntity.ok(userResponseMapper.resultToResponse(result));
     }
+
+    // ROLE: ADMIN
 
     /**
      * API để cho role Admin lấy ra danh sách người dùng
@@ -92,6 +99,7 @@ public class UserController {
      * @param request chứa các field, page, sort column...
      * @return PageData<UserResponse>
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @ApiResponseMessage(message = UserDetailMessageKey.USER_GET_SUCCESSFULLY)
     @PostMapping("/all")
     public ResponseEntity<PageData<UserResponse>> findAllUsers(
@@ -111,6 +119,8 @@ public class UserController {
         return ResponseEntity.ok(responsePageData);
     }
 
+    // ROLE: ADMIN
+
     /**
      * Cập nhật trạng thái của người dùng: ACTIVE, UNACTIVE
      * Nếu đang là ACTIVE => UNACTIVE và ngược lại
@@ -118,11 +128,14 @@ public class UserController {
      * @param id user id
      * @return UserStatus
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}/status")
     public ResponseEntity<UserStatus> updateStatus(@PathVariable Long id) {
         UserStatus newStatus = updateUserInputPort.updateStatus(id);
         return ResponseEntity.ok(newStatus);
     }
+
+    // ROLE: LEARNER, ADMIN, CONTENT_MANAGER
 
     /**
      * Cập nhật thông tin cơ bản của người dùng:
@@ -132,6 +145,7 @@ public class UserController {
      * @param request bao gồm: username, full name, gender, dob
      * @return UserResponse
      */
+    @PreAuthorize("hasAnyRole('LEARNER', 'ADMIN', 'CONTENT_MANAGER')")
     @ApiResponseMessage(message = UserDetailMessageKey.USER_UPDATE_INFO_SUCCESSFULLY)
     @PatchMapping(value = "/info")
     public ResponseEntity<UserResponse> updateUserInfo(
@@ -152,6 +166,8 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    // ROLE: LEARNER, ADMIN, CONTENT_MANAGER
+
     /**
      * Cập nhật avatar của người dùng
      *
@@ -159,6 +175,7 @@ public class UserController {
      * @param avatarFile file avatar mới của người dùng upload lên
      * @return UserResponse
      */
+    @PreAuthorize("hasAnyRole('LEARNER', 'ADMIN', 'CONTENT_MANAGER')")
     @ApiResponseMessage(message = UserDetailMessageKey.USER_UPDATE_AVATAR_SUCCESSFULLY)
     @PatchMapping("/avatar")
     public ResponseEntity<UserResponse> updateUserAvatar(

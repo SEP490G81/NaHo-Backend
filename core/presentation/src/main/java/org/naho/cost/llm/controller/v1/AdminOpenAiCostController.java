@@ -12,6 +12,7 @@ import org.naho.cost.result.OpenAiCostSummaryResult;
 import org.naho.speech.llm.conversation.command.OpenAiCostQueryCommand;
 import org.naho.speech.llm.conversation.port.in.GetOpenAiCostInputPort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,8 @@ public class AdminOpenAiCostController {
     private final OpenAiCostRequestMapper openAiCostRequestMapper;
     private final OpenAiCostResponseMapper openAiCostResponseMapper;
 
+    // ROLE: ADMIN
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/summary")
     public ResponseEntity<OpenAiCostSummaryResponse> getSummary() {
         OpenAiCostSummaryResult result = getOpenAiCostInputPort.getSummary();
@@ -34,6 +37,8 @@ public class AdminOpenAiCostController {
         return ResponseEntity.ok(response);
     }
 
+    // ROLE: ADMIN
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/chart")
     public ResponseEntity<OpenAiCostChartResponse> getChartData(OpenAiCostChartRequest request) {
         OpenAiCostQueryCommand command = openAiCostRequestMapper.requestToCommand(request);
@@ -42,6 +47,8 @@ public class AdminOpenAiCostController {
         return ResponseEntity.ok(response);
     }
 
+    // ROLE: ADMIN
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/sync")
     public ResponseEntity<Void> triggerManualSync() {
         syncOpenAiCostInputPort.syncIncremental(3);

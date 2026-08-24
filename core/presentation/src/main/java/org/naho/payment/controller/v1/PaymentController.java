@@ -30,6 +30,7 @@ import org.naho.user.result.AccessTokenPayload;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,6 +56,8 @@ public class PaymentController {
     @Value("${app.frontend-url:http://localhost:3636}")
     private String frontendUrl;
 
+    // ROLE: ADMIN
+    @PreAuthorize("hasRole('ADMIN')")
     @ApiResponseMessage(message = PaymentDetailMessageKey.PAYMENT_ORDER_GET_ALL_SUCCESS)
     @PostMapping("/all")
     public ResponseEntity<PageData<PaymentOrderResponse>> findAllPaymentOrders(
@@ -74,6 +77,8 @@ public class PaymentController {
         return ResponseEntity.ok(responsePageData);
     }
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @GetMapping("/my-orders")
     @ApiResponseMessage(message = PaymentDetailMessageKey.PAYMENT_ORDER_GET_ALL_SUCCESS)
     public ResponseEntity<List<PaymentOrderResponse>> getMyPaymentOrders(
@@ -88,6 +93,8 @@ public class PaymentController {
         return ResponseEntity.ok(responses);
     }
 
+    // ROLE: ADMIN
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/admin/upgrade-subscription")
     @ApiResponseMessage(message = PaymentDetailMessageKey.PAYMENT_SUBSCRIPTION_UPGRADE_SUCCESS)
     public ResponseEntity<UserSubscriptionResponse> upgradeUserSubscription(
@@ -105,6 +112,8 @@ public class PaymentController {
         return ResponseEntity.ok(response);
     }
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @PostMapping("/create")
     @ApiResponseMessage(message = PaymentDetailMessageKey.PAYMENT_ORDER_CREATION_SUCCESS)
     public ResponseEntity<CreatePaymentResponse> createPayment(
@@ -129,6 +138,7 @@ public class PaymentController {
         return ResponseEntity.ok(response);
     }
 
+    // PUBLIC RESOURCE
     @GetMapping("/vnpay-ipn")
     public ResponseEntity<VnPayIpnResponse> receiveVnPayIpn(
             @RequestParam Map<String, String> queryParams) {
@@ -147,6 +157,7 @@ public class PaymentController {
         }
     }
 
+    // PUBLIC RESOURCE
     @GetMapping("/vnpay-return")
     public ResponseEntity<Void> receiveVnPayReturn(
             @RequestParam Map<String, String> queryParams) {
@@ -175,6 +186,8 @@ public class PaymentController {
         }
     }
 
+    // ROLE: LEARNER, ADMIN
+    @PreAuthorize("hasAnyRole('LEARNER', 'ADMIN')")
     @GetMapping("/{orderCode}")
     @ApiResponseMessage(message = PaymentDetailMessageKey.PAYMENT_ORDER_GET_SUCCESS)
     public ResponseEntity<PaymentOrderResponse> getPaymentByOrderCode(
@@ -184,6 +197,8 @@ public class PaymentController {
         return ResponseEntity.ok(response);
     }
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @PostMapping("/{orderCode}/cancel")
     @ApiResponseMessage(message = PaymentDetailMessageKey.PAYMENT_ORDER_CANCEL_SUCCESS)
     public ResponseEntity<CancelPaymentResponse> cancelPayment(

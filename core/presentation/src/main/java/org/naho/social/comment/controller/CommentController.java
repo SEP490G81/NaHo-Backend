@@ -26,6 +26,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,6 +43,8 @@ public class CommentController {
     private final SimpMessagingTemplate messagingTemplate;
     private final RoleRepositoryPort roleRepositoryPort;
 
+    // ROLE: LEARNER, ADMIN, CONTENT_MANAGER
+    @PreAuthorize("hasAnyRole('LEARNER', 'ADMIN', 'CONTENT_MANAGER')")
     @GetMapping
     @ApiResponseMessage(message = CommentDetailMessageKey.COMMENT_GET_LIST_SUCCESS)
     public ResponseEntity<CommentListResponse> getComments(
@@ -55,6 +58,8 @@ public class CommentController {
         return ResponseEntity.ok(response);
     }
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @PostMapping
     public ResponseEntity<CommentResponse> createCommentRest(
             @Valid @RequestBody CreateCommentRequest createCommentRequest,
@@ -68,6 +73,8 @@ public class CommentController {
         return ResponseEntity.ok(response);
     }
 
+    // ROLE: LEANER
+    @PreAuthorize("hasRole('LEARNER')")
     @PutMapping
     @ApiResponseMessage(message = CommentDetailMessageKey.COMMENT_UPDATE_SUCCESS)
     public ResponseEntity<CommentResponse> updateCommentRest(
@@ -81,6 +88,8 @@ public class CommentController {
         return ResponseEntity.ok(response);
     }
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasAnyRole('LEARNER', 'ADMIN', 'CONTENT_MANAGER')")
     @DeleteMapping
     @ApiResponseMessage(message = CommentDetailMessageKey.COMMENT_DELETE_SUCCESS)
     public ResponseEntity<Void> deleteCommentRest(
@@ -94,6 +103,8 @@ public class CommentController {
         return ResponseEntity.ok().build();
     }
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @MessageMapping("/comments/create")
     @SendTo("/topic/comments")
     public CommentResponse createComment(
@@ -105,6 +116,8 @@ public class CommentController {
         return commentResponseMapper.resultToResponse(commentResult);
     }
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @MessageMapping("/comments/update")
     @SendTo("/topic/comments")
     public CommentResponse fixComment(
@@ -116,6 +129,8 @@ public class CommentController {
         return commentResponseMapper.resultToResponse(commentResult);
     }
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasAnyRole('LEARNER', 'ADMIN', 'CONTENT_MANAGER')")
     @MessageMapping("/comments/delete")
     @SendTo("/topic/comments")
     public DeleteCommandRequest deleteComment(

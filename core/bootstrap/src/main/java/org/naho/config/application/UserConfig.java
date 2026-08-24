@@ -167,7 +167,8 @@ public class UserConfig {
             EncoderPort encoderPort,
             UserSessionRepositoryPort userSessionRepositoryPort,
             UserSessionServicePort userSessionServicePort,
-            UserSessionEventPublisherPort userSessionEventPublisherPort) {
+            UserSessionEventPublisherPort userSessionEventPublisherPort,
+            RoleRepositoryPort roleRepositoryPort) {
         return new VerifyEmailUseCase(
                 userRepositoryPort,
                 otpPort,
@@ -176,7 +177,8 @@ public class UserConfig {
                 encoderPort,
                 userSessionRepositoryPort,
                 userSessionServicePort,
-                userSessionEventPublisherPort);
+                userSessionEventPublisherPort,
+                roleRepositoryPort);
     }
 
     @Bean

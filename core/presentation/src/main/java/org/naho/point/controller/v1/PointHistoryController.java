@@ -13,6 +13,7 @@ import org.naho.point.result.PointHistoryResult;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,6 +28,8 @@ public class PointHistoryController {
     private final PointHistoryRequestMapper pointHistoryRequestMapper;
     private final PointHistoryResponseMapper pointHistoryResponseMapper;
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @ApiResponseMessage(message = PointHistoryDetailMessageKey.POINT_HISTORY_GET_ALL_SUCCESS)
     @PostMapping("/all")
     public ResponseEntity<PageData<PointHistoryResponse>> findAllByUserId(

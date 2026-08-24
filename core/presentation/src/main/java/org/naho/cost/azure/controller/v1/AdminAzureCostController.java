@@ -15,6 +15,7 @@ import org.naho.i18n.message.speech.SpeechDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,6 +36,8 @@ public class AdminAzureCostController {
     @Value("${app.start-date:2026-01-01}")
     private LocalDate appStartDate;
 
+    // ROLE: ADMIN
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/summary")
     @ApiResponseMessage(message = SpeechDetailMessageKey.AZURE_COST_SUMMARY_GET_SUCCESS)
     public ResponseEntity<AzureCostSummaryResponse> getSummary() {
@@ -43,6 +46,8 @@ public class AdminAzureCostController {
         return ResponseEntity.ok(response);
     }
 
+    // ROLE: ADMIN
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/chart")
     @ApiResponseMessage(message = SpeechDetailMessageKey.AZURE_COST_CHART_GET_SUCCESS)
     public ResponseEntity<AzureCostChartResponse> getChartData(AzureCostChartRequest request) {
@@ -52,6 +57,8 @@ public class AdminAzureCostController {
         return ResponseEntity.ok(response);
     }
 
+    // ROLE: ADMIN
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/sync")
     public ResponseEntity<Void> triggerManualFullSync() {
         syncAzureCostInputPort.syncFullBackfill(appStartDate);

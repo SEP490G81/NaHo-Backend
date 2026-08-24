@@ -11,6 +11,7 @@ import org.naho.i18n.message.daily.UserDailyMissionDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +24,8 @@ public class UserDailyMissionController {
     private final CrudUserDailyMissionInputPort crudUserDailyMissionInputPort;
     private final UserDailyMissionResponseMapper userDailyMissionResponseMapper;
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @ApiResponseMessage(message = UserDailyMissionDetailMessageKey.USER_DAILY_MISSION_GET_TODAY_SUCCESS)
     @GetMapping("/today")
     public ResponseEntity<List<UserDailyMissionResponse>> findAllUserTodayMissions(
@@ -38,6 +41,8 @@ public class UserDailyMissionController {
         return ResponseEntity.ok(responses);
     }
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @ApiResponseMessage(message = UserDailyMissionDetailMessageKey.USER_DAILY_MISSION_EARN_SUCCESS)
     @PostMapping("/earn")
     public ResponseEntity<UserDailyMissionResponse> earnMission(

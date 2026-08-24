@@ -55,6 +55,11 @@ public class TokenServiceAdapter implements TokenServicePort {
 
     @Override
     public TokenResult generateAccessToken(UserSession userSession) {
+        return generateAccessToken(userSession, false);
+    }
+
+    @Override
+    public TokenResult generateAccessToken(UserSession userSession, boolean isAdmin) {
         Instant issuedAt = Instant.now();
         Instant expiresAt = userSession.getAccessTokenExpiresAt();
         if (expiresAt == null) {
@@ -75,8 +80,10 @@ public class TokenServiceAdapter implements TokenServicePort {
                 .signWith(jwtSecretKey, Jwts.SIG.HS512)
                 .compact();
 
+        String cookieName = isAdmin ? TokenType.ADMIN_ACCESS_TOKEN_COOKIE_NAME : TokenType.ACCESS_TOKEN_COOKIE_NAME;
+
         return new TokenResult(
-                TokenType.ACCESS_TOKEN_COOKIE_NAME,
+                cookieName,
                 TokenType.ACCESS_TOKEN_NAME,
                 value,
                 expiresAt,
@@ -91,12 +98,19 @@ public class TokenServiceAdapter implements TokenServicePort {
 
     @Override
     public TokenResult generateRefreshToken(Instant issuedAt) {
+        return generateRefreshToken(issuedAt, false);
+    }
+
+    @Override
+    public TokenResult generateRefreshToken(Instant issuedAt, boolean isAdmin) {
         Instant expiresAt = issuedAt.plus(jwtProperties.getRefreshTokenExpiration());
         Long expiresIn = issuedAt.plus(jwtProperties.getAccessTokenExpiration()).getEpochSecond();
 
         String rawToken = generateSecureRandomToken();
+        String cookieName = isAdmin ? TokenType.ADMIN_REFRESH_TOKEN_COOKIE_NAME : TokenType.REFRESH_TOKEN_COOKIE_NAME;
+
         return new TokenResult(
-                TokenType.REFRESH_TOKEN_COOKIE_NAME,
+                cookieName,
                 TokenType.REFRESH_TOKEN_NAME,
                 rawToken,
                 expiresAt,

@@ -26,6 +26,28 @@ public class VerifyEmailUseCase implements VerifyEmailInputPort {
     private final UserSessionRepositoryPort userSessionRepositoryPort;
     private final UserSessionServicePort userSessionServicePort;
     private final UserSessionEventPublisherPort userSessionEventPublisherPort;
+    private final RoleRepositoryPort roleRepositoryPort;
+
+    public VerifyEmailUseCase(
+            UserRepositoryPort userRepositoryPort,
+            OtpPort otpPort,
+            TransactionPort transactionPort,
+            TokenServicePort tokenServicePort,
+            EncoderPort encoderPort,
+            UserSessionRepositoryPort userSessionRepositoryPort,
+            UserSessionServicePort userSessionServicePort,
+            UserSessionEventPublisherPort userSessionEventPublisherPort,
+            RoleRepositoryPort roleRepositoryPort) {
+        this.userRepositoryPort = userRepositoryPort;
+        this.otpPort = otpPort;
+        this.transactionPort = transactionPort;
+        this.tokenServicePort = tokenServicePort;
+        this.encoderPort = encoderPort;
+        this.userSessionRepositoryPort = userSessionRepositoryPort;
+        this.userSessionServicePort = userSessionServicePort;
+        this.userSessionEventPublisherPort = userSessionEventPublisherPort;
+        this.roleRepositoryPort = roleRepositoryPort;
+    }
 
     public VerifyEmailUseCase(
             UserRepositoryPort userRepositoryPort,
@@ -36,14 +58,16 @@ public class VerifyEmailUseCase implements VerifyEmailInputPort {
             UserSessionRepositoryPort userSessionRepositoryPort,
             UserSessionServicePort userSessionServicePort,
             UserSessionEventPublisherPort userSessionEventPublisherPort) {
-        this.userRepositoryPort = userRepositoryPort;
-        this.otpPort = otpPort;
-        this.transactionPort = transactionPort;
-        this.tokenServicePort = tokenServicePort;
-        this.encoderPort = encoderPort;
-        this.userSessionRepositoryPort = userSessionRepositoryPort;
-        this.userSessionServicePort = userSessionServicePort;
-        this.userSessionEventPublisherPort = userSessionEventPublisherPort;
+        this(
+                userRepositoryPort,
+                otpPort,
+                transactionPort,
+                tokenServicePort,
+                encoderPort,
+                userSessionRepositoryPort,
+                userSessionServicePort,
+                userSessionEventPublisherPort,
+                null);
     }
 
     @Override
@@ -88,7 +112,8 @@ public class VerifyEmailUseCase implements VerifyEmailInputPort {
                 SessionRevokedReason.LOGIN_ON_OTHER_DEVICE);
 
         Instant now = Instant.now();
-        TokenResult refreshToken = tokenServicePort.generateRefreshToken(now);
+        boolean isAdmin = isUserAdmin(user.getId());
+        TokenResult refreshToken = tokenServicePort.generateRefreshToken(now, isAdmin);
         String hashRefreshToken = encoderPort.hashRefreshToken(refreshToken.value());
 
         UserSession userSession = UserSession.builder()
@@ -104,7 +129,7 @@ public class VerifyEmailUseCase implements VerifyEmailInputPort {
                 .build();
 
         UserSession savedUserSession = userSessionRepositoryPort.save(userSession);
-        TokenResult accessToken = tokenServicePort.generateAccessToken(savedUserSession);
+        TokenResult accessToken = tokenServicePort.generateAccessToken(savedUserSession, isAdmin);
 
         userSessionEventPublisherPort.publishForceLogoutEvent(new ForceLogoutCommand(
                 savedUserSession.getUserId(),
@@ -112,5 +137,13 @@ public class VerifyEmailUseCase implements VerifyEmailInputPort {
                 SessionRevokedReason.LOGIN_ON_OTHER_DEVICE));
 
         return new LoginResult(accessToken, refreshToken);
+    }
+
+    private boolean isUserAdmin(Long userId) {
+        if (userId == null || roleRepositoryPort == null) {
+            return false;
+        }
+        java.util.List<String> roleNames = roleRepositoryPort.findRoleNamesByUserId(userId);
+        return roleNames.contains("ADMIN") || roleNames.contains("CONTENT_MANAGER");
     }
 }

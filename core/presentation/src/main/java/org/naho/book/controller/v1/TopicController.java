@@ -17,6 +17,7 @@ import org.naho.user.port.out.RoleRepositoryPort;
 import org.naho.user.result.AccessTokenPayload;
 import org.naho.user.type.RoleName;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,7 +36,9 @@ public class TopicController {
     private final RoleRepositoryPort roleRepositoryPort;
 
 
+    // ROLE: ADMIN, CONTENT_MANAGER, LEANER
     // FIND ALL TOPICS BY BOOK
+    @PreAuthorize("hasAnyRole('ADMIN', 'CONTENT_MANAGER', 'LEARNER')")
     @GetMapping("/books/{bookId}")
     @ApiResponseMessage(message = TopicDetailMessageKey.TOPIC_GET_LIST_SUCCESS)
     public ResponseEntity<List<TopicResponse>> listTopics(@PathVariable Long bookId) {
@@ -48,7 +51,9 @@ public class TopicController {
         return ResponseEntity.ok(responses);
     }
 
+    // ROLE: ADMIN, CONTENT_MANAGER, LEANER
     // GET TOPIC DETAIL
+    @PreAuthorize("hasAnyRole('ADMIN', 'CONTENT_MANAGER', 'LEARNER')")
     @GetMapping("/{id}")
     @ApiResponseMessage(message = TopicDetailMessageKey.TOPIC_GET_DETAIL_SUCCESS)
     public ResponseEntity<TopicDetailResponse> getTopicDetail(
@@ -60,7 +65,9 @@ public class TopicController {
         return ResponseEntity.ok(response);
     }
 
+    // ROLE: CONTENT_MANAGER
     // UPDATE TOPIC
+    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
     @PutMapping("/{id}")
     @ApiResponseMessage(message = TopicDetailMessageKey.TOPIC_UPDATE_SUCCESS)
     public ResponseEntity<TopicDetailResponse> updateTopic(

@@ -13,6 +13,7 @@ import org.naho.cost.result.AwsCostSummaryResult;
 import org.naho.i18n.message.speech.SpeechDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +27,8 @@ public class AdminAwsCostController {
     private final AwsCostRequestMapper awsCostRequestMapper;
     private final AwsCostResponseMapper awsCostResponseMapper;
 
+    // ROLE: ADMIN
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/summary")
     @ApiResponseMessage(message = SpeechDetailMessageKey.AWS_COST_SUMMARY_GET_SUCCESS)
     public ResponseEntity<AwsCostSummaryResponse> getSummary() {
@@ -34,6 +37,8 @@ public class AdminAwsCostController {
         return ResponseEntity.ok(response);
     }
 
+    // ROLE: ADMIN
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/chart")
     @ApiResponseMessage(message = SpeechDetailMessageKey.AWS_COST_CHART_GET_SUCCESS)
     public ResponseEntity<AwsCostChartResponse> getChartData(AwsCostChartRequest request) {

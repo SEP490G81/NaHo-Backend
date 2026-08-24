@@ -9,6 +9,7 @@ import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
 import org.naho.subscription.result.UserSubscriptionResult;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,12 +24,15 @@ public class UserSubscriptionController {
     private final GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
     private final UserSubscriptionResponseMapper userSubscriptionResponseMapper;
 
+    // ROLE: LEARNER
+
     /**
      * Lấy gói đăng kí hiện tại của người dùng đang đăng nhập
      *
      * @param payload chứa user id lấy từ JWT token
      * @return SubscriptionPlanResponse
      */
+    @PreAuthorize("hasRole('LEARNER')")
     @GetMapping("/me")
     @ApiResponseMessage(message = SubscriptionDetailMessageKey.SUBSCRIPTION_USER_GET_ACTIVE_SUCCESS)
     public ResponseEntity<UserSubscriptionResponse> getUserActiveSubscriptionPlan(
@@ -42,6 +46,8 @@ public class UserSubscriptionController {
         return ResponseEntity.ok(response);
     }
 
+    // ROLE: ADMIN
+
     /**
      * Lấy gói đăng kí hiện tại của người dùng theo id
      *
@@ -49,6 +55,7 @@ public class UserSubscriptionController {
      * @return SubscriptionPlanResponse
      */
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{userId}")
     @ApiResponseMessage(message = SubscriptionDetailMessageKey.SUBSCRIPTION_USER_GET_ACTIVE_SUCCESS)
     public ResponseEntity<UserSubscriptionResponse> getUserActiveSubscriptionPlan(

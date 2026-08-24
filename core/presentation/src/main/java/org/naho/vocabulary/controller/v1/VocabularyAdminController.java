@@ -17,6 +17,7 @@ import org.naho.vocabulary.port.in.*;
 import org.naho.vocabulary.result.VocabularyResult;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,6 +44,8 @@ public class VocabularyAdminController {
         }
     }
 
+    // ROLE: CONTENT_MANAGER
+    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
     @PostMapping
     public ResponseEntity<VocabularyResponse> createVocabulary(
             @Valid @RequestBody CreateVocabularyRequest request,
@@ -52,6 +55,8 @@ public class VocabularyAdminController {
         return ResponseEntity.ok(vocabularyAdminMapper.toResponse(result));
     }
 
+    // ROLE: CONTENT_MANAGER
+    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
     @PutMapping("/{id}")
     @ApiResponseMessage(message = VocabularyDetailMessageKey.VOCABULARY_UPDATE_SUCCESS)
     public ResponseEntity<VocabularyResponse> updateVocabulary(
@@ -64,6 +69,8 @@ public class VocabularyAdminController {
         return ResponseEntity.ok(vocabularyAdminMapper.toResponse(result));
     }
 
+    // ROLE: CONTENT_MANAGER
+    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteVocabulary(
             @PathVariable Long id,
@@ -73,6 +80,8 @@ public class VocabularyAdminController {
         return ResponseEntity.noContent().build();
     }
 
+    // ROLE: CONTENT_MANAGER
+    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<VocabularyResponse> getVocabularyDetail(
             @PathVariable Long id,
@@ -82,6 +91,8 @@ public class VocabularyAdminController {
         return ResponseEntity.ok(vocabularyAdminMapper.toResponse(result));
     }
 
+    // ROLE: CONTENT_MANAGER
+    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
     @GetMapping("/search")
     public ResponseEntity<PageData<VocabularyResponse>> searchVocabularies(
             @RequestParam String keyword,

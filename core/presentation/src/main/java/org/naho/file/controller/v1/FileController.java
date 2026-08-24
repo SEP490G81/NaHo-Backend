@@ -10,6 +10,7 @@ import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,6 +24,8 @@ import java.nio.charset.StandardCharsets;
 public class FileController {
     private final DownloadFileInputPort downloadFileInputPort;
 
+    // ROLE: ADMIN, CONTENT_MANAGER, LEARNER
+    @PreAuthorize("hasAnyRole('ADMIN', 'CONTENT_MANAGER', 'LEARNER')")
     @ApiResponseMessage(message = FileDetailMessageKey.FILE_DOWNLOAD_SUCCESSFULLY)
     @GetMapping("/download")
     public ResponseEntity<InputStreamResource> downloadFileFromCloud(@RequestParam("object_key") String objectKey) {

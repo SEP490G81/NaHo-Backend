@@ -19,6 +19,7 @@ import org.naho.vocabulary.result.VocabularyQuizResult;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,7 +40,9 @@ public class VocabularyController {
     private final GetRandomVocabularyQuizInputPort getRandomVocabularyQuizInputPort;
     private final VocabularyQuizResponseMapper vocabularyQuizResponseMapper;
 
+    // ROLE: ADMIN, CONTENT_MANAGER, LEANER
     //validate file excel
+    @PreAuthorize("hasAnyRole('ADMIN', 'CONTENT_MANAGER', 'LEARNER')")
     @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiResponseMessage(message = VocabularyQuestionDetailMessageKey.VOCABULARY_IMPORT_SUCCESS)
     public ResponseEntity<Void> importVocabulary(@RequestPart("file") MultipartFile file) {
@@ -55,6 +58,8 @@ public class VocabularyController {
         }
     }
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @GetMapping("/objective/{objectiveId}")
     @ApiResponseMessage(message = VocabularyQuestionDetailMessageKey.VOCABULARY_OBJECTIVE_GET_SUCCESS)
     public ResponseEntity<VocabulariesOfObjectiveResponse> getVocabulariesOfObjective(
@@ -65,6 +70,8 @@ public class VocabularyController {
         return ResponseEntity.ok(response);
     }
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @GetMapping("/topic/{topicId}")
     @ApiResponseMessage(message = VocabularyQuestionDetailMessageKey.VOCABULARY_TOPIC_GET_SUCCESS)
     public ResponseEntity<VocabulariesOfTopicResponse> getVocabulariesOfTopic(
@@ -75,6 +82,8 @@ public class VocabularyController {
         return ResponseEntity.ok(response);
     }
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @GetMapping("/quiz")
     @ApiResponseMessage(message = VocabularyQuestionDetailMessageKey.VOCABULARY_QUIZ_GET_SUCCESS)
     public ResponseEntity<List<VocabularyQuizResponse>> getRandomQuiz(
@@ -85,6 +94,8 @@ public class VocabularyController {
         return ResponseEntity.ok(response);
     }
 
+    // ROLE: ADMIN, CONTENT_MANAGER, LEARNER
+    @PreAuthorize("hasAnyRole('ADMIN', 'CONTENT_MANAGER', 'LEARNER')")
     @GetMapping("/export/question/{questionId}")
     public ResponseEntity<byte[]> exportByQuestion(
             @PathVariable("questionId") Long questionId
@@ -105,6 +116,8 @@ public class VocabularyController {
         }
     }
 
+    // ROLE: ADMIN, CONTENT_MANAGER, LEARNER
+    @PreAuthorize("hasAnyRole('ADMIN', 'CONTENT_MANAGER', 'LEARNER')")
     @GetMapping("/export/objective/{objectiveId}")
     public ResponseEntity<byte[]> exportByObjective(@PathVariable("objectiveId") Long objectiveId) {
         try {

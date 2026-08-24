@@ -10,6 +10,7 @@ import org.naho.learning.result.LearningPathNodeDetailResult;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +25,8 @@ public class LearningPathNodeController {
     private final GetLearningPathNodeDetailInputPort getLearningPathNodeDetailInputPort;
     private final LearningPathNodeResponseMapper learningPathNodeResponseMapper;
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @GetMapping("/{id}")
     @ApiResponseMessage(message = LearningPathNodeDetailMessageKey.LEARNING_PATH_NODE_GET_DETAIL_SUCCESS)
     public ResponseEntity<LearningPathNodeDetailResponse> getLearningPathNodeDetail(

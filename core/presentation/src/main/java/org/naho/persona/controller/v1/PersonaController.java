@@ -16,6 +16,7 @@ import org.naho.persona.result.PersonaResult;
 import org.naho.persona.type.PersonaStatus;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,6 +31,8 @@ public class PersonaController {
     private final UpdatePersonaInputPort updatePersonaInputPort;
     private final PersonaResponseMapper personaResponseMapper;
 
+    // ROLE: CONTENT_MANAGER, LEARNER
+    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'LEARNER', 'ADMIN')")
     @GetMapping
     @ApiResponseMessage(message = "Get all personas successfully!")
     public ResponseEntity<List<PersonaResponse>> getAllPersonas() {
@@ -42,6 +45,8 @@ public class PersonaController {
         return ResponseEntity.ok(responses);
     }
 
+    // ROLE: CONTENT_MANAGER, LEARNER
+    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'LEARNER', 'ADMIN')")
     @GetMapping("/{personaId}")
     @ApiResponseMessage(message = "Get persona successfully!")
     public ResponseEntity<PersonaResponse> findById(
@@ -51,6 +56,8 @@ public class PersonaController {
         return ResponseEntity.ok(personaResponseMapper.resultToResponse(result));
     }
 
+    // ROLE: CONTENT_MANAGER
+    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
     @PostMapping
     @ApiResponseMessage(message = "Create persona successfully!")
     public ResponseEntity<PersonaResponse> createPersona(
@@ -70,6 +77,8 @@ public class PersonaController {
         return ResponseEntity.ok(personaResponseMapper.resultToResponse(persona));
     }
 
+    // ROLE: CONTENT_MANAGER
+    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
     @PutMapping("/{personaId}")
     @ApiResponseMessage(message = "Update persona successfully!")
     public ResponseEntity<PersonaResponse> updatePersona(
@@ -91,6 +100,8 @@ public class PersonaController {
         return ResponseEntity.ok(personaResponseMapper.resultToResponse(persona));
     }
 
+    // ROLE: CONTENT_MANAGER
+    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
     @PatchMapping("/{personaId}/status")
     @ApiResponseMessage(message = PersonaDetailMessageKey.PERSONA_UPDATE_STATUS_SUCCESS)
     public ResponseEntity<PersonaStatus> updatePersonaStatus(@PathVariable Long personaId) {

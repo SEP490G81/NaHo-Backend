@@ -28,6 +28,7 @@ import org.naho.user.result.AccessTokenPayload;
 import org.naho.user.type.RoleName;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -52,6 +53,8 @@ public class BookController {
     private final UploadBookCoverImageInputPort uploadBookCoverImageInputPort;
     private final FileResponseMapper fileResponseMapper;
 
+    // ROLE: ADMIN, CONTENT_MANAGER
+    @PreAuthorize("hasAnyRole('ADMIN', 'CONTENT_MANAGER')")
     @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiResponseMessage(message = BookDetailMessageKey.BOOK_IMPORT_SUCCESS)
     public ResponseEntity<Void> importBookDataFromExcel(@RequestPart("file") MultipartFile file) {
@@ -67,6 +70,8 @@ public class BookController {
         }
     }
 
+    // ROLE: ADMIN, CONTENT_MANAGER, LEANER
+    @PreAuthorize("hasAnyRole('ADMIN', 'CONTENT_MANAGER', 'LEARNER')")
     @GetMapping
     @ApiResponseMessage(message = BookDetailMessageKey.BOOK_GET_LIST_SUCCESS)
     public ResponseEntity<List<BookResponse>> listBooks() {
@@ -75,6 +80,8 @@ public class BookController {
         return ResponseEntity.ok(response);
     }
 
+    // ROLE: ADMIN, CONTENT_MANAGER, LEANER
+    @PreAuthorize("hasAnyRole('ADMIN', 'CONTENT_MANAGER', 'LEARNER')")
     @GetMapping("/{bookId}")
     @ApiResponseMessage(message = BookDetailMessageKey.BOOK_GET_DETAIL_SUCCESS)
     public ResponseEntity<BookResponse> getBookDetail(@PathVariable Long bookId) {
@@ -83,6 +90,8 @@ public class BookController {
         return ResponseEntity.ok(response);
     }
 
+    // ROLE: CONTENT_MANAGER
+    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
     @PutMapping("/{bookId}")
     @ApiResponseMessage(message = BookDetailMessageKey.BOOK_UPDATE_SUCCESS)
     public ResponseEntity<BookResponse> updateBook(
@@ -101,6 +110,8 @@ public class BookController {
         return ResponseEntity.ok(response);
     }
 
+    // ROLE: CONTENT_MANAGER
+    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
     @PostMapping(value = "/cover-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiResponseMessage(message = BookDetailMessageKey.BOOK_COVER_UPLOAD_SUCCESS)
     public ResponseEntity<FileResponse> uploadCoverImage(

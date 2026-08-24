@@ -29,6 +29,7 @@ import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -51,6 +52,8 @@ public class ReportController {
     private final FileValidatorPort fileValidatorPort;
     private final FileStorageServicePort fileStorageServicePort;
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiResponseMessage(message = ReportDetailMessageKey.REPORT_CREATE_SUCCESS)
     public ResponseEntity<ReportResponse> createReport(
@@ -89,6 +92,8 @@ public class ReportController {
         return ResponseEntity.status(HttpStatus.CREATED).body(reportResponseMapper.resultToResponse(result));
     }
 
+    // ROLE: ADMIN
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin")
     @ApiResponseMessage(message = ReportDetailMessageKey.REPORT_GET_LIST_ADMIN_SUCCESS)
     public ResponseEntity<List<ReportResponse>> getReportsByAdmin() {
@@ -98,6 +103,8 @@ public class ReportController {
                 .toList());
     }
 
+    // ROLE: CONTENT_MANAGER
+    @PreAuthorize("hasRole('CONTENT_MANAGER')")
     @GetMapping("/content-manager")
     @ApiResponseMessage(message = ReportDetailMessageKey.REPORT_GET_LIST_CONTENT_MANAGER_SUCCESS)
     public ResponseEntity<List<ReportResponse>> getReportsByContentManager() {
@@ -107,6 +114,8 @@ public class ReportController {
                 .toList());
     }
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @GetMapping("/user")
     @ApiResponseMessage(message = ReportDetailMessageKey.REPORT_GET_LIST_USER_SUCCESS)
     public ResponseEntity<List<ReportResponse>> getReportsByUser(
@@ -118,6 +127,8 @@ public class ReportController {
         return ResponseEntity.ok(responses);
     }
 
+    // ROLE: ADMIN, CONTENT_MANAGER
+    @PreAuthorize("hasAnyRole('ADMIN', 'CONTENT_MANAGER')")
     @PatchMapping("/{id}/status")
     @ApiResponseMessage(message = ReportDetailMessageKey.REPORT_UPDATE_STATUS_SUCCESS)
     public ResponseEntity<ReportResponse> updateReportStatus(
@@ -129,6 +140,8 @@ public class ReportController {
         return ResponseEntity.ok(reportResponseMapper.resultToResponse(result));
     }
 
+    // ROLE: ADMIN, CONTENT_MANAGER, LEARNER
+    @PreAuthorize("hasAnyRole('ADMIN', 'CONTENT_MANAGER', 'LEARNER')")
     @GetMapping("/{id}")
     @ApiResponseMessage(message = ReportDetailMessageKey.REPORT_GET_DETAIL_SUCCESS)
     public ResponseEntity<ReportResponse> getReport(@PathVariable("id") Long id) {

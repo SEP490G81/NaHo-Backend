@@ -14,6 +14,7 @@ import org.naho.notification.result.NotificationResult;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +31,8 @@ public class NotificationController {
     private final MarkAllNotificationsAsReadInputPort markAllNotificationsAsReadInputPort;
     private final NotificationResponseMapper notificationResponseMapper;
 
+    // ROLE: ADMIN, CONTENT_MANAGER, LEARNER
+    @PreAuthorize("hasAnyRole('ADMIN', 'CONTENT_MANAGER', 'LEARNER')")
     @GetMapping
     @ApiResponseMessage(message = NotificationDetailMessageKey.NOTIFICATION_GET_LIST_SUCCESS)
     public ResponseEntity<List<NotificationResponse>> getList(
@@ -47,6 +50,8 @@ public class NotificationController {
         return ResponseEntity.ok(responses);
     }
 
+    // ROLE: ADMIN, CONTENT_MANAGER, LEARNER
+    @PreAuthorize("hasAnyRole('ADMIN', 'CONTENT_MANAGER', 'LEARNER')")
     @GetMapping("/unread-count")
     @ApiResponseMessage(message = NotificationDetailMessageKey.NOTIFICATION_COUNT_UNREAD_SUCCESS)
     public ResponseEntity<Long> countUnread(@AuthenticationPrincipal AccessTokenPayload payload) {
@@ -54,6 +59,8 @@ public class NotificationController {
         return ResponseEntity.ok(count);
     }
 
+    // ROLE: ADMIN, CONTENT_MANAGER, LEARNER
+    @PreAuthorize("hasAnyRole('ADMIN', 'CONTENT_MANAGER', 'LEARNER')")
     @PatchMapping("/{id}/read")
     @ApiResponseMessage(message = NotificationDetailMessageKey.NOTIFICATION_MARK_READ_SUCCESS)
     public ResponseEntity<NotificationResponse> markAsRead(
@@ -66,6 +73,8 @@ public class NotificationController {
         return ResponseEntity.ok(notificationResponseMapper.resultToResponse(result));
     }
 
+    // ROLE: ADMIN, CONTENT_MANAGER, LEARNER
+    @PreAuthorize("hasAnyRole('ADMIN', 'CONTENT_MANAGER', 'LEARNER')")
     @PatchMapping("/read-all")
     @ApiResponseMessage(message = NotificationDetailMessageKey.NOTIFICATION_MARK_ALL_READ_SUCCESS)
     public ResponseEntity<Void> markAllAsRead(@AuthenticationPrincipal AccessTokenPayload payload) {

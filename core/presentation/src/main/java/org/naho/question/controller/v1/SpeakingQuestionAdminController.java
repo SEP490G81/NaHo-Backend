@@ -17,6 +17,7 @@ import org.naho.user.result.AccessTokenPayload;
 import org.naho.user.type.RoleName;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +34,8 @@ public class SpeakingQuestionAdminController {
     private final SpeakingQuestionResponseMapper speakingQuestionResponseMapper;
     private final RoleRepositoryPort roleRepositoryPort;
 
+    // ROLE: CONTENT_MANAGER
+    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
     @PutMapping("/{id}")
     @ApiResponseMessage(message = SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_UPDATE_SUCCESS)
     public ResponseEntity<UpdateSpeakingQuestionResult> updateSpeakingQuestion(
@@ -83,6 +86,8 @@ public class SpeakingQuestionAdminController {
         return ResponseEntity.ok(result);
     }
 
+    // ROLE: CONTENT_MANAGER
+    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<SpeakingQuestionResponse> getSpeakingQuestionDetail(
             @PathVariable("id") Long id,

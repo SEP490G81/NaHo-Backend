@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +32,8 @@ public class ReactionController {
     private final SimpMessagingTemplate messagingTemplate;
     private final ReactionRequestMapper reactionRequestMapper;
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @GetMapping
     @ApiResponseMessage(message = ReactionDetailMessageKey.REACTION_GET_DETAIL_SUCCESS)
     public ResponseEntity<ReactionDetailResponse> getReactionsByComment(
@@ -39,6 +42,8 @@ public class ReactionController {
         return ResponseEntity.ok(reactionResponseMapper.resultToDetailResponse(result));
     }
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @PostMapping("/toggle")
     @ApiResponseMessage(message = ReactionDetailMessageKey.REACTION_TOGGLE_SUCCESS)
     public ResponseEntity<ReactionResponse> toggleReaction(
@@ -51,6 +56,8 @@ public class ReactionController {
         return ResponseEntity.ok(response);
     }
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @MessageMapping("/reaction/toggle")
     @SendTo("/topic/reaction")
     public ReactionResponse actionReact(

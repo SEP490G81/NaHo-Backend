@@ -12,6 +12,7 @@ import org.naho.user.dto.response.LeaderboardUserResponse;
 import org.naho.user.result.AccessTokenPayload;
 import org.naho.user.result.LeaderboardUserResult;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +29,8 @@ public class LeagueController {
     private final LeagueResponseMapper leagueResponseMapper;
     private final UserResponseMapper userResponseMapper;
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @ApiResponseMessage(message = LeagueDetailMessageKey.LEAGUE_GET_ALL_SUCCESS)
     @GetMapping("/all")
     public ResponseEntity<List<LeagueResponse>> findAll() {
@@ -40,6 +43,8 @@ public class LeagueController {
         return ResponseEntity.ok(leagueResponseList);
     }
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @ApiResponseMessage(message = LeagueDetailMessageKey.LEAGUE_GET_LEADERBOARD_SUCCESS)
     @GetMapping("leaderboard/{leagueId}")
     public ResponseEntity<List<LeaderboardUserResponse>> findTop10OrderByTotalPointInLeague(
@@ -54,6 +59,8 @@ public class LeagueController {
         return ResponseEntity.ok(responses);
     }
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @ApiResponseMessage(message = LeagueDetailMessageKey.LEAGUE_GET_USER_LEADERBOARD_SUCCESS)
     @GetMapping("/me")
     public ResponseEntity<List<LeaderboardUserResponse>> findTopOfUserByUserId(

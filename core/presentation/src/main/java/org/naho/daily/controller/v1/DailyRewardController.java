@@ -16,6 +16,7 @@ import org.naho.shared.constant.SystemZoneId;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +32,8 @@ public class DailyRewardController {
     private final DailyRewardResponseMapper dailyRewardResponseMapper;
     private final UserDailyAttendanceResponseMapper userDailyAttendanceResponseMapper;
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @ApiResponseMessage(message = DailyRewardDetailMessageKey.DAILY_REWARD_GET_CURRENT_MONTH_SUCCESS)
     @GetMapping("/current-month")
     public ResponseEntity<List<DailyRewardResponse>> getCurrentMonthDailyRewards() {
@@ -42,6 +45,8 @@ public class DailyRewardController {
         return ResponseEntity.ok(responses);
     }
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @ApiResponseMessage(message = DailyRewardDetailMessageKey.DAILY_REWARD_CREATE_CURRENT_MONTH_SUCCESS)
     @PostMapping("/current-month")
     public ResponseEntity<List<DailyRewardResponse>> createCurrentMonthDailyRewards() {
@@ -57,6 +62,8 @@ public class DailyRewardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @ApiResponseMessage(message = DailyRewardDetailMessageKey.DAILY_REWARD_EARN_SUCCESS)
     @PostMapping
     public ResponseEntity<UserDailyAttendanceResponse> earnDailyReward(

@@ -13,6 +13,7 @@ import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,6 +30,8 @@ public class AnswerHistoryController {
     private final CrudAnswerHistoryInputPort crudAnswerHistoryInputPort;
     private final AnswerHistoryResponseMapper answerHistoryResponseMapper;
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @ApiResponseMessage(message = FileDetailMessageKey.FILE_GENERATE_PRESIGNED_URL_SUCCESSFULLY)
     @GetMapping("/{id}/presigned-url")
     public ResponseEntity<Void> generateAudioFilePresignedUrl(
@@ -44,6 +47,8 @@ public class AnswerHistoryController {
                 .build();
     }
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @ApiResponseMessage(message = SpeakingQuestionDetailMessageKey.ANSWER_HISTORY_GET_LIST_SUCCESS)
     @GetMapping("/speaking-question/{speakingQuestionId}")
     public ResponseEntity<List<AnswerHistoryListItemResponse>> findAllBySpeakingQuestionIdAndUserId(
@@ -60,6 +65,8 @@ public class AnswerHistoryController {
         return ResponseEntity.ok(responses);
     }
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @ApiResponseMessage(message = SpeakingQuestionDetailMessageKey.ANSWER_HISTORY_GET_DETAIL_SUCCESS)
     @GetMapping("/{answerHistoryId}")
     public ResponseEntity<AnswerHistoryResponse> findByAnswerHistoryIdAndUserId(

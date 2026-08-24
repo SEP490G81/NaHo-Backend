@@ -9,6 +9,7 @@ import org.naho.learning.result.UserLearningProgressResult;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +22,8 @@ public class UserLearningProgressController {
     private final CrudUserLearningProgressInputPort crudUserLearningProgressInputPort;
     private final UserLearningProgressResponseMapper userLearningProgressResponseMapper;
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @ApiResponseMessage(message = UserLearningProgressDetailMessageKey.USER_LEARNING_PROGRESS_GET_SUCCESS)
     @GetMapping("/me")
     public ResponseEntity<UserLearningProgressResponse> findMyUserLearningProgress(

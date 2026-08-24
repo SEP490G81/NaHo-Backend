@@ -38,16 +38,10 @@ public class SecurityConfig {
             "/api/v1/auth/forgot-password-otp",
             "/api/v1/auth/reset-password",
             "/api/v1/auth/resend-otp",
-            "/api/v1/users/**",
-            "/api/v1/roles/**",
-            "/api/v1/books/**",
-            "/api/v1/reports/**",
-            "/api/v1/topics/**",
-            "/api/v1/lessons/**",
+            "/api/v1/users/register",
+            "/api/v1/sse/connect",
             "/api/v1/payments/vnpay-ipn",
             "/api/v1/payments/vnpay-return",
-            "/api/v1/quote/**",
-            "/api/v1/vocabularies/**",
             "/ws/**"
     };
 

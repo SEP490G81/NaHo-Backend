@@ -8,6 +8,7 @@ import org.naho.quote.port.in.GetRandomQuoteInputPort;
 import org.naho.quote.result.QuoteResult;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +21,8 @@ public class QuoteController {
     private final GetRandomQuoteInputPort getRandomQuoteInputPort;
     private final QuoteResponseMapper quoteResponseMapper;
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @GetMapping
     @ApiResponseMessage(message = QuoteDetailMessageKey.QUOTE_GET_SUCCESS)
     public ResponseEntity<QuoteResponse> getRandomQuote() {

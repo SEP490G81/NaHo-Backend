@@ -8,6 +8,7 @@ import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.shared.exception.PresentationException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -21,6 +22,8 @@ public class GrammarController {
 
     private final ImportGrammarPort importGrammarPort;
 
+    // ROLE: CONTENT_MANAGER
+    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
     @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiResponseMessage(message = GrammarDetailMessageKey.GRAMMAR_IMPORT_SUCCESS)
     public ResponseEntity<Void> importGrammar(@RequestPart("file") MultipartFile file) {

@@ -17,6 +17,7 @@ import org.naho.user.result.LoginResult;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,6 +42,7 @@ public class AuthController {
     private final ChangePasswordInputPort changePasswordInputPort;
     private final ChangePasswordRequestMapper changePasswordRequestMapper;
 
+    // PUBLIC RESOURCE
     @ApiResponseMessage(message = UserDetailMessageKey.USER_LOGIN_SUCCESSFULLY)
     @PostMapping("/login")
     public ResponseEntity<Void> credentialsLogin(
@@ -65,6 +67,7 @@ public class AuthController {
                 .build();
     }
 
+    // PUBLIC RESOURCE
     @ApiResponseMessage(message = UserDetailMessageKey.USER_LOGOUT_SUCCESSFULLY)
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(
@@ -81,18 +84,39 @@ public class AuthController {
         ResponseCookie clearRefreshTokenCookie =
                 cookieFactory.clearCookieForJWTToken(TokenType.REFRESH_TOKEN_COOKIE_NAME);
 
+        ResponseCookie clearAdminAccessTokenCookie =
+                cookieFactory.clearCookieForJWTToken(TokenType.ADMIN_ACCESS_TOKEN_COOKIE_NAME);
+
+        ResponseCookie clearAdminRefreshTokenCookie =
+                cookieFactory.clearCookieForJWTToken(TokenType.ADMIN_REFRESH_TOKEN_COOKIE_NAME);
+
         return ResponseEntity
                 .noContent()
                 .header(HttpHeaders.SET_COOKIE, clearAccessTokenCookie.toString())
                 .header(HttpHeaders.SET_COOKIE, clearRefreshTokenCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, clearAdminAccessTokenCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, clearAdminRefreshTokenCookie.toString())
                 .build();
     }
 
+    // PUBLIC RESOURCE
     @ApiResponseMessage(message = UserDetailMessageKey.USER_ROTATE_TOKEN_SUCCESSFULLY)
     @PostMapping("/rotation")
     public ResponseEntity<Void> rotateToken(
-            @CookieValue(TokenType.REFRESH_TOKEN_COOKIE_NAME) String refreshToken
+            @CookieValue(value = TokenType.REFRESH_TOKEN_COOKIE_NAME, required = false) String userRefreshToken,
+            @CookieValue(value = TokenType.ADMIN_REFRESH_TOKEN_COOKIE_NAME, required = false) String adminRefreshToken
     ) {
+        String refreshToken = (adminRefreshToken != null && !adminRefreshToken.isBlank())
+                ? adminRefreshToken
+                : userRefreshToken;
+
+        if (refreshToken == null || refreshToken.isBlank()) {
+            throw new org.naho.shared.exception.ApplicationException(
+                    org.naho.user.exception.UserErrorCode.USER_UNAUTHORIZED,
+                    UserDetailMessageKey.USER_UNAUTHORIZED
+            );
+        }
+
         LoginResult result = authInputPort.rotateToken(refreshToken);
 
         ResponseCookie accessTokenCookie =
@@ -107,6 +131,7 @@ public class AuthController {
                 .build();
     }
 
+    // PUBLIC RESOURCE
     @ApiResponseMessage(message = UserDetailMessageKey.USER_EMAIL_VERIFIED_SUCCESSFULLY)
     @PostMapping("/verify-email")
     public ResponseEntity<Void> verifyEmail(
@@ -127,6 +152,7 @@ public class AuthController {
                 .build();
     }
 
+    // PUBLIC RESOURCE
     @ApiResponseMessage(message = UserDetailMessageKey.USER_OTP_RESENT_SUCCESSFULLY)
     @PostMapping("/resend-otp")
     public ResponseEntity<Void> resendOtp(
@@ -137,6 +163,7 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
+    // PUBLIC RESOURCE
     @ApiResponseMessage(message = UserDetailMessageKey.USER_FORGOT_PASSWORD_EMAIL_SENT)
     @PostMapping("/forgot-password")
     public ResponseEntity<Void> forgotPassword(
@@ -147,6 +174,7 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
+    // PUBLIC RESOURCE
     @ApiResponseMessage(message = UserDetailMessageKey.USER_OTP_VERIFIED_SUCCESSFULLY)
     @PostMapping("/forgot-password-otp")
     public ResponseEntity<java.util.Map<String, String>> verifyForgotPasswordOtp(
@@ -157,6 +185,7 @@ public class AuthController {
         return ResponseEntity.ok(java.util.Map.of("resetToken", resetToken));
     }
 
+    // PUBLIC RESOURCE
     @ApiResponseMessage(message = UserDetailMessageKey.USER_PASSWORD_RESET_SUCCESSFULLY)
     @PostMapping("/reset-password")
     public ResponseEntity<Void> resetPassword(
@@ -167,6 +196,8 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
+    // ROLE: USER, ADMIN, CONTENT_MANAGER
+
     /**
      * Đổi mật khẩu (khi người dùng nhớ mật khẩu cũ)
      *
@@ -174,6 +205,7 @@ public class AuthController {
      * @param request bao gồm old password và password mới
      * @return Void
      */
+    @PreAuthorize("hasAnyRole('LEARNER', 'ADMIN', 'CONTENT_MANAGER')")
     @ApiResponseMessage(message = UserDetailMessageKey.USER_CHANGE_PASSWORD_SUCCESSFULLY)
     @PostMapping("/change-password")
     public ResponseEntity<Void> changePassword(

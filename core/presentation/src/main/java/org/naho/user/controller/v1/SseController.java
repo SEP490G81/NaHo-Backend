@@ -15,6 +15,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class SseController {
     private final UserSessionConnectionManager userSessionConnectionManager;
 
+    // PUBLIC RESOURCE
     @GetMapping("/connect")
     public SseEmitter connect(@AuthenticationPrincipal AccessTokenPayload payload) {
         return userSessionConnectionManager.connect(

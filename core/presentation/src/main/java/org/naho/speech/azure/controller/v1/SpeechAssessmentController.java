@@ -13,6 +13,7 @@ import org.naho.speech.azure.result.SpeechAssessmentResult;
 import org.naho.subscription.port.in.GetActiveSubscriptionInputPort;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +30,8 @@ public class SpeechAssessmentController {
     private final FileValidatorPort fileValidatorPort;
     private final GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
 
+    // ROLE: LEARNER
+
     /**
      *
      * @param file
@@ -37,6 +40,7 @@ public class SpeechAssessmentController {
      * @return
      * @throws IOException
      */
+    @PreAuthorize("hasRole('LEARNER')")
     @PostMapping
     @ApiResponseMessage(message = SpeechDetailMessageKey.SPEECH_PRONUNCIATION_ASSESSMENT_SUCCESSFULLY)
     public ResponseEntity<SpeechAssessmentResponse> assessPronunciation(

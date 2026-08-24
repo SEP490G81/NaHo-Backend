@@ -9,6 +9,7 @@ import org.naho.learning.result.UserLearningProgressResult;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,11 +23,14 @@ public class UserLearningProgressController {
     private final CrudUserLearningProgressInputPort crudUserLearningProgressInputPort;
     private final UserLearningProgressResponseMapper userLearningProgressResponseMapper;
 
+    // ROLE: LEARNER
+
     /**
      * @param payload chứa user id của người đang đăng nhập
      * @return UserLearningProgressResponse
      * @deprecated Lấy user learning progress của người đang đăng nhập
      */
+    @PreAuthorize("hasRole('LEARNER')")
     @Deprecated(forRemoval = true)
     @ApiResponseMessage(message = UserLearningProgressDetailMessageKey.USER_LEARNING_PROGRESS_GET_SUCCESS)
     @GetMapping
@@ -42,12 +46,15 @@ public class UserLearningProgressController {
         return ResponseEntity.ok(response);
     }
 
+    // ROLE: LEARNER
+    
     /**
      * Lấy user learning progress theo id của người dùng
      *
      * @param userId user id
      * @return UserLearningProgressResponse
      */
+    @PreAuthorize("hasRole('LEARNER')")
     @ApiResponseMessage(message = UserLearningProgressDetailMessageKey.USER_LEARNING_PROGRESS_GET_SUCCESS)
     @GetMapping("/{userId}")
     public ResponseEntity<UserLearningProgressResponse> findUserLearningProgressByUserId(

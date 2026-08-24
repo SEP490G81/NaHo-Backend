@@ -16,6 +16,7 @@ import org.naho.user.port.out.RoleRepositoryPort;
 import org.naho.user.result.AccessTokenPayload;
 import org.naho.user.type.RoleName;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +34,8 @@ public class ObjectiveController {
     private final UpdateObjectiveInputPort updateObjectiveInputPort;
     private final ObjectiveRequestMapper objectiveRequestMapper;
 
+    // ROLE: ADMIN, CONTENT_MANAGER, LEANER
+    @PreAuthorize("hasAnyRole('ADMIN', 'CONTENT_MANAGER', 'LEARNER')")
     @GetMapping("/{id}")
     @ApiResponseMessage(message = ObjectiveDetailMessageKey.OBJECTIVE_GET_DETAIL_SUCCESS)
     public ResponseEntity<ObjectiveDetailResponse> getObjectiveDetail(
@@ -44,6 +47,8 @@ public class ObjectiveController {
         return ResponseEntity.ok(response);
     }
 
+    // ROLE: CONTENT_MANAGER
+    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
     @PutMapping("/{id}")
     @ApiResponseMessage(message = ObjectiveDetailMessageKey.OBJECTIVE_UPDATE_SUCCESS)
     public ResponseEntity<ObjectiveResponse> updateObjective(

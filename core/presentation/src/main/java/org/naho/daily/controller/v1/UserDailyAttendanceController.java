@@ -9,6 +9,7 @@ import org.naho.i18n.message.daily.UserDailyAttendanceDetailMessageKey;
 import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,8 @@ public class UserDailyAttendanceController {
     private final CrudUserDailyAttendanceInputPort crudUserDailyAttendanceInputPort;
     private final UserDailyAttendanceResponseMapper userDailyAttendanceResponseMapper;
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @ApiResponseMessage(message = UserDailyAttendanceDetailMessageKey.USER_DAILY_ATTENDANCE_GET_CURRENT_MONTH_SUCCESS)
     @GetMapping("/all/current-month")
     public ResponseEntity<List<UserDailyAttendanceResponse>> findAllUserDailyAttendanceOfCurrentMonth(

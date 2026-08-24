@@ -155,7 +155,8 @@ public class AuthUseCase implements AuthInputPort {
                 SessionRevokedReason.LOGIN_ON_OTHER_DEVICE
         );
 
-        TokenResult refreshToken = tokenServicePort.generateRefreshToken(now);
+        boolean isAdmin = isUserAdmin(user.getId());
+        TokenResult refreshToken = tokenServicePort.generateRefreshToken(now, isAdmin);
 
         String hashRefreshToken = encoderPort.hashRefreshToken(refreshToken.value());
 
@@ -174,7 +175,7 @@ public class AuthUseCase implements AuthInputPort {
         // câu lệnh insert
         UserSession savedUserSession = userSessionRepositoryPort.save(userSession);
 
-        TokenResult accessToken = tokenServicePort.generateAccessToken(savedUserSession);
+        TokenResult accessToken = tokenServicePort.generateAccessToken(savedUserSession, isAdmin);
 
         userSessionEventPublisherPort.publishForceLogoutEvent(new ForceLogoutCommand(
                 savedUserSession.getUserId(),
@@ -252,7 +253,8 @@ public class AuthUseCase implements AuthInputPort {
 
         Instant now = Instant.now();
 
-        TokenResult refreshToken = tokenServicePort.generateRefreshToken(now);
+        boolean isAdmin = isUserAdmin(currentUser.getId());
+        TokenResult refreshToken = tokenServicePort.generateRefreshToken(now, isAdmin);
 
         String hashRefreshToken = encoderPort.hashRefreshToken(refreshToken.value());
 
@@ -270,7 +272,7 @@ public class AuthUseCase implements AuthInputPort {
 
         UserSession savedUserSession = userSessionRepositoryPort.save(userSession);
 
-        TokenResult accessToken = tokenServicePort.generateAccessToken(savedUserSession);
+        TokenResult accessToken = tokenServicePort.generateAccessToken(savedUserSession, isAdmin);
 
         userSessionEventPublisherPort.publishForceLogoutEvent(new ForceLogoutCommand(
                 savedUserSession.getUserId(),
@@ -317,8 +319,9 @@ public class AuthUseCase implements AuthInputPort {
         userSession.setLastUsedAt(now);
         userSessionRepositoryPort.save(userSession);
 
+        boolean isAdmin = isUserAdmin(userSession.getUserId());
         // generate new refresh token and new user session
-        TokenResult newRefreshToken = tokenServicePort.generateRefreshToken(now);
+        TokenResult newRefreshToken = tokenServicePort.generateRefreshToken(now, isAdmin);
 
         String newHashRefreshToken = encoderPort.hashRefreshToken(newRefreshToken.value());
 
@@ -336,10 +339,18 @@ public class AuthUseCase implements AuthInputPort {
 
         UserSession savedUserSession = userSessionRepositoryPort.save(newUserSession);
 
-        TokenResult newAccessToken = tokenServicePort.generateAccessToken(savedUserSession);
+        TokenResult newAccessToken = tokenServicePort.generateAccessToken(savedUserSession, isAdmin);
 
         return new LoginResult(
                 newAccessToken,
                 newRefreshToken);
+    }
+
+    private boolean isUserAdmin(Long userId) {
+        if (userId == null) {
+            return false;
+        }
+        java.util.List<String> roleNames = roleRepositoryPort.findRoleNamesByUserId(userId);
+        return roleNames.contains(RoleName.ADMIN.name()) || roleNames.contains(RoleName.CONTENT_MANAGER.name());
     }
 }

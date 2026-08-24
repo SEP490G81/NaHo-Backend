@@ -9,6 +9,7 @@ import org.naho.subscription.port.in.CrudUserDailyAiUsageInputPort;
 import org.naho.subscription.result.UserDailyAiUsageResult;
 import org.naho.user.result.AccessTokenPayload;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +22,8 @@ public class UserDailyAiUsageController {
     private final CrudUserDailyAiUsageInputPort crudUserDailyAiUsageInputPort;
     private final UserDailyAiUsageResponseMapper userDailyAiUsageResponseMapper;
 
+    // ROLE: LEARNER
+    @PreAuthorize("hasRole('LEARNER')")
     @ApiResponseMessage(message = SubscriptionDetailMessageKey.USER_DAILY_AI_USAGE_GET_TODAY_SUCCESS)
     @GetMapping("/today")
     public ResponseEntity<UserDailyAiUsageResponse> findTodayUserDailyAiUsage(

@@ -17,6 +17,7 @@ import org.naho.user.result.AccessTokenPayload;
 import org.naho.user.type.RoleName;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,6 +44,8 @@ public class GrammarAdminController {
         }
     }
 
+    // ROLE: CONTENT_MANAGER
+    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
     @PostMapping
     public ResponseEntity<GrammarResponse> createGrammar(
             @Valid @RequestBody CreateGrammarRequest request,
@@ -52,6 +55,8 @@ public class GrammarAdminController {
         return ResponseEntity.ok(grammarAdminMapper.resultToResponse(result));
     }
 
+    // ROLE: CONTENT_MANAGER
+    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
     @PutMapping("/{id}")
     @ApiResponseMessage(message = GrammarDetailMessageKey.GRAMMAR_UPDATE_SUCCESS)
     public ResponseEntity<GrammarResponse> updateGrammar(
@@ -64,6 +69,8 @@ public class GrammarAdminController {
         return ResponseEntity.ok(grammarAdminMapper.resultToResponse(result));
     }
 
+    // ROLE: CONTENT_MANAGER
+    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGrammar(
             @PathVariable Long id,
@@ -73,6 +80,8 @@ public class GrammarAdminController {
         return ResponseEntity.noContent().build();
     }
 
+    // ROLE: CONTENT_MANAGER
+    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<GrammarResponse> getGrammarDetail(
             @PathVariable Long id,
@@ -82,6 +91,8 @@ public class GrammarAdminController {
         return ResponseEntity.ok(grammarAdminMapper.resultToResponse(result));
     }
 
+    // ROLE: CONTENT_MANAGER
+    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
     @GetMapping("/search")
     public ResponseEntity<PageData<GrammarResponse>> searchGrammars(
             @RequestParam String keyword,
