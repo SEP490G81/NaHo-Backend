@@ -26,7 +26,6 @@ import org.naho.speech.llm.conversation.dto.response.SpeakingSessionListItemResp
 import org.naho.speech.llm.conversation.dto.response.SpeakingSessionResponse;
 import org.naho.speech.llm.conversation.port.in.CrudSpeakingSessionInputPort;
 import org.naho.speech.llm.conversation.port.in.EndSessionInputPort;
-import org.naho.speech.llm.conversation.port.in.SpeakingSessionCleanupInputPort;
 import org.naho.speech.llm.conversation.port.in.SpeakingSessionInputPort;
 import org.naho.speech.llm.conversation.result.ChatResult;
 import org.naho.speech.llm.conversation.result.SpeakingSessionAssessmentResult;
@@ -57,7 +56,6 @@ public class SpeakingSessionController {
     private final FileStorageServicePort fileStorageServicePort;
     private final FileValidatorPort fileValidatorPort;
     private final GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
-    private final SpeakingSessionCleanupInputPort speakingSessionCleanupInputPort;
     private final CrudSpeakingSessionInputPort crudSpeakingSessionInputPort;
     private final FileAudioConvertPort fileAudioConvertPort;
 
@@ -209,7 +207,7 @@ public class SpeakingSessionController {
             @PathVariable String sessionCode,
             @AuthenticationPrincipal AccessTokenPayload payload
     ) {
-        speakingSessionCleanupInputPort.deleteSession(sessionCode, payload.userId());
+        crudSpeakingSessionInputPort.deleteSessionBySessionCodeAndUserId(sessionCode, payload.userId());
         return ResponseEntity.noContent().build();
     }
 

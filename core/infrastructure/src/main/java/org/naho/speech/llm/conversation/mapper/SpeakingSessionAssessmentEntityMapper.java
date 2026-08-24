@@ -18,6 +18,7 @@ public interface SpeakingSessionAssessmentEntityMapper {
     @Mapping(target = "speakingSessionId", source = "speakingSession.id")
     SpeakingSessionAssessment entityToDomain(SpeakingSessionAssessmentEntity entity);
 
+    @Mapping(target = "speakingImprovedExpressions", ignore = true)
     @Mapping(target = "speakingSession", source = "speakingSessionId")
     @Mapping(target = "createdTime", ignore = true)
     @Mapping(target = "modifiedTime", ignore = true)

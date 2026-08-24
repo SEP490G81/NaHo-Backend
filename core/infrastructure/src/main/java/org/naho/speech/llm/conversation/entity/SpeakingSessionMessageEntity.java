@@ -5,9 +5,12 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.file.entity.FileEntity;
+import org.naho.shared.converter.StringListJsonConverter;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.speech.llm.type.MessageType;
 import org.naho.speech.llm.type.SenderType;
+
+import java.util.List;
 
 @SuperBuilder
 @Getter
@@ -54,6 +57,10 @@ public class SpeakingSessionMessageEntity extends BaseEntity {
 
     @Column(name = "pronunciation_score")
     Double pronunciationScore;
+
+    @Convert(converter = StringListJsonConverter.class)
+    @Column(name = "suggested_replies", columnDefinition = "TEXT")
+    List<String> suggestedReplies;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "audio_file_id")

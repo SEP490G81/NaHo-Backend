@@ -150,6 +150,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                         .content(parsed.reply())
                         .contentTranslation(parsed.replyTranslation())
                         .grammarNote(parsed.grammarNote())
+                        .suggestedReplies(parsed.suggestedReplies())
                         .build()
         );
 
@@ -224,12 +225,13 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                             .content(parsed.reply())
                             .contentTranslation(parsed.replyTranslation())
                             .grammarNote(parsed.grammarNote())
+                            .suggestedReplies(parsed.suggestedReplies())
                             .build()
             );
 
             return new ChatResult(
                     speakingSessionMessageResultMapper.domainToResult(userMessage),
-                    speakingSessionMessageResultMapper.domainToResult(aiMessage, parsed.suggestedReplies())
+                    speakingSessionMessageResultMapper.domainToResult(aiMessage)
             );
         });
     }
@@ -325,6 +327,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
                             .content(parsed.reply())
                             .contentTranslation(parsed.replyTranslation())
                             .grammarNote(parsed.grammarNote())
+                            .suggestedReplies(parsed.suggestedReplies())
                             .build()
             );
 
@@ -333,7 +336,7 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
 
             return new ChatResult(
                     speakingSessionMessageResultMapper.domainToResult(userMessage),
-                    speakingSessionMessageResultMapper.domainToResult(aiMessage, parsed.suggestedReplies())
+                    speakingSessionMessageResultMapper.domainToResult(aiMessage)
             );
         });
     }

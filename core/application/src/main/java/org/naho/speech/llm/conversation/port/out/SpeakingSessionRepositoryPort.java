@@ -12,7 +12,7 @@ import java.util.List;
 public interface SpeakingSessionRepositoryPort {
     SpeakingSession save(SpeakingSession speakingSession);
 
-    SpeakingSession increaseTotalTurns(Long sessionId);
+    void increaseTotalTurns(Long sessionId);
 
     SpeakingSession initSpeakingSession(
             String sessionCode,
@@ -39,7 +39,7 @@ public interface SpeakingSessionRepositoryPort {
      */
     int countActiveSessionsByUserId(Long userId);
 
-    void deleteSessionBySessionCode(String sessionCode);
+    void deleteSessionBySessionCodeAndUserId(String sessionCode, Long userId);
 
     boolean isSessionBelongToUser(String sessionCode, Long userId);
 

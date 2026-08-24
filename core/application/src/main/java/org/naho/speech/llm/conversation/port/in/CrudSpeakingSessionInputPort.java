@@ -19,4 +19,6 @@ public interface CrudSpeakingSessionInputPort {
             String sessionCode,
             Long userId
     );
+
+    void deleteSessionBySessionCodeAndUserId(String sessionCode, Long userId);
 }

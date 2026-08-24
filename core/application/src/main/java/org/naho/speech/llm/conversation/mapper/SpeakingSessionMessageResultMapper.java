@@ -7,36 +7,29 @@ import org.naho.speech.llm.model.conversation.SpeakingSessionMessage;
 import org.naho.speech.llm.type.MessageType;
 import org.naho.speech.llm.type.SenderType;
 
-import java.util.List;
-
 public class SpeakingSessionMessageResultMapper {
     private final SpeakingSessionHelper speakingSessionHelper;
     private final FileStorageServicePort fileStorageServicePort;
 
     public SpeakingSessionMessageResultMapper(
             SpeakingSessionHelper speakingSessionHelper,
-            FileStorageServicePort fileStorageServicePort
-    ) {
+            FileStorageServicePort fileStorageServicePort) {
         this.speakingSessionHelper = speakingSessionHelper;
         this.fileStorageServicePort = fileStorageServicePort;
     }
 
     public SpeakingSessionMessageResult domainToResult(SpeakingSessionMessage domain) {
-        return domainToResult(domain, List.of());
-    }
-
-    public SpeakingSessionMessageResult domainToResult(SpeakingSessionMessage domain, List<String> suggestedReplies) {
         if (domain == null) {
             return null;
         }
 
-        String aiReplyAudio = SenderType.ASSISTANT.equals(domain.getSenderType()) ?
-                speakingSessionHelper.toAudioBase64(domain.getSessionId(), domain.getContent()) :
-                "";
+        String aiReplyAudio = SenderType.ASSISTANT.equals(domain.getSenderType())
+                ? speakingSessionHelper.toAudioBase64(domain.getSessionId(), domain.getContent())
+                : "";
 
-        String userRecordAudio = (domain.getMessageType().equals(MessageType.AUDIO) && domain.getAudioFileId() != null) ?
-                fileStorageServicePort.generatePresignedUrl(domain.getAudioFileId()) :
-                "";
+        String userRecordAudio = (domain.getMessageType().equals(MessageType.AUDIO) && domain.getAudioFileId() != null)
+                ? fileStorageServicePort.generatePresignedUrl(domain.getAudioFileId())
+                : "";
 
         return SpeakingSessionMessageResult.builder()
                 .id(domain.getId())
@@ -54,7 +47,7 @@ public class SpeakingSessionMessageResultMapper {
                 .pronunciationScore(domain.getPronunciationScore())
                 .aiReplyAudio(aiReplyAudio)
                 .userRecordAudio(userRecordAudio)
-                .suggestedReplies(suggestedReplies)
+                .suggestedReplies(domain.getSuggestedReplies())
                 .build();
     }
 }

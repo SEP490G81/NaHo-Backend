@@ -3,6 +3,8 @@ package org.naho.speech.llm.model.conversation;
 import org.naho.speech.llm.type.MessageType;
 import org.naho.speech.llm.type.SenderType;
 
+import java.util.List;
+
 public class SpeakingSessionMessage {
 
     private Long id;
@@ -19,6 +21,7 @@ public class SpeakingSessionMessage {
     private String grammarNote;
     private String hintForLearner;
     private Double pronunciationScore;
+    private List<String> suggestedReplies;
 
     private SpeakingSessionMessage(Builder builder) {
         this.id = builder.id;
@@ -35,6 +38,7 @@ public class SpeakingSessionMessage {
         this.grammarNote = builder.grammarNote;
         this.hintForLearner = builder.hintForLearner;
         this.pronunciationScore = builder.pronunciationScore;
+        this.suggestedReplies = builder.suggestedReplies;
     }
 
     public static Builder builder() {
@@ -93,6 +97,10 @@ public class SpeakingSessionMessage {
         return pronunciationScore;
     }
 
+    public List<String> getSuggestedReplies() {
+        return suggestedReplies;
+    }
+
     public static class Builder {
 
         private Long id;
@@ -109,6 +117,7 @@ public class SpeakingSessionMessage {
         private String grammarNote;
         private String hintForLearner;
         private Double pronunciationScore;
+        private List<String> suggestedReplies;
 
         public Builder id(Long id) {
             this.id = id;
@@ -172,6 +181,11 @@ public class SpeakingSessionMessage {
 
         public Builder pronunciationScore(Double pronunciationScore) {
             this.pronunciationScore = pronunciationScore;
+            return this;
+        }
+
+        public Builder suggestedReplies(List<String> suggestedReplies) {
+            this.suggestedReplies = suggestedReplies;
             return this;
         }
 

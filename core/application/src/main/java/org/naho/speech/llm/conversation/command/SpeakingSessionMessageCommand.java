@@ -4,6 +4,8 @@ import org.naho.file.model.File;
 import org.naho.speech.llm.type.MessageType;
 import org.naho.speech.llm.type.SenderType;
 
+import java.util.List;
+
 public record SpeakingSessionMessageCommand(
         Long sessionId,
         Integer turnIndex,
@@ -16,7 +18,8 @@ public record SpeakingSessionMessageCommand(
         String grammarNote,
         String hintForLearner,
         Double pronunciationScore,
-        File audioFile
+        File audioFile,
+        List<String> suggestedReplies
 ) {
 
     public static Builder builder() {
@@ -37,6 +40,7 @@ public record SpeakingSessionMessageCommand(
         private String hintForLearner;
         private Double pronunciationScore;
         private File audioFile;
+        private List<String> suggestedReplies;
 
         public Builder sessionId(Long sessionId) {
             this.sessionId = sessionId;
@@ -98,6 +102,11 @@ public record SpeakingSessionMessageCommand(
             return this;
         }
 
+        public Builder suggestedReplies(List<String> suggestedReplies) {
+            this.suggestedReplies = suggestedReplies;
+            return this;
+        }
+
         public SpeakingSessionMessageCommand build() {
             return new SpeakingSessionMessageCommand(
                     sessionId,
@@ -111,7 +120,8 @@ public record SpeakingSessionMessageCommand(
                     grammarNote,
                     hintForLearner,
                     pronunciationScore,
-                    audioFile
+                    audioFile,
+                    suggestedReplies
             );
         }
     }

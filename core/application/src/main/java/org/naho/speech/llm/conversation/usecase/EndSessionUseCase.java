@@ -1,10 +1,20 @@
 package org.naho.speech.llm.conversation.usecase;
 
+import org.naho.daily.command.CompleteDailyMissionCommand;
+import org.naho.daily.port.in.CrudUserDailyMissionInputPort;
+import org.naho.daily.type.MissionType;
+import org.naho.i18n.message.learning.UserLearningProgressDetailMessageKey;
 import org.naho.i18n.message.llm.LlmDetailMessageKey;
 import org.naho.i18n.message.persona.PersonaDetailMessageKey;
+import org.naho.learning.command.UpdateUserStreakCommand;
+import org.naho.learning.exception.UserLearningProgressErrorCode;
+import org.naho.learning.model.UserLearningProgress;
+import org.naho.learning.port.in.UserLearningStreakInputPort;
+import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
 import org.naho.persona.exception.PersonaErrorCode;
 import org.naho.persona.model.Persona;
 import org.naho.persona.port.out.PersonaRepositoryPort;
+import org.naho.shared.constant.SystemZoneId;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.shared.port.out.TransactionPort;
 import org.naho.speech.llm.conversation.constant.AiMessageField;
@@ -37,6 +47,9 @@ public class EndSessionUseCase implements EndSessionInputPort {
     private final SpeakingSessionMessageRepositoryPort speakingSessionMessageRepositoryPort;
     private final AiChatPort aiChatPort;
     private final SpeakingSessionAssessmentRepositoryPort speakingSessionAssessmentRepositoryPort;
+    private final CrudUserDailyMissionInputPort crudUserDailyMissionInputPort;
+    private final UserLearningProgressRepositoryPort userLearningProgressRepositoryPort;
+    private final UserLearningStreakInputPort userLearningStreakInputPort;
 
     public EndSessionUseCase(
             AiScoringPort aiScoringPort,
@@ -47,7 +60,10 @@ public class EndSessionUseCase implements EndSessionInputPort {
             TransactionPort transactionPort,
             SpeakingSessionMessageRepositoryPort speakingSessionMessageRepositoryPort,
             AiChatPort aiChatPort,
-            SpeakingSessionAssessmentRepositoryPort speakingSessionAssessmentRepositoryPort
+            SpeakingSessionAssessmentRepositoryPort speakingSessionAssessmentRepositoryPort,
+            CrudUserDailyMissionInputPort crudUserDailyMissionInputPort,
+            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
+            UserLearningStreakInputPort userLearningStreakInputPort
     ) {
         this.aiScoringPort = aiScoringPort;
         this.speakingSessionRepositoryPort = speakingSessionRepositoryPort;
@@ -58,6 +74,9 @@ public class EndSessionUseCase implements EndSessionInputPort {
         this.speakingSessionMessageRepositoryPort = speakingSessionMessageRepositoryPort;
         this.aiChatPort = aiChatPort;
         this.speakingSessionAssessmentRepositoryPort = speakingSessionAssessmentRepositoryPort;
+        this.crudUserDailyMissionInputPort = crudUserDailyMissionInputPort;
+        this.userLearningProgressRepositoryPort = userLearningProgressRepositoryPort;
+        this.userLearningStreakInputPort = userLearningStreakInputPort;
     }
 
     @Override
@@ -77,6 +96,19 @@ public class EndSessionUseCase implements EndSessionInputPort {
             );
         }
 
+        // lấy ra các message trong lịch sử chat của session
+        List<SpeakingSessionMessage> previousMessages = speakingSessionMessageRepositoryPort
+                .findAllBySessionId(speakingSession.getId());
+
+        // Nếu người dùng chưa chat tí nào mà đã end
+        // <= 1 bởi vì AI luôn là người chào đầu tiên
+        if (previousMessages.size() <= 1) {
+            throw new ApplicationException(
+                    LlmApplicationError.LLM_TRANSCRIPT_BLANK,
+                    LlmDetailMessageKey.LLM_TRANSCRIPT_BLANK
+            );
+        }
+
         Persona persona = personaRepositoryPort
                 .findById(speakingSession.getPersonaId())
                 .orElseThrow(() -> new ApplicationException(
@@ -92,10 +124,6 @@ public class EndSessionUseCase implements EndSessionInputPort {
                 speakingSession.getMarugotoLevel()
         );
 
-        // lấy ra các message trong lịch sử chat của session
-        List<SpeakingSessionMessage> previousMessages = speakingSessionMessageRepositoryPort
-                .findAllBySessionId(speakingSession.getId());
-
         // cắt bớt lịch sử chat
         if (previousMessages.size() > MAX_SLIDING_WINDOW_MESSAGES) {
             previousMessages = previousMessages.subList(previousMessages.size() - MAX_SLIDING_WINDOW_MESSAGES, previousMessages.size());
@@ -103,6 +131,7 @@ public class EndSessionUseCase implements EndSessionInputPort {
 
         List<Map<String, String>> sessionHistories = new ArrayList<>();
 
+        // Chuyển lịch sử chat thành dạng List<Map<String, String>>
         for (SpeakingSessionMessage speakingSessionMessage : previousMessages) {
             sessionHistories.add(Map.of(
                     AiMessageField.ROLE, speakingSessionMessage.getSenderType().name().toLowerCase(),
@@ -132,6 +161,35 @@ public class EndSessionUseCase implements EndSessionInputPort {
         speakingSession.setEndedAt(Instant.now());
         speakingSession.setStatus(SpeakingSessionStatus.COMPLETED);
         speakingSessionRepositoryPort.save(speakingSession);
+
+        // hoàn thành nhiệm vụ hàng ngày (trò chuyện 1:1 với AI)
+        crudUserDailyMissionInputPort.completeMission(
+                new CompleteDailyMissionCommand(
+                        userId,
+                        MissionType.TALK_WITH_AI
+                )
+        );
+
+        // Lấy thông tin về thành tích học tập của người dùng
+        UserLearningProgress progress = userLearningProgressRepositoryPort
+                .findByUserId(userId)
+                .orElseThrow(() -> new ApplicationException(
+                        UserLearningProgressErrorCode.USER_LEARNING_PROGRESS_NOT_FOUND,
+                        UserLearningProgressDetailMessageKey.USER_LEARNING_PROGRESS_NOT_FOUND_BY_USER_ID
+                ));
+
+        // Cập nhật chuỗi học hàng ngày của người dùng
+        progress = userLearningStreakInputPort.updateUserLearningStreak(
+                UpdateUserStreakCommand.builder()
+                        .userLearningProgress(progress)
+                        .userId(userId)
+                        .now(Instant.now())
+                        .zoneId(SystemZoneId.HO_CHI_MINH_ZONE_ID)
+                        .build()
+        );
+
+        // Lưu tiến trình học của người dùng
+        userLearningProgressRepositoryPort.save(progress);
 
         return speakingSessionAssessmentResultMapper.domainToResult(savedSpeakingSessionAssessment);
     }

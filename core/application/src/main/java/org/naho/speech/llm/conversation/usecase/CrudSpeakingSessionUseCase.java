@@ -2,7 +2,6 @@ package org.naho.speech.llm.conversation.usecase;
 
 import org.naho.i18n.message.llm.LlmDetailMessageKey;
 import org.naho.i18n.message.user.UserDetailMessageKey;
-import org.naho.persona.port.in.GetPersonaInputPort;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.speech.llm.conversation.exception.LlmApplicationError;
 import org.naho.speech.llm.conversation.mapper.SpeakingSessionAssessmentResultMapper;
@@ -25,20 +24,17 @@ public class CrudSpeakingSessionUseCase implements CrudSpeakingSessionInputPort 
     private final SpeakingSessionResultMapper speakingSessionResultMapper;
     private final SpeakingSessionAssessmentRepositoryPort speakingSessionAssessmentRepositoryPort;
     private final SpeakingSessionAssessmentResultMapper speakingSessionAssessmentResultMapper;
-    private final GetPersonaInputPort getPersonaInputPort;
 
     public CrudSpeakingSessionUseCase(
             SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
             SpeakingSessionResultMapper speakingSessionResultMapper,
             SpeakingSessionAssessmentRepositoryPort speakingSessionAssessmentRepositoryPort,
-            SpeakingSessionAssessmentResultMapper speakingSessionAssessmentResultMapper,
-            GetPersonaInputPort getPersonaInputPort
+            SpeakingSessionAssessmentResultMapper speakingSessionAssessmentResultMapper
     ) {
         this.speakingSessionRepositoryPort = speakingSessionRepositoryPort;
         this.speakingSessionResultMapper = speakingSessionResultMapper;
         this.speakingSessionAssessmentRepositoryPort = speakingSessionAssessmentRepositoryPort;
         this.speakingSessionAssessmentResultMapper = speakingSessionAssessmentResultMapper;
-        this.getPersonaInputPort = getPersonaInputPort;
     }
 
     @Override
@@ -131,5 +127,30 @@ public class CrudSpeakingSessionUseCase implements CrudSpeakingSessionInputPort 
         SpeakingSessionAssessmentResult speakingSessionAssessmentResult = speakingSessionAssessmentResultMapper.domainToResult(speakingSessionAssessment);
 
         return speakingSessionResultMapper.domainToResult(speakingSession, speakingSessionAssessmentResult);
+    }
+
+    /**
+     * Xóa session bằng session code và user id
+     *
+     * @param sessionCode mã phiên trò chuyện
+     * @param userId      người sở hữu phiên trò chuyện
+     */
+    @Override
+    public void deleteSessionBySessionCodeAndUserId(String sessionCode, Long userId) {
+        if (sessionCode == null || sessionCode.isBlank()) {
+            throw new ApplicationException(
+                    LlmApplicationError.LLM_SESSION_CODE_INVALID,
+                    LlmDetailMessageKey.LLM_SESSION_CODE_INVALID
+            );
+        }
+
+        if (userId == null) {
+            throw new ApplicationException(
+                    UserErrorCode.USER_NOT_FOUND,
+                    UserDetailMessageKey.USER_ID_NULL
+            );
+        }
+
+        speakingSessionRepositoryPort.deleteSessionBySessionCodeAndUserId(sessionCode, userId);
     }
 }

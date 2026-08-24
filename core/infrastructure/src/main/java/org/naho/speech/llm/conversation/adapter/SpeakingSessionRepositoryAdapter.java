@@ -53,11 +53,11 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
     }
 
     @Override
-    public SpeakingSession increaseTotalTurns(Long sessionId) {
+    public void increaseTotalTurns(Long sessionId) {
         SpeakingSessionEntity entity = speakingSessionJpaRepository.getReferenceById(sessionId);
         entity.setTotalTurns(entity.getTotalTurns() + 1);
         SpeakingSessionEntity savedEntity = speakingSessionJpaRepository.save(entity);
-        return speakingSessionEntityMapper.entityToDomain(savedEntity);
+        speakingSessionEntityMapper.entityToDomain(savedEntity);
     }
 
     @Override
@@ -74,15 +74,13 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
         if (userId == null) {
             throw new InfrastructureException(
                     UserErrorCode.USER_NOT_FOUND,
-                    UserDetailMessageKey.USER_ID_NULL
-            );
+                    UserDetailMessageKey.USER_ID_NULL);
         }
 
         if (sessionCode == null || sessionCode.isBlank()) {
             throw new InfrastructureException(
                     LlmApplicationError.LLM_SESSION_CODE_INVALID,
-                    LlmDetailMessageKey.LLM_SESSION_CODE_INVALID
-            );
+                    LlmDetailMessageKey.LLM_SESSION_CODE_INVALID);
         }
 
         SpeakingSessionEntity sessionEntity = SpeakingSessionEntity.builder()
@@ -105,7 +103,8 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
     @Override
     @Transactional
     public SpeakingSessionMessage saveSpeakingSessionMessage(SpeakingSessionMessageCommand command) {
-        SpeakingSessionEntity speakingSessionEntity = speakingSessionJpaRepository.getReferenceById(command.sessionId());
+        SpeakingSessionEntity speakingSessionEntity = speakingSessionJpaRepository
+                .getReferenceById(command.sessionId());
 
         FileEntity fileEntity = null;
 
@@ -113,36 +112,34 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
             if (command.audioFile() == null || command.audioFile().getId() == null) {
                 throw new InfrastructureException(
                         FileErrorCode.FILE_NOT_VALID,
-                        FileDetailMessageKey.FILE_ID_NULL
-                );
+                        FileDetailMessageKey.FILE_ID_NULL);
             }
 
             fileEntity = fileJpaRepository.findById(command.audioFile().getId())
                     .orElseThrow(() -> new InfrastructureException(
                             FileErrorCode.FILE_NOT_FOUND,
                             FileDetailMessageKey.FILE_NOT_FOUND,
-                            command.audioFile().getId()
-                    ));
+                            command.audioFile().getId()));
         }
 
-        SpeakingSessionMessageEntity speakingSessionMessageEntity =
-                SpeakingSessionMessageEntity.builder()
-                        .session(speakingSessionEntity)
-                        .turnIndex(command.turnIndex())
-                        .senderType(command.senderType())
-                        .messageType(command.messageType())
-                        .content(command.content())
-                        .contentTranslation(command.contentTranslation())
-                        .correctedText(command.correctedText())
-                        .correctionExplanation(command.correctionExplanation())
-                        .grammarNote(command.grammarNote())
-                        .hintForLearner(command.hintForLearner())
-                        .pronunciationScore(command.pronunciationScore())
-                        .audioFile(fileEntity)
-                        .build();
+        SpeakingSessionMessageEntity speakingSessionMessageEntity = SpeakingSessionMessageEntity.builder()
+                .session(speakingSessionEntity)
+                .turnIndex(command.turnIndex())
+                .senderType(command.senderType())
+                .messageType(command.messageType())
+                .content(command.content())
+                .contentTranslation(command.contentTranslation())
+                .correctedText(command.correctedText())
+                .correctionExplanation(command.correctionExplanation())
+                .grammarNote(command.grammarNote())
+                .hintForLearner(command.hintForLearner())
+                .pronunciationScore(command.pronunciationScore())
+                .suggestedReplies(command.suggestedReplies())
+                .audioFile(fileEntity)
+                .build();
 
-        SpeakingSessionMessageEntity savedSpeakingSessionMessageEntity =
-                speakingSessionMessageJpaRepository.save(speakingSessionMessageEntity);
+        SpeakingSessionMessageEntity savedSpeakingSessionMessageEntity = speakingSessionMessageJpaRepository
+                .save(speakingSessionMessageEntity);
 
         return speakingSessionMessageEntityMapper.entityToDomain(savedSpeakingSessionMessageEntity);
     }
@@ -167,28 +164,7 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
 
     @Override
     @Transactional
-    public void deleteSessionBySessionCode(String sessionCode) {
-        if (sessionCode == null || sessionCode.isBlank()) {
-            throw new InfrastructureException(
-                    LlmApplicationError.LLM_SESSION_CODE_INVALID,
-                    LlmDetailMessageKey.LLM_SESSION_CODE_INVALID
-            );
-        }
-
-        SpeakingSessionEntity entity = speakingSessionJpaRepository
-                .findBySessionCode(sessionCode)
-                .orElseThrow(() -> new InfrastructureException(
-                        LlmApplicationError.LLM_SESSION_NOT_FOUND,
-                        LlmDetailMessageKey.LLM_SESSION_NOT_FOUND,
-                        sessionCode
-                ));
-
-        speakingSessionJpaRepository.delete(entity);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public boolean isSessionBelongToUser(String sessionCode, Long userId) {
+    public void deleteSessionBySessionCodeAndUserId(String sessionCode, Long userId) {
         if (userId == null) {
             throw new InfrastructureException(
                     UserErrorCode.USER_NOT_FOUND,
@@ -204,12 +180,37 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
         }
 
         SpeakingSessionEntity entity = speakingSessionJpaRepository
-                .findBySessionCode(sessionCode)
+                .findBySessionCodeAndUser_Id(sessionCode, userId)
                 .orElseThrow(() -> new InfrastructureException(
                         LlmApplicationError.LLM_SESSION_NOT_FOUND,
                         LlmDetailMessageKey.LLM_SESSION_NOT_FOUND,
                         sessionCode
                 ));
+
+        speakingSessionJpaRepository.delete(entity);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean isSessionBelongToUser(String sessionCode, Long userId) {
+        if (userId == null) {
+            throw new InfrastructureException(
+                    UserErrorCode.USER_NOT_FOUND,
+                    UserDetailMessageKey.USER_ID_NULL);
+        }
+
+        if (sessionCode == null || sessionCode.isBlank()) {
+            throw new InfrastructureException(
+                    LlmApplicationError.LLM_SESSION_CODE_INVALID,
+                    LlmDetailMessageKey.LLM_SESSION_CODE_INVALID);
+        }
+
+        SpeakingSessionEntity entity = speakingSessionJpaRepository
+                .findBySessionCode(sessionCode)
+                .orElseThrow(() -> new InfrastructureException(
+                        LlmApplicationError.LLM_SESSION_NOT_FOUND,
+                        LlmDetailMessageKey.LLM_SESSION_NOT_FOUND,
+                        sessionCode));
 
         Long ownerId = entity.getUser() != null ? entity.getUser().getId() : null;
 
@@ -221,8 +222,7 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
         if (sessionCode == null || sessionCode.isBlank()) {
             throw new InfrastructureException(
                     LlmApplicationError.LLM_SESSION_CODE_INVALID,
-                    LlmDetailMessageKey.LLM_SESSION_CODE_INVALID
-            );
+                    LlmDetailMessageKey.LLM_SESSION_CODE_INVALID);
         }
 
         SpeakingSessionEntity entity = speakingSessionJpaRepository
@@ -230,8 +230,7 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
                 .orElseThrow(() -> new InfrastructureException(
                         LlmApplicationError.LLM_SESSION_NOT_FOUND,
                         LlmDetailMessageKey.LLM_SESSION_NOT_FOUND,
-                        sessionCode
-                ));
+                        sessionCode));
 
         return speakingSessionEntityMapper.entityToDomain(entity);
     }
@@ -241,8 +240,7 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
         if (sessionId == null) {
             throw new InfrastructureException(
                     LlmApplicationError.LLM_SESSION_ID_INVALID,
-                    LlmDetailMessageKey.LLM_SESSION_ID_INVALID
-            );
+                    LlmDetailMessageKey.LLM_SESSION_ID_INVALID);
         }
 
         SpeakingSessionEntity entity = speakingSessionJpaRepository
@@ -250,8 +248,7 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
                 .orElseThrow(() -> new InfrastructureException(
                         LlmApplicationError.LLM_SESSION_NOT_FOUND,
                         LlmDetailMessageKey.LLM_SESSION_NOT_FOUND,
-                        sessionId
-                ));
+                        sessionId));
 
         return speakingSessionEntityMapper.entityToDomain(entity);
     }
@@ -269,26 +266,24 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
     }
 
     @Override
-    public SpeakingSession findByUserIdAndSpeakingSessionCodeAndSpeakingSessionStatus(Long userId, String sessionCode, SpeakingSessionStatus status) {
+    public SpeakingSession findByUserIdAndSpeakingSessionCodeAndSpeakingSessionStatus(Long userId,
+                                                                                      String sessionCode, SpeakingSessionStatus status) {
         if (userId == null) {
             throw new InfrastructureException(
                     UserErrorCode.USER_NOT_FOUND,
-                    UserDetailMessageKey.USER_ID_NULL
-            );
+                    UserDetailMessageKey.USER_ID_NULL);
         }
 
         if (sessionCode == null || sessionCode.isBlank()) {
             throw new InfrastructureException(
                     LlmApplicationError.LLM_SESSION_CODE_INVALID,
-                    LlmDetailMessageKey.LLM_SESSION_CODE_INVALID
-            );
+                    LlmDetailMessageKey.LLM_SESSION_CODE_INVALID);
         }
 
         if (status == null) {
             throw new InfrastructureException(
                     LlmApplicationError.LLM_SESSION_STATUS_INVALID,
-                    LlmDetailMessageKey.LLM_SESSION_STATUS_INVALID
-            );
+                    LlmDetailMessageKey.LLM_SESSION_STATUS_INVALID);
         }
 
         SpeakingSessionEntity entity = speakingSessionJpaRepository
@@ -296,8 +291,7 @@ public class SpeakingSessionRepositoryAdapter implements SpeakingSessionReposito
                 .orElseThrow(() -> new InfrastructureException(
                         LlmApplicationError.LLM_SESSION_NOT_FOUND,
                         LlmDetailMessageKey.LLM_SESSION_NOT_FOUND,
-                        sessionCode
-                ));
+                        sessionCode));
 
         return speakingSessionEntityMapper.entityToDomain(entity);
     }

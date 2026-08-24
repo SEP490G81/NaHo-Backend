@@ -4,9 +4,11 @@ import org.naho.book.port.out.BookRepositoryPort;
 import org.naho.book.port.out.LessonRepositoryPort;
 import org.naho.book.port.out.ObjectiveRepositoryPort;
 import org.naho.book.port.out.TopicRepositoryPort;
+import org.naho.daily.port.in.CrudUserDailyMissionInputPort;
 import org.naho.file.port.in.UploadFileInputPort;
 import org.naho.file.port.out.FileRepositoryPort;
 import org.naho.file.port.out.FileStorageServicePort;
+import org.naho.learning.port.in.UserLearningStreakInputPort;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
 import org.naho.persona.port.in.GetPersonaInputPort;
@@ -27,12 +29,10 @@ import org.naho.speech.llm.conversation.mapper.SpeakingSessionMessageResultMappe
 import org.naho.speech.llm.conversation.mapper.SpeakingSessionResultMapper;
 import org.naho.speech.llm.conversation.port.in.CrudSpeakingSessionInputPort;
 import org.naho.speech.llm.conversation.port.in.EndSessionInputPort;
-import org.naho.speech.llm.conversation.port.in.SpeakingSessionCleanupInputPort;
 import org.naho.speech.llm.conversation.port.in.SpeakingSessionInputPort;
 import org.naho.speech.llm.conversation.port.out.*;
 import org.naho.speech.llm.conversation.usecase.CrudSpeakingSessionUseCase;
 import org.naho.speech.llm.conversation.usecase.EndSessionUseCase;
-import org.naho.speech.llm.conversation.usecase.SpeakingSessionCleanupUseCase;
 import org.naho.speech.llm.conversation.usecase.SpeakingSessionUseCase;
 import org.naho.speech.llm.conversation.validator.SpeakingSessionValidator;
 import org.naho.speech.llm.question.helper.SpeakingAnalysisHelper;
@@ -163,7 +163,10 @@ public class ChatConfig {
             TransactionPort transactionPort,
             SpeakingSessionMessageRepositoryPort speakingSessionMessageRepositoryPort,
             AiChatPort aiChatPort,
-            SpeakingSessionAssessmentRepositoryPort speakingSessionAssessmentRepositoryPort
+            SpeakingSessionAssessmentRepositoryPort speakingSessionAssessmentRepositoryPort,
+            CrudUserDailyMissionInputPort crudUserDailyMissionInputPort,
+            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
+            UserLearningStreakInputPort userLearningStreakInputPort
     ) {
         return new EndSessionUseCase(
                 aiScoringPort,
@@ -174,7 +177,10 @@ public class ChatConfig {
                 transactionPort,
                 speakingSessionMessageRepositoryPort,
                 aiChatPort,
-                speakingSessionAssessmentRepositoryPort
+                speakingSessionAssessmentRepositoryPort,
+                crudUserDailyMissionInputPort,
+                userLearningProgressRepositoryPort,
+                userLearningStreakInputPort
         );
     }
 
@@ -231,30 +237,17 @@ public class ChatConfig {
     }
 
     @Bean
-    public SpeakingSessionCleanupInputPort speakingSessionCleanupInputPort(
-            SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
-            SpeakingSessionValidator speakingSessionValidator
-    ) {
-        return new SpeakingSessionCleanupUseCase(
-                speakingSessionRepositoryPort,
-                speakingSessionValidator
-        );
-    }
-
-    @Bean
     public CrudSpeakingSessionInputPort crudSpeakingSessionInputPort(
             SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
             SpeakingSessionResultMapper speakingSessionResultMapper,
             SpeakingSessionAssessmentRepositoryPort speakingSessionAssessmentRepositoryPort,
-            SpeakingSessionAssessmentResultMapper speakingSessionAssessmentResultMapper,
-            GetPersonaInputPort getPersonaInputPort
+            SpeakingSessionAssessmentResultMapper speakingSessionAssessmentResultMapper
     ) {
         return new CrudSpeakingSessionUseCase(
                 speakingSessionRepositoryPort,
                 speakingSessionResultMapper,
                 speakingSessionAssessmentRepositoryPort,
-                speakingSessionAssessmentResultMapper,
-                getPersonaInputPort
+                speakingSessionAssessmentResultMapper
         );
     }
 }
