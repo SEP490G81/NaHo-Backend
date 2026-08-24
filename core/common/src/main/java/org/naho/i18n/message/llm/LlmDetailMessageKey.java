@@ -18,6 +18,11 @@ public final class LlmDetailMessageKey {
     public static final String LLM_SAVE_SESSION_FAILED = "ai.application.session.save_failed";
     public static final String LLM_TRANSCRIPT_BLANK = "ai.application.session.transcript.blank";
 
+    public static final String LLM_MARUGOTO_LEVEL_NULL = "ai.application.marugoto.level.null";
+    public static final String LLM_MARUGOTO_LEVEL_UNSUPPORTED = "ai.application.marugoto.level.unsupported";
+    public static final String LLM_FORMALITY_LEVEL_NULL = "ai.application.formality.level.null";
+    public static final String LLM_FORMALITY_LEVEL_UNSUPPORTED = "ai.application.formality.level.unsupported";
+
     private LlmDetailMessageKey() {
     }
 }

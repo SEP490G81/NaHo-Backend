@@ -14,6 +14,8 @@ public final class LlmTitleMessageKey {
     public static final String LLM_SESSION_ALREADY_STARTED_TITLE = "Speaking session already started";
     public static final String LLM_SESSION_STATUS_INVALID_TITLE = "Session status invalid";
     public static final String LLM_SAVE_SESSION_FAILED_TITLE = "Failed to save speaking session history!";
+    public static final String LLM_MARUGOTO_LEVEL_INVALID_TITLE = "Marugoto level invalid";
+    public static final String LLM_FORMALITY_LEVEL_INVALID_TITLE = "Formality level invalid";
 
     private LlmTitleMessageKey() {
     }

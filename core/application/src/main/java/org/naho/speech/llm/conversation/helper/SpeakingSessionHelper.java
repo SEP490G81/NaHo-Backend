@@ -11,6 +11,7 @@ import org.naho.speech.azure.port.out.TextToSpeechServicePort;
 import org.naho.speech.llm.conversation.constant.AiMessageField;
 import org.naho.speech.llm.conversation.exception.LlmApplicationError;
 import org.naho.speech.llm.conversation.internal.ParsedAiReply;
+import org.naho.speech.llm.conversation.mapper.LevelPromptMapper;
 import org.naho.speech.llm.conversation.port.out.SpeakingSessionRepositoryPort;
 import org.naho.speech.llm.model.conversation.SpeakingSession;
 import org.naho.speech.llm.model.conversation.SpeakingSessionMessage;
@@ -23,27 +24,22 @@ public class SpeakingSessionHelper {
 
     public static final String SYSTEM_PROMPT_TEMPLATE_PATH = "/prompt_template/speaking_session_chat.prompt";
 
-    public static final String PERSONA_INSTRUCTION = """
-            - You are roleplaying as the specified persona. Adapt your tone, formality, and personality accordingly.
-            - Start by greeting the learner in character and inviting them to converse.
-            - Your persona role & prompt: {{personaPrompt}}
-            - Formality level (Keigo/Style): {{formality}}
-            - Marugoto course level: {{marugoto}}
-            """;
-
     public static final int MAX_SLIDING_WINDOW_MESSAGES = 16;
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private final SpeakingSessionRepositoryPort speakingSessionRepositoryPort;
     private final TextToSpeechServicePort textToSpeechServicePort;
+    private final LevelPromptMapper levelPromptMapper;
 
     public SpeakingSessionHelper(
             SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
-            TextToSpeechServicePort textToSpeechServicePort
+            TextToSpeechServicePort textToSpeechServicePort,
+            LevelPromptMapper levelPromptMapper
     ) {
         this.speakingSessionRepositoryPort = speakingSessionRepositoryPort;
         this.textToSpeechServicePort = textToSpeechServicePort;
+        this.levelPromptMapper = levelPromptMapper;
     }
 
     public ParsedAiReply parseAiResponse(String rawResponse) {
@@ -105,13 +101,18 @@ public class SpeakingSessionHelper {
             FormalityLevel formalityLevel,
             MarugotoLevel marugotoLevel
     ) {
-        String systemPromptTemplate = loadPromptTemplate();
-        String personaContextPrompt = PERSONA_INSTRUCTION
-                .replace("{{personaPrompt}}", persona.getPrompt())
-                .replace("{{formality}}", formalityLevel.name())
-                .replace("{{marugoto}}", marugotoLevel.name());
-
-        return systemPromptTemplate.formatted(personaContextPrompt);
+        return loadPromptTemplate()
+                .replace("{{personaDescription}}", persona.getPrompt())
+                .replace(
+                        "{{formalityDescription}}",
+                        levelPromptMapper.mapFormalityLevelToPrompt(formalityLevel)
+                )
+                .replace(
+                        "{{marugotoDescription}}",
+                        levelPromptMapper.mapMarugotoLevelToPrompt(marugotoLevel)
+                )
+                .replace("{{formalityLevel}}", formalityLevel.name())
+                .replace("{{marugotoLevel}}", marugotoLevel.name());
     }
 
     public List<Map<String, String>> getSlidingWindowMessages(

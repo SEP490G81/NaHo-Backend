@@ -73,7 +73,15 @@ public enum LlmApplicationError implements ErrorCode {
     LLM_CONNECTION_TIMEOUT(
             "LLM_I004",
             LlmDetailMessageKey.LLM_CONNECTION_TIMEOUT,
-            504);
+            504),
+    LLM_MARUGOTO_LEVEL_INVALID(
+            "LLM_A011",
+            LlmTitleMessageKey.LLM_MARUGOTO_LEVEL_INVALID_TITLE,
+            400),
+    LLM_FORMALITY_LEVEL_INVALID(
+            "LLM_A012",
+            LlmTitleMessageKey.LLM_FORMALITY_LEVEL_INVALID_TITLE,
+            400);
 
     private final String code;
     private final String titleKey;

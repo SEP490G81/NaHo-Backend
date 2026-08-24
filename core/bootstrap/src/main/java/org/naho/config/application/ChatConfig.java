@@ -23,10 +23,7 @@ import org.naho.speech.azure.port.out.SpeechAssessmentRepositoryPort;
 import org.naho.speech.azure.port.out.TextToSpeechServicePort;
 import org.naho.speech.llm.conversation.adapter.AzureSpeechToTextAdapter;
 import org.naho.speech.llm.conversation.helper.SpeakingSessionHelper;
-import org.naho.speech.llm.conversation.mapper.SpeakingImprovedExpressionResultMapper;
-import org.naho.speech.llm.conversation.mapper.SpeakingSessionAssessmentResultMapper;
-import org.naho.speech.llm.conversation.mapper.SpeakingSessionMessageResultMapper;
-import org.naho.speech.llm.conversation.mapper.SpeakingSessionResultMapper;
+import org.naho.speech.llm.conversation.mapper.*;
 import org.naho.speech.llm.conversation.port.in.CrudSpeakingSessionInputPort;
 import org.naho.speech.llm.conversation.port.in.EndSessionInputPort;
 import org.naho.speech.llm.conversation.port.in.SpeakingSessionInputPort;
@@ -79,13 +76,20 @@ public class ChatConfig {
     }
 
     @Bean
+    public LevelPromptMapper levelPromptMapper() {
+        return new LevelPromptMapper();
+    }
+
+    @Bean
     public SpeakingSessionHelper speakingSessionHelper(
             SpeakingSessionRepositoryPort speakingSessionRepositoryPort,
-            TextToSpeechServicePort textToSpeechServicePort
+            TextToSpeechServicePort textToSpeechServicePort,
+            LevelPromptMapper levelPromptMapper
     ) {
         return new SpeakingSessionHelper(
                 speakingSessionRepositoryPort,
-                textToSpeechServicePort
+                textToSpeechServicePort,
+                levelPromptMapper
         );
     }
 

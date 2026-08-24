@@ -108,18 +108,6 @@ VALUES
  'INTERMEDIATE_1_B1',
  'INFORMAL'),
 
--- 高橋さん -> takahashi.png -> file 24
-(NOW(),
- NULL,
- '高橋さん',
- 'You are Takahashi, an experienced Japanese office worker. Simulate realistic professional conversations such as meetings, project discussions, requests, explanations, and workplace problem solving. Expect the learner to explain opinions and reasons. Respond naturally and sometimes ask for clarification just as a real coworker would.',
- 'ACTIVE',
- 'ja-JP-MasahiroNeural',
- 'MALE',
- 24,
- 'INTERMEDIATE_1_B1',
- 'NEUTRAL'),
-
 -- 中村さん -> nakamura.png -> file 21
 (NOW(),
  NULL,

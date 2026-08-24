@@ -129,12 +129,12 @@ public class SpeakingSessionUseCase implements SpeakingSessionInputPort {
 
         List<Map<String, String>> messages = List.of(
                 Map.of(
-                        AiMessageField.ROLE, SenderType.SYSTEM.name().toLowerCase(),
-                        AiMessageField.CONTENT, systemPromptContent
-                ),
-                Map.of(
                         AiMessageField.ROLE, SenderType.USER.name().toLowerCase(),
                         AiMessageField.CONTENT, "こんにちは、話しましょう！"
+                ),
+                Map.of(
+                        AiMessageField.ROLE, SenderType.SYSTEM.name().toLowerCase(),
+                        AiMessageField.CONTENT, systemPromptContent
                 )
         );
 
