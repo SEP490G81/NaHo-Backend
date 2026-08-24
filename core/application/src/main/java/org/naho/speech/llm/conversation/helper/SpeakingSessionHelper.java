@@ -3,17 +3,25 @@ package org.naho.speech.llm.conversation.helper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.naho.i18n.message.llm.LlmDetailMessageKey;
+import org.naho.persona.model.Persona;
+import org.naho.persona.type.FormalityLevel;
+import org.naho.persona.type.MarugotoLevel;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.speech.azure.port.out.TextToSpeechServicePort;
+import org.naho.speech.llm.conversation.constant.AiMessageField;
 import org.naho.speech.llm.conversation.exception.LlmApplicationError;
+import org.naho.speech.llm.conversation.internal.ParsedAiReply;
 import org.naho.speech.llm.conversation.port.out.SpeakingSessionRepositoryPort;
 import org.naho.speech.llm.model.conversation.SpeakingSession;
+import org.naho.speech.llm.model.conversation.SpeakingSessionMessage;
+import org.naho.speech.llm.type.SenderType;
 
 import java.util.*;
 
 public class SpeakingSessionHelper {
 
     public static final String SYSTEM_PROMPT_TEMPLATE = """
+            ## YOUR ROLE
             You are a Japanese conversation partner on the NaHo language learning platform.
             %s
             
@@ -28,14 +36,17 @@ public class SpeakingSessionHelper {
                  → Subtly model the correct form naturally in your Japanese reply.
                  → Then fill correctedUserText + correctionExplanation fields.
                - Common errors to watch: は/が confusion, を/に confusion, plain vs polite form mismatch.
-            4. **Stuck learner detection**:
+               - **Spoken Text & Punctuation**: Learner input is transcribed from speech (Speech-to-Text). Do NOT correct punctuation marks (like '.', ',', '。', '、', '?') or treat missing/extra punctuation as grammar mistakes. Evaluate ONLY spoken language grammar and phrasing.
+            4. **Natural Aizuchi (相槌)**:
+               - Use natural, context-appropriate Japanese conversational reactions (Aizuchi such as 「そうですね」「なるほど」「ええ」「へえ、そうですか」「あ、本当ですか」) occasionally and naturally to make the dialogue authentic and engaging.
+            5. **Stuck learner detection**:
                - If learner sends only fillers (あー, えーと, うーん) or ≤ 3 meaningful words:
                  → Your reply MUST include a simpler re-ask or a scaffolding hint.
                  → Example: 「少し難しかったですか？「〇〇は△△です」のように言えますよ。」
-            5. **Topic steering**: Gently redirect off-topic responses. Stay on session topic.
-            6. **If no grammar errors found**: correctionExplanation = "Câu của bạn đã rất tự nhiên và chính xác!"
-            7. **Naturalness over perfection**: Prefer warm, natural Japanese over formal textbook phrases.
-            8. **Reply suggestions**: Provide exactly 3 short, natural Japanese response options in "suggestedReplies" for the learner to choose from if they don't know what to reply next.
+            6. **Topic steering**: Gently redirect off-topic responses. Stay on session topic.
+            7. **If no grammar errors found**: correctionExplanation = "Câu của bạn đã rất tự nhiên và chính xác!"
+            8. **Naturalness over perfection**: Prefer warm, natural Japanese over formal textbook phrases.
+            9. **Reply suggestions**: Provide exactly 3 short, natural Japanese response options in "suggestedReplies" for the learner to choose from if they don't know what to reply next.
             
             ## OUTPUT FORMAT (MANDATORY)
             Respond ONLY with a valid raw JSON object. No markdown, no code fences. All 7 fields required:
@@ -54,8 +65,13 @@ public class SpeakingSessionHelper {
             }
             """;
 
-    public static final String PERSONA_INSTRUCTION = "- You are roleplaying as the specified persona. Adapt your tone, formality, and personality accordingly.\n"
-            + "- Start by greeting the learner in character and inviting them to converse.";
+    public static final String PERSONA_INSTRUCTION = """
+            - You are roleplaying as the specified persona. Adapt your tone, formality, and personality accordingly.
+            - Start by greeting the learner in character and inviting them to converse.
+            - Your persona role & prompt: {{personaPrompt}}
+            - Formality level (Keigo/Style): {{formality}}
+            - Marugoto course level: {{marugoto}}
+            """;
 
     public static final int MAX_SLIDING_WINDOW_MESSAGES = 16;
 
@@ -74,8 +90,12 @@ public class SpeakingSessionHelper {
 
     public ParsedAiReply parseAiResponse(String rawResponse) {
         if (rawResponse == null || rawResponse.isBlank()) {
-            return new ParsedAiReply("", "", "", "", "", "", List.of());
+            throw new ApplicationException(
+                    LlmApplicationError.LLM_PARSE_ERROR,
+                    LlmDetailMessageKey.LLM_PARSE_ERROR
+            );
         }
+
         try {
             String cleaned = rawResponse.trim();
             if (cleaned.startsWith("```")) {
@@ -103,15 +123,16 @@ public class SpeakingSessionHelper {
                 }
             }
 
-            return new ParsedAiReply(
-                    reply,
-                    replyTranslation,
-                    grammarNote,
-                    correctedUserText,
-                    correctionExplanation,
-                    hintForLearner,
-                    suggestedReplies
-            );
+            return ParsedAiReply.builder()
+                    .reply(reply)
+                    .replyTranslation(replyTranslation)
+                    .correctedUserText(correctedUserText)
+                    .correctionExplanation(correctionExplanation)
+                    .hintForLearner(hintForLearner)
+                    .grammarNote(grammarNote)
+                    .suggestedReplies(suggestedReplies)
+                    .build();
+
         } catch (Exception e) {
             throw new ApplicationException(
                     LlmApplicationError.LLM_PARSE_ERROR,
@@ -121,97 +142,52 @@ public class SpeakingSessionHelper {
         }
     }
 
-    public String buildPersonaContext(org.naho.persona.model.Persona persona, org.naho.persona.type.FormalityLevel formalityLevel, org.naho.persona.type.MarugotoLevel marugotoLevel) {
-        if (persona == null) {
-            return "";
-        }
-        StringBuilder personaContext = new StringBuilder();
-        personaContext.append("Persona name: ").append(persona.getName()).append("\n");
-        if (persona.getPrompt() != null) {
-            personaContext.append("Persona role: ").append(persona.getPrompt()).append("\n");
-        }
-//        if (persona.getConversationStyle() != null) {
-//            if (persona.getConversationStyle().getDescription() != null) {
-//                personaContext.append("Style description: ").append(persona.getConversationStyle().getDescription())
-//                        .append("\n");
-//            }
-//            if (persona.getConversationStyle().getPrompt() != null) {
-//                personaContext.append("Style instructions: ").append(persona.getConversationStyle().getPrompt())
-//                        .append("\n");
-//            }
-//        }
+    public String buildSystemPromptContent(
+            Persona persona,
+            FormalityLevel formalityLevel,
+            MarugotoLevel marugotoLevel
+    ) {
+        String personaContextPrompt = PERSONA_INSTRUCTION
+                .replace("{{personaPrompt}}", persona.getPrompt())
+                .replace("{{formality}}", formalityLevel.name())
+                .replace("{{marugoto}}", marugotoLevel.name());
 
-        if (formalityLevel != null) {
-            personaContext.append("formalityLevel: ").append(formalityLevel.name()).append("\n");
-        }
-
-        if (marugotoLevel != null) {
-            personaContext.append("marugotoLevel: ").append(marugotoLevel.name()).append("\n");
-        }
-        return personaContext.toString();
-    }
-
-    public String buildCustomInstruction(org.naho.persona.model.Persona persona, org.naho.persona.type.FormalityLevel formalityLevel, org.naho.persona.type.MarugotoLevel marugotoLevel) {
-        StringBuilder customInstruction = new StringBuilder(PERSONA_INSTRUCTION);
-        if (persona != null) {
-            if (persona.getPrompt() != null) {
-                customInstruction.append("\n- Your persona role & prompt: ").append(persona.getPrompt());
-            }
-//            if (persona.getConversationStyle() != null) {
-//                if (persona.getConversationStyle().getDescription() != null) {
-//                    customInstruction.append("\n- Conversation style description: ")
-//                            .append(persona.getConversationStyle().getDescription());
-//                }
-//                if (persona.getConversationStyle().getPrompt() != null) {
-//                    customInstruction.append("\n- Conversation style prompt: ")
-//                            .append(persona.getConversationStyle().getPrompt());
-//                }
-//            }
-        }
-
-        if (formalityLevel != null) {
-            customInstruction.append("\n- Formality level (Keigo/Style): ").append(formalityLevel.name());
-        }
-
-        if (marugotoLevel != null) {
-            customInstruction.append("\n- Marugoto course level: ").append(marugotoLevel.name());
-        }
-        return customInstruction.toString();
+        return SYSTEM_PROMPT_TEMPLATE.formatted(personaContextPrompt);
     }
 
     public List<Map<String, String>> getSlidingWindowMessages(
             SpeakingSession speakingSession,
-            org.naho.persona.model.Persona persona,
-            List<org.naho.speech.llm.model.conversation.SpeakingSessionMessage> messages
+            Persona persona,
+            List<SpeakingSessionMessage> previousMessages,
+            Map<String, String> userMessage
     ) {
-        List<Map<String, String>> history = new ArrayList<>();
-        if (messages != null && !messages.isEmpty()) {
-            List<org.naho.speech.llm.model.conversation.SpeakingSessionMessage> recentMessages;
-            if (messages.size() > MAX_SLIDING_WINDOW_MESSAGES) {
-                recentMessages = messages.subList(messages.size() - MAX_SLIDING_WINDOW_MESSAGES, messages.size());
-            } else {
-                recentMessages = messages;
-            }
-            for (org.naho.speech.llm.model.conversation.SpeakingSessionMessage msg : recentMessages) {
-                String role = msg.getSenderType() != null ? msg.getSenderType().toLowerCase() : "user";
-                history.add(Map.of("role", role, "content", msg.getContent() != null ? msg.getContent() : ""));
-            }
+        List<Map<String, String>> sessionHistories = new ArrayList<>();
+        if (previousMessages.size() > MAX_SLIDING_WINDOW_MESSAGES) {
+            previousMessages = previousMessages.subList(previousMessages.size() - MAX_SLIDING_WINDOW_MESSAGES, previousMessages.size());
         }
 
-        org.naho.persona.type.FormalityLevel formality = speakingSession != null ? speakingSession.getFormalityLevel() : null;
-        org.naho.persona.type.MarugotoLevel marugoto = speakingSession != null ? speakingSession.getMarugotoLevel() : null;
+        for (SpeakingSessionMessage speakingSessionMessage : previousMessages) {
+            sessionHistories.add(Map.of(
+                    AiMessageField.ROLE, speakingSessionMessage.getSenderType().name().toLowerCase(),
+                    AiMessageField.CONTENT, speakingSessionMessage.getContent()
+            ));
+        }
 
-        String customInstruction = buildCustomInstruction(persona, formality, marugoto);
-        String formattedSystemPrompt = SYSTEM_PROMPT_TEMPLATE.formatted(customInstruction);
+        sessionHistories.add(userMessage);
+
+        String systemPromptContent = buildSystemPromptContent(
+                persona,
+                speakingSession.getFormalityLevel(),
+                speakingSession.getMarugotoLevel()
+        );
 
         Map<String, String> systemPrompt = new HashMap<>();
-        systemPrompt.put("role", "system");
-        systemPrompt.put("content", formattedSystemPrompt);
+        systemPrompt.put(AiMessageField.ROLE, SenderType.SYSTEM.name().toLowerCase());
+        systemPrompt.put(AiMessageField.CONTENT, systemPromptContent);
 
-        List<Map<String, String>> slidingWindow = new ArrayList<>();
-        slidingWindow.add(systemPrompt);
-        slidingWindow.addAll(history);
-        return slidingWindow;
+        sessionHistories.add(systemPrompt);
+
+        return sessionHistories;
     }
 
     public String toAudioBase64(Long sessionId, String text) {
@@ -225,65 +201,4 @@ public class SpeakingSessionHelper {
             return null;
         }
     }
-
-    public record ParsedAiReply(
-            String reply,
-            String replyTranslation,
-            String grammarNote,
-            String correctedUserText,
-            String correctionExplanation,
-            String hintForLearner,
-            List<String> suggestedReplies
-    ) {
-    }
-
-//    public void ensureSessionLoadedInMemory(String sessionCode) {
-//        if (sessionCode == null || sessionCode.isBlank()) {
-//            throw new ApplicationException(
-//                    LlmApplicationError.LLM_SESSION_CODE_INVALID,
-//                    LlmDetailMessageKey.LLM_SESSION_CODE_INVALID);
-//        }
-//
-//        if (sessionStorePort.hasSession(sessionCode)) {
-//            return;
-//        }
-//
-//        SpeakingSessionResult activeSession = speakingSessionRepositoryPort
-//                .findActiveSessionByCode(sessionCode, null)
-//                .orElseThrow(() -> new ApplicationException(
-//                        LlmApplicationError.LLM_SESSION_NOT_FOUND,
-//                        LlmDetailMessageKey.LLM_SESSION_NOT_FOUND));
-//
-//        List<Map<String, String>> historyMessages = new ArrayList<>();
-//        if (activeSession.messages() != null) {
-//            for (var msg : activeSession.messages()) {
-//                String role = msg.senderType() != null ? msg.senderType().toLowerCase() : "user";
-//                historyMessages.add(Map.of("role", role, "content", msg.content()));
-//            }
-//        }
-//
-//        StringBuilder fullTranscript = new StringBuilder();
-//        if (activeSession.messages() != null) {
-//            for (var msg : activeSession.messages()) {
-//                String role = msg.senderType() != null ? msg.senderType().toLowerCase() : "user";
-//                fullTranscript.append("[Turn]\n")
-//                        .append(role)
-//                        .append(": ")
-//                        .append(msg.content())
-//                        .append("\n");
-//            }
-//        }
-//
-//        sessionStorePort.restoreSession(
-//                sessionCode,
-//                null,
-//                activeSession.personaId(),
-//                activeSession.topic(),
-//                activeSession.marugotoLevel(),
-//                activeSession.formalityLevel(),
-//                fullTranscript.toString(),
-//                activeSession.totalTurns(),
-//                activeSession.startedAt(),
-//                historyMessages);
-//    }
 }

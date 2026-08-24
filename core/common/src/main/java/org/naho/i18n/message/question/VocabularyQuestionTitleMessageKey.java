@@ -11,6 +11,8 @@ public final class VocabularyQuestionTitleMessageKey {
             "vocabulary.not_found.title";
     public static final String VOCABULARY_QUESTION_LOCKED_TITLE =
             "vocabulary_question.locked.title";
+    public static final String VOCABULARY_IN_USE_TITLE =
+            "vocabulary.in_use.title";
 
     private VocabularyQuestionTitleMessageKey() {
     }

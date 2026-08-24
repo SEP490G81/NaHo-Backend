@@ -1,10 +1,14 @@
 package org.naho.speech.llm.conversation.dto.mapper;
 
 import org.mapstruct.Mapper;
+import org.naho.speech.llm.conversation.dto.response.SpeakingSessionAssessmentDetailResponse;
 import org.naho.speech.llm.conversation.dto.response.SpeakingSessionAssessmentResponse;
+import org.naho.speech.llm.conversation.result.SpeakingSessionAssessmentDetailResult;
 import org.naho.speech.llm.conversation.result.SpeakingSessionAssessmentResult;
 
-@Mapper(componentModel = "spring", uses = {SpeakingImprovedExpressionResponseMapper.class})
+@Mapper(componentModel = "spring")
 public interface SpeakingSessionAssessmentResponseMapper {
     SpeakingSessionAssessmentResponse resultToResponse(SpeakingSessionAssessmentResult result);
+
+    SpeakingSessionAssessmentDetailResponse resultToResponse(SpeakingSessionAssessmentDetailResult result);
 }

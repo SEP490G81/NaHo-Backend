@@ -1,14 +1,17 @@
 package org.naho.speech.llm.conversation.result;
 
 import org.naho.speech.llm.type.MessageType;
+import org.naho.speech.llm.type.SenderType;
+
+import java.util.List;
 
 public record SpeakingSessionMessageResult(
         Long id,
         Long sessionId,
         Long audioFileId,
 
-        int turnIndex,
-        String senderType,
+        Integer turnIndex,
+        SenderType senderType,
         MessageType messageType,
         String content,
         String contentTranslation,
@@ -18,7 +21,8 @@ public record SpeakingSessionMessageResult(
         String hintForLearner,
         Double pronunciationScore,
         String aiReplyAudio,
-        String userRecordAudio
+        String userRecordAudio,
+        List<String> suggestedReplies
 ) {
 
     public static Builder builder() {
@@ -31,8 +35,8 @@ public record SpeakingSessionMessageResult(
         private Long sessionId;
         private Long audioFileId;
 
-        private int turnIndex;
-        private String senderType;
+        private Integer turnIndex;
+        private SenderType senderType;
         private MessageType messageType;
         private String content;
         private String contentTranslation;
@@ -43,6 +47,7 @@ public record SpeakingSessionMessageResult(
         private Double pronunciationScore;
         private String aiReplyAudio;
         private String userRecordAudio;
+        private List<String> suggestedReplies;
 
         public Builder id(Long id) {
             this.id = id;
@@ -59,12 +64,12 @@ public record SpeakingSessionMessageResult(
             return this;
         }
 
-        public Builder turnIndex(int turnIndex) {
+        public Builder turnIndex(Integer turnIndex) {
             this.turnIndex = turnIndex;
             return this;
         }
 
-        public Builder senderType(String senderType) {
+        public Builder senderType(SenderType senderType) {
             this.senderType = senderType;
             return this;
         }
@@ -119,6 +124,11 @@ public record SpeakingSessionMessageResult(
             return this;
         }
 
+        public Builder suggestedReplies(List<String> suggestedReplies) {
+            this.suggestedReplies = suggestedReplies;
+            return this;
+        }
+
         public SpeakingSessionMessageResult build() {
             return new SpeakingSessionMessageResult(
                     id,
@@ -135,7 +145,8 @@ public record SpeakingSessionMessageResult(
                     hintForLearner,
                     pronunciationScore,
                     aiReplyAudio,
-                    userRecordAudio
+                    userRecordAudio,
+                    suggestedReplies
             );
         }
     }

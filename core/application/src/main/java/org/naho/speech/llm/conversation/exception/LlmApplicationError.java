@@ -26,6 +26,10 @@ public enum LlmApplicationError implements ErrorCode {
             "LLM_A003",
             LlmTitleMessageKey.LLM_USER_MESSAGE_INVALID_TITLE,
             400),
+    LLM_TRANSCRIPT_BLANK(
+            "LLM_A010",
+            LlmTitleMessageKey.LLM_TRANSCRIPT_BLANK_TITLE,
+            400),
     LLM_SESSION_ALREADY_COMPLETED(
             "LLM_A004",
             LlmTitleMessageKey.LLM_SESSION_ALREADY_COMPLETED_TITLE,

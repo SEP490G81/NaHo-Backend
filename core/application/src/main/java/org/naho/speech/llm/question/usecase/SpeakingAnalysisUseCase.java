@@ -14,7 +14,9 @@ import org.naho.learning.model.LearningPathNode;
 import org.naho.learning.model.UserLearningProgress;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
+import org.naho.question.command.CompleteSpeakingQuestionCommand;
 import org.naho.question.exception.SpeakingQuestionErrorCode;
+import org.naho.question.port.in.CompleteSpeakingQuestionInputPort;
 import org.naho.question.port.out.AnswerHistoryRepositoryPort;
 import org.naho.question.port.out.AnswerHistoryResultMapper;
 import org.naho.question.result.AnswerHistoryResult;
@@ -52,6 +54,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
     private final FileRepositoryPort fileRepositoryPort;
     private final LearningPathNodeRepositoryPort learningPathNodeRepositoryPort;
     private final UserLearningProgressRepositoryPort userLearningProgressRepositoryPort;
+    private final CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort;
 
     public SpeakingAnalysisUseCase(
             UserDailyAiUsageRepositoryPort userDailyAiUsageRepositoryPort,
@@ -66,7 +69,8 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
             AnswerHistoryResultMapper answerHistoryResultMapper,
             FileRepositoryPort fileRepositoryPort,
             LearningPathNodeRepositoryPort learningPathNodeRepositoryPort,
-            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort
+            UserLearningProgressRepositoryPort userLearningProgressRepositoryPort,
+            CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort
     ) {
         this.userDailyAiUsageRepositoryPort = userDailyAiUsageRepositoryPort;
         this.uploadFileInputPort = uploadFileInputPort;
@@ -81,6 +85,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         this.fileRepositoryPort = fileRepositoryPort;
         this.learningPathNodeRepositoryPort = learningPathNodeRepositoryPort;
         this.userLearningProgressRepositoryPort = userLearningProgressRepositoryPort;
+        this.completeSpeakingQuestionInputPort = completeSpeakingQuestionInputPort;
     }
 
     /**
@@ -171,8 +176,7 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         AiFeedback savedAiFeedback = aiFeedbackRepositoryPort.createNew(aiFeedback);
 
         // Tính điểm tổng kết dựa trên điểm phát âm trung bình và điểm nội dung trung bình
-        double overallScore = (savedSpeechAssessment.getAverageScore()
-                + savedAiFeedback.getAverageScore()) / 2.0;
+        double overallScore = (savedSpeechAssessment.getAverageScore() + savedAiFeedback.getAverageScore()) / 2.0;
 
         // Lưu file vào database để phục cho chức năng upload
         File audioFile = fileRepositoryPort.createNewForUpload(
@@ -196,6 +200,16 @@ public class SpeakingAnalysisUseCase implements SpeakingAnalysisInputPort {
         // tăng số lần đánh giá AI với speaking question của người dùng lên 1 (today)
         userDailyAiUsage.increaseSpeakingEvaluationCount();
         userDailyAiUsageRepositoryPort.save(userDailyAiUsage);
+
+        // đánh dấu là đã học bài speaking question này
+        completeSpeakingQuestionInputPort.completeSpeakingQuestion(
+                CompleteSpeakingQuestionCommand.builder()
+                        .userLearningProgress(progress)
+                        .speakingQuestionLearningPathNode(learningPathNode)
+                        .userId(command.userId())
+                        .overallScore(overallScore)
+                        .build()
+        );
 
         return answerHistoryResultMapper.domainToResult(savedAnswerHistory);
     }

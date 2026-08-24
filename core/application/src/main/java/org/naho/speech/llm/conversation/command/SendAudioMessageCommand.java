@@ -6,26 +6,13 @@ import org.naho.i18n.message.speech.SpeechDetailMessageKey;
 import org.naho.shared.exception.ApplicationException;
 import org.naho.speech.llm.conversation.exception.LlmApplicationError;
 
-/**
- * Command DTO: Gửi audio message trong speaking session.
- *
- * @param sessionCode   Mã phiên hội thoại
- * @param audioBytes    dữ liệu audio (WAV)
- * @param referenceText text chuẩn để đánh giá phát âm (optional)
- * @param storedFile    file lưu tạm local (optional)
- * @param userId        ID của user
- */
 public record SendAudioMessageCommand(
         String sessionCode,
         byte[] audioBytes,
-        String referenceText,
+        double duration,
         StoredFile storedFile,
         Long userId
 ) {
-    public SendAudioMessageCommand(String sessionCode, byte[] audioBytes, String referenceText) {
-        this(sessionCode, audioBytes, referenceText, null, null);
-    }
-
     public SendAudioMessageCommand {
         if (sessionCode == null || sessionCode.isBlank()) {
             throw new ApplicationException(
@@ -45,10 +32,11 @@ public record SendAudioMessageCommand(
         return new Builder();
     }
 
-    public static final class Builder {
+    public static class Builder {
+
         private String sessionCode;
         private byte[] audioBytes;
-        private String referenceText;
+        private double duration;
         private StoredFile storedFile;
         private Long userId;
 
@@ -62,8 +50,8 @@ public record SendAudioMessageCommand(
             return this;
         }
 
-        public Builder referenceText(String referenceText) {
-            this.referenceText = referenceText;
+        public Builder duration(double duration) {
+            this.duration = duration;
             return this;
         }
 
@@ -78,7 +66,13 @@ public record SendAudioMessageCommand(
         }
 
         public SendAudioMessageCommand build() {
-            return new SendAudioMessageCommand(sessionCode, audioBytes, referenceText, storedFile, userId);
+            return new SendAudioMessageCommand(
+                    sessionCode,
+                    audioBytes,
+                    duration,
+                    storedFile,
+                    userId
+            );
         }
     }
 }

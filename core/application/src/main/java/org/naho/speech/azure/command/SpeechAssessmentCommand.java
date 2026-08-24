@@ -11,14 +11,12 @@ public record SpeechAssessmentCommand(
         return new Builder();
     }
 
-    public static final class Builder {
+    public static class Builder {
+
         private byte[] audioBytes;
         private double duration;
         private String referenceText;
         private Long userId;
-
-        private Builder() {
-        }
 
         public Builder audioBytes(byte[] audioBytes) {
             this.audioBytes = audioBytes;

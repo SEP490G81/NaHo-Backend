@@ -5,8 +5,12 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.file.entity.FileEntity;
+import org.naho.shared.converter.StringListJsonConverter;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.speech.llm.type.MessageType;
+import org.naho.speech.llm.type.SenderType;
+
+import java.util.List;
 
 @SuperBuilder
 @Getter
@@ -23,10 +27,11 @@ public class SpeakingSessionMessageEntity extends BaseEntity {
     SpeakingSessionEntity session;
 
     @Column(name = "turn_index", nullable = false)
-    int turnIndex;
+    Integer turnIndex;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "sender_type", nullable = false, length = 20)
-    String senderType;
+    SenderType senderType;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "message_type", length = 20)
@@ -35,7 +40,7 @@ public class SpeakingSessionMessageEntity extends BaseEntity {
     @Column(name = "content", nullable = false, columnDefinition = "LONGTEXT")
     String content;
 
-    @Column(name = "content_translation", nullable = false, columnDefinition = "LONGTEXT")
+    @Column(name = "content_translation", columnDefinition = "LONGTEXT")
     String contentTranslation;
 
     @Column(name = "corrected_text", columnDefinition = "TEXT")
@@ -52,6 +57,10 @@ public class SpeakingSessionMessageEntity extends BaseEntity {
 
     @Column(name = "pronunciation_score")
     Double pronunciationScore;
+
+    @Convert(converter = StringListJsonConverter.class)
+    @Column(name = "suggested_replies", columnDefinition = "TEXT")
+    List<String> suggestedReplies;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "audio_file_id")

@@ -2,6 +2,8 @@ package org.naho.persona.model;
 
 import org.naho.i18n.message.persona.PersonaDetailMessageKey;
 import org.naho.persona.exception.PersonaDomainErrorCode;
+import org.naho.persona.type.FormalityLevel;
+import org.naho.persona.type.MarugotoLevel;
 import org.naho.persona.type.PersonaStatus;
 import org.naho.shared.exception.DomainException;
 import org.naho.user.type.Gender;
@@ -10,22 +12,24 @@ public class Persona {
 
     private final Long id;
     private final Long avatarFileId;
-    private final Long suggestedConversationStyleId;
     private final String name;
     private final String prompt;
     private final PersonaStatus status;
     private final String voiceName;
     private final Gender gender;
+    private final MarugotoLevel defaultMarugotoLevel;
+    private final FormalityLevel defaultFormalityLevel;
 
     private Persona(Builder builder) {
         this.id = builder.id;
         this.avatarFileId = builder.avatarFileId;
-        this.suggestedConversationStyleId = builder.suggestedConversationStyleId;
         this.name = builder.name;
         this.prompt = builder.prompt;
         this.status = builder.status != null ? builder.status : PersonaStatus.ACTIVE;
         this.voiceName = builder.voiceName;
         this.gender = builder.gender;
+        this.defaultMarugotoLevel = builder.defaultMarugotoLevel;
+        this.defaultFormalityLevel = builder.defaultFormalityLevel;
     }
 
     public static Builder builder() {
@@ -38,10 +42,6 @@ public class Persona {
 
     public Long getAvatarFileId() {
         return avatarFileId;
-    }
-
-    public Long getSuggestedConversationStyleId() {
-        return suggestedConversationStyleId;
     }
 
     public String getName() {
@@ -64,16 +64,25 @@ public class Persona {
         return gender;
     }
 
+    public MarugotoLevel getDefaultMarugotoLevel() {
+        return defaultMarugotoLevel;
+    }
+
+    public FormalityLevel getDefaultFormalityLevel() {
+        return defaultFormalityLevel;
+    }
+
     public static class Builder {
 
         private Long id;
         private Long avatarFileId;
-        private Long suggestedConversationStyleId;
         private String name;
         private String prompt;
         private PersonaStatus status;
         private String voiceName;
         private Gender gender;
+        private MarugotoLevel defaultMarugotoLevel;
+        private FormalityLevel defaultFormalityLevel;
 
         public Builder id(Long id) {
             this.id = id;
@@ -82,11 +91,6 @@ public class Persona {
 
         public Builder avatarFileId(Long avatarFileId) {
             this.avatarFileId = avatarFileId;
-            return this;
-        }
-
-        public Builder suggestedConversationStyleId(Long suggestedConversationStyleId) {
-            this.suggestedConversationStyleId = suggestedConversationStyleId;
             return this;
         }
 
@@ -112,6 +116,16 @@ public class Persona {
 
         public Builder gender(Gender gender) {
             this.gender = gender;
+            return this;
+        }
+
+        public Builder defaultMarugotoLevel(MarugotoLevel defaultMarugotoLevel) {
+            this.defaultMarugotoLevel = defaultMarugotoLevel;
+            return this;
+        }
+
+        public Builder defaultFormalityLevel(FormalityLevel defaultFormalityLevel) {
+            this.defaultFormalityLevel = defaultFormalityLevel;
             return this;
         }
 

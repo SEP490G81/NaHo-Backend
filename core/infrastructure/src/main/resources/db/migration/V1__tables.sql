@@ -102,18 +102,6 @@ CREATE TABLE comments
     CONSTRAINT pk_comments PRIMARY KEY (id)
 );
 
-CREATE TABLE conversation_styles
-(
-    id              BIGINT AUTO_INCREMENT NOT NULL,
-    created_time    datetime(6)           NOT NULL,
-    modified_time   datetime(6)           NULL,
-    `description`   VARCHAR(512)          NULL,
-    prompt          TEXT                  NOT NULL,
-    formality_level VARCHAR(255)          NOT NULL,
-    marugoto_level  VARCHAR(255)          NOT NULL,
-    CONSTRAINT pk_conversation_styles PRIMARY KEY (id)
-);
-
 CREATE TABLE daily_missions
 (
     id            BIGINT AUTO_INCREMENT NOT NULL,
@@ -316,16 +304,17 @@ CREATE TABLE permissions
 
 CREATE TABLE personas
 (
-    id                              BIGINT AUTO_INCREMENT NOT NULL,
-    created_time                    datetime(6)           NOT NULL,
-    modified_time                   datetime(6)           NULL,
-    name                            VARCHAR(255)          NOT NULL,
-    prompt                          TEXT                  NOT NULL,
-    status                          VARCHAR(50)           NOT NULL,
-    voice_name                      VARCHAR(100)          NULL,
-    gender                          VARCHAR(20)           NOT NULL,
-    avatar_file_id                  BIGINT                NULL,
-    suggested_conversation_style_id BIGINT                NOT NULL,
+    id                      BIGINT AUTO_INCREMENT NOT NULL,
+    created_time            datetime(6)           NOT NULL,
+    modified_time           datetime(6)           NULL,
+    name                    VARCHAR(255)          NOT NULL,
+    prompt                  TEXT                  NOT NULL,
+    status                  VARCHAR(50)           NOT NULL,
+    voice_name              VARCHAR(100)          NULL,
+    gender                  VARCHAR(20)           NOT NULL,
+    avatar_file_id          BIGINT                NULL,
+    default_marugoto_level  VARCHAR(50)           NULL,
+    default_formality_level VARCHAR(50)           NULL,
     CONSTRAINT pk_personas PRIMARY KEY (id)
 );
 
@@ -404,7 +393,6 @@ CREATE TABLE speaking_improved_expressions
     created_time                   datetime(6)           NOT NULL,
     modified_time                  datetime(6)           NULL,
     speaking_session_assessment_id BIGINT                NOT NULL,
-    turn_index                     INT                   NULL,
     original_text                  TEXT                  NOT NULL,
     improved_text                  TEXT                  NOT NULL,
     explanation_vietnamese         TEXT                  NULL,
@@ -449,15 +437,6 @@ CREATE TABLE speaking_session_assessments
     created_time           datetime(6)           NOT NULL,
     modified_time          datetime(6)           NULL,
     session_id             BIGINT                NOT NULL,
-    overall_score          INT                   NOT NULL,
-    jlpt_estimate          VARCHAR(5)            NOT NULL,
-    fluency_score          INT                   NOT NULL,
-    pronunciation_score    INT                   NOT NULL,
-    grammar_score          INT                   NOT NULL,
-    vocabulary_score       INT                   NOT NULL,
-    interaction_score      INT                   NOT NULL,
-    naturalness_score      INT                   NOT NULL,
-    coherence_score        INT                   NOT NULL,
     summary                TEXT                  NOT NULL,
     strengths              JSON                  NOT NULL,
     weaknesses             JSON                  NOT NULL,
@@ -469,6 +448,7 @@ CREATE TABLE speaking_session_assessments
     feedback_naturalness   TEXT                  NULL,
     feedback_coherence     TEXT                  NULL,
     study_focus_area       VARCHAR(30)           NULL,
+    study_reason           TEXT                  NULL,
     study_recommendation   TEXT                  NULL,
     study_encouragement    TEXT                  NULL,
     CONSTRAINT pk_speaking_session_assessments PRIMARY KEY (id)
@@ -484,35 +464,33 @@ CREATE TABLE speaking_session_messages
     sender_type            VARCHAR(20)           NOT NULL,
     message_type           VARCHAR(20)           NULL,
     content                LONGTEXT              NOT NULL,
-    content_translation    LONGTEXT              NOT NULL,
+    content_translation    LONGTEXT              NULL,
     corrected_text         TEXT                  NULL,
     correction_explanation TEXT                  NULL,
     grammar_note           TEXT                  NULL,
     hint_for_learner       TEXT                  NULL,
     pronunciation_score    DOUBLE                NULL,
+    suggested_replies      TEXT                  NULL,
     audio_file_id          BIGINT                NULL,
     CONSTRAINT pk_speaking_session_messages PRIMARY KEY (id)
 );
 
 CREATE TABLE speaking_sessions
 (
-    id               BIGINT AUTO_INCREMENT NOT NULL,
-    created_time     datetime(6)           NOT NULL,
-    modified_time    datetime(6)           NULL,
-    session_code     VARCHAR(36)           NOT NULL,
-    user_id          BIGINT                NOT NULL,
-    persona_id       BIGINT                NULL,
-    topic            VARCHAR(500)          NULL,
-    voice_name       VARCHAR(100)          NULL,
-    marugoto_level   VARCHAR(30)           NULL,
-    formality_level  VARCHAR(20)           NULL,
-    duration_seconds INT                   NULL,
-    total_turns      INT                   NOT NULL,
-    asr_confidence   DOUBLE                NULL,
-    full_transcript  LONGTEXT              NULL,
-    status           VARCHAR(20)           NOT NULL,
-    started_at       datetime(6)           NOT NULL,
-    ended_at         datetime(6)           NULL,
+    id              BIGINT AUTO_INCREMENT NOT NULL,
+    created_time    datetime(6)           NOT NULL,
+    modified_time   datetime(6)           NULL,
+    session_code    VARCHAR(36)           NOT NULL,
+    user_id         BIGINT                NOT NULL,
+    persona_id      BIGINT                NOT NULL,
+    topic           VARCHAR(500)          NULL,
+    voice_name      VARCHAR(100)          NULL,
+    marugoto_level  VARCHAR(30)           NULL,
+    formality_level VARCHAR(20)           NULL,
+    total_turns     INT                   NOT NULL,
+    status          VARCHAR(20)           NOT NULL,
+    started_at      datetime(6)           NOT NULL,
+    ended_at        datetime(6)           NULL,
     CONSTRAINT pk_speaking_sessions PRIMARY KEY (id)
 );
 
@@ -909,9 +887,6 @@ ALTER TABLE payment_transactions
 ALTER TABLE personas
     ADD CONSTRAINT FK_PERSONAS_ON_AVATAR_FILE FOREIGN KEY (avatar_file_id) REFERENCES files (id);
 
-ALTER TABLE personas
-    ADD CONSTRAINT FK_PERSONAS_ON_SUGGESTED_CONVERSATION_STYLE FOREIGN KEY (suggested_conversation_style_id) REFERENCES conversation_styles (id);
-
 ALTER TABLE point_histories
     ADD CONSTRAINT FK_POINT_HISTORIES_ON_LEARNING_PATH_NODE FOREIGN KEY (learning_path_node_id) REFERENCES learning_path_nodes (id);
 
@@ -944,6 +919,12 @@ ALTER TABLE speaking_questions
 
 ALTER TABLE speaking_questions
     ADD CONSTRAINT FK_SPEAKING_QUESTIONS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+
+ALTER TABLE speaking_sessions
+    ADD CONSTRAINT FK_SPEAKING_SESSIONS_ON_PERSONA FOREIGN KEY (persona_id) REFERENCES personas (id);
+
+ALTER TABLE speaking_sessions
+    ADD CONSTRAINT FK_SPEAKING_SESSIONS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
 ALTER TABLE speaking_session_assessments
     ADD CONSTRAINT FK_SPEAKING_SESSION_ASSESSMENTS_ON_SESSION FOREIGN KEY (session_id) REFERENCES speaking_sessions (id);

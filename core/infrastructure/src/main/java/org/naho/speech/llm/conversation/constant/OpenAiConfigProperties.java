@@ -5,6 +5,8 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.time.Duration;
+
 @Getter
 @Setter
 @ConfigurationProperties(prefix = "app.openai")
@@ -14,6 +16,8 @@ public class OpenAiConfigProperties {
     String adminApiKey;
     String chatModel;
     String scoringModel;
-    int maxTokens;
-    double temperature;
+    Integer maxTokens;
+    Double lowTemperature;
+    Double highTemperature;
+    Duration requestTimeout;
 }

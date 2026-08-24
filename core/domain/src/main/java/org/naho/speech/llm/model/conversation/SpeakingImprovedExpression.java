@@ -4,7 +4,6 @@ public class SpeakingImprovedExpression {
 
     private Long id;
     private Long speakingSessionAssessmentId;
-    private Integer turnIndex;
     private String originalText;
     private String improvedText;
     private String explanationVietnamese;
@@ -12,7 +11,6 @@ public class SpeakingImprovedExpression {
     private SpeakingImprovedExpression(Builder builder) {
         this.id = builder.id;
         this.speakingSessionAssessmentId = builder.speakingSessionAssessmentId;
-        this.turnIndex = builder.turnIndex;
         this.originalText = builder.originalText;
         this.improvedText = builder.improvedText;
         this.explanationVietnamese = builder.explanationVietnamese;
@@ -22,10 +20,29 @@ public class SpeakingImprovedExpression {
         return new Builder();
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public Long getSpeakingSessionAssessmentId() {
+        return speakingSessionAssessmentId;
+    }
+
+    public String getOriginalText() {
+        return originalText;
+    }
+
+    public String getImprovedText() {
+        return improvedText;
+    }
+
+    public String getExplanationVietnamese() {
+        return explanationVietnamese;
+    }
+
     public static class Builder {
         private Long id;
         private Long speakingSessionAssessmentId;
-        private Integer turnIndex;
         private String originalText;
         private String improvedText;
         private String explanationVietnamese;
@@ -37,11 +54,6 @@ public class SpeakingImprovedExpression {
 
         public Builder speakingSessionAssessmentId(Long speakingSessionAssessmentId) {
             this.speakingSessionAssessmentId = speakingSessionAssessmentId;
-            return this;
-        }
-
-        public Builder turnIndex(Integer turnIndex) {
-            this.turnIndex = turnIndex;
             return this;
         }
 

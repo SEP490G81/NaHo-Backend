@@ -196,4 +196,14 @@ public class FileRepositoryAdapter implements FileRepositoryPort {
                 .findAvatarFileByUserId(userId)
                 .map(fileEntityMapper::entityToDomain);
     }
+
+    @Override
+    public List<File> findAllByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return fileJpaRepository.findAllById(ids).stream()
+                .map(fileEntityMapper::entityToDomain)
+                .toList();
+    }
 }

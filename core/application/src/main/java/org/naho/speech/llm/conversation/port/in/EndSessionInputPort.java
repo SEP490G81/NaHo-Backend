@@ -1,14 +1,8 @@
 package org.naho.speech.llm.conversation.port.in;
 
-import org.naho.speech.llm.conversation.result.SpeakingSessionResult;
+import org.naho.speech.llm.conversation.result.SpeakingSessionAssessmentResult;
 
 public interface EndSessionInputPort {
-    SpeakingSessionResult endSession(
-            Long userId,
-            String sessionCode,
-            String topic,
-            String speechMetaData,
-            String arsConfidence
-    );
+    SpeakingSessionAssessmentResult endSession(Long userId, String sessionCode);
 }
 

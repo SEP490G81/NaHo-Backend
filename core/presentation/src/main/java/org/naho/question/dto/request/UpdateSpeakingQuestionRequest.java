@@ -2,13 +2,14 @@ package org.naho.question.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 
+import java.util.List;
+
 public record UpdateSpeakingQuestionRequest(
         @NotBlank(message = "Japanese name is required")
         String japaneseName,
 
         String vietnameseName,
 
-        @NotBlank(message = "Description is required")
         String description,
 
         String japaneseSampleAnswer,
@@ -17,9 +18,9 @@ public record UpdateSpeakingQuestionRequest(
 
         String englishSampleAnswer,
 
-        java.util.List<NestedVocabularyRequest> vocabularies,
+        List<NestedVocabularyRequest> vocabularies,
 
-        java.util.List<NestedGrammarRequest> grammars
+        List<NestedGrammarRequest> grammars
 ) {
     public record NestedVocabularyRequest(
             Long id,

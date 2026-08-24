@@ -24,6 +24,11 @@ public enum VocabularyErrorCode implements ErrorCode {
             "VOCABULARY_E004",
             VocabularyQuestionTitleMessageKey.VOCABULARY_NOT_FOUND_TITLE,
             404
+    ),
+    VOCABULARY_IN_USE(
+            "VOCABULARY_E005",
+            VocabularyQuestionTitleMessageKey.VOCABULARY_IN_USE_TITLE,
+            400
     );
 
     private final String code;

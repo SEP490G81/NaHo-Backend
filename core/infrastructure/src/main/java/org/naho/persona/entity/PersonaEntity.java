@@ -5,6 +5,8 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.naho.file.entity.FileEntity;
+import org.naho.persona.type.FormalityLevel;
+import org.naho.persona.type.MarugotoLevel;
 import org.naho.persona.type.PersonaStatus;
 import org.naho.shared.persistence.BaseEntity;
 import org.naho.user.type.Gender;
@@ -39,7 +41,11 @@ public class PersonaEntity extends BaseEntity {
     @JoinColumn(name = "avatar_file_id")
     FileEntity avatarFile;
 
-    @ManyToOne
-    @JoinColumn(name = "suggested_conversation_style_id", nullable = false)
-    ConversationStyleEntity suggestedConversationStyle;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "default_marugoto_level", length = 50)
+    MarugotoLevel defaultMarugotoLevel;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "default_formality_level", length = 50)
+    FormalityLevel defaultFormalityLevel;
 }

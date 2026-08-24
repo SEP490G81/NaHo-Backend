@@ -34,7 +34,8 @@ public class MessageSourceConfig {
                 "classpath:i18n/payment/payment",
                 "classpath:i18n/subscription/subscription",
                 "classpath:i18n/notification/notification",
-                "classpath:i18n/quote/quote"
+                "classpath:i18n/quote/quote",
+                "classpath:i18n/persona/persona"
         );
 
         messageSource.setDefaultEncoding(DEFAULT_ENCODING);

@@ -101,10 +101,10 @@ public class SpeakingAnalysisHelper {
         try {
             JsonNode root = objectMapper.readTree(rawJson);
 
-            double grammarScore = root.path("grammarScore").asDouble(0.0);
-            double vocabularyScore = root.path("vocabularyScore").asDouble(0.0);
-            double naturalnessScore = root.path("naturalnessScore").asDouble(0.0);
-            double contentRelevantScore = root.path("contentRelevantScore").asDouble(0.0);
+            double grammarScore = root.path("grammarScore").asDouble(0.0) / 10.0;
+            double vocabularyScore = root.path("vocabularyScore").asDouble(0.0) / 10.0;
+            double naturalnessScore = root.path("naturalnessScore").asDouble(0.0) / 10.0;
+            double contentRelevantScore = root.path("contentRelevantScore").asDouble(0.0) / 10.0;
             String suggestJapaneseAnswer = root.path("suggestJapaneseAnswer").asText("");
             String suggestAnswerTranslation = root.path("suggestAnswerTranslation").asText("");
 
@@ -122,10 +122,22 @@ public class SpeakingAnalysisHelper {
                 }
             }
 
+            // tăng điểm nếu người dùng sử dụng ngữ pháp và từ vựng cho sẵn
+            for (int i = 0; i < Math.min(3, usedList.size()); i++) {
+                UsedVocabularyAndGrammar usedVocabularyAndGrammar = usedList.get(i);
+                if (LanguageCategory.GRAMMAR.equals(usedVocabularyAndGrammar.getCategory())) {
+                    grammarScore += 0.5;
+                } else {
+                    vocabularyScore += 0.5;
+                }
+            }
+
             List<UserAnswerError> errorList = new ArrayList<>();
+
             JsonNode errorsNode = root.has("userAnswerErrors")
                     ? root.path("userAnswerErrors")
                     : root.path("errors");
+
             if (errorsNode.isArray()) {
                 for (JsonNode item : errorsNode) {
                     String incorrect = item.path("incorrect").asText("");

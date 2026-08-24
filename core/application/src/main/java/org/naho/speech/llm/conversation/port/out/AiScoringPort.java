@@ -1,14 +1,12 @@
 package org.naho.speech.llm.conversation.port.out;
 
-import org.naho.speech.llm.conversation.result.SpeakingSessionAssessmentResult;
+import org.naho.speech.llm.model.conversation.SpeakingSessionAssessment;
 
 public interface AiScoringPort {
-    SpeakingSessionAssessmentResult score(
+    SpeakingSessionAssessment score(
             String sessionCode,
             String topic,
-            String fullTranscript,
-            String speechMetadata,
-            String asrConfidence,
-            String personaContext
+            String systemPromptContent,
+            String messagesJson
     );
 }

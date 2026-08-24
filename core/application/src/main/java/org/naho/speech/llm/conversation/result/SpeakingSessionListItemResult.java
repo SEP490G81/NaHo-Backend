@@ -1,5 +1,6 @@
 package org.naho.speech.llm.conversation.result;
 
+import org.naho.persona.result.PersonaResult;
 import org.naho.persona.type.FormalityLevel;
 import org.naho.persona.type.MarugotoLevel;
 import org.naho.speech.llm.type.SpeakingSessionStatus;
@@ -10,15 +11,12 @@ public record SpeakingSessionListItemResult(
         Long id,
         String sessionCode,
         Long userId,
-        Long personaId,
+        PersonaResult persona,
         String topic,
         String voiceName,
         MarugotoLevel marugotoLevel,
         FormalityLevel formalityLevel,
-        Integer durationSeconds,
-        int totalTurns,
-        Double asrConfidence,
-        String fullTranscript,
+        Integer totalTurns,
         SpeakingSessionStatus status,
         Instant startedAt,
         Instant endedAt
@@ -33,15 +31,12 @@ public record SpeakingSessionListItemResult(
         private Long id;
         private String sessionCode;
         private Long userId;
-        private Long personaId;
+        private PersonaResult persona;
         private String topic;
         private String voiceName;
         private MarugotoLevel marugotoLevel;
         private FormalityLevel formalityLevel;
-        private Integer durationSeconds;
-        private int totalTurns;
-        private Double asrConfidence;
-        private String fullTranscript;
+        private Integer totalTurns;
         private SpeakingSessionStatus status;
         private Instant startedAt;
         private Instant endedAt;
@@ -61,8 +56,8 @@ public record SpeakingSessionListItemResult(
             return this;
         }
 
-        public Builder personaId(Long personaId) {
-            this.personaId = personaId;
+        public Builder persona(PersonaResult persona) {
+            this.persona = persona;
             return this;
         }
 
@@ -86,23 +81,8 @@ public record SpeakingSessionListItemResult(
             return this;
         }
 
-        public Builder durationSeconds(Integer durationSeconds) {
-            this.durationSeconds = durationSeconds;
-            return this;
-        }
-
-        public Builder totalTurns(int totalTurns) {
+        public Builder totalTurns(Integer totalTurns) {
             this.totalTurns = totalTurns;
-            return this;
-        }
-
-        public Builder asrConfidence(Double asrConfidence) {
-            this.asrConfidence = asrConfidence;
-            return this;
-        }
-
-        public Builder fullTranscript(String fullTranscript) {
-            this.fullTranscript = fullTranscript;
             return this;
         }
 
@@ -126,15 +106,12 @@ public record SpeakingSessionListItemResult(
                     id,
                     sessionCode,
                     userId,
-                    personaId,
+                    persona,
                     topic,
                     voiceName,
                     marugotoLevel,
                     formalityLevel,
-                    durationSeconds,
                     totalTurns,
-                    asrConfidence,
-                    fullTranscript,
                     status,
                     startedAt,
                     endedAt

@@ -1,20 +1,8 @@
 package org.naho.speech.llm.conversation.dto.response;
 
-import java.util.List;
-
 public record SpeakingSessionAssessmentResponse(
         Long id,
         Long speakingSessionId,
-
-        int overallScore,
-        String jlptEstimate,
-        int fluencyScore,
-        int pronunciationScore,
-        int grammarScore,
-        int vocabularyScore,
-        int interactionScore,
-        int naturalnessScore,
-        int coherenceScore,
 
         String summary,
         String strengths,
@@ -29,9 +17,8 @@ public record SpeakingSessionAssessmentResponse(
         String feedbackCoherence,
 
         String studyFocusArea,
+        String studyReason,
         String studyRecommendation,
-        String studyEncouragement,
-
-        List<SpeakingImprovedExpressionResponse> speakingImprovedExpressions
+        String studyEncouragement
 ) {
 }
