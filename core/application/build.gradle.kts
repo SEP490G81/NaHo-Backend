@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    id("jacoco")
 }
 
 group = "org.naho"
@@ -13,6 +14,10 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
+}
+
+jacoco {
+    toolVersion = "0.8.12"
 }
 
 dependencies {
@@ -32,4 +37,29 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)
+        csv.required.set(false)
+        html.required.set(true)
+        html.outputLocation.set(layout.buildDirectory.dir("reports/jacoco/test/html"))
+    }
+    classDirectories.setFrom(
+        files(classDirectories.files.map {
+            fileTree(it) {
+                exclude(
+                    "**/command/**",
+                    "**/result/**",
+                    "**/exception/**",
+                    "**/constant/**",
+                    "**/event/**",
+                    "**/mapper/**"
+                )
+            }
+        })
+    )
 }

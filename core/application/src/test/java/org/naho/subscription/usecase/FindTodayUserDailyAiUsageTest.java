@@ -16,7 +16,6 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -54,7 +53,7 @@ class FindTodayUserDailyAiUsageTest {
                 .aiSessionStartCount(1)
                 .build();
 
-        when(userDailyAiUsageRepositoryPort.findByUserIdAndUsageDateCreateIfNotExists(eq(userId), any(LocalDate.class)))
+        when(userDailyAiUsageRepositoryPort.findByUserIdAndUsageDateCreateIfNotExists(any(Long.class), any(LocalDate.class)))
                 .thenReturn(usage);
         when(userDailyAiUsageResultMapper.domainToResult(usage)).thenReturn(expectedResult);
 
@@ -69,7 +68,7 @@ class FindTodayUserDailyAiUsageTest {
         assertEquals(1, result.aiSessionStartCount());
 
         verify(userDailyAiUsageRepositoryPort, times(1))
-                .findByUserIdAndUsageDateCreateIfNotExists(eq(userId), any(LocalDate.class));
+                .findByUserIdAndUsageDateCreateIfNotExists(any(Long.class), any(LocalDate.class));
         verify(userDailyAiUsageResultMapper, times(1)).domainToResult(usage);
     }
 }
