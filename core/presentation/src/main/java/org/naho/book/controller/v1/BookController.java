@@ -70,7 +70,7 @@ public class BookController {
         }
     }
 
-    // ROLE: ADMIN, CONTENT_MANAGER, LEANER
+    // ROLE: ADMIN, CONTENT_MANAGER, LEARNER
     @PreAuthorize("hasAnyRole('ADMIN', 'CONTENT_MANAGER', 'LEARNER')")
     @GetMapping
     @ApiResponseMessage(message = BookDetailMessageKey.BOOK_GET_LIST_SUCCESS)
@@ -80,7 +80,7 @@ public class BookController {
         return ResponseEntity.ok(response);
     }
 
-    // ROLE: ADMIN, CONTENT_MANAGER, LEANER
+    // ROLE: ADMIN, CONTENT_MANAGER, LEARNER
     @PreAuthorize("hasAnyRole('ADMIN', 'CONTENT_MANAGER', 'LEARNER')")
     @GetMapping("/{bookId}")
     @ApiResponseMessage(message = BookDetailMessageKey.BOOK_GET_DETAIL_SUCCESS)
@@ -91,7 +91,7 @@ public class BookController {
     }
 
     // ROLE: CONTENT_MANAGER
-    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasRole('CONTENT_MANAGER')")
     @PutMapping("/{bookId}")
     @ApiResponseMessage(message = BookDetailMessageKey.BOOK_UPDATE_SUCCESS)
     public ResponseEntity<BookResponse> updateBook(
@@ -111,7 +111,7 @@ public class BookController {
     }
 
     // ROLE: CONTENT_MANAGER
-    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasRole('CONTENT_MANAGER')")
     @PostMapping(value = "/cover-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiResponseMessage(message = BookDetailMessageKey.BOOK_COVER_UPLOAD_SUCCESS)
     public ResponseEntity<FileResponse> uploadCoverImage(

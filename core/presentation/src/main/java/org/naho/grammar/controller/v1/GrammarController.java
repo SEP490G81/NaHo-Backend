@@ -23,7 +23,7 @@ public class GrammarController {
     private final ImportGrammarPort importGrammarPort;
 
     // ROLE: CONTENT_MANAGER
-    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasRole('CONTENT_MANAGER')")
     @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiResponseMessage(message = GrammarDetailMessageKey.GRAMMAR_IMPORT_SUCCESS)
     public ResponseEntity<Void> importGrammar(@RequestPart("file") MultipartFile file) {

@@ -32,7 +32,7 @@ public class PersonaController {
     private final PersonaResponseMapper personaResponseMapper;
 
     // ROLE: CONTENT_MANAGER, LEARNER
-    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'LEARNER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'LEARNER')")
     @GetMapping
     @ApiResponseMessage(message = "Get all personas successfully!")
     public ResponseEntity<List<PersonaResponse>> getAllPersonas() {
@@ -46,7 +46,7 @@ public class PersonaController {
     }
 
     // ROLE: CONTENT_MANAGER, LEARNER
-    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'LEARNER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'LEARNER')")
     @GetMapping("/{personaId}")
     @ApiResponseMessage(message = "Get persona successfully!")
     public ResponseEntity<PersonaResponse> findById(
@@ -57,7 +57,7 @@ public class PersonaController {
     }
 
     // ROLE: CONTENT_MANAGER
-    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasRole('CONTENT_MANAGER')")
     @PostMapping
     @ApiResponseMessage(message = "Create persona successfully!")
     public ResponseEntity<PersonaResponse> createPersona(
@@ -78,7 +78,7 @@ public class PersonaController {
     }
 
     // ROLE: CONTENT_MANAGER
-    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasRole('CONTENT_MANAGER')")
     @PutMapping("/{personaId}")
     @ApiResponseMessage(message = "Update persona successfully!")
     public ResponseEntity<PersonaResponse> updatePersona(
@@ -101,7 +101,7 @@ public class PersonaController {
     }
 
     // ROLE: CONTENT_MANAGER
-    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasRole('CONTENT_MANAGER')")
     @PatchMapping("/{personaId}/status")
     @ApiResponseMessage(message = PersonaDetailMessageKey.PERSONA_UPDATE_STATUS_SUCCESS)
     public ResponseEntity<PersonaStatus> updatePersonaStatus(@PathVariable Long personaId) {

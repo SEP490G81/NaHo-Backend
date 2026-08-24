@@ -40,7 +40,7 @@ public class VocabularyController {
     private final GetRandomVocabularyQuizInputPort getRandomVocabularyQuizInputPort;
     private final VocabularyQuizResponseMapper vocabularyQuizResponseMapper;
 
-    // ROLE: ADMIN, CONTENT_MANAGER, LEANER
+    // ROLE: ADMIN, CONTENT_MANAGER, LEARNER
     //validate file excel
     @PreAuthorize("hasAnyRole('ADMIN', 'CONTENT_MANAGER', 'LEARNER')")
     @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

@@ -77,7 +77,42 @@ public class AuthUseCase implements AuthInputPort {
      */
     @Override
     public LoginResult credentialsLogin(CredentialsLoginCommand command) {
-        // trước tiên phải tìm người dùng qua username hoặc email
+        return credentialsLearnerLogin(command);
+    }
+
+    @Override
+    public LoginResult credentialsLearnerLogin(CredentialsLoginCommand command) {
+        User user = validateCredentials(command);
+
+        if (isUserAdmin(user.getId())) {
+            throw new ApplicationException(
+                    UserErrorCode.USER_ACCESS_DENIED,
+                    UserDetailMessageKey.USER_ACCESS_DENIED
+            );
+        }
+
+        Instant now = Instant.now();
+        return transactionPort.execute(() ->
+                doCredentialsLogin(command, user, now));
+    }
+
+    @Override
+    public LoginResult credentialsAdminLogin(CredentialsLoginCommand command) {
+        User user = validateCredentials(command);
+
+        if (!isUserAdmin(user.getId())) {
+            throw new ApplicationException(
+                    UserErrorCode.USER_ACCESS_DENIED,
+                    UserDetailMessageKey.USER_ACCESS_DENIED
+            );
+        }
+
+        Instant now = Instant.now();
+        return transactionPort.execute(() ->
+                doCredentialsLogin(command, user, now));
+    }
+
+    private User validateCredentials(CredentialsLoginCommand command) {
         User user = userRepositoryPort
                 .findByUsernameOrEmail(command.usernameOrEmail())
                 .orElseThrow(() -> new ApplicationException(
@@ -87,7 +122,6 @@ public class AuthUseCase implements AuthInputPort {
 
         Instant now = Instant.now();
 
-        // nếu tài khoản bị khóa do đăng nhập quá nhiều
         if (user.isLockedByLoginFailed(now)) {
             throw new ApplicationException(
                     UserErrorCode.USER_ACCOUNT_LOCKED,
@@ -96,9 +130,6 @@ public class AuthUseCase implements AuthInputPort {
             );
         }
 
-        // nếu mật khẩu sai thì tăng số lần đăng nhập failed
-        // sau đó lưu lại rồi ném ra lỗi
-        // vì lưu rồi ném ra lỗi nên không để trong transaction được
         if (!encoderPort.matches(command.rawPassword(), user.getHashPassword())) {
             user.incrementFailedLoginAttempt(now);
             userRepositoryPort.save(user);
@@ -109,9 +140,7 @@ public class AuthUseCase implements AuthInputPort {
             );
         }
 
-        // 1 transaction
-        return transactionPort.execute(() ->
-                doCredentialsLogin(command, user, now));
+        return user;
     }
 
     private LoginResult doCredentialsLogin(
@@ -351,6 +380,9 @@ public class AuthUseCase implements AuthInputPort {
             return false;
         }
         java.util.List<String> roleNames = roleRepositoryPort.findRoleNamesByUserId(userId);
+        if (roleNames == null) {
+            return false;
+        }
         return roleNames.contains(RoleName.ADMIN.name()) || roleNames.contains(RoleName.CONTENT_MANAGER.name());
     }
 }

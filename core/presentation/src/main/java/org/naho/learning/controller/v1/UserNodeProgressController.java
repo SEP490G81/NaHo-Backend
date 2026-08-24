@@ -22,8 +22,6 @@ public class UserNodeProgressController {
     private final CrudUserNodeProgressPort crudUserNodeProgressPort;
     private final UserNodeProgressResponseMapper userNodeProgressResponseMapper;
 
-    // ROLE: LEARNER
-    
     /**
      * Lấy thông tin về 1 node mà người dùng học như:
      * - Điểm cao nhất từng đạt được
@@ -36,6 +34,7 @@ public class UserNodeProgressController {
      * @param learningPathNodeId node mà muốn xem chi tiết
      * @return UserNodeProgressResponse
      */
+    // ROLE: LEARNER
     @PreAuthorize("hasRole('LEARNER')")
     @ApiResponseMessage
     @GetMapping("/learning-path-nodes/{learningPathNodeId}")

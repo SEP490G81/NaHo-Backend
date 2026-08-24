@@ -73,7 +73,7 @@ public class CommentController {
         return ResponseEntity.ok(response);
     }
 
-    // ROLE: LEANER
+    // ROLE: LEARNER
     @PreAuthorize("hasRole('LEARNER')")
     @PutMapping
     @ApiResponseMessage(message = CommentDetailMessageKey.COMMENT_UPDATE_SUCCESS)
@@ -89,7 +89,7 @@ public class CommentController {
     }
 
     // ROLE: LEARNER
-    @PreAuthorize("hasAnyRole('LEARNER', 'ADMIN', 'CONTENT_MANAGER')")
+    @PreAuthorize("hasRole('LEARNER')")
     @DeleteMapping
     @ApiResponseMessage(message = CommentDetailMessageKey.COMMENT_DELETE_SUCCESS)
     public ResponseEntity<Void> deleteCommentRest(
@@ -130,7 +130,7 @@ public class CommentController {
     }
 
     // ROLE: LEARNER
-    @PreAuthorize("hasAnyRole('LEARNER', 'ADMIN', 'CONTENT_MANAGER')")
+    @PreAuthorize("hasRole('LEARNER')")
     @MessageMapping("/comments/delete")
     @SendTo("/topic/comments")
     public DeleteCommandRequest deleteComment(

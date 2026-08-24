@@ -34,7 +34,7 @@ public class ObjectiveController {
     private final UpdateObjectiveInputPort updateObjectiveInputPort;
     private final ObjectiveRequestMapper objectiveRequestMapper;
 
-    // ROLE: ADMIN, CONTENT_MANAGER, LEANER
+    // ROLE: ADMIN, CONTENT_MANAGER, LEARNER
     @PreAuthorize("hasAnyRole('ADMIN', 'CONTENT_MANAGER', 'LEARNER')")
     @GetMapping("/{id}")
     @ApiResponseMessage(message = ObjectiveDetailMessageKey.OBJECTIVE_GET_DETAIL_SUCCESS)
@@ -48,7 +48,7 @@ public class ObjectiveController {
     }
 
     // ROLE: CONTENT_MANAGER
-    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasRole('CONTENT_MANAGER')")
     @PutMapping("/{id}")
     @ApiResponseMessage(message = ObjectiveDetailMessageKey.OBJECTIVE_UPDATE_SUCCESS)
     public ResponseEntity<ObjectiveResponse> updateObjective(

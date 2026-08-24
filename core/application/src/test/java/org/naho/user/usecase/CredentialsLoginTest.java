@@ -73,6 +73,8 @@ class CredentialsLoginTest {
                     Supplier<?> supplier = invocation.getArgument(0);
                     return supplier.get();
                 });
+        lenient().when(roleRepositoryPort.findRoleNamesByUserId(any()))
+                .thenReturn(java.util.List.of("LEARNER"));
     }
 
     @Test
@@ -116,10 +118,10 @@ class CredentialsLoginTest {
 
         when(userRepositoryPort.findByUsernameOrEmail("vuongtruc")).thenReturn(Optional.of(user));
         when(encoderPort.matches("Password123@", "$2a$10$hashedPassword")).thenReturn(true);
-        when(tokenServicePort.generateRefreshToken(any())).thenReturn(refreshToken);
+        when(tokenServicePort.generateRefreshToken(any(), anyBoolean())).thenReturn(refreshToken);
         when(encoderPort.hashRefreshToken("refresh-token-value")).thenReturn("hashed-refresh-token");
         when(userSessionRepositoryPort.save(any(UserSession.class))).thenReturn(savedSession);
-        when(tokenServicePort.generateAccessToken(savedSession)).thenReturn(accessToken);
+        when(tokenServicePort.generateAccessToken(any(), anyBoolean())).thenReturn(accessToken);
 
         // Act
         LoginResult result = authUseCase.credentialsLogin(command);
@@ -291,7 +293,7 @@ class CredentialsLoginTest {
 
         when(userRepositoryPort.findByUsernameOrEmail("vuongtruc")).thenReturn(Optional.of(user));
         when(encoderPort.matches("Password123@", "$2a$10$hashedPassword")).thenReturn(true);
-        when(tokenServicePort.generateRefreshToken(any())).thenReturn(refreshToken);
+        when(tokenServicePort.generateRefreshToken(any(), anyBoolean())).thenReturn(refreshToken);
         when(encoderPort.hashRefreshToken("refresh-token-value")).thenReturn("hashed-refresh-token");
 
         // Act & Assert
@@ -302,5 +304,69 @@ class CredentialsLoginTest {
 
         assertEquals(UserSessionDomainErrorCode.USER_SESSION_DEVICE_ID_NOT_VALID, exception.getErrorCode());
         assertEquals(UserSessionDetailMessageKey.USER_SESSION_DEVICE_ID_BLANK, exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("UTCID07 - Đăng nhập Learner thất bại nếu tài khoản có vai trò ADMIN")
+    void UTCID07_LearnerLoginRejectedForAdmin() {
+        CredentialsLoginCommand command = new CredentialsLoginCommand(
+                "adminuser",
+                "Password123@",
+                "device-001",
+                "Chrome/120.0",
+                "127.0.0.1"
+        );
+
+        User user = User.builder()
+                .id(2L)
+                .username(Username.of("adminuser"))
+                .email(Email.of("admin@example.com"))
+                .hashPassword("$2a$10$hashedPassword")
+                .status(UserStatus.ACTIVE)
+                .isEmailVerified(true)
+                .build();
+
+        when(userRepositoryPort.findByUsernameOrEmail("adminuser")).thenReturn(Optional.of(user));
+        when(encoderPort.matches("Password123@", "$2a$10$hashedPassword")).thenReturn(true);
+        when(roleRepositoryPort.findRoleNamesByUserId(2L)).thenReturn(java.util.List.of("ADMIN"));
+
+        ApplicationException exception = assertThrows(
+                ApplicationException.class,
+                () -> authUseCase.credentialsLearnerLogin(command)
+        );
+
+        assertEquals(UserErrorCode.USER_ACCESS_DENIED, exception.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("UTCID08 - Đăng nhập Admin thất bại nếu tài khoản chỉ có vai trò LEARNER")
+    void UTCID08_AdminLoginRejectedForLearner() {
+        CredentialsLoginCommand command = new CredentialsLoginCommand(
+                "learneruser",
+                "Password123@",
+                "device-001",
+                "Chrome/120.0",
+                "127.0.0.1"
+        );
+
+        User user = User.builder()
+                .id(1L)
+                .username(Username.of("learneruser"))
+                .email(Email.of("learner@example.com"))
+                .hashPassword("$2a$10$hashedPassword")
+                .status(UserStatus.ACTIVE)
+                .isEmailVerified(true)
+                .build();
+
+        when(userRepositoryPort.findByUsernameOrEmail("learneruser")).thenReturn(Optional.of(user));
+        when(encoderPort.matches("Password123@", "$2a$10$hashedPassword")).thenReturn(true);
+        when(roleRepositoryPort.findRoleNamesByUserId(1L)).thenReturn(java.util.List.of("LEARNER"));
+
+        ApplicationException exception = assertThrows(
+                ApplicationException.class,
+                () -> authUseCase.credentialsAdminLogin(command)
+        );
+
+        assertEquals(UserErrorCode.USER_ACCESS_DENIED, exception.getErrorCode());
     }
 }

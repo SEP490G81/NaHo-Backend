@@ -72,7 +72,7 @@ public class VocabularyQuestionController {
     }
 
     // ROLE: CONTENT_MANAGER
-    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasRole('CONTENT_MANAGER')")
     @PutMapping("/{id}")
     @ApiResponseMessage(message = VocabularyQuestionDetailMessageKey.VOCABULARY_QUESTION_UPDATE_SUCCESS)
     public ResponseEntity<UpdateVocabularyQuestionResult> updateVocabularyQuestion(

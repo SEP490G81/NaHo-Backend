@@ -88,7 +88,7 @@ VALUES (103, NOW(),
         'Trần Phong',
         b'1',
         0,
-        '{bcrypt}$2b$10$Bj3gWgyWePuE.2J8TPDrPOJNxVUjxJfl0Uecd7k5ecspFuHrP7tvG',
+        '{bcrypt}$2a$10$mLvl6v0NmQ4f5cP6360qnueyzPYTyLizOJDyr7gL2DbAnnFzbK0mq',
         'ACTIVE',
         'MALE',
         (SELECT id

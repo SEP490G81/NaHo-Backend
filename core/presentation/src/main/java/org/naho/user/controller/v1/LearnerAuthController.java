@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-public class AuthController {
+public class LearnerAuthController {
     private final AuthInputPort authInputPort;
     private final LoginRequestMapper loginRequestMapper;
     private final CookieFactory cookieFactory;
@@ -42,7 +42,7 @@ public class AuthController {
     private final ChangePasswordInputPort changePasswordInputPort;
     private final ChangePasswordRequestMapper changePasswordRequestMapper;
 
-    // PUBLIC RESOURCE
+    // PUBLIC RESOURCE - LEARNER LOGIN ONLY
     @ApiResponseMessage(message = UserDetailMessageKey.USER_LOGIN_SUCCESSFULLY)
     @PostMapping("/login")
     public ResponseEntity<Void> credentialsLogin(
@@ -53,7 +53,7 @@ public class AuthController {
         request.setUserAgent(loginRequestResolver.getUserAgent(httpServletRequest));
 
         CredentialsLoginCommand command = loginRequestMapper.requestToCommand(request);
-        LoginResult result = authInputPort.credentialsLogin(command);
+        LoginResult result = authInputPort.credentialsLearnerLogin(command);
 
         ResponseCookie accessTokenCookie =
                 cookieFactory.createCookieForJWTToken(result.accessToken());
@@ -196,15 +196,7 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
-    // ROLE: USER, ADMIN, CONTENT_MANAGER
-
-    /**
-     * Đổi mật khẩu (khi người dùng nhớ mật khẩu cũ)
-     *
-     * @param payload chứa userId của người đăng nhập (lấy từ JWT token)
-     * @param request bao gồm old password và password mới
-     * @return Void
-     */
+    // ROLE: LEARNER, ADMIN, CONTENT_MANAGER
     @PreAuthorize("hasAnyRole('LEARNER', 'ADMIN', 'CONTENT_MANAGER')")
     @ApiResponseMessage(message = UserDetailMessageKey.USER_CHANGE_PASSWORD_SUCCESSFULLY)
     @PostMapping("/change-password")

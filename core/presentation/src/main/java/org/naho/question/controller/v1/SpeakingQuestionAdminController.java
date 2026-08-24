@@ -35,7 +35,7 @@ public class SpeakingQuestionAdminController {
     private final RoleRepositoryPort roleRepositoryPort;
 
     // ROLE: CONTENT_MANAGER
-    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasRole('CONTENT_MANAGER')")
     @PutMapping("/{id}")
     @ApiResponseMessage(message = SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_UPDATE_SUCCESS)
     public ResponseEntity<UpdateSpeakingQuestionResult> updateSpeakingQuestion(
@@ -87,7 +87,7 @@ public class SpeakingQuestionAdminController {
     }
 
     // ROLE: CONTENT_MANAGER
-    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasRole('CONTENT_MANAGER')")
     @GetMapping("/{id}")
     public ResponseEntity<SpeakingQuestionResponse> getSpeakingQuestionDetail(
             @PathVariable("id") Long id,

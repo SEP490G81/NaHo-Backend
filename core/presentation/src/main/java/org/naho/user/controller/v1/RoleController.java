@@ -19,7 +19,7 @@ public class RoleController {
     private final CrudRoleInputPort crudRoleInputPort;
     private final RoleResponseMapper roleResponseMapper;
 
-    // ROLE: USER, ADMIN, CONTENT_MANAGER
+    // ROLE: LEARNER, ADMIN, CONTENT_MANAGER
     @PreAuthorize("hasAnyRole('LEARNER', 'ADMIN', 'CONTENT_MANAGER')")
     @GetMapping
     public ResponseEntity<List<RoleResponse>> getRoles() {

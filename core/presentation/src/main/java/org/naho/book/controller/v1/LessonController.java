@@ -34,7 +34,7 @@ public class LessonController {
     private final UpdateLessonInputPort updateLessonInputPort;
     private final LessonRequestMapper lessonRequestMapper;
 
-    // ROLE: ADMIN, CONTENT_MANAGER, LEANER
+    // ROLE: ADMIN, CONTENT_MANAGER, LEARNER
     @PreAuthorize("hasAnyRole('ADMIN', 'CONTENT_MANAGER', 'LEARNER')")
     @GetMapping("/{id}")
     @ApiResponseMessage(message = LessonDetailMessageKey.LESSON_GET_DETAIL_SUCCESS)
@@ -47,7 +47,7 @@ public class LessonController {
     }
 
     // ROLE: CONTENT_MANAGER
-    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasRole('CONTENT_MANAGER')")
     @PutMapping("/{id}")
     @ApiResponseMessage(message = LessonDetailMessageKey.LESSON_UPDATE_SUCCESS)
     public ResponseEntity<LessonResponse> updateLesson(

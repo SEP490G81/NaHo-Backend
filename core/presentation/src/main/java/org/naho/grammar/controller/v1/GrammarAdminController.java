@@ -45,7 +45,7 @@ public class GrammarAdminController {
     }
 
     // ROLE: CONTENT_MANAGER
-    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasRole('CONTENT_MANAGER')")
     @PostMapping
     public ResponseEntity<GrammarResponse> createGrammar(
             @Valid @RequestBody CreateGrammarRequest request,
@@ -56,7 +56,7 @@ public class GrammarAdminController {
     }
 
     // ROLE: CONTENT_MANAGER
-    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasRole('CONTENT_MANAGER')")
     @PutMapping("/{id}")
     @ApiResponseMessage(message = GrammarDetailMessageKey.GRAMMAR_UPDATE_SUCCESS)
     public ResponseEntity<GrammarResponse> updateGrammar(
@@ -70,7 +70,7 @@ public class GrammarAdminController {
     }
 
     // ROLE: CONTENT_MANAGER
-    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasRole('CONTENT_MANAGER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGrammar(
             @PathVariable Long id,
@@ -81,7 +81,7 @@ public class GrammarAdminController {
     }
 
     // ROLE: CONTENT_MANAGER
-    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasRole('CONTENT_MANAGER')")
     @GetMapping("/{id}")
     public ResponseEntity<GrammarResponse> getGrammarDetail(
             @PathVariable Long id,
@@ -92,7 +92,7 @@ public class GrammarAdminController {
     }
 
     // ROLE: CONTENT_MANAGER
-    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasRole('CONTENT_MANAGER')")
     @GetMapping("/search")
     public ResponseEntity<PageData<GrammarResponse>> searchGrammars(
             @RequestParam String keyword,

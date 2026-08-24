@@ -30,8 +30,6 @@ public class SpeechAssessmentController {
     private final FileValidatorPort fileValidatorPort;
     private final GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
 
-    // ROLE: LEARNER
-
     /**
      *
      * @param file
@@ -40,6 +38,7 @@ public class SpeechAssessmentController {
      * @return
      * @throws IOException
      */
+    // ROLE: LEARNER
     @PreAuthorize("hasRole('LEARNER')")
     @PostMapping
     @ApiResponseMessage(message = SpeechDetailMessageKey.SPEECH_PRONUNCIATION_ASSESSMENT_SUCCESSFULLY)

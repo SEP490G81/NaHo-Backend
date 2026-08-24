@@ -30,13 +30,12 @@ public class SubscriptionPlanController {
     private final SubscriptionPlanRequestMapper subscriptionPlanRequestMapper;
     private final SubscriptionResponseMapper subscriptionResponseMapper;
 
-    // ROLE: ADMIN, LEARNER
-
     /**
      * Lấy ra các Subscription Plan đang được ACTIVE
      *
      * @return List<SubscriptionPlanResponse>
      */
+    // ROLE: ADMIN, LEARNER
     @PreAuthorize("hasAnyRole('ADMIN', 'LEARNER')")
     @GetMapping
     @ApiResponseMessage(message = SubscriptionDetailMessageKey.SUBSCRIPTION_PLANS_GET_LIST_SUCCESS)
@@ -50,8 +49,6 @@ public class SubscriptionPlanController {
         return ResponseEntity.ok(responses);
     }
 
-    // ROLE: ADMIN
-
     /**
      * Admin cập nhật thông số của gói Subscription Plan
      *
@@ -60,6 +57,7 @@ public class SubscriptionPlanController {
      * @param payload thông tin token người dùng
      * @return SubscriptionPlanResponse
      */
+    // ROLE: ADMIN
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     @ApiResponseMessage(message = SubscriptionDetailMessageKey.SUBSCRIPTION_PLAN_UPDATE_SUCCESS)

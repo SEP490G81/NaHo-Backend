@@ -45,7 +45,7 @@ public class VocabularyAdminController {
     }
 
     // ROLE: CONTENT_MANAGER
-    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasRole('CONTENT_MANAGER')")
     @PostMapping
     public ResponseEntity<VocabularyResponse> createVocabulary(
             @Valid @RequestBody CreateVocabularyRequest request,
@@ -56,7 +56,7 @@ public class VocabularyAdminController {
     }
 
     // ROLE: CONTENT_MANAGER
-    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasRole('CONTENT_MANAGER')")
     @PutMapping("/{id}")
     @ApiResponseMessage(message = VocabularyDetailMessageKey.VOCABULARY_UPDATE_SUCCESS)
     public ResponseEntity<VocabularyResponse> updateVocabulary(
@@ -70,7 +70,7 @@ public class VocabularyAdminController {
     }
 
     // ROLE: CONTENT_MANAGER
-    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasRole('CONTENT_MANAGER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteVocabulary(
             @PathVariable Long id,
@@ -81,7 +81,7 @@ public class VocabularyAdminController {
     }
 
     // ROLE: CONTENT_MANAGER
-    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasRole('CONTENT_MANAGER')")
     @GetMapping("/{id}")
     public ResponseEntity<VocabularyResponse> getVocabularyDetail(
             @PathVariable Long id,
@@ -92,7 +92,7 @@ public class VocabularyAdminController {
     }
 
     // ROLE: CONTENT_MANAGER
-    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasRole('CONTENT_MANAGER')")
     @GetMapping("/search")
     public ResponseEntity<PageData<VocabularyResponse>> searchVocabularies(
             @RequestParam String keyword,

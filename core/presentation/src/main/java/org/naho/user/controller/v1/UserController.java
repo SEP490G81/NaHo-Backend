@@ -53,14 +53,13 @@ public class UserController {
     private final FileStorageServicePort fileStorageServicePort;
     private final UserRequestMapper userRequestMapper;
 
-    // ROLE: LEARNER, ADMIN, CONTENT_MANAGER
-
     /**
      * Lấy thông tin chi tiết của người dùng đang đăng nhập
      *
      * @param payload chứa user id của tài khoản đang đăng nhập thông qua JWT
      * @return UserResponse
      */
+    // ROLE: LEARNER, ADMIN, CONTENT_MANAGER
     @PreAuthorize("hasAnyRole('LEARNER', 'ADMIN', 'CONTENT_MANAGER')")
     @ApiResponseMessage(message = UserDetailMessageKey.USER_GET_SUCCESSFULLY)
     @GetMapping("/me")
@@ -90,8 +89,6 @@ public class UserController {
         return ResponseEntity.ok(userResponseMapper.resultToResponse(result));
     }
 
-    // ROLE: ADMIN
-
     /**
      * API để cho role Admin lấy ra danh sách người dùng
      * Có kèm thêm chức năng search, filter, sort.
@@ -99,6 +96,7 @@ public class UserController {
      * @param request chứa các field, page, sort column...
      * @return PageData<UserResponse>
      */
+    // ROLE: ADMIN
     @PreAuthorize("hasRole('ADMIN')")
     @ApiResponseMessage(message = UserDetailMessageKey.USER_GET_SUCCESSFULLY)
     @PostMapping("/all")
@@ -119,8 +117,6 @@ public class UserController {
         return ResponseEntity.ok(responsePageData);
     }
 
-    // ROLE: ADMIN
-
     /**
      * Cập nhật trạng thái của người dùng: ACTIVE, UNACTIVE
      * Nếu đang là ACTIVE => UNACTIVE và ngược lại
@@ -128,14 +124,13 @@ public class UserController {
      * @param id user id
      * @return UserStatus
      */
+    // ROLE: ADMIN
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}/status")
     public ResponseEntity<UserStatus> updateStatus(@PathVariable Long id) {
         UserStatus newStatus = updateUserInputPort.updateStatus(id);
         return ResponseEntity.ok(newStatus);
     }
-
-    // ROLE: LEARNER, ADMIN, CONTENT_MANAGER
 
     /**
      * Cập nhật thông tin cơ bản của người dùng:
@@ -145,6 +140,7 @@ public class UserController {
      * @param request bao gồm: username, full name, gender, dob
      * @return UserResponse
      */
+    // ROLE: LEARNER, ADMIN, CONTENT_MANAGER
     @PreAuthorize("hasAnyRole('LEARNER', 'ADMIN', 'CONTENT_MANAGER')")
     @ApiResponseMessage(message = UserDetailMessageKey.USER_UPDATE_INFO_SUCCESSFULLY)
     @PatchMapping(value = "/info")
@@ -166,8 +162,6 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    // ROLE: LEARNER, ADMIN, CONTENT_MANAGER
-
     /**
      * Cập nhật avatar của người dùng
      *
@@ -175,6 +169,7 @@ public class UserController {
      * @param avatarFile file avatar mới của người dùng upload lên
      * @return UserResponse
      */
+    // ROLE: LEARNER, ADMIN, CONTENT_MANAGER
     @PreAuthorize("hasAnyRole('LEARNER', 'ADMIN', 'CONTENT_MANAGER')")
     @ApiResponseMessage(message = UserDetailMessageKey.USER_UPDATE_AVATAR_SUCCESSFULLY)
     @PatchMapping("/avatar")

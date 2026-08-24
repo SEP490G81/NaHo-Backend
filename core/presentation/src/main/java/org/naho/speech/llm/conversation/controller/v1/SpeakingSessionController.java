@@ -60,8 +60,6 @@ public class SpeakingSessionController {
     private final CrudSpeakingSessionInputPort crudSpeakingSessionInputPort;
     private final FileAudioConvertPort fileAudioConvertPort;
 
-    // ROLE: LEARNER
-
     /**
      * Khởi tạo 1 session mới và lưu vào ram và database
      *
@@ -69,6 +67,7 @@ public class SpeakingSessionController {
      * @param request bao gồm: FormalityLevel và MarugotoLevel và persona id
      * @return trả về session code
      */
+    // ROLE: LEARNER
     @PreAuthorize("hasRole('LEARNER')")
     @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_CONVERSATION_START_SUCCESS)
     @PostMapping("/start")
@@ -88,14 +87,13 @@ public class SpeakingSessionController {
         return ResponseEntity.ok(sessionCode);
     }
 
-    // ROLE: LEARNER
-
     /**
      * Method gửi message để chat với AI
      *
      * @param request chứa transcript (đoạn nội dung người dùng gửi), và session code
      * @return ChatResponse
      */
+    // ROLE: LEARNER
     @PreAuthorize("hasRole('LEARNER')")
     @PostMapping("/message")
     @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_MESSAGE_SEND_SUCCESS)
@@ -111,8 +109,6 @@ public class SpeakingSessionController {
         return ResponseEntity.ok(chatResponseMapper.resultToResponse(result));
     }
 
-    // ROLE: LEARNER
-
     /**
      * Method gửi audio để chat với AI
      *
@@ -121,6 +117,7 @@ public class SpeakingSessionController {
      * @param payload     chứa user id
      * @return ChatResponse
      */
+    // ROLE: LEARNER
     @PreAuthorize("hasRole('LEARNER')")
     @PostMapping(
             value = "/audio/{sessionCode}",
@@ -167,8 +164,6 @@ public class SpeakingSessionController {
         }
     }
 
-    // ROLE: LEARNER
-
     /**
      * Kết thúc phiên trò chuyện và nhận đánh giá
      *
@@ -176,6 +171,7 @@ public class SpeakingSessionController {
      * @param payload     chứa user id
      * @return SpeakingSessionAssessmentResponse
      */
+    // ROLE: LEARNER
     @PreAuthorize("hasRole('LEARNER')")
     @PostMapping("/end/{sessionCode}")
     @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_SESSION_END_SUCCESS)
@@ -190,8 +186,6 @@ public class SpeakingSessionController {
         return ResponseEntity.ok(speakingSessionAssessmentResponseMapper.resultToResponse(result));
     }
 
-    // ROLE: LEARNER
-
     /**
      * Lấy chấm điểm của 1 session nếu đã completed
      *
@@ -199,6 +193,7 @@ public class SpeakingSessionController {
      * @param payload     chứa user id
      * @return SpeakingSessionAssessmentResponse
      */
+    // ROLE: LEARNER
     @PreAuthorize("hasRole('LEARNER')")
     @ApiResponseMessage
     @GetMapping("/end/{sessionCode}")
@@ -211,8 +206,6 @@ public class SpeakingSessionController {
         return ResponseEntity.ok(speakingSessionResponseMapper.resultToResponse(result));
     }
 
-    // ROLE: LEARNER
-
     /**
      * Delete a session by session code.
      *
@@ -220,6 +213,7 @@ public class SpeakingSessionController {
      * @param payload     chứa user id
      * @return ResponseEntity<Void>
      */
+    // ROLE: LEARNER
     @PreAuthorize("hasRole('LEARNER')")
     @DeleteMapping("/{sessionCode}")
     public ResponseEntity<Void> deleteSession(
@@ -230,14 +224,13 @@ public class SpeakingSessionController {
         return ResponseEntity.noContent().build();
     }
 
-    // ROLE: LEARNER
-
     /**
      * Lấy toàn bộ phiên nói chuyện đang dở dang của user
      *
      * @param payload chứa user id
      * @return List<SpeakingSessionListItemResponse>
      */
+    // ROLE: LEARNER
     @PreAuthorize("hasRole('LEARNER')")
     @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_HISTORY_GET_ALL_SUCCESS)
     @GetMapping("/all")
@@ -258,8 +251,6 @@ public class SpeakingSessionController {
         return ResponseEntity.ok(responses);
     }
 
-    // ROLE: LEARNER
-
     /**
      * Lấy ra chi tiết 1 session (gồm các đoạn chat trong đó)
      *
@@ -267,6 +258,7 @@ public class SpeakingSessionController {
      * @param sessionCode session code
      * @return SpeakingSessionResponse
      */
+    // ROLE: LEARNER
     @PreAuthorize("hasRole('LEARNER')")
     @ApiResponseMessage(message = SpeechDetailMessageKey.SPEAKING_HISTORY_GET_DETAIL_SUCCESS)
     @GetMapping("/details")

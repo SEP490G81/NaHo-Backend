@@ -36,7 +36,7 @@ public class TopicController {
     private final RoleRepositoryPort roleRepositoryPort;
 
 
-    // ROLE: ADMIN, CONTENT_MANAGER, LEANER
+    // ROLE: ADMIN, CONTENT_MANAGER, LEARNER
     // FIND ALL TOPICS BY BOOK
     @PreAuthorize("hasAnyRole('ADMIN', 'CONTENT_MANAGER', 'LEARNER')")
     @GetMapping("/books/{bookId}")
@@ -51,7 +51,7 @@ public class TopicController {
         return ResponseEntity.ok(responses);
     }
 
-    // ROLE: ADMIN, CONTENT_MANAGER, LEANER
+    // ROLE: ADMIN, CONTENT_MANAGER, LEARNER
     // GET TOPIC DETAIL
     @PreAuthorize("hasAnyRole('ADMIN', 'CONTENT_MANAGER', 'LEARNER')")
     @GetMapping("/{id}")
@@ -67,7 +67,7 @@ public class TopicController {
 
     // ROLE: CONTENT_MANAGER
     // UPDATE TOPIC
-    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'ADMIN')")
+    @PreAuthorize("hasRole('CONTENT_MANAGER')")
     @PutMapping("/{id}")
     @ApiResponseMessage(message = TopicDetailMessageKey.TOPIC_UPDATE_SUCCESS)
     public ResponseEntity<TopicDetailResponse> updateTopic(
