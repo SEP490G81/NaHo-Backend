@@ -11,7 +11,8 @@ import org.naho.vocabulary.command.CreateVocabularyCommand;
 import org.naho.vocabulary.port.out.VocabularyRepositoryPort;
 import org.naho.vocabulary.result.VocabularyResult;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 

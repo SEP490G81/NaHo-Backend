@@ -11,7 +11,8 @@ import org.naho.book.port.out.ImportBookPort;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class ImportBookTest {

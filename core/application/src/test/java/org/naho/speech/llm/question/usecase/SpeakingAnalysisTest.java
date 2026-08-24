@@ -16,6 +16,7 @@ import org.naho.learning.model.LearningPathNode;
 import org.naho.learning.model.UserLearningProgress;
 import org.naho.learning.port.out.LearningPathNodeRepositoryPort;
 import org.naho.learning.port.out.UserLearningProgressRepositoryPort;
+import org.naho.question.port.in.CompleteSpeakingQuestionInputPort;
 import org.naho.question.port.out.AnswerHistoryRepositoryPort;
 import org.naho.question.port.out.AnswerHistoryResultMapper;
 import org.naho.question.result.AnswerHistoryResult;
@@ -35,7 +36,7 @@ import org.naho.subscription.port.out.UserDailyAiUsageRepositoryPort;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.*;
@@ -69,6 +70,8 @@ class SpeakingAnalysisTest {
     private LearningPathNodeRepositoryPort learningPathNodeRepositoryPort;
     @Mock
     private UserLearningProgressRepositoryPort userLearningProgressRepositoryPort;
+    @Mock
+    private CompleteSpeakingQuestionInputPort completeSpeakingQuestionInputPort;
 
     @InjectMocks
     private SpeakingAnalysisUseCase speakingAnalysisUseCase;
