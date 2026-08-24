@@ -8,4 +8,6 @@ public interface GetSpeakingQuestionInputPort {
     SpeakingQuestionResult findById(FindSpeakingQuestionCommand command);
 
     SpeakingQuestionListItemResult findSpeakingQuestionListItem(FindSpeakingQuestionCommand command);
+
+    SpeakingQuestionResult findSpeakingQuestionForAdmin(Long id);
 }

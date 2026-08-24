@@ -9,11 +9,14 @@ import org.naho.grammar.dto.response.GrammarResponse;
 import org.naho.grammar.mapper.GrammarAdminMapper;
 import org.naho.grammar.port.in.*;
 import org.naho.grammar.result.GrammarResult;
+import org.naho.i18n.message.grammar.GrammarDetailMessageKey;
 import org.naho.pagination.PageData;
+import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.user.port.out.RoleRepositoryPort;
 import org.naho.user.result.AccessTokenPayload;
 import org.naho.user.type.RoleName;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,11 +35,11 @@ public class GrammarAdminController {
 
     private void verifyAdminOrManager(AccessTokenPayload payload) {
         if (payload == null) {
-            throw new org.springframework.security.access.AccessDeniedException("Access Denied");
+            throw new AccessDeniedException("Access Denied");
         }
         java.util.List<String> roleSet = roleRepositoryPort.findRoleNamesByUserId(payload.userId());
         if (!roleSet.contains(RoleName.ADMIN.name()) && !roleSet.contains(RoleName.CONTENT_MANAGER.name())) {
-            throw new org.springframework.security.access.AccessDeniedException("Access Denied");
+            throw new AccessDeniedException("Access Denied");
         }
     }
 
@@ -50,6 +53,7 @@ public class GrammarAdminController {
     }
 
     @PutMapping("/{id}")
+    @ApiResponseMessage(message = GrammarDetailMessageKey.GRAMMAR_UPDATE_SUCCESS)
     public ResponseEntity<GrammarResponse> updateGrammar(
             @PathVariable Long id,
             @Valid @RequestBody UpdateGrammarRequest request,

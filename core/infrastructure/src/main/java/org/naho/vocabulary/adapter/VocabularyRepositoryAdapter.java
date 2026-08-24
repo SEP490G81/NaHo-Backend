@@ -7,7 +7,9 @@ import org.naho.question.entity.VocabularyQuestionEntity;
 import org.naho.question.mapper.VocabularyEntityMapper;
 import org.naho.question.model.Vocabulary;
 import org.naho.question.repository.VocabularyQuestionJpaRepository;
+import org.naho.shared.exception.ApplicationException;
 import org.naho.vocabulary.entity.VocabularyEntity;
+import org.naho.vocabulary.exception.VocabularyErrorCode;
 import org.naho.vocabulary.port.out.VocabularyRepositoryPort;
 import org.naho.vocabulary.repository.VocabularyJpaRepository;
 import org.springframework.data.domain.Page;
@@ -71,9 +73,9 @@ public class VocabularyRepositoryAdapter implements VocabularyRepositoryPort {
             vocabularyJpaRepository.deleteById(id);
             vocabularyJpaRepository.flush();
         } catch (org.springframework.dao.DataIntegrityViolationException e) {
-            throw new org.naho.shared.exception.ApplicationException(
-                    org.naho.vocabulary.exception.VocabularyErrorCode.VOCABULARY_IN_USE,
-                    "Cannot delete vocabulary because it is being used by one or more questions"
+            throw new ApplicationException(
+                    VocabularyErrorCode.VOCABULARY_IN_USE,
+                    "vocabulary.in_use.detail"
             );
         }
     }

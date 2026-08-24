@@ -2,7 +2,9 @@ package org.naho.vocabulary.controller.v1;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.naho.i18n.message.question.VocabularyDetailMessageKey;
 import org.naho.pagination.PageData;
+import org.naho.shared.annotation.ApiResponseMessage;
 import org.naho.user.port.out.RoleRepositoryPort;
 import org.naho.user.result.AccessTokenPayload;
 import org.naho.user.type.RoleName;
@@ -14,6 +16,7 @@ import org.naho.vocabulary.mapper.VocabularyAdminMapper;
 import org.naho.vocabulary.port.in.*;
 import org.naho.vocabulary.result.VocabularyResult;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,11 +35,11 @@ public class VocabularyAdminController {
 
     private void verifyAdminOrManager(AccessTokenPayload payload) {
         if (payload == null) {
-            throw new org.springframework.security.access.AccessDeniedException("Access Denied");
+            throw new AccessDeniedException("Access Denied");
         }
         java.util.List<String> roleSet = roleRepositoryPort.findRoleNamesByUserId(payload.userId());
         if (!roleSet.contains(RoleName.ADMIN.name()) && !roleSet.contains(RoleName.CONTENT_MANAGER.name())) {
-            throw new org.springframework.security.access.AccessDeniedException("Access Denied");
+            throw new AccessDeniedException("Access Denied");
         }
     }
 
@@ -50,6 +53,7 @@ public class VocabularyAdminController {
     }
 
     @PutMapping("/{id}")
+    @ApiResponseMessage(message = VocabularyDetailMessageKey.VOCABULARY_UPDATE_SUCCESS)
     public ResponseEntity<VocabularyResponse> updateVocabulary(
             @PathVariable Long id,
             @Valid @RequestBody UpdateVocabularyRequest request,

@@ -2,11 +2,13 @@ package org.naho.grammar.adapter;
 
 import lombok.RequiredArgsConstructor;
 import org.naho.grammar.entity.GrammarEntity;
+import org.naho.grammar.exception.GrammarErrorCode;
 import org.naho.grammar.port.out.GrammarRepositoryPort;
 import org.naho.pagination.PageData;
 import org.naho.pagination.PageMeta;
 import org.naho.question.model.Grammar;
 import org.naho.question.repository.GrammarJpaRepository;
+import org.naho.shared.exception.ApplicationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -47,9 +49,9 @@ public class GrammarRepositoryAdapter implements GrammarRepositoryPort {
             grammarJpaRepository.deleteById(id);
             grammarJpaRepository.flush();
         } catch (org.springframework.dao.DataIntegrityViolationException e) {
-            throw new org.naho.shared.exception.ApplicationException(
-                    org.naho.grammar.exception.GrammarErrorCode.GRAMMAR_IN_USE,
-                    "Cannot delete grammar because it is being used by one or more questions"
+            throw new ApplicationException(
+                    GrammarErrorCode.GRAMMAR_IN_USE,
+                    "grammar.in_use.detail"
             );
         }
     }

@@ -1,11 +1,13 @@
 package org.naho.question.controller.v1;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.naho.i18n.message.question.VocabularyQuestionDetailMessageKey;
 import org.naho.question.command.CompleteVocabularyQuestionCommand;
 import org.naho.question.command.UpdateVocabularyQuestionCommand;
 import org.naho.question.dto.mapper.VocabularyQuestionResponseMapper;
 import org.naho.question.dto.request.CompleteVocabularyQuestionRequest;
+import org.naho.question.dto.request.UpdateVocabularyQuestionRequest;
 import org.naho.question.port.in.CompleteVocabularyQuestionInputPort;
 import org.naho.question.port.in.UpdateVocabularyQuestionInputPort;
 import org.naho.shared.annotation.ApiResponseMessage;
@@ -13,6 +15,7 @@ import org.naho.user.port.out.RoleRepositoryPort;
 import org.naho.user.result.AccessTokenPayload;
 import org.naho.user.type.RoleName;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -65,10 +68,11 @@ public class VocabularyQuestionController {
     }
 
     @PutMapping("/{id}")
+    @ApiResponseMessage(message = VocabularyQuestionDetailMessageKey.VOCABULARY_QUESTION_UPDATE_SUCCESS)
     public ResponseEntity<org.naho.question.result.UpdateVocabularyQuestionResult> updateVocabularyQuestion(
             @PathVariable Long id,
             @AuthenticationPrincipal AccessTokenPayload payload,
-            @RequestBody @jakarta.validation.Valid org.naho.question.dto.request.UpdateVocabularyQuestionRequest request
+            @RequestBody @Valid UpdateVocabularyQuestionRequest request
     ) {
         verifyAdminOrManager(payload.userId());
         List<UpdateVocabularyQuestionCommand.NestedVocabularyCommand> vocabularies = new java.util.ArrayList<>();
@@ -87,7 +91,7 @@ public class VocabularyQuestionController {
     private void verifyAdminOrManager(Long userId) {
         List<String> roleSet = roleRepositoryPort.findRoleNamesByUserId(userId);
         if (!roleSet.contains(RoleName.ADMIN.name()) && !roleSet.contains(RoleName.CONTENT_MANAGER.name())) {
-            throw new org.springframework.security.access.AccessDeniedException("Access Denied");
+            throw new AccessDeniedException("Access Denied");
         }
     }
 }

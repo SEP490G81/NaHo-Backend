@@ -95,5 +95,29 @@ public class GetSpeakingQuestionUseCase implements GetSpeakingQuestionInputPort 
                 subscriptionPlanResult.sampleAnswerEnabled()
         );
     }
+
+    @Override
+    public SpeakingQuestionResult findSpeakingQuestionForAdmin(Long id) {
+        if (id == null) {
+            throw new ApplicationException(
+                    SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
+                    SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_NOT_FOUND
+            );
+        }
+
+        SpeakingQuestion speakingQuestion = speakingQuestionRepositoryPort
+                .findById(id)
+                .orElseThrow(() -> new ApplicationException(
+                        SpeakingQuestionErrorCode.SPEAKING_QUESTION_NOT_FOUND,
+                        SpeakingQuestionDetailMessageKey.SPEAKING_QUESTION_NOT_FOUND,
+                        id
+                ));
+
+        // For Admin, always return sample answer
+        return speakingQuestionResultMapper.domainToResult(
+                speakingQuestion,
+                true
+        );
+    }
 }
 
