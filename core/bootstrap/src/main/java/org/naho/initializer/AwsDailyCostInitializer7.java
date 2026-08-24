@@ -29,10 +29,9 @@ public class AwsDailyCostInitializer7 implements ApplicationRunner {
      * Nếu có rồi thì lấy 3 ngày gần nhất để sync (hôm nay, hôm qua, và hôm kia)
      *
      * @param args incoming application arguments
-     * @throws Exception exception
      */
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) {
         // hôm nay
         LocalDate to = LocalDate.now(SystemZoneId.HO_CHI_MINH_ZONE_ID);
 
@@ -45,7 +44,11 @@ public class AwsDailyCostInitializer7 implements ApplicationRunner {
 
         log.info("Initializing AWS daily cost to {}...", to);
 
-//        awsDailyCostSyncServicePort.sync(from, to);
+        try {
+            awsDailyCostSyncServicePort.sync(from, to);
+        } catch (Exception e) {
+            log.error("Failed to initialize AWS daily cost on startup: ", e);
+        }
 
         log.info("AWS daily cost to {} initialized!", to);
     }

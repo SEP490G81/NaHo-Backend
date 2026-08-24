@@ -90,6 +90,12 @@ public class SpeakingSessionResultMapper {
 
         PersonaResult personaResult = getPersonaInputPort.findById(domain.getPersonaId());
 
+        List<SpeakingSessionMessage> messages = speakingSessionMessageRepositoryPort.findAllBySessionId(domain.getId());
+
+        List<SpeakingSessionMessageResult> messageResults = messages.stream()
+                .map(speakingSessionMessageResultMapper::domainToResult)
+                .toList();
+
         return SpeakingSessionResult.builder()
                 .id(domain.getId())
                 .sessionCode(domain.getSessionCode())
@@ -104,6 +110,7 @@ public class SpeakingSessionResultMapper {
                 .startedAt(domain.getStartedAt())
                 .endedAt(domain.getEndedAt())
                 .speakingSessionAssessment(speakingSessionAssessmentResult)
+                .speakingSessionMessages(messageResults)
                 .build();
     }
 }

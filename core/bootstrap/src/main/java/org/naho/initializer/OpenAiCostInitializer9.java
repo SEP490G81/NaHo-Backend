@@ -16,7 +16,7 @@ public class OpenAiCostInitializer9 implements ApplicationRunner {
     private final SyncOpenAiCostInputPort syncOpenAiCostInputPort;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) {
         log.info("Checking OpenAI cost history initial backfill state on startup...");
         try {
             syncOpenAiCostInputPort.syncInitialBackfillIfEmpty();

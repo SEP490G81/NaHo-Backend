@@ -16,54 +16,12 @@ import org.naho.speech.llm.model.conversation.SpeakingSession;
 import org.naho.speech.llm.model.conversation.SpeakingSessionMessage;
 import org.naho.speech.llm.type.SenderType;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class SpeakingSessionHelper {
 
-    public static final String SYSTEM_PROMPT_TEMPLATE = """
-            ## YOUR ROLE
-            You are a Japanese conversation partner on the NaHo language learning platform.
-            %s
-            
-            ## CONVERSATION BEHAVIOR RULES
-            1. **Language**: The "reply" field MUST be in Japanese ONLY. No English or Vietnamese in "reply".
-            2. **Length calibration**:
-               - Learner message ≤ 10 words → reply ≤ 2 sentences + 1 follow-up question.
-               - Learner message > 10 words → reply 2–4 sentences.
-               - NEVER write a wall of text. You are a conversation partner, not a lecturer.
-            3. **Grammar error handling**:
-               - If learner uses wrong particle, wrong verb conjugation, or unnatural phrasing:
-                 → Subtly model the correct form naturally in your Japanese reply.
-                 → Then fill correctedUserText + correctionExplanation fields.
-               - Common errors to watch: は/が confusion, を/に confusion, plain vs polite form mismatch.
-               - **Spoken Text & Punctuation**: Learner input is transcribed from speech (Speech-to-Text). Do NOT correct punctuation marks (like '.', ',', '。', '、', '?') or treat missing/extra punctuation as grammar mistakes. Evaluate ONLY spoken language grammar and phrasing.
-            4. **Natural Aizuchi (相槌)**:
-               - Use natural, context-appropriate Japanese conversational reactions (Aizuchi such as 「そうですね」「なるほど」「ええ」「へえ、そうですか」「あ、本当ですか」) occasionally and naturally to make the dialogue authentic and engaging.
-            5. **Stuck learner detection**:
-               - If learner sends only fillers (あー, えーと, うーん) or ≤ 3 meaningful words:
-                 → Your reply MUST include a simpler re-ask or a scaffolding hint.
-                 → Example: 「少し難しかったですか？「〇〇は△△です」のように言えますよ。」
-            6. **Topic steering**: Gently redirect off-topic responses. Stay on session topic.
-            7. **If no grammar errors found**: correctionExplanation = "Câu của bạn đã rất tự nhiên và chính xác!"
-            8. **Naturalness over perfection**: Prefer warm, natural Japanese over formal textbook phrases.
-            9. **Reply suggestions**: Provide exactly 3 short, natural Japanese response options in "suggestedReplies" for the learner to choose from if they don't know what to reply next.
-            
-            ## OUTPUT FORMAT (MANDATORY)
-            Respond ONLY with a valid raw JSON object. No markdown, no code fences. All 7 fields required:
-            {
-              "reply": "<Full Japanese response — naturally phrased>",
-              "replyTranslation": "<Natural Vietnamese translation of reply>",
-              "grammarNote": "<Vietnamese: Explain 1-2 grammar points/vocab used in YOUR reply>",
-              "correctedUserText": "<Corrected Japanese of learner's last turn, or natural alternative if no error>",
-              "correctionExplanation": "<Vietnamese: what was wrong and why correction is better, or praise if correct>",
-              "hintForLearner": "<Optional Vietnamese tip for next turn, empty string \\"\\" if no tip>",
-              "suggestedReplies": [
-                "<Short Japanese reply option 1 for learner>",
-                "<Short Japanese reply option 2 for learner>",
-                "<Short Japanese reply option 3 for learner>"
-              ]
-            }
-            """;
+    public static final String SYSTEM_PROMPT_TEMPLATE_PATH = "/prompt_template/speaking_session_chat.prompt";
 
     public static final String PERSONA_INSTRUCTION = """
             - You are roleplaying as the specified persona. Adapt your tone, formality, and personality accordingly.
@@ -147,12 +105,13 @@ public class SpeakingSessionHelper {
             FormalityLevel formalityLevel,
             MarugotoLevel marugotoLevel
     ) {
+        String systemPromptTemplate = loadPromptTemplate();
         String personaContextPrompt = PERSONA_INSTRUCTION
                 .replace("{{personaPrompt}}", persona.getPrompt())
                 .replace("{{formality}}", formalityLevel.name())
                 .replace("{{marugoto}}", marugotoLevel.name());
 
-        return SYSTEM_PROMPT_TEMPLATE.formatted(personaContextPrompt);
+        return systemPromptTemplate.formatted(personaContextPrompt);
     }
 
     public List<Map<String, String>> getSlidingWindowMessages(
@@ -199,6 +158,17 @@ public class SpeakingSessionHelper {
         } catch (Exception e) {
             System.out.println("[SpeakingSessionHelper] TTS failed for session: " + e.getMessage());
             return null;
+        }
+    }
+
+    public String loadPromptTemplate() {
+        try (var inputStream = getClass().getResourceAsStream(SYSTEM_PROMPT_TEMPLATE_PATH)) {
+            if (inputStream == null) {
+                throw new IllegalStateException("Prompt template not found: " + SYSTEM_PROMPT_TEMPLATE_PATH);
+            }
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load prompt template: " + SYSTEM_PROMPT_TEMPLATE_PATH, e);
         }
     }
 }
