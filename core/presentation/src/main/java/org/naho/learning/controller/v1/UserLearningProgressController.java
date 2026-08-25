@@ -47,14 +47,14 @@ public class UserLearningProgressController {
     }
 
     // ROLE: LEARNER
-    
+
     /**
      * Lấy user learning progress theo id của người dùng
      *
      * @param userId user id
      * @return UserLearningProgressResponse
      */
-    @PreAuthorize("hasRole('LEARNER')")
+    @PreAuthorize("hasAnyRole('LEARNER', 'ADMIN', 'CONTENT_MANAGER')")
     @ApiResponseMessage(message = UserLearningProgressDetailMessageKey.USER_LEARNING_PROGRESS_GET_SUCCESS)
     @GetMapping("/{userId}")
     public ResponseEntity<UserLearningProgressResponse> findUserLearningProgressByUserId(
