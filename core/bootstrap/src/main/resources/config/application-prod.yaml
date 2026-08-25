@@ -34,3 +34,4 @@ logging:
 app:
   cookie:
     secure: true
+    domain: naho.io.vn

@@ -17,13 +17,11 @@ COPY core/presentation/build.gradle.kts ./core/presentation/
 COPY core/common/build.gradle.kts ./core/common/
 COPY core/bootstrap/build.gradle.kts ./core/bootstrap/
 
-RUN sed -i 's/\r$//' ./gradlew && chmod +x ./gradlew
-
-RUN ./gradlew dependencies --no-daemon
+RUN gradle dependencies --no-daemon
 
 COPY core ./core
 
-RUN ./gradlew :core:bootstrap:bootJar --no-daemon
+RUN gradle :core:bootstrap:bootJar --no-daemon
 
 
 # ------ STAGE 2: runtime ------
