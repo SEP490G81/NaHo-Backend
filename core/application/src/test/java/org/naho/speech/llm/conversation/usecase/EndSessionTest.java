@@ -26,6 +26,7 @@ import org.naho.speech.llm.model.conversation.SpeakingSession;
 import org.naho.speech.llm.model.conversation.SpeakingSessionAssessment;
 import org.naho.speech.llm.model.conversation.SpeakingSessionMessage;
 import org.naho.speech.llm.type.SenderType;
+import org.naho.speech.llm.type.SpeakingSessionStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -89,6 +90,7 @@ class EndSessionTest {
 
         when(session.getId()).thenReturn(100L);
         when(session.getUserId()).thenReturn(1L);
+        when(session.getStatus()).thenReturn(SpeakingSessionStatus.IN_PROGRESS);
         when(session.getPersonaId()).thenReturn(10L);
         when(session.getFormalityLevel()).thenReturn(FormalityLevel.FORMAL);
         when(session.getMarugotoLevel()).thenReturn(MarugotoLevel.STARTER_A1);
@@ -138,6 +140,7 @@ class EndSessionTest {
         SpeakingSession session = mock(SpeakingSession.class);
         when(session.getId()).thenReturn(100L);
         when(session.getUserId()).thenReturn(1L);
+        when(session.getStatus()).thenReturn(SpeakingSessionStatus.IN_PROGRESS);
         when(speakingSessionRepositoryPort.findBySessionCode("SESS-1")).thenReturn(session);
         when(speakingSessionMessageRepositoryPort.findAllBySessionId(100L)).thenReturn(List.of());
 
@@ -145,6 +148,20 @@ class EndSessionTest {
                 endSessionUseCase.endSession(1L, "SESS-1"));
 
         assertEquals(LlmApplicationError.LLM_TRANSCRIPT_BLANK, ex.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("UTCID04 - Thất bại khi session không ở trạng thái IN_PROGRESS")
+    void UTCID04_EndSession_StatusNotActive() {
+        SpeakingSession session = mock(SpeakingSession.class);
+        when(session.getUserId()).thenReturn(1L);
+        when(session.getStatus()).thenReturn(SpeakingSessionStatus.COMPLETED);
+        when(speakingSessionRepositoryPort.findBySessionCode("SESS-1")).thenReturn(session);
+
+        ApplicationException ex = assertThrows(ApplicationException.class, () ->
+                endSessionUseCase.endSession(1L, "SESS-1"));
+
+        assertEquals(LlmApplicationError.LLM_SESSION_ALREADY_COMPLETED, ex.getErrorCode());
     }
 }
 

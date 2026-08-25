@@ -96,6 +96,14 @@ public class EndSessionUseCase implements EndSessionInputPort {
             );
         }
 
+        // nếu trạng thái không phải IN_PROGRESS thì không cho nó end
+        if (!SpeakingSessionStatus.IN_PROGRESS.equals(speakingSession.getStatus())) {
+            throw new ApplicationException(
+                    LlmApplicationError.LLM_SESSION_ALREADY_COMPLETED,
+                    LlmDetailMessageKey.LLM_SESSION_ALREADY_COMPLETED
+            );
+        }
+
         // lấy ra các message trong lịch sử chat của session
         List<SpeakingSessionMessage> previousMessages = speakingSessionMessageRepositoryPort
                 .findAllBySessionId(speakingSession.getId());
