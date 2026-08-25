@@ -7,6 +7,8 @@ public final class CommonTitleMessageKey {
             "common.cannot.read.json.title";
     public static final String COMMON_INVALID_REQUEST_TITLE =
             "common.invalid.request.title";
+    public static final String COMMON_RESOURCE_NOT_FOUND_TITLE =
+            "common.resource.not.found.title";
 
     private CommonTitleMessageKey() {
     }

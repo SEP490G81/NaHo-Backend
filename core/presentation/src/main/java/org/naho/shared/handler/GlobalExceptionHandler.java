@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.net.URI;
 import java.time.Instant;
@@ -95,6 +96,37 @@ public class GlobalExceptionHandler {
                 .write();
 
         log.warn(messageService.getMessage(errorCode.getTitleKey()), e);
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ProblemDetailResponse> handleNoResourceFoundException(
+            NoResourceFoundException e,
+            HttpServletRequest request
+    ) {
+        ErrorCode errorCode = CommonErrorCode.COMMON_RESOURCE_NOT_FOUND;
+        HttpStatus status = HttpStatus.valueOf(errorCode.getStatusCode());
+        String errorMessage = e.getMessage();
+
+        ProblemDetailResponse response = ProblemDetailResponse
+                .builder(status)
+                .type(errorCode.getTypeUri())
+                .title(messageService.getMessage(errorCode.getTitleKey()))
+                .detail(errorMessage)
+                .instance(URI.create(request.getRequestURI()))
+                .errorCode(errorCode.getCode())
+                .traceId(ThreadContext.get(ContextLoggingKey.TRACE_ID))
+                .timestamp(Instant.now().toString())
+                .build();
+
+        ErrorLogContextWriter.builder()
+                .status(status)
+                .errorCode(errorCode)
+                .exception(e)
+                .errorMessage(errorMessage)
+                .write();
+
+        log.warn("{}: {}", messageService.getMessage(errorCode.getTitleKey()), e.getMessage());
         return ResponseEntity.status(status).body(response);
     }
 

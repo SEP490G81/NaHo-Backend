@@ -18,6 +18,11 @@ public enum CommonErrorCode implements ErrorCode {
             "COMMON_A003",
             CommonTitleMessageKey.COMMON_INVALID_REQUEST_TITLE,
             400
+    ),
+    COMMON_RESOURCE_NOT_FOUND(
+            "COMMON_A004",
+            CommonTitleMessageKey.COMMON_RESOURCE_NOT_FOUND_TITLE,
+            404
     );
 
     private final String code;
