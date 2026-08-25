@@ -111,7 +111,7 @@ class OpenChestTest {
 
         when(learningPathNodeRepositoryPort.findByIdAndNodeType(node, NodeType.CHEST))
                 .thenReturn(Optional.of(chestNode));
-        when(userNodeProgressRepositoryPort.existsByLearningPathNodeId(node))
+        when(userNodeProgressRepositoryPort.existsByLearningPathNodeIdAndUserId(node, userId))
                 .thenReturn(false);
         when(userLearningProgressRepositoryPort.findByUserId(userId))
                 .thenReturn(Optional.of(progress));
@@ -156,7 +156,7 @@ class OpenChestTest {
 
         assertEquals(LearningPathNodeErrorCode.LEARNING_PATH_NODE_NOT_FOUND, exception.getErrorCode());
         assertEquals(LearningPathNodeDetailMessageKey.LEARNING_PATH_NODE_ID_NOT_FOUND, exception.getMessage());
-        verify(userNodeProgressRepositoryPort, never()).existsByLearningPathNodeId(any());
+        verify(userNodeProgressRepositoryPort, never()).existsByLearningPathNodeIdAndUserId(any(), any());
     }
 
     @Test
@@ -178,7 +178,7 @@ class OpenChestTest {
 
         when(learningPathNodeRepositoryPort.findByIdAndNodeType(node, NodeType.CHEST))
                 .thenReturn(Optional.of(chestNode));
-        when(userNodeProgressRepositoryPort.existsByLearningPathNodeId(node))
+        when(userNodeProgressRepositoryPort.existsByLearningPathNodeIdAndUserId(node, userId))
                 .thenReturn(true);
 
         // Act & Assert
@@ -211,7 +211,7 @@ class OpenChestTest {
 
         when(learningPathNodeRepositoryPort.findByIdAndNodeType(node, NodeType.CHEST))
                 .thenReturn(Optional.of(chestNode));
-        when(userNodeProgressRepositoryPort.existsByLearningPathNodeId(node))
+        when(userNodeProgressRepositoryPort.existsByLearningPathNodeIdAndUserId(node, userId))
                 .thenReturn(false);
         when(userLearningProgressRepositoryPort.findByUserId(userId))
                 .thenReturn(Optional.empty());
@@ -249,7 +249,7 @@ class OpenChestTest {
 
         when(learningPathNodeRepositoryPort.findByIdAndNodeType(node, NodeType.CHEST))
                 .thenReturn(Optional.of(chestNode));
-        when(userNodeProgressRepositoryPort.existsByLearningPathNodeId(node))
+        when(userNodeProgressRepositoryPort.existsByLearningPathNodeIdAndUserId(node, userId))
                 .thenReturn(false);
         when(userLearningProgressRepositoryPort.findByUserId(userId))
                 .thenReturn(Optional.of(progress));
@@ -289,7 +289,7 @@ class OpenChestTest {
 
         when(learningPathNodeRepositoryPort.findByIdAndNodeType(node, NodeType.CHEST))
                 .thenReturn(Optional.of(chestNode));
-        when(userNodeProgressRepositoryPort.existsByLearningPathNodeId(node))
+        when(userNodeProgressRepositoryPort.existsByLearningPathNodeIdAndUserId(node, userId))
                 .thenReturn(false);
         when(userLearningProgressRepositoryPort.findByUserId(userId))
                 .thenReturn(Optional.of(progress));
@@ -333,7 +333,7 @@ class OpenChestTest {
 
         when(learningPathNodeRepositoryPort.findByIdAndNodeType(node, NodeType.CHEST))
                 .thenReturn(Optional.of(chestNode));
-        when(userNodeProgressRepositoryPort.existsByLearningPathNodeId(node))
+        when(userNodeProgressRepositoryPort.existsByLearningPathNodeIdAndUserId(node, userId))
                 .thenReturn(false);
         when(userLearningProgressRepositoryPort.findByUserId(userId))
                 .thenReturn(Optional.of(progress));
