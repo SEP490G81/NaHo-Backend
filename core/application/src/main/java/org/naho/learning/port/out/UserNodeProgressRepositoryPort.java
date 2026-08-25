@@ -5,7 +5,7 @@ import org.naho.learning.model.UserNodeProgress;
 import java.util.Optional;
 
 public interface UserNodeProgressRepositoryPort {
-    boolean existsByLearningPathNodeId(Long learningPathNodeId);
+    boolean existsByLearningPathNodeIdAndUserId(Long learningPathNodeId, Long userId);
 
     UserNodeProgress save(UserNodeProgress userNodeProgress);
 

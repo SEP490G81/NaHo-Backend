@@ -24,24 +24,34 @@ public class CookieFactory {
             maxAge = Duration.ZERO;
         }
 
-        return ResponseCookie
+        var builder = ResponseCookie
                 .from(tokenResult.cookieName(), tokenResult.value())
                 .httpOnly(true)
                 .secure(cookieProperty.isSecure())
                 .sameSite("Lax")
                 .path("/")
-                .maxAge(maxAge)
-                .build();
+                .maxAge(maxAge);
+
+        if (cookieProperty.getDomain() != null && !cookieProperty.getDomain().isBlank()) {
+            builder.domain(cookieProperty.getDomain());
+        }
+
+        return builder.build();
     }
 
     public ResponseCookie clearCookieForJWTToken(String cookieName) {
-        return ResponseCookie
+        var builder = ResponseCookie
                 .from(cookieName, "")
                 .httpOnly(true)
                 .secure(cookieProperty.isSecure())
-                .sameSite("Strict")
+                .sameSite("Lax")
                 .path("/")
-                .maxAge(Duration.ZERO)
-                .build();
+                .maxAge(Duration.ZERO);
+
+        if (cookieProperty.getDomain() != null && !cookieProperty.getDomain().isBlank()) {
+            builder.domain(cookieProperty.getDomain());
+        }
+
+        return builder.build();
     }
 }

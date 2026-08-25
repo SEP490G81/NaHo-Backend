@@ -44,10 +44,12 @@ public class SecurityConfig {
             "/api/v1/sse/connect",
             "/api/v1/payments/vnpay-ipn",
             "/api/v1/payments/vnpay-return",
-            "/ws/**"
+            "/ws/**",
+            "/files/**"
     };
 
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+    private final HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository;
 
     @Bean
     public SecurityFilterChain securityFilterChain(
@@ -69,6 +71,8 @@ public class SecurityConfig {
                         UsernamePasswordAuthenticationFilter.class
                 )
                 .oauth2Login(oauth2 -> oauth2
+                        .authorizationEndpoint(authorization -> authorization
+                                .authorizationRequestRepository(cookieAuthorizationRequestRepository))
                         .successHandler(customOAuth2SuccessHandler))
                 .build();
     }

@@ -89,8 +89,9 @@ public class OpenChestUseCase implements OpenChestInputPort {
                 ));
 
         // nếu người dùng đã từng mở rương này rồi thì không cho mở nữa
-        if (userNodeProgressRepositoryPort.existsByLearningPathNodeId(
-                chestLearningPathNode.getId()
+        if (userNodeProgressRepositoryPort.existsByLearningPathNodeIdAndUserId(
+                chestLearningPathNode.getId(),
+                command.userId()
         )) {
             throw new ApplicationException(
                     ChestErrorCode.CHEST_ALREADY_OPENED,

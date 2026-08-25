@@ -23,8 +23,8 @@ public class UserNodeProgressRepositoryAdapter implements UserNodeProgressReposi
     private final UserJpaRepository userJpaRepository;
 
     @Override
-    public boolean existsByLearningPathNodeId(Long learningPathNodeId) {
-        return userNodeProgressJpaRepository.existsByLearningPathNode_Id(learningPathNodeId);
+    public boolean existsByLearningPathNodeIdAndUserId(Long learningPathNodeId, Long userId) {
+        return userNodeProgressJpaRepository.existsByLearningPathNode_IdAndUser_Id(learningPathNodeId, userId);
     }
 
     @Override

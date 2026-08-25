@@ -40,12 +40,17 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         String name = oAuth2User.getAttribute("name");
         String picture = oAuth2User.getAttribute("picture");
 
+        String deviceId = loginRequestResolver.getDeviceId(request);
+        if (deviceId == null || deviceId.isBlank()) {
+            deviceId = "google-oauth2-" + sub;
+        }
+
         GoogleLoginCommand command = GoogleLoginCommand.builder()
                 .sub(sub)
                 .email(email)
                 .fullName(name)
                 .pictureUrl(picture)
-                .deviceId(loginRequestResolver.getDeviceId(request))
+                .deviceId(deviceId)
                 .userAgent(loginRequestResolver.getUserAgent(request))
                 .ipAddress(loginRequestResolver.getIpAddress(request))
                 .build();
