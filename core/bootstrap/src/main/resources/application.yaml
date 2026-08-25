@@ -2,9 +2,6 @@ spring:
   application:
     name: naho-be
 
-  profiles:
-    active: dev
-
   config:
     import:
       - optional:file:.env[.properties]
@@ -73,9 +70,6 @@ mybatis:
 app:
   start-date: 2026-04-30
   frontend-url: ${FRONTEND_URL}
-  cookie:
-    secure: ${COOKIE_SECURE:true}
-    domain: ${COOKIE_DOMAIN:naho.io.vn}
   scheduler:
     file-upload-retry:
       fixed-delay: 60000

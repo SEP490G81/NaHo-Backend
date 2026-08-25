@@ -34,5 +34,4 @@ logging:
 app:
   cookie:
     secure: false
-  cloudfront:
-    domain: ${CLOUDFRONT_DOMAIN}
+  #    domain: ${COOKIE_DOMAIN}
