@@ -25,14 +25,13 @@ public class LearningPathNodeController {
     private final GetLearningPathNodeDetailInputPort getLearningPathNodeDetailInputPort;
     private final LearningPathNodeResponseMapper learningPathNodeResponseMapper;
 
-    // ROLE: LEARNER
-    @PreAuthorize("hasRole('LEARNER')")
+    // ROLE:CONTENT_MANAGER, LEARNER
+    @PreAuthorize("hasAnyRole('CONTENT_MANAGER', 'LEARNER')")
     @GetMapping("/{id}")
     @ApiResponseMessage(message = LearningPathNodeDetailMessageKey.LEARNING_PATH_NODE_GET_DETAIL_SUCCESS)
     public ResponseEntity<LearningPathNodeDetailResponse> getLearningPathNodeDetail(
             @PathVariable Long id,
-            @AuthenticationPrincipal AccessTokenPayload payload
-    ) {
+            @AuthenticationPrincipal AccessTokenPayload payload) {
         var command = new GetLearningPathNodeDetailCommand(id, payload.userId());
         LearningPathNodeDetailResult result = getLearningPathNodeDetailInputPort.getLearningPathNodeDetail(command);
         LearningPathNodeDetailResponse response = learningPathNodeResponseMapper.resultToResponse(result);
