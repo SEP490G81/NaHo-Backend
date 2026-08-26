@@ -68,6 +68,7 @@ public class AzureSpeechServiceAdapter implements AzureSpeechServicePort {
             recognizer = new SpeechRecognizer(speechConfig, audioConfig);
             pronunciationConfig.applyTo(recognizer);
 
+            // List chứa đánh giá từng thành phần trong record của user
             List<SpeechAssessment> segmentAssessments = Collections.synchronizedList(new ArrayList<>());
             List<Throwable> errors = Collections.synchronizedList(new ArrayList<>());
             Semaphore stopRecognitionSemaphore = new Semaphore(0);
@@ -75,6 +76,7 @@ public class AzureSpeechServiceAdapter implements AzureSpeechServicePort {
             recognizer.recognized.addEventListener((s, e) -> {
                 if (e.getResult().getReason() == ResultReason.RecognizedSpeech) {
                     try {
+                        // Xử lí lấy ra result của từng phần rồi add vào List
                         SpeechAssessment segmentResult = azureSpeechServiceHelper.processResult(e.getResult());
                         segmentAssessments.add(segmentResult);
                     } catch (Exception ex) {
@@ -152,6 +154,7 @@ public class AzureSpeechServiceAdapter implements AzureSpeechServicePort {
                 );
             }
 
+            // Merge các điểm thành phần trong list thành 1 bảng điểm duy nhất
             return azureSpeechServiceHelper.mergeAssessments(segmentAssessments);
 
         } catch (InterruptedException e) {

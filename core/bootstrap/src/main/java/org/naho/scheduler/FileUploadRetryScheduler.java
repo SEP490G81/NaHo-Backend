@@ -22,7 +22,7 @@ public class FileUploadRetryScheduler {
 
     /**
      * Khi hàm này kết thúc thì phải đợi thêm thời gian delay thì mới chạy tiếp.
-     * Ví dụ 10:00 chạy, upload mất 1 phút, thì 10:03 mới chạy tiếp.
+     * Ví dụ 10:00 chạy, upload mất 1 phút, thì 10:02 mới chạy tiếp.
      */
     @Scheduled(fixedDelayString = "${app.scheduler.file-upload-retry.fixed-delay}")
     public void retryUploadFiles() {

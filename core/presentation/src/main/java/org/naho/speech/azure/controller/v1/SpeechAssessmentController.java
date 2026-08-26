@@ -31,11 +31,12 @@ public class SpeechAssessmentController {
     private final GetActiveSubscriptionInputPort getActiveSubscriptionInputPort;
 
     /**
+     * Method đánh giá phát âm của người dùng có expected output
      *
-     * @param file
-     * @param referenceText
-     * @param payload
-     * @return
+     * @param file          file nói của người dùng
+     * @param referenceText expected output
+     * @param payload       chứa user id
+     * @return SpeechAssessmentResponse
      * @throws IOException
      */
     // ROLE: LEARNER
